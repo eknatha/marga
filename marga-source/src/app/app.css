@@ -104,8 +104,8 @@ kbd { font: 500 12px var(--mono); border: 1px solid var(--line-strong); border-b
 .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-weight: 500; font-size: 17px; letter-spacing: -.01em; white-space: nowrap; }
 .brand b { font-weight: 800; }
 .brand img { border-radius: 6px; display: block; }
-.topnav { display: flex; gap: 4px; margin-right: auto; }
-.topnav a { color: var(--text); text-decoration: none; padding: 8px 12px; border-radius: 8px; font-weight: 500; }
+.topnav { display: flex; gap: 2px; margin-right: auto; }
+.topnav a { color: var(--text); text-decoration: none; padding: 8px 10px; white-space: nowrap; border-radius: 8px; font-weight: 500; }
 .topnav a:hover { background: var(--accent-soft); }
 .topnav a.on { color: var(--ink); background: var(--accent-soft); font-weight: 700; }
 .tools { display: flex; align-items: center; gap: 8px; margin-left: auto; }
@@ -462,17 +462,84 @@ kbd { font: 500 12px var(--mono); border: 1px solid var(--line-strong); border-b
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 }
 
-/* ===== print ===== */
+/* ===== print and PDF (watermarked) ===== */
+@page { size: A4; margin: 18mm 14mm 20mm;
+  @bottom-center { content: "MARGA by EknathaLabs \00b7  marga.eknathalabs.com \00b7  Free forever"; font: 8pt sans-serif; color: #666; }
+  @bottom-right { content: counter(page) " / " counter(pages); font: 8pt sans-serif; color: #666; } }
+.print-only { display: none; }
 @media print {
-  :root, :root[data-theme="dark"] { --paper: #fff; --surface: #fff; --ink: #000; --text: #111; --muted: #444; --line: #ccc; --line-strong: #999; --accent-soft: #eee; --code-bg: #fff; --code-line: #bbb; --code-text: #111; --code-dim: #555; }
-  body { background: #fff; font-size: 11pt; }
-  .topbar, .foot, .actions, .copy, .skip, #toast, #search-root, .crumbs, .menu-btn { display: none !important; }
+  :root, :root[data-theme="dark"] { --paper: #fff; --surface: #fff; --ink: #000; --text: #111; --muted: #444; --line: #ccc; --line-strong: #999; --accent-soft: #eee; --code-bg: #fff; --code-line: #bbb; --code-text: #111; --code-dim: #555; --pass: #0a5c42; --run: #6b4200; }
+  html, body { background: #fff !important; color: #111 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-size: 11pt; }
+  /* The watermark: fixed elements repeat on every printed page. */
+  body::before { content: "MARGA by EknathaLabs"; position: fixed; left: 50%; top: 46%; transform: translate(-50%, -50%) rotate(-32deg); font: 700 54pt/1 var(--sans); letter-spacing: .02em; color: rgba(15, 37, 71, .085); white-space: nowrap; z-index: 2147483000; pointer-events: none; }
+  body::after { content: "marga.eknathalabs.com"; position: fixed; left: 50%; top: 56%; transform: translate(-50%, -50%) rotate(-32deg); font: 600 22pt/1 var(--sans); color: rgba(15, 37, 71, .085); white-space: nowrap; z-index: 2147483000; pointer-events: none; }
+  .topbar, .foot, .actions, .copy, .skip, #toast, #search-root, .crumbs, .menu-btn, .voice, .say-row, .say, .toc, .check, .cardsec, .pager, .iv-filters, .iv-tools, .pipe-panel, .lesson-tools, .search-btn, .bar, .gate { display: none !important; }
+  .print-only { display: block; }
+  .wrap { max-width: none; padding: 0; }
   .sheet { column-count: 2; column-gap: 20px; font-size: 9.5pt; }
+  .lesson-grid { display: block; }
+  .prose { max-width: none; font-size: 10.5pt; }
+  h1, h2, h3 { break-after: avoid; }
+  pre, .iv, .refs li, table, blockquote { break-inside: avoid; }
   .code pre { white-space: pre-wrap; }
   .code code, .code .hljs { color: #111 !important; white-space: pre-wrap; }
   .hljs-keyword, .hljs-string, .hljs-comment, .hljs-number, .hljs-title, .hljs-attr, .hljs-built_in, .hljs-variable, .hljs-literal { color: #111 !important; }
   a { color: #000; text-decoration: none; }
+  .refs a::after { content: " (" attr(href) ")"; font-size: 8pt; color: #444; word-break: break-all; }
+  .iv-a[hidden] { display: block !important; }
+  .iv-rate { display: none !important; }
+  .iv { border: 0; border-top: 1px solid #bbb; padding: 8px 0; }
+  .topics a::after { content: ""; }
 }
+
+/* ===== voice bar ===== */
+.voice { margin: 14px 0 6px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.voice-row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: end; }
+.voice .btn { min-height: 38px; padding: 6px 14px; }
+.v-field { display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: var(--muted); font-weight: 600; }
+.v-field select { min-height: 38px; max-width: 260px; padding: 6px 8px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--paper); color: var(--text); font: inherit; font-weight: 500; }
+.voice-msg:empty { display: none; }
+.voice-msg { margin: 8px 0 0; }
+.voice.speaking { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.say-row { margin: 6px 0 10px; }
+.say-row .btn { min-height: 34px; padding: 4px 12px; font-size: 14px; }
+
+/* ===== references ===== */
+.refs { margin: 40px 0 8px; padding: 18px 20px; border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 8px; background: var(--surface); }
+.refs h2 { margin: 0 0 4px; font-size: 1.15rem; }
+.refs ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+.refs li { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+.refs a { font-weight: 600; }
+.refs .host { color: var(--muted); font-size: 13px; font-family: var(--mono); }
+
+/* ===== path topics ===== */
+.topics { margin: 10px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; counter-reset: t; }
+.topics li { counter-increment: t; }
+.topics a { display: inline-block; padding: 3px 10px; border: 1px solid var(--line); border-radius: 99px; font-size: 13.5px; color: var(--text); text-decoration: none; background: var(--paper); }
+.topics a:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ===== InterviewHub ===== */
+.iv-filters { display: flex; flex-wrap: wrap; gap: 10px 14px; margin-top: 16px; align-items: end; }
+.iv-filters .field { display: flex; flex-direction: column; gap: 3px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.iv-filters select, .iv-filters input { min-height: 40px; padding: 6px 10px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; font-weight: 500; }
+.iv-filters .grow { flex: 1 1 220px; }
+.iv-filters .grow input { width: 100%; }
+.iv { margin: 0 0 14px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.iv.r-know { border-left: 4px solid var(--pass); }
+.iv.r-review { border-left: 4px solid var(--run); }
+.iv-q { margin: 0 0 8px; font-size: 1.1rem; line-height: 1.35; color: var(--ink); }
+.iv-meta { margin: 0 0 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.iv-a { margin: 10px 0; padding: 12px 14px; border-radius: 8px; background: var(--accent-soft); font-family: var(--serif); }
+.iv-a > :first-child { margin-top: 0; } .iv-a > :last-child { margin-bottom: 0; }
+.iv-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.iv-rate { display: inline-flex; gap: 8px; }
+.iv-tools .btn { min-height: 38px; padding: 6px 14px; }
+.chip.warn { color: var(--run); border-color: var(--run); background: var(--run-soft); }
+.chip.lvl-senior { border-style: dashed; }
+
+/* ===== footer promise ===== */
+.foot-promise { flex-basis: 100%; margin: 6px 0 0; font-weight: 600; color: var(--ink); letter-spacing: .01em; }
 
 .visitors { font-variant-numeric: tabular-nums; }
 .visitors::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--pass); margin-right: 8px; vertical-align: middle; }
