@@ -29,6 +29,11 @@ Static site. No server code, no GitHub Actions, no cookies.
 - Troubleshooting drills (33, `src/drills/<module>.md`): 3 per module, with logs or command output and a choice of fixes.
 - Mock interview mode (role, level, count, timer, self-scoring, history), interactive flashcards (flip, keyboard, known/learning), Practice hub at `#/practice`.
 - Accessibility panel (Aa button): text size, Atkinson Hyperlegible and OpenDyslexic fonts (loaded only when chosen), spacing, high contrast, reduced motion, link underlines, strong focus, read-aloud highlight. Saved in this browser.
+- Better search (`/` or Ctrl+K): typo tolerant, ranked, with filters (Lessons, Cases, Cheat sheets, Interview, Glossary, Practice), snippets and recent searches. Indexes lessons, cases, post-mortems, cheat sheets, interview answers, glossary, drills, explainers and tools.
+- Glossary (`src/glossary.md`, 136 terms): dotted terms inside lessons, cases and answers show a hover or focus card; the "Explain like I am new" switch adds a plain-words note after each marked term.
+- Daily challenge (`#/daily`), plus Today (`#/today`) with the interview of the day and the case of the day. The pick is made from the date, so everyone sees the same ones; no server involved.
+- Animated explainers (`src/app/explainers.js`, 7): DNS, TCP, TLS, pod scheduling, rolling update, Terraform, a pipeline. Play, step, slider, speed, read aloud.
+- Subnet and CIDR playground, YAML playground (js-yaml, Kubernetes checks) and Python playground (8 exercises with tests). Python (Pyodide, pinned in `more.js`) is downloaded from cdn.jsdelivr.net only when a visitor presses Load; keep `PY_VER` equal to the installed `pyodide` package version.
 - Footer promise: Free forever, No login, No ads, No cookies.
 
 ## Known limits
@@ -38,6 +43,8 @@ Static site. No server code, no GitHub Actions, no cookies.
 - Cloud CLI commands in lessons were checked for syntax only, not run against real accounts.
 - Hands-on labs are planned and not implemented.
 - Case studies and post-mortems are short summaries of public reports, written without live access to the sources. Check dates, times and numbers against the linked original before relying on them.
+- The Python playground needs internet the first time (about 10 MB from a public CDN) and cannot stop an infinite loop. It is the only feature that contacts a third party, and only on request.
+- Daily and Today use the visitor's local date.
 - Calculators give estimates from the numbers a visitor enters; they do not model real systems.
 - Text size uses CSS zoom; it is reset for print.
 
@@ -45,4 +52,5 @@ Static site. No server code, no GitHub Actions, no cookies.
 1. Create a site at goatcounter.com with the code `marga-eknathalabs` (or build with `MARGA_COUNTER=yourcode`; `MARGA_COUNTER=` disables it).
 2. In its settings, enable "Allow adding visitor counts on the website".
 The footer shows unique visitors once the counter responds (falls back to page views), keeps the last value if the counter is unreachable, and retries. Every page view (each route, plus each cheat sheet page) is recorded; hits are skipped on localhost and when the browser sends Do Not Track.
+The line always shows in the footer: "Counting visitors", then the number, or "Visitor count unavailable" if GoatCounter cannot be reached or step 2 was not done.
 If the number does not appear: open the browser console and look for the "visitor count unavailable" message; the usual cause is the setting in step 2, or a different site code.
