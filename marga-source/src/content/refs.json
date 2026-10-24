@@ -1,0 +1,1660 @@
+{
+ "modules": {
+  "linux": [
+   [
+    "Linux man-pages (man7.org)",
+    "https://man7.org/linux/man-pages/index.html"
+   ],
+   [
+    "The Linux kernel documentation",
+    "https://docs.kernel.org/"
+   ],
+   [
+    "systemd documentation",
+    "https://systemd.io/"
+   ]
+  ],
+  "bash": [
+   [
+    "GNU Bash reference manual",
+    "https://www.gnu.org/software/bash/manual/bash.html"
+   ],
+   [
+    "ShellCheck",
+    "https://www.shellcheck.net/"
+   ],
+   [
+    "POSIX shell command language",
+    "https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html"
+   ]
+  ],
+  "python": [
+   [
+    "The Python tutorial",
+    "https://docs.python.org/3/tutorial/index.html"
+   ],
+   [
+    "pip documentation",
+    "https://pip.pypa.io/en/stable/"
+   ],
+   [
+    "pytest documentation",
+    "https://docs.pytest.org/en/stable/"
+   ]
+  ],
+  "networking": [
+   [
+    "RFC 9110: HTTP semantics",
+    "https://www.rfc-editor.org/rfc/rfc9110"
+   ],
+   [
+    "Netfilter documentation",
+    "https://www.netfilter.org/documentation/"
+   ],
+   [
+    "WireGuard quick start",
+    "https://www.wireguard.com/quickstart/"
+   ]
+  ],
+  "docker": [
+   [
+    "Docker: get started",
+    "https://docs.docker.com/get-started/"
+   ],
+   [
+    "Dockerfile reference",
+    "https://docs.docker.com/reference/dockerfile/"
+   ],
+   [
+    "Open Container Initiative",
+    "https://opencontainers.org/about/overview/"
+   ]
+  ],
+  "cicd": [
+   [
+    "Martin Fowler: Continuous Integration",
+    "https://martinfowler.com/articles/continuousIntegration.html"
+   ],
+   [
+    "Jenkins documentation",
+    "https://www.jenkins.io/doc/"
+   ],
+   [
+    "Argo CD documentation",
+    "https://argo-cd.readthedocs.io/en/stable/"
+   ]
+  ],
+  "kubernetes": [
+   [
+    "Kubernetes concepts",
+    "https://kubernetes.io/docs/concepts/"
+   ],
+   [
+    "kubectl quick reference",
+    "https://kubernetes.io/docs/reference/kubectl/quick-reference/"
+   ],
+   [
+    "Helm documentation",
+    "https://helm.sh/docs/"
+   ]
+  ],
+  "terraform": [
+   [
+    "Terraform documentation",
+    "https://developer.hashicorp.com/terraform/docs"
+   ],
+   [
+    "Terraform language",
+    "https://developer.hashicorp.com/terraform/language"
+   ],
+   [
+    "Terraform CLI",
+    "https://developer.hashicorp.com/terraform/cli"
+   ]
+  ],
+  "cloud": [
+   [
+    "AWS documentation",
+    "https://docs.aws.amazon.com/"
+   ],
+   [
+    "Azure documentation",
+    "https://learn.microsoft.com/en-us/azure/"
+   ],
+   [
+    "AWS Well-Architected Framework",
+    "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html"
+   ]
+  ],
+  "observability": [
+   [
+    "Prometheus overview",
+    "https://prometheus.io/docs/introduction/overview/"
+   ],
+   [
+    "OpenTelemetry documentation",
+    "https://opentelemetry.io/docs/"
+   ],
+   [
+    "Grafana documentation",
+    "https://grafana.com/docs/grafana/latest/"
+   ]
+  ],
+  "sre": [
+   [
+    "SRE book: service level objectives",
+    "https://sre.google/sre-book/service-level-objectives/"
+   ],
+   [
+    "SRE book: managing incidents",
+    "https://sre.google/sre-book/managing-incidents/"
+   ],
+   [
+    "SRE book: postmortem culture",
+    "https://sre.google/sre-book/postmortem-culture/"
+   ]
+  ]
+ },
+ "lessons": {
+  "linux/filesystem-and-navigation": [
+   [
+    "Filesystem Hierarchy Standard 3.0",
+    "https://refspecs.linuxfoundation.org/FHS_3.0/fhs/index.html"
+   ],
+   [
+    "Linux man-pages (man7.org)",
+    "https://man7.org/linux/man-pages/index.html"
+   ],
+   [
+    "GNU Bash reference manual",
+    "https://www.gnu.org/software/bash/manual/bash.html"
+   ]
+  ],
+  "linux/users-groups-permissions": [
+   [
+    "Linux man-pages (man7.org)",
+    "https://man7.org/linux/man-pages/index.html"
+   ],
+   [
+    "Red Hat Enterprise Linux documentation",
+    "https://docs.redhat.com/"
+   ],
+   [
+    "Ubuntu Server documentation",
+    "https://ubuntu.com/server/docs"
+   ]
+  ],
+  "linux/processes-and-services": [
+   [
+    "systemd.service manual",
+    "https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html"
+   ],
+   [
+    "systemd documentation",
+    "https://systemd.io/"
+   ],
+   [
+    "Linux man-pages (man7.org)",
+    "https://man7.org/linux/man-pages/index.html"
+   ]
+  ],
+  "linux/disks-and-filesystems": [
+   [
+    "The Linux kernel documentation",
+    "https://docs.kernel.org/"
+   ],
+   [
+    "Linux man-pages (man7.org)",
+    "https://man7.org/linux/man-pages/index.html"
+   ],
+   [
+    "Red Hat Enterprise Linux documentation",
+    "https://docs.redhat.com/"
+   ]
+  ],
+  "linux/lvm-and-raid": [
+   [
+    "LVM2 project",
+    "https://sourceware.org/lvm2/"
+   ],
+   [
+    "Linux kernel: md (software RAID) admin guide",
+    "https://docs.kernel.org/admin-guide/md.html"
+   ],
+   [
+    "Red Hat Enterprise Linux documentation",
+    "https://docs.redhat.com/"
+   ]
+  ],
+  "linux/package-management": [
+   [
+    "Debian Reference Manual",
+    "https://www.debian.org/doc/manuals/debian-reference/"
+   ],
+   [
+    "DNF command reference",
+    "https://dnf.readthedocs.io/en/latest/command_ref.html"
+   ],
+   [
+    "Ubuntu Server documentation",
+    "https://ubuntu.com/server/docs"
+   ]
+  ],
+  "linux/ssh-and-remote-access": [
+   [
+    "OpenSSH manual pages",
+    "https://www.openssh.com/manual.html"
+   ],
+   [
+    "Ubuntu Server documentation",
+    "https://ubuntu.com/server/docs"
+   ],
+   [
+    "Red Hat Enterprise Linux documentation",
+    "https://docs.redhat.com/"
+   ]
+  ],
+  "linux/cron-and-timers": [
+   [
+    "systemd.timer manual",
+    "https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html"
+   ],
+   [
+    "systemd manual pages",
+    "https://www.freedesktop.org/software/systemd/man/latest/"
+   ],
+   [
+    "Linux man-pages (man7.org)",
+    "https://man7.org/linux/man-pages/index.html"
+   ]
+  ],
+  "linux/logs-and-troubleshooting": [
+   [
+    "journalctl manual",
+    "https://www.freedesktop.org/software/systemd/man/latest/journalctl.html"
+   ],
+   [
+    "systemd documentation",
+    "https://systemd.io/"
+   ],
+   [
+    "Linux man-pages (man7.org)",
+    "https://man7.org/linux/man-pages/index.html"
+   ]
+  ],
+  "linux/performance-triage": [
+   [
+    "Linux performance (Brendan Gregg)",
+    "https://www.brendangregg.com/linuxperf.html"
+   ],
+   [
+    "proc(5) manual",
+    "https://man7.org/linux/man-pages/man5/proc.5.html"
+   ],
+   [
+    "The Linux kernel documentation",
+    "https://docs.kernel.org/"
+   ]
+  ],
+  "linux/boot-and-kernel": [
+   [
+    "GNU GRUB manual",
+    "https://www.gnu.org/software/grub/manual/grub/grub.html"
+   ],
+   [
+    "Kernel command-line parameters",
+    "https://docs.kernel.org/admin-guide/kernel-parameters.html"
+   ],
+   [
+    "Documentation for /proc/sys (sysctl)",
+    "https://docs.kernel.org/admin-guide/sysctl/index.html"
+   ]
+  ],
+  "linux/security-hardening": [
+   [
+    "CIS Benchmarks",
+    "https://www.cisecurity.org/cis-benchmarks"
+   ],
+   [
+    "SELinux Project",
+    "https://selinuxproject.org/page/Main_Page"
+   ],
+   [
+    "Ubuntu Server documentation: security and AppArmor",
+    "https://ubuntu.com/server/docs"
+   ]
+  ],
+  "bash/script-basics": [
+   [
+    "GNU Bash reference manual",
+    "https://www.gnu.org/software/bash/manual/bash.html"
+   ],
+   [
+    "POSIX shell command language",
+    "https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html"
+   ],
+   [
+    "ShellCheck",
+    "https://www.shellcheck.net/"
+   ]
+  ],
+  "bash/control-flow-and-functions": [
+   [
+    "GNU Bash reference manual",
+    "https://www.gnu.org/software/bash/manual/bash.html"
+   ],
+   [
+    "POSIX shell command language",
+    "https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html"
+   ],
+   [
+    "ShellCheck",
+    "https://www.shellcheck.net/"
+   ]
+  ],
+  "bash/text-processing": [
+   [
+    "GNU grep manual",
+    "https://www.gnu.org/software/grep/manual/grep.html"
+   ],
+   [
+    "GNU sed manual",
+    "https://www.gnu.org/software/sed/manual/sed.html"
+   ],
+   [
+    "GNU Awk user guide",
+    "https://www.gnu.org/software/gawk/manual/"
+   ]
+  ],
+  "bash/advanced-patterns": [
+   [
+    "GNU Bash reference manual",
+    "https://www.gnu.org/software/bash/manual/bash.html"
+   ],
+   [
+    "ShellCheck",
+    "https://www.shellcheck.net/"
+   ],
+   [
+    "POSIX shell command language",
+    "https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html"
+   ]
+  ],
+  "bash/apis-and-json": [
+   [
+    "curl documentation",
+    "https://curl.se/docs/manpage.html"
+   ],
+   [
+    "Everything curl",
+    "https://everything.curl.dev/"
+   ],
+   [
+    "jq manual",
+    "https://jqlang.org/manual/"
+   ]
+  ],
+  "bash/safe-automation": [
+   [
+    "GNU Bash reference manual",
+    "https://www.gnu.org/software/bash/manual/bash.html"
+   ],
+   [
+    "ShellCheck",
+    "https://www.shellcheck.net/"
+   ],
+   [
+    "systemd.timer manual",
+    "https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html"
+   ]
+  ],
+  "python/basics-and-environments": [
+   [
+    "The Python tutorial",
+    "https://docs.python.org/3/tutorial/index.html"
+   ],
+   [
+    "venv: virtual environments",
+    "https://docs.python.org/3/library/venv.html"
+   ],
+   [
+    "pip documentation",
+    "https://pip.pypa.io/en/stable/"
+   ]
+  ],
+  "python/files-and-processes": [
+   [
+    "pathlib module",
+    "https://docs.python.org/3/library/pathlib.html"
+   ],
+   [
+    "subprocess module",
+    "https://docs.python.org/3/library/subprocess.html"
+   ],
+   [
+    "Logging HOWTO",
+    "https://docs.python.org/3/howto/logging.html"
+   ]
+  ],
+  "python/http-apis-and-json": [
+   [
+    "Requests documentation",
+    "https://requests.readthedocs.io/en/latest/"
+   ],
+   [
+    "json module",
+    "https://docs.python.org/3/library/json.html"
+   ],
+   [
+    "RFC 9110: HTTP semantics",
+    "https://www.rfc-editor.org/rfc/rfc9110"
+   ]
+  ],
+  "python/cloud-sdks": [
+   [
+    "Boto3 documentation",
+    "https://boto3.amazonaws.com/v1/documentation/api/latest/index.html"
+   ],
+   [
+    "Azure SDK for Python",
+    "https://learn.microsoft.com/en-us/azure/developer/python/"
+   ],
+   [
+    "Azure Identity client library for Python",
+    "https://learn.microsoft.com/en-us/python/api/overview/azure/identity-readme"
+   ]
+  ],
+  "python/testing-and-packaging": [
+   [
+    "pytest documentation",
+    "https://docs.pytest.org/en/stable/"
+   ],
+   [
+    "argparse module",
+    "https://docs.python.org/3/library/argparse.html"
+   ],
+   [
+    "Python Packaging User Guide",
+    "https://packaging.python.org/en/latest/tutorials/packaging-projects/"
+   ]
+  ],
+  "networking/ip-addressing-and-subnets": [
+   [
+    "RFC 1918: private address space",
+    "https://www.rfc-editor.org/rfc/rfc1918"
+   ],
+   [
+    "RFC 4632: CIDR",
+    "https://www.rfc-editor.org/rfc/rfc4632"
+   ],
+   [
+    "Amazon VPC user guide",
+    "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
+   ]
+  ],
+  "networking/dns": [
+   [
+    "RFC 1035: DNS implementation",
+    "https://www.rfc-editor.org/rfc/rfc1035"
+   ],
+   [
+    "Amazon Route 53",
+    "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html"
+   ],
+   [
+    "Azure DNS overview",
+    "https://learn.microsoft.com/en-us/azure/dns/dns-overview"
+   ]
+  ],
+  "networking/http-and-tls": [
+   [
+    "RFC 9110: HTTP semantics",
+    "https://www.rfc-editor.org/rfc/rfc9110"
+   ],
+   [
+    "RFC 8446: TLS 1.3",
+    "https://www.rfc-editor.org/rfc/rfc8446"
+   ],
+   [
+    "MDN: HTTP",
+    "https://developer.mozilla.org/en-US/docs/Web/HTTP"
+   ]
+  ],
+  "networking/routing-and-nat": [
+   [
+    "AWS: VPC route tables",
+    "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Route_Tables.html"
+   ],
+   [
+    "AWS: NAT gateways",
+    "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html"
+   ],
+   [
+    "Azure NAT Gateway",
+    "https://learn.microsoft.com/en-us/azure/nat-gateway/nat-overview"
+   ]
+  ],
+  "networking/troubleshooting-toolkit": [
+   [
+    "tcpdump manual",
+    "https://www.tcpdump.org/manpages/tcpdump.1.html"
+   ],
+   [
+    "Wireshark documentation",
+    "https://www.wireshark.org/docs/"
+   ],
+   [
+    "Linux man-pages (man7.org)",
+    "https://man7.org/linux/man-pages/index.html"
+   ]
+  ],
+  "networking/firewalls-and-load-balancing": [
+   [
+    "Netfilter documentation",
+    "https://www.netfilter.org/documentation/"
+   ],
+   [
+    "nftables wiki",
+    "https://wiki.nftables.org/wiki-nftables/index.php/Main_Page"
+   ],
+   [
+    "nginx documentation",
+    "https://nginx.org/en/docs/"
+   ]
+  ],
+  "networking/vpn-and-tunnels": [
+   [
+    "WireGuard quick start",
+    "https://www.wireguard.com/quickstart/"
+   ],
+   [
+    "AWS Site-to-Site VPN",
+    "https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html"
+   ],
+   [
+    "Azure VPN Gateway",
+    "https://learn.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-about-vpngateways"
+   ]
+  ],
+  "docker/containers-and-images": [
+   [
+    "Docker: get started",
+    "https://docs.docker.com/get-started/"
+   ],
+   [
+    "Open Container Initiative",
+    "https://opencontainers.org/about/overview/"
+   ],
+   [
+    "namespaces(7) manual",
+    "https://man7.org/linux/man-pages/man7/namespaces.7.html"
+   ]
+  ],
+  "docker/writing-dockerfiles": [
+   [
+    "Dockerfile reference",
+    "https://docs.docker.com/reference/dockerfile/"
+   ],
+   [
+    "Docker: build best practices",
+    "https://docs.docker.com/build/building/best-practices/"
+   ],
+   [
+    "Docker: multi-stage builds",
+    "https://docs.docker.com/build/building/multi-stage/"
+   ]
+  ],
+  "docker/volumes-and-networking": [
+   [
+    "Docker: volumes",
+    "https://docs.docker.com/engine/storage/volumes/"
+   ],
+   [
+    "Docker: networking",
+    "https://docs.docker.com/engine/network/"
+   ],
+   [
+    "cgroups(7) manual",
+    "https://man7.org/linux/man-pages/man7/cgroups.7.html"
+   ]
+  ],
+  "docker/compose": [
+   [
+    "Docker Compose documentation",
+    "https://docs.docker.com/compose/"
+   ],
+   [
+    "Docker: get started",
+    "https://docs.docker.com/get-started/"
+   ],
+   [
+    "Docker: build best practices",
+    "https://docs.docker.com/build/building/best-practices/"
+   ]
+  ],
+  "docker/registries-and-supply-chain": [
+   [
+    "Docker Hub documentation",
+    "https://docs.docker.com/docker-hub/"
+   ],
+   [
+    "Trivy documentation",
+    "https://trivy.dev/latest/docs/"
+   ],
+   [
+    "Sigstore: Cosign",
+    "https://docs.sigstore.dev/cosign/signing/overview/"
+   ]
+  ],
+  "docker/runtimes-oci-and-podman": [
+   [
+    "Open Container Initiative",
+    "https://opencontainers.org/about/overview/"
+   ],
+   [
+    "Podman documentation",
+    "https://docs.podman.io/en/latest/"
+   ],
+   [
+    "containerd documentation",
+    "https://containerd.io/docs/"
+   ]
+  ],
+  "docker/security-and-troubleshooting": [
+   [
+    "Docker Engine security",
+    "https://docs.docker.com/engine/security/"
+   ],
+   [
+    "Trivy documentation",
+    "https://trivy.dev/latest/docs/"
+   ],
+   [
+    "Docker: build best practices",
+    "https://docs.docker.com/build/building/best-practices/"
+   ]
+  ],
+  "cicd/pipeline-fundamentals": [
+   [
+    "Martin Fowler: Continuous Integration",
+    "https://martinfowler.com/articles/continuousIntegration.html"
+   ],
+   [
+    "Continuous Delivery (Jez Humble and Dave Farley)",
+    "https://continuousdelivery.com/"
+   ],
+   [
+    "DORA research and metrics",
+    "https://dora.dev/"
+   ]
+  ],
+  "cicd/building-a-pipeline": [
+   [
+    "Jenkins: Pipeline syntax",
+    "https://www.jenkins.io/doc/book/pipeline/syntax/"
+   ],
+   [
+    "Jenkins documentation",
+    "https://www.jenkins.io/doc/"
+   ],
+   [
+    "Jenkins: using credentials",
+    "https://www.jenkins.io/doc/book/using/using-credentials/"
+   ]
+  ],
+  "cicd/testing-and-quality-gates": [
+   [
+    "Martin Fowler: The practical test pyramid",
+    "https://martinfowler.com/articles/practical-test-pyramid.html"
+   ],
+   [
+    "pytest documentation",
+    "https://docs.pytest.org/en/stable/"
+   ],
+   [
+    "Grafana k6 documentation",
+    "https://grafana.com/docs/k6/latest/"
+   ]
+  ],
+  "cicd/deployment-strategies": [
+   [
+    "Kubernetes: Deployments",
+    "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/"
+   ],
+   [
+    "Argo Rollouts documentation",
+    "https://argo-rollouts.readthedocs.io/en/stable/"
+   ],
+   [
+    "Continuous Delivery (Jez Humble and Dave Farley)",
+    "https://continuousdelivery.com/"
+   ]
+  ],
+  "cicd/versioning-and-artifacts": [
+   [
+    "Semantic Versioning 2.0.0",
+    "https://semver.org/"
+   ],
+   [
+    "Keep a Changelog",
+    "https://keepachangelog.com/en/1.1.0/"
+   ],
+   [
+    "DORA research and metrics",
+    "https://dora.dev/"
+   ]
+  ],
+  "cicd/pipeline-security": [
+   [
+    "OWASP Top 10 CI/CD Security Risks",
+    "https://owasp.org/www-project-top-10-ci-cd-security-risks/"
+   ],
+   [
+    "SLSA: supply-chain levels for software artifacts",
+    "https://slsa.dev/"
+   ],
+   [
+    "AWS IAM: OIDC identity providers",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_oidc.html"
+   ]
+  ],
+  "cicd/declarative-delivery-with-argo-cd": [
+   [
+    "Argo CD documentation",
+    "https://argo-cd.readthedocs.io/en/stable/"
+   ],
+   [
+    "Flux documentation",
+    "https://fluxcd.io/flux/"
+   ],
+   [
+    "Argo Rollouts documentation",
+    "https://argo-rollouts.readthedocs.io/en/stable/"
+   ]
+  ],
+  "kubernetes/architecture": [
+   [
+    "Kubernetes cluster architecture",
+    "https://kubernetes.io/docs/concepts/architecture/"
+   ],
+   [
+    "Kubernetes concepts",
+    "https://kubernetes.io/docs/concepts/"
+   ],
+   [
+    "kubectl quick reference",
+    "https://kubernetes.io/docs/reference/kubectl/quick-reference/"
+   ]
+  ],
+  "kubernetes/pods-and-deployments": [
+   [
+    "Kubernetes: Pods",
+    "https://kubernetes.io/docs/concepts/workloads/pods/"
+   ],
+   [
+    "Kubernetes: Deployments",
+    "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/"
+   ],
+   [
+    "Kubernetes: liveness, readiness and startup probes",
+    "https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/"
+   ]
+  ],
+  "kubernetes/services-and-ingress": [
+   [
+    "Kubernetes: Service",
+    "https://kubernetes.io/docs/concepts/services-networking/service/"
+   ],
+   [
+    "Kubernetes: Ingress",
+    "https://kubernetes.io/docs/concepts/services-networking/ingress/"
+   ],
+   [
+    "Kubernetes: DNS for Services and Pods",
+    "https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/"
+   ]
+  ],
+  "kubernetes/config-and-secrets": [
+   [
+    "Kubernetes: ConfigMaps",
+    "https://kubernetes.io/docs/concepts/configuration/configmap/"
+   ],
+   [
+    "Kubernetes: Secrets",
+    "https://kubernetes.io/docs/concepts/configuration/secret/"
+   ],
+   [
+    "The Twelve-Factor App",
+    "https://12factor.net/"
+   ]
+  ],
+  "kubernetes/storage": [
+   [
+    "Kubernetes: Storage",
+    "https://kubernetes.io/docs/concepts/storage/"
+   ],
+   [
+    "Kubernetes: StatefulSets",
+    "https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/"
+   ],
+   [
+    "kubectl quick reference",
+    "https://kubernetes.io/docs/reference/kubectl/quick-reference/"
+   ]
+  ],
+  "kubernetes/jobs-cronjobs-daemonsets": [
+   [
+    "Kubernetes: Jobs",
+    "https://kubernetes.io/docs/concepts/workloads/controllers/job/"
+   ],
+   [
+    "Kubernetes: CronJob",
+    "https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/"
+   ],
+   [
+    "Kubernetes: DaemonSet",
+    "https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/"
+   ]
+  ],
+  "kubernetes/resources-and-quotas": [
+   [
+    "Kubernetes: resource management for containers",
+    "https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/"
+   ],
+   [
+    "Kubernetes: resource quotas",
+    "https://kubernetes.io/docs/concepts/policy/resource-quotas/"
+   ],
+   [
+    "Kubernetes: Pod QoS classes",
+    "https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/"
+   ]
+  ],
+  "kubernetes/autoscaling": [
+   [
+    "Kubernetes: Horizontal Pod Autoscaling",
+    "https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/"
+   ],
+   [
+    "KEDA documentation",
+    "https://keda.sh/docs/"
+   ],
+   [
+    "Karpenter documentation",
+    "https://karpenter.sh/docs/"
+   ]
+  ],
+  "kubernetes/rbac-and-security": [
+   [
+    "Kubernetes: RBAC authorization",
+    "https://kubernetes.io/docs/reference/access-authn-authz/rbac/"
+   ],
+   [
+    "Kubernetes: Pod Security Standards",
+    "https://kubernetes.io/docs/concepts/security/pod-security-standards/"
+   ],
+   [
+    "Certified Kubernetes Security Specialist (CKS)",
+    "https://training.linuxfoundation.org/certification/certified-kubernetes-security-specialist/"
+   ]
+  ],
+  "kubernetes/scheduling-and-troubleshooting": [
+   [
+    "Kubernetes: scheduling and eviction",
+    "https://kubernetes.io/docs/concepts/scheduling-eviction/"
+   ],
+   [
+    "Kubernetes: debug applications",
+    "https://kubernetes.io/docs/tasks/debug/debug-application/"
+   ],
+   [
+    "kubectl quick reference",
+    "https://kubernetes.io/docs/reference/kubectl/quick-reference/"
+   ]
+  ],
+  "kubernetes/helm-and-kustomize": [
+   [
+    "Helm documentation",
+    "https://helm.sh/docs/"
+   ],
+   [
+    "Helm: chart best practices",
+    "https://helm.sh/docs/chart_best_practices/"
+   ],
+   [
+    "Kubernetes: declarative management with Kustomize",
+    "https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/"
+   ]
+  ],
+  "kubernetes/crds-and-operators": [
+   [
+    "Kubernetes: custom resources",
+    "https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/"
+   ],
+   [
+    "Kubernetes: operator pattern",
+    "https://kubernetes.io/docs/concepts/extend-kubernetes/operator/"
+   ],
+   [
+    "Kubernetes concepts",
+    "https://kubernetes.io/docs/concepts/"
+   ]
+  ],
+  "kubernetes/cni-and-cluster-networking": [
+   [
+    "Kubernetes: services, load balancing and networking",
+    "https://kubernetes.io/docs/concepts/services-networking/"
+   ],
+   [
+    "Kubernetes: network policies",
+    "https://kubernetes.io/docs/concepts/services-networking/network-policies/"
+   ],
+   [
+    "Cilium documentation",
+    "https://docs.cilium.io/en/stable/"
+   ]
+  ],
+  "kubernetes/cluster-install-upgrade-etcd": [
+   [
+    "Kubernetes: installing with kubeadm",
+    "https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/"
+   ],
+   [
+    "Kubernetes: upgrading kubeadm clusters",
+    "https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/"
+   ],
+   [
+    "Kubernetes: operating etcd (backup and restore)",
+    "https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/"
+   ]
+  ],
+  "kubernetes/cka-cks-exam-strategy": [
+   [
+    "Certified Kubernetes Administrator (CKA)",
+    "https://training.linuxfoundation.org/certification/certified-kubernetes-administrator-cka/"
+   ],
+   [
+    "Certified Kubernetes Security Specialist (CKS)",
+    "https://training.linuxfoundation.org/certification/certified-kubernetes-security-specialist/"
+   ],
+   [
+    "kubectl quick reference",
+    "https://kubernetes.io/docs/reference/kubectl/quick-reference/"
+   ]
+  ],
+  "terraform/iac-and-hcl-basics": [
+   [
+    "Terraform documentation",
+    "https://developer.hashicorp.com/terraform/docs"
+   ],
+   [
+    "Terraform language",
+    "https://developer.hashicorp.com/terraform/language"
+   ],
+   [
+    "Terraform CLI",
+    "https://developer.hashicorp.com/terraform/cli"
+   ]
+  ],
+  "terraform/providers-and-resources": [
+   [
+    "Terraform: resources",
+    "https://developer.hashicorp.com/terraform/language/resources"
+   ],
+   [
+    "Terraform AWS provider",
+    "https://registry.terraform.io/providers/hashicorp/aws/latest/docs"
+   ],
+   [
+    "Terraform AzureRM provider",
+    "https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs"
+   ]
+  ],
+  "terraform/variables-and-outputs": [
+   [
+    "Terraform: input variables",
+    "https://developer.hashicorp.com/terraform/language/values/variables"
+   ],
+   [
+    "Terraform language",
+    "https://developer.hashicorp.com/terraform/language"
+   ],
+   [
+    "Terraform: built-in functions",
+    "https://developer.hashicorp.com/terraform/language/functions"
+   ]
+  ],
+  "terraform/expressions-and-dynamic-blocks": [
+   [
+    "Terraform: expressions",
+    "https://developer.hashicorp.com/terraform/language/expressions"
+   ],
+   [
+    "Terraform: for_each",
+    "https://developer.hashicorp.com/terraform/language/meta-arguments/for_each"
+   ],
+   [
+    "Terraform: dynamic blocks",
+    "https://developer.hashicorp.com/terraform/language/expressions/dynamic-blocks"
+   ]
+  ],
+  "terraform/state": [
+   [
+    "Terraform: state",
+    "https://developer.hashicorp.com/terraform/language/state"
+   ],
+   [
+    "Terraform: backends",
+    "https://developer.hashicorp.com/terraform/language/backend"
+   ],
+   [
+    "Terraform CLI",
+    "https://developer.hashicorp.com/terraform/cli"
+   ]
+  ],
+  "terraform/modules": [
+   [
+    "Terraform: modules",
+    "https://developer.hashicorp.com/terraform/language/modules"
+   ],
+   [
+    "Terraform language",
+    "https://developer.hashicorp.com/terraform/language"
+   ],
+   [
+    "Terraform: refactoring with moved blocks",
+    "https://developer.hashicorp.com/terraform/language/modules/develop/refactoring"
+   ]
+  ],
+  "terraform/secrets-and-sensitive-data": [
+   [
+    "Terraform: sensitive data in state",
+    "https://developer.hashicorp.com/terraform/language/state/sensitive-data"
+   ],
+   [
+    "Terraform: input variables",
+    "https://developer.hashicorp.com/terraform/language/values/variables"
+   ],
+   [
+    "Azure Key Vault",
+    "https://learn.microsoft.com/en-us/azure/key-vault/general/overview"
+   ]
+  ],
+  "terraform/aws-and-azure-end-to-end": [
+   [
+    "Terraform AWS provider",
+    "https://registry.terraform.io/providers/hashicorp/aws/latest/docs"
+   ],
+   [
+    "Terraform AzureRM provider",
+    "https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs"
+   ],
+   [
+    "Terraform: lifecycle meta-argument",
+    "https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle"
+   ]
+  ],
+  "terraform/workflows-and-drift": [
+   [
+    "Terraform CLI",
+    "https://developer.hashicorp.com/terraform/cli"
+   ],
+   [
+    "Terraform: tests",
+    "https://developer.hashicorp.com/terraform/language/tests"
+   ],
+   [
+    "Terraform: state",
+    "https://developer.hashicorp.com/terraform/language/state"
+   ]
+  ],
+  "cloud/cloud-fundamentals": [
+   [
+    "AWS shared responsibility model",
+    "https://aws.amazon.com/compliance/shared-responsibility-model/"
+   ],
+   [
+    "AWS Well-Architected Framework",
+    "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html"
+   ],
+   [
+    "Azure Well-Architected Framework",
+    "https://learn.microsoft.com/en-us/azure/well-architected/"
+   ]
+  ],
+  "cloud/identity-and-access": [
+   [
+    "AWS IAM user guide",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html"
+   ],
+   [
+    "AWS IAM: security best practices",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+   ],
+   [
+    "Azure RBAC overview",
+    "https://learn.microsoft.com/en-us/azure/role-based-access-control/overview"
+   ]
+  ],
+  "cloud/virtual-networks": [
+   [
+    "Amazon VPC user guide",
+    "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
+   ],
+   [
+    "Azure Virtual Network",
+    "https://learn.microsoft.com/en-us/azure/virtual-network/virtual-networks-overview"
+   ],
+   [
+    "AWS: VPC route tables",
+    "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Route_Tables.html"
+   ]
+  ],
+  "cloud/compute-and-storage": [
+   [
+    "Amazon EC2 documentation",
+    "https://docs.aws.amazon.com/ec2/"
+   ],
+   [
+    "Azure Virtual Machines",
+    "https://learn.microsoft.com/en-us/azure/virtual-machines/"
+   ],
+   [
+    "Azure Storage introduction",
+    "https://learn.microsoft.com/en-us/azure/storage/common/storage-introduction"
+   ]
+  ],
+  "cloud/dns-and-cdn": [
+   [
+    "Amazon Route 53",
+    "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html"
+   ],
+   [
+    "Azure DNS overview",
+    "https://learn.microsoft.com/en-us/azure/dns/dns-overview"
+   ],
+   [
+    "Amazon CloudFront",
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html"
+   ]
+  ],
+  "cloud/serverless": [
+   [
+    "AWS Lambda developer guide",
+    "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+   ],
+   [
+    "Azure Functions overview",
+    "https://learn.microsoft.com/en-us/azure/azure-functions/functions-overview"
+   ],
+   [
+    "AWS documentation",
+    "https://docs.aws.amazon.com/"
+   ]
+  ],
+  "cloud/kubernetes-on-cloud": [
+   [
+    "Amazon EKS user guide",
+    "https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html"
+   ],
+   [
+    "Azure Kubernetes Service",
+    "https://learn.microsoft.com/en-us/azure/aks/what-is-aks"
+   ],
+   [
+    "EKS: IAM roles for service accounts",
+    "https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html"
+   ]
+  ],
+  "cloud/monitoring-and-logging": [
+   [
+    "Amazon CloudWatch",
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html"
+   ],
+   [
+    "Azure Monitor overview",
+    "https://learn.microsoft.com/en-us/azure/azure-monitor/overview"
+   ],
+   [
+    "AWS CloudTrail",
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html"
+   ]
+  ],
+  "cloud/security-and-governance": [
+   [
+    "AWS Organizations: service control policies",
+    "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html"
+   ],
+   [
+    "Azure Policy overview",
+    "https://learn.microsoft.com/en-us/azure/governance/policy/overview"
+   ],
+   [
+    "AWS Key Management Service",
+    "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html"
+   ]
+  ],
+  "cloud/managed-services-and-cost": [
+   [
+    "AWS Cost Management",
+    "https://docs.aws.amazon.com/cost-management/latest/userguide/what-is-costmanagement.html"
+   ],
+   [
+    "Microsoft Cost Management",
+    "https://learn.microsoft.com/en-us/azure/cost-management-billing/"
+   ],
+   [
+    "AWS RDS user guide",
+    "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html"
+   ]
+  ],
+  "observability/observability-fundamentals": [
+   [
+    "OpenTelemetry concepts",
+    "https://opentelemetry.io/docs/concepts/"
+   ],
+   [
+    "SRE book: monitoring distributed systems",
+    "https://sre.google/sre-book/monitoring-distributed-systems/"
+   ],
+   [
+    "Prometheus overview",
+    "https://prometheus.io/docs/introduction/overview/"
+   ]
+  ],
+  "observability/metrics-and-prometheus": [
+   [
+    "Prometheus overview",
+    "https://prometheus.io/docs/introduction/overview/"
+   ],
+   [
+    "Prometheus: querying basics",
+    "https://prometheus.io/docs/prometheus/latest/querying/basics/"
+   ],
+   [
+    "Prometheus: metric and label naming",
+    "https://prometheus.io/docs/practices/naming/"
+   ]
+  ],
+  "observability/logs-and-traces": [
+   [
+    "Grafana Loki documentation",
+    "https://grafana.com/docs/loki/latest/"
+   ],
+   [
+    "OpenTelemetry documentation",
+    "https://opentelemetry.io/docs/"
+   ],
+   [
+    "Jaeger documentation",
+    "https://www.jaegertracing.io/docs/"
+   ]
+  ],
+  "observability/log-pipelines": [
+   [
+    "Fluent Bit manual",
+    "https://docs.fluentbit.io/manual"
+   ],
+   [
+    "Grafana Loki documentation",
+    "https://grafana.com/docs/loki/latest/"
+   ],
+   [
+    "LogQL: Loki query language",
+    "https://grafana.com/docs/loki/latest/query/"
+   ]
+  ],
+  "observability/opentelemetry": [
+   [
+    "OpenTelemetry documentation",
+    "https://opentelemetry.io/docs/"
+   ],
+   [
+    "OpenTelemetry Collector",
+    "https://opentelemetry.io/docs/collector/"
+   ],
+   [
+    "W3C Trace Context",
+    "https://www.w3.org/TR/trace-context/"
+   ]
+  ],
+  "observability/synthetic-and-blackbox-monitoring": [
+   [
+    "Prometheus: exporters and integrations",
+    "https://prometheus.io/docs/instrumenting/exporters/"
+   ],
+   [
+    "Prometheus: alerting",
+    "https://prometheus.io/docs/alerting/latest/overview/"
+   ],
+   [
+    "SRE book: monitoring distributed systems",
+    "https://sre.google/sre-book/monitoring-distributed-systems/"
+   ]
+  ],
+  "observability/alerting-and-dashboards": [
+   [
+    "Prometheus: alerting",
+    "https://prometheus.io/docs/alerting/latest/overview/"
+   ],
+   [
+    "Alertmanager",
+    "https://prometheus.io/docs/alerting/latest/alertmanager/"
+   ],
+   [
+    "SRE workbook: alerting on SLOs",
+    "https://sre.google/workbook/alerting-on-slos/"
+   ]
+  ],
+  "sre/slos-and-error-budgets": [
+   [
+    "SRE book: service level objectives",
+    "https://sre.google/sre-book/service-level-objectives/"
+   ],
+   [
+    "SRE workbook: error budget policy",
+    "https://sre.google/workbook/error-budget-policy/"
+   ],
+   [
+    "SRE workbook: alerting on SLOs",
+    "https://sre.google/workbook/alerting-on-slos/"
+   ]
+  ],
+  "sre/incident-response": [
+   [
+    "SRE book: managing incidents",
+    "https://sre.google/sre-book/managing-incidents/"
+   ],
+   [
+    "PagerDuty incident response documentation",
+    "https://response.pagerduty.com/"
+   ],
+   [
+    "SRE book: practical alerting",
+    "https://sre.google/sre-book/practical-alerting/"
+   ]
+  ],
+  "sre/postmortems-and-toil": [
+   [
+    "SRE book: postmortem culture",
+    "https://sre.google/sre-book/postmortem-culture/"
+   ],
+   [
+    "SRE book: eliminating toil",
+    "https://sre.google/sre-book/eliminating-toil/"
+   ],
+   [
+    "PagerDuty incident response documentation",
+    "https://response.pagerduty.com/"
+   ]
+  ],
+  "sre/reliability-patterns": [
+   [
+    "SRE book: handling overload",
+    "https://sre.google/sre-book/handling-overload/"
+   ],
+   [
+    "SRE book: addressing cascading failures",
+    "https://sre.google/sre-book/addressing-cascading-failures/"
+   ],
+   [
+    "AWS: disaster recovery of workloads",
+    "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-workloads-on-aws.html"
+   ]
+  ],
+  "sre/on-call": [
+   [
+    "SRE book: being on-call",
+    "https://sre.google/sre-book/being-on-call/"
+   ],
+   [
+    "PagerDuty incident response documentation",
+    "https://response.pagerduty.com/"
+   ],
+   [
+    "SRE book: practical alerting",
+    "https://sre.google/sre-book/practical-alerting/"
+   ]
+  ],
+  "sre/capacity-planning": [
+   [
+    "SRE book: reliable product launches",
+    "https://sre.google/sre-book/reliable-product-launches/"
+   ],
+   [
+    "Grafana k6 documentation",
+    "https://grafana.com/docs/k6/latest/"
+   ],
+   [
+    "Kubernetes: Horizontal Pod Autoscaling",
+    "https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/"
+   ]
+  ],
+  "sre/chaos-engineering-and-game-days": [
+   [
+    "Principles of Chaos Engineering",
+    "https://principlesofchaos.org/"
+   ],
+   [
+    "AWS Fault Injection Service",
+    "https://docs.aws.amazon.com/fis/latest/userguide/what-is.html"
+   ],
+   [
+    "Azure Chaos Studio",
+    "https://learn.microsoft.com/en-us/azure/chaos-studio/chaos-studio-overview"
+   ]
+  ],
+  "sre/change-management-and-releases": [
+   [
+    "SRE book: release engineering",
+    "https://sre.google/sre-book/release-engineering/"
+   ],
+   [
+    "DORA research and metrics",
+    "https://dora.dev/"
+   ],
+   [
+    "OpenFeature documentation",
+    "https://openfeature.dev/docs/reference/intro"
+   ]
+  ]
+ },
+ "sheets": {
+  "linux": [
+   [
+    "Linux man-pages (man7.org)",
+    "https://man7.org/linux/man-pages/index.html"
+   ],
+   [
+    "Filesystem Hierarchy Standard 3.0",
+    "https://refspecs.linuxfoundation.org/FHS_3.0/fhs/index.html"
+   ],
+   [
+    "systemd documentation",
+    "https://systemd.io/"
+   ]
+  ],
+  "bash": [
+   [
+    "GNU Bash reference manual",
+    "https://www.gnu.org/software/bash/manual/bash.html"
+   ],
+   [
+    "ShellCheck",
+    "https://www.shellcheck.net/"
+   ],
+   [
+    "POSIX shell command language",
+    "https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html"
+   ]
+  ],
+  "networking": [
+   [
+    "RFC 1918: private address space",
+    "https://www.rfc-editor.org/rfc/rfc1918"
+   ],
+   [
+    "Netfilter documentation",
+    "https://www.netfilter.org/documentation/"
+   ],
+   [
+    "MDN: HTTP",
+    "https://developer.mozilla.org/en-US/docs/Web/HTTP"
+   ]
+  ],
+  "docker": [
+   [
+    "Dockerfile reference",
+    "https://docs.docker.com/reference/dockerfile/"
+   ],
+   [
+    "Docker: get started",
+    "https://docs.docker.com/get-started/"
+   ],
+   [
+    "Docker Compose documentation",
+    "https://docs.docker.com/compose/"
+   ]
+  ],
+  "kubernetes": [
+   [
+    "kubectl quick reference",
+    "https://kubernetes.io/docs/reference/kubectl/quick-reference/"
+   ],
+   [
+    "Kubernetes concepts",
+    "https://kubernetes.io/docs/concepts/"
+   ],
+   [
+    "Kubernetes: installing with kubeadm",
+    "https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/"
+   ]
+  ],
+  "terraform": [
+   [
+    "Terraform CLI",
+    "https://developer.hashicorp.com/terraform/cli"
+   ],
+   [
+    "Terraform language",
+    "https://developer.hashicorp.com/terraform/language"
+   ],
+   [
+    "Terraform AWS provider",
+    "https://registry.terraform.io/providers/hashicorp/aws/latest/docs"
+   ]
+  ],
+  "cicd": [
+   [
+    "Jenkins: Pipeline syntax",
+    "https://www.jenkins.io/doc/book/pipeline/syntax/"
+   ],
+   [
+    "Argo CD documentation",
+    "https://argo-cd.readthedocs.io/en/stable/"
+   ],
+   [
+    "Semantic Versioning 2.0.0",
+    "https://semver.org/"
+   ]
+  ],
+  "aws": [
+   [
+    "AWS CLI user guide",
+    "https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html"
+   ],
+   [
+    "AWS documentation",
+    "https://docs.aws.amazon.com/"
+   ],
+   [
+    "AWS IAM: security best practices",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+   ]
+  ],
+  "azure": [
+   [
+    "Azure CLI documentation",
+    "https://learn.microsoft.com/en-us/cli/azure/"
+   ],
+   [
+    "Azure documentation",
+    "https://learn.microsoft.com/en-us/azure/"
+   ],
+   [
+    "Azure RBAC overview",
+    "https://learn.microsoft.com/en-us/azure/role-based-access-control/overview"
+   ]
+  ],
+  "prometheus": [
+   [
+    "Prometheus overview",
+    "https://prometheus.io/docs/introduction/overview/"
+   ],
+   [
+    "Prometheus: querying basics",
+    "https://prometheus.io/docs/prometheus/latest/querying/basics/"
+   ],
+   [
+    "Alertmanager",
+    "https://prometheus.io/docs/alerting/latest/alertmanager/"
+   ]
+  ],
+  "sre": [
+   [
+    "SRE book: service level objectives",
+    "https://sre.google/sre-book/service-level-objectives/"
+   ],
+   [
+    "SRE book: managing incidents",
+    "https://sre.google/sre-book/managing-incidents/"
+   ],
+   [
+    "SRE book: postmortem culture",
+    "https://sre.google/sre-book/postmortem-culture/"
+   ]
+  ],
+  "systemd": [
+   [
+    "systemd documentation",
+    "https://systemd.io/"
+   ],
+   [
+    "systemd manual pages",
+    "https://www.freedesktop.org/software/systemd/man/latest/"
+   ],
+   [
+    "journalctl manual",
+    "https://www.freedesktop.org/software/systemd/man/latest/journalctl.html"
+   ]
+  ],
+  "python": [
+   [
+    "The Python tutorial",
+    "https://docs.python.org/3/tutorial/index.html"
+   ],
+   [
+    "venv: virtual environments",
+    "https://docs.python.org/3/library/venv.html"
+   ],
+   [
+    "Requests documentation",
+    "https://requests.readthedocs.io/en/latest/"
+   ]
+  ],
+  "helm": [
+   [
+    "Helm documentation",
+    "https://helm.sh/docs/"
+   ],
+   [
+    "Kubernetes: declarative management with Kustomize",
+    "https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/"
+   ],
+   [
+    "Helm: chart best practices",
+    "https://helm.sh/docs/chart_best_practices/"
+   ]
+  ]
+ }
+}

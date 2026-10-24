@@ -2,71 +2,99 @@
   {
     "id": "linux",
     "title": "Linux for engineers",
-    "summary": "Navigate, secure and troubleshoot a Linux server the way production work demands.",
+    "summary": "Navigate, secure, package, schedule and troubleshoot a Linux server the way production work demands.",
     "level": "Beginner",
     "requires": []
   },
   {
     "id": "bash",
     "title": "Shell scripting",
-    "summary": "Write Bash scripts that fail loudly, run safely and replace repetitive manual work.",
+    "summary": "Write Bash scripts that fail loudly, run safely, parse JSON from APIs and replace repetitive manual work.",
     "level": "Beginner",
-    "requires": ["linux"]
+    "requires": [
+      "linux"
+    ]
+  },
+  {
+    "id": "python",
+    "title": "Python for automation",
+    "summary": "Write Python scripts that handle files, processes, HTTP APIs and cloud SDKs, with tests and a packaged command-line tool.",
+    "level": "Beginner",
+    "requires": [
+      "linux"
+    ]
   },
   {
     "id": "networking",
     "title": "Networking essentials",
     "summary": "Reason about addresses, DNS, HTTP, TLS and firewalls well enough to debug any connectivity failure.",
     "level": "Beginner",
-    "requires": ["linux"]
+    "requires": [
+      "linux"
+    ]
   },
   {
     "id": "docker",
     "title": "Docker and containers",
-    "summary": "Build small, secure images and run multi-container applications with confidence.",
+    "summary": "Build small, secure images, run multi-container applications, and understand registries, runtimes and the OCI standard.",
     "level": "Beginner",
-    "requires": ["linux"]
+    "requires": [
+      "linux"
+    ]
   },
   {
     "id": "cicd",
     "title": "CI/CD and delivery",
-    "summary": "Design pipelines that build, test and ship safely, then deploy with rolling, canary and declarative delivery.",
+    "summary": "Design pipelines that build, test and ship safely, secure the supply chain, and deploy with rolling, canary and declarative delivery.",
     "level": "Intermediate",
-    "requires": ["docker"]
+    "requires": [
+      "docker"
+    ]
   },
   {
     "id": "kubernetes",
     "title": "Kubernetes",
-    "summary": "Run workloads on Kubernetes, from architecture and networking to RBAC, troubleshooting and exam strategy.",
+    "summary": "Run workloads on Kubernetes from architecture and networking to Helm, autoscaling, operators, cluster upgrades, RBAC, troubleshooting and exam strategy.",
     "level": "Intermediate",
-    "requires": ["docker", "networking"]
+    "requires": [
+      "docker",
+      "networking"
+    ]
   },
   {
     "id": "terraform",
     "title": "Terraform and infrastructure as code",
-    "summary": "Describe infrastructure as code, manage state safely and structure reusable modules.",
+    "summary": "Describe infrastructure as code, use advanced HCL, manage state and secrets safely, and build real AWS and Azure stacks.",
     "level": "Intermediate",
-    "requires": ["linux"]
+    "requires": [
+      "linux"
+    ]
   },
   {
     "id": "cloud",
     "title": "Cloud platforms: AWS and Azure",
-    "summary": "Core concepts side by side on AWS and Azure: identity, networks, compute, storage and cost.",
+    "summary": "Core concepts side by side on AWS and Azure: identity, networks, DNS and CDN, compute, serverless, managed Kubernetes, security, monitoring and cost.",
     "level": "Intermediate",
-    "requires": ["networking"]
+    "requires": [
+      "networking"
+    ]
   },
   {
     "id": "observability",
     "title": "Observability",
-    "summary": "Instrument systems with metrics, logs and traces, and alert on what users actually feel.",
+    "summary": "Instrument systems with metrics, logs and traces, ship them with OpenTelemetry, probe from outside, and alert on what users actually feel.",
     "level": "Intermediate",
-    "requires": ["linux"]
+    "requires": [
+      "linux"
+    ]
   },
   {
     "id": "sre",
     "title": "Site reliability engineering",
-    "summary": "Define reliability with SLOs, respond to incidents, learn from failures and remove toil.",
+    "summary": "Define reliability with SLOs, respond to incidents, run on-call, plan capacity, practise failure and manage change safely.",
     "level": "Advanced",
-    "requires": ["observability"]
+    "requires": [
+      "observability"
+    ]
   }
 ]

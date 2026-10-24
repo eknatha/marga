@@ -3,9 +3,20 @@
     {
       "id": "devops",
       "title": "DevOps Engineer",
-      "summary": "Automate the path from code to production: Linux, scripting, containers, pipelines, Kubernetes, infrastructure as code and monitoring.",
+      "summary": "Automate the path from code to production: Linux, Bash and Python, networking, containers, pipelines, Kubernetes, infrastructure as code, cloud and monitoring.",
       "audience": "Sysadmins, developers and support engineers moving into DevOps roles.",
-      "modules": ["linux", "bash", "networking", "docker", "cicd", "kubernetes", "terraform", "observability"],
+      "modules": [
+        "linux",
+        "bash",
+        "python",
+        "networking",
+        "docker",
+        "cicd",
+        "kubernetes",
+        "terraform",
+        "cloud",
+        "observability"
+      ],
       "outcomes": [
         "Administer and troubleshoot Linux servers from the command line.",
         "Automate routine work with safe, readable Bash scripts.",
@@ -13,44 +24,89 @@
         "Build CI/CD pipelines with tests, artifacts and staged deployments.",
         "Deploy and debug workloads on Kubernetes.",
         "Provision infrastructure with Terraform and keep state safe.",
-        "Add metrics, logs and alerts so you know when a release hurts users."
+        "Add metrics, logs and alerts so you know when a release hurts users.",
+        "Write Python and Bash automation that talks to APIs and cloud SDKs.",
+        "Operate across AWS and Azure well enough to deploy a full stack."
       ]
     },
     {
       "id": "cloud",
       "title": "Cloud Engineer",
-      "summary": "Design and run cloud infrastructure on AWS and Azure with networking, identity, Terraform, containers and monitoring.",
+      "summary": "Design and run cloud infrastructure on AWS and Azure with networking, identity, Terraform, serverless, containers and monitoring.",
       "audience": "Engineers who build and operate infrastructure in public cloud accounts.",
-      "modules": ["linux", "networking", "cloud", "terraform", "docker", "kubernetes", "cicd", "observability"],
+      "modules": [
+        "linux",
+        "bash",
+        "python",
+        "networking",
+        "cloud",
+        "terraform",
+        "docker",
+        "kubernetes",
+        "cicd",
+        "observability"
+      ],
       "outcomes": [
         "Explain the shared responsibility model and apply least-privilege identity.",
         "Design virtual networks with public and private subnets on AWS and Azure.",
         "Choose between virtual machines, containers and serverless for a workload.",
         "Provision and change cloud resources safely with Terraform.",
         "Run managed Kubernetes and ship to it from a pipeline.",
-        "Track cost and apply well-architected practices."
+        "Track cost and apply well-architected practices.",
+        "Build serverless and managed Kubernetes workloads, and secure them with governance controls.",
+        "Script cloud tasks with Python and the CLI."
       ]
     },
     {
       "id": "sre",
       "title": "Site Reliability Engineer",
-      "summary": "Keep services reliable: infrastructure and containers first, then observability, SLOs, incident response and toil reduction.",
+      "summary": "Keep services reliable: Linux, containers and cloud first, then observability, SLOs, on-call, incident response, capacity and chaos testing.",
       "audience": "Operations and platform engineers who own uptime and on-call.",
-      "modules": ["linux", "bash", "networking", "docker", "kubernetes", "terraform", "observability", "sre"],
+      "modules": [
+        "linux",
+        "bash",
+        "python",
+        "networking",
+        "docker",
+        "cicd",
+        "kubernetes",
+        "terraform",
+        "cloud",
+        "observability",
+        "sre"
+      ],
       "outcomes": [
         "Debug performance and failures on Linux and in Kubernetes.",
         "Instrument services and write alerts that page for symptoms, not noise.",
         "Define SLIs and SLOs, and use error budgets to guide release decisions.",
         "Run an incident with clear roles, communication and a timeline.",
         "Write blameless postmortems that lead to real fixes.",
-        "Find toil and replace it with automation."
+        "Find toil and replace it with automation.",
+        "Run a healthy on-call rotation and plan capacity before it runs out.",
+        "Practise failure with game days and manage change safely."
       ]
     }
   ],
   "planned": [
-    { "id": "platform", "title": "Platform Engineer", "summary": "Build internal developer platforms, golden paths and self-service infrastructure." },
-    { "id": "devsecops", "title": "DevSecOps Engineer", "summary": "Secure pipelines, images, clusters and cloud accounts from the start." },
-    { "id": "k8s-admin", "title": "Kubernetes Administrator (CKA and CKS)", "summary": "A focused path for cluster administration and security certification practice." },
-    { "id": "mlops", "title": "MLOps and AI infrastructure", "summary": "Run model training and serving workloads reliably on shared infrastructure." }
+    {
+      "id": "platform",
+      "title": "Platform Engineer",
+      "summary": "Build internal developer platforms, golden paths and self-service infrastructure."
+    },
+    {
+      "id": "devsecops",
+      "title": "DevSecOps Engineer",
+      "summary": "Secure pipelines, images, clusters and cloud accounts from the start."
+    },
+    {
+      "id": "k8s-admin",
+      "title": "Kubernetes Administrator (CKA and CKS)",
+      "summary": "A focused path for cluster administration and security certification practice."
+    },
+    {
+      "id": "mlops",
+      "title": "MLOps and AI infrastructure",
+      "summary": "Run model training and serving workloads reliably on shared infrastructure."
+    }
   ]
 }
