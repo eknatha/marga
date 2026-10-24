@@ -125,7 +125,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const text = await page.evaluate(() => document.body.innerText);
     ok(!/\bgit/i.test(text), 'visible text mentions git');
     ok(/Labs/.test(text) && /planned/i.test(text), 'home should mention planned labs');
-    eq(await page.locator('.pipe .stage').count() >= 8, true, 'pipeline stages rendered');
+    eq(await page.locator('.tree .node').count() >= 8, true, 'skill tree nodes rendered');
     eq(await page.getAttribute('html', 'lang'), 'en', 'html lang');
     const canon = await page.getAttribute('link[rel=canonical]', 'href');
     eq(canon, 'https://marga.eknathalabs.com/', 'canonical');
@@ -133,11 +133,12 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await ctx.close();
   });
 
-  await test('brand is MARGA by EknathaLabs and the visitor count shows in the footer', async () => {
+  await test('brand is MARGA and the visitor count shows at the top right', async () => {
     const { ctx, page, issues, hits } = await open();
     await page.goto(BASE + '/');
     await page.waitForSelector('#main h1');
-    ok(/MARGA/.test(await page.textContent('.brand')) && /by EknathaLabs/.test(await page.textContent('.brand')), 'brand text: ' + await page.textContent('.brand'));
+    eq((await page.textContent('.brand')).trim(), 'MARGA', 'header brand is just MARGA');
+    ok(await page.evaluate(() => { const r = document.querySelector('#visitors').getBoundingClientRect(), w = document.querySelector('.utilbar .wrap').getBoundingClientRect(); return r.right > w.right - 24 && r.top < 40; }), 'visitor count sits at the top right');
     ok(!/Academy/i.test(await page.evaluate(() => document.title + document.body.innerText)), 'no leftover "Academy" wording');
     await page.waitForFunction(() => /^\d[\d ]* visitors?$/.test(document.querySelector('#visitors').textContent.trim()));
     eq((await page.textContent('#visitors')).trim(), '1 234 visitors', 'visitor text');
@@ -456,7 +457,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       await page.evaluate((j) => localStorage.setItem('ea.progress.v1', j), junk);
       await page.reload();
       await page.waitForSelector('#main h1');
-      ok(await page.locator('.pipe .stage').count() > 0, `app renders with ${junk}`);
+      ok(await page.locator('.tree .node').count() > 0, `app renders with ${junk}`);
     }
     eq(issues.length, 0, issues.join(' | '));
     await ctx.close();
@@ -1259,7 +1260,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const { ctx, page } = await open();
     await go(page, '/');
     const links = await page.locator('#topnav a').allInnerTexts();
-    eq(links.join('|'), 'Paths|Cheat sheets|Case studies|Practice|Progress|InterviewHub', 'nav order');
+    eq(links.join('|'), 'Skill trees|Cheat sheets|Case studies|Practice|Progress|InterviewHub', 'nav order');
     await nav(page, '/practice');
     eq(await page.locator('.prac li').count(), 15, 'hub cards');
     for (const href of ['#/drills', '#/interview/mock', '#/flashcards', '#/cases', '#/architecture', '#/calculators', '#/review', '#/labs']) ok(await page.locator(`.prac a[href="${href}"]`).count() === 1, 'hub links to ' + href);
@@ -1492,7 +1493,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const EXPL = await page.evaluate(() => null); 
     await go(page, '/explainers');
     const ids = await page.locator('.prac a').evaluateAll((as) => as.map((a) => a.getAttribute('href').replace('#/explainers/', '')));
-    ok(ids.length >= 28, 'explainers listed: ' + ids.length);
+    ok(ids.length >= 44, 'explainers listed: ' + ids.length);
     for (const id of ids) {
       await go(page, '/explainers/' + id);
       await page.waitForSelector('.ex-svg');
@@ -1701,6 +1702,49 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       eq(res.length, 0, 'axe: ' + res.join(' | '));
       await ctx.close();
     }
+  });
+
+  await test('visitor count: falls back to the second counter when GoatCounter totals are unreadable', async () => {
+    const ctx = await browser.newContext({ serviceWorkers: 'block' });
+    await ctx.addInitScript(() => { window.MARGA_FORCE_REMOTE = true; });
+    const calls = [];
+    await ctx.route(/goatcounter\.com/, (r) => /\/counter\//.test(r.request().url()) ? r.abort() : r.fulfill({ status: 200, contentType: 'image/gif', body: Buffer.from('R0lGODlhAQABAAAAACw=', 'base64') }));
+    await ctx.route(/abacus\.jasoncameron\.dev/, (r) => { calls.push(r.request().url()); return r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: '{"value":4321}' }); });
+    const page = await ctx.newPage(); await page.goto(BASE + '/');
+    await page.waitForFunction(() => /^4321 visitors$/.test(document.querySelector('#visitors').textContent.trim()), null, { timeout: 40000 });
+    ok(/\/hit\//.test(calls[0]), 'first load counts a hit');
+    await page.reload(); await page.waitForTimeout(100);
+    await page.waitForFunction(() => /visitors$/.test(document.querySelector('#visitors').textContent.trim()), null, { timeout: 40000 });
+    await ctx.close();
+  });
+
+  await test('skill trees: tiers, locked and ready states, connectors, role switch, mastered after passing', async () => {
+    const { ctx, page } = await open(); await go(page, '/paths');
+    await page.waitForSelector('.tree .node');
+    ok(/Skill trees/.test(await page.textContent('#main h1')), 'page title');
+    eq(await page.locator('.node').count(), 10, 'devops tree has 10 skills');
+    ok(await page.locator('.tier').count() >= 3, 'several tiers');
+    eq(await page.locator('.node.s-ready').count(), 1, 'only the foundation is ready at the start');
+    ok(await page.locator('.node.s-lock').count() >= 5, 'dependent skills are locked');
+    await page.waitForFunction(() => document.querySelectorAll('.tree-lines path').length >= 9);
+    await page.locator('.tab').nth(2).click(); await page.waitForSelector('.node[data-id="sre"]');
+    eq(await page.locator('.node').count(), 11, 'sre tree has 11 skills');
+    const prog = emptyProgress(); prog.lessons = doneMap(MODS.linux.lessons);
+    await setProgress(page, prog); await nav(page, '/paths'); await page.waitForSelector('.tree .node');
+    eq(await page.locator('.node[data-id="linux"].s-pass').count(), 1, 'linux is mastered');
+    ok(await page.locator('.node.s-ready').count() >= 4, 'its children are ready');
+    ok(await page.locator('.tree-lines path.done').count() >= 4, 'connectors from a mastered skill are solid');
+    await ctx.close();
+  });
+
+  await test('cheat sheets: every sheet has warning callouts and many commands', async () => {
+    const { ctx, page } = await open();
+    for (const id of Object.keys(data.sheets)) {
+      await go(page, '/cheatsheet/' + id); await page.waitForSelector('.callout-warning');
+      ok(await page.locator('.callout-warning').count() >= 4, id + ' warnings');
+      ok(await page.locator('.code pre').count() >= 6, id + ' code blocks');
+    }
+    await ctx.close();
   });
 
   // ------------------------------------------------------------ screenshots
