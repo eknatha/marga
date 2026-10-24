@@ -208,7 +208,36 @@ function loadContent() {
     const html = marked.parse(body);
     sheets[id] = { id, title: meta.title, summary: meta.summary || '', module: meta.module || '', html, toc: state.toc, text: plain(html) };
   }
-  return { modules, paths, lessons, sheets };
+
+  // official references: refs.json { modules:{}, lessons:{}, sheets:{} } -> [{t,u}]
+  const refsFile = path.join(SRC, 'content', 'refs.json');
+  const refs = fs.existsSync(refsFile) ? JSON.parse(fs.readFileSync(refsFile, 'utf8')) : {};
+  const toRefs = (arr) => (arr || []).map(([t, u]) => ({ t, u }));
+  for (const m of modules) m.refs = toRefs((refs.modules || {})[m.id]);
+  for (const id of Object.keys(lessons)) lessons[id].refs = toRefs((refs.lessons || {})[id]);
+  for (const id of Object.keys(sheets)) sheets[id].refs = toRefs((refs.sheets || {})[id]);
+
+  // InterviewHub: src/interview/<module>.md  ->  "## Question" + "level: x" + answer markdown
+  const interview = [];
+  const idir = path.join(SRC, 'interview');
+  if (fs.existsSync(idir)) {
+    for (const f of fs.readdirSync(idir).filter((x) => x.endsWith('.md')).sort()) {
+      const mod = f.replace(/\.md$/, '');
+      const parts = fs.readFileSync(path.join(idir, f), 'utf8').split(/^## /m).slice(1);
+      parts.forEach((blk, i) => {
+        const nl = blk.indexOf('\n');
+        const q = blk.slice(0, nl).trim();
+        let rest = blk.slice(nl + 1).replace(/^\s+/, '');
+        const lm = rest.match(/^level:\s*(junior|mid|senior)\s*\n/);
+        if (!lm) throw new Error(`interview/${f}: question "${q}" needs a level: junior|mid|senior line`);
+        rest = rest.slice(lm[0].length).trim();
+        const { marked } = makeMarkdown();
+        const html = marked.parse(rest);
+        interview.push({ id: `${mod}-${i + 1}`, module: mod, level: lm[1], q, html, text: plain(html) });
+      });
+    }
+  }
+  return { modules, paths, lessons, sheets, interview };
 }
 
 /* ---------- output ---------- */
@@ -227,6 +256,12 @@ function fontCss() {
 @font-face{font-family:"Source Serif 4";font-style:italic;font-weight:200 900;font-display:swap;src:url(${fx('', 'source-serif-4-italic.woff2')}) format("woff2-variations")}
 @font-face{font-family:"JetBrains Mono";font-style:normal;font-weight:100 800;font-display:swap;src:url(${fx('', 'jetbrains-mono.woff2')}) format("woff2-variations")}
 `;
+}
+
+function refsBlock(list) {
+  if (!list || !list.length) return '';
+  return '<section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul>' +
+    list.map((r) => `<li><a href="${esc(r.u)}" target="_blank" rel="noopener">${esc(r.t)}</a><span class="host">${esc(r.u.replace(/^https:\/\/([^/]+).*$/, '$1'))}</span></li>`).join('') + '</ul></section>';
 }
 
 function main() {
@@ -251,10 +286,11 @@ function main() {
   const css = fontCss() + read('app/app.css');
   const js = read('app/app.js');
   const dataJs = 'window.ACADEMY=' + JSON.stringify({ domain: DOMAIN, counter: COUNTER, ...data }).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029') + ';';
-  const ver = crypto.createHash('sha1').update(css + js + dataJs).digest('hex').slice(0, 8);
+  const ver = crypto.createHash('sha1').update(css + js + dataJs + read('app/voice.js')).digest('hex').slice(0, 8);
 
   write('assets/app.css', css);
   write('assets/app.js', js);
+  write('assets/voice.js', read('app/voice.js'));
   write('assets/data.js', dataJs);
 
   const shell = read('app/shell.html').replace(/{{VER}}/g, ver).replace(/{{SITE}}/g, SITE).replace(/{{DOMAIN}}/g, DOMAIN);
@@ -268,7 +304,7 @@ function main() {
     const html = sheetTpl
       .replace(/{{VER}}/g, ver).replace(/{{SITE}}/g, SITE)
       .replace(/{{TITLE}}/g, esc(s.title)).replace(/{{SUMMARY}}/g, esc(s.summary))
-      .replace(/{{ID}}/g, s.id).replace('{{BODY}}', s.html);
+      .replace(/{{ID}}/g, s.id).replace('{{REFS}}', refsBlock(s.refs)).replace('{{BODY}}', s.html);
     write(`cheatsheets/${s.id}.html`, html);
   }
   const idxTpl = read('app/sheet-index.html');
@@ -288,7 +324,7 @@ function main() {
   }, null, 2));
   write('icon.svg', read('app/icon.svg'));
 
-  const precache = ['./', 'index.html', 'assets/app.css', 'assets/app.js', 'assets/data.js', 'icon.svg', 'manifest.webmanifest', 'cheatsheets/']
+  const precache = ['./', 'index.html', 'assets/app.css', 'assets/app.js', 'assets/data.js', 'assets/voice.js', 'icon.svg', 'manifest.webmanifest', 'cheatsheets/']
     .concat(Object.keys(fonts).map((f) => 'assets/fonts/' + f))
     .concat(list.map((s) => `cheatsheets/${s.id}.html`));
   write('sw.js', read('app/sw.js').replace('{{VER}}', ver).replace('{{FILES}}', JSON.stringify(precache)));
@@ -298,7 +334,7 @@ function main() {
   const nQuiz = Object.values(data.lessons).reduce((n, l) => n + l.quiz.length, 0);
   const nCards = Object.values(data.lessons).reduce((n, l) => n + l.cards.length, 0);
   const size = fs.statSync(path.join(DIST, 'assets', 'data.js')).size;
-  console.log(`built v${ver}: ${data.modules.length} modules, ${nLessons} lessons, ${nQuiz} quiz questions, ${nCards} flashcards, ${list.length} cheat sheets, data.js ${(size / 1024).toFixed(0)} KB`);
+  console.log(`built v${ver}: ${data.modules.length} modules, ${nLessons} lessons, ${nQuiz} quiz questions, ${nCards} flashcards, ${list.length} cheat sheets, ${data.interview.length} interview questions, data.js ${(size / 1024).toFixed(0)} KB`);
 }
 
 main();

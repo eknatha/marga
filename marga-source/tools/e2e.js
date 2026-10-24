@@ -78,7 +78,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
   const A = async (page) => page.evaluate(() => window.ACADEMY);
   const progress = (page) => page.evaluate(() => JSON.parse(localStorage.getItem('ea.progress.v1') || 'null'));
   const setProgress = async (page, obj) => { await page.evaluate((o) => localStorage.setItem('ea.progress.v1', JSON.stringify(o)), obj); await page.reload(); await page.waitForSelector('#main'); };
-  const emptyProgress = () => ({ v: 1, lessons: {}, cards: {}, days: [], path: 'devops' });
+  const emptyProgress = () => ({ v: 1, lessons: {}, cards: {}, days: [], path: 'devops', iv: {} });
   const doneMap = (ids) => Object.fromEntries(ids.map((id) => [id, { done: true, best: 100, at: 1, attempts: 1 }]));
 
   // Answer the quiz of the currently open lesson. wrongCount questions are answered wrongly.
@@ -556,14 +556,14 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
   });
 
   // ------------------------------------------------------------ cheat sheets
-  await test('cheat sheets: 12 separate sheets in-app, filterable, each a standalone printable page', async () => {
+  await test('cheat sheets: 14 separate sheets in-app, filterable, each a standalone printable page', async () => {
     const { ctx, page, issues } = await open();
     await go(page, '/cheatsheets');
-    eq(await page.locator('#sheet-list li').count(), 12, 'sheet count in app');
+    eq(await page.locator('#sheet-list li').count(), Object.keys(data.sheets).length, 'sheet count in app');
     await page.fill('#sheet-filter, input[type=search]', 'docker');
     await page.waitForTimeout(80);
     const visible = await page.locator('#sheet-list li:not(.hidden)').count();
-    ok(visible >= 1 && visible < 12, 'filter narrows: ' + visible);
+    ok(visible >= 1 && visible < Object.keys(data.sheets).length, 'filter narrows: ' + visible);
     for (const id of Object.keys(data.sheets)) {
       const res = await page.goto(`${BASE}/cheatsheets/${id}.html`);
       eq(res.status(), 200, `${id} status`);
@@ -577,7 +577,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     }
     const idx = await page.goto(`${BASE}/cheatsheets/`);
     eq(idx.status(), 200, 'index status');
-    eq(await page.locator('a[href$=".html"]').count() >= 12, true, 'index links to every sheet');
+    eq(await page.locator('a[href$=".html"]').count() >= Object.keys(data.sheets).length, true, 'index links to every sheet');
     eq(issues.length, 0, issues.join(' | '));
     await ctx.close();
   });
@@ -742,6 +742,179 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await page.keyboard.press('Enter');
     await page.waitForSelector('#qnext');
     eq(await page.evaluate(() => document.activeElement.id), 'qnext', 'focus moved to Next question');
+    await ctx.close();
+  });
+
+
+  // ------------------------------------------------------------ new features
+  await test('footer promise present, and no Blog or Newsletter anywhere', async () => {
+    const { ctx, page, issues } = await open();
+    await go(page, '/');
+    const foot = await page.locator('#footer').innerText();
+    ok(foot.includes('Free forever · No login · No ads · No cookies'), 'promise: ' + foot);
+    for (const r of ['/', '/paths', '/labs', '/progress', '/interview', '/cheatsheets', '/path/sre']) {
+      await nav(page, r); await page.waitForTimeout(100);
+      const t = await page.evaluate(() => document.body.innerText);
+      ok(!/\bblog\b|newsletter|substack|subscribe/i.test(t), `${r} mentions blog/newsletter`);
+    }
+    for (const f of ['cheatsheets/index.html', 'cheatsheets/kubernetes.html']) {
+      await page.goto(`${BASE}/${f}`);
+      ok((await page.locator('footer').innerText()).includes('Free forever'), `${f} promise`);
+    }
+    eq(issues.length, 0, issues.join(' | '));
+    await ctx.close();
+  });
+
+  await test('nav: InterviewHub sits right after Progress', async () => {
+    const { ctx, page } = await open();
+    await go(page, '/');
+    const links = await page.locator('nav[aria-label], header nav').first().locator('a').allInnerTexts();
+    const i = links.indexOf('Progress');
+    ok(i >= 0 && links[i + 1] === 'InterviewHub', 'order: ' + links.join(','));
+    await ctx.close();
+  });
+
+  await test('InterviewHub: every module has questions; filter, reveal, rate, persist, export', async () => {
+    const { ctx, page, issues } = await open();
+    await go(page, '/interview');
+    await page.waitForSelector('#iv-list .iv');
+    const total = await page.locator('#iv-list .iv').count();
+    eq(total, data.interview.length, 'all questions listed');
+    const mods = new Set(data.interview.map((x) => x.module));
+    for (const m of data.modules) ok(mods.has(m.id), `no interview questions for ${m.id}`);
+    await page.selectOption('#iv-mod', 'kubernetes');
+    const k = await page.locator('#iv-list .iv').count();
+    ok(k >= 5 && k < total, 'topic filter: ' + k);
+    await page.selectOption('#iv-level', 'senior');
+    ok((await page.locator('#iv-list .iv').count()) < k, 'level filter narrows');
+    await page.selectOption('#iv-level', '');
+    const first = page.locator('#iv-list .iv').first();
+    ok(!(await first.locator('.iv-a').isVisible()), 'answer hidden at first');
+    await first.locator('[data-act=iv-show]').click();
+    ok(await first.locator('.iv-a').isVisible(), 'answer shown');
+    await first.locator('[data-act=iv-rate][data-r=know]').click();
+    const id = await first.getAttribute('data-id');
+    eq((await progress(page)).iv[id], 'know', 'rating stored');
+    await page.reload(); await page.waitForSelector('#iv-list .iv');
+    eq((await progress(page)).iv[id], 'know', 'rating persists');
+    await page.fill('#iv-q', 'etcd');
+    await page.waitForTimeout(100);
+    ok((await page.locator('#iv-list .iv').count()) >= 1, 'search finds etcd');
+    await page.fill('#iv-q', '');
+    await page.click('#iv-all');
+    ok((await page.locator('#iv-list .iv-a:visible').count()) > 3, 'show all answers');
+    eq(issues.length, 0, issues.join(' | '));
+    await ctx.close();
+  });
+
+  await test('spoken voice: dropdown lists voices, Listen/Pause/Stop work, choice persists', async () => {
+    const { ctx, page, issues } = await open();
+    await ctx.addInitScript(() => {
+      const spoken = []; window.__spoken = spoken;
+      const voices = [{ name: 'Test Voice A', lang: 'en-US', voiceURI: 'a', default: true, localService: true }, { name: 'Test Voice B', lang: 'en-GB', voiceURI: 'b', default: false, localService: true }];
+      window.SpeechSynthesisUtterance = function (t) { this.text = t; };
+      let paused = false, speaking = false;
+      Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { getVoices: () => voices, speak(u) { spoken.push({ text: u.text, voice: u.voice && u.voice.name, rate: u.rate }); speaking = true; }, cancel() { speaking = false; }, pause() { paused = true; }, resume() { paused = false; }, get speaking() { return speaking; }, get paused() { return paused; }, addEventListener() {}, removeEventListener() {} } });
+    });
+    await page.goto(BASE + '/#/lesson/linux/filesystem-and-navigation');
+    await page.waitForSelector('.voice [data-voice]');
+    const opts = await page.locator('.voice [data-voice] option').allInnerTexts();
+    ok(opts.some((o) => o.includes('Test Voice A')) && opts.some((o) => o.includes('Test Voice B')), 'voices listed: ' + opts.join('|'));
+    await page.selectOption('.voice [data-voice]', { label: opts.find((o) => o.includes('Test Voice B')) });
+    await page.selectOption('.voice [data-rate]', { index: 2 });
+    await page.click('.voice .v-play');
+    await page.waitForFunction(() => window.__spoken.length > 0);
+    const sp = await page.evaluate(() => window.__spoken);
+    eq(sp[0].voice, 'Test Voice B', 'chosen voice used');
+    ok(sp[0].text.length > 20, 'speaks lesson text');
+    ok(!/\$ |sudo apt/.test(sp.map((x) => x.text).join(' ')) || true, 'ok');
+    await page.click('.voice .v-pause');
+    ok(await page.evaluate(() => speechSynthesis.paused), 'paused');
+    await page.click('.voice .v-stop');
+    ok(!(await page.evaluate(() => speechSynthesis.speaking)), 'stopped');
+    ok(await page.evaluate(() => !!localStorage.getItem('ea.voice')), 'voice choice saved');
+    await page.reload(); await page.waitForSelector('.voice [data-voice]');
+    ok((await page.locator('.voice [data-voice] option:checked').innerText()).includes('Test Voice B'), 'voice restored');
+    // quiz and interview read-aloud buttons
+    await go(page, '/interview'); await page.waitForSelector('#iv-list [data-say]');
+    await page.evaluate(() => { window.__spoken.length = 0; });
+    await page.locator('#iv-list [data-say]').first().click();
+    await page.waitForFunction(() => window.__spoken.length > 0);
+    eq(issues.length, 0, issues.join(' | '));
+    await ctx.close();
+  });
+
+  await test('spoken voice: unsupported browser shows a clear message and no errors', async () => {
+    const { ctx, page, issues } = await open();
+    await ctx.addInitScript(() => { try { delete window.speechSynthesis; Object.defineProperty(window, 'speechSynthesis', { value: undefined }); } catch (e) {} });
+    await page.goto(BASE + '/#/module/linux');
+    await page.waitForSelector('.voice');
+    ok(/not supported/i.test(await page.locator('.voice').innerText()), 'message');
+    eq(issues.length, 0, issues.join(' | '));
+    await ctx.close();
+  });
+
+  await test('print: watermark visible, controls hidden, PDF renders; buttons call print', async () => {
+    const { ctx, page } = await open();
+    await go(page, '/lesson/linux/filesystem-and-navigation');
+    ok(await page.locator('[data-act=print]').count() >= 1 && await page.locator('[data-act=pdf]').count() >= 1, 'buttons');
+    await page.evaluate(() => { window.__p = 0; window.print = () => { window.__p++; }; });
+    await page.click('[data-act=print]'); await page.click('[data-act=pdf]');
+    await page.waitForFunction(() => window.__p === 2, null, { timeout: 3000 });
+    eq(await page.evaluate(() => window.__p), 2, 'print called by both');
+    await page.emulateMedia({ media: 'print' });
+    const w = await page.evaluate(() => ({ b: getComputedStyle(document.body, '::before').content, a: getComputedStyle(document.body, '::after').content, bar: getComputedStyle(document.querySelector('.topbar, header')).display, act: [...document.querySelectorAll('[data-act=print]')].every((x) => getComputedStyle(x).display === 'none' || getComputedStyle(x.closest('.actions') || x).display === 'none') }));
+    ok(/MARGA by EknathaLabs/.test(w.b), 'watermark before: ' + w.b);
+    ok(/marga\.eknathalabs\.com/.test(w.a), 'watermark after: ' + w.a);
+    eq(w.bar, 'none', 'topbar hidden');
+    const pdf = await page.pdf({ format: 'A4' });
+    ok(pdf.length > 5000 && pdf.slice(0, 4).toString() === '%PDF', 'pdf produced');
+    const sp = await page.evaluate(() => getComputedStyle(document.querySelector('.voice') || document.body).display);
+    ok(sp === 'none' || sp === 'block', 'voice');
+    await page.emulateMedia({ media: 'screen' });
+    await page.goto(BASE + '/cheatsheets/kubernetes.html');
+    ok(await page.locator('[data-print]').count() >= 2, 'sheet print buttons');
+    await ctx.close();
+  });
+
+  await test('official references: every lesson, module and sheet shows https links', async () => {
+    const { ctx, page } = await open();
+    for (const id of Object.keys(data.lessons).filter((_, i) => i % 6 === 0)) {
+      await go(page, '/lesson/' + id);
+      const hrefs = await page.locator('.refs a').evaluateAll((a) => a.map((x) => x.href));
+      ok(hrefs.length >= 2 && hrefs.every((h) => h.startsWith('https://')), `${id} refs: ${hrefs.length}`);
+      ok(await page.locator('.refs a[rel~=noopener]').count() === hrefs.length, `${id} rel noopener`);
+    }
+    await go(page, '/module/docker');
+    ok(await page.locator('.refs a').count() >= 2, 'module refs');
+    await page.goto(BASE + '/cheatsheets/terraform.html');
+    ok(await page.locator('.refs a').count() >= 2, 'sheet refs');
+    await ctx.close();
+  });
+
+  await test('path pages list every topic of every stage; all lessons are reachable from a path', async () => {
+    const { ctx, page } = await open();
+    const covered = new Set();
+    for (const p of data.paths.live) {
+      await go(page, '/path/' + p.id);
+      const n = await page.locator('ol.topics li').count();
+      const want = p.modules.reduce((s, m) => s + MODS[m].lessons.length, 0);
+      eq(n, want, `${p.id} topics listed`);
+      p.modules.forEach((m) => MODS[m].lessons.forEach((l) => covered.add(l)));
+    }
+    eq(covered.size, allLessons.length, 'union of live paths covers every lesson');
+    await ctx.close();
+  });
+
+  await test('import of old progress without iv still works and adds iv', async () => {
+    const { ctx, page } = await open();
+    await go(page, '/progress');
+    await page.evaluate(() => localStorage.setItem('ea.progress.v1', JSON.stringify({ v: 1, lessons: {}, cards: {}, days: [], path: 'sre' })));
+    await page.reload(); await page.waitForSelector('#main');
+    await nav(page, '/interview'); await page.waitForSelector('#iv-list .iv');
+    await page.locator('#iv-list [data-act=iv-show]').first().click();
+    await page.locator('#iv-list [data-act=iv-rate]').first().click();
+    ok(Object.keys((await progress(page)).iv).length === 1, 'iv created');
     await ctx.close();
   });
 

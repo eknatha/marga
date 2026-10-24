@@ -454,7 +454,7 @@ function checkLinks() {
       allowedHash.push(h);
     }
     for (const m of l.html.matchAll(/href="(https?:[^"]+)"/g)) {
-      if (!/eknathalabs\.com|substack\.com/.test(m[1])) warn('links', `lesson ${id}: external link ${m[1]}`);
+      if (!/eknathalabs\.com/.test(m[1])) warn('links', `lesson ${id}: external link ${m[1]}`);
     }
   }
   // service worker file list
@@ -490,6 +490,80 @@ function checkBudgets() {
   if (fonts > 400 * 1024) warn('budget', `fonts total ${Math.round(fonts / 1024)} KB`);
 }
 
+
+// ---------------------------------------------------------------- 8. references, interview, promise, voice, print
+const REF_HOSTS = /^https:\/\/([a-z0-9-]+\.)*(kubernetes\.io|docker\.com|hashicorp\.com|terraform\.io|aws\.amazon\.com|microsoft\.com|azure\.com|prometheus\.io|sre\.google|python\.org|man7\.org|rfc-editor\.org|opentelemetry\.io|grafana\.com|helm\.sh|kernel\.org|gnu\.org|redhat\.com|ubuntu\.com|debian\.org|nginx\.org|openssh\.com|argoproj\.github\.io|cncf\.io|opencontainers\.org|github\.com|cloud\.google\.com|cloudflare\.com|iptables\.org|netfilter\.org|systemd\.io|freedesktop\.org|kubectl\.docs\.kubernetes\.io|kustomize\.io|pypa\.io|pytest\.org|readthedocs\.io|postgresql\.org|jenkins\.io|semver\.org|owasp\.org|nist\.gov|slsa\.dev|sigstore\.dev|open-policy-agent\.org|aquasec\.com|trivy\.dev|podman\.io|buildah\.io|etcd\.io|cni\.dev|istio\.io|envoyproxy\.io|linuxfoundation\.org|cisecurity\.org|google\.com|w3\.org|ietf\.org|letsencrypt\.org|github\.io|gitlab\.com|hashicorp\.github\.io|opengroup\.org|jq\.dev|jqlang\.github\.io|curl\.se|openssl\.org|lvm2\.sourceware\.org|sourceware\.org|kernel\.dk|brendangregg\.com|netflix\.github\.io|principlesofchaos\.org|litmuschaos\.io|chaos-mesh\.org|pagerduty\.com|atlassian\.com|dora\.dev|12factor\.net|martinfowler\.com|apache\.org|elastic\.co|fluentbit\.io|fluentd\.org|vector\.dev|jaegertracing\.io|loki\.io|thanos\.io|victoriametrics\.com|containerd\.io|continuousdelivery\.com|keepachangelog\.com|fluxcd\.io|keda\.sh|karpenter\.sh|cilium\.io|openfeature\.dev|selinuxproject\.org|shellcheck\.net|everything\.curl\.dev|jqlang\.org|amazonaws\.com|mozilla\.org|tcpdump\.org|wireshark\.org|wireguard\.com|nftables\.org)(\/|$)/;
+function checkExtras() {
+  // official references on every lesson, module and sheet
+  const checkRefs = (what, refs) => {
+    if (!Array.isArray(refs) || refs.length < 2) { err('refs', `${what}: needs at least 2 official references`); return; }
+    const seen = new Set();
+    for (const r of refs) {
+      if (!r.t || !r.u) err('refs', `${what}: reference missing title or url`);
+      else if (!/^https:\/\//.test(r.u)) err('refs', `${what}: reference must be https: ${r.u}`);
+      else if (!REF_HOSTS.test(r.u)) err('refs', `${what}: host not on the allow list: ${r.u}`);
+      if (/\bgit/i.test((r.t || '') + (r.u || '').replace(/github\.(com|io)/g, ''))) err('refs', `${what}: forbidden word in reference: ${r.t} ${r.u}`);
+      if (seen.has(r.u)) err('refs', `${what}: duplicate reference ${r.u}`);
+      seen.add(r.u); count('references');
+    }
+  };
+  for (const [id, l] of Object.entries(lessons)) checkRefs('lesson ' + id, l.refs);
+  for (const [id, s] of Object.entries(sheets)) checkRefs('sheet ' + id, s.refs);
+  for (const m of modules) checkRefs('module ' + m.id, m.refs);
+
+  // interview hub
+  const IV = A.interview || [];
+  const mods = new Set();
+  const seen = new Set();
+  for (const x of IV) {
+    if (!modById[x.module]) err('interview', `unknown module ${x.module}`);
+    if (!['junior', 'mid', 'senior'].includes(x.level)) err('interview', `${x.id}: bad level ${x.level}`);
+    if (!x.q || !x.q.trim()) err('interview', `${x.id}: empty question`);
+    if ((x.text || '').split(/\s+/).length < 25) err('interview', `${x.id}: answer too short`);
+    if (seen.has(x.id)) err('interview', `duplicate id ${x.id}`);
+    seen.add(x.id); mods.add(x.module); count('interview questions');
+    if (/\bgit/i.test(x.q + ' ' + x.text)) err('interview', `${x.id}: forbidden word`);
+  }
+  for (const m of modules) if (!mods.has(m.id)) err('interview', `module ${m.id} has no interview questions`);
+  for (const lv of ['junior', 'mid', 'senior']) if (!IV.some((x) => x.level === lv)) err('interview', `no ${lv} questions`);
+
+  // every live path covers its modules in prerequisite order, every lesson is on some path
+  const covered = new Set();
+  for (const p of A.paths.live) {
+    const pos = Object.fromEntries(p.modules.map((m, i) => [m, i]));
+    for (const m of p.modules) {
+      if (!modById[m]) { err('paths', `${p.id}: unknown module ${m}`); continue; }
+      for (const r of modById[m].requires) if (!(r in pos) || pos[r] > pos[m]) err('paths', `${p.id}: ${m} requires ${r} earlier in the path`);
+      modById[m].lessons.forEach((l) => covered.add(l));
+    }
+  }
+  for (const id of Object.keys(lessons)) if (!covered.has(id)) err('paths', `lesson ${id} is not on any live path`);
+
+  // footer promise, no blog or newsletter, voice and print wiring
+  const PROMISE = 'Free forever · No login · No ads · No cookies';
+  const appJs = read(path.join(DIST, 'assets/app.js'));
+  if (!appJs.includes(PROMISE) && !appJs.includes(PROMISE.replace(/·/g, '\\u00b7'))) err('footer', 'app.js is missing the footer promise');
+  for (const f of ['cheatsheets/index.html', ...Object.keys(sheets).map((k) => `cheatsheets/${k}.html`)]) {
+    const h = read(path.join(DIST, f));
+    if (!h.includes(PROMISE)) err('footer', `${f}: missing footer promise`);
+    if (/blog|newsletter|substack/i.test(h.replace(/<style[\s\S]*?<\/style>/g, ''))) err('footer', `${f}: mentions blog or newsletter`);
+  }
+  if (/newsletter|substack|>\s*Blog\s*</i.test(appJs)) err('footer', 'app.js mentions blog or newsletter');
+  const sw = read(path.join(DIST, 'sw.js'));
+  if (!/assets\/voice\.js/.test(sw)) err('voice', 'voice.js is not in the service worker precache');
+  if (!fs.existsSync(path.join(DIST, 'assets/voice.js'))) err('voice', 'assets/voice.js missing');
+  if (!/assets\/voice\.js/.test(read(path.join(DIST, 'index.html')))) err('voice', 'index.html does not load voice.js');
+  const css = read(path.join(DIST, 'assets/app.css'));
+  if (!/@media print/.test(css) || !/MARGA by EknathaLabs/.test(css)) err('print', 'print stylesheet or watermark text missing');
+  if (!/body::after/.test(css)) err('print', 'second watermark layer missing');
+  for (const k of Object.keys(sheets)) {
+    const h = read(path.join(DIST, `cheatsheets/${k}.html`));
+    if (!/data-print/.test(h)) err('print', `cheatsheets/${k}.html has no print button`);
+    if (!/voice-slot/.test(h)) err('voice', `cheatsheets/${k}.html has no voice bar`);
+  }
+  if (fs.existsSync(path.join(ROOT, '.github'))) err('deploy', '.github exists, but the site must not use workflows');
+}
+
 // ---------------------------------------------------------------- run
 const steps = [
   ['content schema', checkSchema],
@@ -498,7 +572,8 @@ const steps = [
   ['code-block syntax', checkCode],
   ['lesson structure', checkLessonStructure],
   ['links and assets', checkLinks],
-  ['size budgets', checkBudgets]
+  ['size budgets', checkBudgets],
+  ['references, interview, footer, voice, print', checkExtras]
 ];
 for (const [name, fn] of steps) {
   const before = errors.length;
