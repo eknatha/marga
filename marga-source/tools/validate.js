@@ -634,6 +634,60 @@ function checkPractice() {
   stats['calculators'] = L.list.length;
 }
 
+function checkMore() {
+  const mods = new Set(A.modules.map((m) => m.id));
+  const FORBID = /\bgit/i;
+  // glossary
+  if ((A.glossary || []).length < 100) err('glossary', `need at least 100 terms, found ${(A.glossary || []).length}`);
+  const gids = new Set();
+  for (const g of A.glossary || []) {
+    if (gids.has(g.id)) err('glossary', `${g.term}: duplicate id`); gids.add(g.id);
+    if (!g.plain || g.plain.length < 15) err('glossary', `${g.term}: plain-words text is missing or short`);
+    if (!g.def || g.def.length < 25) err('glossary', `${g.term}: definition is missing or short`);
+    if (!mods.has(g.module)) err('glossary', `${g.term}: unknown module ${g.module}`);
+    if (FORBID.test(JSON.stringify(g))) err('glossary', `${g.term}: contains a forbidden word`);
+    if (/[<>]/.test(g.plain + g.def)) err('glossary', `${g.term}: contains markup characters`);
+    count('glossary terms');
+  }
+  for (const m of A.modules) if ((A.glossary || []).filter((g) => g.module === m.id).length < 4) err('glossary', `module ${m.id} has fewer than 4 terms`);
+  // explainers
+  const ex = (() => { const w = { window: {} }; vm.runInNewContext(read(path.join(DIST, 'assets', 'explainers.js')), w); return w.window.MARGA_EXPLAINERS || []; })();
+  if (ex.length < 7) err('explainers', `need at least 7, found ${ex.length}`);
+  for (const x of ex) {
+    if (!mods.has(x.module)) err('explainers', `${x.id}: unknown module`);
+    if (x.steps.length < 6) err('explainers', `${x.id}: fewer than 6 steps`);
+    x.steps.forEach((s, i) => {
+      if (!(s.f >= 0 && s.f < x.actors.length && s.t >= 0 && s.t < x.actors.length)) err('explainers', `${x.id} step ${i + 1}: actor index out of range`);
+      if (!s.l || !s.n || s.n.length < 30) err('explainers', `${x.id} step ${i + 1}: needs a label and an explanation`);
+    });
+    if (FORBID.test(JSON.stringify(x))) err('explainers', `${x.id}: contains a forbidden word`);
+    count('explainers');
+  }
+  // scripts present, loaded and cached for offline use
+  const html = read(path.join(DIST, 'index.html')), sw = read(path.join(DIST, 'sw.js'));
+  for (const f of ['net.js', 'search.js', 'yaml.js', 'explainers.js', 'more.js']) {
+    if (!fs.existsSync(path.join(DIST, 'assets', f))) err('assets', `assets/${f} missing`);
+    if (!html.includes(f)) err('assets', `index.html does not load ${f}`);
+    if (!sw.includes(f)) err('assets', `${f} is not in the offline cache list`);
+    if (FORBID.test(read(path.join(DIST, 'assets', f)))) err('assets', `assets/${f} contains a forbidden word`);
+  }
+  // Python playground: pinned to the installed version, loaded only on request
+  const more = read(path.join(DIST, 'assets', 'more.js'));
+  const pv = (more.match(/PY_VER = '([\d.]+)'/) || [])[1];
+  let inst = null; try { inst = JSON.parse(read(path.join(ROOT, 'node_modules', 'pyodide', 'package.json'))).version; } catch (e) { /* optional */ }
+  if (!pv) err('python', 'playground does not pin a Pyodide version'); else if (inst && inst !== pv) err('python', `playground uses Pyodide ${pv} but ${inst} is installed`);
+  if (html.includes('pyodide')) err('python', 'index.html must not load Pyodide at page load');
+  // subnet maths and search sanity
+  const N = require(path.join(SRC, 'app', 'net.js'));
+  if (N.info('192.168.10.130/26').hosts !== 62 || N.summarize(['10.0.0.0/25', '10.0.0.128/25']).join() !== '10.0.0.0/24') err('net', 'subnet maths gave a wrong answer');
+  const SR = require(path.join(SRC, 'app', 'search.js'));
+  SR.build([{ kind: 'Lesson', group: 'Lessons', title: 'Kubernetes pods', sub: '', body: '' }]);
+  if (!SR.query('kuberntes').length) err('search', 'typo tolerance is broken');
+  // the visitor line is always shown in the footer, and counter code is set
+  if (!/visitors/.test(read(path.join(DIST, 'assets', 'app.js')))) err('counter', 'footer has no visitor line');
+  stats['glossary terms'] = (A.glossary || []).length;
+}
+
 // ---------------------------------------------------------------- run
 const steps = [
   ['content schema', checkSchema],
@@ -644,7 +698,8 @@ const steps = [
   ['links and assets', checkLinks],
   ['size budgets', checkBudgets],
   ['references, interview, footer, voice, print', checkExtras],
-  ['case studies, architecture, drills, accessibility, counter', checkPractice]
+  ['case studies, architecture, drills, accessibility, counter', checkPractice],
+  ['glossary, explainers, search, subnet, playgrounds', checkMore]
 ];
 for (const [name, fn] of steps) {
   const before = errors.length;

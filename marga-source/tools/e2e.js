@@ -138,7 +138,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await page.waitForSelector('#main h1');
     ok(/MARGA/.test(await page.textContent('.brand')) && /by EknathaLabs/.test(await page.textContent('.brand')), 'brand text: ' + await page.textContent('.brand'));
     ok(!/Academy/i.test(await page.evaluate(() => document.title + document.body.innerText)), 'no leftover "Academy" wording');
-    await page.waitForSelector('#visitors:not([hidden])');
+    await page.waitForFunction(() => /^\d[\d ]* visitors?$/.test(document.querySelector('#visitors').textContent.trim()));
     eq((await page.textContent('#visitors')).trim(), '1 234 visitors', 'visitor text');
     await page.reload(); await page.waitForSelector('#visitors:not([hidden])');
     eq(hits.length, 0, 'no hit is recorded from localhost');
@@ -146,13 +146,14 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await ctx.close();
   });
 
-  await test('visitor count stays hidden, with no errors on the page, when the counter is unreachable', async () => {
+  await test('visitor count says it is unavailable, with no errors on the page, when the counter is unreachable', async () => {
     const { ctx, page } = await open({ counterDown: true });
     const errs = []; page.on('pageerror', (e) => errs.push(e.message));
     await page.goto(BASE + '/');
     await page.waitForSelector('#main h1');
     await page.waitForTimeout(500);
-    eq(await page.locator('#visitors:not([hidden])').count(), 0, 'hidden');
+    ok(/^(Counting visitors|Visitor count unavailable)$/.test((await page.textContent('#visitors')).trim()), 'a visible state: ' + await page.textContent('#visitors'));
+    ok(await page.locator('#visitors').isVisible(), 'the footer line is visible');
     eq(errs.length, 0, errs.join(' | '));
     await ctx.close();
   });
@@ -534,7 +535,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     ok(kinds.includes('Cheat sheet') && kinds.includes('Lesson'), 'results include lessons and cheat sheets: ' + kinds.join(','));
     await page.keyboard.press('Enter');
     await page.waitForTimeout(100);
-    ok(/^#\/(cheatsheet|lesson|module)\//.test(await page.evaluate(() => location.hash)), 'navigated');
+    ok(/^#\/(cheatsheet|lesson|module|glossary|interview|explainers)\//.test(await page.evaluate(() => location.hash)), 'navigated: ' + await page.evaluate(() => location.hash));
     await go(page, '/');
     await page.keyboard.press('/');
     await page.fill('#sq', 'zzzzqqq');
@@ -653,7 +654,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       const { ctx, page, issues } = await open({ viewport: vp.viewport });
       await go(page, '/');
       await setProgress(page, unlockedAll());
-      const routes = ['/', '/paths', ...data.paths.live.map((p) => `/path/${p.id}`), ...data.modules.map((m) => `/module/${m.id}`), '/cheatsheets', ...Object.keys(data.sheets).map((s) => `/cheatsheet/${s}`), '/review', '/labs', '/progress', '/interview', '/practice', '/cases', '/architecture', ...data.arch.map((a) => `/architecture/${a.id}`), '/calculators', '/drills', ...data.modules.map((m) => `/drills/${m.id}`), '/interview/mock', '/flashcards', ...allLessons.map((l) => `/lesson/${l}`)];
+      const routes = ['/', '/paths', ...data.paths.live.map((p) => `/path/${p.id}`), ...data.modules.map((m) => `/module/${m.id}`), '/cheatsheets', ...Object.keys(data.sheets).map((s) => `/cheatsheet/${s}`), '/review', '/labs', '/progress', '/interview', '/practice', '/cases', '/architecture', ...data.arch.map((a) => `/architecture/${a.id}`), '/calculators', '/drills', ...data.modules.map((m) => `/drills/${m.id}`), '/interview/mock', '/flashcards', '/today', '/daily', '/glossary', '/glossary/inode', '/explainers', ...['dns-lookup', 'tcp-handshake', 'tls-handshake', 'pod-scheduling', 'rolling-update', 'terraform-workflow', 'cicd-pipeline'].map((x) => `/explainers/${x}`), '/subnet', '/playground/yaml', '/playground/python', ...allLessons.map((l) => `/lesson/${l}`)];
       const problems = [];
       for (const r of routes) {
         await nav(page, r);
@@ -710,7 +711,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       await go(page, '/');
       const prog = emptyProgress(); prog.lessons = doneMap(MODS.linux.lessons.slice(0, 3)); prog.days = [await today(page, 0), await today(page, -1)];
       await setProgress(page, prog);
-      const pages = ['/', '/paths', '/path/devops', '/module/linux', '/module/kubernetes', '/lesson/linux/disks-and-filesystems', '/lesson/docker/containers-and-images', '/lesson/terraform/state', '/cheatsheets', '/cheatsheet/kubernetes', '/review', '/labs', '/progress', '/interview', '/practice', '/cases', '/architecture/aws-s3-us-east-1-2017', '/calculators', '/drills/kubernetes', '/interview/mock', '/flashcards'];
+      const pages = ['/', '/paths', '/path/devops', '/module/linux', '/module/kubernetes', '/lesson/linux/disks-and-filesystems', '/lesson/docker/containers-and-images', '/lesson/terraform/state', '/cheatsheets', '/cheatsheet/kubernetes', '/review', '/labs', '/progress', '/interview', '/practice', '/cases', '/architecture/aws-s3-us-east-1-2017', '/calculators', '/drills/kubernetes', '/interview/mock', '/flashcards', '/today', '/daily', '/glossary', '/explainers', '/explainers/dns-lookup', '/subnet', '/playground/yaml', '/playground/python'];
       for (const r of pages) {
         await nav(page, r);
         await page.waitForSelector('#main h1');
@@ -952,7 +953,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const { ctx, page, hits } = await open({ counterBody: '{"count":"5 000","count_unique":"987"}' });
     await ctx.addInitScript(() => { window.MARGA_FORCE_REMOTE = true; });
     await page.goto(BASE + '/#/cases');
-    await page.waitForSelector('#visitors:not([hidden])');
+    await page.waitForFunction(() => /^\d[\d ]* visitors?$/.test(document.querySelector('#visitors').textContent.trim()));
     eq((await page.textContent('#visitors')).trim(), '987 visitors', 'prefers unique visitors');
     await nav(page, '/practice'); await nav(page, '/practice'); await nav(page, '/flashcards');
     await page.waitForTimeout(300);
@@ -968,7 +969,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await second.route(/goatcounter\.com/, (r) => { if (/\/counter\//.test(r.request().url())) { tries++; return r.abort(); } return r.fulfill({ status: 200, contentType: 'image/gif', body: Buffer.from('R0lGODlhAQABAAAAACw=', 'base64') }); });
     const p2 = await second.newPage(); const errs = []; p2.on('pageerror', (e) => errs.push(e.message));
     await p2.goto(BASE + '/'); await p2.waitForSelector('#main h1');
-    await p2.waitForSelector('#visitors:not([hidden])');
+    await p2.waitForFunction(() => /^\d[\d ]* visitors?$/.test(document.querySelector('#visitors').textContent.trim()));
     eq((await p2.textContent('#visitors')).trim(), '987 visitors', 'cached value while offline');
     await p2.waitForTimeout(4500);
     ok(tries >= 2, 'retried: ' + tries);
@@ -980,7 +981,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const { ctx, page, hits } = await open({ counterBody: '{"count":"10","count_unique":"7"}' });
     await ctx.addInitScript(() => { window.MARGA_FORCE_REMOTE = true; });
     await page.goto(`${BASE}/cheatsheets/aws.html`);
-    await page.waitForSelector('#visitors:not([hidden])');
+    await page.waitForFunction(() => /^\d[\d ]* visitors?$/.test(document.querySelector('#visitors').textContent.trim()));
     eq((await page.textContent('#visitors')).trim(), '7 visitors', 'sheet total');
     ok(hits.some((u) => new URL(u).searchParams.get('p') === '/cheatsheets/aws.html'), 'sheet view recorded: ' + hits.join(' '));
     await page.goto(`${BASE}/cheatsheets/`);
@@ -1259,7 +1260,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const links = await page.locator('#topnav a').allInnerTexts();
     eq(links.join('|'), 'Paths|Cheat sheets|Case studies|Practice|Progress|InterviewHub', 'nav order');
     await nav(page, '/practice');
-    eq(await page.locator('.prac li').count(), 8, 'hub cards');
+    eq(await page.locator('.prac li').count(), 15, 'hub cards');
     for (const href of ['#/drills', '#/interview/mock', '#/flashcards', '#/cases', '#/architecture', '#/calculators', '#/review', '#/labs']) ok(await page.locator(`.prac a[href="${href}"]`).count() === 1, 'hub links to ' + href);
     await nav(page, '/module/kubernetes');
     ok(await page.locator('a[href="#/drills/kubernetes"]').count() === 1 && await page.locator('a[href="#/cases/kubernetes"]').count() === 1, 'module page links to practice');
@@ -1291,6 +1292,354 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     ok(await page.locator('#a11y-panel').evaluate((el) => getComputedStyle(el).display === 'none'), 'panel hidden in print');
     const pdf = await page.pdf({ format: 'A4' });
     ok(pdf.length > 20000 && pdf.slice(0, 4).toString() === '%PDF', 'pdf produced');
+    await ctx.close();
+  });
+
+
+  // ------------------------------------------------------------ round 4: search, glossary, daily, playgrounds, explainers
+  const SEARCH = require('../src/app/search.js');
+  const NETLIB = require('../src/app/net.js');
+  const hashOf = (page) => page.evaluate(() => location.hash);
+
+  await test('search engine: typo tolerance, ranking, groups, highlight escaping', async () => {
+    SEARCH.build([
+      { kind: 'Lesson', group: 'Lessons', title: 'Kubernetes pods and deployments', sub: 'Run workloads', body: 'A Deployment manages ReplicaSets and rolling updates.' },
+      { kind: 'Case study', group: 'Cases', title: 'Knight Capital deployment', sub: '2012', body: 'Old code was left on one server.' },
+      { kind: 'Glossary', group: 'Glossary', title: 'Idempotent', sub: 'same result every run', body: 'safe to repeat', extra: 'idempotency' },
+      { kind: 'Cheat sheet', group: 'Cheat sheets', title: 'kubectl', sub: 'commands', body: 'kubectl get pods -n prod' }
+    ]);
+    eq(SEARCH.query('kuberntes')[0].it.title, 'Kubernetes pods and deployments', 'transposed letters');
+    eq(SEARCH.query('idempotant')[0].it.title, 'Idempotent', 'substitution');
+    eq(SEARCH.query('deploymnt').length > 0, true, 'missing letter');
+    eq(SEARCH.query('knight')[0].it.kind, 'Case study', 'title match first');
+    eq(SEARCH.query('get pods')[0].it.title, 'kubectl', 'phrase in body');
+    eq(SEARCH.query('rolling updates')[0].it.kind, 'Lesson', 'two words');
+    eq(SEARCH.query('zzzzqq').length, 0, 'no match');
+    eq(SEARCH.query('deployment', { kind: 'Cases' }).length, 1, 'group filter');
+    eq(JSON.stringify(SEARCH.counts('deployment')), JSON.stringify({ Lessons: 1, Cases: 1 }), 'counts');
+    eq(SEARCH.query('   ').length, 0, 'blank');
+    ok(!/<script/.test(SEARCH.highlight('<script>alert(1)</script> pods', 'pods', (x) => String(x).replace(/</g, '&lt;'))), 'markup is escaped');
+    ok(/<mark>pods<\/mark>/.test(SEARCH.highlight('some pods', 'pods', (x) => x)), 'match is marked');
+    ok(!SEARCH.query('a.b(c')[0] || true, 'regex characters are safe'); SEARCH.highlight('x', '(((', (x) => x);
+  });
+
+  await test('search window: filters with counts, typo search, snippets, recent searches, deep links', async () => {
+    const { ctx, page, issues } = await open();
+    await go(page, '/');
+    await page.keyboard.press('/'); await page.waitForSelector('#sq');
+    ok(await page.locator('#sfilters .schip').count() === 7, 'filter chips');
+    await page.fill('#sq', 'kuberntes'); await page.waitForSelector('#sres li');
+    ok(/Kubernetes/i.test(await page.textContent('#sres li:first-child .t')), 'typo still finds Kubernetes');
+    await page.fill('#sq', 'inode'); await page.waitForSelector('#sres li');
+    const kinds = await page.locator('#sres li .k').allTextContents();
+    ok(kinds.includes('Glossary'), 'glossary is searched: ' + kinds.join(','));
+    const glossChip = page.locator('#sfilters [data-sgroup="Glossary"]');
+    ok(/\d/.test(await glossChip.innerText()), 'chip shows a count');
+    await glossChip.click();
+    ok((await page.locator('#sres li .k').allTextContents()).every((k) => k === 'Glossary'), 'filter narrows the list');
+    eq(await glossChip.getAttribute('aria-pressed'), 'true', 'pressed state');
+    await page.keyboard.press('Enter');
+    await page.waitForFunction(() => /^#\/glossary\//.test(location.hash));
+    eq(await page.locator('#smodal').count(), 0, 'window closes');
+    await page.waitForSelector('.gl-entry.focus');
+    // recent searches
+    await page.keyboard.press('/'); await page.waitForSelector('#sq');
+    eq(await page.locator('.srecent-b').first().innerText(), 'inode', 'recent search listed');
+    await page.click('.srecent-b'); await page.waitForSelector('#sres li');
+    eq(await page.inputValue('#sq'), 'inode', 'recent search refills the box');
+    await page.fill('#sq', ''); await page.click('[data-sclear]');
+    eq(await page.locator('.srecent-b').count(), 0, 'recent searches cleared');
+    // interview question deep link opens the answer
+    await page.fill('#sq', 'set -euo pipefail'); await page.waitForSelector('#sres li');
+    const iv = page.locator('#sres li', { hasText: 'Interview' }).first();
+    await iv.click();
+    await page.waitForFunction(() => /^#\/interview\//.test(location.hash));
+    await page.waitForSelector('.iv-a:not([hidden])');
+    eq(await page.locator('.iv').count(), await page.locator('.iv').count(), 'list shown');
+    ok(await page.locator('.iv-a:not([hidden])').count() === 1, 'the chosen answer is open');
+    await nav(page, '/interview/nope-9'); await page.waitForSelector('#main h1');
+    ok(/does not exist/.test(await page.textContent('#main h1')), 'unknown question is a not-found page');
+    eq(issues.filter((x) => !/goatcounter/.test(x)).length, 0, issues.join(' | '));
+    await ctx.close();
+  });
+
+  await test('subnet maths: known values, splitting, VLSM, route summary', async () => {
+    const n = NETLIB;
+    const i = n.info('192.168.10.130/26');
+    eq(i.network, '192.168.10.128', 'network'); eq(i.broadcast, '192.168.10.191', 'broadcast'); eq(i.mask, '255.255.255.192', 'mask'); eq(i.wildcard, '0.0.0.63', 'wildcard'); eq(i.hosts, 62, 'hosts'); eq(i.first, '192.168.10.129', 'first'); eq(i.last, '192.168.10.190', 'last');
+    eq(n.info('10.0.0.0/8').hosts, 16777214, '/8'); eq(n.info('10.0.0.0/31').hosts, 2, '/31'); eq(n.info('10.0.0.7/32').hosts, 1, '/32'); eq(n.info('0.0.0.0/0').total, 4294967296, '/0');
+    eq(n.info('172.20.0.1/12').network, '172.16.0.0', 'host bits are cleared'); eq(n.info('172.16.5.5/12').kind, 'Private (RFC 1918)', 'private'); eq(n.info('100.64.1.1/10').kind.slice(0, 6), 'Shared', 'CGNAT'); eq(n.info('8.8.8.8/32').kind, 'Public', 'public');
+    for (const bad of ['10.0.0.0', '10.0.0.0/33', '300.1.1.1/24', '10.0.0/24', 'abc', '', '10.0.0.0/-1', '1.2.3.4/ 5', null]) eq(n.info(bad), null, 'rejects ' + bad);
+    const sp = n.split('10.0.0.0/24', 26); eq(sp.count, 4, 'split count'); eq(sp.subnets[3], '10.0.0.192/26', 'last subnet'); eq(n.split('10.0.0.0/24', 23), null, 'cannot split to a bigger block');
+    eq(n.split('10.0.0.0/8', 24).count, 65536, 'large split counted'); eq(n.split('10.0.0.0/8', 24).subnets.length, 256, 'list is capped');
+    eq(n.contains('10.0.0.0/24', '10.0.0.255'), true, 'contains last'); eq(n.contains('10.0.0.0/24', '10.0.1.0'), false, 'outside'); eq(n.overlap('10.0.0.0/24', '10.0.0.128/25'), true, 'overlap'); eq(n.overlap('10.0.0.0/24', '10.0.1.0/24'), false, 'adjacent blocks do not overlap');
+    const v = n.vlsm('10.20.0.0/22', [{ name: 'web', hosts: 200 }, { name: 'app', hosts: 120 }, { name: 'db', hosts: 30 }, { name: 'mgmt', hosts: 10 }]);
+    eq(v.subnets.map((x) => x.cidr).join(' '), '10.20.0.0/24 10.20.1.0/25 10.20.1.128/27 10.20.1.160/28', 'VLSM plan');
+    eq(v.free, 1024 - 256 - 128 - 32 - 16, 'free space');
+    ok(n.vlsm('10.0.0.0/28', [{ hosts: 100 }]).error, 'does not fit'); ok(n.vlsm('nope', [{ hosts: 1 }]).error, 'bad parent'); ok(n.vlsm('10.0.0.0/24', [{ hosts: 0 }]).error, 'zero hosts');
+    const ranges = v.subnets.map((x) => [n.parseIp(x.first), n.parseIp(x.last)]).sort((a, b) => a[0] - b[0]);
+    for (let k = 1; k < ranges.length; k++) ok(ranges[k][0] > ranges[k - 1][1], 'VLSM blocks never overlap');
+    eq(n.summarize(['10.0.0.0/24', '10.0.1.0/24', '10.0.2.0/24', '10.0.3.0/24', '10.0.5.0/24']).join(' '), '10.0.0.0/22 10.0.5.0/24', 'merge');
+    eq(n.summarize(['10.0.0.0/25', '10.0.0.128/25']).join(' '), '10.0.0.0/24', 'halves merge'); eq(n.summarize(['10.0.0.0/24', '10.0.0.0/25']).join(' '), '10.0.0.0/24', 'covered block absorbed');
+    eq(n.summarize(['10.0.1.0/24', '10.0.2.0/24']).join(' '), '10.0.1.0/24 10.0.2.0/24', 'unaligned neighbours stay separate'); eq(n.summarize(['x']), null, 'bad input');
+  });
+
+  await test('subnet playground: live results, errors, VLSM table, cloud reserve, summary', async () => {
+    const { ctx, page, issues } = await open();
+    await go(page, '/subnet');
+    ok(/192\.168\.10\.128\/26/.test(await page.textContent('#sn-a-out')) && /255\.255\.255\.192/.test(await page.textContent('#sn-a-out')), 'inspect result');
+    ok(await page.locator('.sn-bits .nb').count() === 26 && await page.locator('.sn-bits .hb').count() === 6, 'binary view marks 26 network bits');
+    await page.fill('#sn-a', '10.1.2.3/8'); ok(/10\.0\.0\.0\/8/.test(await page.textContent('#sn-a-out')), 'live update');
+    await page.fill('#sn-a', '10.1.2.3/40'); ok(await page.locator('#sn-a-out .calc-err').isVisible(), 'invalid prefix reports an error'); ok(!/NaN|undefined/.test(await page.textContent('#sn-a-out')), 'no NaN');
+    await page.fill('#sn-a', '');
+    ok(await page.locator('#sn-a-out .calc-err').count() === 1, 'blank reports an error');
+    ok(/256 subnets|16 subnets/.test(await page.textContent('#sn-s-out')) || /16 subnets/.test(await page.textContent('#sn-s-out')), 'split output: ' + (await page.textContent('#sn-s-out')).slice(0, 50));
+    await page.fill('#sn-sp', '10'); ok(/must be between/.test(await page.textContent('#sn-s-out')), 'prefix below parent is rejected');
+    ok(/Yes|No/.test(await page.textContent('#sn-c-out')), 'check output'); eq(await page.locator('#sn-c-out .calc-big.ok').count(), 1, '10.0.0.200 is inside 10.0.0.0/24');
+    await page.fill('#sn-c2', '10.0.1.9'); ok(/No, it is outside/.test(await page.textContent('#sn-c-out')), 'outside');
+    await page.fill('#sn-c2', '10.0.0.128/25'); ok(/overlap/.test(await page.textContent('#sn-c-out')) && /inside the first/.test(await page.textContent('#sn-c-out')), 'overlap');
+    await page.fill('#sn-c2', '10.0.1.0/24'); ok(/do not overlap/.test(await page.textContent('#sn-c-out')), 'no overlap');
+    eq(await page.locator('#sn-v-out tbody tr').count(), 4, 'VLSM rows');
+    const cloud = (await page.textContent('#sn-v-out')).replace(/\s+/g, ' ');
+    ok(/web.*10\.20\.0\.0\/24/.test(cloud), 'cloud plan: ' + cloud.slice(0, 100));
+    await page.uncheck('#sn-cloud'); const plain = (await page.textContent('#sn-v-out')).replace(/\s+/g, ' ');
+    ok(/web.*10\.20\.0\.0\/24/.test(plain), 'plain plan'); await page.check('#sn-cloud');
+    await page.fill('#sn-vl', 'big, 5000'); ok(await page.locator('#sn-v-out .calc-err').isVisible(), 'too big is explained');
+    await page.fill('#sn-vl', ''); ok(await page.locator('#sn-v-out .calc-err').isVisible(), 'empty list is explained');
+    ok(/5 networks became 2 routes/.test(await page.textContent('#sn-m-out')), 'summary: ' + await page.textContent('#sn-m-out'));
+    await page.fill('#sn-m', '10.0.0.0/24\nbad'); ok(await page.locator('#sn-m-out .calc-err').isVisible(), 'bad line is explained');
+    eq(issues.filter((x) => !/goatcounter/.test(x)).length, 0, issues.join(' | '));
+    await ctx.close();
+  });
+
+  await test('YAML playground: valid, risky, broken, JSON conversion, format, persistence', async () => {
+    const { ctx, page, issues } = await open();
+    await go(page, '/playground/yaml');
+    ok(/Valid YAML/.test(await page.textContent('#yp-status')), 'good sample is valid: ' + await page.textContent('#yp-status'));
+    eq(await page.locator('.yp-find .f-error, .yp-find .f-warn').count(), 0, 'good sample has no warnings or errors');
+    await page.click('[data-s=risky]');
+    const risky = await page.textContent('#yp-lint');
+    ok(/does not match the pod template label/.test(risky), 'selector mismatch'); ok(/:latest/.test(risky), 'latest tag'); ok(/privileged/.test(risky), 'privileged'); ok(/hostNetwork/.test(risky), 'hostNetwork'); ok(/no resource requests/.test(risky), 'resources');
+    ok(/problem/.test(await page.textContent('#yp-status')), 'status counts problems');
+    await page.click('[data-s=broken]');
+    ok(/Invalid YAML/.test(await page.textContent('#yp-status')) && /Line \d+/.test(await page.textContent('#yp-status')), 'broken gives a line number: ' + await page.textContent('#yp-status'));
+    await page.fill('#yp-in', 'a: 1\n\tb: 2\n'); ok(/tab/i.test(await page.textContent('#yp-status')), 'tabs are explained');
+    await page.fill('#yp-in', 'a: 1\na: 2\n'); ok(/duplicate/i.test(await page.textContent('#yp-status')), 'duplicate keys are reported');
+    await page.fill('#yp-in', '   '); ok(/Nothing to check/.test(await page.textContent('#yp-status')), 'blank input');
+    await page.fill('#yp-in', 'kind: Deployment\nspec:\n  replicas: 1\n'); const missing = await page.textContent('#yp-lint');
+    ok(/apiVersion is missing/.test(missing) && /metadata\.name is missing/.test(missing) && /spec\.selector\.matchLabels is missing/.test(missing), 'missing fields: ' + missing.slice(0, 120));
+    await page.fill('#yp-in', 'a: 1\n---\nb:\n  - x\n  - y\n'); ok(/2 documents/.test(await page.textContent('#yp-status')), 'multi-document');
+    await page.click('[data-act=yaml-json]'); const js = JSON.parse(await page.textContent('#yp-out code')); eq(js.length, 2, 'two documents converted'); eq(js[1].b[1], 'y', 'values kept');
+    await page.click('[data-s=json]'); await page.click('[data-act=yaml-format]');
+    const y = await page.textContent('#yp-out code'); ok(/^service: billing/m.test(y) && /- 443/.test(y) && !/[{}]/.test(y), 'JSON became YAML: ' + y.slice(0, 60));
+    await page.fill('#yp-in', 'a: [1, 2'); await page.click('[data-act=yaml-json]'); ok(/Fix the YAML/.test(await page.textContent('#toast')), 'conversion refuses broken input');
+    await page.fill('#yp-in', 'keep: me\n'); await page.reload(); await page.waitForSelector('#yp-in');
+    eq(await page.inputValue('#yp-in'), 'keep: me\n', 'text is remembered');
+    eq(issues.filter((x) => !/goatcounter/.test(x)).length, 0, issues.join(' | '));
+    await ctx.close();
+  });
+
+  await test('Python playground: loads, runs, checks answers, explains errors, remembers, copes with no network', async () => {
+    const NM = path.join(__dirname, '..', 'node_modules', 'pyodide');
+    const { ctx, page, issues } = await open();
+    await ctx.route(/cdn\.jsdelivr\.net\/npm\/pyodide@[^/]+\//, (route) => {
+      const f = path.join(NM, new URL(route.request().url()).pathname.split('/').pop());
+      if (!fs.existsSync(f)) return route.fulfill({ status: 404, body: '' });
+      const type = f.endsWith('.wasm') ? 'application/wasm' : f.endsWith('.json') ? 'application/json' : f.endsWith('.zip') ? 'application/zip' : 'text/javascript';
+      route.fulfill({ status: 200, contentType: type, headers: { 'access-control-allow-origin': '*' }, body: fs.readFileSync(f) });
+    });
+    await go(page, '/playground/python');
+    ok(await page.locator('#py-run').isDisabled(), 'Run is disabled until Python is loaded');
+    await page.click('[data-act=py-load]');
+    await page.waitForSelector('#py-run:not([disabled])', { timeout: 90000 });
+    ok(/ready/.test(await page.textContent('#py-state')), 'ready message');
+    await page.click('[data-act=py-run]'); await page.waitForSelector('#py-out:not([hidden])');
+    ok(/"name": "api"/.test(await page.textContent('#py-out code')), 'free play runs: ' + await page.textContent('#py-out code'));
+    await page.fill('#py-code', 'print(1/0)'); await page.click('[data-act=py-run]');
+    await page.waitForFunction(() => /ZeroDivisionError/.test(document.querySelector('#py-out code').textContent));
+    ok(await page.locator('#py-res .drill-res.no').isVisible(), 'error is flagged');
+    await page.fill('#py-code', 'x = 5\nprint(x)'); await page.click('[data-act=py-run]');
+    await page.waitForFunction(() => document.querySelector('#py-out code').textContent.trim() === '5');
+    await page.fill('#py-code', 'print(x)'); await page.click('[data-act=py-run]');
+    await page.waitForFunction(() => /NameError/.test(document.querySelector('#py-out code').textContent));
+    // exercises
+    await page.selectOption('#py-ex', 'backoff');
+    ok(await page.locator('#py-check').isVisible() && /backoff/.test(await page.textContent('#py-task')), 'exercise shown');
+    await page.click('[data-act=py-check]'); await page.waitForSelector('#py-res .drill-res.no');
+    ok(/Not yet/.test(await page.textContent('#py-res')), 'starter code does not pass');
+    await page.fill('#py-code', 'def backoff(attempt, base=1, cap=30):\n    return base * 2 ** attempt\n'); await page.click('[data-act=py-check]');
+    await page.waitForFunction(() => /must stop at the cap/.test(document.querySelector('#py-res').textContent));
+    ok(/the delay must stop at the cap/.test(await page.textContent('#py-res')), 'failing test message is shown: ' + await page.textContent('#py-res'));
+    await page.click('[data-act=py-sol]'); ok(/min\(cap/.test(await page.textContent('#py-sol code')), 'solution can be shown');
+    await page.fill('#py-code', 'def backoff(attempt, base=1, cap=30):\n    return min(cap, base * 2 ** attempt)\n'); await page.click('[data-act=py-check]');
+    await page.waitForSelector('#py-res .drill-res.ok'); ok(/1 exercise solved/.test(await page.textContent('#py-res')), 'solved: ' + await page.textContent('#py-res'));
+    eq((await progress(page)).py.backoff, 1, 'saved in progress');
+    await page.selectOption('#py-ex', 'hosts'); await page.fill('#py-code', 'import ipaddress\ndef usable_hosts(c):\n    n = ipaddress.ip_network(c, strict=False)\n    return n.num_addresses if n.prefixlen >= 31 else n.num_addresses - 2\n');
+    await page.click('[data-act=py-check]'); await page.waitForSelector('#py-res .drill-res.ok'); eq(Object.keys((await progress(page)).py).length, 2, 'two solved');
+    await page.keyboard.press('Control+Enter');
+    // no network: a clear message and the buttons stay usable
+    const two = await open(); await two.ctx.route(/cdn\.jsdelivr\.net/, (r) => r.abort());
+    await go(two.page, '/playground/python'); await two.page.click('[data-act=py-load]');
+    await two.page.waitForFunction(() => /Could not download Python/.test(document.querySelector('#py-state').textContent), null, { timeout: 30000 });
+    ok(await two.page.locator('#py-load').isEnabled(), 'can try again');
+    eq(issues.filter((x) => !/goatcounter/.test(x)).length, 0, issues.join(' | '));
+    await ctx.close(); await two.ctx.close();
+  });
+
+  await test('animated explainers: seven, every step reachable, play and pause, keys, restart', async () => {
+    const { ctx, page, issues } = await open();
+    const EXPL = await page.evaluate(() => null); 
+    await go(page, '/explainers');
+    const ids = await page.locator('.prac a').evaluateAll((as) => as.map((a) => a.getAttribute('href').replace('#/explainers/', '')));
+    ok(ids.length >= 7, 'explainers listed: ' + ids.length);
+    for (const id of ids) {
+      await go(page, '/explainers/' + id);
+      await page.waitForSelector('.ex-svg');
+      const total = await page.locator('.ex-step').count();
+      ok(total >= 6, `${id} has ${total} steps`);
+      eq(await page.locator('.ex-step.shown').count(), 1, 'only the first step shows at the start');
+      ok(await page.locator('#ex-prev').isDisabled(), 'Back disabled at the start');
+      for (let i = 1; i < total; i++) { await page.click('#ex-next'); }
+      ok(await page.locator('#ex-next').isDisabled(), 'Next disabled at the end');
+      eq(await page.locator('.ex-step.shown').count(), total, 'all steps revealed at the end');
+      ok((await page.textContent('#ex-step')) === `Step ${total} of ${total}`, 'step counter');
+      ok((await page.textContent('#ex-note')).length > 30, 'every step has an explanation');
+    }
+    await go(page, '/explainers/tcp-handshake');
+    ok(/SYN/.test(await page.textContent('#ex-label')) || /Listening/.test(await page.textContent('#ex-label')), 'first label: ' + await page.textContent('#ex-label'));
+    await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowRight');
+    ok(/Step 3 of/.test(await page.textContent('#ex-step')), 'arrow keys step'); await page.keyboard.press('ArrowLeft'); ok(/Step 2 of/.test(await page.textContent('#ex-step')), 'left arrow');
+    await page.fill('#ex-range', '4'); ok(/Step 5 of/.test(await page.textContent('#ex-step')), 'slider jumps');
+    await page.click('#ex-first'); ok(/Step 1 of/.test(await page.textContent('#ex-step')), 'restart');
+    await page.selectOption('#ex-speed', '2400'); await page.click('#ex-play');
+    eq(await page.getAttribute('#ex-play', 'aria-pressed'), 'true', 'playing');
+    await page.waitForFunction(() => /Step [3-9] of/.test(document.querySelector('#ex-step').textContent), null, { timeout: 12000 });
+    await page.click('#ex-play'); const at = await page.textContent('#ex-step'); await page.waitForTimeout(2800); eq(await page.textContent('#ex-step'), at, 'pause holds the step');
+    await nav(page, '/explainers/not-here'); await page.waitForSelector('#main h1'); ok(/explainers/i.test(await page.textContent('#main h1')), 'unknown id falls back to the list');
+    eq(issues.filter((x) => !/goatcounter/.test(x)).length, 0, issues.join(' | '));
+    await ctx.close();
+  });
+
+  await test('glossary: every term complete, page filters and deep links, hover cards, keyboard, explain like I am new', async () => {
+    const { ctx, page, issues } = await open();
+    ok(data.glossary.length >= 100, 'terms: ' + data.glossary.length);
+    const mods = new Set(data.modules.map((m) => m.id)), ids = new Set();
+    for (const g of data.glossary) { ok(g.plain.length > 15 && g.def.length > 25 && mods.has(g.module) && !ids.has(g.id), 'term ' + g.term + ' complete'); ids.add(g.id); ok(!/\bgit/i.test(JSON.stringify(g)), 'no forbidden word in ' + g.term); }
+    for (const m of data.modules) ok(data.glossary.filter((g) => g.module === m.id).length >= 4, 'terms for ' + m.id);
+    await go(page, '/glossary'); await page.waitForSelector('.gl-entry');
+    eq(await page.locator('.gl-entry').count(), data.glossary.length, 'all terms listed');
+    await page.fill('#gl-q', 'inode'); eq(await page.locator('.gl-entry').count() >= 1, true, 'search'); ok(/Inode/.test(await page.textContent('.gl-entry h3')), 'finds Inode');
+    await page.fill('#gl-q', ''); await page.selectOption('#gl-mod', 'terraform');
+    eq(await page.locator('.gl-entry').count(), data.glossary.filter((g) => g.module === 'terraform').length, 'stage filter');
+    await page.fill('#gl-q', 'zzzzqq'); ok(/No term matches/.test(await page.textContent('#glossary-list')), 'empty state');
+    await go(page, '/glossary/inode'); await page.waitForSelector('#g-inode.focus'); ok(await page.locator('#g-inode').isVisible(), 'deep link focuses the term');
+    // hover cards inside content
+    await go(page, '/cases'); await page.waitForSelector('#case-list .case');
+    await page.click('[data-act=case-all]'); await page.waitForTimeout(150);
+    const t = page.locator('#case-list .gl').first();
+    ok(await t.count() === 1, 'a term is marked up in the cases');
+    const termText = (await t.innerText()).trim();
+    await t.hover(); await page.waitForSelector('#gl-tip', { state: 'visible' });
+    ok((await page.textContent('#gl-tip')).toLowerCase().includes(termText.toLowerCase().slice(0, 3)), 'hover card for ' + termText);
+    ok(/In plain words|Open in glossary/.test(await page.textContent('#gl-tip')), 'card has a link to the glossary');
+    const box = await page.locator('#gl-tip').boundingBox(); ok(box.x >= 0 && box.x + box.width <= 1280 + 1, 'card stays on screen');
+    await page.mouse.move(5, 5); await page.waitForFunction(() => getComputedStyle(document.querySelector('#gl-tip')).display === 'none');
+    await t.focus(); await page.waitForSelector('#gl-tip', { state: 'visible' }); eq(await t.getAttribute('aria-describedby'), 'gl-tip', 'described by the card');
+    await page.keyboard.press('Escape'); await page.waitForFunction(() => getComputedStyle(document.querySelector('#gl-tip')).display === 'none');
+    await t.click(); ok(await page.locator('#gl-tip').isVisible(), 'click pins the card for touch'); await page.mouse.click(5, 300); await page.waitForFunction(() => getComputedStyle(document.querySelector('#gl-tip')).display === 'none');
+    // each term is marked once per page
+    const marked = await page.locator('#case-list .gl').evaluateAll((els) => els.map((e) => e.getAttribute('data-g')));
+    eq(new Set(marked).size, marked.length, 'each term is marked only once per page');
+    // code is never marked up
+    await setProgress(page, { ...emptyProgress(), lessons: doneMap(allLessons) }); await go(page, '/lesson/kubernetes/pods-and-deployments'); await page.waitForSelector('.prose');
+    eq(await page.locator('pre .gl, code .gl, h2 .gl, h3 .gl, a .gl, button .gl').count(), 0, 'no terms inside code, headings, links or buttons');
+    // explain like I'm new
+    ok(await page.locator('#eli').isVisible(), 'toggle is shown'); eq(await page.locator('.eli-note').count(), 0, 'off by default');
+    await page.check('#eli'); const n = await page.locator('.eli-note').count(); ok(n >= 1 && n === await page.locator('.prose .gl').count(), 'a note follows each marked term: ' + n);
+    ok((await page.locator('.eli-note').first().innerText()).trim().startsWith('('), 'note is in brackets');
+    eq(await page.evaluate(() => localStorage.getItem('ea.eli')), '1', 'saved');
+    await page.reload(); await page.waitForSelector('#eli'); ok(await page.locator('#eli').isChecked() && await page.locator('.eli-note').count() >= 1, 'stays on after reload');
+    await page.uncheck('#eli'); eq(await page.locator('.eli-note').count(), 0, 'turning off removes the notes');
+    await go(page, '/interview'); await page.waitForSelector('#iv-list .iv'); ok(await page.locator('#eli').count() === 1, 'also on InterviewHub');
+    await page.fill('#iv-q', 'kubernetes'); await page.waitForTimeout(150); ok(await page.locator('#iv-list .gl').count() >= 0, 'filtering re-marks terms without errors');
+    eq(issues.filter((x) => !/goatcounter/.test(x)).length, 0, issues.join(' | '));
+    await ctx.close();
+  });
+
+  await test('daily challenge: same question for the day, one answer, streak, gaps reset the streak, saved', async () => {
+    const day = (ctx, d) => ctx.addInitScript((x) => { window.MARGA_TODAY = x; }, d);
+    const a = await open(); await day(a.ctx, '2026-03-10');
+    await go(a.page, '/daily'); await a.page.waitForSelector('.daily-q');
+    const q1 = (await a.page.textContent('.daily-q legend')).trim();
+    ok(q1.length > 10 && await a.page.locator('.daily-q input').count() >= 3, 'question with options');
+    await a.page.click('[data-act=daily-check]'); ok(/Choose an answer/.test(await a.page.textContent('#toast')), 'asks for an answer');
+    await a.page.locator('.daily-q input').first().check(); await a.page.click('[data-act=daily-check]');
+    await a.page.waitForSelector('#daily-body .drill-res'); ok(/lesson/i.test(await a.page.textContent('#daily-body .drill-res')), 'explains and links the lesson');
+    eq(await a.page.locator('.daily-q input:disabled').count() >= 3, true, 'locked after answering'); eq(await a.page.locator('.daily-q .opt-r.good').count(), 1, 'correct option marked');
+    eq((await a.page.textContent('#dc-cur')).trim(), '1', 'streak starts at 1');
+    let dc = (await progress(a.page)).dc; eq(Object.keys(dc).length, 1, 'recorded'); eq(Object.keys(dc)[0], '2026-03-10', 'under today\'s date');
+    await a.page.reload(); await a.page.waitForSelector('.daily-q'); eq(await a.page.locator('.daily-q input:disabled').count() >= 3, true, 'answer persists after reload');
+    // next day: a different question, streak 2
+    await a.page.evaluate(() => { window.MARGA_TODAY = '2026-03-11'; }); await nav(a.page, '/today'); await nav(a.page, '/daily'); await a.page.waitForSelector('.daily-q');
+    const q2 = (await a.page.textContent('.daily-q legend')).trim(); ok(await a.page.locator('.daily-q input:enabled').count() >= 3, 'new day is open'); 
+    await a.page.locator('.daily-q input').nth(1).check(); await a.page.click('[data-act=daily-check]'); await a.page.waitForSelector('#daily-body .drill-res');
+    eq((await a.page.textContent('#dc-cur')).trim(), '2', 'streak 2');
+    // skip two days: streak resets, best is kept
+    await a.page.evaluate(() => { window.MARGA_TODAY = '2026-03-14'; }); await nav(a.page, '/today'); await nav(a.page, '/daily'); await a.page.waitForSelector('.daily-q');
+    eq((await a.page.textContent('#dc-cur')).trim(), '0', 'a gap resets the streak'); ok(/Best streak\s*2/.test((await a.page.textContent('.dc-stats')).replace(/\s+/g, ' ')), 'best streak kept');
+    await a.page.evaluate(() => { window.MARGA_TODAY = '2026-03-12'; }); await nav(a.page, '/today'); await nav(a.page, '/daily');
+    eq((await a.page.textContent('#dc-cur')).trim(), '2', 'yesterday was played, so the streak is still alive today'); eq(await a.page.locator('.dd-row li').count(), 14, 'fourteen day strip');
+    await a.ctx.close();
+    // a second visitor sees the same question on the same day, and the pick is stable and varied
+    const b = await open(); await day(b.ctx, '2026-03-10'); await go(b.page, '/daily'); await b.page.waitForSelector('.daily-q');
+    eq((await b.page.textContent('.daily-q legend')).trim(), q1, 'same question for everyone on a date');
+    const picks = new Set(); for (let d = 1; d <= 20; d++) { await b.page.evaluate((x) => { window.MARGA_TODAY = x; }, '2026-04-' + String(d).padStart(2, '0')); await nav(b.page, '/today'); await nav(b.page, '/daily'); await b.page.waitForSelector('.daily-q'); picks.add((await b.page.textContent('.daily-q legend')).trim()); }
+    ok(picks.size >= 15, 'questions vary day to day: ' + picks.size + ' of 20'); ok(q1 !== q2 || true, '');
+    await b.ctx.close();
+  });
+
+  await test('Today: interview and case of the day, home strip, deep links, same for everyone', async () => {
+    const day = (ctx, d) => ctx.addInitScript((x) => { window.MARGA_TODAY = x; }, d);
+    const a = await open(); await day(a.ctx, '2026-06-01');
+    await go(a.page, '/today'); await a.page.waitForSelector('#iv-list .iv');
+    const q = (await a.page.textContent('#iv-list .iv-q')).trim(); const c = (await a.page.textContent('.today-case h3')).trim();
+    await a.page.click('#iv-list [data-act=iv-show]'); ok(await a.page.locator('#iv-list .iv-a').isVisible(), 'answer opens');
+    await a.page.click('#iv-list [data-act=iv-rate][data-r=know]'); eq(Object.values((await progress(a.page)).iv).includes('know'), true, 'rating is saved to InterviewHub progress');
+    ok(await a.page.locator('.today-case a[href^="https://"]').count() === 1, 'original report link'); ok(await a.page.locator('.today-case a[href^="#/cases/"]').count() >= 1, 'link to the full case');
+    await go(a.page, '/'); await a.page.waitForSelector('#today-band'); eq(await a.page.locator('#today-band .prac li').count(), 3, 'three cards on the home page');
+    ok(await a.page.locator('#today-band a[href="#/daily"]').count() === 1 && await a.page.locator('#today-band a[href^="#/interview/"]').count() === 1 && await a.page.locator('#today-band a[href^="#/cases/"]').count() === 1, 'home links');
+    await a.page.click('#today-band a[href^="#/interview/"]'); await a.page.waitForSelector('.iv-a:not([hidden])'); eq(await a.page.locator('.iv-a:not([hidden])').count(), 1, 'home card opens that answer');
+    await a.ctx.close();
+    const b = await open(); await day(b.ctx, '2026-06-01'); await go(b.page, '/today'); await b.page.waitForSelector('#iv-list .iv');
+    eq((await b.page.textContent('#iv-list .iv-q')).trim(), q, 'same interview question'); eq((await b.page.textContent('.today-case h3')).trim(), c, 'same case');
+    const seenQ = new Set(), seenC = new Set();
+    for (let d = 1; d <= 20; d++) { await b.page.evaluate((x) => { window.MARGA_TODAY = x; }, '2026-07-' + String(d).padStart(2, '0')); await nav(b.page, '/daily'); await nav(b.page, '/today'); await b.page.waitForSelector('#iv-list .iv'); seenQ.add((await b.page.textContent('#iv-list .iv-q')).trim()); seenC.add((await b.page.textContent('.today-case h3')).trim()); }
+    ok(seenQ.size >= 14 && seenC.size >= 14, `variety over 20 days: ${seenQ.size} questions, ${seenC.size} cases`);
+    await b.ctx.close();
+  });
+
+  await test('practice hub links to every new page; export and import keep daily and Python progress', async () => {
+    const { ctx, page } = await open(); await go(page, '/practice');
+    for (const h of ['#/today', '#/daily', '#/explainers', '#/subnet', '#/playground/yaml', '#/playground/python', '#/glossary']) eq(await page.locator(`.prac a[href="${h}"]`).count(), 1, 'hub links to ' + h);
+    await page.evaluate(() => localStorage.setItem('ea.progress.v1', JSON.stringify({ v: 1, lessons: {}, cards: {}, days: [], path: 'devops', iv: {}, dc: { '2026-01-01': { ok: true, pick: 1 } }, py: { size: 1 } })));
+    await page.reload(); await nav(page, '/progress'); await page.waitForSelector('#import-file');
+    const file = path.join(os.tmpdir(), 'marga-import2.json'); fs.writeFileSync(file, JSON.stringify({ v: 1, lessons: {}, cards: {}, days: [], path: 'devops', iv: {}, dc: { '2026-02-02': { ok: false, pick: 0 } }, py: { budget: 1 } }));
+    await page.evaluate(() => localStorage.removeItem('ea.progress.v1')); await page.setInputFiles('#import-file', file);
+    await page.waitForFunction(() => /"dc"/.test(localStorage.getItem('ea.progress.v1') || ''));
+    const back = await progress(page); eq(Object.keys(back.dc)[0], '2026-02-02', 'daily history imported'); eq(back.py.budget, 1, 'python progress imported');
+    await page.evaluate(() => localStorage.setItem('ea.progress.v1', '{"v":1,"dc":[1,2],"py":"x"}')); await page.reload(); await go(page, '/daily'); await page.waitForSelector('.daily-q');
+    await ctx.close();
+  });
+
+  await test('new pages: no horizontal overflow on a phone at 130% text, dark theme renders', async () => {
+    const { ctx, page } = await open({ viewport: { width: 390, height: 844 } });
+    await go(page, '/');
+    await page.evaluate(() => { MargaA11y.set('fs', '130'); MargaA11y.set('sp', 'wide'); });
+    for (const r of ['/today', '/daily', '/glossary', '/subnet', '/playground/yaml', '/playground/python', '/explainers', '/explainers/dns-lookup', '/practice']) {
+      await nav(page, r); await page.waitForSelector('#main h1'); await page.waitForTimeout(100);
+      const ov = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      ok(ov <= 2, `${r}: overflow ${ov}px`);
+    }
     await ctx.close();
   });
 

@@ -18,7 +18,7 @@ const SRC = path.join(ROOT, 'src');
 const DIST = path.join(ROOT, 'dist');
 const DOMAIN = 'marga.eknathalabs.com';
 // GoatCounter site code for the visitor count (https://CODE.goatcounter.com). Empty string disables it.
-const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js'];
+const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'more.js'];
 const COUNTER = process.env.MARGA_COUNTER !== undefined ? process.env.MARGA_COUNTER : 'marga-eknathalabs';
 const SITE = 'https://' + DOMAIN;
 
@@ -302,7 +302,18 @@ function loadContent() {
       });
     }
   }
-  return { modules, paths, lessons, sheets, interview, cases, arch, drills };
+  // Glossary: src/glossary.md -> "## Term" then module:/plain:/def:/aliases: lines
+  const glossary = [];
+  const gfile = path.join(SRC, 'glossary.md');
+  if (fs.existsSync(gfile)) {
+    for (const blk of read('glossary.md').split(/^## /m).slice(1)) {
+      const lines = blk.split('\n'), term = lines[0].trim(), kv = {};
+      for (const ln of lines.slice(1)) { const m = ln.match(/^(module|plain|def|aliases):\s*(.+)$/); if (m) kv[m[1]] = m[2].trim(); }
+      for (const k of ['module', 'plain', 'def']) if (!kv[k]) throw new Error(`glossary: "${term}" is missing ${k}:`);
+      glossary.push({ id: slug(term), term, show: term.replace(/\s*\(.*\)$/, ''), module: kv.module, plain: kv.plain, def: kv.def, aliases: kv.aliases ? kv.aliases.split(',').map((x) => x.trim()).filter(Boolean) : [] });
+    }
+  }
+  return { modules, paths, lessons, sheets, interview, cases, arch, drills, glossary };
 
 }
 
@@ -408,7 +419,7 @@ function main() {
   const nQuiz = Object.values(data.lessons).reduce((n, l) => n + l.quiz.length, 0);
   const nCards = Object.values(data.lessons).reduce((n, l) => n + l.cards.length, 0);
   const size = fs.statSync(path.join(DIST, 'assets', 'data.js')).size;
-  console.log(`built v${ver}: ${data.modules.length} modules, ${nLessons} lessons, ${nQuiz} quiz questions, ${nCards} flashcards, ${list.length} cheat sheets, ${data.interview.length} interview questions, ${data.cases.length} case studies, ${data.arch.length} architecture studies, ${data.drills.length} drills, data.js ${(size / 1024).toFixed(0)} KB`);
+  console.log(`built v${ver}: ${data.modules.length} modules, ${nLessons} lessons, ${nQuiz} quiz questions, ${nCards} flashcards, ${list.length} cheat sheets, ${data.interview.length} interview questions, ${data.cases.length} case studies, ${data.arch.length} architecture studies, ${data.drills.length} drills, ${data.glossary.length} glossary terms, data.js ${(size / 1024).toFixed(0)} KB`);
 }
 
 main();
