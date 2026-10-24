@@ -597,7 +597,7 @@ function checkPractice() {
   // drills
   for (const m of A.modules) {
     const n = (A.drills || []).filter((d) => d.module === m.id).length;
-    if (n !== 3) err('drills', `module ${m.id} has ${n} drills, needs exactly 3`);
+    if (n < 5) err("drills", `module ${m.id} has ${n} drills, needs at least 5`);
   }
   const dids = new Set();
   for (const d of A.drills || []) {
@@ -652,8 +652,8 @@ function checkMore() {
   for (const m of A.modules) if ((A.glossary || []).filter((g) => g.module === m.id).length < 4) err('glossary', `module ${m.id} has fewer than 4 terms`);
   // explainers
   const ex = (() => { const w = { window: {} }; vm.runInNewContext(read(path.join(DIST, 'assets', 'explainers.js')), w); return w.window.MARGA_EXPLAINERS || []; })();
-  if (ex.length < 44) err('explainers', `need at least 44, found ${ex.length}`);
-  for (const m of mods) if (ex.filter((x) => x.module === m).length < 4) err('explainers', `module ${m} needs at least 4 explainers`);
+  if (ex.length < 60) err('explainers', `need at least 60, found ${ex.length}`);
+  for (const m of mods) if (ex.filter((x) => x.module === m).length < 5) err("explainers", `module ${m} needs at least 5 explainers`);
   for (const x of ex) {
     if (!mods.has(x.module)) err('explainers', `${x.id}: unknown module`);
     if (x.steps.length < 6) err('explainers', `${x.id}: fewer than 6 steps`);

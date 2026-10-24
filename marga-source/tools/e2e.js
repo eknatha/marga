@@ -14,7 +14,7 @@ const DIST = process.env.DIST ? path.resolve(process.env.DIST) : path.resolve(__
 const SHOTS = process.env.SHOTS || '';
 const EXPL_IDS = (() => { const w = { window: {} }; require('vm').runInNewContext(fs.readFileSync(path.resolve(__dirname, '../src/app/explainers.js'), 'utf8'), w); return w.window.MARGA_EXPLAINERS.map((x) => x.id); })();
 const AXE = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
-const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.txt': 'text/plain', '.xml': 'application/xml', '.webmanifest': 'application/manifest+json' };
+const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.txt': 'text/plain', '.xml': 'application/xml', '.wasm': 'application/wasm', '.webmanifest': 'application/manifest+json' };
 
 function serve() {
   return new Promise((resolve) => {
@@ -656,7 +656,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       const { ctx, page, issues } = await open({ viewport: vp.viewport });
       await go(page, '/');
       await setProgress(page, unlockedAll());
-      const routes = ['/', '/paths', ...data.paths.live.map((p) => `/path/${p.id}`), ...data.modules.map((m) => `/module/${m.id}`), '/cheatsheets', ...Object.keys(data.sheets).map((s) => `/cheatsheet/${s}`), '/review', '/labs', '/progress', '/interview', '/practice', '/cases', '/architecture', ...data.arch.map((a) => `/architecture/${a.id}`), '/calculators', '/drills', ...data.modules.map((m) => `/drills/${m.id}`), '/interview/mock', '/flashcards', '/today', '/daily', '/glossary', '/glossary/inode', '/placement', '/explainers', ...EXPL_IDS.map((x) => `/explainers/${x}`), '/subnet', '/playground/yaml', '/playground/python', ...allLessons.map((l) => `/lesson/${l}`)];
+      const routes = ['/', '/paths', ...data.paths.live.map((p) => `/path/${p.id}`), ...data.modules.map((m) => `/module/${m.id}`), '/cheatsheets', ...Object.keys(data.sheets).map((s) => `/cheatsheet/${s}`), '/review', '/labs', '/progress', '/interview', '/practice', '/cases', '/architecture', ...data.arch.map((a) => `/architecture/${a.id}`), '/calculators', '/drills', ...data.modules.map((m) => `/drills/${m.id}`), '/interview/mock', '/flashcards', '/today', '/daily', '/glossary', '/glossary/inode', '/placement', '/playground/go', '/playground/hcl', '/playground/sql', '/explainers', ...EXPL_IDS.map((x) => `/explainers/${x}`), '/subnet', '/playground/yaml', '/playground/python', ...allLessons.map((l) => `/lesson/${l}`)];
       const problems = [];
       for (const r of routes) {
         await nav(page, r);
@@ -1140,12 +1140,12 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await ctx.close();
   });
 
-  await test('troubleshooting drills: 3 per module, answer, explanation, retry, progress', async () => {
+  await test('troubleshooting drills: 5 per module, answer, explanation, retry, progress', async () => {
     const { ctx, page, issues } = await open();
-    for (const m of data.modules) eq(data.drills.filter((d) => d.module === m.id).length, 3, `drills for ${m.id}`);
+    for (const m of data.modules) eq(data.drills.filter((d) => d.module === m.id).length, 5, `drills for ${m.id}`);
     for (const d of data.drills) ok(d.options.length >= 3 && d.options.filter((o) => o.ok).length === 1 && d.evidence.length > 20 && d.why.length > 40, `drill ${d.id} well formed`);
     await go(page, '/drills/linux');
-    eq(await page.locator('.drill').count(), 3, 'three drills on the page');
+    eq(await page.locator('.drill').count(), 5, 'five drills on the page');
     const first = page.locator('.drill').nth(0), second = page.locator('.drill').nth(1);
     await first.locator('[data-act=drill-check]').click();
     ok(/Choose an answer/.test(await page.textContent('#toast')), 'asks for an answer first');
@@ -1163,7 +1163,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const dr = (await progress(page)).dr;
     const ids = Object.keys(dr);
     ok(ids.length === 2 && ids.filter((k) => dr[k].ok).length === 1, 'progress recorded: ' + JSON.stringify(dr));
-    ok(/1 of 33 solved/.test(await page.textContent('#drill-stats')), 'stats');
+    ok(/1 of 55 solved/.test(await page.textContent('#drill-stats')), 'stats');
     await page.reload(); await page.waitForSelector('.drill');
     eq(await page.locator('.drill.solved').count(), 1, 'solved state persists');
     await page.selectOption('#dr-mod', 'docker'); await page.waitForSelector('#dg-docker');
@@ -1262,7 +1262,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const links = await page.locator('#topnav a').allInnerTexts();
     eq(links.join('|'), 'Skill trees|Cheat sheets|Case studies|Practice|Progress|InterviewHub', 'nav order');
     await nav(page, '/practice');
-    eq(await page.locator('.prac li').count(), 15, 'hub cards');
+    eq(await page.locator('.prac li').count(), 18, 'hub cards');
     for (const href of ['#/drills', '#/interview/mock', '#/flashcards', '#/cases', '#/architecture', '#/calculators', '#/review', '#/labs']) ok(await page.locator(`.prac a[href="${href}"]`).count() === 1, 'hub links to ' + href);
     await nav(page, '/module/kubernetes');
     ok(await page.locator('a[href="#/drills/kubernetes"]').count() === 1 && await page.locator('a[href="#/cases/kubernetes"]').count() === 1, 'module page links to practice');
@@ -1733,7 +1733,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await setProgress(page, prog); await nav(page, '/paths'); await page.waitForSelector('.tree .node');
     eq(await page.locator('.node[data-id="linux"].s-pass').count(), 1, 'linux is mastered');
     ok(await page.locator('.node.s-ready').count() >= 4, 'its children are ready');
-    ok(await page.locator('.tree-lines path.done').count() >= 4, 'connectors from a mastered skill are solid');
+    ok(await page.locator('.tree-lines path.active').count() >= 4, 'connectors from a mastered skill into ready skills glow');
     await ctx.close();
   });
 
@@ -1744,6 +1744,115 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       ok(await page.locator('.callout-warning').count() >= 4, id + ' warnings');
       ok(await page.locator('.code pre').count() >= 6, id + ' code blocks');
     }
+    await ctx.close();
+  });
+
+  await test('labs: SQL for SREs runs real SQLite, every solution is accepted, a wrong query is not', async () => {
+    const { ctx, page } = await open(); await go(page, '/playground/sql');
+    await page.waitForFunction(() => /ready/.test(document.querySelector('#sql-state').textContent), null, { timeout: 30000 });
+    const labs = await page.evaluate(() => window.ACADEMY.labs.sql.map((x) => ({ id: x.id, sol: x.sol })));
+    ok(labs.length >= 20, 'sql exercises: ' + labs.length);
+    await page.selectOption('#lab-ex', labs[0].id);
+    await page.fill('#lab-code', 'SELECT 1'); await page.click('#lab-check');
+    await page.waitForSelector('#lab-res .drill-res.no');
+    for (const x of labs) {
+      await page.selectOption('#lab-ex', x.id); await page.fill('#lab-code', x.sol); await page.click('#lab-check');
+      await page.waitForSelector('#lab-res .drill-res.ok', { timeout: 8000 });
+    }
+    ok(/20 of 20 exercises solved/.test(await page.textContent('#lab-count')), 'count: ' + await page.textContent('#lab-count'));
+    await page.selectOption('#lab-ex', 'free'); await page.fill('#lab-code', 'SELECT name FROM services WHERE tier = 1 ORDER BY name'); await page.click('#lab-run');
+    await page.waitForSelector('#lab-out table'); eq(await page.locator('#lab-out tbody tr').count(), 3, 'free query rows');
+    await page.fill('#lab-code', 'SELEC oops'); await page.click('#lab-run'); await page.waitForSelector('#lab-res .drill-res.no');
+    await ctx.close();
+  });
+
+  await test('labs: Terraform (HCL) playground accepts every solution, explains a syntax error with its line', async () => {
+    const { ctx, page } = await open(); await go(page, '/playground/hcl');
+    const labs = await page.evaluate(() => window.ACADEMY.labs.hcl.map((x) => ({ id: x.id, sol: x.sol, start: x.start })));
+    eq(labs.length, 30, 'thirty exercises');
+    for (const x of labs) {
+      await page.selectOption('#lab-ex', x.id);
+      await page.fill('#lab-code', x.start); await page.click('#lab-check'); await page.waitForSelector('#lab-res .drill-res.no');
+      await page.fill('#lab-code', x.sol); await page.click('#lab-check'); await page.waitForSelector('#lab-res .drill-res.ok');
+    }
+    ok(/30 of 30/.test(await page.textContent('#lab-count')), 'all solved');
+    await page.selectOption('#lab-ex', 'free'); await page.fill('#lab-code', 'resource "aws_s3_bucket" "x" {\n  bucket = "a"\n');
+    await page.click('#lab-check'); await page.waitForSelector('#lab-res .drill-res.no');
+    ok(/Line 1/.test(await page.textContent('#lab-res')) && /never closed/.test(await page.textContent('#lab-res')), 'syntax message: ' + await page.textContent('#lab-res'));
+    await page.fill('#lab-code', 'resource "aws_security_group" "w" {\n  ingress {\n    from_port = 22\n    cidr_blocks = ["0.0.0.0/0"]\n  }\n}\n');
+    await page.waitForSelector('#lab-lint .f-error');
+    await ctx.close();
+  });
+
+  await test('labs: YAML exercises are checked against the file in the editor', async () => {
+    const { ctx, page } = await open(); await go(page, '/playground/yaml');
+    const labs = await page.evaluate(() => window.ACADEMY.labs.yaml.map((x) => ({ id: x.id, sol: x.sol })));
+    eq(labs.length, 30, 'thirty exercises');
+    for (const x of labs) {
+      await page.selectOption('#yx-ex', x.id); await page.click('#yx-check'); await page.waitForSelector('#yx-res .drill-res.no');
+      await page.fill('#yp-in', x.sol); await page.click('#yx-check'); await page.waitForSelector('#yx-res .drill-res.ok');
+    }
+    ok(/30 of 30 solved/.test(await page.textContent('#yx-count')), 'count');
+    await page.selectOption('#yx-ex', 'indent'); await page.fill('#yp-in', 'a:\n  b: 1\n c: 2\n'); await page.click('#yx-check');
+    await page.waitForSelector('#yx-res .drill-res.no'); ok(/Invalid YAML/.test(await page.textContent('#yx-res')), 'invalid yaml message');
+    const keep = await progress(page); ok(Object.keys(keep.lab).length === 30, 'progress saved: ' + Object.keys(keep.lab).length);
+    await ctx.close();
+  });
+
+  await test('labs: Go playground sends code to the Go Playground only on Run and checks the output', async () => {
+    const { ctx, page } = await open(); const posts = [];
+    await ctx.route(/go\.dev\/_\/compile/, async (route) => {
+      const body = new URLSearchParams(route.request().postData() || ''); posts.push(body.get('body'));
+      const code = body.get('body') || '';
+      const ex = await page.evaluate(() => window.ACADEMY.labs.go.map((x) => ({ sol: x.sol, expect: x.expect })));
+      const hit = ex.find((x) => x.sol.trim() === code.trim());
+      const broken = /BROKEN/.test(code);
+      route.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(broken ? { Errors: './prog.go:3:1: syntax error', Events: null } : { Errors: '', Events: [{ Message: hit ? hit.expect : 'hello\n', Kind: 'stdout', Delay: 0 }] }) });
+    });
+    await go(page, '/playground/go'); eq(posts.length, 0, 'nothing is sent before Run');
+    const labs = await page.evaluate(() => window.ACADEMY.labs.go.map((x) => ({ id: x.id, sol: x.sol })));
+    eq(labs.length >= 30, true, 'thirty exercises');
+    await page.selectOption('#lab-ex', labs[0].id); await page.click('#lab-check'); await page.waitForSelector('#lab-res .drill-res.no');
+    await page.fill('#lab-code', labs[0].sol); await page.click('#lab-check'); await page.waitForSelector('#lab-res .drill-res.ok');
+    await page.fill('#lab-code', 'BROKEN'); await page.click('#lab-run'); await page.waitForFunction(() => /syntax error/.test(document.querySelector('#lab-out').textContent));
+    ok(posts.length >= 3, 'code sent on each run: ' + posts.length);
+    await ctx.close();
+    const second = await open(); await second.ctx.route(/go\.dev|golang\.org/, (r) => r.abort());
+    await go(second.page, '/playground/go'); await second.page.click('#lab-run'); await second.page.waitForSelector('#lab-res .drill-res.no');
+    ok(/Could not reach/.test(await second.page.textContent('#lab-res')), 'offline message');
+    await second.ctx.close();
+  });
+
+  await test('labs: Python playground lists the extra exercises and the hub counts every playground', async () => {
+    const { ctx, page } = await open(); await go(page, '/playground/python');
+    ok(await page.locator('#py-ex option').count() >= 31, 'python options: ' + await page.locator('#py-ex option').count());
+    await page.selectOption('#py-ex', 'bucket'); ok(/token/i.test(await page.textContent('#py-task')), 'task shown');
+    await go(page, '/practice');
+    for (const h of ['#/playground/go', '#/playground/hcl', '#/playground/sql']) eq(await page.locator(`.prac a[href="${h}"]`).count(), 1, 'hub links to ' + h);
+    await ctx.close();
+  });
+
+  await test('skill tree: active branches glow and update live when a lesson is passed, also from another tab', async () => {
+    const { ctx, page } = await open(); await go(page, '/');
+    await page.waitForSelector('.node.s-ready');
+    eq(await page.locator('.tree-lines .ln.active').count(), 0, 'no active branch before any parent is mastered');
+    const id = await page.locator('.node.s-ready').first().getAttribute('data-id');
+    const prog = emptyProgress(); prog.lessons = doneMap(MODS[id].lessons);
+    await page.evaluate((v) => { localStorage.setItem('ea.progress.v1', JSON.stringify(v)); window.dispatchEvent(new StorageEvent('storage', { key: 'ea.progress.v1', newValue: JSON.stringify(v) })); }, prog);
+    await page.waitForFunction((i) => document.querySelector('.node[data-id="' + i + '"]').classList.contains('s-pass'), id, { timeout: 5000 });
+    await page.waitForSelector('.tree-lines .ln.active', { timeout: 5000 });
+    ok(await page.locator('.node.s-ready').count() >= 1, 'children became ready');
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    eq(await page.evaluate(() => getComputedStyle(document.querySelector('.node.s-ready .ring')).animationName), 'glow', 'ready node glows');
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    eq(await page.evaluate(() => getComputedStyle(document.querySelector('.node.s-ready .ring')).animationName), 'none', 'reduced motion stops the glow');
+    await ctx.close();
+  });
+
+  await test('warnings: callouts have a severity icon and distinct danger style on a cheat sheet', async () => {
+    const { ctx, page } = await open(); await go(page, '/cheatsheets');
+    const r = await page.evaluate(async () => { const t = await (await fetch('cheatsheets/kubernetes.html')).text(); return { d: (t.match(/callout-danger/g) || []).length, w: (t.match(/callout-warning/g) || []).length }; });
+    ok(r.d + r.w >= 3, 'callouts on sheet: ' + JSON.stringify(r));
     await ctx.close();
   });
 

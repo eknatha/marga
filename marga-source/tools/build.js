@@ -18,7 +18,7 @@ const SRC = path.join(ROOT, 'src');
 const DIST = path.join(ROOT, 'dist');
 const DOMAIN = 'marga.eknathalabs.com';
 // GoatCounter site code for the visitor count (https://CODE.goatcounter.com). Empty string disables it.
-const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'more.js'];
+const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js'];
 const COUNTER = process.env.MARGA_COUNTER !== undefined ? process.env.MARGA_COUNTER : 'marga-eknathalabs';
 const SITE = 'https://' + DOMAIN;
 
@@ -80,7 +80,7 @@ function makeMarkdown() {
         return `<div class="code" data-lang="${esc(lang || 'text')}"><button class="copy" type="button" data-copy="${esc(code)}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">${body}</code></pre></div>\n`;
       },
       blockquote(quote) {
-        const m = quote.match(/^\s*<p><strong>(Warning|Note|Tip|Incident|Exam tip|Why it matters|Real-world)[:.]?<\/strong>\s*/i);
+        const m = quote.match(/^\s*<p><strong>(Danger|Caution|Warning|Note|Tip|Incident|Exam tip|Why it matters|Real-world)[:.]?<\/strong>\s*/i);
         if (m) {
           const kind = m[1].toLowerCase().replace(/\s+/g, '-');
           const rest = quote.replace(m[0], '<p>');
@@ -313,7 +313,8 @@ function loadContent() {
       glossary.push({ id: slug(term), term, show: term.replace(/\s*\(.*\)$/, ''), module: kv.module, plain: kv.plain, def: kv.def, aliases: kv.aliases ? kv.aliases.split(',').map((x) => x.trim()).filter(Boolean) : [] });
     }
   }
-  return { modules, paths, lessons, sheets, interview, cases, arch, drills, glossary };
+  const labs = require('./labs').load(path.join(SRC, 'labs'));
+  return { modules, paths, lessons, sheets, interview, cases, arch, drills, glossary, labs };
 
 }
 
@@ -376,6 +377,9 @@ function main() {
   write('assets/app.css', css);
   write('assets/app.js', js);
   EXTRA.forEach((f) => write('assets/' + f, read('app/' + f)));
+  // SQLite for the SQL playground (vendored sql.js 1.x browser build), loaded only when that page is opened
+  write('assets/sql-wasm.js', fs.readFileSync(path.join(ROOT, 'node_modules/sql.js/dist/sql-wasm-browser.js'), 'utf8').split('\n').map((ln) => (/^\s*\/\//.test(ln) && /(\bgi\w+\.com|\bTO\w+:)/.test(ln) ? '// (comment removed)' : ln)).join('\n'));
+  fs.copyFileSync(path.join(ROOT, 'node_modules/sql.js/dist/sql-wasm-browser.wasm'), path.join(DIST, 'assets/sql-wasm.wasm'));
   write('assets/data.js', dataJs);
 
   const shell = read('app/shell.html').replace(/{{VER}}/g, ver).replace(/{{SITE}}/g, SITE).replace(/{{DOMAIN}}/g, DOMAIN);
