@@ -794,3 +794,38 @@ html[data-a-fs="150"] .a11y-panel { max-height: calc((100vh - 90px) / 1.5); }
 .pl-res { list-style: none; padding: 0; margin: 12px 0; }
 .pl-res li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--line); }
 @media (max-width: 900px) { .hero-grid2 { grid-template-columns: minmax(0, 1fr); gap: 28px; } .role span { margin-left: 32px; flex-basis: 100%; } }
+
+/* ---- utility strip with the visitor count, top right ---- */
+.utilbar { background: var(--surface); border-bottom: 1px solid var(--line); font: 500 .82rem/1 var(--sans); color: var(--muted); }
+.utilbar-in { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 30px; }
+.util-promise { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.utilbar .visitors { margin-left: auto; color: var(--ink); font-weight: 700; white-space: nowrap; }
+@media (max-width: 560px) { .util-promise { display: none; } .utilbar-in { justify-content: flex-end; } }
+
+/* ---- skill trees ---- */
+.tree-wrap { margin-top: 6px; }
+.tree-meta { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 4px 0 18px; font: 500 .95rem var(--sans); color: var(--muted); }
+.tree-meta b { color: var(--ink); }
+.tree { position: relative; display: grid; gap: 26px; padding: 6px 0 4px; }
+.tree-lines { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: visible; }
+.tree-lines .ln { fill: none; stroke: var(--line-strong); stroke-width: 2; stroke-dasharray: 5 5; }
+.tree-lines .ln.done { stroke: var(--pass); stroke-dasharray: none; }
+.tier { position: relative; z-index: 1; }
+.tier-name { margin: 0 0 8px; font: 600 .82rem var(--sans); color: var(--muted); text-align: center; }
+.tier-nodes { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 18px 16px; }
+.node { width: 148px; }
+.node a { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; padding: 10px 8px 12px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); color: var(--text); text-decoration: none; height: 100%; }
+.node a:hover { border-color: var(--accent); }
+.node .ring { --c: var(--accent); width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--c) calc(var(--p) * 1%), var(--line) 0); }
+.node .badge { width: 46px; height: 46px; border-radius: 50%; background: var(--surface); display: grid; place-items: center; font: 800 1.1rem var(--sans); color: var(--ink); }
+.node .badge svg { width: 22px; height: 22px; }
+.node .name { font: 700 .95rem/1.2 var(--sans); color: var(--ink); }
+.node .sub { font: .8rem/1.3 var(--sans); color: var(--muted); }
+.node.s-pass .ring { --c: var(--pass); } .node.s-pass a { border-color: var(--pass); } .node.s-pass .badge { color: var(--pass); background: var(--pass-soft); }
+.node.s-ready .ring { --c: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 4px var(--accent-soft); }
+.node.s-ready a { border-color: var(--accent); }
+.node.s-run .ring { --c: var(--run); } .node.s-run a { border-color: var(--run); }
+.node.s-lock a { background: transparent; border-style: dashed; opacity: .85; }
+.node.s-lock .ring { background: var(--line); } .node.s-lock .badge { color: var(--lock); }
+.tree-legend { margin: 14px 0 0; text-align: center; }
+@media (max-width: 560px) { .node { width: calc(50% - 8px); } .tier-nodes { gap: 14px 12px; } }

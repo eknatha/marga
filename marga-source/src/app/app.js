@@ -155,10 +155,12 @@ function theme() { return document.documentElement.getAttribute('data-theme') ||
 function renderChrome() {
   var st = streaks();
   $('#chrome').innerHTML =
+    '<div class="utilbar"><div class="wrap utilbar-in"><span class="util-promise">Free forever \u00b7 No login \u00b7 No ads \u00b7 No cookies</span>' +
+    (D.counter ? '<span class="visitors" id="visitors" role="status" aria-label="Visitor count" hidden></span>' : '') + '</div></div>' +
     '<header class="topbar"><div class="wrap topbar-in">' +
-    '<a class="brand" href="#/"><img src="icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>' +
+    '<a class="brand" href="#/"><img src="icon.svg" alt="" width="26" height="26"><span><b>MARGA</b></span></a>' +
     '<nav class="topnav" id="topnav" aria-label="Main">' +
-    '<a href="#/paths" data-nav="paths">Paths</a><a href="#/cheatsheets" data-nav="cheatsheets">Cheat sheets</a>' +
+    '<a href="#/paths" data-nav="paths">Skill trees</a><a href="#/cheatsheets" data-nav="cheatsheets">Cheat sheets</a>' +
     '<a href="#/cases" data-nav="cases">Case studies</a><a href="#/practice" data-nav="practice">Practice</a><a href="#/progress" data-nav="progress">Progress</a><a href="#/interview" data-nav="interview">InterviewHub</a></nav>' +
     '<div class="tools">' +
     '<button class="btn btn-quiet search-btn" type="button" data-act="search" aria-label="Search lessons and cheat sheets">' + ICON.search + '<span>Search</span><kbd>/</kbd></button>' +
@@ -171,7 +173,6 @@ function renderChrome() {
     '<footer class="foot"><div class="wrap foot-in">' +
     '<span>MARGA by EknathaLabs</span>' +
     '<a href="cheatsheets/">Printable cheat sheets</a><a href="#/interview">InterviewHub</a><a href="#/practice">Practice</a><a href="#/glossary">Glossary</a><a href="#/labs">Labs (planned)</a>' +
-    (D.counter ? '<span class="visitors" id="visitors" hidden></span>' : '') +
     '<span class="foot-note">Progress is saved in this browser only.</span>' +
     '<p class="foot-promise">Free forever \u00b7 No login \u00b7 No ads \u00b7 No cookies</p><p class="small foot-ver">Version ' + siteVer() + '</p></div></footer>';
   if (window.MargaCounter && D.counter) MargaCounter.rebind('#visitors');
@@ -184,25 +185,67 @@ function setNav(name) {
   $$('#topnav a').forEach(function (a) { a.classList.toggle('on', a.getAttribute('data-nav') === name); });
 }
 
-/* ---------- pipeline component ---------- */
-function stageHtml(m, i, animate) {
-  var s = modStatus(m), n = modCount(m), tot = m.lessons.length;
-  var pct = Math.round(n / tot * 100);
-  var label = { pass: 'Passed', run: 'In progress', ready: 'Ready to start', lock: 'Locked' }[s];
-  var inner = s === 'pass' ? ICON.check : s === 'lock' ? ICON.lock : '';
-  return '<li class="stage s-' + s + '" style="--i:' + i + ';--p:' + pct + '">' +
-    '<a href="#/module/' + m.id + '" aria-label="' + e(m.title) + ', ' + label + ', ' + n + ' of ' + tot + ' lessons passed">' +
-    '<span class="rail"><span class="dot">' + inner + '</span><span class="line"><i></i></span></span>' +
-    '<span class="name">' + e(m.title) + '</span><span class="sub">' + (s === 'lock' ? 'Locked' : n + ' of ' + tot + ' lessons') + '</span></a></li>';
+/* ---------- skill tree component ---------- */
+var TIER_NAMES = ['Foundations', 'Core skills', 'Platform skills', 'Advanced skills', 'Mastery'];
+function treeTiers(p) {
+  var inPath = {}; p.modules.forEach(function (id) { inPath[id] = true; });
+  var depth = {};
+  function d(id) {
+    if (depth[id] !== undefined) return depth[id];
+    var r = MOD[id].requires.filter(function (x) { return inPath[x]; });
+    depth[id] = r.length ? 1 + Math.max.apply(null, r.map(d)) : 0;
+    return depth[id];
+  }
+  p.modules.forEach(d);
+  var tiers = [];
+  p.modules.forEach(function (id) { (tiers[depth[id]] = tiers[depth[id]] || []).push(id); });
+  return tiers.filter(Boolean);
 }
-function pipelineHtml(p, animate) {
-  return '<ol class="pipe' + (animate ? ' run-anim' : '') + '">' + p.modules.map(function (id, i) { return stageHtml(MOD[id], i, animate); }).join('') + '</ol>';
+function nodeHtml(m, pid) {
+  var s = modStatus(m), n = modCount(m), tot = m.lessons.length, pct = Math.round(n / tot * 100);
+  var label = { pass: 'Mastered', run: 'In progress', ready: 'Ready to unlock skills', lock: 'Locked' }[s];
+  var badge = s === 'pass' ? ICON.check : s === 'lock' ? ICON.lock : '<span>' + n + '</span>';
+  var need = s === 'lock' ? m.requires.map(function (r) { return MOD[r].title; }).join(' and ') : '';
+  return '<li class="node s-' + s + '" data-id="' + m.id + '" data-req="' + e(m.requires.join(' ')) + '" style="--p:' + pct + '">' +
+    '<a href="#/module/' + m.id + '" aria-label="' + e(m.title) + ', ' + label + ', ' + n + ' of ' + tot + ' lessons passed' + (need ? '. Needs ' + e(need) : '') + '">' +
+    '<span class="ring"><span class="badge">' + badge + '</span></span>' +
+    '<span class="name">' + e(m.title) + '</span><span class="sub">' + (s === 'lock' ? 'Needs ' + e(need) : 'Level ' + n + ' of ' + tot) + '</span></a></li>';
 }
-function armPipeline() {
-  var p = $('.pipe.run-anim');
-  if (!p) return;
-  requestAnimationFrame(function () { requestAnimationFrame(function () { p.classList.add('go'); }); });
+function treeHtml(p) {
+  var tiers = treeTiers(p), pp = pathProgress(p);
+  var xp = pp.done * 100, rank = pp.done === 0 ? 'Newcomer' : pp.done < pp.total * .25 ? 'Apprentice' : pp.done < pp.total * .6 ? 'Practitioner' : pp.done < pp.total ? 'Senior' : 'Master';
+  return '<div class="tree-wrap"><p class="tree-meta"><span><b>' + xp + '</b> skill points</span><span>Rank: <b>' + rank + '</b></span><span>' + pp.done + ' of ' + pp.total + ' lessons passed</span></p>' +
+    '<div class="tree" data-path="' + p.id + '" role="group" aria-label="' + e(p.title) + ' skill tree"><svg class="tree-lines" aria-hidden="true" focusable="false"></svg>' +
+    tiers.map(function (t, i) { return '<div class="tier"><p class="tier-name">' + (TIER_NAMES[i] || 'Tier ' + (i + 1)) + '</p><ol class="tier-nodes">' + t.map(function (id) { return nodeHtml(MOD[id], p.id); }).join('') + '</ol></div>'; }).join('') +
+    '</div><p class="tree-legend small">Pass every lesson check in a skill to master it. Locked skills open when the skills that lead into them are mastered.</p></div>';
 }
+function drawTree() {
+  $$('.tree').forEach(function (tr) {
+    var svg = $('.tree-lines', tr); if (!svg) return;
+    var box = tr.getBoundingClientRect(), w = tr.offsetWidth, h = tr.offsetHeight, k = box.width ? w / box.width : 1;
+    svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    var nodes = {}; $$('.node', tr).forEach(function (n) { nodes[n.getAttribute('data-id')] = n; });
+    var out = '';
+    Object.keys(nodes).forEach(function (id) {
+      (nodes[id].getAttribute('data-req') || '').split(' ').forEach(function (r) {
+        if (!r || !nodes[r]) return;
+        var a = nodes[r].querySelector('.ring').getBoundingClientRect(), b = nodes[id].querySelector('.ring').getBoundingClientRect();
+        var x1 = (a.left + a.width / 2 - box.left) * k, y1 = (a.top + a.height - box.top) * k, x2 = (b.left + b.width / 2 - box.left) * k, y2 = (b.top - box.top) * k;
+        var my = (y1 + y2) / 2, done = nodes[r].classList.contains('s-pass');
+        out += '<path d="M' + x1 + ' ' + y1 + ' C' + x1 + ' ' + my + ' ' + x2 + ' ' + my + ' ' + x2 + ' ' + y2 + '" class="' + (done ? 'ln done' : 'ln') + '"/>';
+      });
+    });
+    svg.innerHTML = out;
+  });
+}
+var treeRO = null;
+function armTree() {
+  var tr = $('.tree'); if (!tr) return;
+  requestAnimationFrame(function () { requestAnimationFrame(drawTree); });
+  if (window.ResizeObserver) { if (treeRO) treeRO.disconnect(); treeRO = new ResizeObserver(function () { drawTree(); }); treeRO.observe(tr); }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawTree);
+}
+window.addEventListener('resize', function () { drawTree(); });
 
 /* ---------- views ---------- */
 var view = { title: '', html: '', after: null, nav: '', voice: '', voiceLabel: '' };
@@ -251,10 +294,10 @@ function homeView() {
 
     '<section class="stats" aria-label="What is on MARGA"><div class="wrap">' + stats + '</div></section>' +
 
-    '<section class="band"><div class="wrap"><div class="band-head"><h2>Pick a path. Pass each check to move on.</h2><p>Each path is an ordered set of stages. A stage opens when the stages it depends on are passed.</p></div>' +
+    '<section class="band"><div class="wrap"><div class="band-head"><h2>Pick a skill tree. Pass each check to unlock the next skill.</h2><p>Each role is a tree of skills. A skill unlocks when the skills that lead into it are mastered.</p></div>' +
     '<div class="pipe-panel"><div class="pipe-head"><div role="tablist" aria-label="Role paths" class="tabs">' + tabs + '</div>' +
-    '<p class="pipe-meta">' + plural(p.modules.length, 'stage') + ', about ' + hours(pp.minutes) + ' of study. ' + pp.done + ' of ' + pp.total + ' lessons passed.</p></div>' +
-    pipelineHtml(p, true) +
+    '<p class="pipe-meta">' + plural(p.modules.length, 'skill') + ', about ' + hours(pp.minutes) + ' of study. ' + pp.done + ' of ' + pp.total + ' lessons passed.</p></div>' +
+    treeHtml(p) +
     '<p class="pipe-foot"><a href="#/path/' + p.id + '">See the full ' + e(p.title) + ' path</a></p></div>' +
     '<div class="rows">' + LIVE.map(pathRow).join('') + '</div>' +
     '<h3 class="sub-h">In development</h3><ul class="planned">' + PLANNED.map(function (x) { return '<li><strong>' + e(x.title) + '</strong><span>' + e(x.summary) + '</span><em>Planned</em></li>'; }).join('') + '</ul></div></section>' +
@@ -281,7 +324,7 @@ function homeView() {
     '<div class="note-panel"><h3>Hands-on labs are planned</h3><p>Browser-based practice with automatic checking is in development. Until then, every lesson includes a written incident walkthrough with sample output so you can follow the reasoning.</p><p><a href="#/labs">What is planned</a></p></div></div></section>' +
 
     '<section class="band alt"><div class="wrap"><h2>About the author</h2><p class="prose-narrow">Eknatha Reddy is a Senior Platform Engineer and SRE with 14+ years in enterprise infrastructure, Linux, virtualization and production support. The lessons are written from incidents and migrations, not from vendor slides.</p></div></section>';
-  view.after = function () { armPipeline(); armTerm(); };
+  view.after = function () { armTree(); armTerm(); };
 }
 
 function armTerm() {
@@ -307,11 +350,18 @@ function pathRow(p) {
 }
 
 function pathsView() {
-  view.title = 'Role paths | MARGA by EknathaLabs'; view.nav = 'paths';
-  view.html = '<section class="page-head wrap"><h1>Role paths</h1><p class="lede">Pick the path that matches the job you want. Lessons are shared between paths, so progress carries over.</p></section>' +
-    '<div class="wrap"><div class="rows">' + LIVE.map(pathRow).join('') + '</div>' +
+  var p = PATH[S.path] || LIVE[0], pp = pathProgress(p);
+  var tabs = LIVE.map(function (x) {
+    return '<button type="button" role="tab" class="tab' + (x.id === p.id ? ' on' : '') + '" data-act="pick-path" data-id="' + x.id + '" aria-selected="' + (x.id === p.id) + '">' + e(x.title) + '</button>';
+  }).join('');
+  view.title = 'Skill trees | MARGA'; view.nav = 'paths';
+  view.html = '<section class="page-head wrap"><h1>Skill trees</h1><p class="lede">Each role is a tree of skills. Master a skill by passing its lesson checks and the skills it leads to unlock. Lessons are shared between roles, so progress carries over.</p></section>' +
+    '<div class="wrap"><div class="pipe-panel"><div class="pipe-head"><div role="tablist" aria-label="Role skill trees" class="tabs">' + tabs + '</div>' +
+    '<p class="pipe-meta">' + plural(p.modules.length, 'skill') + ', about ' + hours(pp.minutes) + ' of study.</p></div>' + treeHtml(p) +
+    '<p class="pipe-foot"><a href="#/path/' + p.id + '">See the full ' + e(p.title) + ' path with every topic</a></p></div>' +
+    '<h2 class="sub-h">All roles</h2><div class="rows">' + LIVE.map(pathRow).join('') + '</div>' +
     '<h2 class="sub-h">In development</h2><ul class="planned">' + PLANNED.map(function (x) { return '<li><strong>' + e(x.title) + '</strong><span>' + e(x.summary) + '</span><em>Planned</em></li>'; }).join('') + '</ul></div>';
-  view.after = null;
+  view.after = armTree;
 }
 
 function pathView(id) {
@@ -324,11 +374,11 @@ function pathView(id) {
     '<dl class="facts"><div><dt>Who it is for</dt><dd>' + e(p.audience) + '</dd></div><div><dt>Study time</dt><dd>About ' + hours(pp.minutes) + '</dd></div><div><dt>Progress</dt><dd>' + pp.done + ' of ' + pp.total + ' lessons</dd></div></dl>' +
     '<div class="actions">' + (next ? '<a class="btn btn-primary" href="' + hrefLesson(next) + '">' + (pp.done ? 'Continue: ' : 'Start: ') + e(LES[next].title) + '</a>' : '<span class="chip pass">Path complete</span>') +
     '<button class="btn btn-quiet" type="button" data-act="pick-path" data-id="' + p.id + '" data-go="home">Make this my home path</button>' + printBar() + '</div>' + voiceSlot() + '</section>' +
-    '<div class="wrap"><div class="pipe-panel">' + pipelineHtml(p, true) + '</div>' +
+    '<div class="wrap"><div class="pipe-panel">' + treeHtml(p) + '</div>' +
     '<h2 class="sub-h">What you will be able to do</h2><ul class="outcomes">' + p.outcomes.map(function (o) { return '<li>' + e(o) + '</li>'; }).join('') + '</ul>' +
     '<h2 class="sub-h">Stages</h2><div class="stage-list">' + p.modules.map(function (mid, i) { return stageRow(MOD[mid], i); }).join('') + '</div></div>';
   view.voice = '#main'; view.voiceLabel = p.title + ' path';
-  view.after = armPipeline;
+  view.after = armTree;
 }
 
 function stageRow(m, i) {
