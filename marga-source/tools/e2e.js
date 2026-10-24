@@ -12,6 +12,7 @@ const { chromium } = require('playwright');
 
 const DIST = process.env.DIST ? path.resolve(process.env.DIST) : path.resolve(__dirname, '../dist');
 const SHOTS = process.env.SHOTS || '';
+const EXPL_IDS = (() => { const w = { window: {} }; require('vm').runInNewContext(fs.readFileSync(path.resolve(__dirname, '../src/app/explainers.js'), 'utf8'), w); return w.window.MARGA_EXPLAINERS.map((x) => x.id); })();
 const AXE = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.txt': 'text/plain', '.xml': 'application/xml', '.webmanifest': 'application/manifest+json' };
 
@@ -119,7 +120,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await page.goto(BASE + '/');
     await page.waitForSelector('#main h1');
     const h1 = await page.textContent('#main h1');
-    ok(/DevOps, cloud and SRE/i.test(h1), `unexpected h1: ${h1}`);
+    ok(/Learn to fix production/i.test(h1), `unexpected h1: ${h1}`);
     eq(await page.title(), 'MARGA by EknathaLabs: DevOps, cloud and SRE training', 'title');
     const text = await page.evaluate(() => document.body.innerText);
     ok(!/\bgit/i.test(text), 'visible text mentions git');
@@ -640,7 +641,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await ctx.setOffline(true);
     await page.reload();
     await page.waitForSelector('#main h1', { timeout: 8000 });
-    ok(/DevOps, cloud and SRE/.test(await page.textContent('#main h1')), 'home renders offline');
+    ok(/Learn to fix production/.test(await page.textContent('#main h1')), 'home renders offline');
     await page.goto(BASE + '/cheatsheets/docker.html');
     ok(/Docker/.test(await page.title()), 'cheat sheet page available offline');
     await ctx.setOffline(false);
@@ -654,7 +655,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       const { ctx, page, issues } = await open({ viewport: vp.viewport });
       await go(page, '/');
       await setProgress(page, unlockedAll());
-      const routes = ['/', '/paths', ...data.paths.live.map((p) => `/path/${p.id}`), ...data.modules.map((m) => `/module/${m.id}`), '/cheatsheets', ...Object.keys(data.sheets).map((s) => `/cheatsheet/${s}`), '/review', '/labs', '/progress', '/interview', '/practice', '/cases', '/architecture', ...data.arch.map((a) => `/architecture/${a.id}`), '/calculators', '/drills', ...data.modules.map((m) => `/drills/${m.id}`), '/interview/mock', '/flashcards', '/today', '/daily', '/glossary', '/glossary/inode', '/explainers', ...['dns-lookup', 'tcp-handshake', 'tls-handshake', 'pod-scheduling', 'rolling-update', 'terraform-workflow', 'cicd-pipeline'].map((x) => `/explainers/${x}`), '/subnet', '/playground/yaml', '/playground/python', ...allLessons.map((l) => `/lesson/${l}`)];
+      const routes = ['/', '/paths', ...data.paths.live.map((p) => `/path/${p.id}`), ...data.modules.map((m) => `/module/${m.id}`), '/cheatsheets', ...Object.keys(data.sheets).map((s) => `/cheatsheet/${s}`), '/review', '/labs', '/progress', '/interview', '/practice', '/cases', '/architecture', ...data.arch.map((a) => `/architecture/${a.id}`), '/calculators', '/drills', ...data.modules.map((m) => `/drills/${m.id}`), '/interview/mock', '/flashcards', '/today', '/daily', '/glossary', '/glossary/inode', '/placement', '/explainers', ...EXPL_IDS.map((x) => `/explainers/${x}`), '/subnet', '/playground/yaml', '/playground/python', ...allLessons.map((l) => `/lesson/${l}`)];
       const problems = [];
       for (const r of routes) {
         await nav(page, r);
@@ -711,7 +712,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       await go(page, '/');
       const prog = emptyProgress(); prog.lessons = doneMap(MODS.linux.lessons.slice(0, 3)); prog.days = [await today(page, 0), await today(page, -1)];
       await setProgress(page, prog);
-      const pages = ['/', '/paths', '/path/devops', '/module/linux', '/module/kubernetes', '/lesson/linux/disks-and-filesystems', '/lesson/docker/containers-and-images', '/lesson/terraform/state', '/cheatsheets', '/cheatsheet/kubernetes', '/review', '/labs', '/progress', '/interview', '/practice', '/cases', '/architecture/aws-s3-us-east-1-2017', '/calculators', '/drills/kubernetes', '/interview/mock', '/flashcards', '/today', '/daily', '/glossary', '/explainers', '/explainers/dns-lookup', '/subnet', '/playground/yaml', '/playground/python'];
+      const pages = ['/', '/paths', '/path/devops', '/module/linux', '/module/kubernetes', '/lesson/linux/disks-and-filesystems', '/lesson/docker/containers-and-images', '/lesson/terraform/state', '/cheatsheets', '/cheatsheet/kubernetes', '/review', '/labs', '/progress', '/interview', '/practice', '/cases', '/architecture/aws-s3-us-east-1-2017', '/calculators', '/drills/kubernetes', '/interview/mock', '/flashcards', '/today', '/daily', '/glossary', '/placement', '/explainers', '/explainers/dns-lookup', '/subnet', '/playground/yaml', '/playground/python'];
       for (const r of pages) {
         await nav(page, r);
         await page.waitForSelector('#main h1');
@@ -1486,12 +1487,12 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await ctx.close(); await two.ctx.close();
   });
 
-  await test('animated explainers: seven, every step reachable, play and pause, keys, restart', async () => {
+  await test('animated explainers: all, every step reachable, play and pause, keys, restart', async () => {
     const { ctx, page, issues } = await open();
     const EXPL = await page.evaluate(() => null); 
     await go(page, '/explainers');
     const ids = await page.locator('.prac a').evaluateAll((as) => as.map((a) => a.getAttribute('href').replace('#/explainers/', '')));
-    ok(ids.length >= 7, 'explainers listed: ' + ids.length);
+    ok(ids.length >= 28, 'explainers listed: ' + ids.length);
     for (const id of ids) {
       await go(page, '/explainers/' + id);
       await page.waitForSelector('.ex-svg');
@@ -1635,12 +1636,71 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const { ctx, page } = await open({ viewport: { width: 390, height: 844 } });
     await go(page, '/');
     await page.evaluate(() => { MargaA11y.set('fs', '130'); MargaA11y.set('sp', 'wide'); });
-    for (const r of ['/today', '/daily', '/glossary', '/subnet', '/playground/yaml', '/playground/python', '/explainers', '/explainers/dns-lookup', '/practice']) {
+    for (const r of ['/today', '/daily', '/glossary', '/subnet', '/playground/yaml', '/playground/python', '/explainers', '/explainers/dns-lookup', '/practice', '/placement']) {
       await nav(page, r); await page.waitForSelector('#main h1'); await page.waitForTimeout(100);
       const ov = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       ok(ov <= 2, `${r}: overflow ${ov}px`);
     }
     await ctx.close();
+  });
+
+  await test('landing page: hero, roles, stats, terminal, incident teaser, tools, placement link', async () => {
+    const { ctx, page } = await open(); await go(page, '/');
+    ok(/Learn to fix production/.test(await page.textContent('.hero h1')), 'headline');
+    eq(await page.locator('.role').count(), 3, 'three role cards');
+    const second = await page.locator('.role').nth(1).getAttribute('data-id');
+    await page.locator('.role').nth(1).click(); await page.waitForSelector('.role.on');
+    eq(await page.locator('.role.on').getAttribute('data-id'), second, 'role card switches the path');
+    eq(await page.locator('.stats b').count(), 5, 'five stats');
+    const nums = await page.locator('.stats b').allTextContents(); ok(nums.every((n) => +n > 0), 'stats from data: ' + nums);
+    eq(await page.locator('.tl-l.pend').count(), 0, 'terminal shows its finished state with reduced motion');
+    ok(await page.locator('#term a[href="#/drills/kubernetes"]').count() === 1, 'terminal links to the drill');
+    eq(await page.locator('#today-band .prac li').count(), 3, 'today strip');
+    eq(await page.locator('.tl-card li').count(), 5, 'incident timeline');
+    ok(await page.locator('a[href="#/architecture/aws-s3-us-east-1-2017"]').count() >= 1, 'post-mortem link');
+    eq(await page.locator('.band a[href="#/subnet"]').count(), 1, 'tools band');
+    eq(await page.locator('.today dd').count(), 3, 'progress numbers');
+    await ctx.close();
+  });
+
+  await test('landing page: terminal types out when motion is allowed', async () => {
+    const { ctx, page } = await open();
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await go(page, '/');
+    await page.waitForFunction(() => document.querySelectorAll('#term .tl-l.pend').length === 0, null, { timeout: 12000 });
+    await ctx.close();
+  });
+
+  await test('placement check: ten questions, a result, a suggested stage', async () => {
+    const { ctx, page } = await open(); await go(page, '/');
+    await page.click('a[href="#/placement"]'); await page.waitForSelector('#pl .opt');
+    for (let i = 0; i < 10; i++) {
+      eq((await page.textContent('.qcount')).trim(), `Question ${i + 1} of 10`);
+      await page.locator('#pl .opt').first().click();
+      await page.click('#pl-next');
+    }
+    await page.waitForSelector('.pl-res');
+    eq(await page.locator('.pl-res li').count(), 5, 'five stage rows');
+    ok(/of 10 correct/.test(await page.textContent('#pl h2')), 'score shown');
+    ok(await page.locator('#pl .btn-primary').count() === 1, 'primary action');
+    const before = await progress(page); eq(Object.keys((before && before.lessons) || {}).length, 0, 'nothing unlocked');
+    await page.click('#pl-again'); await page.waitForSelector('#pl .opt');
+    await ctx.close();
+  });
+
+  await test('landing page: no overflow on a phone at 130% text, axe clean in both themes', async () => {
+    for (const dark of [false, true]) {
+      const { ctx, page } = await open({ viewport: { width: 390, height: 844 }, dark }); await go(page, '/');
+      await page.evaluate(() => { MargaA11y.set('fs', '130'); });
+      await page.waitForTimeout(150);
+      const ov = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      ok(ov <= 2, 'overflow ' + ov);
+      await page.evaluate(() => { MargaA11y.set('fs', '100'); });
+      await page.addScriptTag({ content: AXE });
+      const res = await page.evaluate(async () => (await axe.run('#main', { runOnly: ['wcag2a', 'wcag2aa'] })).violations.map((v) => v.id + ': ' + v.nodes.map((n) => n.target).join(' ')));
+      eq(res.length, 0, 'axe: ' + res.join(' | '));
+      await ctx.close();
+    }
   });
 
   // ------------------------------------------------------------ screenshots

@@ -652,7 +652,8 @@ function checkMore() {
   for (const m of A.modules) if ((A.glossary || []).filter((g) => g.module === m.id).length < 4) err('glossary', `module ${m.id} has fewer than 4 terms`);
   // explainers
   const ex = (() => { const w = { window: {} }; vm.runInNewContext(read(path.join(DIST, 'assets', 'explainers.js')), w); return w.window.MARGA_EXPLAINERS || []; })();
-  if (ex.length < 7) err('explainers', `need at least 7, found ${ex.length}`);
+  if (ex.length < 28) err('explainers', `need at least 28, found ${ex.length}`);
+  for (const m of mods) if (ex.filter((x) => x.module === m).length < 2) err('explainers', `module ${m} needs at least 2 explainers`);
   for (const x of ex) {
     if (!mods.has(x.module)) err('explainers', `${x.id}: unknown module`);
     if (x.steps.length < 6) err('explainers', `${x.id}: fewer than 6 steps`);
