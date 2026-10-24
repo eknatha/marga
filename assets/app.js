@@ -159,44 +159,27 @@ function renderChrome() {
     '<a class="brand" href="#/"><img src="icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>' +
     '<nav class="topnav" id="topnav" aria-label="Main">' +
     '<a href="#/paths" data-nav="paths">Paths</a><a href="#/cheatsheets" data-nav="cheatsheets">Cheat sheets</a>' +
-    '<a href="#/review" data-nav="review">Review cards</a><a href="#/labs" data-nav="labs">Labs</a><a href="#/progress" data-nav="progress">Progress</a><a href="#/interview" data-nav="interview">InterviewHub</a></nav>' +
+    '<a href="#/cases" data-nav="cases">Case studies</a><a href="#/practice" data-nav="practice">Practice</a><a href="#/progress" data-nav="progress">Progress</a><a href="#/interview" data-nav="interview">InterviewHub</a></nav>' +
     '<div class="tools">' +
     '<button class="btn btn-quiet search-btn" type="button" data-act="search" aria-label="Search lessons and cheat sheets">' + ICON.search + '<span>Search</span><kbd>/</kbd></button>' +
     '<a class="streak' + (st.cur ? ' on' : '') + '" href="#/progress" title="Current streak ' + plural(st.cur, 'day') + ', best ' + plural(st.best, 'day') + '" aria-label="Current streak ' + plural(st.cur, 'day') + '">' + ICON.flame + '<b>' + st.cur + '</b></a>' +
+    '<button class="btn btn-quiet icon-btn a11y-btn" type="button" data-act="a11y" aria-label="Reading and accessibility options" aria-expanded="false" aria-controls="a11y-panel"><b aria-hidden="true">Aa</b></button>' +
     '<button class="btn btn-quiet icon-btn" type="button" data-act="theme" aria-label="Switch to ' + (theme() === 'dark' ? 'light' : 'dark') + ' theme">' + (theme() === 'dark' ? ICON.sun : ICON.moon) + '</button>' +
     '<button class="btn btn-quiet icon-btn menu-btn" type="button" data-act="menu" aria-label="Menu" aria-expanded="false"><span></span></button>' +
     '</div></div></header>';
   $('#footer').innerHTML =
     '<footer class="foot"><div class="wrap foot-in">' +
     '<span>MARGA by EknathaLabs</span>' +
-    '<a href="cheatsheets/">Printable cheat sheets</a><a href="#/interview">InterviewHub</a>' +
-    (D.counter ? '<span class="visitors" id="visitors"' + (visitorText ? '' : ' hidden') + '>' + e(visitorText) + '</span>' : '') +
+    '<a href="cheatsheets/">Printable cheat sheets</a><a href="#/interview">InterviewHub</a><a href="#/practice">Practice</a><a href="#/labs">Labs (planned)</a>' +
+    (D.counter ? '<span class="visitors" id="visitors" hidden></span>' : '') +
     '<span class="foot-note">Progress is saved in this browser only.</span>' +
-    '<p class="foot-promise">Free forever \u00b7 No login \u00b7 No ads \u00b7 No cookies</p></div></footer>';
+    '<p class="foot-promise">Free forever \u00b7 No login \u00b7 No ads \u00b7 No cookies</p><p class="small foot-ver">Version ' + siteVer() + '</p></div></footer>';
+  if (window.MargaCounter && D.counter) MargaCounter.rebind('#visitors');
 }
 
-/* ---------- visitor count (GoatCounter, optional, silent on failure) ---------- */
-var visitorText = '';
-function visitors() {
-  if (!D.counter || !window.fetch) return;
-  var base = 'https://' + D.counter + '.goatcounter.com/';
-  var local = /^(localhost|127\..*|\[::1\]|)$/.test(location.hostname) || location.protocol === 'file:';
-  try {
-    if (!local && !sessionStorage.getItem('ea.hit')) {
-      sessionStorage.setItem('ea.hit', '1');
-      new Image().src = base + 'count?p=' + encodeURIComponent('/') + '&t=' + encodeURIComponent(document.title) + '&r=' + encodeURIComponent(document.referrer);
-    }
-  } catch (x) { /* storage blocked: skip the hit */ }
-  // Count the hit before asking for the total, so a first visit includes itself.
-  setTimeout(function () {
-    fetch(base + 'counter/TOTAL.json').then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (j) {
-      var n = String(j && j.count || '').replace(/\s/g, ' ').trim();
-      if (!/^\d[\d ,.]*$/.test(n)) return;
-      visitorText = n + (n === '1' ? ' visitor' : ' visitors');
-      var el = $('#visitors'); if (el) { el.textContent = visitorText; el.hidden = false; }
-    }).catch(function () { /* offline or counter not set up: stay hidden */ });
-  }, local ? 0 : 900);
-}
+/* ---------- visitor count: see counter.js ---------- */
+function siteVer() { try { var m = /[?&]v=([0-9a-f]+)/.exec(document.querySelector('script[src*="app.js"]').getAttribute('src')); return m ? m[1] : 'dev'; } catch (x) { return 'dev'; } }
+function visitors() { if (window.MargaCounter && D.counter) MargaCounter.init(D.counter, '#visitors'); }
 function setNav(name) {
   $$('#topnav a').forEach(function (a) { a.classList.toggle('on', a.getAttribute('data-nav') === name); });
 }
@@ -325,6 +308,7 @@ function moduleView(id) {
     '<p class="lede">' + e(m.summary) + '</p>' +
     '<dl class="facts"><div><dt>Level</dt><dd>' + e(m.level) + '</dd></div><div><dt>Study time</dt><dd>About ' + hours(m.minutes) + '</dd></div><div><dt>Progress</dt><dd>' + n + ' of ' + tot + ' lessons</dd></div></dl>' +
     '<div class="bar wide" role="img" aria-label="' + pct + ' percent complete"><i style="width:' + pct + '%"></i></div>' + lock +
+    '<p class="small">Practice this stage: <a href="#/drills/' + m.id + '">troubleshooting drills</a>, <a href="#/cases/' + m.id + '">case studies</a>, <a href="#/flashcards">flashcards</a>.</p>' +
     (sheets.length ? '<p class="small">Cheat sheet: ' + sheets.map(function (k) { return '<a href="#/cheatsheet/' + k + '">' + e(SHEETS[k].title) + '</a>'; }).join(', ') + '</p>' : '') +
     '<div class="actions">' + printBar() + '</div>' + voiceSlot() +
     '</section><div class="wrap"><ol class="jobs">' + m.lessons.map(function (lid, i) { return jobHtml(lid, i); }).join('') + '</ol>' + refsHtml(m.refs, 'Official documentation for this stage') + '</div>';
@@ -598,7 +582,7 @@ function interviewView() {
   view.html = '<section class="page-head wrap"><h1>InterviewHub</h1>' +
     '<p class="lede">Common DevOps, cloud and SRE interview questions with model answers. Open any question, say your answer out loud first, then compare. Everything here is open: no lesson needs to be passed.</p>' +
     '<p class="small" id="iv-stats">' + e(ivStats()) + '</p>' +
-    '<div class="actions">' + printBar() + '<button type="button" class="btn btn-quiet" data-act="iv-all" id="iv-all">Show all answers</button></div>' + voiceSlot() +
+    '<div class="actions"><a class="btn btn-primary" href="#/interview/mock">Start a mock interview</a>' + printBar() + '<button type="button" class="btn btn-quiet" data-act="iv-all" id="iv-all">Show all answers</button></div>' + voiceSlot() +
     '<div class="iv-filters"><label class="field"><span>Topic</span><select id="iv-mod">' + modOpts + '</select></label>' +
     '<label class="field"><span>Level</span><select id="iv-level">' + lvOpts + '</select></label>' +
     '<label class="field"><span>Show</span><select id="iv-status">' + stOpts + '</select></label>' +
@@ -673,6 +657,8 @@ function progressView() {
           var o = JSON.parse(r.result);
           if (!o || o.v !== 1 || typeof o.lessons !== 'object' || !Array.isArray(o.days)) throw new Error('bad');
           S = { v: 1, lessons: o.lessons || {}, cards: o.cards || {}, days: o.days, path: o.path || 'devops', iv: (o.iv && typeof o.iv === 'object') ? o.iv : {} };
+          ['cs', 'dr', 'fc'].forEach(function (k) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) S[k] = o[k]; });
+          if (Array.isArray(o.mock)) S.mock = o.mock.slice(-20);
           save(); renderChrome(); toast('Progress imported.'); route();
         } catch (x) { toast('That file is not a MARGA progress export.'); }
       };
@@ -707,6 +693,7 @@ function route() {
   if (view.after) view.after();
   mountVoice();
   var hd = $('#main h1'); if (hd) { hd.setAttribute('tabindex', '-1'); }
+  if (window.MargaCounter && D.counter) MargaCounter.hit(h === '/' ? '/' : h, view.title);
 }
 
 /* ---------- search ---------- */
@@ -718,6 +705,8 @@ function buildIndex() {
     var l = LES[id];
     INDEX.push({ kind: 'Lesson', title: l.title, sub: MOD[l.module].title, href: hrefLesson(id), lesson: id, hay: (l.title + ' ' + l.summary + ' ' + l.toc.map(function (x) { return x.text; }).join(' ')).toLowerCase(), t: l.title.toLowerCase() });
   });
+  (D.cases || []).forEach(function (c) { INDEX.push({ kind: 'Case study', title: c.title, sub: c.company + ', ' + c.year, href: '#/cases/' + c.id, hay: (c.title + ' ' + c.company + ' ' + c.area + ' ' + c.what + ' ' + c.cause + ' ' + c.lesson).toLowerCase(), t: c.title.toLowerCase() }); });
+  (D.arch || []).forEach(function (a) { INDEX.push({ kind: 'Post-mortem', title: a.title, sub: a.summary, href: '#/architecture/' + a.id, hay: (a.title + ' ' + a.summary + ' ' + a.text).toLowerCase(), t: a.title.toLowerCase() }); });
   Object.keys(SHEETS).forEach(function (id) {
     var s = SHEETS[id];
     INDEX.push({ kind: 'Cheat sheet', title: s.title, sub: s.summary, href: '#/cheatsheet/' + id, hay: (s.title + ' ' + s.summary + ' ' + s.text).toLowerCase(), t: s.title.toLowerCase() });
@@ -791,6 +780,7 @@ document.addEventListener('click', function (ev) {
   var act = t.closest('[data-act]');
   if (!act) return;
   var a = act.getAttribute('data-act');
+  if (actions[a]) { actions[a](act, ev); return; }
   if (a === 'iv-show') { var cardEl = act.closest('.iv'); ivToggle(cardEl, act.getAttribute('aria-expanded') !== 'true'); }
   else if (a === 'iv-all') {
     var openAll = act.getAttribute('data-open') !== '1';
@@ -838,11 +828,56 @@ document.addEventListener('keydown', function (ev) {
 });
 window.addEventListener('hashchange', function () { var nv = $('#topnav'); if (nv) nv.classList.remove('open'); route(); });
 
+/* ---------- extension API (extras.js registers more views through this) ---------- */
+var actions = {};
+var api = {
+  D: D, MODS: MODS, MOD: MOD, LES: LES, LIVE: LIVE, PATH: PATH, LEVELS: LEVELS, IV: IV,
+  $: $, $$: $$, e: e, plural: plural, shuffle: shuffle, hours: hours,
+  state: function () { return S; }, save: save, markActive: markActive, renderChrome: renderChrome, setNav: setNav,
+  view: view, toast: toast, printBar: printBar, voiceSlot: voiceSlot, wireSay: wireSay, refsHtml: refsHtml,
+  hrefLesson: hrefLesson, isDone: isDone, route: route,
+  addRoute: function (re, fn) { routes.push([re, fn]); },
+  onAct: function (name, fn) { actions[name] = fn; }
+};
+window.MargaApp = api;
+if (typeof window.MargaExtras === 'function') window.MargaExtras(api);
+
+/* ---------- accessibility panel ---------- */
+(function () {
+  var root = $('#a11y-root');
+  if (!root || !window.MargaA11y) return;
+  root.innerHTML = MargaA11y.panelHtml();
+  var panel = $('#a11y-panel');
+  function setOpen(open) {
+    panel.hidden = !open;
+    var b = $('[data-act=a11y]'); if (b) b.setAttribute('aria-expanded', String(open));
+    if (open) { var f = $('select', panel); if (f) f.focus(); } else if (b) b.focus();
+  }
+  actions.a11y = function () { setOpen(panel.hidden); };
+  panel.addEventListener('change', function (ev) {
+    var id = ev.target.getAttribute('data-a11y-set');
+    if (id) MargaA11y.set(id, ev.target.value);
+  });
+  panel.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-a11y]'); if (!b) return;
+    if (b.getAttribute('data-a11y') === 'close') setOpen(false);
+    else if (b.getAttribute('data-a11y') === 'reset') { MargaA11y.reset(); MargaA11y.sync(); toast('Reading options reset.'); }
+  });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && !panel.hidden) setOpen(false); });
+  document.addEventListener('click', function (ev) {
+    if (panel.hidden) return;
+    if (ev.target.closest('#a11y-panel') || ev.target.closest('[data-act=a11y]')) return;
+    panel.hidden = true; var b = $('[data-act=a11y]'); if (b) b.setAttribute('aria-expanded', 'false');
+  });
+})();
+
 /* ---------- start ---------- */
 renderChrome();
 route();
 visitors();
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
-  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () { /* offline cache is optional */ }); });
+  var hadSW = !!navigator.serviceWorker.controller, reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', function () { if (hadSW && !reloaded) { reloaded = true; location.reload(); } });
+  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(function (r) { try { r.update(); } catch (x) { /* ignore */ } }).catch(function () { /* offline cache is optional */ }); });
 }
 })();
