@@ -14,8 +14,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=6ec74770">
-<script src="../assets/a11y.js?v=6ec74770"></script>
+<link rel="stylesheet" href="../assets/app.css?v=60459120">
+<script src="../assets/a11y.js?v=60459120"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -188,12 +188,70 @@ az lock create --name no-delete --lock-type CanNotDelete --resource-group shop-p
 az policy state list --resource-group shop-prod --filter <span class="hljs-string">&quot;complianceState eq &#x27;NonCompliant&#x27;&quot;</span>
 az lock create --name no-delete --lock-type CanNotDelete --resource-group shop-prod</code></pre></div>
 <p>Azure Policy enforces rules such as allowed regions and required tags. Resource locks guard against accidental deletion.</p>
+<h2 id="subscription-and-identity-checks">Subscription and identity checks</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="az account show -o table
+az account list -o table
+az account set --subscription &quot;Production&quot;
+az ad signed-in-user show --query userPrincipalName
+az role assignment list --assignee user@example.com --all -o table
+az group list -o table
+az resource list -g rg-shop -o table
+az monitor activity-log list --offset 1d --query &quot;[?level=='Error']&quot; -o table" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">az account show -o table
+az account list -o table
+az account <span class="hljs-built_in">set</span> --subscription <span class="hljs-string">&quot;Production&quot;</span>
+az ad signed-in-user show --query userPrincipalName
+az role assignment list --assignee user@example.com --all -o table
+az group list -o table
+az resource list -g rg-shop -o table
+az monitor activity-log list --offset 1d --query <span class="hljs-string">&quot;[?level==&#x27;Error&#x27;]&quot;</span> -o table</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Check <code>az account show</code> before every change. The default subscription can be production. Use <code>--subscription</code> in scripts instead of relying on the current one.</p>
+</aside>
+<h2 id="compute-and-network-more">Compute and network, more</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="az vm list -d -g rg-shop -o table
+az vm deallocate -g rg-shop -n vm-web1
+az vm run-command invoke -g rg-shop -n vm-web1 --command-id RunShellScript --scripts &quot;systemctl status nginx&quot;
+az network nsg rule list -g rg-shop --nsg-name nsg-web -o table
+az network public-ip list -o table
+az network vnet subnet list -g rg-shop --vnet-name vnet-shop -o table
+az aks get-credentials -g rg-shop -n aks-shop --overwrite-existing
+az aks show -g rg-shop -n aks-shop --query &quot;{version:kubernetesVersion,state:provisioningState}&quot;
+az storage account show -n acmeshop --query &quot;{https:enableHttpsTrafficOnly,public:allowBlobPublicAccess}&quot;" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">az vm list -d -g rg-shop -o table
+az vm deallocate -g rg-shop -n vm-web1
+az vm run-command invoke -g rg-shop -n vm-web1 --command-id RunShellScript --scripts <span class="hljs-string">&quot;systemctl status nginx&quot;</span>
+az network nsg rule list -g rg-shop --nsg-name nsg-web -o table
+az network public-ip list -o table
+az network vnet subnet list -g rg-shop --vnet-name vnet-shop -o table
+az aks get-credentials -g rg-shop -n aks-shop --overwrite-existing
+az aks show -g rg-shop -n aks-shop --query <span class="hljs-string">&quot;{version:kubernetesVersion,state:provisioningState}&quot;</span>
+az storage account show -n acmeshop --query <span class="hljs-string">&quot;{https:enableHttpsTrafficOnly,public:allowBlobPublicAccess}&quot;</span></code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>az vm stop</code> keeps the VM allocated and you still pay for it. Use <code>az vm deallocate</code> to stop compute billing.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>az vm run-command</code> runs as root or SYSTEM. Treat the script as a production change and log it.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>az aks get-credentials --overwrite-existing</code> replaces the kube context of the same name. Check <code>kubectl config current-context</code> afterwards.</p>
+</aside>
+<h2 id="delete-and-cost-cautions">Delete and cost cautions</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="az group show -n rg-test --query &quot;properties.provisioningState&quot;
+az resource list -g rg-test -o table
+az group delete -n rg-test --no-wait
+az lock create --name keep --lock-type CanNotDelete -g rg-shop
+az consumption usage list --top 20 -o table" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">az group show -n rg-test --query <span class="hljs-string">&quot;properties.provisioningState&quot;</span>
+az resource list -g rg-test -o table
+az group delete -n rg-test --no-wait
+az lock create --name keep --lock-type CanNotDelete -g rg-shop
+az consumption usage list --top 20 -o table</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>az group delete</code> removes every resource in the group, including databases and storage. List the resources first, and apply <code>CanNotDelete</code> locks to production groups.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>--yes</code> and <code>--no-wait</code> hide prompts and results. Do not add them to commands you have not run before.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not put client secrets in scripts. Use managed identities, and rotate service principal secrets before they expire.</p>
+</aside>
 </article>
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://learn.microsoft.com/en-us/cli/azure/" target="_blank" rel="noopener">Azure CLI documentation</a><span class="host">learn.microsoft.com</span></li><li><a href="https://learn.microsoft.com/en-us/azure/" target="_blank" rel="noopener">Azure documentation</a><span class="host">learn.microsoft.com</span></li><li><a href="https://learn.microsoft.com/en-us/azure/role-based-access-control/overview" target="_blank" rel="noopener">Azure RBAC overview</a><span class="host">learn.microsoft.com</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=6ec74770"></script>
-<script src="../assets/counter.js?v=6ec74770"></script>
+<script src="../assets/voice.js?v=60459120"></script>
+<script src="../assets/counter.js?v=60459120"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

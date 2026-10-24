@@ -53,9 +53,29 @@ function fetchTotal(attempt) {
     })
     .catch(function (e) {
       MargaCounter.status = 'unavailable'; MargaCounter.error = String(e && e.message || e);
+      if (attempt === 0 && !shown) fallback();
       if (attempt < 3) timers.push(setTimeout(function () { fetchTotal(attempt + 1); }, [1500, 6000, 20000][attempt]));
       else { if (!shown) say('Visitor count unavailable'); if (window.console && console.info) console.info('MARGA visitor count unavailable (' + MargaCounter.error + '). In GoatCounter settings, enable "Allow adding visitor counts on your website" and check the site code.'); }
     });
+}
+/* Second source, used only when GoatCounter's public total cannot be read (for example the setting
+   "Allow adding visitor counts on your website" is off). Abacus is a free counter with no login and no cookies.
+   One hit per browser session, then plain reads. The number is its own count, not GoatCounter's. */
+var FB = 'https://abacus.jasoncameron.dev/';
+function fallback() {
+  if (!window.fetch || local()) { if (!shown) say('Visitor count unavailable'); return; }
+  var ns = 'marga-eknathalabs', key = 'visits', counted = false;
+  try { counted = sessionStorage.getItem('ea.vc.hit') === '1'; } catch (x) { /* ignore */ }
+  fetch(FB + (counted || dnt() ? 'get/' : 'hit/') + ns + '/' + key, { cache: 'no-store' })
+    .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); })
+    .then(function (j) {
+      var n = String(j && j.value !== undefined ? j.value : '');
+      if (!/^\d+$/.test(n)) throw new Error('unexpected response');
+      if (!counted) { try { sessionStorage.setItem('ea.vc.hit', '1'); } catch (x) { /* ignore */ } }
+      store(KEY, JSON.stringify({ n: n, t: Date.now() }));
+      MargaCounter.status = 'fallback'; paint(n);
+    })
+    .catch(function () { if (!shown) say('Visitor count unavailable'); });
 }
 function init(c, el) {
   code = c || '';

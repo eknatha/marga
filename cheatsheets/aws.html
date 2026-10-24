@@ -14,8 +14,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=6ec74770">
-<script src="../assets/a11y.js?v=6ec74770"></script>
+<link rel="stylesheet" href="../assets/app.css?v=60459120">
+<script src="../assets/a11y.js?v=60459120"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -227,12 +227,62 @@ aws cloudwatch describe-alarms --state-value ALARM</code></pre></div>
 <li>Rotate related credentials</li>
 <li>Replace the key with a role</li>
 </ol>
+<h2 id="compute-and-storage-more">Compute and storage, more</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="aws ec2 describe-instances --filters Name=instance-state-name,Values=running --query 'Reservations[].Instances[].[InstanceId,InstanceType,PrivateIpAddress,Tags[?Key==`Name`]|[0].Value]' --output table
+aws ec2 describe-security-groups --group-ids sg-0123456789abcdef0
+aws ec2 describe-volumes --filters Name=status,Values=available
+aws ec2 create-snapshot --volume-id vol-0123456789abcdef0 --description &quot;before change&quot;
+aws ec2 stop-instances --instance-ids i-0123456789abcdef0
+aws s3 ls s3://acme-uploads --recursive --human-readable --summarize
+aws s3 sync ./site s3://acme-site --dryrun
+aws s3 cp s3://acme-uploads/shop/logo.png .
+aws s3api get-bucket-policy-status --bucket acme-uploads
+aws s3api get-public-access-block --bucket acme-uploads
+aws rds describe-db-instances --query 'DBInstances[].[DBInstanceIdentifier,DBInstanceStatus,MultiAZ]'
+aws logs tail /aws/lambda/shop-api --since 15m --follow" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">aws ec2 describe-instances --filters Name=instance-state-name,Values=running --query <span class="hljs-string">&#x27;Reservations[].Instances[].[InstanceId,InstanceType,PrivateIpAddress,Tags[?Key==`Name`]|[0].Value]&#x27;</span> --output table
+aws ec2 describe-security-groups --group-ids sg-0123456789abcdef0
+aws ec2 describe-volumes --filters Name=status,Values=available
+aws ec2 create-snapshot --volume-id vol-0123456789abcdef0 --description <span class="hljs-string">&quot;before change&quot;</span>
+aws ec2 stop-instances --instance-ids i-0123456789abcdef0
+aws s3 <span class="hljs-built_in">ls</span> s3://acme-uploads --recursive --human-readable --summarize
+aws s3 <span class="hljs-built_in">sync</span> ./site s3://acme-site --dryrun
+aws s3 <span class="hljs-built_in">cp</span> s3://acme-uploads/shop/logo.png .
+aws s3api get-bucket-policy-status --bucket acme-uploads
+aws s3api get-public-access-block --bucket acme-uploads
+aws rds describe-db-instances --query <span class="hljs-string">&#x27;DBInstances[].[DBInstanceIdentifier,DBInstanceStatus,MultiAZ]&#x27;</span>
+aws logs <span class="hljs-built_in">tail</span> /aws/lambda/shop-api --since 15m --follow</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>aws s3 sync --delete</code> and <code>aws s3 rm --recursive</code> remove objects at once, and on a versioned bucket they leave delete markers. Run <code>--dryrun</code> first.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>aws ec2 terminate-instances</code> cannot be undone, and attached volumes with <code>DeleteOnTermination</code> are removed. Take a snapshot and use <code>stop-instances</code> when you are unsure.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Opening a security group to <code>0.0.0.0/0</code> on SSH or database ports exposes it to the whole internet. Use your own address range or Session Manager.</p>
+</aside>
+<h2 id="cost-and-safety-checks">Cost and safety checks</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="aws ce get-cost-and-usage --time-period Start=2026-10-01,End=2026-10-24 --granularity DAILY --metrics UnblendedCost
+aws budgets describe-budgets --account-id 123456789012
+aws ec2 describe-addresses --query 'Addresses[?AssociationId==null]'
+aws ec2 describe-nat-gateways --filter Name=state,Values=available
+aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=DeleteBucket --max-results 5
+aws configservice describe-compliance-by-config-rule" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">aws ce get-cost-and-usage --time-period Start=2026-10-01,End=2026-10-24 --granularity DAILY --metrics UnblendedCost
+aws budgets describe-budgets --account-id 123456789012
+aws ec2 describe-addresses --query <span class="hljs-string">&#x27;Addresses[?AssociationId==null]&#x27;</span>
+aws ec2 describe-nat-gateways --filter Name=state,Values=available
+aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=DeleteBucket --max-results 5
+aws configservice describe-compliance-by-config-rule</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Unattached Elastic IPs, idle NAT gateways, old snapshots and unused load balancers keep costing money. Review them every month, and set a budget alert.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Check <code>aws sts get-caller-identity</code> and <code>AWS_PROFILE</code> before every change. Running a command in the wrong account is a frequent cause of incidents.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not put access keys in scripts or environment files in a repository. Use roles, SSO (<code>aws sso login</code>) or a secrets manager, and rotate any key that was exposed.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>aws iam delete-user</code>, <code>delete-role</code> and <code>delete-policy</code> can break running workloads that use them. Search CloudTrail and Access Advisor for recent use first.</p>
+</aside>
 </article>
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html" target="_blank" rel="noopener">AWS CLI user guide</a><span class="host">docs.aws.amazon.com</span></li><li><a href="https://docs.aws.amazon.com/" target="_blank" rel="noopener">AWS documentation</a><span class="host">docs.aws.amazon.com</span></li><li><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html" target="_blank" rel="noopener">AWS IAM: security best practices</a><span class="host">docs.aws.amazon.com</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=6ec74770"></script>
-<script src="../assets/counter.js?v=6ec74770"></script>
+<script src="../assets/voice.js?v=60459120"></script>
+<script src="../assets/counter.js?v=60459120"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

@@ -343,4 +343,204 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: 'Fix: retry budget and circuit breaker', n: 'Limit retries to a small share of traffic. A circuit breaker stops calling a failing dependency for a short time and fails fast.' },
     { f: 1, t: 0, l: 'Shed load, return 503 early', n: 'A service that rejects excess requests quickly protects itself and recovers sooner than one that tries to serve everything.' }
   ] }
+,
+{ id: 'ssh-login', module: 'linux', title: 'How an SSH login works', summary: 'Key exchange, host check and key-based sign-in.',
+  actors: ['Your laptop', 'sshd on the server', 'PAM and shell'],
+  steps: [
+    { f: 0, t: 1, l: 'Open TCP port 22', n: 'The client connects to the server. Both sides send the protocol version they support.' },
+    { f: 1, t: 0, l: 'Server sends its host key', n: 'The server proves who it is with its host key. The client compares it with the entry in known_hosts.' },
+    { f: 0, t: 0, l: 'Check known_hosts', n: 'A new key asks for your confirmation. A changed key triggers a loud warning, because it can mean a different machine or an attack.' },
+    { f: 0, t: 1, l: 'Agree on session keys', n: 'Both sides run a key exchange and derive keys that only they know. All traffic from now on is encrypted.' },
+    { f: 0, t: 1, l: 'Offer your public key', n: 'The client offers a public key. The server looks for it in ~/.ssh/authorized_keys of the target user.' },
+    { f: 1, t: 0, l: 'Challenge to prove the private key', n: 'The server sends a challenge that only the matching private key can sign. The private key never leaves your laptop.' },
+    { f: 1, t: 2, l: 'Account and policy checks', n: 'PAM checks that the account is valid and not locked, and applies limits. Wrong file permissions on ~/.ssh make the server ignore your key.' },
+    { f: 2, t: 0, l: 'Shell starts, session is open', n: 'The server starts the login shell for the user. Use ssh -v to see each of these stages when a login fails.' }
+  ] },
+{ id: 'cron-run', module: 'bash', title: 'A cron job runs, and why it behaves differently', summary: 'The small environment of scheduled jobs.',
+  actors: ['cron daemon', 'Shell (sh)', 'Your script', 'Mail or log'],
+  steps: [
+    { f: 0, t: 0, l: 'Every minute: read the crontab', n: 'The cron daemon wakes up each minute and checks whether any entry matches the current time.' },
+    { f: 0, t: 1, l: '30 2 * * * /opt/backup.sh', n: 'At 02:30 it starts a shell. This is a plain sh with a minimal environment, not your login shell.' },
+    { f: 1, t: 1, l: 'Small PATH, no profile files', n: 'Your .bashrc and .profile are not read, and PATH is short. A command that works in your terminal can be missing here.' },
+    { f: 1, t: 2, l: 'Run the script', n: 'Use absolute paths for commands and files, and set the variables the script needs at its top.' },
+    { f: 2, t: 2, l: 'Script writes output', n: 'Anything printed goes to the owner by mail, or is lost if mail is not set up. Redirect to a log file with >> backup.log 2>&1.' },
+    { f: 2, t: 2, l: 'Two runs overlap', n: 'If a run is still going when the next one starts, you get two copies. Guard with flock -n /tmp/backup.lock.' },
+    { f: 2, t: 3, l: 'Exit status, then alert', n: 'Cron does not alert on failure by itself. Have the script report success or failure to a monitoring check.' }
+  ] },
+{ id: 'exit-codes', module: 'bash', title: 'Exit codes and how a script decides what to do', summary: 'From a failed command to the exit of the script.',
+  actors: ['Script', 'Command', 'Shell variables'],
+  steps: [
+    { f: 0, t: 1, l: 'Run grep -q ready status.txt', n: 'Every command ends with an exit status. Zero means success. Any other number means some kind of failure.' },
+    { f: 1, t: 2, l: 'Status stored in $?', n: 'The shell puts the status of the last command into $?. It changes after every command, so read it at once.' },
+    { f: 0, t: 2, l: 'if grep ...; then ...', n: 'An if statement tests the exit status directly. You do not need to compare $? to 0.' },
+    { f: 1, t: 0, l: 'Status 1 means no match', n: 'For grep, 1 means no match and 2 means an error. The meaning of numbers belongs to each program, so read its manual.' },
+    { f: 0, t: 0, l: 'set -e stops on an unexpected failure', n: 'With set -e the script stops on the first failing command that is not part of a test. It is a safety net, not full error handling.' },
+    { f: 0, t: 0, l: 'trap runs the cleanup', n: 'A trap on EXIT or ERR removes temp files and reports where the script failed.' },
+    { f: 0, t: 2, l: 'exit 3 tells the caller why', n: 'Choose clear exit codes and document them. A caller such as cron, CI or another script reads them to decide what to do next.' }
+  ] },
+{ id: 'python-boto3', module: 'python', title: 'How boto3 finds credentials and calls AWS', summary: 'The credential chain and a signed request.',
+  actors: ['Your script', 'boto3 credential chain', 'STS or metadata service', 'AWS API'],
+  steps: [
+    { f: 0, t: 1, l: 'boto3.client("s3")', n: 'You create a client without passing keys. boto3 looks for credentials in a fixed order.' },
+    { f: 1, t: 1, l: 'Check environment variables first', n: 'AWS_ACCESS_KEY_ID and related variables win if they are set. A forgotten variable can send you to the wrong account.' },
+    { f: 1, t: 1, l: 'Then shared files and profiles', n: 'Next come ~/.aws/credentials and config, including AWS_PROFILE and SSO profiles.' },
+    { f: 1, t: 2, l: 'Then the role of the machine', n: 'On EC2, ECS or EKS the chain asks the metadata service or a web identity token for short-lived credentials.' },
+    { f: 2, t: 1, l: 'Temporary keys returned', n: 'The service returns keys with an expiry time. boto3 refreshes them before they expire.' },
+    { f: 0, t: 3, l: 'list_objects_v2 (signed)', n: 'The request is signed with the credentials, so the server can check who sent it and that nobody changed it.' },
+    { f: 3, t: 0, l: 'Response or ClientError', n: 'You get data, or a ClientError with a code such as AccessDenied. Use sts get_caller_identity to see which identity was used.' }
+  ] },
+{ id: 'python-container-signal', module: 'python', title: 'A Python service in a container and SIGTERM', summary: 'Graceful shutdown during a deployment.',
+  actors: ['Orchestrator', 'Container runtime', 'Python service', 'In-flight requests'],
+  steps: [
+    { f: 0, t: 1, l: 'Rolling update: stop the old pod', n: 'The orchestrator asks the runtime to stop the container, after it removes it from the load balancer.' },
+    { f: 1, t: 2, l: 'SIGTERM to PID 1', n: 'The runtime sends SIGTERM to the main process of the container. With a shell wrapper the signal may never reach Python.' },
+    { f: 2, t: 2, l: 'Signal handler sets a flag', n: 'Register signal.signal(SIGTERM, handler). The handler stops accepting new work and sets a flag.' },
+    { f: 2, t: 3, l: 'Finish current requests', n: 'The service completes the requests it has already started, and closes connections and files.' },
+    { f: 2, t: 2, l: 'Exit with code 0', n: 'When the work is done the process exits cleanly, and the container stops quickly.' },
+    { f: 1, t: 2, l: 'After the grace period: SIGKILL', n: 'If the process is still running when terminationGracePeriodSeconds ends, it is killed at once and requests are cut off.' },
+    { f: 0, t: 1, l: 'Use exec form for the entrypoint', n: 'Write CMD ["python", "app.py"] so Python is PID 1 and receives the signal. Add an init such as tini if you spawn children.' }
+  ] },
+{ id: 'docker-network', module: 'docker', title: 'Container to container networking', summary: 'Bridge networks, DNS names and published ports.',
+  actors: ['Browser on the host', 'Published port rule', 'web container', 'db container', 'Embedded DNS'],
+  steps: [
+    { f: 0, t: 1, l: 'localhost:8080', n: 'The browser connects to a port on the host. Docker has a rule that forwards it to a container.' },
+    { f: 1, t: 2, l: 'Forward to web:80', n: 'The rule rewrites the destination to the IP address of the web container on the bridge network.' },
+    { f: 2, t: 4, l: 'Resolve "db"', n: 'On a user-defined network, containers find each other by name. The built-in DNS server at 127.0.0.11 answers.' },
+    { f: 4, t: 2, l: 'db is 172.19.0.3', n: 'The name resolves to the current address of the db container. The address can change, so use the name.' },
+    { f: 2, t: 3, l: 'Connect to db:5432', n: 'The traffic stays inside the network. The database port does not need to be published to the host.' },
+    { f: 3, t: 2, l: 'Query result', n: 'The database answers. Keeping the database off the host ports means that only the web container can reach it.' },
+    { f: 2, t: 0, l: 'HTML response', n: 'The web container sends the page back through the published port. On the default bridge network, name lookup does not work, so create your own network.' }
+  ] },
+{ id: 'docker-multistage', module: 'docker', title: 'A multi-stage build gives a small image', summary: 'Build in one stage, ship only what you need.',
+  actors: ['Dockerfile', 'Build stage', 'Final stage', 'Registry'],
+  steps: [
+    { f: 0, t: 1, l: 'FROM golang:1.23 AS build', n: 'The first stage has the full compiler and tools. It can be large, and it never ships.' },
+    { f: 1, t: 1, l: 'Download dependencies, compile', n: 'Copy go.mod and download modules first so the cache is used, then copy the source and build a static binary.' },
+    { f: 0, t: 2, l: 'FROM gcr.io/distroless/static', n: 'The second stage starts from a tiny base image with no shell and no package manager.' },
+    { f: 1, t: 2, l: 'COPY --from=build /app /app', n: 'Only the binary is copied. Compilers, source code and build caches stay behind in the first stage.' },
+    { f: 2, t: 2, l: 'USER nonroot, ENTRYPOINT', n: 'Run as a non-root user. A smaller image has fewer packages that can have vulnerabilities.' },
+    { f: 2, t: 3, l: 'Push 20 MB instead of 900 MB', n: 'The registry stores only the final stage. Pulls are faster and scale-out is quicker.' },
+    { f: 0, t: 1, l: 'Debug with --target build', n: 'docker build --target build gives you the first stage, with all the tools, when you need to investigate.' }
+  ] },
+{ id: 'canary-release', module: 'cicd', title: 'Canary release with automatic checks', summary: 'Send 5 percent of traffic to the new version and watch.',
+  actors: ['Pipeline', 'Router', 'Stable v1', 'Canary v2', 'Metrics'],
+  steps: [
+    { f: 0, t: 3, l: 'Deploy v2 beside v1', n: 'The new version runs next to the stable one. At first it receives no user traffic.' },
+    { f: 0, t: 1, l: 'Route 5 percent to v2', n: 'The router sends a small share of requests to the canary. Real users and real data test the release.' },
+    { f: 4, t: 3, l: 'Compare error rate and latency', n: 'Metrics for v2 are compared with v1 over the same period. The comparison matters more than an absolute number.' },
+    { f: 0, t: 4, l: 'Gate: healthy for 10 minutes?', n: 'The pipeline reads the metrics and decides. Define the pass rule before the release, not during it.' },
+    { f: 0, t: 1, l: 'Raise to 25, 50, then 100 percent', n: 'If the checks pass, the share grows in steps, with a pause and a check at each step.' },
+    { f: 0, t: 1, l: 'Failure: route 0 percent to v2', n: 'If errors rise, the router sends all traffic back to v1 at once. Only a small share of users saw the problem.' },
+    { f: 0, t: 2, l: 'Retire v1 after a soak period', n: 'Keep the old version for a while after 100 percent so that you can roll back quickly.' }
+  ] },
+{ id: 'pr-checks', module: 'cicd', title: 'What happens when you open a pull request', summary: 'Checks, review and a protected main branch.',
+  actors: ['Developer', 'CI system', 'Reviewer', 'Main branch'],
+  steps: [
+    { f: 0, t: 1, l: 'Open a pull request', n: 'The change triggers the pipeline. It runs in a clean environment on the proposed result of the merge.' },
+    { f: 1, t: 1, l: 'Lint, unit tests, build', n: 'Fast checks run first, so a mistake is reported in minutes and slower checks do not run for nothing.' },
+    { f: 1, t: 1, l: 'Security and dependency scans', n: 'Scans look for known vulnerabilities and for secrets in the change. A failure blocks the merge.' },
+    { f: 1, t: 0, l: 'Report status on the pull request', n: 'The developer sees red or green checks and a link to the logs. A flaky test hurts trust, so fix or remove it.' },
+    { f: 2, t: 0, l: 'Review the change', n: 'A person reads the change for design, risk and clarity. Small changes get better reviews.' },
+    { f: 3, t: 1, l: 'Branch protection allows merge', n: 'The main branch requires passing checks and an approval. Nobody pushes to it directly.' },
+    { f: 1, t: 3, l: 'Build once, release the artifact', n: 'After the merge the pipeline builds the artifact once, tags it with the commit, and passes it on to later stages.' }
+  ] },
+{ id: 'k8s-crashloop', module: 'kubernetes', title: 'Why a pod ends in CrashLoopBackOff', summary: 'Restarts, back-off and where to look.',
+  actors: ['kubelet', 'Container', 'Pod status', 'You'],
+  steps: [
+    { f: 0, t: 1, l: 'Start the container', n: 'The kubelet starts the container with the command and environment from the pod spec.' },
+    { f: 1, t: 1, l: 'Process exits with an error', n: 'The program stops, for example because a setting is missing or a dependency refuses it. Exit code 1 is an application error, 137 is a kill, often out of memory.' },
+    { f: 0, t: 1, l: 'Restart policy: start again', n: 'With restartPolicy Always, the kubelet starts the container again.' },
+    { f: 0, t: 2, l: 'Wait longer each time', n: 'Waits grow: 10 s, 20 s, 40 s up to 5 minutes. The status shows CrashLoopBackOff while it waits.' },
+    { f: 3, t: 2, l: 'kubectl describe pod', n: 'Events and Last State show the exit code and reason such as OOMKilled or Error.' },
+    { f: 3, t: 1, l: 'kubectl logs --previous', n: 'The logs of the crashed run show the real error. Plain logs may show the new, empty container.' },
+    { f: 3, t: 2, l: 'Fix config, memory or probes', n: 'Common causes are a missing variable or secret, a memory limit that is too low, or a liveness probe that kills a slow start. Use a startup probe for slow starts.' }
+  ] },
+{ id: 'tf-modules-plan', module: 'terraform', title: 'How Terraform builds a plan', summary: 'Configuration, state and the real world compared.',
+  actors: ['Configuration', 'Terraform core', 'State', 'Provider and cloud'],
+  steps: [
+    { f: 0, t: 1, l: 'Read the .tf files and modules', n: 'Terraform loads all configuration files in the folder and the modules that they call, and builds a graph of resources.' },
+    { f: 1, t: 2, l: 'Load the current state', n: 'State is Terraform\'s record of what it manages: the real IDs and the last known attributes.' },
+    { f: 1, t: 3, l: 'Refresh: ask the cloud', n: 'The provider reads the real objects. If someone changed a resource by hand, Terraform notices the drift here.' },
+    { f: 1, t: 1, l: 'Compare wanted with actual', n: 'For each resource it decides: create, update in place, replace or destroy, or no change.' },
+    { f: 1, t: 0, l: 'Print the plan', n: 'The plan lists every action with the attribute that causes it. Arguments marked "forces replacement" need special care.' },
+    { f: 1, t: 3, l: 'apply: call the provider in order', n: 'Dependencies decide the order. Independent resources are created in parallel.' },
+    { f: 1, t: 2, l: 'Save the new state', n: 'After each successful change the state is updated, so an interrupted apply can continue from where it stopped.' }
+  ] },
+{ id: 'tf-drift', module: 'terraform', title: 'Detecting and fixing drift', summary: 'Someone changed production by hand.',
+  actors: ['Engineer in the console', 'Cloud resource', 'Terraform plan', 'Team'],
+  steps: [
+    { f: 0, t: 1, l: 'Open port 22 to the world in the console', n: 'During an incident someone changes a security group by hand. The code and the state are not updated.' },
+    { f: 2, t: 1, l: 'Scheduled plan reads reality', n: 'A nightly terraform plan compares the real security group with the code.' },
+    { f: 2, t: 3, l: 'Plan shows an unexpected change', n: 'The plan wants to remove the rule. This difference between code and reality is drift.' },
+    { f: 3, t: 2, l: 'Decide: keep or revert?', n: 'If the change was right, update the code. If it was a shortcut, let Terraform put it back. Do not apply blindly.' },
+    { f: 2, t: 1, l: 'Apply or import the change', n: 'Applying removes the manual rule. For a new resource created by hand, terraform import brings it under management.' },
+    { f: 3, t: 0, l: 'Reduce console access', n: 'Give read-only access to most people, and use break-glass roles that are logged.' },
+    { f: 3, t: 2, l: 'Alert on drift in a pipeline', n: 'A scheduled plan that fails when it finds changes turns drift into a ticket, instead of a surprise.' }
+  ] },
+{ id: 'vpc-routing', module: 'cloud', title: 'Public and private subnets, NAT and the internet', summary: 'Which route table sends traffic where.',
+  actors: ['Private app server', 'NAT gateway (public subnet)', 'Internet gateway', 'Internet service'],
+  steps: [
+    { f: 0, t: 0, l: 'App needs to call an update server', n: 'The server in the private subnet has only a private address. Nobody on the internet can start a connection to it.' },
+    { f: 0, t: 1, l: 'Route table: 0.0.0.0/0 goes to NAT', n: 'The private subnet route table sends all non-local traffic to the NAT gateway.' },
+    { f: 1, t: 1, l: 'NAT swaps the source address', n: 'The NAT gateway replaces the private source address with its own public address and remembers the connection.' },
+    { f: 1, t: 2, l: 'Public subnet route: 0.0.0.0/0 to the IGW', n: 'The route table of the public subnet points to the internet gateway, which connects the VPC to the internet.' },
+    { f: 2, t: 3, l: 'Request leaves the VPC', n: 'The internet service sees the public address of the NAT gateway only.' },
+    { f: 3, t: 1, l: 'Response returns to NAT', n: 'The reply comes back to the NAT gateway, which maps it to the original private address.' },
+    { f: 1, t: 0, l: 'Response reaches the app', n: 'Outbound works but inbound does not start here. NAT gateways charge by hour and by data, and a VPC endpoint avoids them for cloud services.' }
+  ] },
+{ id: 'slo-burn-alert', module: 'observability', title: 'Multi-window burn rate alerting', summary: 'Page fast for big problems, ticket slowly for small ones.',
+  actors: ['Error budget', 'Fast window (1h and 5m)', 'Slow window (6h and 30m)', 'On-call', 'Ticket queue'],
+  steps: [
+    { f: 0, t: 0, l: 'SLO 99.9 percent, budget 0.1 percent', n: 'The budget is the share of requests that may fail in the SLO period. Burn rate says how fast it is being spent.' },
+    { f: 0, t: 1, l: 'Burn rate 14.4 for the last hour', n: 'At this speed 2 percent of the monthly budget is gone in one hour. The whole budget would be gone in about two days.' },
+    { f: 1, t: 1, l: 'Check the 5 minute window too', n: 'A short window confirms that the problem is still happening, so the page stops soon after the fix.' },
+    { f: 1, t: 3, l: 'Both true: page the on-call', n: 'A fast burn needs a human now. The page links to a runbook and the dashboard.' },
+    { f: 0, t: 2, l: 'Burn rate 1 to 6 over 6 hours', n: 'A slower burn does not need a night call, but it will empty the budget before the month ends.' },
+    { f: 2, t: 4, l: 'Open a ticket for the daytime', n: 'A ticket is picked up during working hours. This keeps pages for what is urgent and avoids alert fatigue.' },
+    { f: 0, t: 3, l: 'Tune with real history', n: 'Review thresholds after incidents and false alarms. Alerts should match the SLO, not every cause of trouble.' }
+  ] },
+{ id: 'chaos-experiment', module: 'sre', title: 'Running a chaos experiment safely', summary: 'Hypothesis, small blast radius, abort rule.',
+  actors: ['Team', 'Experiment tool', 'Service', 'Dashboards'],
+  steps: [
+    { f: 0, t: 0, l: 'Write a hypothesis', n: 'For example: if one of three replicas dies, the success rate stays above 99.9 percent.' },
+    { f: 0, t: 3, l: 'Define steady state and abort rule', n: 'Pick the metrics that show health, and say in advance when to stop, such as errors above 1 percent for two minutes.' },
+    { f: 0, t: 1, l: 'Announce and limit the blast radius', n: 'Tell the on-call team. Start in staging, or with one pod or a small share of traffic in production.' },
+    { f: 1, t: 2, l: 'Inject the fault: kill a pod', n: 'The tool injects one fault at a time, such as killing a pod, adding latency or blocking a dependency.' },
+    { f: 3, t: 0, l: 'Watch the dashboards', n: 'Someone watches the steady-state metrics during the whole run and keeps a finger on the stop button.' },
+    { f: 1, t: 2, l: 'Stop and restore', n: 'The experiment ends after the planned time, or earlier if the abort rule is hit. All changes are reverted.' },
+    { f: 0, t: 0, l: 'Record the result and fix the gap', n: 'If the hypothesis failed, you found a weakness cheaply. Make an action with an owner and repeat the test after the fix.' }
+  ] },
+{ id: 'ingress-request', module: 'networking', title: 'An HTTPS request through a Kubernetes ingress', summary: 'Load balancer, ingress controller, Service and pod.',
+  actors: ['Client', 'Cloud load balancer', 'Ingress controller', 'Service', 'Pod'],
+  steps: [
+    { f: 0, t: 1, l: 'https://shop.example.com/api', n: 'DNS maps the name to the public address of the cloud load balancer.' },
+    { f: 1, t: 2, l: 'Forward to the ingress controller', n: 'The load balancer sends traffic to the nodes where the ingress controller pods run.' },
+    { f: 2, t: 2, l: 'Terminate TLS, match host and path', n: 'The controller uses the certificate from a Secret and matches the host and the path against Ingress rules.' },
+    { f: 2, t: 3, l: 'Choose the backend Service', n: 'The rule for /api points to the Service named api. A wrong service name or port gives a 503.' },
+    { f: 3, t: 4, l: 'Pick a ready pod', n: 'The Service sends the request to a pod that passes its readiness probe.' },
+    { f: 4, t: 0, l: 'Response travels back', n: 'The answer returns along the same path. Each hop adds a little latency and has its own timeout.' },
+    { f: 2, t: 2, l: 'Where to look when it fails', n: 'A 404 means no rule matched. A 502 or 503 means no healthy backend. Check kubectl describe ingress and the controller logs.' }
+  ] },
+{ id: 'tcp-teardown', module: 'networking', title: 'How a TCP connection closes, and TIME_WAIT', summary: 'FIN, ACK and why sockets stay for a while.',
+  actors: ['Client', 'Server'],
+  steps: [
+    { f: 0, t: 1, l: 'FIN: I have no more to send', n: 'The side that finishes first sends a FIN segment. This closes one direction of the connection.' },
+    { f: 1, t: 0, l: 'ACK', n: 'The other side acknowledges. It can still send data, which is called a half-closed connection.' },
+    { f: 1, t: 0, l: 'FIN: I am done as well', n: 'When the server has no more data, it sends its own FIN.' },
+    { f: 0, t: 1, l: 'ACK: connection is closed', n: 'The client acknowledges the last FIN, so both sides know that the connection has ended.' },
+    { f: 0, t: 0, l: 'Client waits in TIME_WAIT', n: 'The side that closed first keeps the socket for about 60 seconds, so late packets from the old connection cannot confuse a new one.' },
+    { f: 1, t: 1, l: 'Server socket is freed', n: 'The server frees its socket as soon as it sees the last ACK. Many TIME_WAIT sockets on a busy client are normal.' },
+    { f: 0, t: 1, l: 'Reuse connections', n: 'If you run out of ports, use keep-alive and connection pools instead of tuning the kernel. Check with ss -s.' }
+  ] },
+{ id: 'oom-kill', module: 'linux', title: 'How the OOM killer picks a victim', summary: 'Memory pressure, reclaim and the kill.',
+  actors: ['Applications', 'Kernel memory manager', 'OOM killer', 'Logs'],
+  steps: [
+    { f: 0, t: 1, l: 'Programs ask for more memory', n: 'A service grows, for example from a leak or a traffic spike. The kernel gives pages when they are touched.' },
+    { f: 1, t: 1, l: 'Reclaim: drop cache, use swap', n: 'First the kernel frees page cache, which is cheap. It may also swap out cold pages, which is slow.' },
+    { f: 1, t: 1, l: 'Nothing left to reclaim', n: 'When free memory and swap run out, the kernel cannot satisfy an allocation. Waiting longer will not help.' },
+    { f: 1, t: 2, l: 'Call the OOM killer', n: 'The OOM killer scores each process by memory use and adjustments, and chooses the one that frees the most memory with the least harm.' },
+    { f: 2, t: 0, l: 'SIGKILL to the victim', n: 'The chosen process is killed at once with no cleanup. It is often your biggest service, not the one that leaked.' },
+    { f: 2, t: 3, l: 'Message in dmesg and journal', n: 'Look for "Out of memory: Killed process" in dmesg -T or journalctl -k. In containers the cgroup limit gives exit code 137.' },
+    { f: 0, t: 1, l: 'Prevent: limits and monitoring', n: 'Set memory limits per service, alert on available memory, and find the leak. Adding swap hides a problem, it does not solve it.' }
+  ] }
 ];

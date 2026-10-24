@@ -14,8 +14,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=6ec74770">
-<script src="../assets/a11y.js?v=6ec74770"></script>
+<link rel="stylesheet" href="../assets/app.css?v=60459120">
+<script src="../assets/a11y.js?v=60459120"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -222,12 +222,70 @@ argocd app <span class="hljs-built_in">history</span> shop-api-prod</code></pre>
 <li>Scan images and dependencies; fail on high severity</li>
 <li>Deploy only from the main branch after review</li>
 </ul>
+<h2 id="pipeline-hygiene-commands">Pipeline hygiene commands</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="yamllint .ci/pipeline.yml
+actionlint
+docker run --rm -v &quot;$PWD&quot;:/src hadolint/hadolint hadolint /src/Dockerfile
+shellcheck ci/*.sh
+trivy image --severity HIGH,CRITICAL --exit-code 1 app:1.4
+trivy fs --scanners vuln,secret .
+syft app:1.4 -o spdx-json &gt; sbom.json
+cosign sign --key cosign.key registry.example.com/app@sha256:ABC123
+cosign verify --key cosign.pub registry.example.com/app@sha256:ABC123" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">yamllint .ci/pipeline.yml
+actionlint
+docker run --<span class="hljs-built_in">rm</span> -v <span class="hljs-string">&quot;<span class="hljs-variable">$PWD</span>&quot;</span>:/src hadolint/hadolint hadolint /src/Dockerfile
+shellcheck ci/*.sh
+trivy image --severity HIGH,CRITICAL --exit-code 1 app:1.4
+trivy fs --scanners vuln,secret .
+syft app:1.4 -o spdx-json &gt; sbom.json
+cosign sign --key cosign.key registry.example.com/app@sha256:ABC123
+cosign verify --key cosign.pub registry.example.com/app@sha256:ABC123</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not hide a failing scan with <code>|| true</code> or <code>--exit-code 0</code> to make the build green. If a finding is accepted, record it with an owner and an expiry date.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Never print secrets in a pipeline log, and do not run <code>env</code> or <code>set -x</code> in a step that has secrets. Masking works only for values that the system knows as secrets.</p>
+</aside>
+<h2 id="build-test-and-promote">Build, test and promote</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="make test
+pytest -q --maxfail=1 --junitxml=report.xml
+npm ci &amp;&amp; npm test
+docker build --pull --cache-from app:cache -t app:$SHORT_SHA .
+docker push registry.example.com/app:$SHORT_SHA
+docker buildx imagetools inspect registry.example.com/app:$SHORT_SHA
+curl -fsS https://staging.example.com/healthz
+curl -fsS -o /dev/null -w '%{http_code}\n' https://staging.example.com/version" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">make <span class="hljs-built_in">test</span>
+pytest -q --maxfail=1 --junitxml=report.xml
+npm ci &amp;&amp; npm <span class="hljs-built_in">test</span>
+docker build --pull --cache-from app:cache -t app:<span class="hljs-variable">$SHORT_SHA</span> .
+docker push registry.example.com/app:<span class="hljs-variable">$SHORT_SHA</span>
+docker buildx imagetools inspect registry.example.com/app:<span class="hljs-variable">$SHORT_SHA</span>
+curl -fsS https://staging.example.com/healthz
+curl -fsS -o /dev/null -w <span class="hljs-string">&#x27;%{http_code}\n&#x27;</span> https://staging.example.com/version</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Use <code>npm ci</code> or a lock file install in CI, not <code>npm install</code>. Unlocked installs make builds that cannot be repeated.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Build once and promote the same artifact through environments. Rebuilding for production means that you ship something nobody tested.</p>
+</aside>
+<h2 id="deploy-and-rollback">Deploy and rollback</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl set image deploy/api app=registry.example.com/app:$SHORT_SHA -n shop
+kubectl rollout status deploy/api -n shop --timeout=180s
+kubectl rollout undo deploy/api -n shop
+helm upgrade --install api ./chart -n shop --atomic --timeout 5m
+curl -fsS https://example.com/healthz || exit 1" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubectl <span class="hljs-built_in">set</span> image deploy/api app=registry.example.com/app:<span class="hljs-variable">$SHORT_SHA</span> -n shop
+kubectl rollout status deploy/api -n shop --<span class="hljs-built_in">timeout</span>=180s
+kubectl rollout undo deploy/api -n shop
+helm upgrade --install api ./chart -n shop --atomic --<span class="hljs-built_in">timeout</span> 5m
+curl -fsS https://example.com/healthz || <span class="hljs-built_in">exit</span> 1</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not let a pipeline deploy to production with admin credentials that live forever. Use short-lived credentials, a protected environment and a manual approval for risky changes.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>A rollback does not undo database changes. Make migrations backward compatible, and ship them before the code that needs them.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Re-running an old pipeline can redeploy an old version over a newer one. Check the commit and the version before you press retry.</p>
+</aside>
 </article>
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://www.jenkins.io/doc/book/pipeline/syntax/" target="_blank" rel="noopener">Jenkins: Pipeline syntax</a><span class="host">www.jenkins.io</span></li><li><a href="https://argo-cd.readthedocs.io/en/stable/" target="_blank" rel="noopener">Argo CD documentation</a><span class="host">argo-cd.readthedocs.io</span></li><li><a href="https://semver.org/" target="_blank" rel="noopener">Semantic Versioning 2.0.0</a><span class="host">semver.org</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=6ec74770"></script>
-<script src="../assets/counter.js?v=6ec74770"></script>
+<script src="../assets/voice.js?v=60459120"></script>
+<script src="../assets/counter.js?v=60459120"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

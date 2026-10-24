@@ -14,8 +14,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=6ec74770">
-<script src="../assets/a11y.js?v=6ec74770"></script>
+<link rel="stylesheet" href="../assets/app.css?v=60459120">
+<script src="../assets/a11y.js?v=60459120"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -242,12 +242,90 @@ promtool check config prometheus.yml</code></pre></div>
 <div class="code" data-lang="text"><button class="copy" type="button" data-copy="{app=&quot;shop-api&quot;} | json | level=&quot;error&quot; | route=&quot;/checkout&quot;" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">{app=&quot;shop-api&quot;} | json | level=&quot;error&quot; | route=&quot;/checkout&quot;</code></pre></div>
 <h2 id="cardinality-check">Cardinality check</h2>
 <div class="code" data-lang="bash"><button class="copy" type="button" data-copy="curl -s localhost:9090/api/v1/status/tsdb | jq '.data.seriesCountByMetricName[0:5]'" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">curl -s localhost:9090/api/v1/status/tsdb | jq <span class="hljs-string">&#x27;.data.seriesCountByMetricName[0:5]&#x27;</span></code></pre></div>
+<h2 id="query-patterns-to-know">Query patterns to know</h2>
+<div class="code" data-lang="promql"><button class="copy" type="button" data-copy="sum by (status) (rate(http_requests_total[5m]))
+sum(rate(http_requests_total{status=~&quot;5..&quot;}[5m])) / sum(rate(http_requests_total[5m]))
+histogram_quantile(0.99, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))
+1 - avg by (instance) (rate(node_cpu_seconds_total{mode=&quot;idle&quot;}[5m]))
+node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes
+predict_linear(node_filesystem_avail_bytes{mountpoint=&quot;/&quot;}[6h], 24 * 3600) &lt; 0
+increase(kube_pod_container_status_restarts_total[1h]) &gt; 3
+up == 0
+count by (job) (up)
+topk(5, sum by (pod) (container_memory_working_set_bytes))
+absent(up{job=&quot;api&quot;})" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-built_in">sum</span> <span class="hljs-keyword">by</span> (status) (<span class="hljs-built_in">rate</span>(http_requests_total[<span class="hljs-number">5</span>m]))
+<span class="hljs-built_in">sum</span>(<span class="hljs-built_in">rate</span>(http_requests_total{<span class="hljs-attr">status</span>=~<span class="hljs-string">&quot;5..&quot;</span>}[<span class="hljs-number">5</span>m])) / <span class="hljs-built_in">sum</span>(<span class="hljs-built_in">rate</span>(http_requests_total[<span class="hljs-number">5</span>m]))
+<span class="hljs-built_in">histogram_quantile</span>(<span class="hljs-number">0.99</span>, <span class="hljs-built_in">sum</span> <span class="hljs-keyword">by</span> (le) (<span class="hljs-built_in">rate</span>(http_request_duration_seconds_bucket[<span class="hljs-number">5</span>m])))
+<span class="hljs-number">1</span> - <span class="hljs-built_in">avg</span> <span class="hljs-keyword">by</span> (instance) (<span class="hljs-built_in">rate</span>(node_cpu_seconds_total{<span class="hljs-attr">mode</span>=<span class="hljs-string">&quot;idle&quot;</span>}[<span class="hljs-number">5</span>m]))
+node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes
+<span class="hljs-built_in">predict_linear</span>(node_filesystem_avail_bytes{<span class="hljs-attr">mountpoint</span>=<span class="hljs-string">&quot;/&quot;</span>}[<span class="hljs-number">6</span>h], <span class="hljs-number">24</span> * <span class="hljs-number">3600</span>) &lt; <span class="hljs-number">0</span>
+<span class="hljs-built_in">increase</span>(kube_pod_container_status_restarts_total[<span class="hljs-number">1</span>h]) &gt; <span class="hljs-number">3</span>
+<span class="hljs-built_in">up</span> == <span class="hljs-number">0</span>
+<span class="hljs-built_in">count</span> <span class="hljs-keyword">by</span> (job) (<span class="hljs-built_in">up</span>)
+<span class="hljs-built_in">topk</span>(<span class="hljs-number">5</span>, <span class="hljs-built_in">sum</span> <span class="hljs-keyword">by</span> (pod) (container_memory_working_set_bytes))
+<span class="hljs-built_in">absent</span>(<span class="hljs-built_in">up</span>{<span class="hljs-attr">job</span>=<span class="hljs-string">&quot;api&quot;</span>})</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Use <code>rate()</code> on counters, never plot a raw counter. And take the rate before you aggregate: <code>sum(rate(x[5m]))</code>, not <code>rate(sum(x)[5m])</code>.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Labels with many values, such as user ID, URL or request ID, create huge numbers of series and can crash Prometheus. Keep label values bounded.</p>
+</aside>
+<h2 id="operate-the-server">Operate the server</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="promtool check config /etc/prometheus/prometheus.yml
+promtool check rules /etc/prometheus/rules/*.yml
+promtool test rules tests/alerts_test.yml
+promtool query instant http://localhost:9090 'up'
+curl -s localhost:9090/api/v1/targets | jq '.data.activeTargets[] | {job:.labels.job, health:.health, err:.lastError}'
+curl -s localhost:9090/api/v1/alerts | jq '.data.alerts[].labels'
+curl -X POST localhost:9090/-/reload
+curl -s localhost:9090/api/v1/status/tsdb | jq '.data.seriesCountByMetricName[:5]'
+amtool alert query
+amtool silence add alertname=HighLatency --duration=2h --comment=&quot;deploy in progress&quot; --author=me
+amtool config routes test --config.file=alertmanager.yml severity=page team=shop" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">promtool check config /etc/prometheus/prometheus.yml
+promtool check rules /etc/prometheus/rules/*.yml
+promtool <span class="hljs-built_in">test</span> rules tests/alerts_test.yml
+promtool query instant http://localhost:9090 <span class="hljs-string">&#x27;up&#x27;</span>
+curl -s localhost:9090/api/v1/targets | jq <span class="hljs-string">&#x27;.data.activeTargets[] | {job:.labels.job, health:.health, err:.lastError}&#x27;</span>
+curl -s localhost:9090/api/v1/alerts | jq <span class="hljs-string">&#x27;.data.alerts[].labels&#x27;</span>
+curl -X POST localhost:9090/-/reload
+curl -s localhost:9090/api/v1/status/tsdb | jq <span class="hljs-string">&#x27;.data.seriesCountByMetricName[:5]&#x27;</span>
+amtool alert query
+amtool silence add alertname=HighLatency --duration=2h --comment=<span class="hljs-string">&quot;deploy in progress&quot;</span> --author=me
+amtool config routes <span class="hljs-built_in">test</span> --config.file=alertmanager.yml severity=page team=shop</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Run <code>promtool check config</code> and <code>check rules</code> before every reload. A bad file stops the reload, or worse, a restart.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>A silence hides pages for everyone. Give it a short duration, a clear comment and an owner, and remove it when the work ends.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>The admin API (<code>/api/v1/admin/tsdb/delete_series</code>) permanently deletes data. Keep it disabled unless you need it, and never expose Prometheus to the internet without authentication.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Reducing retention or deleting the data directory loses history, which you need for capacity trends and postmortems.</p>
+</aside>
+<h2 id="alert-rule-skeleton">Alert rule skeleton</h2>
+<div class="code" data-lang="yaml"><button class="copy" type="button" data-copy="groups:
+  - name: api
+    rules:
+      - alert: HighErrorRatio
+        expr: sum(rate(http_requests_total{status=~&quot;5..&quot;}[5m])) / sum(rate(http_requests_total[5m])) &gt; 0.02
+        for: 10m
+        labels: {severity: page, team: shop}
+        annotations:
+          summary: &quot;More than 2 percent of requests fail&quot;
+          runbook_url: &quot;https://runbooks.example.com/high-error-ratio&quot;" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-attr">groups:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">api</span>
+    <span class="hljs-attr">rules:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">alert:</span> <span class="hljs-string">HighErrorRatio</span>
+        <span class="hljs-attr">expr:</span> <span class="hljs-string">sum(rate(http_requests_total{status=~&quot;5..&quot;}[5m]))</span> <span class="hljs-string">/</span> <span class="hljs-string">sum(rate(http_requests_total[5m]))</span> <span class="hljs-string">&gt;</span> <span class="hljs-number">0.02</span>
+        <span class="hljs-attr">for:</span> <span class="hljs-string">10m</span>
+        <span class="hljs-attr">labels:</span> {<span class="hljs-attr">severity:</span> <span class="hljs-string">page</span>, <span class="hljs-attr">team:</span> <span class="hljs-string">shop</span>}
+        <span class="hljs-attr">annotations:</span>
+          <span class="hljs-attr">summary:</span> <span class="hljs-string">&quot;More than 2 percent of requests fail&quot;</span>
+          <span class="hljs-attr">runbook_url:</span> <span class="hljs-string">&quot;https://runbooks.example.com/high-error-ratio&quot;</span></code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>An alert without <code>for</code> fires on every blip, and one without a runbook link wakes people for no reason. Alert on symptoms that users feel, not on every cause.</p>
+</aside>
 </article>
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://prometheus.io/docs/introduction/overview/" target="_blank" rel="noopener">Prometheus overview</a><span class="host">prometheus.io</span></li><li><a href="https://prometheus.io/docs/prometheus/latest/querying/basics/" target="_blank" rel="noopener">Prometheus: querying basics</a><span class="host">prometheus.io</span></li><li><a href="https://prometheus.io/docs/alerting/latest/alertmanager/" target="_blank" rel="noopener">Alertmanager</a><span class="host">prometheus.io</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=6ec74770"></script>
-<script src="../assets/counter.js?v=6ec74770"></script>
+<script src="../assets/voice.js?v=60459120"></script>
+<script src="../assets/counter.js?v=60459120"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

@@ -14,8 +14,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=6ec74770">
-<script src="../assets/a11y.js?v=6ec74770"></script>
+<link rel="stylesheet" href="../assets/app.css?v=60459120">
+<script src="../assets/a11y.js?v=60459120"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -217,12 +217,124 @@ MemoryMax=512M" aria-label="Copy code">Copy</button><pre tabindex="0"><code clas
 <td>Too many rapid restarts; fix cause, then <code>systemctl reset-failed NAME</code></td>
 </tr>
 </tbody></table></div>
+<h2 id="inspect-units-and-boot">Inspect units and boot</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="systemctl status nginx --no-pager -l
+systemctl is-active nginx; systemctl is-enabled nginx
+systemctl list-units --failed
+systemctl list-timers --all
+systemctl cat nginx
+systemctl show nginx -p ExecStart -p Restart -p MainPID
+systemctl list-dependencies multi-user.target --reverse | head
+systemd-analyze blame | head
+systemd-analyze critical-chain
+systemd-analyze verify /etc/systemd/system/app.service
+systemd-analyze security app.service" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">systemctl status nginx --no-pager -l
+systemctl is-active nginx; systemctl is-enabled nginx
+systemctl list-units --failed
+systemctl list-timers --all
+systemctl <span class="hljs-built_in">cat</span> nginx
+systemctl show nginx -p ExecStart -p Restart -p MainPID
+systemctl list-dependencies multi-user.target --reverse | <span class="hljs-built_in">head</span>
+systemd-analyze blame | <span class="hljs-built_in">head</span>
+systemd-analyze critical-chain
+systemd-analyze verify /etc/systemd/system/app.service
+systemd-analyze security app.service</code></pre></div>
+<h2 id="change-units-safely">Change units safely</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="sudo systemctl edit app.service
+sudo systemctl daemon-reload
+sudo systemctl restart app.service
+sudo systemctl reload nginx
+sudo systemctl enable --now app.service
+sudo systemctl disable --now app.service
+sudo systemctl mask unwanted.service
+sudo systemctl revert app.service
+sudo systemctl set-property app.service MemoryMax=1G" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-built_in">sudo</span> systemctl edit app.service
+<span class="hljs-built_in">sudo</span> systemctl daemon-reload
+<span class="hljs-built_in">sudo</span> systemctl restart app.service
+<span class="hljs-built_in">sudo</span> systemctl reload nginx
+<span class="hljs-built_in">sudo</span> systemctl <span class="hljs-built_in">enable</span> --now app.service
+<span class="hljs-built_in">sudo</span> systemctl <span class="hljs-built_in">disable</span> --now app.service
+<span class="hljs-built_in">sudo</span> systemctl mask unwanted.service
+<span class="hljs-built_in">sudo</span> systemctl revert app.service
+<span class="hljs-built_in">sudo</span> systemctl set-property app.service MemoryMax=1G</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not edit files under <code>/usr/lib/systemd/system</code>: a package update overwrites them. Use <code>systemctl edit</code> to create a drop-in.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>restart</code> stops and starts the service, so users see an interruption. Use <code>reload</code> when the program supports it, and test the config first (for example <code>nginx -t</code>).</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Always run <code>daemon-reload</code> after changing unit files, and check <code>systemctl status</code> for the result. A broken unit can leave a service down.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>systemctl mask</code> makes a unit impossible to start, even as a dependency. <code>isolate</code>, <code>poweroff</code>, <code>reboot</code> and <code>rescue</code> change the state of the whole machine, so confirm the host with <code>hostname</code> first.</p>
+</aside>
+<h2 id="logs-with-journalctl">Logs with journalctl</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="journalctl -u app.service -f
+journalctl -u app.service --since &quot;1 hour ago&quot; -p err
+journalctl -b -1 -p err
+journalctl -k --since today
+journalctl --list-boots
+journalctl _PID=1234
+journalctl -o json-pretty -n 1 -u app.service
+journalctl --disk-usage
+sudo journalctl --vacuum-time=14d" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">journalctl -u app.service -f
+journalctl -u app.service --since <span class="hljs-string">&quot;1 hour ago&quot;</span> -p err
+journalctl -b -1 -p err
+journalctl -k --since today
+journalctl --list-boots
+journalctl _PID=1234
+journalctl -o json-pretty -n 1 -u app.service
+journalctl --disk-usage
+<span class="hljs-built_in">sudo</span> journalctl --vacuum-time=14d</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>journalctl --vacuum-*</code> deletes old logs for good. Keep what you need for audits and postmortems, and check <code>Storage=persistent</code> if logs must survive a reboot.</p>
+</aside>
+<h2 id="timers-and-unit-templates">Timers and unit templates</h2>
+<div class="code" data-lang="ini"><button class="copy" type="button" data-copy="[Unit]
+Description=Nightly cleanup
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/cleanup.sh
+[Install]
+WantedBy=multi-user.target" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-section">[Unit]</span>
+<span class="hljs-attr">Description</span>=Nightly cleanup
+<span class="hljs-section">[Service]</span>
+<span class="hljs-attr">Type</span>=<span class="hljs-literal">on</span>eshot
+<span class="hljs-attr">ExecStart</span>=/usr/local/bin/cleanup.sh
+<span class="hljs-section">[Install]</span>
+<span class="hljs-attr">WantedBy</span>=multi-user.target</code></pre></div>
+<div class="code" data-lang="ini"><button class="copy" type="button" data-copy="[Timer]
+OnCalendar=*-*-* 02:30:00
+Persistent=true
+RandomizedDelaySec=300
+[Install]
+WantedBy=timers.target" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-section">[Timer]</span>
+<span class="hljs-attr">OnCalendar</span>=*-*-* <span class="hljs-number">02</span>:<span class="hljs-number">30</span>:<span class="hljs-number">00</span>
+<span class="hljs-attr">Persistent</span>=<span class="hljs-literal">true</span>
+<span class="hljs-attr">RandomizedDelaySec</span>=<span class="hljs-number">300</span>
+<span class="hljs-section">[Install]</span>
+<span class="hljs-attr">WantedBy</span>=timers.target</code></pre></div>
+<div class="code" data-lang="ini"><button class="copy" type="button" data-copy="[Service]
+Restart=on-failure
+RestartSec=5
+StartLimitBurst=5
+StartLimitIntervalSec=60
+NoNewPrivileges=true
+ProtectSystem=strict
+PrivateTmp=true" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-section">[Service]</span>
+<span class="hljs-attr">Restart</span>=<span class="hljs-literal">on</span>-failure
+<span class="hljs-attr">RestartSec</span>=<span class="hljs-number">5</span>
+<span class="hljs-attr">StartLimitBurst</span>=<span class="hljs-number">5</span>
+<span class="hljs-attr">StartLimitIntervalSec</span>=<span class="hljs-number">60</span>
+<span class="hljs-attr">NoNewPrivileges</span>=<span class="hljs-literal">true</span>
+<span class="hljs-attr">ProtectSystem</span>=strict
+<span class="hljs-attr">PrivateTmp</span>=<span class="hljs-literal">true</span></code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>Restart=always</code> with no limit can hide a crash loop that burns CPU and fills logs. Set <code>RestartSec</code> and the start limits, and alert on restarts.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>A unit that runs as root with no sandbox options has full access. Use a dedicated user and options such as <code>NoNewPrivileges</code> and <code>ProtectSystem</code>.</p>
+</aside>
 </article>
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://systemd.io/" target="_blank" rel="noopener">systemd documentation</a><span class="host">systemd.io</span></li><li><a href="https://www.freedesktop.org/software/systemd/man/latest/" target="_blank" rel="noopener">systemd manual pages</a><span class="host">www.freedesktop.org</span></li><li><a href="https://www.freedesktop.org/software/systemd/man/latest/journalctl.html" target="_blank" rel="noopener">journalctl manual</a><span class="host">www.freedesktop.org</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=6ec74770"></script>
-<script src="../assets/counter.js?v=6ec74770"></script>
+<script src="../assets/voice.js?v=60459120"></script>
+<script src="../assets/counter.js?v=60459120"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

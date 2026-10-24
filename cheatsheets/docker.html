@@ -14,8 +14,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=6ec74770">
-<script src="../assets/a11y.js?v=6ec74770"></script>
+<link rel="stylesheet" href="../assets/app.css?v=60459120">
+<script src="../assets/a11y.js?v=60459120"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -221,12 +221,110 @@ docker compose down -v               <span class="hljs-comment"># also deletes v
   --memory 512m --cpus 1 \
   registry.example.com/shop-api:1.8.2</code></pre></div>
 <p>Avoid <code>--privileged</code> and mounting <code>/var/run/docker.sock</code> into containers.</p>
+<h2 id="images-and-registries-more">Images and registries, more</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="docker image ls --digests
+docker history --no-trunc app:1.4
+docker image inspect app:1.4 --format '{{.Config.User}} {{.Config.Entrypoint}}'
+docker tag app:1.4 registry.example.com/team/app:1.4
+docker push registry.example.com/team/app:1.4
+docker save -o app.tar app:1.4
+docker load -i app.tar
+docker buildx build --platform linux/amd64,linux/arm64 -t app:1.4 .
+docker scout cves app:1.4" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">docker image <span class="hljs-built_in">ls</span> --digests
+docker <span class="hljs-built_in">history</span> --no-trunc app:1.4
+docker image inspect app:1.4 --format <span class="hljs-string">&#x27;{{.Config.User}} {{.Config.Entrypoint}}&#x27;</span>
+docker tag app:1.4 registry.example.com/team/app:1.4
+docker push registry.example.com/team/app:1.4
+docker save -o app.tar app:1.4
+docker load -i app.tar
+docker buildx build --platform linux/amd64,linux/arm64 -t app:1.4 .
+docker scout cves app:1.4</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not tag production deployments with <code>latest</code>. It moves, so two hosts can run different code. Pin a version tag or, better, a digest.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Never copy secrets into an image with <code>COPY</code> or <code>ARG</code>. They stay in the image layers and in <code>docker history</code>. Use build secrets (<code>--secret</code>) or runtime injection.</p>
+</aside>
+<h2 id="run-and-inspect-containers-more">Run and inspect containers, more</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="docker run -d --name web --restart unless-stopped -p 8080:80 nginx:1.27
+docker run --rm -it --user 1000:1000 --read-only --cap-drop ALL alpine sh
+docker run --memory 512m --cpus 1.5 app:1.4
+docker exec -it web sh
+docker logs -f --tail 100 --since 10m web
+docker inspect web --format '{{.State.Health.Status}} {{.NetworkSettings.IPAddress}}'
+docker stats --no-stream
+docker top web
+docker diff web
+docker cp web:/etc/nginx/nginx.conf ./nginx.conf
+docker port web
+docker events --since 10m" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">docker run -d --name web --restart unless-stopped -p 8080:80 nginx:1.27
+docker run --<span class="hljs-built_in">rm</span> -it --user 1000:1000 --read-only --cap-drop ALL alpine sh
+docker run --memory 512m --cpus 1.5 app:1.4
+docker <span class="hljs-built_in">exec</span> -it web sh
+docker logs -f --<span class="hljs-built_in">tail</span> 100 --since 10m web
+docker inspect web --format <span class="hljs-string">&#x27;{{.State.Health.Status}} {{.NetworkSettings.IPAddress}}&#x27;</span>
+docker stats --no-stream
+docker top web
+docker diff web
+docker <span class="hljs-built_in">cp</span> web:/etc/nginx/nginx.conf ./nginx.conf
+docker port web
+docker events --since 10m</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>--privileged</code> gives a container nearly full access to the host. Do not use it unless you understand why, and never mount <code>/var/run/docker.sock</code> into an untrusted container: it is root on the host.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Publishing with <code>-p 8080:80</code> listens on all interfaces and Docker edits firewall rules itself. Bind to localhost with <code>-p 127.0.0.1:8080:80</code> when the service is private.</p>
+</aside>
+<h2 id="volumes-and-networks-2">Volumes and networks</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="docker volume ls
+docker volume inspect pgdata
+docker run -v pgdata:/var/lib/postgresql/data postgres:16
+docker run -v &quot;$PWD&quot;:/work:ro alpine ls /work
+docker network ls
+docker network create --driver bridge backend
+docker network connect backend web
+docker network inspect backend" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">docker volume <span class="hljs-built_in">ls</span>
+docker volume inspect pgdata
+docker run -v pgdata:/var/lib/postgresql/data postgres:16
+docker run -v <span class="hljs-string">&quot;<span class="hljs-variable">$PWD</span>&quot;</span>:/work:ro alpine <span class="hljs-built_in">ls</span> /work
+docker network <span class="hljs-built_in">ls</span>
+docker network create --driver bridge backend
+docker network connect backend web
+docker network inspect backend</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Data written inside a container is lost when the container is removed. Keep state in named volumes and back them up.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>A bind mount such as <code>-v /:/host</code> exposes the host filesystem. Mount only what you need, and read-only (<code>:ro</code>) where possible.</p>
+</aside>
+<h2 id="compose-2">Compose</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="docker compose config
+docker compose up -d --build
+docker compose ps
+docker compose logs -f api
+docker compose exec api sh
+docker compose pull &amp;&amp; docker compose up -d
+docker compose down" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">docker compose config
+docker compose up -d --build
+docker compose ps
+docker compose logs -f api
+docker compose <span class="hljs-built_in">exec</span> api sh
+docker compose pull &amp;&amp; docker compose up -d
+docker compose down</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>docker compose down -v</code> also deletes the named volumes, including your database. Use plain <code>down</code> unless you really want to wipe the data.</p>
+</aside>
+<h2 id="cleanup-and-cautions">Cleanup and cautions</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="docker system df
+docker container prune
+docker image prune
+docker builder prune --filter until=168h" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">docker system <span class="hljs-built_in">df</span>
+docker container prune
+docker image prune
+docker builder prune --filter <span class="hljs-keyword">until</span>=168h</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>docker system prune -a --volumes</code> removes every unused image, stopped container and unused volume. On a shared host that can delete someone else&#39;s data. Look at <code>docker system df</code> and prune one resource type at a time.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>docker rm -f</code> kills a running container without a graceful stop. Use <code>docker stop</code> first, which sends SIGTERM and waits.</p>
+</aside>
 </article>
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://docs.docker.com/reference/dockerfile/" target="_blank" rel="noopener">Dockerfile reference</a><span class="host">docs.docker.com</span></li><li><a href="https://docs.docker.com/get-started/" target="_blank" rel="noopener">Docker: get started</a><span class="host">docs.docker.com</span></li><li><a href="https://docs.docker.com/compose/" target="_blank" rel="noopener">Docker Compose documentation</a><span class="host">docs.docker.com</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=6ec74770"></script>
-<script src="../assets/counter.js?v=6ec74770"></script>
+<script src="../assets/voice.js?v=60459120"></script>
+<script src="../assets/counter.js?v=60459120"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

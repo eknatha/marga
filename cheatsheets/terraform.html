@@ -14,8 +14,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=6ec74770">
-<script src="../assets/a11y.js?v=6ec74770"></script>
+<link rel="stylesheet" href="../assets/app.css?v=60459120">
+<script src="../assets/a11y.js?v=60459120"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -289,12 +289,98 @@ tflint
 trivy config .
 terraform plan -detailed-exitcode     <span class="hljs-comment"># 0 none, 1 error, 2 changes</span>
 terraform <span class="hljs-built_in">test</span></code></pre></div>
+<h2 id="workflow-with-a-saved-plan">Workflow with a saved plan</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="terraform fmt -recursive
+terraform validate
+terraform init -upgrade
+terraform plan -out=tfplan -input=false
+terraform show tfplan
+terraform show -json tfplan | jq '.resource_changes[] | select(.change.actions != [&quot;no-op&quot;]) | {a: .address, c: .change.actions}'
+terraform apply tfplan
+terraform output -json
+terraform providers
+terraform version" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">terraform <span class="hljs-built_in">fmt</span> -recursive
+terraform validate
+terraform init -upgrade
+terraform plan -out=tfplan -input=<span class="hljs-literal">false</span>
+terraform show tfplan
+terraform show -json tfplan | jq <span class="hljs-string">&#x27;.resource_changes[] | select(.change.actions != [&quot;no-op&quot;]) | {a: .address, c: .change.actions}&#x27;</span>
+terraform apply tfplan
+terraform output -json
+terraform providers
+terraform version</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Read the plan before you apply it, especially lines marked <code>destroy</code> or <code>must be replaced</code>. A change to one argument can force a new resource, such as a database.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>terraform apply -auto-approve</code> skips the human check. Use it only in a pipeline that applies a reviewed, saved plan.</p>
+</aside>
+<h2 id="state-inspection-and-surgery">State inspection and surgery</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="terraform state list
+terraform state show aws_instance.web
+terraform state pull &gt; backup.tfstate
+terraform state mv aws_instance.web aws_instance.app
+terraform state rm aws_instance.old
+terraform import aws_s3_bucket.logs acme-logs
+terraform force-unlock LOCK_ID
+terraform refresh
+terraform taint aws_instance.web
+terraform apply -replace=aws_instance.web" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">terraform state list
+terraform state show aws_instance.web
+terraform state pull &gt; backup.tfstate
+terraform state <span class="hljs-built_in">mv</span> aws_instance.web aws_instance.app
+terraform state <span class="hljs-built_in">rm</span> aws_instance.old
+terraform import aws_s3_bucket.logs acme-logs
+terraform force-unlock LOCK_ID
+terraform refresh
+terraform taint aws_instance.web
+terraform apply -replace=aws_instance.web</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Always run <code>terraform state pull &gt; backup.tfstate</code> before <code>state mv</code>, <code>state rm</code> or <code>import</code>. A wrong state edit can make Terraform destroy or duplicate real resources.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>terraform force-unlock</code> is only safe when you are sure that no other run is active. Check who holds the lock first.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not edit the state file by hand and do not commit it to a shared repository: it can contain secrets in plain text. Use a remote backend with encryption and locking.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>terraform taint</code> is deprecated. Use <code>apply -replace=ADDRESS</code>, which shows the effect in the plan.</p>
+</aside>
+<h2 id="targeting-variables-and-workspaces">Targeting, variables and workspaces</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="terraform plan -target=module.network
+terraform plan -var 'env=staging' -var-file=staging.tfvars
+terraform workspace list
+terraform workspace new staging
+terraform workspace select prod
+terraform console
+export TF_LOG=INFO TF_LOG_PATH=tf.log
+TF_VAR_db_password=&quot;$DB_PASSWORD&quot; terraform plan" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">terraform plan -target=module.network
+terraform plan -var <span class="hljs-string">&#x27;env=staging&#x27;</span> -var-file=staging.tfvars
+terraform workspace list
+terraform workspace new staging
+terraform workspace <span class="hljs-keyword">select</span> prod
+terraform console
+<span class="hljs-built_in">export</span> TF_LOG=INFO TF_LOG_PATH=tf.log
+TF_VAR_db_password=<span class="hljs-string">&quot;<span class="hljs-variable">$DB_PASSWORD</span>&quot;</span> terraform plan</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>-target</code> skips dependencies and leaves the state out of step with the code. Use it only for recovery, then run a full plan.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>TF_LOG=TRACE</code> can write secrets and tokens into the log. Do not attach such logs to tickets.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Check <code>terraform workspace show</code> before apply. Applying to the wrong workspace is a common cause of production changes.</p>
+</aside>
+<h2 id="destroy">Destroy</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="terraform plan -destroy -out=destroy.tfplan
+terraform show destroy.tfplan | less
+terraform destroy -target=aws_instance.test
+lifecycle { prevent_destroy = true }" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">terraform plan -destroy -out=destroy.tfplan
+terraform show destroy.tfplan | less
+terraform destroy -target=aws_instance.test
+lifecycle { prevent_destroy = <span class="hljs-literal">true</span> }</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>terraform destroy</code> deletes everything in the state, including databases and buckets. Always review <code>plan -destroy</code>, set <code>prevent_destroy</code> on critical resources, and turn on deletion protection in the cloud.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Provider upgrades with <code>init -upgrade</code> can change behaviour. Pin versions in <code>required_providers</code> and read the changelog.</p>
+</aside>
 </article>
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://developer.hashicorp.com/terraform/cli" target="_blank" rel="noopener">Terraform CLI</a><span class="host">developer.hashicorp.com</span></li><li><a href="https://developer.hashicorp.com/terraform/language" target="_blank" rel="noopener">Terraform language</a><span class="host">developer.hashicorp.com</span></li><li><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs" target="_blank" rel="noopener">Terraform AWS provider</a><span class="host">registry.terraform.io</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=6ec74770"></script>
-<script src="../assets/counter.js?v=6ec74770"></script>
+<script src="../assets/voice.js?v=60459120"></script>
+<script src="../assets/counter.js?v=60459120"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

@@ -14,8 +14,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=6ec74770">
-<script src="../assets/a11y.js?v=6ec74770"></script>
+<link rel="stylesheet" href="../assets/app.css?v=60459120">
+<script src="../assets/a11y.js?v=60459120"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -276,12 +276,80 @@ Next update: HH:MM UTC</code></pre></div>
 <li>Quiet period, people watching</li>
 <li>Findings turned into tracked actions</li>
 </ul>
+<h2 id="slo-and-error-budget-maths">SLO and error budget maths</h2>
+<div class="code" data-lang="promql"><button class="copy" type="button" data-copy="sum(rate(http_requests_total{status!~&quot;5..&quot;}[30d])) / sum(rate(http_requests_total[30d]))
+1 - (sum(rate(http_requests_total{status!~&quot;5..&quot;}[1h])) / sum(rate(http_requests_total[1h])))
+(sum(rate(http_requests_total{status=~&quot;5..&quot;}[1h])) / sum(rate(http_requests_total[1h]))) / 0.001" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-built_in">sum</span>(<span class="hljs-built_in">rate</span>(http_requests_total{<span class="hljs-attr">status</span>!~<span class="hljs-string">&quot;5..&quot;</span>}[<span class="hljs-number">30</span>d])) / <span class="hljs-built_in">sum</span>(<span class="hljs-built_in">rate</span>(http_requests_total[<span class="hljs-number">30</span>d]))
+<span class="hljs-number">1</span> - (<span class="hljs-built_in">sum</span>(<span class="hljs-built_in">rate</span>(http_requests_total{<span class="hljs-attr">status</span>!~<span class="hljs-string">&quot;5..&quot;</span>}[<span class="hljs-number">1</span>h])) / <span class="hljs-built_in">sum</span>(<span class="hljs-built_in">rate</span>(http_requests_total[<span class="hljs-number">1</span>h])))
+(<span class="hljs-built_in">sum</span>(<span class="hljs-built_in">rate</span>(http_requests_total{<span class="hljs-attr">status</span>=~<span class="hljs-string">&quot;5..&quot;</span>}[<span class="hljs-number">1</span>h])) / <span class="hljs-built_in">sum</span>(<span class="hljs-built_in">rate</span>(http_requests_total[<span class="hljs-number">1</span>h]))) / <span class="hljs-number">0.001</span></code></pre></div>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="99.9 percent over 30 days   = 43.2 minutes of error budget
+99.95 percent over 30 days  = 21.6 minutes
+99.99 percent over 30 days  = 4.3 minutes
+burn rate 14.4 for 1 hour   = 2 percent of the monthly budget gone
+burn rate 6 for 6 hours     = 5 percent of the monthly budget gone" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">99.9 percent over 30 days   = 43.2 minutes of error budget
+99.95 percent over 30 days  = 21.6 minutes
+99.99 percent over 30 days  = 4.3 minutes
+burn rate 14.4 for 1 hour   = 2 percent of the monthly budget gone
+burn rate 6 for 6 hours     = 5 percent of the monthly budget gone</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>An SLO of 100 percent is not a goal: it leaves no room for change. Pick a target that users notice, and write down what happens when the budget is gone.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Measure the SLI where users are (load balancer, synthetic probe), not only inside the service. A healthy process behind a broken proxy still looks fine from the inside.</p>
+</aside>
+<h2 id="incident-commands-and-habits">Incident commands and habits</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="date -u
+kubectl rollout history deploy/api -n shop
+kubectl rollout undo deploy/api -n shop
+kubectl get events -A --sort-by=.lastTimestamp | tail -30
+curl -s -o /dev/null -w '%{http_code} %{time_total}\n' https://example.com/healthz
+journalctl -u api --since &quot;30 min ago&quot; -p warning" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-built_in">date</span> -u
+kubectl rollout <span class="hljs-built_in">history</span> deploy/api -n shop
+kubectl rollout undo deploy/api -n shop
+kubectl get events -A --sort-by=.lastTimestamp | <span class="hljs-built_in">tail</span> -30
+curl -s -o /dev/null -w <span class="hljs-string">&#x27;%{http_code} %{time_total}\n&#x27;</span> https://example.com/healthz
+journalctl -u api --since <span class="hljs-string">&quot;30 min ago&quot;</span> -p warning</code></pre></div>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="1. Declare, name an incident commander, open one channel.
+2. Post the first update within 10 minutes, then at a fixed interval.
+3. Mitigate first (roll back, fail over, turn a flag off), find the cause later.
+4. Write down every change with a UTC time.
+5. Confirm recovery on the user-facing graph, then close.
+6. Hold a blameless review within 5 working days. Track actions with an owner and a date." aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">1. Declare, name an incident commander, open one channel.
+2. Post the first update within 10 minutes, then at a fixed interval.
+3. Mitigate first (roll back, fail over, turn a flag off), find the cause later.
+4. Write down every change with a UTC time.
+5. Confirm recovery on the user-facing graph, then close.
+6. Hold a blameless review within 5 working days. Track actions with an owner and a date.</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>In an incident do not make several changes at once. You will not know which one helped, or which one made it worse.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not restart a failing service just to see: you can lose the evidence in memory. Capture logs, <code>dmesg</code> and thread or heap information first when it is safe.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Never paste secrets or personal data into an incident channel or ticket. It is kept for a long time and many people can read it.</p>
+</aside>
+<h2 id="capacity-and-resilience-checks">Capacity and resilience checks</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl top nodes
+kubectl get hpa -A
+kubectl get pdb -A
+df -h; df -i
+free -m; vmstat 1 5
+iostat -xz 1 5
+curl -s localhost:9090/api/v1/query --data-urlencode 'query=predict_linear(node_filesystem_avail_bytes[6h], 7*86400)' | jq ." aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubectl top nodes
+kubectl get hpa -A
+kubectl get pdb -A
+<span class="hljs-built_in">df</span> -h; <span class="hljs-built_in">df</span> -i
+free -m; vmstat 1 5
+iostat -xz 1 5
+curl -s localhost:9090/api/v1/query --data-urlencode <span class="hljs-string">&#x27;query=predict_linear(node_filesystem_avail_bytes[6h], 7*86400)&#x27;</span> | jq .</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Load and chaos tests belong in a test environment first. In production, start small, have a way to stop, have a named owner and tell the on-call team beforehand.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not remove an alert because it is noisy. Fix the cause or the threshold, and keep the page for something a human must do now.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Untested backups are not backups. Restore into a clean environment on a schedule and measure how long it takes.</p>
+</aside>
 </article>
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://sre.google/sre-book/service-level-objectives/" target="_blank" rel="noopener">SRE book: service level objectives</a><span class="host">sre.google</span></li><li><a href="https://sre.google/sre-book/managing-incidents/" target="_blank" rel="noopener">SRE book: managing incidents</a><span class="host">sre.google</span></li><li><a href="https://sre.google/sre-book/postmortem-culture/" target="_blank" rel="noopener">SRE book: postmortem culture</a><span class="host">sre.google</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=6ec74770"></script>
-<script src="../assets/counter.js?v=6ec74770"></script>
+<script src="../assets/voice.js?v=60459120"></script>
+<script src="../assets/counter.js?v=60459120"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

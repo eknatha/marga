@@ -14,8 +14,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=6ec74770">
-<script src="../assets/a11y.js?v=6ec74770"></script>
+<link rel="stylesheet" href="../assets/app.css?v=60459120">
+<script src="../assets/a11y.js?v=60459120"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -136,12 +136,66 @@ patches:
 <span class="hljs-attr">patches:</span>
   <span class="hljs-bullet">-</span> <span class="hljs-attr">path:</span> <span class="hljs-string">replica-patch.yaml</span></code></pre></div>
 <p>Base files stay valid YAML; overlays patch them per environment.</p>
+<h2 id="find-and-inspect-charts">Find and inspect charts</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+helm search repo nginx --versions | head
+helm show values bitnami/nginx &gt; values-default.yaml
+helm show chart bitnami/nginx
+helm pull bitnami/nginx --untar --version 18.2.0
+helm lint ./mychart
+helm template web ./mychart -f values-prod.yaml | less" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+helm search repo nginx --versions | <span class="hljs-built_in">head</span>
+helm show values bitnami/nginx &gt; values-default.yaml
+helm show chart bitnami/nginx
+helm pull bitnami/nginx --untar --version 18.2.0
+helm lint ./mychart
+helm template web ./mychart -f values-prod.yaml | less</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>A chart is code that creates cluster resources. Read the templates and the values of third-party charts before installing, and pin the chart version with <code>--version</code>.</p>
+</aside>
+<h2 id="install-upgrade-roll-back-2">Install, upgrade, roll back</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="helm install web ./mychart -n shop --create-namespace -f values-prod.yaml
+helm upgrade --install web ./mychart -n shop -f values-prod.yaml --atomic --timeout 5m
+helm upgrade web ./mychart -n shop --reuse-values --set image.tag=1.5
+helm diff upgrade web ./mychart -n shop -f values-prod.yaml
+helm list -A
+helm status web -n shop
+helm history web -n shop
+helm rollback web 3 -n shop --wait
+helm get values web -n shop --all
+helm get manifest web -n shop
+helm test web -n shop" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">helm install web ./mychart -n shop --create-namespace -f values-prod.yaml
+helm upgrade --install web ./mychart -n shop -f values-prod.yaml --atomic --<span class="hljs-built_in">timeout</span> 5m
+helm upgrade web ./mychart -n shop --reuse-values --<span class="hljs-built_in">set</span> image.tag=1.5
+helm diff upgrade web ./mychart -n shop -f values-prod.yaml
+helm list -A
+helm status web -n shop
+helm <span class="hljs-built_in">history</span> web -n shop
+helm rollback web 3 -n shop --<span class="hljs-built_in">wait</span>
+helm get values web -n shop --all
+helm get manifest web -n shop
+helm <span class="hljs-built_in">test</span> web -n shop</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>--reuse-values</code> keeps old values and ignores new chart defaults, which can hide a broken upgrade. Prefer passing the full values file each time.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>helm upgrade --install</code> without <code>--atomic</code> can leave a half-upgraded release. Use <code>--atomic</code> and <code>--timeout</code>, and check <code>helm history</code> after a failure.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>helm diff</code> is a separate plugin (<code>helm plugin list</code>). Install the helm-diff plugin before touching production, so you see the change before you apply it.</p>
+</aside>
+<h2 id="remove">Remove</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="helm uninstall web -n shop --dry-run
+helm uninstall web -n shop
+helm uninstall web -n shop --keep-history" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">helm uninstall web -n shop --dry-run
+helm uninstall web -n shop
+helm uninstall web -n shop --keep-history</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>helm uninstall</code> deletes every resource of the release, and persistent volume claims may follow depending on the chart. Back up data first. CRDs installed from a chart&#39;s <code>crds/</code> folder are not removed by Helm.</p>
+</aside>
 </article>
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://helm.sh/docs/" target="_blank" rel="noopener">Helm documentation</a><span class="host">helm.sh</span></li><li><a href="https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/" target="_blank" rel="noopener">Kubernetes: declarative management with Kustomize</a><span class="host">kubernetes.io</span></li><li><a href="https://helm.sh/docs/chart_best_practices/" target="_blank" rel="noopener">Helm: chart best practices</a><span class="host">helm.sh</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=6ec74770"></script>
-<script src="../assets/counter.js?v=6ec74770"></script>
+<script src="../assets/voice.js?v=60459120"></script>
+<script src="../assets/counter.js?v=60459120"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
