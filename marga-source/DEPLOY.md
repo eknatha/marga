@@ -59,3 +59,14 @@ If the number does not appear: open the browser console and look for the "visito
 - Skill trees replace the linear pipeline on the home page, the Skill trees page and each path page. A tree is built from each stage's `requires` list; no extra data is needed.
 - Visitor count sits in a strip at the top right. It reads the GoatCounter total; if that cannot be read it falls back to a second free counter (abacus.jasoncameron.dev, namespace marga-eknathalabs), counted once per browser session. For the GoatCounter number to show, enable "Allow adding visitor counts on your website" in its settings.
 - Every cheat sheet has more commands and red Warning boxes on risky ones (`> **Warning:** ...` in the markdown).
+
+
+## Playgrounds and labs (added)
+- Python playground now has 31 exercises. YAML playground has 30 exercises checked against the file in the editor. Terraform (HCL) playground has 30 exercises and SQL for SREs has 20; Go has 31.
+- The HCL check is structural (a small HCL reader plus rules). It is not `terraform validate` and does not know provider schemas.
+- SQL runs on sql.js (SQLite compiled to WebAssembly), vendored in `assets/sql-wasm.js` and `assets/sql-wasm.wasm`. It loads on first use and is then cached by the service worker for offline use.
+- The Go playground sends the code in the editor to the public Go Playground (go.dev) only when the visitor presses Run or Check. It needs internet. Whether go.dev accepts cross-origin requests from your domain was not verified from the build machine; test it once after deploy.
+- Exercise sources are in `src/labs/*.md`; `node tools/labs-verify.js` checks that every solution passes and every starter fails (Go needs a local Go toolchain).
+- Skill tree branches glow when the parent skill is mastered and the child is ready or in progress. They refresh from the storage event, so a lesson passed in another tab updates the tree.
+- Warnings: `> **Danger:**`, `> **Caution:**` and `> **Warning:**` blockquotes get an icon and distinct styles (also in print).
+- Content added from memory (explainers, drills, 30 architecture post-mortems) should be spot-checked against the cited sources.
