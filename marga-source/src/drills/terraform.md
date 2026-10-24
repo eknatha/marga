@@ -50,3 +50,37 @@ Error: creating S3 Bucket (company-reports): BucketAlreadyOwnedByYou
 - Rename the resource in code and ignore the error
 - Disable the state backend
 why: Terraform has no record of the manual bucket, so it tries to create one. `terraform import aws_s3_bucket.reports company-reports` (or an `import` block) attaches the real bucket to the resource. Run a plan and adjust the code until it shows no unwanted changes. Then restrict console changes to avoid more drift.
+
+## Plan wants to destroy and recreate a database
+level: mid
+After a small edit, the plan shows that a production database will be replaced.
+
+```text
+# aws_db_instance.main must be replaced
+-/+ resource "aws_db_instance" "main" {
+      ~ identifier = "shop-db" -> "shop-database" # forces replacement
+```
+? What should you do?
++ Revert the rename so the plan shows no replacement, and use a moved block when only the resource address changes. Do not apply until the plan is clean
+- Apply and restore from backup later
+- Delete the state file
+- Run apply with -auto-approve in the pipeline
+why: Changing the identifier of a database forces a new instance, and the old one is destroyed with its data. Read the plan before every apply. Also set lifecycle prevent_destroy and deletion protection on production data stores, so that a mistaken plan fails.
+
+## Two engineers cannot apply at once
+level: mid
+Applies fail with a message about the state, when two people work on the same stack.
+
+```text
+Error: Error acquiring the state lock
+Lock Info:
+  ID:        6f1c...
+  Operation: OperationTypeApply
+  Who:       maria@build-host
+```
+? What is the right response?
++ Wait for the other apply to finish. If it crashed, confirm that nothing is running and only then use force-unlock with the lock ID
+- Delete the state file and start again
+- Disable locking in the backend
+- Copy the state to your laptop and apply from there
+why: The lock stops two writers from corrupting the state. It is a safety feature. Check with the person or the pipeline first. Force-unlock is for a stale lock after a crash. Never bypass locking, because a race can lose resources from state.

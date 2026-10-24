@@ -49,3 +49,35 @@ A postmortem for a deployment outage lists these follow-up actions.
 - Action 3, because documentation always prevents problems
 - Action 4, because discussion is enough
 why: Good actions remove or reduce the risk by changing the system, and have an owner and a date. "Be more careful" blames people and cannot be checked. A canary with an automatic stop turns a human worry into a safeguard. Track actions to completion, since postmortems that do not change anything repeat the incident.
+
+## Burn rate alert after a bad deploy
+level: mid
+An SLO of 99.9 percent over 30 days is in place. Right after a release, the error rate jumps.
+
+```text
+SLO: 99.9% success over 30 days (error budget: 43.2 minutes)
+Error rate since 14:00: 3% for 40 minutes
+Budget used this window: 78%
+```
+? What should the team do first?
++ Roll back or stop the release to protect the remaining budget, then investigate, and pause risky changes if the budget runs out
+- Raise the SLO to 99.99 percent
+- Hide the dashboard until the end of the month
+- Add more alerts and keep deploying
+why: A 3 percent error rate is 30 times the allowed 0.1 percent rate, so the budget burns fast. Mitigation comes before diagnosis: roll back or turn off the change. The error budget policy then guides the rest, for example freezing feature work until reliability recovers.
+
+## Postmortem blames a person
+level: mid
+A draft postmortem for an outage says that an engineer ran the wrong command and should be more careful.
+
+```text
+Root cause: Engineer typed the wrong cluster name.
+Action items:
+  1. Remind everyone to double check commands.
+```
+? How should the document be improved?
++ Describe how the system allowed the mistake, for example a lookalike name and no confirmation, and add action items that change tooling, with owners and dates
+- Keep the draft and add the engineer's name in bold
+- Delete the document to keep the team calm
+- Add more reminders to double check
+why: People will always make mistakes, so a reminder is not a control. A blameless review asks why the action was easy and the consequence large. Good action items change the system: guard rails for production contexts, confirmations, smaller blast radius, and a faster rollback, each with an owner and a date.

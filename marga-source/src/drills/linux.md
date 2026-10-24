@@ -58,3 +58,40 @@ sda     12.0  940.0  310.5  100.0
 - Kill all processes with high memory use
 - Reboot the server immediately
 why: Load average counts processes waiting for I/O as well as CPU. 85% iowait with disk utilisation at 100% and a 310 ms await show the disk is the bottleneck. Identify the writer, then decide whether to throttle, move or fix it. Rebooting would hide the cause and lose the evidence.
+
+## Process cannot bind to port 8080
+level: junior
+A service fails to start after a reboot with an error about its port.
+
+```text
+$ journalctl -u webapp -n 2
+webapp: listen tcp :8080: bind: address already in use
+
+$ ss -ltnp | grep 8080
+LISTEN 0 128 *:8080 *:* users:(("python3",pid=912,fd=4))
+```
+? What should you do?
++ Find out what started the python3 process, and stop it or move one of the services to another port
+- Run the service as root so that it can take the port
+- Reboot again until it works
+- Open port 8080 in the firewall
+why: The error means another process already holds the port. ss -ltnp names it. Look at its command line and parent, for example with ps -fp 912 and systemctl status. The right fix is to remove the duplicate or give the services different ports. Root does not allow two programs to share a port.
+
+## Cron job never runs
+level: mid
+A backup script works when run by hand. A cron entry was added, and no backup files appear.
+
+```text
+$ crontab -l
+0 2 * * * backup.sh
+
+$ grep CRON /var/log/syslog | tail -1
+CRON[3012]: (root) CMD (backup.sh)
+CRON[3012]: (CRON) info (No MTA installed, discarding output)
+```
+? What is the most likely cause?
++ Cron has a small PATH, so backup.sh is not found. Use the full path to the script and send the output to a log
+- The system clock is wrong
+- Cron cannot run at 2 AM
+- The script needs a newer kernel
+why: Cron runs jobs with a minimal environment, often only /usr/bin:/bin. Your shell finds the script because of your PATH or current directory. Use absolute paths, set PATH in the crontab, and redirect output, for example >> /var/log/backup.log 2>&1, so errors are visible.

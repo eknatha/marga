@@ -52,3 +52,34 @@ Scrape duration: 10.0s    scrape_timeout: 10s
 - Whether Alertmanager is running
 - Whether the Grafana version is the latest
 why: Gaps appear when scrapes fail. The error "context deadline exceeded" and a scrape duration equal to the timeout show the endpoint is too slow. Look for a metrics handler that does expensive work on each request, a busy application, or network trouble. Fix the cause. Raising the timeout is only a temporary measure and must stay below the scrape interval.
+
+## Alert fires for every pod restart
+level: mid
+The on-call engineer gets 40 pages a night. Each one is a single pod restart that recovers by itself.
+
+```text
+Alert: KubePodRestarted  severity=page
+Condition: increase(kube_pod_container_status_restarts_total[5m]) > 0
+Last 7 days: 280 pages, 3 customer-visible incidents
+```
+? What is the best change?
++ Page on symptoms such as the error rate or latency against the SLO, and send restart counts to a ticket or dashboard
+- Raise the number of people on call
+- Mute the alert permanently
+- Lower the threshold to catch more restarts
+why: A page should mean that a human must act now because users are affected. A recovering restart does not meet that bar. Alerting on user-facing symptoms and burn rate catches the real incidents. Cause-level signals stay as lower-severity notifications that help with diagnosis.
+
+## High cardinality blows up metrics storage
+level: senior
+The metrics server runs out of memory after a deploy. A new metric was added.
+
+```text
+http_requests_total{path="/users/48213", user_id="48213", method="GET"}
+Active series: 1.2M before, 38M after
+```
+? What is the cause and fix?
++ User ID and raw path values create a new series for each user. Use the route template as a label, and keep identifiers in logs or traces
+- The scrape interval is too long
+- The server needs a faster disk only
+- Counters must be changed to gauges
+why: Each unique combination of label values is a separate time series that costs memory. Unbounded values such as user IDs make the count grow without limit. Label by the route pattern (for example /users/:id), status class and method, and put the detail into logs or traces where it is searchable.

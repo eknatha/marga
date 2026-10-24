@@ -54,3 +54,45 @@ gzip: /data/reports/summary.pdf: No such file or directory
 - Use ls -l instead of ls
 - Run the loop twice
 why: Word splitting turns the file `Q3 summary.pdf` into two words. Parsing the output of `ls` is fragile. A glob keeps each file name as one word, and quoting the variable keeps it intact. For recursive or unusual names use `find ... -print0 | xargs -0` or `while IFS= read -r -d ''`.
+
+## Loop breaks on file names with spaces
+level: junior
+A cleanup script should delete old log files. It works on the test server, then fails on a path that contains a space.
+
+```text
+$ cat clean.sh
+for f in $(ls /var/log/app); do
+  rm /var/log/app/$f
+done
+
+$ ./clean.sh
+rm: cannot remove '/var/log/app/access': No such file or directory
+rm: cannot remove 'old.log': No such file or directory
+```
+? What is the best fix?
++ Loop over a glob and quote the variable, for example for f in /var/log/app/*; do rm -- "$f"; done
+- Add sudo in front of rm
+- Replace ls with ls -a
+- Run the script with sh instead of bash
+why: The shell splits the output of ls on spaces, so "access old.log" became two words. Never parse ls output. A glob keeps each name as one word, and quotes keep it as one word when you use it. The double dash protects against names that start with a dash. Test with a file name that has spaces before you trust a loop.
+
+## Script keeps going after a failed step
+level: mid
+A deploy script copies files and restarts a service. It restarted the service even though the copy had failed.
+
+```text
+$ cat deploy.sh
+#!/bin/bash
+cp -r build/ /srv/app/
+systemctl restart app
+
+$ ./deploy.sh
+cp: cannot create directory '/srv/app/build': Permission denied
+Job for app.service ... started
+```
+? What change makes the script stop at the first failure?
++ Add set -euo pipefail after the shebang line, and handle expected failures on purpose
+- Add sleep 5 between the two lines
+- Redirect errors to /dev/null
+- Run the script twice
+why: By default bash continues after a failed command. set -e ends the script when a command fails, -u treats an unset variable as an error, and pipefail makes a pipeline fail when any part fails. They have limits, for example inside conditions, so also check the results of the steps that matter. Silencing errors only hides the problem.

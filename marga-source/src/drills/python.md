@@ -54,3 +54,43 @@ $ ps aux | grep health.py | wc -l
 - Wrap the call in a bare except
 - Use a global retry loop with no limit
 why: `requests` has no default timeout, so a server that accepts the connection and stays silent blocks forever. Set connect and read timeouts, catch `requests.exceptions.RequestException`, and exit with a non-zero status so the failure shows up. Add a lock or `timeout` command so runs cannot overlap.
+
+## Mutable default argument keeps old data
+level: junior
+A function that collects errors returns items from earlier calls.
+
+```text
+def add_error(msg, errors=[]):
+    errors.append(msg)
+    return errors
+
+>>> add_error("disk full")
+['disk full']
+>>> add_error("timeout")
+['disk full', 'timeout']
+```
+? What is the right fix?
++ Use None as the default and create a new list inside the function when it is None
+- Call the function with a bigger list
+- Use a tuple as the default and keep calling append
+- Add global before errors
+why: Default values are created once, when the function is defined, so every call shares the same list. Write def add_error(msg, errors=None): and then if errors is None: errors = []. This applies to dicts and sets too.
+
+## Script slow when reading a huge log
+level: mid
+A script that reads a 6 GB log file uses all the memory on the server.
+
+```text
+def count_errors(path):
+    lines = open(path).readlines()
+    return sum(1 for l in lines if "ERROR" in l)
+
+$ /usr/bin/time -v python count.py app.log
+Maximum resident set size: 7340032 kB
+```
+? What is the best change?
++ Iterate over the file object line by line inside a with block, so that only one line is in memory at a time
+- Buy more memory
+- Use readlines with a larger buffer
+- Convert the file to a list of lists first
+why: readlines builds a list of every line in memory. A file object is an iterator, so for line in f reads one buffered line at a time and uses a small, constant amount of memory. Use with open(path) as f so that the file is closed even if an error occurs.

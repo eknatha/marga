@@ -57,3 +57,44 @@ Step 4/5 : RUN npm ci
 - Run npm ci in the CMD line
 - Add a second COPY . . at the end
 why: Docker caches each layer and reuses it only while that layer and all earlier layers are unchanged. `COPY . .` changes with every edit, so the following install runs again. Copying the manifest first keeps the install layer cached until dependencies change. A `.dockerignore` file also keeps the build context small.
+
+## Container exits with code 137
+level: mid
+A Java service container restarts every few hours. Nothing is in the application log.
+
+```text
+$ docker ps -a
+CONTAINER ID  IMAGE      STATUS
+3c1f...       shop/api   Exited (137) 3 minutes ago
+
+$ docker inspect 3c1f --format '{{.State.OOMKilled}} {{.HostConfig.Memory}}'
+true 536870912
+```
+? What does this show and what should you do?
++ The kernel killed the process for exceeding the 512 MB memory limit. Measure real use, raise the limit and set the JVM heap below it
+- The image is corrupt and must be rebuilt
+- The container ran out of disk space
+- The Docker daemon is out of date
+why: Exit code 137 is 128 plus signal 9, a kill. OOMKilled true means the cgroup memory limit was hit. The JVM adds non-heap memory on top of the heap, so a heap equal to the limit will fail. Set the heap to a share of the limit and look at the real peak.
+
+## Image is huge and slow to deploy
+level: mid
+A small Go service ships as a 1.4 GB image. Pulls on new nodes take minutes.
+
+```text
+$ cat Dockerfile
+FROM golang:1.22
+WORKDIR /app
+COPY . .
+RUN go build -o server .
+CMD ["./server"]
+
+$ docker images shop/api
+shop/api   latest   1.4GB
+```
+? Which change helps most?
++ Use a multi-stage build: compile in the golang image, and copy only the binary into a small final image
+- Add more layers with RUN commands
+- Switch the tag to latest
+- Run docker system prune on the nodes
+why: The final image still contains the compiler, the module cache and the source. A multi-stage build keeps those in the build stage. The runtime stage can be a minimal base or distroless image, which gives a much smaller image, a faster pull and fewer packages to patch.

@@ -57,3 +57,41 @@ Verify return code: 21 (unable to verify the first certificate)
 - Renew the certificate with a shorter validity
 - Change the TLS port
 why: Only the leaf certificate (depth 0) is sent. Browsers can fetch missing intermediates, but many clients cannot. Install the certificate file that contains the leaf followed by the intermediate(s), and test again with `openssl s_client`. Disabling verification removes the protection that TLS gives.
+
+## Name resolves in one place and not another
+level: mid
+A service reaches a database by name from a laptop, but not from a server in the cloud network.
+
+```text
+laptop$ dig +short db.internal.example.com
+10.20.4.15
+
+server$ dig db.internal.example.com
+status: NXDOMAIN
+server$ cat /etc/resolv.conf
+nameserver 8.8.8.8
+```
+? What is the most likely cause?
++ The server uses a public resolver which does not know the private zone. Point it at the resolver for the private network
+- The database is down
+- The port is blocked by a firewall
+- The certificate has expired
+why: NXDOMAIN is an answer from a resolver that does not know the name. The laptop uses the corporate resolver, which serves the internal zone. The server asks 8.8.8.8, which cannot. In the cloud, use the VPC resolver or a private hosted zone that is associated with the network.
+
+## Intermittent timeouts through a load balancer
+level: senior
+Some requests to a service time out after exactly 60 seconds. Short requests are fine.
+
+```text
+$ curl -sS -m 120 https://api.example.com/export
+curl: (52) Empty reply from server   (after 60.0 s)
+
+Load balancer idle timeout: 60 s
+Backend processing time for /export: 90 s
+```
+? What is the best fix?
++ Make long work asynchronous, or send data in the connection before 60 seconds, or raise the idle timeout above the processing time on purpose
+- Add more backend servers
+- Disable TLS
+- Reduce the DNS TTL
+why: The load balancer closes a connection that has had no traffic for 60 seconds, and the export is silent for 90 seconds. More servers do not change that. The cleaner design is to start the job and let the client poll or receive a callback. Otherwise raise the idle timeout, and make sure the backend timeout is longer than the one on the balancer.

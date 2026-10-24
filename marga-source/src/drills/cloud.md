@@ -52,3 +52,38 @@ S3                 Requests-Tier1                $31
 - Turn off logging
 - Move the bucket to a different storage class
 why: NAT gateways charge per gigabyte processed. Traffic to S3 and to some other AWS services can use a gateway or interface endpoint instead, which avoids the NAT data processing charge. Review the cost by usage type, tag resources, and set budget alerts so a rise is noticed within days.
+
+## Storage bucket open to the world
+level: junior
+A security scanner reports that a bucket with customer exports is readable by anyone.
+
+```text
+$ aws s3api get-bucket-policy --bucket acme-exports
+{"Statement":[{"Effect":"Allow","Principal":"*","Action":"s3:GetObject","Resource":"arn:aws:s3:::acme-exports/*"}]}
+
+$ aws s3api get-public-access-block --bucket acme-exports
+NoSuchPublicAccessBlockConfiguration
+```
+? What should you do first?
++ Turn on the public access block for the bucket, replace the policy with named principals, and check the access logs for reads by unknown parties
+- Rename the bucket
+- Delete the scanner finding
+- Wait for the next audit
+why: Principal "*" lets anyone read every object. Block public access stops it at once and acts as a guard against later mistakes. Then restrict the policy to the roles that need it, and review the access logs to learn whether data was taken, because that decides whether you must notify anyone.
+
+## Bill doubled with no new traffic
+level: mid
+The monthly cloud bill is twice as high as last month. Request counts are flat.
+
+```text
+Cost by service (this month vs last):
+  EC2 instances      $4,100 vs $4,000
+  NAT gateway data   $5,900 vs $600
+  S3 storage         $  800 vs $  780
+```
+? Which investigation is the best next step?
++ Find which workloads send large volumes of data through the NAT gateway, for example with flow logs, and use gateway endpoints or private paths for storage and registry traffic
+- Resize every EC2 instance
+- Move the S3 buckets to another region
+- Turn off the load balancer
+why: The jump is in NAT gateway data processing, which costs per gigabyte. A change such as a new job pulling large images or objects over the internet path can cause it. Flow logs show the source and destination. VPC endpoints for object storage and the container registry remove that traffic from the NAT gateway.

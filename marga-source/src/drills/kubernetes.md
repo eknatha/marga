@@ -65,3 +65,44 @@ web-abc12   IPv4         8080   <unset>
 - Increase the replica count
 - Change the Service type to NodePort
 why: A Service sends traffic only to Pods whose labels match its selector and which are Ready. The selector is `app=web` and the Pods are labelled `app=webapp`, so the endpoints are empty. Fix the selector or the labels. If labels match, check that the Pods pass their readiness probe and that the namespace is the same.
+
+## Pods stay Pending
+level: junior
+A new deployment never starts. Every pod stays in Pending.
+
+```text
+$ kubectl get pods
+NAME            READY   STATUS    RESTARTS
+api-6d9c-x2     0/1     Pending   0
+
+$ kubectl describe pod api-6d9c-x2
+Events:
+  Warning  FailedScheduling  0/4 nodes are available:
+  4 Insufficient memory.
+```
+? What is the best next step?
++ Compare the pod memory request with node capacity, then lower the request, add nodes, or free capacity
+- Delete the namespace
+- Restart the kubelet on one node
+- Change the image pull policy
+why: The scheduler places pods using the requests, not the actual use. The event says no node has enough unreserved memory. Check the request in the pod spec, and what the nodes have left with kubectl describe node. Right-sizing the request or adding capacity solves it.
+
+## Rolling update stalls with failing readiness
+level: mid
+After a release, new pods start but never become ready, and the old pods keep serving.
+
+```text
+$ kubectl rollout status deploy/web
+Waiting for deployment "web" rollout to finish: 1 out of 3 new replicas have been updated...
+
+$ kubectl describe pod web-7b-q9
+Readiness probe failed: HTTP probe failed with statuscode: 404
+$ kubectl logs web-7b-q9
+GET /healthz 404
+```
+? What happened?
++ The new version no longer serves the path the readiness probe checks. The rollout is correctly holding back, so fix the probe path or the app and redeploy, or roll back
+- Kubernetes is broken and needs an upgrade
+- The service has no selector
+- The pods need more CPU
+why: A rolling update only removes old pods when new ones report ready. Here the probe gets a 404, so the new pods never become ready and the old ones stay. This is the safety feature working. Check what changed in the release, and use kubectl rollout undo to go back if users are affected.

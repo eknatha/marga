@@ -50,3 +50,37 @@ test_order_ids        PASS FAIL PASS PASS PASS FAIL PASS PASS PASS PASS
 - Remove the test stage
 - Only run tests on release days
 why: Flaky tests teach people to ignore failures, which hides real ones. Retry-until-green makes the pipeline slow and untrustworthy. Move the unstable tests out of the blocking path, track them, and fix root causes such as shared data between tests, ordering, real clocks, or network calls. Then return them to the blocking suite.
+
+## Pipeline passes but the wrong image is deployed
+level: mid
+The pipeline is green, yet production runs old code after a release. The deploy step uses a tag.
+
+```text
+build:  docker build -t shop/api:latest .
+push:   docker push shop/api:latest
+deploy: kubectl set image deploy/api api=shop/api:latest
+
+$ kubectl rollout status deploy/api
+deployment "api" successfully rolled out
+```
+? What is the most likely problem and fix?
++ The mutable latest tag did not change in the manifest, so nothing rolled. Deploy an immutable tag such as the commit ID, or the image digest
+- The cluster has too little memory
+- The registry is down
+- The pipeline needs more runners
+why: Setting the same image string gives no change to the pod template, so Kubernetes starts no new pods. Even with a restart, nodes may use a cached latest. Tag each build with a unique value, such as the commit hash, and deploy that exact tag or digest. You can then say what runs in production and roll back to a known tag.
+
+## Secrets appear in the build log
+level: mid
+A reviewer finds an API token in the output of a pipeline job.
+
+```text
++ curl -H "Authorization: Bearer 9f8a...c41" https://api.example.com/deploy
++ echo "token is 9f8a...c41"
+```
+? What is the right response?
++ Revoke and rotate the token now, then stop printing it, use masked secret variables, and avoid shell tracing around commands that use secrets
+- Delete the log and keep the token
+- Make the repository private and keep the token
+- Shorten the retention of the logs only
+why: Anyone who could read the log may have copied the token, so it must be treated as exposed. Rotate first. Then fix the cause: shell tracing printed the command, and an echo printed the value. Use the masking feature of the CI system, keep secrets out of the command line where possible, and give each token the smallest scope.
