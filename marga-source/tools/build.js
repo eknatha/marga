@@ -18,6 +18,7 @@ const SRC = path.join(ROOT, 'src');
 const DIST = path.join(ROOT, 'dist');
 const DOMAIN = 'marga.eknathalabs.com';
 // GoatCounter site code for the visitor count (https://CODE.goatcounter.com). Empty string disables it.
+const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js'];
 const COUNTER = process.env.MARGA_COUNTER !== undefined ? process.env.MARGA_COUNTER : 'marga-eknathalabs';
 const SITE = 'https://' + DOMAIN;
 
@@ -237,7 +238,72 @@ function loadContent() {
       });
     }
   }
-  return { modules, paths, lessons, sheets, interview };
+
+  // Real-world case studies: src/cases/*.md -> "## Title" then "key: value" lines
+  const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const srcPair = (v) => { const i = v.lastIndexOf('|'); return i < 0 ? { t: 'Source', u: v.trim() } : { t: v.slice(0, i).trim(), u: v.slice(i + 1).trim() }; };
+  const cases = [];
+  const cdir = path.join(SRC, 'cases');
+  if (fs.existsSync(cdir)) {
+    for (const f of fs.readdirSync(cdir).filter((x) => x.endsWith('.md')).sort()) {
+      for (const blk of fs.readFileSync(path.join(cdir, f), 'utf8').split(/^## /m).slice(1)) {
+        const nl = blk.indexOf('\n');
+        const title = blk.slice(0, nl).trim();
+        const kv = {};
+        for (const line of blk.slice(nl + 1).split('\n')) {
+          const m = line.match(/^([a-z]+):\s*(.+)$/);
+          if (m) kv[m[1]] = m[2].trim();
+        }
+        for (const k of ['company', 'year', 'area', 'modules', 'source', 'what', 'cause', 'fix', 'lesson']) if (!kv[k]) throw new Error(`cases/${f}: "${title}" is missing ${k}:`);
+        cases.push({ id: slug(title), title, company: kv.company, year: Number(kv.year), area: kv.area, modules: kv.modules.split(',').map((x) => x.trim()), source: srcPair(kv.source), what: kv.what, cause: kv.cause, fix: kv.fix, lesson: kv.lesson });
+      }
+    }
+  }
+
+  // Architecture post-mortems: src/architecture/<slug>.md -> "# Title", key lines, blank line, markdown body
+  const arch = [];
+  const adir = path.join(SRC, 'architecture');
+  if (fs.existsSync(adir)) {
+    for (const f of fs.readdirSync(adir).filter((x) => x.endsWith('.md')).sort()) {
+      const raw = fs.readFileSync(path.join(adir, f), 'utf8');
+      const tm = raw.match(/^# (.+)\n/);
+      if (!tm) throw new Error(`architecture/${f}: needs a "# Title" first line`);
+      const [head, ...restParts] = raw.slice(tm[0].length).split(/\n\s*\n/);
+      const kv = {};
+      for (const line of head.split('\n')) { const m = line.match(/^([a-z]+):\s*(.+)$/); if (m) kv[m[1]] = m[2].trim(); }
+      for (const k of ['company', 'date', 'modules', 'calc', 'source', 'summary']) if (!kv[k]) throw new Error(`architecture/${f}: missing ${k}:`);
+      const html = makeMarkdown().marked.parse(restParts.join('\n\n'));
+      arch.push({ id: f.replace(/\.md$/, '').replace(/^\d+-/, ''), title: tm[1].trim(), company: kv.company, date: kv.date, modules: kv.modules.split(',').map((x) => x.trim()), calcs: kv.calc.split(',').map((x) => x.trim()), sources: kv.source.split(';').map(srcPair), summary: kv.summary, html, text: plain(html) });
+    }
+  }
+
+  // Troubleshooting drills: src/drills/<module>.md
+  const drills = [];
+  const ddir = path.join(SRC, 'drills');
+  if (fs.existsSync(ddir)) {
+    for (const f of fs.readdirSync(ddir).filter((x) => x.endsWith('.md')).sort()) {
+      const mod = f.replace(/\.md$/, '');
+      fs.readFileSync(path.join(ddir, f), 'utf8').split(/^## /m).slice(1).forEach((blk, i) => {
+        const nl = blk.indexOf('\n');
+        const title = blk.slice(0, nl).trim();
+        let rest = blk.slice(nl + 1);
+        const lm = rest.match(/^\s*level:\s*(junior|mid|senior)\s*\n/);
+        if (!lm) throw new Error(`drills/${f}: "${title}" needs a level: line`);
+        rest = rest.slice(lm[0].length);
+        const fm = rest.match(/```text\n([\s\S]*?)```/);
+        if (!fm) throw new Error(`drills/${f}: "${title}" needs a text fence with the evidence`);
+        const story = rest.slice(0, fm.index).trim();
+        const after = rest.slice(fm.index + fm[0].length);
+        const qm = after.match(/^\? (.+)$/m);
+        const wm = after.match(/^why:\s*([\s\S]+)$/m);
+        const options = [...after.matchAll(/^([+-]) (.+)$/gm)].map((m) => ({ t: m[2].trim(), ok: m[1] === '+' }));
+        if (!qm || !wm) throw new Error(`drills/${f}: "${title}" needs a ? question line and a why: line`);
+        drills.push({ id: `${mod}-${i + 1}`, module: mod, level: lm[1], title, story, evidence: fm[1].replace(/\n$/, ''), q: qm[1].trim(), options, why: wm[1].trim() });
+      });
+    }
+  }
+  return { modules, paths, lessons, sheets, interview, cases, arch, drills };
+
 }
 
 /* ---------- output ---------- */
@@ -254,6 +320,10 @@ function fontCss() {
 @font-face{font-family:"Bricolage Grotesque";font-style:normal;font-weight:200 800;font-display:swap;src:url(${fx('', 'bricolage-grotesque.woff2')}) format("woff2-variations")}
 @font-face{font-family:"Source Serif 4";font-style:normal;font-weight:200 900;font-display:swap;src:url(${fx('', 'source-serif-4.woff2')}) format("woff2-variations")}
 @font-face{font-family:"Source Serif 4";font-style:italic;font-weight:200 900;font-display:swap;src:url(${fx('', 'source-serif-4-italic.woff2')}) format("woff2-variations")}
+@font-face{font-family:"Atkinson Hyperlegible";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/atkinson-400.woff2) format("woff2")}
+@font-face{font-family:"Atkinson Hyperlegible";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/atkinson-700.woff2) format("woff2")}
+@font-face{font-family:"OpenDyslexic";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/opendyslexic-400.woff2) format("woff2")}
+@font-face{font-family:"OpenDyslexic";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/opendyslexic-700.woff2) format("woff2")}
 @font-face{font-family:"JetBrains Mono";font-style:normal;font-weight:100 800;font-display:swap;src:url(${fx('', 'jetbrains-mono.woff2')}) format("woff2-variations")}
 `;
 }
@@ -283,14 +353,18 @@ function main() {
     fs.copyFileSync(path.join(nm, rel), out);
   }
 
+  // optional reading fonts: copied, loaded only when a reader picks them, not precached
+  const opt = { 'atkinson-400.woff2': '@fontsource/atkinson-hyperlegible/files/atkinson-hyperlegible-latin-400-normal.woff2', 'atkinson-700.woff2': '@fontsource/atkinson-hyperlegible/files/atkinson-hyperlegible-latin-700-normal.woff2', 'opendyslexic-400.woff2': '@fontsource/opendyslexic/files/opendyslexic-latin-400-normal.woff2', 'opendyslexic-700.woff2': '@fontsource/opendyslexic/files/opendyslexic-latin-700-normal.woff2' };
+  for (const [name, rel] of Object.entries(opt)) fs.copyFileSync(path.join(ROOT, 'node_modules', rel), path.join(DIST, 'assets', 'fonts', name));
+
   const css = fontCss() + read('app/app.css');
   const js = read('app/app.js');
   const dataJs = 'window.ACADEMY=' + JSON.stringify({ domain: DOMAIN, counter: COUNTER, ...data }).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029') + ';';
-  const ver = crypto.createHash('sha1').update(css + js + dataJs + read('app/voice.js')).digest('hex').slice(0, 8);
+  const ver = crypto.createHash('sha1').update(css + js + dataJs + EXTRA.map((f) => read('app/' + f)).join('')).digest('hex').slice(0, 8);
 
   write('assets/app.css', css);
   write('assets/app.js', js);
-  write('assets/voice.js', read('app/voice.js'));
+  EXTRA.forEach((f) => write('assets/' + f, read('app/' + f)));
   write('assets/data.js', dataJs);
 
   const shell = read('app/shell.html').replace(/{{VER}}/g, ver).replace(/{{SITE}}/g, SITE).replace(/{{DOMAIN}}/g, DOMAIN);
@@ -304,12 +378,12 @@ function main() {
     const html = sheetTpl
       .replace(/{{VER}}/g, ver).replace(/{{SITE}}/g, SITE)
       .replace(/{{TITLE}}/g, esc(s.title)).replace(/{{SUMMARY}}/g, esc(s.summary))
-      .replace(/{{ID}}/g, s.id).replace('{{REFS}}', refsBlock(s.refs)).replace('{{BODY}}', s.html);
+      .replace(/{{COUNTER}}/g, COUNTER).replace(/{{ID}}/g, s.id).replace('{{REFS}}', refsBlock(s.refs)).replace('{{BODY}}', s.html);
     write(`cheatsheets/${s.id}.html`, html);
   }
   const idxTpl = read('app/sheet-index.html');
   const rows = list.map((s) => `<li><a href="${s.id}.html"><strong>${esc(s.title)}</strong><span>${esc(s.summary)}</span></a></li>`).join('\n');
-  write('cheatsheets/index.html', idxTpl.replace(/{{VER}}/g, ver).replace(/{{SITE}}/g, SITE).replace('{{ROWS}}', rows));
+  write('cheatsheets/index.html', idxTpl.replace(/{{COUNTER}}/g, COUNTER).replace(/{{VER}}/g, ver).replace(/{{SITE}}/g, SITE).replace('{{ROWS}}', rows));
 
   // static files
   write('CNAME', DOMAIN + '\n');
@@ -324,7 +398,7 @@ function main() {
   }, null, 2));
   write('icon.svg', read('app/icon.svg'));
 
-  const precache = ['./', 'index.html', 'assets/app.css', 'assets/app.js', 'assets/data.js', 'assets/voice.js', 'icon.svg', 'manifest.webmanifest', 'cheatsheets/']
+  const precache = ['./', 'index.html', 'assets/app.css', 'assets/app.js', 'assets/data.js', ...EXTRA.map((f) => 'assets/' + f), 'icon.svg', 'manifest.webmanifest', 'cheatsheets/']
     .concat(Object.keys(fonts).map((f) => 'assets/fonts/' + f))
     .concat(list.map((s) => `cheatsheets/${s.id}.html`));
   write('sw.js', read('app/sw.js').replace('{{VER}}', ver).replace('{{FILES}}', JSON.stringify(precache)));
@@ -334,7 +408,7 @@ function main() {
   const nQuiz = Object.values(data.lessons).reduce((n, l) => n + l.quiz.length, 0);
   const nCards = Object.values(data.lessons).reduce((n, l) => n + l.cards.length, 0);
   const size = fs.statSync(path.join(DIST, 'assets', 'data.js')).size;
-  console.log(`built v${ver}: ${data.modules.length} modules, ${nLessons} lessons, ${nQuiz} quiz questions, ${nCards} flashcards, ${list.length} cheat sheets, ${data.interview.length} interview questions, data.js ${(size / 1024).toFixed(0)} KB`);
+  console.log(`built v${ver}: ${data.modules.length} modules, ${nLessons} lessons, ${nQuiz} quiz questions, ${nCards} flashcards, ${list.length} cheat sheets, ${data.interview.length} interview questions, ${data.cases.length} case studies, ${data.arch.length} architecture studies, ${data.drills.length} drills, data.js ${(size / 1024).toFixed(0)} KB`);
 }
 
 main();

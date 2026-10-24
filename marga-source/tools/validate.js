@@ -487,7 +487,7 @@ function checkBudgets() {
   if (data > 3 * 1024 * 1024) warn('budget', `data.js is ${Math.round(data / 1024)} KB`);
   const fonts = walk(path.join(DIST, 'assets'), (p) => /\.woff2?$/.test(p)).reduce((n, f) => n + fs.statSync(f).size, 0);
   stats['fonts KB'] = Math.round(fonts / 1024);
-  if (fonts > 400 * 1024) warn('budget', `fonts total ${Math.round(fonts / 1024)} KB`);
+  if (fonts > 1200 * 1024) warn('budget', `fonts total ${Math.round(fonts / 1024)} KB`);
 }
 
 
@@ -564,6 +564,76 @@ function checkExtras() {
   if (fs.existsSync(path.join(ROOT, '.github'))) err('deploy', '.github exists, but the site must not use workflows');
 }
 
+function checkPractice() {
+  const mods = new Set(A.modules.map((m) => m.id));
+  const FORBID = /\bgit/i;
+  const https = (u) => typeof u === 'string' && /^https:\/\/[a-z0-9.-]+\.[a-z]{2,}(\/|$)/i.test(u);
+  // case studies
+  if (!Array.isArray(A.cases) || A.cases.length < 50) err('cases', `need at least 50 case studies, found ${(A.cases || []).length}`);
+  const ids = new Set();
+  for (const c of A.cases || []) {
+    const w = `case ${c.id}`;
+    if (ids.has(c.id)) err('cases', `${w}: duplicate id`); ids.add(c.id);
+    for (const k of ['title', 'company', 'area', 'what', 'cause', 'fix', 'lesson']) if (!c[k] || String(c[k]).length < (['what', 'cause', 'fix', 'lesson'].includes(k) ? 30 : 2)) err('cases', `${w}: missing or short "${k}"`);
+    if (!(c.year >= 1990 && c.year <= 2026)) err('cases', `${w}: bad year ${c.year}`);
+    if (!Array.isArray(c.modules) || !c.modules.length || c.modules.some((m) => !mods.has(m))) err('cases', `${w}: bad module list`);
+    if (!c.source || !https(c.source.u) || !c.source.t) err('cases', `${w}: needs an https source with a title`);
+    if (FORBID.test(JSON.stringify(c))) err('cases', `${w}: contains a forbidden word`);
+    count('case studies');
+  }
+  for (const m of A.modules) if ((A.cases || []).filter((c) => c.modules.includes(m.id)).length < 2) err('cases', `module ${m.id} has fewer than 2 case studies`);
+  // architecture studies
+  if ((A.arch || []).length < 8) err('arch', `need at least 8 architecture studies, found ${(A.arch || []).length}`);
+  const calcIds = new Set(require(path.join(SRC, 'app', 'calc.js')).list.map((x) => x.id));
+  for (const a of A.arch || []) {
+    const w = `architecture ${a.id}`;
+    if (!a.title || !a.html || a.html.length < 2000) err('arch', `${w}: missing or short body`);
+    for (const h of ['The system', 'Timeline as reported', 'Root cause', 'Trade-offs to weigh']) if (!a.html.includes(h)) err('arch', `${w}: missing section "${h}"`);
+    if (!Array.isArray(a.sources) || !a.sources.length || a.sources.some((x) => !https(x.u))) err('arch', `${w}: needs https sources`);
+    if (!Array.isArray(a.calcs) || !a.calcs.length || a.calcs.some((x) => !calcIds.has(x))) err('arch', `${w}: calculators missing or unknown: ${JSON.stringify(a.calcs)}`);
+    if (FORBID.test(a.html + a.title + JSON.stringify(a.sources))) err('arch', `${w}: contains a forbidden word`);
+    count('architecture studies');
+  }
+  // drills
+  for (const m of A.modules) {
+    const n = (A.drills || []).filter((d) => d.module === m.id).length;
+    if (n !== 3) err('drills', `module ${m.id} has ${n} drills, needs exactly 3`);
+  }
+  const dids = new Set();
+  for (const d of A.drills || []) {
+    const w = `drill ${d.id}`;
+    if (dids.has(d.id)) err('drills', `${w}: duplicate id`); dids.add(d.id);
+    if (!mods.has(d.module)) err('drills', `${w}: unknown module`);
+    if (!d.title || !d.story || !d.evidence || !d.why) err('drills', `${w}: missing field`);
+    if (!Array.isArray(d.options) || d.options.length < 3 || d.options.filter((o) => o.ok).length !== 1) err('drills', `${w}: needs 3 or more options and exactly one correct`);
+    if (FORBID.test(JSON.stringify(d))) err('drills', `${w}: contains a forbidden word`);
+    count('drills');
+  }
+  // scripts present, loaded, precached
+  const html = read(path.join(DIST, 'index.html'));
+  const sw = read(path.join(DIST, 'sw.js'));
+  for (const f of ['a11y.js', 'counter.js', 'calc.js', 'extras.js']) {
+    if (!fs.existsSync(path.join(DIST, 'assets', f))) err('assets', `assets/${f} missing`);
+    if (!html.includes(f)) err('assets', `index.html does not load ${f}`);
+    if (!sw.includes(f)) err('assets', `${f} is not in the offline cache list`);
+  }
+  for (const f of ['atkinson-400.woff2', 'atkinson-700.woff2', 'opendyslexic-400.woff2', 'opendyslexic-700.woff2']) if (!fs.existsSync(path.join(DIST, 'assets', 'fonts', f))) err('assets', `font ${f} missing`);
+  for (const f of walk(path.join(DIST, 'cheatsheets'), (p) => /\.html$/.test(p))) {
+    const t = read(f);
+    if (!t.includes('a11y.js') || !t.includes('counter.js') || !t.includes('id="visitors"')) err('sheets', `${rel(f)}: lacks accessibility or visitor-count scripts`);
+  }
+  if (!A.counter) err('counter', 'no counter code configured'); else if (!/^[a-z0-9-]+$/.test(A.counter)) err('counter', 'bad counter code ' + A.counter);
+  // calculator maths sanity
+  const L = require(path.join(SRC, 'app', 'calc.js'));
+  for (const d of L._defs) {
+    const v = {}; d.inputs.forEach((i) => { v[i.id] = i.value; });
+    const rows = d.compute(v);
+    if (!rows.length || rows.some((r) => /NaN|undefined|Infinity/.test(r.join(' ')))) err('calc', `${d.id}: bad output with default values`);
+  }
+  if (Math.abs(L.math.budgetMinutes(99.9, 30) - 43.2) > 1e-9) err('calc', 'error budget formula is wrong');
+  stats['calculators'] = L.list.length;
+}
+
 // ---------------------------------------------------------------- run
 const steps = [
   ['content schema', checkSchema],
@@ -573,7 +643,8 @@ const steps = [
   ['lesson structure', checkLessonStructure],
   ['links and assets', checkLinks],
   ['size budgets', checkBudgets],
-  ['references, interview, footer, voice, print', checkExtras]
+  ['references, interview, footer, voice, print', checkExtras],
+  ['case studies, architecture, drills, accessibility, counter', checkPractice]
 ];
 for (const [name, fn] of steps) {
   const before = errors.length;
