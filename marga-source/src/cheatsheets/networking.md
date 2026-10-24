@@ -144,7 +144,7 @@ ethtool eth0
 
 > **Warning:** Changing firewall rules over SSH can lock you out. Add an allow rule for your own session first, keep a second session open, and schedule an automatic rollback.
 
-> **Warning:** Packet captures can contain passwords, tokens and personal data. Store them securely and delete them when the work is done.
+> **Danger:** Packet captures can contain passwords, tokens and personal data. Store them securely and delete them when the work is done.
 
 ## Cautions for network changes
 

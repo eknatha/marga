@@ -198,7 +198,7 @@ terraform providers
 terraform version
 ```
 
-> **Warning:** Read the plan before you apply it, especially lines marked `destroy` or `must be replaced`. A change to one argument can force a new resource, such as a database.
+> **Danger:** Read the plan before you apply it, especially lines marked `destroy` or `must be replaced`. A change to one argument can force a new resource, such as a database.
 
 > **Warning:** `terraform apply -auto-approve` skips the human check. Use it only in a pipeline that applies a reviewed, saved plan.
 
@@ -217,9 +217,9 @@ terraform taint aws_instance.web
 terraform apply -replace=aws_instance.web
 ```
 
-> **Warning:** Always run `terraform state pull > backup.tfstate` before `state mv`, `state rm` or `import`. A wrong state edit can make Terraform destroy or duplicate real resources.
+> **Danger:** Always run `terraform state pull > backup.tfstate` before `state mv`, `state rm` or `import`. A wrong state edit can make Terraform destroy or duplicate real resources.
 
-> **Warning:** `terraform force-unlock` is only safe when you are sure that no other run is active. Check who holds the lock first.
+> **Danger:** `terraform force-unlock` is only safe when you are sure that no other run is active. Check who holds the lock first.
 
 > **Warning:** Do not edit the state file by hand and do not commit it to a shared repository: it can contain secrets in plain text. Use a remote backend with encryption and locking.
 
@@ -253,6 +253,6 @@ terraform destroy -target=aws_instance.test
 lifecycle { prevent_destroy = true }
 ```
 
-> **Warning:** `terraform destroy` deletes everything in the state, including databases and buckets. Always review `plan -destroy`, set `prevent_destroy` on critical resources, and turn on deletion protection in the cloud.
+> **Danger:** `terraform destroy` deletes everything in the state, including databases and buckets. Always review `plan -destroy`, set `prevent_destroy` on critical resources, and turn on deletion protection in the cloud.
 
 > **Warning:** Provider upgrades with `init -upgrade` can change behaviour. Pin versions in `required_providers` and read the changelog.

@@ -145,4 +145,4 @@ helm uninstall web -n shop
 helm uninstall web -n shop --keep-history
 ```
 
-> **Warning:** `helm uninstall` deletes every resource of the release, and persistent volume claims may follow depending on the chart. Back up data first. CRDs installed from a chart's `crds/` folder are not removed by Helm.
+> **Danger:** `helm uninstall` deletes every resource of the release, and persistent volume claims may follow depending on the chart. Back up data first. CRDs installed from a chart's `crds/` folder are not removed by Helm.

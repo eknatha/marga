@@ -145,9 +145,9 @@ aws rds describe-db-instances --query 'DBInstances[].[DBInstanceIdentifier,DBIns
 aws logs tail /aws/lambda/shop-api --since 15m --follow
 ```
 
-> **Warning:** `aws s3 sync --delete` and `aws s3 rm --recursive` remove objects at once, and on a versioned bucket they leave delete markers. Run `--dryrun` first.
+> **Danger:** `aws s3 sync --delete` and `aws s3 rm --recursive` remove objects at once, and on a versioned bucket they leave delete markers. Run `--dryrun` first.
 
-> **Warning:** `aws ec2 terminate-instances` cannot be undone, and attached volumes with `DeleteOnTermination` are removed. Take a snapshot and use `stop-instances` when you are unsure.
+> **Danger:** `aws ec2 terminate-instances` cannot be undone, and attached volumes with `DeleteOnTermination` are removed. Take a snapshot and use `stop-instances` when you are unsure.
 
 > **Warning:** Opening a security group to `0.0.0.0/0` on SSH or database ports exposes it to the whole internet. Use your own address range or Session Manager.
 
@@ -168,4 +168,4 @@ aws configservice describe-compliance-by-config-rule
 
 > **Warning:** Do not put access keys in scripts or environment files in a repository. Use roles, SSO (`aws sso login`) or a secrets manager, and rotate any key that was exposed.
 
-> **Warning:** `aws iam delete-user`, `delete-role` and `delete-policy` can break running workloads that use them. Search CloudTrail and Access Advisor for recent use first.
+> **Danger:** `aws iam delete-user`, `delete-role` and `delete-policy` can break running workloads that use them. Search CloudTrail and Access Advisor for recent use first.

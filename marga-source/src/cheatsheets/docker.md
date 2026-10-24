@@ -193,7 +193,7 @@ docker compose pull && docker compose up -d
 docker compose down
 ```
 
-> **Warning:** `docker compose down -v` also deletes the named volumes, including your database. Use plain `down` unless you really want to wipe the data.
+> **Danger:** `docker compose down -v` also deletes the named volumes, including your database. Use plain `down` unless you really want to wipe the data.
 
 ## Cleanup and cautions
 
@@ -204,6 +204,6 @@ docker image prune
 docker builder prune --filter until=168h
 ```
 
-> **Warning:** `docker system prune -a --volumes` removes every unused image, stopped container and unused volume. On a shared host that can delete someone else's data. Look at `docker system df` and prune one resource type at a time.
+> **Danger:** `docker system prune -a --volumes` removes every unused image, stopped container and unused volume. On a shared host that can delete someone else's data. Look at `docker system df` and prune one resource type at a time.
 
 > **Warning:** `docker rm -f` kills a running container without a graceful stop. Use `docker stop` first, which sends SIGTERM and waits.

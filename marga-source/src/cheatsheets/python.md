@@ -209,4 +209,4 @@ python -m build
 python -m twine check dist/*
 ```
 
-> **Warning:** `twine upload` publishes to a public index and cannot be undone: a version number can never be reused. Test with the test index first.
+> **Danger:** `twine upload` publishes to a public index and cannot be undone: a version number can never be reused. Test with the test index first.

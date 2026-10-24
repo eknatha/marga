@@ -163,7 +163,7 @@ sudo systemctl revert app.service
 sudo systemctl set-property app.service MemoryMax=1G
 ```
 
-> **Warning:** Do not edit files under `/usr/lib/systemd/system`: a package update overwrites them. Use `systemctl edit` to create a drop-in.
+> **Danger:** Do not edit files under `/usr/lib/systemd/system`: a package update overwrites them. Use `systemctl edit` to create a drop-in.
 
 > **Warning:** `restart` stops and starts the service, so users see an interruption. Use `reload` when the program supports it, and test the config first (for example `nginx -t`).
 
@@ -185,7 +185,7 @@ journalctl --disk-usage
 sudo journalctl --vacuum-time=14d
 ```
 
-> **Warning:** `journalctl --vacuum-*` deletes old logs for good. Keep what you need for audits and postmortems, and check `Storage=persistent` if logs must survive a reboot.
+> **Danger:** `journalctl --vacuum-*` deletes old logs for good. Keep what you need for audits and postmortems, and check `Storage=persistent` if logs must survive a reboot.
 
 ## Timers and unit templates
 

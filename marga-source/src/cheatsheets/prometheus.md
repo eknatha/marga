@@ -183,9 +183,9 @@ amtool config routes test --config.file=alertmanager.yml severity=page team=shop
 
 > **Warning:** A silence hides pages for everyone. Give it a short duration, a clear comment and an owner, and remove it when the work ends.
 
-> **Warning:** The admin API (`/api/v1/admin/tsdb/delete_series`) permanently deletes data. Keep it disabled unless you need it, and never expose Prometheus to the internet without authentication.
+> **Danger:** The admin API (`/api/v1/admin/tsdb/delete_series`) permanently deletes data. Keep it disabled unless you need it, and never expose Prometheus to the internet without authentication.
 
-> **Warning:** Reducing retention or deleting the data directory loses history, which you need for capacity trends and postmortems.
+> **Danger:** Reducing retention or deleting the data directory loses history, which you need for capacity trends and postmortems.
 
 ## Alert rule skeleton
 

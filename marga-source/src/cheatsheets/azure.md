@@ -165,7 +165,7 @@ az lock create --name keep --lock-type CanNotDelete -g rg-shop
 az consumption usage list --top 20 -o table
 ```
 
-> **Warning:** `az group delete` removes every resource in the group, including databases and storage. List the resources first, and apply `CanNotDelete` locks to production groups.
+> **Danger:** `az group delete` removes every resource in the group, including databases and storage. List the resources first, and apply `CanNotDelete` locks to production groups.
 
 > **Warning:** `--yes` and `--no-wait` hide prompts and results. Do not add them to commands you have not run before.
 

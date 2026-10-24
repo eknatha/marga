@@ -132,7 +132,7 @@ command -v jq >/dev/null || { echo "jq is required" >&2; exit 1; }
 
 > **Warning:** `set -e` is not a full safety net. It does not stop on failures inside `if` conditions, `&&` lists or command substitutions in some cases. Check exit codes of the commands that matter.
 
-> **Warning:** `rm -rf "$tmp"` with an empty `tmp` is dangerous. The `:?` form (`${tmp:?}`) stops the script instead.
+> **Danger:** `rm -rf "$tmp"` with an empty `tmp` is dangerous. The `:?` form (`${tmp:?}`) stops the script instead.
 
 ## Variables and expansion
 
@@ -177,11 +177,11 @@ find . -name '*.tmp' -print0 | xargs -0 rm -f
 flock -n /tmp/job.lock ./job.sh
 ```
 
-> **Warning:** `>` truncates the file immediately. A typo such as `cmd > important.conf` destroys the content. Use `set -o noclobber` or `>>` to append.
+> **Danger:** `>` truncates the file immediately. A typo such as `cmd > important.conf` destroys the content. Use `set -o noclobber` or `>>` to append.
 
 > **Warning:** `eval` runs a string as code. Never pass user input to it. Prefer arrays and `"${cmd[@]}"`.
 
-> **Warning:** `xargs rm` and `find -delete` act at once. Run the command with `-print` or `echo` first.
+> **Danger:** `xargs rm` and `find -delete` act at once. Run the command with `-print` or `echo` first.
 
 ## Debugging
 

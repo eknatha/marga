@@ -132,7 +132,7 @@ xargs -a hosts.txt -P4 -I{} ping -c1 {}
 tee -a out.log < input.txt
 ```
 
-> **Warning:** `sed -i` edits the file in place with no undo. Keep a copy first: `sed -i.bak 's/a/b/' file`. A mistyped `xargs` with `rm` can delete the wrong files, so run it with `echo` first.
+> **Danger:** `sed -i` edits the file in place with no undo. Keep a copy first: `sed -i.bak 's/a/b/' file`. A mistyped `xargs` with `rm` can delete the wrong files, so run it with `echo` first.
 
 ## Archives and transfer
 
@@ -149,7 +149,7 @@ curl -fsSLO https://example.com/file.tgz
 sha256sum file.tgz
 ```
 
-> **Warning:** `rsync --delete` removes files at the destination that are missing from the source. Always run it with `--dry-run` first, and mind the trailing slash on the source: `src/` copies the contents, `src` copies the folder.
+> **Danger:** `rsync --delete` removes files at the destination that are missing from the source. Always run it with `--dry-run` first, and mind the trailing slash on the source: `src/` copies the contents, `src` copies the folder.
 
 > **Warning:** `tar -xzf` can overwrite existing files. Extract into an empty folder with `-C`.
 
@@ -191,11 +191,11 @@ sudo tcpdump -i eth0 -nn port 53 -c 20
 
 ## Cautions for risky commands
 
-> **Warning:** `rm -rf` has no recycle bin. Never run it with an unquoted variable such as `rm -rf $DIR/*`: if `DIR` is empty it becomes `rm -rf /*`. Use `rm -rf -- "${DIR:?}"/`.
+> **Danger:** `rm -rf` has no recycle bin. Never run it with an unquoted variable such as `rm -rf $DIR/*`: if `DIR` is empty it becomes `rm -rf /*`. Use `rm -rf -- "${DIR:?}"/`.
 
 > **Warning:** `dd of=/dev/sdX` overwrites a disk with no confirmation. Confirm the device with `lsblk` and read the command twice.
 
-> **Warning:** `mkfs`, `fdisk` and `parted` on a mounted or wrong disk destroy data. Check `lsblk -f` and `findmnt` first.
+> **Danger:** `mkfs`, `fdisk` and `parted` on a mounted or wrong disk destroy data. Check `lsblk -f` and `findmnt` first.
 
 > **Warning:** `kill -9` gives a process no chance to clean up. Try `kill` (SIGTERM) first and wait.
 

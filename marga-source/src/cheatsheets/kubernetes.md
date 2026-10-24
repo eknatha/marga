@@ -211,9 +211,9 @@ kubectl taint nodes worker-1 dedicated=gpu:NoSchedule
 kubectl get pdb -A
 ```
 
-> **Warning:** `kubectl drain` evicts pods. With `--delete-emptydir-data` the data in emptyDir volumes is lost, and a PodDisruptionBudget of 0 can block it forever. Drain one node at a time and watch the rollout.
+> **Danger:** `kubectl drain` evicts pods. With `--delete-emptydir-data` the data in emptyDir volumes is lost, and a PodDisruptionBudget of 0 can block it forever. Drain one node at a time and watch the rollout.
 
-> **Warning:** `kubectl delete node` removes the node object, not the machine. Drain first and confirm the cloud instance state.
+> **Danger:** `kubectl delete node` removes the node object, not the machine. Drain first and confirm the cloud instance state.
 
 ## Secrets and config
 
@@ -231,12 +231,12 @@ kubectl rollout restart deploy/api -n shop
 
 ## Cautions for destructive commands
 
-> **Warning:** `kubectl delete -f` and `kubectl delete ns shop` remove everything in the file or namespace, including volumes with `Delete` reclaim policy. Run `kubectl get all -n shop` and use `--dry-run=server` first.
+> **Danger:** `kubectl delete -f` and `kubectl delete ns shop` remove everything in the file or namespace, including volumes with `Delete` reclaim policy. Run `kubectl get all -n shop` and use `--dry-run=server` first.
 
-> **Warning:** `kubectl delete pod --force --grace-period=0` skips graceful shutdown and can leave a StatefulSet pod running twice. Use it only for stuck terminating pods after you confirm the node is gone.
+> **Danger:** `kubectl delete pod --force --grace-period=0` skips graceful shutdown and can leave a StatefulSet pod running twice. Use it only for stuck terminating pods after you confirm the node is gone.
 
-> **Warning:** `kubectl delete pvc` can delete the underlying disk. Check `kubectl get pv` for the reclaim policy first.
+> **Danger:** `kubectl delete pvc` can delete the underlying disk. Check `kubectl get pv` for the reclaim policy first.
 
-> **Warning:** Commands with `-A` or `--all` act on every namespace. Read the output of the matching `get` before you run `delete`.
+> **Danger:** Commands with `-A` or `--all` act on every namespace. Read the output of the matching `get` before you run `delete`.
 
 > **Warning:** Do not bind `cluster-admin` to users or service accounts for convenience. Grant the smallest Role that works.
