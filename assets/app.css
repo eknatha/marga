@@ -760,3 +760,46 @@ html[data-a-fs="150"] .a11y-panel { max-height: calc((100vh - 90px) / 1.5); }
 .ex-ctl select, .pyp select { min-height: 40px; padding: 6px 10px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; font-size: 15px; }
 .ex-ctl .opt-r { margin: 0; }
 .iv-filters .field input, .iv-filters .grow input { margin-top: 0; }
+
+/* ---- landing page, round 4 ---- */
+.hero2 { padding: 56px 0 48px; }
+.hero-grid2 { display: grid; grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr); gap: 48px; align-items: center; }
+.hero2 h1 { font-size: clamp(2.1rem, 4.4vw, 3.1rem); line-height: 1.05; max-width: 14em; }
+.hero2 .lede { max-width: 30em; }
+.roles { display: grid; gap: 10px; margin: 0 0 22px; }
+.role { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 13px 16px; font: inherit; color: var(--text); cursor: pointer; }
+.role:hover { border-color: var(--line-strong); }
+.role.on { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.role .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line-strong); flex: none; }
+.role.on .dot { border: 5px solid var(--accent); }
+.role strong { color: var(--ink); font-size: 1.05rem; }
+.role span { margin-left: auto; color: var(--muted); font-size: .92rem; }
+.hero2 .today { margin-top: 20px; }
+.term { background: var(--code-bg); border-radius: 14px; box-shadow: 0 18px 50px rgba(15, 37, 71, .25); overflow: hidden; font: 14px/1.6 var(--mono); color: var(--code-text); min-width: 0; }
+.tbar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--code-line); color: var(--code-dim); font-size: 12.5px; }
+.tbar i { width: 10px; height: 10px; border-radius: 50%; background: #3b4a6b; display: inline-block; }
+.tbar span { margin-left: 8px; }
+.tb { padding: 16px 18px 18px; overflow-x: auto; }
+.tb p { margin: 0; white-space: pre; }
+.tb .pr, .tb .ok { color: #7CE0B0; } .tb .dim { color: var(--code-dim); } .tb .bad { color: #FF8E86; } .tb .warn { color: #F5C26B; }
+.tb .cur { display: inline-block; width: 8px; height: 16px; background: var(--code-text); vertical-align: text-bottom; }
+.tl-l.pend { visibility: hidden; }
+.term-hint { margin-top: 12px; padding: 10px 12px; border-left: 3px solid #F5C26B; background: #16264a; border-radius: 0 8px 8px 0; font: 13.5px/1.5 var(--sans); color: var(--code-text); white-space: normal; }
+.tcap { display: flex; justify-content: space-between; gap: 12px; padding: 10px 14px; background: var(--code-line); font: 12.5px var(--sans); color: var(--code-dim); }
+.tcap a { color: #9FB6FF; font-weight: 700; }
+.stats { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.stats .wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; padding-top: 22px; padding-bottom: 22px; }
+.stats div { border-left: 1px solid var(--line); padding-left: 18px; }
+.stats div:first-child { border: 0; padding: 0; }
+.stats b { display: block; font: 800 2rem/1.1 var(--sans); color: var(--ink); }
+.stats span { color: var(--muted); font-size: .92rem; }
+.tl-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; }
+.tl-card h3 { margin: 0 0 12px; font-size: 1rem; color: var(--ink); }
+.tl-card ul { margin: 0; padding: 0; list-style: none; }
+.tl-card li { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: .95rem; }
+.tl-card li:last-child { border: 0; }
+.tl-card time { font: 600 .85rem var(--mono); color: var(--muted); }
+.tl-card li.x span { color: var(--fail); font-weight: 600; }
+.pl-res { list-style: none; padding: 0; margin: 12px 0; }
+.pl-res li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+@media (max-width: 900px) { .hero-grid2 { grid-template-columns: minmax(0, 1fr); gap: 28px; } .role span { margin-left: 32px; flex-basis: 100%; } }
