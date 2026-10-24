@@ -24,6 +24,11 @@ Static site. No server code, no GitHub Actions, no cookies.
 - Quizzes, flashcards, streaks, 14 cheat sheets, InterviewHub (91 questions, self-rating).
 - Spoken voice: Listen, Pause, Stop, a Voice dropdown and Speed on lessons, modules, paths, cheat sheets and InterviewHub. Uses the browser's built-in speech engine; available voices depend on the browser and operating system.
 - Print and Save as PDF with a MARGA watermark. Both open the browser print dialog; choose Save as PDF as the destination.
+- Real-world case studies (56, `src/cases/*.md`): what happened, cause, fix, lesson, link to the original report. Filter by type and stage, search, mark as read.
+- Architecture post-mortems (10, `src/architecture/*.md`) with interactive trade-off calculators (error budget, serial/parallel availability, cloud cost, backup recovery, retry storms, cell blast radius, capacity with zone loss).
+- Troubleshooting drills (33, `src/drills/<module>.md`): 3 per module, with logs or command output and a choice of fixes.
+- Mock interview mode (role, level, count, timer, self-scoring, history), interactive flashcards (flip, keyboard, known/learning), Practice hub at `#/practice`.
+- Accessibility panel (Aa button): text size, Atkinson Hyperlegible and OpenDyslexic fonts (loaded only when chosen), spacing, high contrast, reduced motion, link underlines, strong focus, read-aloud highlight. Saved in this browser.
 - Footer promise: Free forever, No login, No ads, No cookies.
 
 ## Known limits
@@ -32,8 +37,12 @@ Static site. No server code, no GitHub Actions, no cookies.
 - Official reference links were written from known documentation structure and could not be checked live from the build environment. Spot-check them and fix any that moved.
 - Cloud CLI commands in lessons were checked for syntax only, not run against real accounts.
 - Hands-on labs are planned and not implemented.
+- Case studies and post-mortems are short summaries of public reports, written without live access to the sources. Check dates, times and numbers against the linked original before relying on them.
+- Calculators give estimates from the numbers a visitor enters; they do not model real systems.
+- Text size uses CSS zoom; it is reset for print.
 
 ## Visitor count (GoatCounter, free, no cookies)
 1. Create a site at goatcounter.com with the code `marga-eknathalabs` (or build with `MARGA_COUNTER=yourcode`; `MARGA_COUNTER=` disables it).
 2. In its settings, enable "Allow adding visitor counts on the website".
-The footer shows the total once the counter responds; otherwise nothing is shown.
+The footer shows unique visitors once the counter responds (falls back to page views), keeps the last value if the counter is unreachable, and retries. Every page view (each route, plus each cheat sheet page) is recorded; hits are skipped on localhost and when the browser sends Do Not Track.
+If the number does not appear: open the browser console and look for the "visitor count unavailable" message; the usual cause is the setting in step 2, or a different site code.
