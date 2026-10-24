@@ -1,7 +1,7 @@
 'use strict';
 // Network-first service worker: fresh content when online, full offline use from cache otherwise.
-const CACHE = 'marga-38ecb8a8';
-const FILES = ["./","index.html","assets/app.css","assets/app.js","assets/data.js","assets/voice.js","icon.svg","manifest.webmanifest","cheatsheets/","assets/fonts/bricolage-grotesque.woff2","assets/fonts/source-serif-4.woff2","assets/fonts/source-serif-4-italic.woff2","assets/fonts/jetbrains-mono.woff2","cheatsheets/aws.html","cheatsheets/azure.html","cheatsheets/bash.html","cheatsheets/cicd.html","cheatsheets/docker.html","cheatsheets/helm.html","cheatsheets/kubernetes.html","cheatsheets/linux.html","cheatsheets/networking.html","cheatsheets/prometheus.html","cheatsheets/python.html","cheatsheets/sre.html","cheatsheets/systemd.html","cheatsheets/terraform.html"];
+const CACHE = 'marga-d76a6528';
+const FILES = ["./","index.html","assets/app.css","assets/app.js","assets/data.js","assets/voice.js","assets/counter.js","assets/calc.js","assets/a11y.js","assets/extras.js","icon.svg","manifest.webmanifest","cheatsheets/","assets/fonts/bricolage-grotesque.woff2","assets/fonts/source-serif-4.woff2","assets/fonts/source-serif-4-italic.woff2","assets/fonts/jetbrains-mono.woff2","cheatsheets/aws.html","cheatsheets/azure.html","cheatsheets/bash.html","cheatsheets/cicd.html","cheatsheets/docker.html","cheatsheets/helm.html","cheatsheets/kubernetes.html","cheatsheets/linux.html","cheatsheets/networking.html","cheatsheets/prometheus.html","cheatsheets/python.html","cheatsheets/sre.html","cheatsheets/systemd.html","cheatsheets/terraform.html"];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES)).then(() => self.skipWaiting()));
@@ -19,7 +19,7 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
   event.respondWith(
-    fetch(req)
+    fetch(req, { cache: 'no-cache' })
       .then((res) => {
         if (res && res.ok) {
           const copy = res.clone();
