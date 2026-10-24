@@ -14,8 +14,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=60459120">
-<script src="../assets/a11y.js?v=60459120"></script>
+<link rel="stylesheet" href="../assets/app.css?v=26fba5eb">
+<script src="../assets/a11y.js?v=26fba5eb"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -309,7 +309,7 @@ terraform apply tfplan
 terraform output -json
 terraform providers
 terraform version</code></pre></div>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Read the plan before you apply it, especially lines marked <code>destroy</code> or <code>must be replaced</code>. A change to one argument can force a new resource, such as a database.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p>Read the plan before you apply it, especially lines marked <code>destroy</code> or <code>must be replaced</code>. A change to one argument can force a new resource, such as a database.</p>
 </aside>
 <aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>terraform apply -auto-approve</code> skips the human check. Use it only in a pipeline that applies a reviewed, saved plan.</p>
 </aside>
@@ -333,9 +333,9 @@ terraform force-unlock LOCK_ID
 terraform refresh
 terraform taint aws_instance.web
 terraform apply -replace=aws_instance.web</code></pre></div>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Always run <code>terraform state pull &gt; backup.tfstate</code> before <code>state mv</code>, <code>state rm</code> or <code>import</code>. A wrong state edit can make Terraform destroy or duplicate real resources.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p>Always run <code>terraform state pull &gt; backup.tfstate</code> before <code>state mv</code>, <code>state rm</code> or <code>import</code>. A wrong state edit can make Terraform destroy or duplicate real resources.</p>
 </aside>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>terraform force-unlock</code> is only safe when you are sure that no other run is active. Check who holds the lock first.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>terraform force-unlock</code> is only safe when you are sure that no other run is active. Check who holds the lock first.</p>
 </aside>
 <aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not edit the state file by hand and do not commit it to a shared repository: it can contain secrets in plain text. Use a remote backend with encryption and locking.</p>
 </aside>
@@ -371,7 +371,7 @@ lifecycle { prevent_destroy = true }" aria-label="Copy code">Copy</button><pre t
 terraform show destroy.tfplan | less
 terraform destroy -target=aws_instance.test
 lifecycle { prevent_destroy = <span class="hljs-literal">true</span> }</code></pre></div>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>terraform destroy</code> deletes everything in the state, including databases and buckets. Always review <code>plan -destroy</code>, set <code>prevent_destroy</code> on critical resources, and turn on deletion protection in the cloud.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>terraform destroy</code> deletes everything in the state, including databases and buckets. Always review <code>plan -destroy</code>, set <code>prevent_destroy</code> on critical resources, and turn on deletion protection in the cloud.</p>
 </aside>
 <aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Provider upgrades with <code>init -upgrade</code> can change behaviour. Pin versions in <code>required_providers</code> and read the changelog.</p>
 </aside>
@@ -379,8 +379,8 @@ lifecycle { prevent_destroy = <span class="hljs-literal">true</span> }</code></p
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://developer.hashicorp.com/terraform/cli" target="_blank" rel="noopener">Terraform CLI</a><span class="host">developer.hashicorp.com</span></li><li><a href="https://developer.hashicorp.com/terraform/language" target="_blank" rel="noopener">Terraform language</a><span class="host">developer.hashicorp.com</span></li><li><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs" target="_blank" rel="noopener">Terraform AWS provider</a><span class="host">registry.terraform.io</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=60459120"></script>
-<script src="../assets/counter.js?v=60459120"></script>
+<script src="../assets/voice.js?v=26fba5eb"></script>
+<script src="../assets/counter.js?v=26fba5eb"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

@@ -14,8 +14,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=60459120">
-<script src="../assets/a11y.js?v=60459120"></script>
+<link rel="stylesheet" href="../assets/app.css?v=26fba5eb">
+<script src="../assets/a11y.js?v=26fba5eb"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -240,7 +240,7 @@ az resource list -g rg-test -o table
 az group delete -n rg-test --no-wait
 az lock create --name keep --lock-type CanNotDelete -g rg-shop
 az consumption usage list --top 20 -o table</code></pre></div>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>az group delete</code> removes every resource in the group, including databases and storage. List the resources first, and apply <code>CanNotDelete</code> locks to production groups.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>az group delete</code> removes every resource in the group, including databases and storage. List the resources first, and apply <code>CanNotDelete</code> locks to production groups.</p>
 </aside>
 <aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>--yes</code> and <code>--no-wait</code> hide prompts and results. Do not add them to commands you have not run before.</p>
 </aside>
@@ -250,8 +250,8 @@ az consumption usage list --top 20 -o table</code></pre></div>
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://learn.microsoft.com/en-us/cli/azure/" target="_blank" rel="noopener">Azure CLI documentation</a><span class="host">learn.microsoft.com</span></li><li><a href="https://learn.microsoft.com/en-us/azure/" target="_blank" rel="noopener">Azure documentation</a><span class="host">learn.microsoft.com</span></li><li><a href="https://learn.microsoft.com/en-us/azure/role-based-access-control/overview" target="_blank" rel="noopener">Azure RBAC overview</a><span class="host">learn.microsoft.com</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=60459120"></script>
-<script src="../assets/counter.js?v=60459120"></script>
+<script src="../assets/voice.js?v=26fba5eb"></script>
+<script src="../assets/counter.js?v=26fba5eb"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

@@ -14,8 +14,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=60459120">
-<script src="../assets/a11y.js?v=60459120"></script>
+<link rel="stylesheet" href="../assets/app.css?v=26fba5eb">
+<script src="../assets/a11y.js?v=26fba5eb"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -305,7 +305,7 @@ docker compose logs -f api
 docker compose <span class="hljs-built_in">exec</span> api sh
 docker compose pull &amp;&amp; docker compose up -d
 docker compose down</code></pre></div>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>docker compose down -v</code> also deletes the named volumes, including your database. Use plain <code>down</code> unless you really want to wipe the data.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>docker compose down -v</code> also deletes the named volumes, including your database. Use plain <code>down</code> unless you really want to wipe the data.</p>
 </aside>
 <h2 id="cleanup-and-cautions">Cleanup and cautions</h2>
 <div class="code" data-lang="bash"><button class="copy" type="button" data-copy="docker system df
@@ -315,7 +315,7 @@ docker builder prune --filter until=168h" aria-label="Copy code">Copy</button><p
 docker container prune
 docker image prune
 docker builder prune --filter <span class="hljs-keyword">until</span>=168h</code></pre></div>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>docker system prune -a --volumes</code> removes every unused image, stopped container and unused volume. On a shared host that can delete someone else&#39;s data. Look at <code>docker system df</code> and prune one resource type at a time.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>docker system prune -a --volumes</code> removes every unused image, stopped container and unused volume. On a shared host that can delete someone else&#39;s data. Look at <code>docker system df</code> and prune one resource type at a time.</p>
 </aside>
 <aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>docker rm -f</code> kills a running container without a graceful stop. Use <code>docker stop</code> first, which sends SIGTERM and waits.</p>
 </aside>
@@ -323,8 +323,8 @@ docker builder prune --filter <span class="hljs-keyword">until</span>=168h</code
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://docs.docker.com/reference/dockerfile/" target="_blank" rel="noopener">Dockerfile reference</a><span class="host">docs.docker.com</span></li><li><a href="https://docs.docker.com/get-started/" target="_blank" rel="noopener">Docker: get started</a><span class="host">docs.docker.com</span></li><li><a href="https://docs.docker.com/compose/" target="_blank" rel="noopener">Docker Compose documentation</a><span class="host">docs.docker.com</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=60459120"></script>
-<script src="../assets/counter.js?v=60459120"></script>
+<script src="../assets/voice.js?v=26fba5eb"></script>
+<script src="../assets/counter.js?v=26fba5eb"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

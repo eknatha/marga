@@ -542,5 +542,152 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 0, l: 'SIGKILL to the victim', n: 'The chosen process is killed at once with no cleanup. It is often your biggest service, not the one that leaked.' },
     { f: 2, t: 3, l: 'Message in dmesg and journal', n: 'Look for "Out of memory: Killed process" in dmesg -T or journalctl -k. In containers the cgroup limit gives exit code 137.' },
     { f: 0, t: 1, l: 'Prevent: limits and monitoring', n: 'Set memory limits per service, alert on available memory, and find the leak. Adding swap hides a problem, it does not solve it.' }
+  ] },
+{ id: "dhcp-lease", module: "networking", title: "How a device gets an IP address with DHCP", summary: "Discover, offer, request, acknowledge, and what happens when the lease runs out.",
+  actors: ["New device", "DHCP server"],
+  steps: [
+    { f: 0, t: 0, l: "No address yet", n: "A device that joins the network has no IP address, so it can only send broadcasts on the local segment." },
+    { f: 0, t: 1, l: "DISCOVER (broadcast)", n: "The device asks everybody on the segment: is there a DHCP server? It uses 0.0.0.0 as its source address." },
+    { f: 1, t: 0, l: "OFFER: 10.0.4.57 for 24h", n: "The server picks a free address from its pool and offers it, with a lease time, a mask, a gateway and DNS servers." },
+    { f: 0, t: 1, l: "REQUEST: I take 10.0.4.57", n: "The device accepts one offer. It is still a broadcast, so that other servers learn their offers were not used." },
+    { f: 1, t: 0, l: "ACK: lease confirmed", n: "The server records the lease and confirms. The device can now configure its interface with the address and the gateway." },
+    { f: 0, t: 0, l: "Use the address", n: "The device starts to use the network. If another device already used that address, you would see a conflict, so servers check the pool carefully." },
+    { f: 0, t: 1, l: "Renew at half the lease", n: "After half of the lease time the device asks the same server to extend the lease, so its address does not change while it stays online." },
+    { f: 1, t: 0, l: "ACK: lease extended", n: "The server extends the lease. If the server is unreachable, the device tries again later, and after the lease ends it must start from DISCOVER." }
+  ] },
+{ id: "cdn-cache", module: "networking", title: "How a CDN serves a cached page", summary: "Edge cache hit, cache miss, and why headers decide what is stored.",
+  actors: ["Browser", "CDN edge", "Origin server"],
+  steps: [
+    { f: 0, t: 1, l: "GET /logo.png", n: "The browser is sent to the nearest edge location, usually by DNS or anycast routing, and asks for the file." },
+    { f: 1, t: 1, l: "Look up the cache", n: "The edge builds a cache key from the URL, and some headers, and checks whether it holds a fresh copy." },
+    { f: 1, t: 2, l: "Miss: fetch from origin", n: "The edge does not have the object, so it makes a request to the origin server. Only this first request travels the long way." },
+    { f: 2, t: 1, l: "200 OK, Cache-Control: max-age=3600", n: "The origin replies with the file and headers. Cache-Control says how long the copy may be reused." },
+    { f: 1, t: 0, l: "200 OK, X-Cache: MISS", n: "The edge stores the object and returns it. The first visitor sees the slower path." },
+    { f: 0, t: 1, l: "GET /logo.png (next visitor)", n: "Another user in the same region asks for the same file a minute later." },
+    { f: 1, t: 0, l: "200 OK, X-Cache: HIT", n: "The edge answers from its cache with no trip to the origin. This lowers latency and the load on the origin." },
+    { f: 1, t: 2, l: "After 1 hour: conditional request", n: "When the copy is stale, the edge can ask the origin if it changed, using ETag. A 304 means the stored copy is still good." }
+  ] },
+{ id: "bash-trap-cleanup", module: "bash", title: "Cleaning up with trap when a script is stopped", summary: "How trap runs your cleanup on exit, on Ctrl+C and on errors.",
+  actors: ["Script", "Shell", "Operating system"],
+  steps: [
+    { f: 0, t: 1, l: "trap cleanup EXIT INT TERM", n: "The script registers a function to run when the shell exits or receives an interrupt or terminate signal." },
+    { f: 0, t: 0, l: "tmp=$(mktemp -d)", n: "The script creates a temporary directory for its work. It is the thing that must be removed at the end." },
+    { f: 0, t: 0, l: "Do the real work", n: "The script downloads and processes files in the temporary directory. This may take minutes." },
+    { f: 2, t: 1, l: "User presses Ctrl+C (SIGINT)", n: "The terminal sends SIGINT to the script. Without a trap the script would stop and leave the directory behind." },
+    { f: 1, t: 0, l: "Run cleanup", n: "Bash calls the registered function before it ends. The function removes the temporary directory and releases locks." },
+    { f: 0, t: 2, l: "rm -rf \"$tmp\"", n: "The cleanup removes files with a quoted variable. If the variable were empty, an unquoted command could delete the wrong path, so check it first." },
+    { f: 1, t: 2, l: "Exit with a status", n: "The shell exits with the proper status code. A SIGKILL cannot be trapped, so cleanup may not run in that case." }
+  ] },
+{ id: "auto-rollback", module: "cicd", title: "Automatic rollback after a failed health check", summary: "A deploy that watches its own health and returns to the last good version.",
+  actors: ["Pipeline", "Orchestrator", "New version", "Monitoring"],
+  steps: [
+    { f: 0, t: 1, l: "Deploy version 42", n: "The pipeline asks the orchestrator to roll out the new version, and remembers that version 41 was the last good one." },
+    { f: 1, t: 2, l: "Start new instances", n: "The orchestrator starts a small share of instances on version 42 and keeps the rest on version 41." },
+    { f: 3, t: 2, l: "Watch error rate and latency", n: "Monitoring compares the new instances with the old ones over a set time window, using the same signals your SLO uses." },
+    { f: 3, t: 0, l: "Error rate 4% against 0.1%", n: "The new version is clearly worse than the baseline. This is a failed check, and it does not need a person to notice it." },
+    { f: 0, t: 1, l: "Roll back to version 41", n: "The pipeline tells the orchestrator to restore the last good version and stops the rollout." },
+    { f: 1, t: 2, l: "Remove version 42", n: "The new instances are drained and removed. Users on the old instances were never affected much, because the exposure was small." },
+    { f: 0, t: 0, l: "Mark the release failed", n: "The pipeline marks the change as failed, notifies the owner and links the data. Later, the team fixes the cause and tries again." }
+  ] },
+{ id: "nat-gateway", module: "cloud", title: "How a private server reaches the internet through NAT", summary: "Route table, NAT gateway, and why the internet cannot start connections back.",
+  actors: ["Private server", "NAT gateway", "Internet host"],
+  steps: [
+    { f: 0, t: 0, l: "Needs to download updates", n: "The server has only a private address such as 10.0.2.15, so the internet cannot route replies to it directly." },
+    { f: 0, t: 1, l: "Route 0.0.0.0/0 sends to NAT", n: "The route table of the private subnet sends all non-local traffic to the NAT gateway in a public subnet." },
+    { f: 1, t: 1, l: "Rewrite the source address", n: "The gateway replaces the private source with its own public address and records the mapping for this connection." },
+    { f: 1, t: 2, l: "Request from the public address", n: "The internet host sees only the gateway address. The host does not know the private address of the server." },
+    { f: 2, t: 1, l: "Response to the gateway", n: "The reply returns to the public address of the gateway, as for any other client." },
+    { f: 1, t: 0, l: "Translate back and forward", n: "The gateway finds the mapping, restores the private destination, and forwards the reply to the server." },
+    { f: 2, t: 1, l: "Unsolicited connection from outside", n: "A host that tries to connect to the private server first has no mapping, so the gateway drops it. This is why NAT hides the server." },
+    { f: 1, t: 1, l: "Watch the data charges", n: "NAT gateways bill by the amount of data processed, so large downloads can cost much. Use endpoints for cloud storage and registries." }
+  ] },
+{ id: "presigned-url", module: "cloud", title: "How a pre-signed URL gives temporary access", summary: "Letting a user upload to a private bucket without sharing credentials.",
+  actors: ["Browser", "Application", "Object storage"],
+  steps: [
+    { f: 0, t: 1, l: "I want to upload report.pdf", n: "The user asks the application for permission to upload. The bucket itself stays private." },
+    { f: 1, t: 1, l: "Check who the user is", n: "The application authenticates the user and decides whether this upload is allowed, and for which path." },
+    { f: 1, t: 2, l: "Sign a PUT request", n: "Using its own credentials, the application creates a signature for one object key, one method and a short expiry, for example 5 minutes." },
+    { f: 1, t: 0, l: "Pre-signed URL", n: "The URL contains the signature in its query string. Anybody who holds it can use it until it expires, so treat it like a password." },
+    { f: 0, t: 2, l: "PUT the file to the URL", n: "The browser sends the file directly to storage. The data does not pass through the application server." },
+    { f: 2, t: 2, l: "Verify the signature", n: "Storage recomputes the signature and checks the expiry and the permissions of the signer. The request is accepted only if everything matches." },
+    { f: 2, t: 0, l: "200 OK", n: "The object is stored. After the expiry time the same URL stops working." }
+  ] },
+{ id: "image-pull", module: "docker", title: "How docker pull downloads only the layers it needs", summary: "Manifest, layers, the local cache, and why base images matter.",
+  actors: ["Docker CLI", "Docker daemon", "Registry"],
+  steps: [
+    { f: 0, t: 1, l: "docker pull shop/api:1.8", n: "The CLI sends the request to the daemon, which does the work." },
+    { f: 1, t: 2, l: "Ask for the manifest of the tag", n: "The daemon asks the registry for the manifest. It lists the layers of the image by digest and the configuration." },
+    { f: 2, t: 1, l: "Manifest: 5 layers", n: "The registry returns the list. Each layer is identified by a hash of its content, so the same layer has the same ID everywhere." },
+    { f: 1, t: 1, l: "Compare with the local store", n: "The daemon checks which layer digests are already on disk. Layers from the same base image are likely to be present." },
+    { f: 1, t: 2, l: "Download the missing layers", n: "Only the two new layers are downloaded, in parallel. Three layers say Already exists." },
+    { f: 1, t: 1, l: "Verify and unpack", n: "Each layer is checked against its digest, and then unpacked into the storage driver." },
+    { f: 1, t: 0, l: "Status: Downloaded newer image", n: "The image is ready. A tag can move, so for production deployments use the digest, which never changes." }
+  ] },
+{ id: "readiness-probe", module: "kubernetes", title: "Readiness probes and traffic", summary: "How a pod is added to and removed from a Service without dropping requests.",
+  actors: ["Kubelet", "Pod", "Endpoints", "Service traffic"],
+  steps: [
+    { f: 1, t: 1, l: "Container starts", n: "The application starts, loads its cache and connects to the database. This takes about 20 seconds." },
+    { f: 0, t: 1, l: "Readiness probe: GET /ready", n: "The kubelet calls the probe on the schedule given in the spec. A failure or timeout means not ready." },
+    { f: 1, t: 0, l: "503 not ready", n: "The pod answers that it is still starting. It is not in the list of endpoints, so no traffic is sent to it." },
+    { f: 0, t: 1, l: "Probe again after the period", n: "The kubelet keeps asking. Meanwhile the old pods carry the load." },
+    { f: 1, t: 0, l: "200 ready", n: "The application has finished starting and the probe succeeds as many times as the success threshold requires." },
+    { f: 0, t: 2, l: "Add the pod to the endpoints", n: "The pod IP is added to the endpoint list of the Service, and the proxies on every node update their rules." },
+    { f: 3, t: 1, l: "Requests begin to arrive", n: "Traffic is spread across all ready pods. If the probe later fails, the pod is removed from the list again, without a restart." }
+  ] },
+{ id: "systemd-restart", module: "linux", title: "How systemd restarts a crashing service", summary: "Restart policy, back-off, and the start limit that stops a restart loop.",
+  actors: ["systemd", "Service process", "Journal"],
+  steps: [
+    { f: 0, t: 1, l: "Start the service", n: "systemd runs the command from the unit file. With Restart=on-failure it will react to a non-zero exit." },
+    { f: 1, t: 2, l: "Log the output", n: "Standard output and errors of the process are captured by the journal, so you can read them with journalctl -u name." },
+    { f: 1, t: 0, l: "Exit with status 1", n: "The process crashes, for example because of a missing config file. systemd sees the exit status." },
+    { f: 0, t: 0, l: "Wait RestartSec", n: "systemd waits for the configured time before trying again, for example 5 seconds, to avoid a busy loop." },
+    { f: 0, t: 1, l: "Start again", n: "The service is started again. If the cause is not fixed it fails again. This repeats." },
+    { f: 0, t: 0, l: "Start limit reached", n: "After StartLimitBurst failures within StartLimitIntervalSec, systemd stops trying and marks the unit as failed." },
+    { f: 0, t: 2, l: "Read the cause", n: "An operator runs journalctl, fixes the config, and then uses systemctl reset-failed before starting the service again." }
+  ] },
+{ id: "metrics-scrape", module: "observability", title: "How Prometheus scrapes and stores metrics", summary: "Targets, scrape, storage, query, and why the pull model helps.",
+  actors: ["Prometheus", "Application", "Storage", "Grafana"],
+  steps: [
+    { f: 0, t: 0, l: "Read the target list", n: "Prometheus knows what to scrape from static config or service discovery, for example from Kubernetes pods." },
+    { f: 0, t: 1, l: "GET /metrics every 15 s", n: "Prometheus pulls the current values in a text format. The application only needs to expose them." },
+    { f: 1, t: 0, l: "Counters, gauges, histograms", n: "The reply lists metric names with labels and values, such as http_requests_total{status=\"500\"} 42." },
+    { f: 0, t: 2, l: "Append samples with a timestamp", n: "Each series gets a new sample. Storage cost grows with the number of series, so labels must have few values." },
+    { f: 0, t: 0, l: "up = 1 for the target", n: "A successful scrape also sets the up metric, and a failed one sets it to 0. That is how you notice a dead target." },
+    { f: 3, t: 2, l: "Query: rate(http_requests_total[5m])", n: "Grafana sends a PromQL query. rate turns an ever-growing counter into a per-second value." },
+    { f: 2, t: 3, l: "Series for the graph", n: "The result is drawn as a graph. Alert rules use the same queries and fire when a condition holds for a given time." }
+  ] },
+{ id: "requests-timeout", module: "python", title: "Why every HTTP call needs a timeout", summary: "What happens to a script when the server stops answering.",
+  actors: ["Script", "requests library", "API server"],
+  steps: [
+    { f: 0, t: 1, l: "requests.get(url)", n: "The script makes a call with no timeout argument. By default the library waits with no limit." },
+    { f: 1, t: 2, l: "Open connection, send request", n: "The library connects and sends the request over the network." },
+    { f: 2, t: 2, l: "Server hangs", n: "The server accepts the connection and then stops responding, for example because it is overloaded or a firewall dropped packets." },
+    { f: 1, t: 1, l: "Wait, and wait", n: "With no timeout the call never returns. The script stays stuck, and a cron job or worker slot is used up for good." },
+    { f: 0, t: 1, l: "requests.get(url, timeout=(3, 10))", n: "The fix: 3 seconds to connect and 10 seconds to read. The numbers are chosen from what is normal for the service." },
+    { f: 1, t: 0, l: "raises Timeout", n: "After the limit the library raises an exception. The script can retry with back-off, or report a failure." },
+    { f: 0, t: 0, l: "Log and continue or fail", n: "The script logs the problem with the URL and the time, and moves on or exits with an error. It does not hang." }
+  ] },
+{ id: "oncall-escalation", module: "sre", title: "How an alert escalates to a person", summary: "Page, acknowledge, escalate and hand over to an incident commander.",
+  actors: ["Alert system", "Primary on-call", "Secondary on-call", "Incident commander"],
+  steps: [
+    { f: 0, t: 0, l: "SLO burn alert fires", n: "Monitoring decides that users are affected and creates a page, with a link to the runbook and the dashboard." },
+    { f: 0, t: 1, l: "Page the primary", n: "The paging system calls the primary on-call engineer with a push, a text and a phone call." },
+    { f: 1, t: 0, l: "Acknowledge", n: "The engineer acknowledges within the target time. This stops the escalation timer, and tells others someone is on it." },
+    { f: 1, t: 1, l: "Triage and mitigate", n: "The engineer looks at the dashboard and the latest deploy. A rollback might be the fastest mitigation." },
+    { f: 1, t: 2, l: "Ask for help", n: "The problem is larger than expected, so the engineer pages the secondary, who joins the call." },
+    { f: 1, t: 3, l: "Declare an incident", n: "Impact is large, so the incident commander takes over coordination, while the engineers continue the technical work." },
+    { f: 3, t: 3, l: "Keep a timeline and updates", n: "The commander posts status updates on a schedule and writes down decisions. This is the raw material for the postmortem." },
+    { f: 0, t: 0, l: "If nobody acknowledges", n: "Without an acknowledgement, the system escalates to the secondary after a set time, then to a manager. This is why escalation policies matter." }
+  ] },
+{ id: "tf-import", module: "terraform", title: "Bringing an existing resource under Terraform with import", summary: "Config first, import into state, then plan until there is no diff.",
+  actors: ["Engineer", "Terraform", "Cloud API", "State file"],
+  steps: [
+    { f: 0, t: 0, l: "A bucket exists but is not managed", n: "Someone created it in the console. Terraform does not know about it, and a plan would try to create a second one." },
+    { f: 0, t: 1, l: "Write the resource block", n: "The engineer writes configuration for the bucket with its real name. An import block or the import command connects the two." },
+    { f: 1, t: 2, l: "Read the real resource", n: "During import, Terraform asks the cloud API for the attributes of the existing bucket." },
+    { f: 1, t: 3, l: "Record it in state", n: "The resource is added to the state under its address. Nothing in the cloud has changed yet." },
+    { f: 0, t: 1, l: "terraform plan", n: "The plan compares the configuration with the state. Differences show where the code does not match the real settings." },
+    { f: 1, t: 0, l: "Show a diff", n: "For example, the tags in the code are missing in reality. The engineer adjusts the code until the plan shows no changes." },
+    { f: 0, t: 1, l: "Review before apply", n: "Only when the plan is clean or shows changes you want do you apply. From now on, changes go through code." }
   ] }
 ];

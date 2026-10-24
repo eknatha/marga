@@ -14,8 +14,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=60459120">
-<script src="../assets/a11y.js?v=60459120"></script>
+<link rel="stylesheet" href="../assets/app.css?v=26fba5eb">
+<script src="../assets/a11y.js?v=26fba5eb"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -226,7 +226,7 @@ sed <span class="hljs-string">&#x27;s/old/new/g&#x27;</span> file.txt
 diff -u old.conf new.conf
 xargs -a hosts.txt -P4 -I{} ping -c1 {}
 <span class="hljs-built_in">tee</span> -a out.log &lt; input.txt</code></pre></div>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>sed -i</code> edits the file in place with no undo. Keep a copy first: <code>sed -i.bak &#39;s/a/b/&#39; file</code>. A mistyped <code>xargs</code> with <code>rm</code> can delete the wrong files, so run it with <code>echo</code> first.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>sed -i</code> edits the file in place with no undo. Keep a copy first: <code>sed -i.bak &#39;s/a/b/&#39; file</code>. A mistyped <code>xargs</code> with <code>rm</code> can delete the wrong files, so run it with <code>echo</code> first.</p>
 </aside>
 <h2 id="archives-and-transfer">Archives and transfer</h2>
 <div class="code" data-lang="bash"><button class="copy" type="button" data-copy="tar -czf backup.tar.gz /srv/app
@@ -248,7 +248,7 @@ rsync -avh --delete src/ user@host:/dst/
 scp file.txt user@host:/tmp/
 curl -fsSLO https://example.com/file.tgz
 <span class="hljs-built_in">sha256sum</span> file.tgz</code></pre></div>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>rsync --delete</code> removes files at the destination that are missing from the source. Always run it with <code>--dry-run</code> first, and mind the trailing slash on the source: <code>src/</code> copies the contents, <code>src</code> copies the folder.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>rsync --delete</code> removes files at the destination that are missing from the source. Always run it with <code>--dry-run</code> first, and mind the trailing slash on the source: <code>src/</code> copies the contents, <code>src</code> copies the folder.</p>
 </aside>
 <aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>tar -xzf</code> can overwrite existing files. Extract into an empty folder with <code>-C</code>.</p>
 </aside>
@@ -299,11 +299,11 @@ nc -zv host 443
 <aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>tcpdump</code> on a busy host can fill the disk and add load. Always limit it with <code>-c</code>, a filter and a time limit, and do not capture personal data you are not allowed to keep.</p>
 </aside>
 <h2 id="cautions-for-risky-commands">Cautions for risky commands</h2>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>rm -rf</code> has no recycle bin. Never run it with an unquoted variable such as <code>rm -rf $DIR/*</code>: if <code>DIR</code> is empty it becomes <code>rm -rf /*</code>. Use <code>rm -rf -- &quot;${DIR:?}&quot;/</code>.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>rm -rf</code> has no recycle bin. Never run it with an unquoted variable such as <code>rm -rf $DIR/*</code>: if <code>DIR</code> is empty it becomes <code>rm -rf /*</code>. Use <code>rm -rf -- &quot;${DIR:?}&quot;/</code>.</p>
 </aside>
 <aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>dd of=/dev/sdX</code> overwrites a disk with no confirmation. Confirm the device with <code>lsblk</code> and read the command twice.</p>
 </aside>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>mkfs</code>, <code>fdisk</code> and <code>parted</code> on a mounted or wrong disk destroy data. Check <code>lsblk -f</code> and <code>findmnt</code> first.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>mkfs</code>, <code>fdisk</code> and <code>parted</code> on a mounted or wrong disk destroy data. Check <code>lsblk -f</code> and <code>findmnt</code> first.</p>
 </aside>
 <aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>kill -9</code> gives a process no chance to clean up. Try <code>kill</code> (SIGTERM) first and wait.</p>
 </aside>
@@ -317,8 +317,8 @@ nc -zv host 443
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://man7.org/linux/man-pages/index.html" target="_blank" rel="noopener">Linux man-pages (man7.org)</a><span class="host">man7.org</span></li><li><a href="https://refspecs.linuxfoundation.org/FHS_3.0/fhs/index.html" target="_blank" rel="noopener">Filesystem Hierarchy Standard 3.0</a><span class="host">refspecs.linuxfoundation.org</span></li><li><a href="https://systemd.io/" target="_blank" rel="noopener">systemd documentation</a><span class="host">systemd.io</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=60459120"></script>
-<script src="../assets/counter.js?v=60459120"></script>
+<script src="../assets/voice.js?v=26fba5eb"></script>
+<script src="../assets/counter.js?v=26fba5eb"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

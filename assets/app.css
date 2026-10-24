@@ -316,7 +316,14 @@ kbd { font: 500 12px var(--mono); border: 1px solid var(--line-strong); border-b
 .callout p { margin: 0; }
 .callout-title { font-weight: 800; color: var(--ink); margin: 0 0 4px; }
 .callout code { background: color-mix(in srgb, var(--surface) 70%, transparent); }
-.callout-warning { border-color: var(--fail); background: var(--fail-soft); }
+.callout-warning, .callout-danger, .callout-caution { position: relative; border-left-width: 8px; border-color: var(--fail); background: var(--fail-soft); padding-left: 52px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fail) 35%, transparent); }
+.callout-warning::before, .callout-danger::before, .callout-caution::before { content: "!"; position: absolute; left: 12px; top: 12px; width: 28px; height: 28px; border-radius: 50%; background: var(--fail); color: var(--surface); font: 800 18px/28px var(--sans); text-align: center; }
+.callout-warning .callout-title, .callout-danger .callout-title { color: var(--fail); }
+.callout-danger { background: repeating-linear-gradient(135deg, var(--fail-soft) 0 14px, color-mix(in srgb, var(--fail) 14%, var(--fail-soft)) 14px 28px); }
+.callout-danger .callout-title::after { content: " - destructive or irreversible"; font-weight: 600; font-size: .85em; }
+.callout-caution { border-color: var(--run); background: var(--run-soft); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--run) 35%, transparent); }
+.callout-caution::before { background: var(--run); }
+.callout-caution .callout-title { color: var(--ink); }
 .callout-incident { border-color: var(--run); background: var(--run-soft); }
 .callout-why-it-matters { border-color: var(--pass); background: var(--pass-soft); }
 
@@ -819,6 +826,15 @@ html[data-a-fs="150"] .a11y-panel { max-height: calc((100vh - 90px) / 1.5); }
 .tree-lines { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: visible; }
 .tree-lines .ln { fill: none; stroke: var(--line-strong); stroke-width: 2; stroke-dasharray: 5 5; }
 .tree-lines .ln.done { stroke: var(--pass); stroke-dasharray: none; }
+.tree-lines .ln.active { stroke: var(--accent); stroke-width: 3; stroke-dasharray: 8 7; filter: drop-shadow(0 0 4px var(--accent)); animation: flow 1.2s linear infinite; }
+.tree-lines .ln.active.run { stroke: var(--run); filter: drop-shadow(0 0 4px var(--run)); }
+@keyframes flow { to { stroke-dashoffset: -30; } }
+@keyframes glow { 0%, 100% { box-shadow: 0 0 0 4px var(--accent-soft), 0 0 8px 2px transparent; } 50% { box-shadow: 0 0 0 5px var(--accent-soft), 0 0 16px 5px var(--accent); } }
+@keyframes pop { 0% { transform: scale(.92); } 60% { transform: scale(1.06); } 100% { transform: scale(1); } }
+.node.s-ready .ring, .node.s-run .ring { animation: glow 2.4s ease-in-out infinite; }
+.node.s-run .ring { box-shadow: 0 0 0 4px var(--run-soft); }
+.node.just { animation: pop .5s ease-out; }
+@media (prefers-reduced-motion: reduce) { .tree-lines .ln.active { animation: none; } .node.s-ready .ring, .node.s-run .ring, .node.just { animation: none; } }
 .tier { position: relative; z-index: 1; }
 .tier-name { margin: 0 0 8px; font: 600 .82rem var(--sans); color: var(--muted); text-align: center; }
 .tier-nodes { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 18px 16px; }
@@ -838,3 +854,4 @@ html[data-a-fs="150"] .a11y-panel { max-height: calc((100vh - 90px) / 1.5); }
 .node.s-lock .ring { background: var(--line); } .node.s-lock .badge { color: var(--lock); }
 .tree-legend { margin: 14px 0 0; text-align: center; }
 @media (max-width: 560px) { .node { width: calc(50% - 8px); } .tier-nodes { gap: 14px 12px; } }
+@media print { .callout-warning, .callout-danger, .callout-caution { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #fff; border: 2px solid #000; border-left-width: 10px; } .callout-warning::before, .callout-danger::before, .callout-caution::before { background: #000; color: #fff; } .callout-danger .callout-title::before { content: "DANGER: "; } .callout-warning .callout-title::before { content: "WARNING: "; } }

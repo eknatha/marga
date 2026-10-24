@@ -14,8 +14,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=60459120">
-<script src="../assets/a11y.js?v=60459120"></script>
+<link rel="stylesheet" href="../assets/app.css?v=26fba5eb">
+<script src="../assets/a11y.js?v=26fba5eb"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -257,7 +257,7 @@ sudo systemctl set-property app.service MemoryMax=1G" aria-label="Copy code">Cop
 <span class="hljs-built_in">sudo</span> systemctl mask unwanted.service
 <span class="hljs-built_in">sudo</span> systemctl revert app.service
 <span class="hljs-built_in">sudo</span> systemctl set-property app.service MemoryMax=1G</code></pre></div>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not edit files under <code>/usr/lib/systemd/system</code>: a package update overwrites them. Use <code>systemctl edit</code> to create a drop-in.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p>Do not edit files under <code>/usr/lib/systemd/system</code>: a package update overwrites them. Use <code>systemctl edit</code> to create a drop-in.</p>
 </aside>
 <aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>restart</code> stops and starts the service, so users see an interruption. Use <code>reload</code> when the program supports it, and test the config first (for example <code>nginx -t</code>).</p>
 </aside>
@@ -283,7 +283,7 @@ journalctl _PID=1234
 journalctl -o json-pretty -n 1 -u app.service
 journalctl --disk-usage
 <span class="hljs-built_in">sudo</span> journalctl --vacuum-time=14d</code></pre></div>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>journalctl --vacuum-*</code> deletes old logs for good. Keep what you need for audits and postmortems, and check <code>Storage=persistent</code> if logs must survive a reboot.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>journalctl --vacuum-*</code> deletes old logs for good. Keep what you need for audits and postmortems, and check <code>Storage=persistent</code> if logs must survive a reboot.</p>
 </aside>
 <h2 id="timers-and-unit-templates">Timers and unit templates</h2>
 <div class="code" data-lang="ini"><button class="copy" type="button" data-copy="[Unit]
@@ -333,8 +333,8 @@ PrivateTmp=true" aria-label="Copy code">Copy</button><pre tabindex="0"><code cla
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://systemd.io/" target="_blank" rel="noopener">systemd documentation</a><span class="host">systemd.io</span></li><li><a href="https://www.freedesktop.org/software/systemd/man/latest/" target="_blank" rel="noopener">systemd manual pages</a><span class="host">www.freedesktop.org</span></li><li><a href="https://www.freedesktop.org/software/systemd/man/latest/journalctl.html" target="_blank" rel="noopener">journalctl manual</a><span class="host">www.freedesktop.org</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=60459120"></script>
-<script src="../assets/counter.js?v=60459120"></script>
+<script src="../assets/voice.js?v=26fba5eb"></script>
+<script src="../assets/counter.js?v=26fba5eb"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

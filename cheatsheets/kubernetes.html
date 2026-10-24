@@ -14,8 +14,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=60459120">
-<script src="../assets/a11y.js?v=60459120"></script>
+<link rel="stylesheet" href="../assets/app.css?v=26fba5eb">
+<script src="../assets/a11y.js?v=26fba5eb"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -317,9 +317,9 @@ kubectl drain worker-1 --ignore-daemonsets --delete-emptydir-data --<span class=
 kubectl uncordon worker-1
 kubectl taint nodes worker-1 dedicated=gpu:NoSchedule
 kubectl get pdb -A</code></pre></div>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>kubectl drain</code> evicts pods. With <code>--delete-emptydir-data</code> the data in emptyDir volumes is lost, and a PodDisruptionBudget of 0 can block it forever. Drain one node at a time and watch the rollout.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>kubectl drain</code> evicts pods. With <code>--delete-emptydir-data</code> the data in emptyDir volumes is lost, and a PodDisruptionBudget of 0 can block it forever. Drain one node at a time and watch the rollout.</p>
 </aside>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>kubectl delete node</code> removes the node object, not the machine. Drain first and confirm the cloud instance state.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>kubectl delete node</code> removes the node object, not the machine. Drain first and confirm the cloud instance state.</p>
 </aside>
 <h2 id="secrets-and-config">Secrets and config</h2>
 <div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl create secret generic db --from-literal=password='change-me' -n shop --dry-run=client -o yaml
@@ -336,13 +336,13 @@ kubectl rollout restart deploy/api -n shop</code></pre></div>
 <aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Passwords on the command line end up in shell history. Prefer files or a secrets manager.</p>
 </aside>
 <h2 id="cautions-for-destructive-commands">Cautions for destructive commands</h2>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>kubectl delete -f</code> and <code>kubectl delete ns shop</code> remove everything in the file or namespace, including volumes with <code>Delete</code> reclaim policy. Run <code>kubectl get all -n shop</code> and use <code>--dry-run=server</code> first.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>kubectl delete -f</code> and <code>kubectl delete ns shop</code> remove everything in the file or namespace, including volumes with <code>Delete</code> reclaim policy. Run <code>kubectl get all -n shop</code> and use <code>--dry-run=server</code> first.</p>
 </aside>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>kubectl delete pod --force --grace-period=0</code> skips graceful shutdown and can leave a StatefulSet pod running twice. Use it only for stuck terminating pods after you confirm the node is gone.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>kubectl delete pod --force --grace-period=0</code> skips graceful shutdown and can leave a StatefulSet pod running twice. Use it only for stuck terminating pods after you confirm the node is gone.</p>
 </aside>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>kubectl delete pvc</code> can delete the underlying disk. Check <code>kubectl get pv</code> for the reclaim policy first.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>kubectl delete pvc</code> can delete the underlying disk. Check <code>kubectl get pv</code> for the reclaim policy first.</p>
 </aside>
-<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Commands with <code>-A</code> or <code>--all</code> act on every namespace. Read the output of the matching <code>get</code> before you run <code>delete</code>.</p>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p>Commands with <code>-A</code> or <code>--all</code> act on every namespace. Read the output of the matching <code>get</code> before you run <code>delete</code>.</p>
 </aside>
 <aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not bind <code>cluster-admin</code> to users or service accounts for convenience. Grant the smallest Role that works.</p>
 </aside>
@@ -350,8 +350,8 @@ kubectl rollout restart deploy/api -n shop</code></pre></div>
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://kubernetes.io/docs/reference/kubectl/quick-reference/" target="_blank" rel="noopener">kubectl quick reference</a><span class="host">kubernetes.io</span></li><li><a href="https://kubernetes.io/docs/concepts/" target="_blank" rel="noopener">Kubernetes concepts</a><span class="host">kubernetes.io</span></li><li><a href="https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/" target="_blank" rel="noopener">Kubernetes: installing with kubeadm</a><span class="host">kubernetes.io</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=60459120"></script>
-<script src="../assets/counter.js?v=60459120"></script>
+<script src="../assets/voice.js?v=26fba5eb"></script>
+<script src="../assets/counter.js?v=26fba5eb"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
