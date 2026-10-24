@@ -242,18 +242,67 @@ function todayView() {
 }
 A.addRoute(/^\/today$/, todayView);
 
-/* home page: a Today strip */
-A.afterRoute(function (h) {
-  if (h !== '/') return;
-  var hero = $('#main .hero'); if (!hero || $('#today-band')) return;
+/* home page: the Today strip, built by the landing page */
+function todayStrip() {
   var key = todayKey(), x = ivOfDay(key), c = caseOfDay(key), st = dailyStreak(), done = !!bag('dc')[key];
-  var sec = document.createElement('section'); sec.className = 'band'; sec.id = 'today-band';
-  sec.innerHTML = '<div class="wrap"><div class="band-head"><h2>Today</h2><p>New every day, the same for everyone. <a href="#/today">Open Today</a></p></div><ul class="prac">' +
+  return '<section class="band alt" id="today-band"><div class="wrap"><div class="band-head"><h2>Today</h2><p>New every day, the same for everyone. Two minutes is enough. <a href="#/today">Open Today</a></p></div><ul class="prac">' +
     '<li><a href="#/daily"><strong>Daily challenge</strong><span>' + (done ? 'Answered today. Come back tomorrow.' : 'One quiz question from the lessons.') + '</span><em>Daily streak ' + st.cur + '</em></a></li>' +
     (x ? '<li><a href="#/interview/' + e(x.id) + '"><strong>Interview of the day</strong><span>' + e(x.q) + '</span><em>' + e(modTitle(x.module)) + '</em></a></li>' : '') +
-    (c ? '<li><a href="#/cases/' + e(c.id) + '"><strong>Case of the day</strong><span>' + e(c.title) + ' (' + e(c.company) + ', ' + c.year + ')</span><em>Real incident</em></a></li>' : '') + '</ul></div>';
-  hero.parentNode.insertBefore(sec, hero.nextSibling);
-});
+    (c ? '<li><a href="#/cases/' + e(c.id) + '"><strong>Case of the day</strong><span>' + e(c.title) + ' (' + e(c.company) + ', ' + c.year + ')</span><em>Real incident</em></a></li>' : '') + '</ul></div></section>';
+}
+A.todayStrip = todayStrip;
+
+/* ---------------------------------------------------------------- placement check */
+var PL = null;
+function plBuild() {
+  var p = A.PATH[S().path] || A.LIVE[0], mods = p.modules.slice(0, 5), qs = [];
+  mods.forEach(function (mid) {
+    var l = A.LES[MOD[mid].lessons[0]];
+    A.shuffle(l.quiz).slice(0, 2).forEach(function (q) { qs.push({ q: q, mod: mid }); });
+  });
+  return { p: p, mods: mods, qs: qs, pos: 0, right: {} };
+}
+function placementView() {
+  view.title = 'Placement check | MARGA by EknathaLabs'; view.nav = 'paths';
+  PL = plBuild();
+  view.html = head('Placement check', 'Ten questions, two from the start of each of the first five stages of your path. It suggests where to begin. It is a guide, not a certificate, and it does not unlock anything.') +
+    '<div class="wrap narrow"><p class="small">Path: <strong>' + e(PL.p.title) + '</strong>. You can change the path on the <a href="#/">home page</a>.</p><div id="pl" class="check"></div></div>';
+  view.after = plAsk;
+}
+A.addRoute(/^\/placement$/, placementView);
+function plAsk() {
+  var root = $('#pl'); if (!root || !PL) return;
+  if (PL.pos >= PL.qs.length) return plDone(root);
+  var it = PL.qs[PL.pos], q = it.q, opts = A.shuffle(q.options.map(function (o, oi) { return { o: o, oi: oi }; }));
+  root.innerHTML = '<div class="qprog" aria-hidden="true"><i style="width:' + (PL.pos / PL.qs.length * 100) + '%"></i></div><p class="qcount">Question ' + (PL.pos + 1) + ' of ' + PL.qs.length + '</p>' +
+    '<h2 class="qtext">' + e(q.q) + '</h2><div class="opts" role="group" aria-label="Answer choices">' + opts.map(function (x, k) {
+      return '<button type="button" class="opt" data-oi="' + x.oi + '"><span class="key">' + String.fromCharCode(65 + k) + '</span><span>' + e(x.o) + '</span></button>'; }).join('') + '</div><div class="feedback" id="pl-fb" aria-live="polite"></div>';
+  $$('.opt', root).forEach(function (b) {
+    b.addEventListener('click', function () {
+      var ok = Number(b.getAttribute('data-oi')) === q.answer;
+      if (ok) PL.right[it.mod] = (PL.right[it.mod] || 0) + 1;
+      $$('.opt', root).forEach(function (x) { x.disabled = true; if (Number(x.getAttribute('data-oi')) === q.answer) x.classList.add('right'); });
+      if (!ok) b.classList.add('wrong');
+      var last = PL.pos === PL.qs.length - 1;
+      $('#pl-fb', root).innerHTML = '<p class="' + (ok ? 'ok' : 'bad') + '"><strong>' + (ok ? 'Correct.' : 'Not quite.') + '</strong> ' + e(q.why) + '</p><button class="btn btn-primary" type="button" id="pl-next">' + (last ? 'See result' : 'Next question') + '</button>';
+      var nb = $('#pl-next', root); nb.focus();
+      nb.addEventListener('click', function () { PL.pos++; plAsk(); });
+    });
+  });
+}
+function plDone(root) {
+  var total = 0, start = -1;
+  PL.mods.forEach(function (mid, i) { var r = PL.right[mid] || 0; total += r; if (start < 0 && r < 2) start = i; });
+  var rec = start < 0 ? null : MOD[PL.mods[start]];
+  var msg = rec
+    ? 'Suggested starting point: <strong>' + e(rec.title) + '</strong> (stage ' + (start + 1) + ' of ' + PL.p.modules.length + '). ' + (start === 0 ? 'Begin at the first stage.' : 'The earlier stages looked solid. You can still skim them from the stage pages.')
+    : 'You answered every question correctly. Start with <strong>' + e(MOD[PL.p.modules[Math.min(5, PL.p.modules.length - 1)]].title) + '</strong>, or revisit anything from the earlier stages.';
+  root.innerHTML = '<div class="result ' + (rec ? 'fail' : 'pass') + '"><h2>' + total + ' of ' + PL.qs.length + ' correct</h2><p>' + msg + '</p>' +
+    '<p class="small">Stages open when the stages they depend on are passed, so you still pass each lesson check in order. This result is not saved.</p>' +
+    '<ul class="pl-res">' + PL.mods.map(function (mid) { return '<li><a href="#/module/' + e(mid) + '">' + e(modTitle(mid)) + '</a><span>' + (PL.right[mid] || 0) + ' of 2</span></li>'; }).join('') + '</ul>' +
+    '<div class="actions">' + (rec ? '<a class="btn btn-primary" href="#/module/' + e(rec.id) + '">Open ' + e(rec.title) + '</a>' : '<a class="btn btn-primary" href="#/path/' + e(PL.p.id) + '">Open the path</a>') + '<button class="btn btn-quiet" type="button" id="pl-again">Take it again</button></div></div>';
+  $('#pl-again', root).addEventListener('click', function () { PL = plBuild(); plAsk(); });
+}
 
 /* ---------------------------------------------------------------- subnet and CIDR playground */
 var NET = window.MargaNet;
@@ -554,8 +603,9 @@ window.addEventListener('hashchange', function () { exStop(); });
 function explainersView() {
   view.title = 'Animated explainers | MARGA by EknathaLabs'; view.nav = 'practice';
   view.html = head('Animated explainers', 'Watch how common systems work, one message at a time. Step through yourself or press Play. Each step has a plain explanation.') +
-    '<div class="wrap"><ul class="prac">' + EXP.map(function (x) {
-      return '<li><a href="#/explainers/' + e(x.id) + '"><strong>' + e(x.title) + '</strong><span>' + e(x.summary) + '</span><em>' + plural(x.steps.length, 'step') + ', ' + e(modTitle(x.module)) + '</em></a></li>'; }).join('') + '</ul></div>';
+    '<div class="wrap">' + MODS.filter(function (m) { return EXP.some(function (x) { return x.module === m.id; }); }).map(function (m) {
+      return '<h2 class="sub-h">' + e(m.title) + '</h2><ul class="prac">' + EXP.filter(function (x) { return x.module === m.id; }).map(function (x) {
+        return '<li><a href="#/explainers/' + e(x.id) + '"><strong>' + e(x.title) + '</strong><span>' + e(x.summary) + '</span><em>' + plural(x.steps.length, 'step') + '</em></a></li>'; }).join('') + '</ul>'; }).join('') + '</div>';
   view.after = null;
 }
 A.addRoute(/^\/explainers$/, explainersView);
@@ -607,7 +657,7 @@ function explainerView(id) {
   if (!x) return explainersView();
   view.title = x.title + ' | MARGA by EknathaLabs'; view.nav = 'practice';
   EX = { x: x, i: 0, playing: false, speed: 4200 };
-  var others = EXP.filter(function (q) { return q.id !== id; });
+  var others = EXP.filter(function (q) { return q.id !== id; }).sort(function (p, q) { return (q.module === x.module) - (p.module === x.module); });
   view.html = head(x.title, e(x.summary), '<p class="small"><a class="chip" href="#/module/' + e(x.module) + '">' + e(modTitle(x.module)) + '</a> <a href="#/explainers">All explainers</a></p>') +
     '<div class="wrap"><div class="ex" id="ex"><div class="ex-ctl" role="group" aria-label="Playback controls"><button type="button" class="btn btn-quiet" id="ex-first" data-act="ex-first">Restart</button><button type="button" class="btn btn-quiet" id="ex-prev" data-act="ex-prev">Back</button>' +
     '<button type="button" class="btn btn-primary" id="ex-play" data-act="ex-play" aria-pressed="false">Play</button><button type="button" class="btn btn-quiet" id="ex-next" data-act="ex-next">Next</button>' +

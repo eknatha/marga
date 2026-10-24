@@ -221,21 +221,53 @@ function homeView() {
   var pp = pathProgress(p);
   view.title = 'MARGA by EknathaLabs: DevOps, cloud and SRE training';
   view.nav = '';
+  var roles = LIVE.map(function (x) {
+    var pr = pathProgress(x), on = x.id === p.id;
+    return '<button type="button" role="radio" class="role' + (on ? ' on' : '') + '" data-act="pick-path" data-id="' + x.id + '" aria-checked="' + on + '"><i class="dot" aria-hidden="true"></i><strong>' + e(x.title) + '</strong><span>' + plural(pr.total, 'lesson') + ', ' + plural(x.modules.length, 'stage') + '</span></button>';
+  }).join('');
+  var nCases = (D.cases || []).length, nArch = (D.arch || []).length, nDrills = (D.drills || []).length, nIv = (IV || []).length, nEx = (window.MARGA_EXPLAINERS || []).length;
+  var stats = [[t.total, 'lessons with checks'], [nCases, 'real incidents'], [nDrills, 'troubleshooting drills'], [nIv, 'interview answers'], [nEx, 'animated explainers']].map(function (x) { return '<div><b>' + x[0] + '</b><span>' + x[1] + '</span></div>'; }).join('');
+  var TL = [['09:37', 'An engineer runs a command to remove a few servers.'], ['09:37', 'A mistyped input removes far more than intended.', 1], ['After', 'The index and placement subsystems stop serving requests.'], ['Midday', 'A full restart takes much longer than expected.'], ['About four hours', 'S3 is fully back.']];
+  var tools = [['#/subnet', 'Subnet and CIDR', 'Split networks, plan VLSM, merge routes.'], ['#/playground/yaml', 'YAML playground', 'Find errors and risky Kubernetes settings.'], ['#/playground/python', 'Python playground', 'Run Python with built-in tests.'], ['#/explainers', 'Animated explainers', 'DNS, TLS, pods, rolling updates and more.']];
   view.html =
-    '<section class="hero"><div class="wrap hero-grid">' +
-    '<div class="hero-copy"><h1>Practical DevOps, cloud and SRE training from someone who runs production.</h1>' +
-    '<p class="lede">Pick a role path. Pass each lesson check to unlock the next one. Every tool you learn comes with its own cheat sheet.</p>' +
-    '<div class="actions">' + cta + '<a class="btn btn-quiet" href="#/cheatsheets">Browse cheat sheets</a></div></div>' +
+    '<section class="hero hero2"><div class="wrap hero-grid2">' +
+    '<div class="hero-copy"><h1>Learn to fix production before production breaks.</h1>' +
+    '<p class="lede">Practical DevOps, cloud and SRE training from someone who runs production. Real incidents, real commands, no login, no ads.</p>' +
+    '<div class="roles" role="radiogroup" aria-label="Choose your role">' + roles + '</div>' +
+    '<div class="actions">' + cta + '<a class="btn btn-quiet" href="#/placement">Take the 10-question placement check</a></div>' +
+    '<p class="small">Free forever. Progress stays in your browser.</p>' +
     '<dl class="today"><div><dt>Day streak</dt><dd>' + st.cur + '</dd></div><div><dt>Lessons passed</dt><dd>' + t.done + '<small> of ' + t.total + '</small></dd></div>' +
     '<div><dt>Best streak</dt><dd>' + st.best + '</dd></div></dl></div>' +
-    '<div class="wrap"><div class="pipe-panel"><div class="pipe-head"><div role="tablist" aria-label="Role paths" class="tabs">' + tabs + '</div>' +
+    '<div class="term" id="term" aria-label="Example terminal session"><div class="tbar"><i></i><i></i><i></i><span>prod-cluster: a pod will not start</span></div><div class="tb" tabindex="0" role="region" aria-label="Terminal output">' +
+    '<p class="tl-l"><span class="pr">$</span> kubectl get pods -n shop</p>' +
+    '<p class="tl-l dim">NAME                  READY  STATUS             RESTARTS</p>' +
+    '<p class="tl-l">api-7d9f8c6b5-x2k4p   0/1    <span class="bad">CrashLoopBackOff</span>  6</p>' +
+    '<p class="tl-l">web-5c4d7f9b8-m8q2z   1/1    <span class="ok">Running</span>           0</p>' +
+    '<p class="tl-l"><span class="pr">$</span> kubectl logs api-7d9f8c6b5-x2k4p --previous</p>' +
+    '<p class="tl-l warn">Error: DATABASE_URL is not set</p>' +
+    '<p class="tl-l"><span class="pr">$</span> kubectl set env deploy/api DATABASE_URL=<span class="cur"></span></p>' +
+    '<div class="tl-l term-hint"><b>Your turn.</b> The pod crashes on start. What did the log just tell you? Pick the fix in the drill, then read what a real incident looked like.</div></div>' +
+    '<div class="tcap"><span>Troubleshooting drill, Kubernetes</span><a href="#/drills/kubernetes">Try it</a></div></div></div></section>' +
+
+    '<section class="stats" aria-label="What is on MARGA"><div class="wrap">' + stats + '</div></section>' +
+
+    '<section class="band"><div class="wrap"><div class="band-head"><h2>Pick a path. Pass each check to move on.</h2><p>Each path is an ordered set of stages. A stage opens when the stages it depends on are passed.</p></div>' +
+    '<div class="pipe-panel"><div class="pipe-head"><div role="tablist" aria-label="Role paths" class="tabs">' + tabs + '</div>' +
     '<p class="pipe-meta">' + plural(p.modules.length, 'stage') + ', about ' + hours(pp.minutes) + ' of study. ' + pp.done + ' of ' + pp.total + ' lessons passed.</p></div>' +
     pipelineHtml(p, true) +
-    '<p class="pipe-foot"><a href="#/path/' + p.id + '">See the full ' + e(p.title) + ' path</a></p></div></div></section>' +
-
-    '<section class="band"><div class="wrap"><div class="band-head"><h2>Role paths</h2><p>Each path is an ordered set of stages. A stage opens when the stages it depends on are passed.</p></div>' +
+    '<p class="pipe-foot"><a href="#/path/' + p.id + '">See the full ' + e(p.title) + ' path</a></p></div>' +
     '<div class="rows">' + LIVE.map(pathRow).join('') + '</div>' +
     '<h3 class="sub-h">In development</h3><ul class="planned">' + PLANNED.map(function (x) { return '<li><strong>' + e(x.title) + '</strong><span>' + e(x.summary) + '</span><em>Planned</em></li>'; }).join('') + '</ul></div></section>' +
+
+    (api.todayStrip ? api.todayStrip() : '') +
+
+    '<section class="band"><div class="wrap two"><div><h2>Learn from the incidents that made the news</h2><p>' + nCases + ' short case studies and ' + nArch + ' detailed post-mortems, each with the cause, the fix and the lesson. Start with one that is easy to follow.</p>' +
+    '<p class="actions"><a class="btn btn-primary" href="#/architecture/aws-s3-us-east-1-2017">Read the S3 post-mortem</a><a class="btn btn-quiet" href="#/cases">All case studies</a></p></div>' +
+    '<div class="tl-card"><h3>AWS S3, US-East-1, 28 February 2017</h3><ul>' + TL.map(function (x) { return '<li' + (x[2] ? ' class="x"' : '') + '><time>' + e(x[0]) + '</time><span>' + e(x[1]) + '</span></li>'; }).join('') + '</ul>' +
+    '<p class="small">As reported by the provider. The post-mortem page links to the original report.</p></div></div></section>' +
+
+    '<section class="band alt"><div class="wrap"><div class="band-head"><h2>Tools you can use in the browser</h2><p>Nothing to install. Your work stays on your device.</p></div><ul class="prac">' +
+    tools.map(function (x) { return '<li><a href="' + x[0] + '"><strong>' + e(x[1]) + '</strong><span>' + e(x[2]) + '</span></a></li>'; }).join('') + '</ul></div></section>' +
 
     '<section class="band alt"><div class="wrap two"><div><h2>A cheat sheet for every tool</h2><p>Linux, Bash, Python, networking, Docker, Kubernetes, Helm, Terraform, CI/CD, AWS, Azure, Prometheus and SRE each have a separate, searchable page with official references. Print them with a watermark or save them as PDF. They are always open, no progress needed.</p>' +
     '<p><a class="btn btn-quiet" href="#/cheatsheets">Open cheat sheets</a></p></div>' +
@@ -249,7 +281,21 @@ function homeView() {
     '<div class="note-panel"><h3>Hands-on labs are planned</h3><p>Browser-based practice with automatic checking is in development. Until then, every lesson includes a written incident walkthrough with sample output so you can follow the reasoning.</p><p><a href="#/labs">What is planned</a></p></div></div></section>' +
 
     '<section class="band alt"><div class="wrap"><h2>About the author</h2><p class="prose-narrow">Eknatha Reddy is a Senior Platform Engineer and SRE with 14+ years in enterprise infrastructure, Linux, virtualization and production support. The lessons are written from incidents and migrations, not from vendor slides.</p></div></section>';
-  view.after = armPipeline;
+  view.after = function () { armPipeline(); armTerm(); };
+}
+
+function armTerm() {
+  var t = $('#term'); if (!t) return;
+  var reduce = (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) || document.documentElement.getAttribute('data-a-motion') === 'reduce';
+  if (reduce) return;
+  var ls = $$('.tl-l', t), i = 0;
+  ls.forEach(function (x) { x.classList.add('pend'); });
+  (function step() {
+    if (!document.body.contains(t)) return;
+    if (i >= ls.length) return;
+    ls[i].classList.remove('pend'); i++;
+    setTimeout(step, i === 5 ? 900 : 520);
+  })();
 }
 
 function pathRow(p) {

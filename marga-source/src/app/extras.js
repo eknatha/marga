@@ -34,7 +34,7 @@ function practiceView() {
   var items = [
     ['#/today', 'Today', 'An interview question, a real incident and a quiz question that change every day.', 'New every day'],
     ['#/daily', 'Daily challenge', 'One quiz question a day from the lessons. Keep the daily streak going.', 'Daily streak ' + (S().dc ? Object.keys(S().dc).length + ' answered' : 'not started')],
-    ['#/explainers', 'Animated explainers', 'Step through DNS, TCP, TLS, pod scheduling, rolling updates, Terraform and a pipeline.', '7 explainers'],
+    ['#/explainers', 'Animated explainers', 'Step through how boot, DNS, TLS, pods, pipelines, Terraform, incidents and more really work.', (window.MARGA_EXPLAINERS || []).length + ' explainers'],
     ['#/subnet', 'Subnet and CIDR playground', 'Inspect networks, split them, plan VLSM for a VPC and merge routes.', 'Runs in your browser'],
     ['#/playground/yaml', 'YAML playground', 'Check YAML and Kubernetes manifests, convert to JSON, find risky settings.', 'Runs in your browser'],
     ['#/playground/python', 'Python playground', 'Write and run Python with built-in tests for eight exercises.', Object.keys(S().py || {}).length + ' of 8 solved'],
