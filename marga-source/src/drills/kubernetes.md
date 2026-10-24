@@ -1,0 +1,67 @@
+## CrashLoopBackOff with exit code 137
+level: junior
+A Pod restarts again and again after a new release.
+
+```text
+$ kubectl get pod api-7d9f-x2k
+NAME          READY  STATUS             RESTARTS
+api-7d9f-x2k  0/1    CrashLoopBackOff   9
+
+$ kubectl describe pod api-7d9f-x2k | grep -A6 "Last State"
+    Last State:  Terminated
+      Reason:    OOMKilled
+      Exit Code: 137
+    Limits:
+      memory:  256Mi
+```
+? What does this tell you?
++ The container used more memory than its limit, so check usage and raise the limit or fix the leak
+- The image cannot be pulled
+- The liveness probe path is wrong
+- The node has no free CPU
+why: `OOMKilled` and exit code 137 show the kernel stopped the container for exceeding its memory limit. Compare real usage with `kubectl top pod`, look at what changed in the release, and set requests and limits from measurements. A limit that is too tight causes loops like this one.
+
+## Pod stuck in Pending
+level: junior
+A new deployment never starts.
+
+```text
+$ kubectl get pod
+NAME         READY  STATUS   RESTARTS
+batch-5c-9z  0/1    Pending  0
+
+$ kubectl describe pod batch-5c-9z | tail -4
+Events:
+  Warning  FailedScheduling  0/3 nodes are available: 3 Insufficient cpu.
+$ kubectl get pod batch-5c-9z -o jsonpath='{.spec.containers[0].resources.requests}'
+{"cpu":"8"}
+```
+? What is the likely cause?
++ The Pod requests 8 CPUs, and no node has that much unreserved CPU
+- The cluster DNS is down
+- The image pull secret is missing
+- The Service has no endpoints
+why: The scheduler places Pods by their requests. "Insufficient cpu" means no node has enough unreserved CPU for the 8 requested. Reduce the request to a realistic value, free capacity, or add nodes of a larger size or let the autoscaler add them. Check nodes with `kubectl describe node` and look at the allocated resources.
+
+## Service with no endpoints
+level: mid
+Requests to a Service fail even though the Pods are Running.
+
+```text
+$ kubectl get svc web -o jsonpath='{.spec.selector}'
+{"app":"web"}
+
+$ kubectl get pods --show-labels
+NAME         READY  STATUS   LABELS
+webapp-6f-1  1/1    Running  app=webapp,pod-template-hash=6f
+
+$ kubectl get endpointslices -l kubernetes.io/service-name=web
+NAME        ADDRESSTYPE  PORTS  ENDPOINTS
+web-abc12   IPv4         8080   <unset>
+```
+? How do you fix it?
++ Make the Service selector match the Pod labels, here app=webapp
+- Restart the kube-proxy on every node
+- Increase the replica count
+- Change the Service type to NodePort
+why: A Service sends traffic only to Pods whose labels match its selector and which are Ready. The selector is `app=web` and the Pods are labelled `app=webapp`, so the endpoints are empty. Fix the selector or the labels. If labels match, check that the Pods pass their readiness probe and that the namespace is the same.
