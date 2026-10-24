@@ -18,6 +18,7 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
+<script src="assets/a11y.js?v={{VER}}"></script>
 <link rel="stylesheet" href="assets/app.css?v={{VER}}">
 </head>
 <body>
@@ -28,9 +29,13 @@
 </main>
 <div id="footer"></div>
 <div id="search-root"></div>
+<div id="a11y-root"></div>
 <div id="toast" role="status" aria-live="polite"></div>
 <script src="assets/data.js?v={{VER}}"></script>
 <script src="assets/voice.js?v={{VER}}"></script>
+<script src="assets/counter.js?v={{VER}}"></script>
+<script src="assets/calc.js?v={{VER}}"></script>
+<script src="assets/extras.js?v={{VER}}"></script>
 <script src="assets/app.js?v={{VER}}"></script>
 </body>
 </html>

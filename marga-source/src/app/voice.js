@@ -9,7 +9,7 @@ var store = {
   get: function (k, d) { try { var v = localStorage.getItem(k); return v === null ? d : v; } catch (x) { return d; } },
   set: function (k, v) { try { localStorage.setItem(k, v); } catch (x) { /* ignore */ } }
 };
-var state = { queue: [], pos: 0, playing: false, paused: false, token: 0, onchange: null };
+var state = { queue: [], els: [], pos: 0, playing: false, paused: false, token: 0, onchange: null };
 
 function loadVoices() {
   if (!supported) return;
@@ -55,11 +55,11 @@ function attr(s) { return esc(s).replace(/"/g, '&quot;'); }
 function chunksFrom(root) {
   var out = [];
   if (!root) return out;
-  var skip = '.code, pre, .copy, .toc, .voice, .no-voice, script, style, button, .actions, nav.crumbs, .pager';
+  var skip = '.code, pre, .copy, .toc, .voice, .no-voice, script, style, button, .actions, nav.crumbs, .pager, [hidden], .calc, .a11y-panel, textarea, select';
   var all = root.querySelectorAll('h1,h2,h3,h4,p,li,dt,dd,th,td,blockquote,figcaption,.code');
   all.forEach(function (el) {
     if (el.matches('.code')) {
-      if (!el.parentElement.closest('.code')) out.push('Code example. See the page for the commands.');
+      if (!el.parentElement.closest('.code')) out.push({ t: 'Code example. See the page for the commands.', el: el });
       return;
     }
     if (el.closest(skip)) return;
@@ -67,33 +67,48 @@ function chunksFrom(root) {
     var t = (el.textContent || '').replace(/\s+/g, ' ').trim();
     if (!t) return;
     if (/^H[1-4]$/.test(el.tagName)) t = t + '.';
-    out.push(t);
+    out.push({ t: t, el: el });
   });
-  // merge very short neighbours, split very long ones (engines stall on long utterances)
-  var merged = [];
-  out.forEach(function (t) {
-    sentences(t).forEach(function (s) {
+  // merge very short neighbours of the same element, split very long ones (engines stall on long utterances)
+  var merged = [], els = [];
+  out.forEach(function (o) {
+    sentences(o.t).forEach(function (s) {
       if (s.length > 240) s = s.replace(/(.{120,240}?[,;:]\s)/g, '$1|').split('|').join('\n');
       s.split('\n').forEach(function (p) {
-        var last = merged[merged.length - 1];
-        if (last && last.length + p.length < 160) merged[merged.length - 1] = last + ' ' + p;
-        else merged.push(p);
+        var k = merged.length - 1;
+        if (k >= 0 && els[k] === o.el && merged[k].length + p.length < 160) merged[k] = merged[k] + ' ' + p;
+        else { merged.push(p); els.push(o.el); }
       });
     });
   });
-  return merged.filter(Boolean);
+  var keep = [], keepEls = [];
+  merged.forEach(function (t, i) { if (t) { keep.push(t); keepEls.push(els[i]); } });
+  keep.els = keepEls;
+  return keep;
+}
+
+var marked = null;
+function highlightOn() { try { return (window.MargaA11y ? MargaA11y.get().hl : 'on') !== 'off'; } catch (x) { return true; } }
+function mark(el) {
+  if (marked) { marked.classList.remove('say-now'); marked = null; }
+  if (el && el.classList && highlightOn()) {
+    el.classList.add('say-now'); marked = el;
+    try { var r = el.getBoundingClientRect(); if (r.top < 70 || r.bottom > window.innerHeight - 20) el.scrollIntoView({ block: 'center', behavior: 'auto' }); } catch (x) { /* ignore */ }
+  }
 }
 
 function notify() { if (state.onchange) state.onchange(); }
 function stop() {
   state.token++;
-  state.queue = []; state.pos = 0; state.playing = false; state.paused = false;
+  state.queue = []; state.els = []; state.pos = 0; state.playing = false; state.paused = false;
+  mark(null);
   if (supported) synth.cancel();
   notify();
 }
 function next(tok) {
   if (tok !== state.token) return;
-  if (state.pos >= state.queue.length) { state.playing = false; state.paused = false; notify(); return; }
+  if (state.pos >= state.queue.length) { state.playing = false; state.paused = false; mark(null); notify(); return; }
+  mark(state.els[state.pos]);
   var u = new SpeechSynthesisUtterance(state.queue[state.pos]);
   var v = chosen(); if (v) { u.voice = v; u.lang = v.lang; }
   u.rate = rate();
@@ -101,11 +116,11 @@ function next(tok) {
   u.onerror = function (ev) { if (ev && (ev.error === 'canceled' || ev.error === 'interrupted')) return; state.pos++; next(tok); };
   synth.speak(u);
 }
-function speakList(list, onchange) {
+function speakList(list, onchange, els) {
   if (!supported || !list.length) return false;
   synth.cancel();
   state.token++;
-  state.queue = list; state.pos = 0; state.playing = true; state.paused = false; state.onchange = onchange || null;
+  state.queue = list; state.els = els || list.els || []; state.pos = 0; state.playing = true; state.paused = false; state.onchange = onchange || null;
   notify();
   var tok = state.token;
   setTimeout(function () { next(tok); }, 30);
@@ -151,7 +166,7 @@ function mount(slot, getRoot, label) {
   }
   play.addEventListener('click', function () {
     var list = chunksFrom(typeof getRoot === 'function' ? getRoot() : getRoot);
-    if (label) list.unshift(label + '.');
+    if (label) { list.unshift(label + '.'); list.els.unshift(null); }
     if (!list.length) { slot.querySelector('.voice-msg').textContent = 'Nothing to read on this page.'; return; }
     speakList(list, paint);
     paint();
@@ -162,8 +177,8 @@ function mount(slot, getRoot, label) {
   spd.addEventListener('change', function () { store.set('ea.rate', spd.value); restartIfMine(); });
   function restartIfMine() {
     if (state.onchange !== paint || !state.playing) return;
-    var rest = state.queue.slice(state.pos);
-    speakList(rest, paint);
+    var rest = state.queue.slice(state.pos), restEls = state.els.slice(state.pos);
+    speakList(rest, paint, restEls);
   }
   paint();
 }
