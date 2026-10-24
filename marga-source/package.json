@@ -1,0 +1,27 @@
+{
+  "name": "marga-eknathalabs",
+  "version": "1.0.0",
+  "description": "MARGA by EknathaLabs: role-based DevOps, cloud and SRE training site",
+  "main": "index.js",
+  "scripts": {
+    "build": "node tools/build.js",
+    "validate": "node tools/validate.js",
+    "e2e": "node tools/e2e.js",
+    "test": "node tools/build.js && node tools/validate.js && node tools/e2e.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/source-serif-4": "^5.3.1",
+    "highlight.js": "^11.12.0",
+    "marked": "^12.0.2"
+  },
+  "devDependencies": {
+    "axe-core": "^4.10.2",
+    "playwright": "^1.63.0"
+  },
+  "private": true
+}

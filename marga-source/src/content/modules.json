@@ -1,0 +1,72 @@
+[
+  {
+    "id": "linux",
+    "title": "Linux for engineers",
+    "summary": "Navigate, secure and troubleshoot a Linux server the way production work demands.",
+    "level": "Beginner",
+    "requires": []
+  },
+  {
+    "id": "bash",
+    "title": "Shell scripting",
+    "summary": "Write Bash scripts that fail loudly, run safely and replace repetitive manual work.",
+    "level": "Beginner",
+    "requires": ["linux"]
+  },
+  {
+    "id": "networking",
+    "title": "Networking essentials",
+    "summary": "Reason about addresses, DNS, HTTP, TLS and firewalls well enough to debug any connectivity failure.",
+    "level": "Beginner",
+    "requires": ["linux"]
+  },
+  {
+    "id": "docker",
+    "title": "Docker and containers",
+    "summary": "Build small, secure images and run multi-container applications with confidence.",
+    "level": "Beginner",
+    "requires": ["linux"]
+  },
+  {
+    "id": "cicd",
+    "title": "CI/CD and delivery",
+    "summary": "Design pipelines that build, test and ship safely, then deploy with rolling, canary and declarative delivery.",
+    "level": "Intermediate",
+    "requires": ["docker"]
+  },
+  {
+    "id": "kubernetes",
+    "title": "Kubernetes",
+    "summary": "Run workloads on Kubernetes, from architecture and networking to RBAC, troubleshooting and exam strategy.",
+    "level": "Intermediate",
+    "requires": ["docker", "networking"]
+  },
+  {
+    "id": "terraform",
+    "title": "Terraform and infrastructure as code",
+    "summary": "Describe infrastructure as code, manage state safely and structure reusable modules.",
+    "level": "Intermediate",
+    "requires": ["linux"]
+  },
+  {
+    "id": "cloud",
+    "title": "Cloud platforms: AWS and Azure",
+    "summary": "Core concepts side by side on AWS and Azure: identity, networks, compute, storage and cost.",
+    "level": "Intermediate",
+    "requires": ["networking"]
+  },
+  {
+    "id": "observability",
+    "title": "Observability",
+    "summary": "Instrument systems with metrics, logs and traces, and alert on what users actually feel.",
+    "level": "Intermediate",
+    "requires": ["linux"]
+  },
+  {
+    "id": "sre",
+    "title": "Site reliability engineering",
+    "summary": "Define reliability with SLOs, respond to incidents, learn from failures and remove toil.",
+    "level": "Advanced",
+    "requires": ["observability"]
+  }
+]
