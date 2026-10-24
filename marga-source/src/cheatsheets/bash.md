@@ -116,3 +116,82 @@ command -v jq >/dev/null || { echo "jq required" >&2; exit 1; }
 retry() { local n=0; until "$@"; do n=$((n+1)); [[ $n -ge 3 ]] && return 1; sleep $((2**n)); done; }
 exec 9>/tmp/job.lock && flock -n 9 || { echo "already running"; exit 1; }
 ```
+
+## Safer scripts
+
+```bash
+#!/usr/bin/env bash
+set -Eeuo pipefail
+IFS=$'\n\t'
+trap 'echo "failed at line $LINENO" >&2' ERR
+trap 'rm -rf -- "$tmp"' EXIT
+tmp=$(mktemp -d)
+: "${ENVIRONMENT:?set ENVIRONMENT}"
+command -v jq >/dev/null || { echo "jq is required" >&2; exit 1; }
+```
+
+> **Warning:** `set -e` is not a full safety net. It does not stop on failures inside `if` conditions, `&&` lists or command substitutions in some cases. Check exit codes of the commands that matter.
+
+> **Warning:** `rm -rf "$tmp"` with an empty `tmp` is dangerous. The `:?` form (`${tmp:?}`) stops the script instead.
+
+## Variables and expansion
+
+```bash
+name=${1:-default}
+echo "${path##*/}"
+echo "${file%.txt}.md"
+echo "${#name}"
+echo "${name^^}"
+arr=(a b c); echo "${arr[@]}" "${#arr[@]}"
+declare -A ages=([ann]=30 [bob]=25); echo "${ages[ann]}"
+echo "$(date +%F)"
+echo $((5 * 3))
+printf '%s\n' "${arr[@]}"
+```
+
+> **Warning:** Always quote variables: `"$var"`. An unquoted value with spaces splits into several arguments, and `*` is expanded to file names.
+
+## Loops, tests and functions
+
+```bash
+for f in *.log; do [ -e "$f" ] || continue; gzip "$f"; done
+while IFS= read -r line; do echo "$line"; done < hosts.txt
+[[ -f file && -r file ]] && echo readable
+[[ $x =~ ^[0-9]+$ ]] && echo number
+case "$1" in start) run ;; stop) halt ;; *) usage ;; esac
+retry() { local n=0; until "$@"; do ((++n >= 5)) && return 1; sleep $((2**n)); done; }
+```
+
+## Input, output and files
+
+```bash
+cmd > out.txt 2> err.txt
+cmd > all.txt 2>&1
+cmd | tee out.txt
+cmd <<'EOT'
+literal text, no expansion
+EOT
+exec 3>>audit.log; echo "ran" >&3
+mapfile -t lines < file.txt
+find . -name '*.tmp' -print0 | xargs -0 rm -f
+flock -n /tmp/job.lock ./job.sh
+```
+
+> **Warning:** `>` truncates the file immediately. A typo such as `cmd > important.conf` destroys the content. Use `set -o noclobber` or `>>` to append.
+
+> **Warning:** `eval` runs a string as code. Never pass user input to it. Prefer arrays and `"${cmd[@]}"`.
+
+> **Warning:** `xargs rm` and `find -delete` act at once. Run the command with `-print` or `echo` first.
+
+## Debugging
+
+```bash
+bash -n script.sh
+bash -x script.sh
+set -x; risky; set +x
+shellcheck script.sh
+PS4='+ ${BASH_SOURCE}:${LINENO}: ' bash -x script.sh
+echo "${PIPESTATUS[@]}"
+```
+
+> **Warning:** `set -x` prints every command, including ones that contain passwords or tokens. Turn it off around secrets, and do not leave it on in CI logs.

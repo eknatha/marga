@@ -141,3 +141,102 @@ k get pod NAME -o jsonpath='{.status.containerStatuses[0].lastState}'
 k get secret NAME -o jsonpath='{.data.password}' | base64 -d
 k get pods -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeName
 ```
+
+## Context and namespaces
+
+```bash
+kubectl config get-contexts
+kubectl config current-context
+kubectl config use-context staging
+kubectl config set-context --current --namespace=shop
+kubectl get ns
+kubectl api-resources --namespaced=true
+kubectl explain deployment.spec.strategy
+kubectl auth can-i delete pods -n shop
+kubectl auth can-i --list -n shop
+```
+
+> **Warning:** Check `kubectl config current-context` before any change. Most production accidents are the right command on the wrong cluster. Consider a prompt that shows the context.
+
+## Inspect and debug, more
+
+```bash
+kubectl get pods -A -o wide --field-selector status.phase!=Running
+kubectl get events -n shop --sort-by=.lastTimestamp
+kubectl describe pod api-0 -n shop
+kubectl logs api-0 -c app --previous --tail=200
+kubectl logs -l app=api --all-containers --since=15m
+kubectl exec -it api-0 -c app -- sh
+kubectl debug -it api-0 --image=busybox:1.36 --target=app
+kubectl debug node/worker-1 -it --image=busybox:1.36
+kubectl port-forward svc/api 8080:80 -n shop
+kubectl cp shop/api-0:/tmp/dump.txt ./dump.txt
+kubectl top pod -n shop --containers
+kubectl top node
+kubectl get pod api-0 -o yaml | less
+```
+
+> **Warning:** `kubectl exec` and `debug` give shell access to a running workload. Do not change files or install tools in a production container: the change is lost and may hide the real cause.
+
+> **Warning:** `kubectl port-forward` exposes the service to your machine only, but anything you paste through it goes to production. Never point a test tool at it.
+
+## Change safely
+
+```bash
+kubectl diff -f deploy.yaml
+kubectl apply -f deploy.yaml --dry-run=server
+kubectl apply -f deploy.yaml
+kubectl rollout status deploy/api -n shop
+kubectl rollout undo deploy/api -n shop
+kubectl scale deploy/api --replicas=5 -n shop
+kubectl set image deploy/api app=registry.example.com/api:1.5 -n shop
+kubectl annotate deploy/api kubernetes.io/change-cause="bump to 1.5"
+kubectl label pod api-0 debug=true
+kubectl patch deploy api -p '{"spec":{"replicas":3}}'
+```
+
+> **Warning:** `kubectl edit` and `patch` change live objects that are not in your source files, so the next `apply` or pipeline run can undo them silently, or the cluster can drift. Prefer changing the manifest and applying it.
+
+> **Warning:** `kubectl scale --replicas=0` stops the service. Do it only on purpose and say so in the incident channel.
+
+## Nodes and maintenance, more
+
+```bash
+kubectl get nodes -o wide
+kubectl describe node worker-1 | sed -n '/Taints/,/Conditions/p'
+kubectl cordon worker-1
+kubectl drain worker-1 --ignore-daemonsets --delete-emptydir-data --timeout=300s
+kubectl uncordon worker-1
+kubectl taint nodes worker-1 dedicated=gpu:NoSchedule
+kubectl get pdb -A
+```
+
+> **Warning:** `kubectl drain` evicts pods. With `--delete-emptydir-data` the data in emptyDir volumes is lost, and a PodDisruptionBudget of 0 can block it forever. Drain one node at a time and watch the rollout.
+
+> **Warning:** `kubectl delete node` removes the node object, not the machine. Drain first and confirm the cloud instance state.
+
+## Secrets and config
+
+```bash
+kubectl create secret generic db --from-literal=password='change-me' -n shop --dry-run=client -o yaml
+kubectl get secret db -n shop -o jsonpath='{.data.password}' | base64 -d
+kubectl create configmap app-config --from-file=app.properties
+kubectl get cm app-config -o yaml
+kubectl rollout restart deploy/api -n shop
+```
+
+> **Warning:** Base64 is not encryption. Anyone who can read a Secret can read its value. Restrict access with RBAC, and do not paste decoded values into chat or tickets.
+
+> **Warning:** Passwords on the command line end up in shell history. Prefer files or a secrets manager.
+
+## Cautions for destructive commands
+
+> **Warning:** `kubectl delete -f` and `kubectl delete ns shop` remove everything in the file or namespace, including volumes with `Delete` reclaim policy. Run `kubectl get all -n shop` and use `--dry-run=server` first.
+
+> **Warning:** `kubectl delete pod --force --grace-period=0` skips graceful shutdown and can leave a StatefulSet pod running twice. Use it only for stuck terminating pods after you confirm the node is gone.
+
+> **Warning:** `kubectl delete pvc` can delete the underlying disk. Check `kubectl get pv` for the reclaim policy first.
+
+> **Warning:** Commands with `-A` or `--all` act on every namespace. Read the output of the matching `get` before you run `delete`.
+
+> **Warning:** Do not bind `cluster-admin` to users or service accounts for convenience. Grant the smallest Role that works.

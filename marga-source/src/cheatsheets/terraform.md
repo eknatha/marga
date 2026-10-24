@@ -182,3 +182,77 @@ trivy config .
 terraform plan -detailed-exitcode     # 0 none, 1 error, 2 changes
 terraform test
 ```
+
+## Workflow with a saved plan
+
+```bash
+terraform fmt -recursive
+terraform validate
+terraform init -upgrade
+terraform plan -out=tfplan -input=false
+terraform show tfplan
+terraform show -json tfplan | jq '.resource_changes[] | select(.change.actions != ["no-op"]) | {a: .address, c: .change.actions}'
+terraform apply tfplan
+terraform output -json
+terraform providers
+terraform version
+```
+
+> **Warning:** Read the plan before you apply it, especially lines marked `destroy` or `must be replaced`. A change to one argument can force a new resource, such as a database.
+
+> **Warning:** `terraform apply -auto-approve` skips the human check. Use it only in a pipeline that applies a reviewed, saved plan.
+
+## State inspection and surgery
+
+```bash
+terraform state list
+terraform state show aws_instance.web
+terraform state pull > backup.tfstate
+terraform state mv aws_instance.web aws_instance.app
+terraform state rm aws_instance.old
+terraform import aws_s3_bucket.logs acme-logs
+terraform force-unlock LOCK_ID
+terraform refresh
+terraform taint aws_instance.web
+terraform apply -replace=aws_instance.web
+```
+
+> **Warning:** Always run `terraform state pull > backup.tfstate` before `state mv`, `state rm` or `import`. A wrong state edit can make Terraform destroy or duplicate real resources.
+
+> **Warning:** `terraform force-unlock` is only safe when you are sure that no other run is active. Check who holds the lock first.
+
+> **Warning:** Do not edit the state file by hand and do not commit it to a shared repository: it can contain secrets in plain text. Use a remote backend with encryption and locking.
+
+> **Warning:** `terraform taint` is deprecated. Use `apply -replace=ADDRESS`, which shows the effect in the plan.
+
+## Targeting, variables and workspaces
+
+```bash
+terraform plan -target=module.network
+terraform plan -var 'env=staging' -var-file=staging.tfvars
+terraform workspace list
+terraform workspace new staging
+terraform workspace select prod
+terraform console
+export TF_LOG=INFO TF_LOG_PATH=tf.log
+TF_VAR_db_password="$DB_PASSWORD" terraform plan
+```
+
+> **Warning:** `-target` skips dependencies and leaves the state out of step with the code. Use it only for recovery, then run a full plan.
+
+> **Warning:** `TF_LOG=TRACE` can write secrets and tokens into the log. Do not attach such logs to tickets.
+
+> **Warning:** Check `terraform workspace show` before apply. Applying to the wrong workspace is a common cause of production changes.
+
+## Destroy
+
+```bash
+terraform plan -destroy -out=destroy.tfplan
+terraform show destroy.tfplan | less
+terraform destroy -target=aws_instance.test
+lifecycle { prevent_destroy = true }
+```
+
+> **Warning:** `terraform destroy` deletes everything in the state, including databases and buckets. Always review `plan -destroy`, set `prevent_destroy` on critical resources, and turn on deletion protection in the cloud.
+
+> **Warning:** Provider upgrades with `init -upgrade` can change behaviour. Pin versions in `required_providers` and read the changelog.

@@ -119,3 +119,54 @@ az lock create --name no-delete --lock-type CanNotDelete --resource-group shop-p
 ```
 
 Azure Policy enforces rules such as allowed regions and required tags. Resource locks guard against accidental deletion.
+
+## Subscription and identity checks
+
+```bash
+az account show -o table
+az account list -o table
+az account set --subscription "Production"
+az ad signed-in-user show --query userPrincipalName
+az role assignment list --assignee user@example.com --all -o table
+az group list -o table
+az resource list -g rg-shop -o table
+az monitor activity-log list --offset 1d --query "[?level=='Error']" -o table
+```
+
+> **Warning:** Check `az account show` before every change. The default subscription can be production. Use `--subscription` in scripts instead of relying on the current one.
+
+## Compute and network, more
+
+```bash
+az vm list -d -g rg-shop -o table
+az vm deallocate -g rg-shop -n vm-web1
+az vm run-command invoke -g rg-shop -n vm-web1 --command-id RunShellScript --scripts "systemctl status nginx"
+az network nsg rule list -g rg-shop --nsg-name nsg-web -o table
+az network public-ip list -o table
+az network vnet subnet list -g rg-shop --vnet-name vnet-shop -o table
+az aks get-credentials -g rg-shop -n aks-shop --overwrite-existing
+az aks show -g rg-shop -n aks-shop --query "{version:kubernetesVersion,state:provisioningState}"
+az storage account show -n acmeshop --query "{https:enableHttpsTrafficOnly,public:allowBlobPublicAccess}"
+```
+
+> **Warning:** `az vm stop` keeps the VM allocated and you still pay for it. Use `az vm deallocate` to stop compute billing.
+
+> **Warning:** `az vm run-command` runs as root or SYSTEM. Treat the script as a production change and log it.
+
+> **Warning:** `az aks get-credentials --overwrite-existing` replaces the kube context of the same name. Check `kubectl config current-context` afterwards.
+
+## Delete and cost cautions
+
+```bash
+az group show -n rg-test --query "properties.provisioningState"
+az resource list -g rg-test -o table
+az group delete -n rg-test --no-wait
+az lock create --name keep --lock-type CanNotDelete -g rg-shop
+az consumption usage list --top 20 -o table
+```
+
+> **Warning:** `az group delete` removes every resource in the group, including databases and storage. List the resources first, and apply `CanNotDelete` locks to production groups.
+
+> **Warning:** `--yes` and `--no-wait` hide prompts and results. Do not add them to commands you have not run before.
+
+> **Warning:** Do not put client secrets in scripts. Use managed identities, and rotate service principal secrets before they expire.

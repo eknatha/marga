@@ -126,3 +126,67 @@ Keep toil below about half of an engineer's time.
 - Abort condition defined
 - Quiet period, people watching
 - Findings turned into tracked actions
+
+## SLO and error budget maths
+
+```promql
+sum(rate(http_requests_total{status!~"5.."}[30d])) / sum(rate(http_requests_total[30d]))
+1 - (sum(rate(http_requests_total{status!~"5.."}[1h])) / sum(rate(http_requests_total[1h])))
+(sum(rate(http_requests_total{status=~"5.."}[1h])) / sum(rate(http_requests_total[1h]))) / 0.001
+```
+
+```text
+99.9 percent over 30 days   = 43.2 minutes of error budget
+99.95 percent over 30 days  = 21.6 minutes
+99.99 percent over 30 days  = 4.3 minutes
+burn rate 14.4 for 1 hour   = 2 percent of the monthly budget gone
+burn rate 6 for 6 hours     = 5 percent of the monthly budget gone
+```
+
+> **Warning:** An SLO of 100 percent is not a goal: it leaves no room for change. Pick a target that users notice, and write down what happens when the budget is gone.
+
+> **Warning:** Measure the SLI where users are (load balancer, synthetic probe), not only inside the service. A healthy process behind a broken proxy still looks fine from the inside.
+
+## Incident commands and habits
+
+```bash
+date -u
+kubectl rollout history deploy/api -n shop
+kubectl rollout undo deploy/api -n shop
+kubectl get events -A --sort-by=.lastTimestamp | tail -30
+curl -s -o /dev/null -w '%{http_code} %{time_total}\n' https://example.com/healthz
+journalctl -u api --since "30 min ago" -p warning
+```
+
+```text
+1. Declare, name an incident commander, open one channel.
+2. Post the first update within 10 minutes, then at a fixed interval.
+3. Mitigate first (roll back, fail over, turn a flag off), find the cause later.
+4. Write down every change with a UTC time.
+5. Confirm recovery on the user-facing graph, then close.
+6. Hold a blameless review within 5 working days. Track actions with an owner and a date.
+```
+
+> **Warning:** In an incident do not make several changes at once. You will not know which one helped, or which one made it worse.
+
+> **Warning:** Do not restart a failing service just to see: you can lose the evidence in memory. Capture logs, `dmesg` and thread or heap information first when it is safe.
+
+> **Warning:** Never paste secrets or personal data into an incident channel or ticket. It is kept for a long time and many people can read it.
+
+## Capacity and resilience checks
+
+```bash
+kubectl top nodes
+kubectl get hpa -A
+kubectl get pdb -A
+df -h; df -i
+free -m; vmstat 1 5
+iostat -xz 1 5
+curl -s localhost:9090/api/v1/query --data-urlencode 'query=predict_linear(node_filesystem_avail_bytes[6h], 7*86400)' | jq .
+```
+
+> **Warning:** Load and chaos tests belong in a test environment first. In production, start small, have a way to stop, have a named owner and tell the on-call team beforehand.
+
+> **Warning:** Do not remove an alert because it is noisy. Fix the cause or the threshold, and keep the page for something a human must do now.
+
+> **Warning:** Untested backups are not backups. Restore into a clean environment on a schedule and measure how long it takes.

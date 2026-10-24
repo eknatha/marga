@@ -142,3 +142,64 @@ Page on symptoms; ticket for slow-burn causes; dashboards for the rest.
 ```bash
 curl -s localhost:9090/api/v1/status/tsdb | jq '.data.seriesCountByMetricName[0:5]'
 ```
+
+## Query patterns to know
+
+```promql
+sum by (status) (rate(http_requests_total[5m]))
+sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m]))
+histogram_quantile(0.99, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))
+1 - avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m]))
+node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes
+predict_linear(node_filesystem_avail_bytes{mountpoint="/"}[6h], 24 * 3600) < 0
+increase(kube_pod_container_status_restarts_total[1h]) > 3
+up == 0
+count by (job) (up)
+topk(5, sum by (pod) (container_memory_working_set_bytes))
+absent(up{job="api"})
+```
+
+> **Warning:** Use `rate()` on counters, never plot a raw counter. And take the rate before you aggregate: `sum(rate(x[5m]))`, not `rate(sum(x)[5m])`.
+
+> **Warning:** Labels with many values, such as user ID, URL or request ID, create huge numbers of series and can crash Prometheus. Keep label values bounded.
+
+## Operate the server
+
+```bash
+promtool check config /etc/prometheus/prometheus.yml
+promtool check rules /etc/prometheus/rules/*.yml
+promtool test rules tests/alerts_test.yml
+promtool query instant http://localhost:9090 'up'
+curl -s localhost:9090/api/v1/targets | jq '.data.activeTargets[] | {job:.labels.job, health:.health, err:.lastError}'
+curl -s localhost:9090/api/v1/alerts | jq '.data.alerts[].labels'
+curl -X POST localhost:9090/-/reload
+curl -s localhost:9090/api/v1/status/tsdb | jq '.data.seriesCountByMetricName[:5]'
+amtool alert query
+amtool silence add alertname=HighLatency --duration=2h --comment="deploy in progress" --author=me
+amtool config routes test --config.file=alertmanager.yml severity=page team=shop
+```
+
+> **Warning:** Run `promtool check config` and `check rules` before every reload. A bad file stops the reload, or worse, a restart.
+
+> **Warning:** A silence hides pages for everyone. Give it a short duration, a clear comment and an owner, and remove it when the work ends.
+
+> **Warning:** The admin API (`/api/v1/admin/tsdb/delete_series`) permanently deletes data. Keep it disabled unless you need it, and never expose Prometheus to the internet without authentication.
+
+> **Warning:** Reducing retention or deleting the data directory loses history, which you need for capacity trends and postmortems.
+
+## Alert rule skeleton
+
+```yaml
+groups:
+  - name: api
+    rules:
+      - alert: HighErrorRatio
+        expr: sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) > 0.02
+        for: 10m
+        labels: {severity: page, team: shop}
+        annotations:
+          summary: "More than 2 percent of requests fail"
+          runbook_url: "https://runbooks.example.com/high-error-ratio"
+```
+
+> **Warning:** An alert without `for` fires on every blip, and one without a runbook link wakes people for no reason. Alert on symptoms that users feel, not on every cause.

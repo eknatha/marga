@@ -99,3 +99,50 @@ patches:
 ```
 
 Base files stay valid YAML; overlays patch them per environment.
+
+## Find and inspect charts
+
+```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+helm search repo nginx --versions | head
+helm show values bitnami/nginx > values-default.yaml
+helm show chart bitnami/nginx
+helm pull bitnami/nginx --untar --version 18.2.0
+helm lint ./mychart
+helm template web ./mychart -f values-prod.yaml | less
+```
+
+> **Warning:** A chart is code that creates cluster resources. Read the templates and the values of third-party charts before installing, and pin the chart version with `--version`.
+
+## Install, upgrade, roll back
+
+```bash
+helm install web ./mychart -n shop --create-namespace -f values-prod.yaml
+helm upgrade --install web ./mychart -n shop -f values-prod.yaml --atomic --timeout 5m
+helm upgrade web ./mychart -n shop --reuse-values --set image.tag=1.5
+helm diff upgrade web ./mychart -n shop -f values-prod.yaml
+helm list -A
+helm status web -n shop
+helm history web -n shop
+helm rollback web 3 -n shop --wait
+helm get values web -n shop --all
+helm get manifest web -n shop
+helm test web -n shop
+```
+
+> **Warning:** `--reuse-values` keeps old values and ignores new chart defaults, which can hide a broken upgrade. Prefer passing the full values file each time.
+
+> **Warning:** `helm upgrade --install` without `--atomic` can leave a half-upgraded release. Use `--atomic` and `--timeout`, and check `helm history` after a failure.
+
+> **Warning:** `helm diff` is a separate plugin (`helm plugin list`). Install the helm-diff plugin before touching production, so you see the change before you apply it.
+
+## Remove
+
+```bash
+helm uninstall web -n shop --dry-run
+helm uninstall web -n shop
+helm uninstall web -n shop --keep-history
+```
+
+> **Warning:** `helm uninstall` deletes every resource of the release, and persistent volume claims may follow depending on the chart. Back up data first. CRDs installed from a chart's `crds/` folder are not removed by Helm.

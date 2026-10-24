@@ -132,3 +132,93 @@ systemd-analyze security shop.service     # exposure score and suggestions
 | `status=200/CHDIR` | Missing working directory |
 | Restart loop | App crashes; read the journal; check `RestartSec` |
 | `start-limit-hit` | Too many rapid restarts; fix cause, then `systemctl reset-failed NAME` |
+
+## Inspect units and boot
+
+```bash
+systemctl status nginx --no-pager -l
+systemctl is-active nginx; systemctl is-enabled nginx
+systemctl list-units --failed
+systemctl list-timers --all
+systemctl cat nginx
+systemctl show nginx -p ExecStart -p Restart -p MainPID
+systemctl list-dependencies multi-user.target --reverse | head
+systemd-analyze blame | head
+systemd-analyze critical-chain
+systemd-analyze verify /etc/systemd/system/app.service
+systemd-analyze security app.service
+```
+
+## Change units safely
+
+```bash
+sudo systemctl edit app.service
+sudo systemctl daemon-reload
+sudo systemctl restart app.service
+sudo systemctl reload nginx
+sudo systemctl enable --now app.service
+sudo systemctl disable --now app.service
+sudo systemctl mask unwanted.service
+sudo systemctl revert app.service
+sudo systemctl set-property app.service MemoryMax=1G
+```
+
+> **Warning:** Do not edit files under `/usr/lib/systemd/system`: a package update overwrites them. Use `systemctl edit` to create a drop-in.
+
+> **Warning:** `restart` stops and starts the service, so users see an interruption. Use `reload` when the program supports it, and test the config first (for example `nginx -t`).
+
+> **Warning:** Always run `daemon-reload` after changing unit files, and check `systemctl status` for the result. A broken unit can leave a service down.
+
+> **Warning:** `systemctl mask` makes a unit impossible to start, even as a dependency. `isolate`, `poweroff`, `reboot` and `rescue` change the state of the whole machine, so confirm the host with `hostname` first.
+
+## Logs with journalctl
+
+```bash
+journalctl -u app.service -f
+journalctl -u app.service --since "1 hour ago" -p err
+journalctl -b -1 -p err
+journalctl -k --since today
+journalctl --list-boots
+journalctl _PID=1234
+journalctl -o json-pretty -n 1 -u app.service
+journalctl --disk-usage
+sudo journalctl --vacuum-time=14d
+```
+
+> **Warning:** `journalctl --vacuum-*` deletes old logs for good. Keep what you need for audits and postmortems, and check `Storage=persistent` if logs must survive a reboot.
+
+## Timers and unit templates
+
+```ini
+[Unit]
+Description=Nightly cleanup
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/cleanup.sh
+[Install]
+WantedBy=multi-user.target
+```
+
+```ini
+[Timer]
+OnCalendar=*-*-* 02:30:00
+Persistent=true
+RandomizedDelaySec=300
+[Install]
+WantedBy=timers.target
+```
+
+```ini
+[Service]
+Restart=on-failure
+RestartSec=5
+StartLimitBurst=5
+StartLimitIntervalSec=60
+NoNewPrivileges=true
+ProtectSystem=strict
+PrivateTmp=true
+```
+
+> **Warning:** `Restart=always` with no limit can hide a crash loop that burns CPU and fills logs. Set `RestartSec` and the start limits, and alert on restarts.
+
+> **Warning:** A unit that runs as root with no sandbox options has full access. Use a dedicated user and options such as `NoNewPrivileges` and `ProtectSystem`.

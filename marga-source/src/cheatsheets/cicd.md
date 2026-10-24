@@ -123,3 +123,54 @@ Pull model: credentials stay in the cluster, drift is detected, and rollback is 
 - Separate plan or build permissions from deploy permissions
 - Scan images and dependencies; fail on high severity
 - Deploy only from the main branch after review
+
+## Pipeline hygiene commands
+
+```bash
+yamllint .ci/pipeline.yml
+actionlint
+docker run --rm -v "$PWD":/src hadolint/hadolint hadolint /src/Dockerfile
+shellcheck ci/*.sh
+trivy image --severity HIGH,CRITICAL --exit-code 1 app:1.4
+trivy fs --scanners vuln,secret .
+syft app:1.4 -o spdx-json > sbom.json
+cosign sign --key cosign.key registry.example.com/app@sha256:ABC123
+cosign verify --key cosign.pub registry.example.com/app@sha256:ABC123
+```
+
+> **Warning:** Do not hide a failing scan with `|| true` or `--exit-code 0` to make the build green. If a finding is accepted, record it with an owner and an expiry date.
+
+> **Warning:** Never print secrets in a pipeline log, and do not run `env` or `set -x` in a step that has secrets. Masking works only for values that the system knows as secrets.
+
+## Build, test and promote
+
+```bash
+make test
+pytest -q --maxfail=1 --junitxml=report.xml
+npm ci && npm test
+docker build --pull --cache-from app:cache -t app:$SHORT_SHA .
+docker push registry.example.com/app:$SHORT_SHA
+docker buildx imagetools inspect registry.example.com/app:$SHORT_SHA
+curl -fsS https://staging.example.com/healthz
+curl -fsS -o /dev/null -w '%{http_code}\n' https://staging.example.com/version
+```
+
+> **Warning:** Use `npm ci` or a lock file install in CI, not `npm install`. Unlocked installs make builds that cannot be repeated.
+
+> **Warning:** Build once and promote the same artifact through environments. Rebuilding for production means that you ship something nobody tested.
+
+## Deploy and rollback
+
+```bash
+kubectl set image deploy/api app=registry.example.com/app:$SHORT_SHA -n shop
+kubectl rollout status deploy/api -n shop --timeout=180s
+kubectl rollout undo deploy/api -n shop
+helm upgrade --install api ./chart -n shop --atomic --timeout 5m
+curl -fsS https://example.com/healthz || exit 1
+```
+
+> **Warning:** Do not let a pipeline deploy to production with admin credentials that live forever. Use short-lived credentials, a protected environment and a manual approval for risky changes.
+
+> **Warning:** A rollback does not undo database changes. Make migrations backward compatible, and ship them before the code that needs them.
+
+> **Warning:** Re-running an old pipeline can redeploy an old version over a newer one. Check the commit and the version before you press retry.

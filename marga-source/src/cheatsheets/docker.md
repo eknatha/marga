@@ -124,3 +124,86 @@ docker run -d --name api \
 ```
 
 Avoid `--privileged` and mounting `/var/run/docker.sock` into containers.
+
+## Images and registries, more
+
+```bash
+docker image ls --digests
+docker history --no-trunc app:1.4
+docker image inspect app:1.4 --format '{{.Config.User}} {{.Config.Entrypoint}}'
+docker tag app:1.4 registry.example.com/team/app:1.4
+docker push registry.example.com/team/app:1.4
+docker save -o app.tar app:1.4
+docker load -i app.tar
+docker buildx build --platform linux/amd64,linux/arm64 -t app:1.4 .
+docker scout cves app:1.4
+```
+
+> **Warning:** Do not tag production deployments with `latest`. It moves, so two hosts can run different code. Pin a version tag or, better, a digest.
+
+> **Warning:** Never copy secrets into an image with `COPY` or `ARG`. They stay in the image layers and in `docker history`. Use build secrets (`--secret`) or runtime injection.
+
+## Run and inspect containers, more
+
+```bash
+docker run -d --name web --restart unless-stopped -p 8080:80 nginx:1.27
+docker run --rm -it --user 1000:1000 --read-only --cap-drop ALL alpine sh
+docker run --memory 512m --cpus 1.5 app:1.4
+docker exec -it web sh
+docker logs -f --tail 100 --since 10m web
+docker inspect web --format '{{.State.Health.Status}} {{.NetworkSettings.IPAddress}}'
+docker stats --no-stream
+docker top web
+docker diff web
+docker cp web:/etc/nginx/nginx.conf ./nginx.conf
+docker port web
+docker events --since 10m
+```
+
+> **Warning:** `--privileged` gives a container nearly full access to the host. Do not use it unless you understand why, and never mount `/var/run/docker.sock` into an untrusted container: it is root on the host.
+
+> **Warning:** Publishing with `-p 8080:80` listens on all interfaces and Docker edits firewall rules itself. Bind to localhost with `-p 127.0.0.1:8080:80` when the service is private.
+
+## Volumes and networks
+
+```bash
+docker volume ls
+docker volume inspect pgdata
+docker run -v pgdata:/var/lib/postgresql/data postgres:16
+docker run -v "$PWD":/work:ro alpine ls /work
+docker network ls
+docker network create --driver bridge backend
+docker network connect backend web
+docker network inspect backend
+```
+
+> **Warning:** Data written inside a container is lost when the container is removed. Keep state in named volumes and back them up.
+
+> **Warning:** A bind mount such as `-v /:/host` exposes the host filesystem. Mount only what you need, and read-only (`:ro`) where possible.
+
+## Compose
+
+```bash
+docker compose config
+docker compose up -d --build
+docker compose ps
+docker compose logs -f api
+docker compose exec api sh
+docker compose pull && docker compose up -d
+docker compose down
+```
+
+> **Warning:** `docker compose down -v` also deletes the named volumes, including your database. Use plain `down` unless you really want to wipe the data.
+
+## Cleanup and cautions
+
+```bash
+docker system df
+docker container prune
+docker image prune
+docker builder prune --filter until=168h
+```
+
+> **Warning:** `docker system prune -a --volumes` removes every unused image, stopped container and unused volume. On a shared host that can delete someone else's data. Look at `docker system df` and prune one resource type at a time.
+
+> **Warning:** `docker rm -f` kills a running container without a graceful stop. Use `docker stop` first, which sends SIGTERM and waits.
