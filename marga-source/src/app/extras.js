@@ -25,6 +25,8 @@ function sel(id, label, options, cur) {
 function say(btn, text) { return '<button type="button" class="btn btn-quiet say" data-say="' + e(text) + '">Read aloud</button>'; }
 
 /* =========================================================== Practice hub */
+function labN(l) { return ((D.labs || {})[l] || []).length; }
+function labDone(l) { var m = (S().lab || {}); return ((D.labs || {})[l] || []).filter(function (x) { return m[l + ':' + x.id]; }).length; }
 function practiceView() {
   var dr = bag('dr'), solved = Object.keys(dr).filter(function (k) { return dr[k].ok; }).length;
   var fc = bag('fc'), known = Object.keys(fc).filter(function (k) { return fc[k] === 'k'; }).length;
@@ -36,8 +38,11 @@ function practiceView() {
     ['#/daily', 'Daily challenge', 'One quiz question a day from the lessons. Keep the daily streak going.', 'Daily streak ' + (S().dc ? Object.keys(S().dc).length + ' answered' : 'not started')],
     ['#/explainers', 'Animated explainers', 'Step through how boot, DNS, TLS, pods, pipelines, Terraform, incidents and more really work.', (window.MARGA_EXPLAINERS || []).length + ' explainers'],
     ['#/subnet', 'Subnet and CIDR playground', 'Inspect networks, split them, plan VLSM for a VPC and merge routes.', 'Runs in your browser'],
-    ['#/playground/yaml', 'YAML playground', 'Check YAML and Kubernetes manifests, convert to JSON, find risky settings.', 'Runs in your browser'],
-    ['#/playground/python', 'Python playground', 'Write and run Python with built-in tests for eight exercises.', Object.keys(S().py || {}).length + ' of 8 solved'],
+    ['#/playground/yaml', 'YAML playground', 'Check YAML and Kubernetes manifests, convert to JSON, find risky settings, and practise with ' + labN('yaml') + ' exercises.', labDone('yaml') + ' of ' + labN('yaml') + ' solved'],
+    ['#/playground/python', 'Python playground', 'Write and run Python with built-in tests for ' + (8 + labN('python')) + ' exercises.', Object.keys(S().py || {}).length + ' of ' + (8 + labN('python')) + ' solved'],
+    ['#/playground/go', 'Go playground', 'Thirty Go exercises for operations work, run on the public Go Playground.', labDone('go') + ' of ' + labN('go') + ' solved'],
+    ['#/playground/hcl', 'Terraform (HCL) playground', 'Write Terraform configuration and get it checked: variables, resources, modules, state and lifecycle.', labDone('hcl') + ' of ' + labN('hcl') + ' solved'],
+    ['#/playground/sql', 'SQL for SREs', 'Query deploys, incidents, alerts and SLO data with a real SQLite database in your browser.', labDone('sql') + ' of ' + labN('sql') + ' solved'],
     ['#/glossary', 'Glossary', 'Plain-words meanings for ' + (D.glossary || []).length + ' terms, also shown inside lessons.', (D.glossary || []).length + ' terms'],
     ['#/drills', 'Troubleshooting drills', 'Read real output, find the cause, pick the fix. Three scenarios for every stage.', solved + ' of ' + DRILLS.length + ' solved'],
     ['#/interview/mock', 'Mock interview', 'A timed run of questions for your role. Reveal the model answer, score yourself, find weak topics.', mock.length ? 'Best score ' + best + '%' : 'Not tried yet'],

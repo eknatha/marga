@@ -44,7 +44,7 @@ function load() {
   return memStore || fresh();
 }
 var S = load();
-function save() { memStore = S; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (x) { /* ignore */ } }
+function save() { memStore = S; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (x) { /* ignore */ } if (typeof refreshTree === 'function') refreshTree(); }
 
 function dayKey(d) {
   d = d || new Date();
@@ -231,8 +231,9 @@ function drawTree() {
         if (!r || !nodes[r]) return;
         var a = nodes[r].querySelector('.ring').getBoundingClientRect(), b = nodes[id].querySelector('.ring').getBoundingClientRect();
         var x1 = (a.left + a.width / 2 - box.left) * k, y1 = (a.top + a.height - box.top) * k, x2 = (b.left + b.width / 2 - box.left) * k, y2 = (b.top - box.top) * k;
-        var my = (y1 + y2) / 2, done = nodes[r].classList.contains('s-pass');
-        out += '<path d="M' + x1 + ' ' + y1 + ' C' + x1 + ' ' + my + ' ' + x2 + ' ' + my + ' ' + x2 + ' ' + y2 + '" class="' + (done ? 'ln done' : 'ln') + '"/>';
+        var my = (y1 + y2) / 2, done = nodes[r].classList.contains('s-pass'), cs = nodes[id].classList;
+        var cls = done && cs.contains('s-pass') ? 'ln done' : done && cs.contains('s-run') ? 'ln active run' : done && cs.contains('s-ready') ? 'ln active' : 'ln';
+        out += '<path d="M' + x1 + ' ' + y1 + ' C' + x1 + ' ' + my + ' ' + x2 + ' ' + my + ' ' + x2 + ' ' + y2 + '" class="' + cls + '"/>';
       });
     });
     svg.innerHTML = out;
@@ -241,11 +242,31 @@ function drawTree() {
 var treeRO = null;
 function armTree() {
   var tr = $('.tree'); if (!tr) return;
+  treeSig = treeState();
   requestAnimationFrame(function () { requestAnimationFrame(drawTree); });
   if (window.ResizeObserver) { if (treeRO) treeRO.disconnect(); treeRO = new ResizeObserver(function () { drawTree(); }); treeRO.observe(tr); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawTree);
 }
 window.addEventListener('resize', function () { drawTree(); });
+/* Live tree: rebuild the nodes whenever progress changes (same tab, other tab, or returning to the tab). */
+var treeSig = '';
+function treeState() { return JSON.stringify(S.lessons || {}); }
+function refreshTree() {
+  var wrap = $('.tree-wrap'); if (!wrap) { treeSig = ''; return; }
+  var tr = $('.tree', wrap), p = tr && PATH[tr.getAttribute('data-path')]; if (!p) return;
+  var sig = treeState(); if (sig === treeSig) return; var first = !treeSig; treeSig = sig;
+  if (first) return;
+  var before = {}; $$('.node', wrap).forEach(function (n) { before[n.getAttribute('data-id')] = n.className; });
+  var tmp = document.createElement('div'); tmp.innerHTML = treeHtml(p);
+  wrap.innerHTML = tmp.firstChild.innerHTML;
+  $$('.node', wrap).forEach(function (n) { if (before[n.getAttribute('data-id')] !== n.className) n.classList.add('just'); });
+  armTree();
+}
+window.addEventListener('storage', function (ev) {
+  if (ev.key !== KEY) return;
+  try { var v = JSON.parse(ev.newValue || 'null'); if (v && v.lessons) { S.lessons = v.lessons; refreshTree(); } } catch (x) { /* ignore */ }
+});
+document.addEventListener('visibilitychange', function () { if (!document.hidden) refreshTree(); });
 
 /* ---------- views ---------- */
 var view = { title: '', html: '', after: null, nav: '', voice: '', voiceLabel: '' };
@@ -271,7 +292,7 @@ function homeView() {
   var nCases = (D.cases || []).length, nArch = (D.arch || []).length, nDrills = (D.drills || []).length, nIv = (IV || []).length, nEx = (window.MARGA_EXPLAINERS || []).length;
   var stats = [[t.total, 'lessons with checks'], [nCases, 'real incidents'], [nDrills, 'troubleshooting drills'], [nIv, 'interview answers'], [nEx, 'animated explainers']].map(function (x) { return '<div><b>' + x[0] + '</b><span>' + x[1] + '</span></div>'; }).join('');
   var TL = [['09:37', 'An engineer runs a command to remove a few servers.'], ['09:37', 'A mistyped input removes far more than intended.', 1], ['After', 'The index and placement subsystems stop serving requests.'], ['Midday', 'A full restart takes much longer than expected.'], ['About four hours', 'S3 is fully back.']];
-  var tools = [['#/subnet', 'Subnet and CIDR', 'Split networks, plan VLSM, merge routes.'], ['#/playground/yaml', 'YAML playground', 'Find errors and risky Kubernetes settings.'], ['#/playground/python', 'Python playground', 'Run Python with built-in tests.'], ['#/explainers', 'Animated explainers', 'DNS, TLS, pods, rolling updates and more.']];
+  var tools = [['#/subnet', 'Subnet and CIDR', 'Split networks, plan VLSM, merge routes.'], ['#/playground/yaml', 'YAML playground', 'Find errors and risky Kubernetes settings.'], ['#/playground/python', 'Python playground', 'Run Python with built-in tests.'], ['#/playground/go', 'Go playground', '30 Go exercises run on the Go Playground.'], ['#/playground/hcl', 'Terraform playground', '30 HCL exercises checked in the browser.'], ['#/playground/sql', 'SQL for SREs', '20 SQL exercises on a real SQLite engine.'], ['#/explainers', 'Animated explainers', 'DNS, TLS, pods, rolling updates and more.']];
   view.html =
     '<section class="hero hero2"><div class="wrap hero-grid2">' +
     '<div class="hero-copy"><h1>Learn to fix production before production breaks.</h1>' +
@@ -761,7 +782,7 @@ function progressView() {
           var o = JSON.parse(r.result);
           if (!o || o.v !== 1 || typeof o.lessons !== 'object' || !Array.isArray(o.days)) throw new Error('bad');
           S = { v: 1, lessons: o.lessons || {}, cards: o.cards || {}, days: o.days, path: o.path || 'devops', iv: (o.iv && typeof o.iv === 'object') ? o.iv : {} };
-          ['cs', 'dr', 'fc', 'dc', 'py'].forEach(function (k) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) S[k] = o[k]; });
+          ['cs', 'dr', 'fc', 'dc', 'py', 'lab'].forEach(function (k) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) S[k] = o[k]; });
           if (Array.isArray(o.mock)) S.mock = o.mock.slice(-20);
           save(); renderChrome(); toast('Progress imported.'); route();
         } catch (x) { toast('That file is not a MARGA progress export.'); }
@@ -822,6 +843,9 @@ function buildIndex() {
   [['Subnet and CIDR playground', 'Split networks, check addresses, plan VLSM, summarise routes', '#/subnet', 'ip cidr subnet mask vlsm netmask'],
    ['YAML playground', 'Check YAML and Kubernetes manifests in the browser', '#/playground/yaml', 'yaml validate kubernetes manifest json lint'],
    ['Python playground', 'Run Python in the browser', '#/playground/python', 'python run code exercises'],
+   ['Go playground', 'Go exercises run on the Go Playground', '#/playground/go', 'go golang run code exercises'],
+   ['Terraform playground', 'HCL exercises checked in the browser', '#/playground/hcl', 'terraform hcl lint exercises'],
+   ['SQL for SREs', 'SQL exercises on SQLite in the browser', '#/playground/sql', 'sql sqlite query exercises'],
    ['Daily challenge', 'One question a day with a streak', '#/daily', 'quiz question streak'],
    ['Today: interview and case of the day', 'A fresh question and incident every day', '#/today', 'interview of the day case of the day']].forEach(function (x) { addIdx('Tool', 'Practice', x[0], x[1], x[2], x[1], x[3]); });
   if (window.MargaSearch) MargaSearch.build(INDEX);
@@ -975,6 +999,7 @@ var api = {
 window.MargaApp = api;
 if (typeof window.MargaExtras === 'function') window.MargaExtras(api);
 if (typeof window.MargaMore === 'function') window.MargaMore(api);
+if (typeof window.MargaLabs === 'function') window.MargaLabs(api);
 
 /* ---------- accessibility panel ---------- */
 (function () {

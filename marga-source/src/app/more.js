@@ -400,8 +400,8 @@ function yamlView() {
     '<label class="field"><span>YAML or JSON</span><textarea id="yp-in" class="editor" rows="18" spellcheck="false" autocomplete="off" autocapitalize="off" aria-describedby="yp-hint"></textarea></label><p class="small" id="yp-hint">Checks run as you type. Several documents separated by --- are supported.</p>' +
     '<div class="actions"><button type="button" class="btn btn-primary" data-act="yaml-format">Format as YAML</button><button type="button" class="btn btn-quiet" data-act="yaml-json">Convert to JSON</button><button type="button" class="btn btn-quiet" data-act="yaml-copy">Copy result</button></div>' +
     '<div id="yp-status" role="status" aria-live="polite"></div><div id="yp-lint"></div><pre class="evidence" id="yp-out" tabindex="0" aria-label="Result" hidden><code></code></pre>' +
-    '<section class="note-panel"><h3>Common YAML mistakes</h3><ul><li>Tabs instead of spaces. YAML only allows spaces for indentation.</li><li>A key written twice. The second silently wins in some tools, so this tool reports it.</li><li>Unquoted values that look like something else, such as 1.10, 08, or yes and no in older parsers. Quote them when they must be text.</li><li>A list item that is not aligned with its siblings.</li></ul></section></div>';
-  view.after = yamlWire;
+    '<div id="yx"></div><section class="note-panel"><h3>Common YAML mistakes</h3><ul><li>Tabs instead of spaces. YAML only allows spaces for indentation.</li><li>A key written twice. The second silently wins in some tools, so this tool reports it.</li><li>Unquoted values that look like something else, such as 1.10, 08, or yes and no in older parsers. Quote them when they must be text.</li><li>A list item that is not aligned with its siblings.</li></ul></section></div>';
+  view.after = function () { yamlWire(); if (A.yamlExercises) A.yamlExercises(); };
 }
 function ypLoad(text) {
   var docs, y = window.jsyaml;
@@ -517,6 +517,7 @@ var PY_EX = [
     start: 'import ipaddress\n\ndef usable_hosts(cidr):\n    pass\n', sol: 'import ipaddress\n\ndef usable_hosts(cidr):\n    net = ipaddress.ip_network(cidr, strict=False)\n    if net.prefixlen >= 31:\n        return net.num_addresses\n    return net.num_addresses - 2\n',
     tests: 'assert usable_hosts("10.0.0.0/24") == 254\nassert usable_hosts("10.0.0.0/31") == 2\nassert usable_hosts("10.0.0.5/32") == 1\nassert usable_hosts("192.168.1.130/26") == 62\n' }
 ];
+PY_EX = PY_EX.concat((D.labs && D.labs.python) || []);
 function pyLoad() {
   if (PY.py) return Promise.resolve(PY.py);
   if (PY.promise) return PY.promise;
@@ -537,7 +538,7 @@ function pyView() {
   view.html = head('Python playground', 'Write and run real Python in your browser, then check your answer against built-in tests. Python itself (about 10 MB) is downloaded from a public CDN the first time you press Load, then your browser keeps it. Your code never leaves your device.') +
     '<div class="wrap narrow pyp"><div class="actions"><button type="button" class="btn btn-primary" data-act="py-load" id="py-load">Load Python</button><span class="small" id="py-state" role="status" aria-live="polite">Python is not loaded yet.</span></div>' +
     sel('py-ex', 'Exercise', [['free', 'Free play (no tests)']].concat(PY_EX.map(function (x, i) { return [x.id, (solved[x.id] ? 'Solved: ' : '') + (i + 1) + '. ' + x.title]; })), 'free') +
-    '<p id="py-task" class="py-task"></p>' +
+    '<p id="py-task" class="py-task"></p><details id="py-hintbox" hidden><summary>Hint</summary><p id="py-hint"></p></details>' +
     '<label class="field"><span>Python code</span><textarea id="py-code" class="editor" rows="14" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea></label>' +
     '<div class="actions"><button type="button" class="btn btn-primary" data-act="py-run" id="py-run" disabled>Run (Ctrl+Enter)</button><button type="button" class="btn btn-quiet" data-act="py-check" id="py-check" disabled>Check my answer</button><button type="button" class="btn btn-quiet" data-act="py-reset">Reset code</button><button type="button" class="btn btn-quiet" data-act="py-sol" id="py-solbtn" aria-expanded="false">Show a solution</button></div>' +
     '<div id="py-res" role="status" aria-live="polite"></div><pre class="evidence" id="py-out" tabindex="0" aria-label="Program output" hidden><code></code></pre><pre class="evidence" id="py-sol" hidden aria-label="A solution"><code></code></pre>' +
@@ -549,6 +550,7 @@ function pyShow(id) {
   var x = pyFind(id);
   $('#py-task').textContent = x ? x.task : 'Free play: write anything and press Run. Try print("hello") or import ipaddress.';
   $('#py-code').value = x ? x.start : 'import json\n\nservice = {"name": "api", "replicas": 3}\nprint(json.dumps(service, indent=2))\n';
+  var hb = $('#py-hintbox'); if (hb) { hb.hidden = !(x && x.hint); if (x && x.hint) { $('#py-hint').textContent = x.hint; hb.open = false; } }
   $('#py-check').hidden = !x; $('#py-solbtn').hidden = !x; $('#py-sol').hidden = true; $('#py-res').innerHTML = ''; $('#py-out').hidden = true;
   $('#py-solbtn').setAttribute('aria-expanded', 'false');
 }
