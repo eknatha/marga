@@ -14,18 +14,20 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=0e68a589">
+<link rel="stylesheet" href="../assets/app.css?v=38ecb8a8">
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
   <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
-  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a></nav>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="../#/interview">InterviewHub</a></nav>
 </div></header>
 <main class="wrap sheet-page" id="main">
   <header class="page-head">
     <h1>Azure cheat sheet</h1>
     <p class="lede">Identity, networking, compute, storage, cost and diagnostics commands for Azure.</p>
-    <div class="actions"><button class="btn btn-quiet" type="button" onclick="window.print()">Print or save as PDF</button></div>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
   </header>
   <article class="sheet"><h2 id="account-and-identity">Account and identity</h2>
 <div class="code" data-lang="bash"><button class="copy" type="button" data-copy="az login
@@ -186,9 +188,13 @@ az policy state list --resource-group shop-prod --filter <span class="hljs-strin
 az lock create --name no-delete --lock-type CanNotDelete --resource-group shop-prod</code></pre></div>
 <p>Azure Policy enforces rules such as allowed regions and required tags. Resource locks guard against accidental deletion.</p>
 </article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://learn.microsoft.com/en-us/cli/azure/" target="_blank" rel="noopener">Azure CLI documentation</a><span class="host">learn.microsoft.com</span></li><li><a href="https://learn.microsoft.com/en-us/azure/" target="_blank" rel="noopener">Azure documentation</a><span class="host">learn.microsoft.com</span></li><li><a href="https://learn.microsoft.com/en-us/azure/role-based-access-control/overview" target="_blank" rel="noopener">Azure RBAC overview</a><span class="host">learn.microsoft.com</span></li></ul></section>
 </main>
-<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://eknathalabs.com" rel="noopener">Blog</a><a href="https://eknathalabs.substack.com" rel="noopener">Newsletter</a></div></footer>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=38ecb8a8"></script>
 <script>
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
 document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
 </script>
 </body>

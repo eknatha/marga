@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Helm and Kustomize cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="Charts, releases, values, upgrade and rollback commands, template functions and Kustomize overlays.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/helm.html">
+<meta property="og:title" content="Helm and Kustomize cheat sheet">
+<meta property="og:description" content="Charts, releases, values, upgrade and rollback commands, template functions and Kustomize overlays.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/helm.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=38ecb8a8">
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="../#/interview">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>Helm and Kustomize cheat sheet</h1>
+    <p class="lede">Charts, releases, values, upgrade and rollback commands, template functions and Kustomize overlays.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="repositories-and-search">Repositories and search</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+helm repo list
+helm search repo nginx --versions | head
+helm show chart bitnami/nginx
+helm show values bitnami/nginx &gt; default-values.yaml" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+helm repo list
+helm search repo nginx --versions | <span class="hljs-built_in">head</span>
+helm show chart bitnami/nginx
+helm show values bitnami/nginx &gt; default-values.yaml</code></pre></div>
+<h2 id="install-upgrade-roll-back">Install, upgrade, roll back</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="helm install web bitnami/nginx -n shop --create-namespace -f values-prod.yaml
+helm upgrade --install web bitnami/nginx -n shop -f values-prod.yaml --atomic --timeout 5m
+helm list -n shop
+helm status web -n shop
+helm history web -n shop
+helm rollback web 2 -n shop
+helm uninstall web -n shop" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">helm install web bitnami/nginx -n shop --create-namespace -f values-prod.yaml
+helm upgrade --install web bitnami/nginx -n shop -f values-prod.yaml --atomic --<span class="hljs-built_in">timeout</span> 5m
+helm list -n shop
+helm status web -n shop
+helm <span class="hljs-built_in">history</span> web -n shop
+helm rollback web 2 -n shop
+helm uninstall web -n shop</code></pre></div>
+<p>Keep overrides in values files, not <code>--set</code>. <code>--atomic</code> rolls back a failed upgrade.</p>
+<h2 id="inspect-and-debug">Inspect and debug</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="helm template web bitnami/nginx -f values-prod.yaml
+helm template web ./chart --debug
+helm lint ./chart
+helm get values web -n shop
+helm get manifest web -n shop
+helm diff upgrade web bitnami/nginx -n shop -f values-prod.yaml" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">helm template web bitnami/nginx -f values-prod.yaml
+helm template web ./chart --debug
+helm lint ./chart
+helm get values web -n shop
+helm get manifest web -n shop
+helm diff upgrade web bitnami/nginx -n shop -f values-prod.yaml</code></pre></div>
+<p><code>helm diff</code> needs the diff plugin. <code>helm template</code> never touches the cluster.</p>
+<h2 id="chart-layout">Chart layout</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="shop/
+  Chart.yaml          name, version, appVersion
+  values.yaml         defaults
+  templates/
+    deployment.yaml
+    service.yaml
+    _helpers.tpl      named templates
+  charts/             dependencies" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">shop/
+  Chart.yaml          name, version, appVersion
+  values.yaml         defaults
+  templates/
+    deployment.yaml
+    service.yaml
+    _helpers.tpl      named templates
+  charts/             dependencies</code></pre></div>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="helm create shop
+helm package ./shop
+helm dependency update ./shop
+helm push shop-0.1.0.tgz oci://registry.example.com/charts" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">helm create shop
+helm package ./shop
+helm dependency update ./shop
+helm push shop-0.1.0.tgz oci://registry.example.com/charts</code></pre></div>
+<h2 id="template-syntax">Template syntax</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="{{ .Values.replicaCount }}                    read a value
+{{ .Release.Name }}  {{ .Release.Namespace }} release info
+{{ include &quot;shop.fullname&quot; . }}               call a helper
+{{ .Values.image.tag | default &quot;latest&quot; | quote }}
+{{- if .Values.ingress.enabled }} ... {{- end }}
+{{- range .Values.hosts }} - {{ . }} {{- end }}
+{{- toYaml .Values.resources | nindent 12 }}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">{{ .Values.replicaCount }}                    read a value
+{{ .Release.Name }}  {{ .Release.Namespace }} release info
+{{ include &quot;shop.fullname&quot; . }}               call a helper
+{{ .Values.image.tag | default &quot;latest&quot; | quote }}
+{{- if .Values.ingress.enabled }} ... {{- end }}
+{{- range .Values.hosts }} - {{ . }} {{- end }}
+{{- toYaml .Values.resources | nindent 12 }}</code></pre></div>
+<p><code>{{-</code> trims whitespace before the tag. Indentation errors are the most common bug.</p>
+<h2 id="kustomize">Kustomize</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl kustomize overlays/production
+kubectl apply -k overlays/production
+kubectl diff -k overlays/production
+kustomize build overlays/production | kubectl apply -f -" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubectl kustomize overlays/production
+kubectl apply -k overlays/production
+kubectl diff -k overlays/production
+kustomize build overlays/production | kubectl apply -f -</code></pre></div>
+<div class="code" data-lang="yaml"><button class="copy" type="button" data-copy="apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+namespace: shop
+images:
+  - name: registry.example.com/shop/api
+    newTag: 1.8.2
+patches:
+  - path: replica-patch.yaml" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">kustomize.config.k8s.io/v1beta1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">Kustomization</span>
+<span class="hljs-attr">resources:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-string">../../base</span>
+<span class="hljs-attr">namespace:</span> <span class="hljs-string">shop</span>
+<span class="hljs-attr">images:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">registry.example.com/shop/api</span>
+    <span class="hljs-attr">newTag:</span> <span class="hljs-number">1.8</span><span class="hljs-number">.2</span>
+<span class="hljs-attr">patches:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">path:</span> <span class="hljs-string">replica-patch.yaml</span></code></pre></div>
+<p>Base files stay valid YAML; overlays patch them per environment.</p>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://helm.sh/docs/" target="_blank" rel="noopener">Helm documentation</a><span class="host">helm.sh</span></li><li><a href="https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/" target="_blank" rel="noopener">Kubernetes: declarative management with Kustomize</a><span class="host">kubernetes.io</span></li><li><a href="https://helm.sh/docs/chart_best_practices/" target="_blank" rel="noopener">Helm: chart best practices</a><span class="host">helm.sh</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=38ecb8a8"></script>
+<script>
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

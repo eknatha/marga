@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="Environments, core syntax, files, subprocess, HTTP, JSON, cloud SDK, testing and packaging snippets for automation.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/python.html">
+<meta property="og:title" content="Python cheat sheet">
+<meta property="og:description" content="Environments, core syntax, files, subprocess, HTTP, JSON, cloud SDK, testing and packaging snippets for automation.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/python.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=38ecb8a8">
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="../#/interview">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>Python cheat sheet</h1>
+    <p class="lede">Environments, core syntax, files, subprocess, HTTP, JSON, cloud SDK, testing and packaging snippets for automation.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="environments">Environments</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install requests==2.32.3
+python -m pip freeze &gt; requirements.txt
+python -m pip install -r requirements.txt
+python -m pip list --outdated
+deactivate" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">python3 -m venv .venv
+<span class="hljs-built_in">source</span> .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install requests==2.32.3
+python -m pip freeze &gt; requirements.txt
+python -m pip install -r requirements.txt
+python -m pip list --outdated
+deactivate</code></pre></div>
+<p>One virtual environment per project. Call <code>python -m pip</code> so pip matches the interpreter.</p>
+<h2 id="core-syntax">Core syntax</h2>
+<div class="code" data-lang="python"><button class="copy" type="button" data-copy="servers = [&quot;web-1&quot;, &quot;web-2&quot;, &quot;db-1&quot;]
+limits = {&quot;cpu&quot;: 80, &quot;memory&quot;: 90}
+web = [s for s in servers if s.startswith(&quot;web&quot;)]
+by_len = {s: len(s) for s in servers}
+print(f&quot;{len(web)} web servers, cpu limit {limits.get('cpu', 100)}&quot;)
+
+def over(metric: str, value: float) -&gt; bool:
+    return value &gt; limits.get(metric, 100)
+
+if __name__ == &quot;__main__&quot;:
+    raise SystemExit(0)" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">servers = [<span class="hljs-string">&quot;web-1&quot;</span>, <span class="hljs-string">&quot;web-2&quot;</span>, <span class="hljs-string">&quot;db-1&quot;</span>]
+limits = {<span class="hljs-string">&quot;cpu&quot;</span>: <span class="hljs-number">80</span>, <span class="hljs-string">&quot;memory&quot;</span>: <span class="hljs-number">90</span>}
+web = [s <span class="hljs-keyword">for</span> s <span class="hljs-keyword">in</span> servers <span class="hljs-keyword">if</span> s.startswith(<span class="hljs-string">&quot;web&quot;</span>)]
+by_len = {s: <span class="hljs-built_in">len</span>(s) <span class="hljs-keyword">for</span> s <span class="hljs-keyword">in</span> servers}
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">{<span class="hljs-built_in">len</span>(web)}</span> web servers, cpu limit <span class="hljs-subst">{limits.get(<span class="hljs-string">&#x27;cpu&#x27;</span>, <span class="hljs-number">100</span>)}</span>&quot;</span>)
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">over</span>(<span class="hljs-params">metric: <span class="hljs-built_in">str</span>, value: <span class="hljs-built_in">float</span></span>) -&gt; <span class="hljs-built_in">bool</span>:
+    <span class="hljs-keyword">return</span> value &gt; limits.get(metric, <span class="hljs-number">100</span>)
+
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:
+    <span class="hljs-keyword">raise</span> SystemExit(<span class="hljs-number">0</span>)</code></pre></div>
+<h2 id="files-and-paths">Files and paths</h2>
+<div class="code" data-lang="python"><button class="copy" type="button" data-copy="from pathlib import Path
+
+p = Path(&quot;/etc/myapp/app.conf&quot;)
+text = p.read_text(encoding=&quot;utf-8&quot;)
+Path(&quot;/var/tmp/out&quot;).mkdir(parents=True, exist_ok=True)
+for f in Path(&quot;/var/log/myapp&quot;).glob(&quot;*.log&quot;):
+    print(f.name, f.stat().st_size)
+with open(&quot;report.txt&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;) as fh:
+    fh.write(&quot;done\n&quot;)" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">from</span> pathlib <span class="hljs-keyword">import</span> Path
+
+p = Path(<span class="hljs-string">&quot;/etc/myapp/app.conf&quot;</span>)
+text = p.read_text(encoding=<span class="hljs-string">&quot;utf-8&quot;</span>)
+Path(<span class="hljs-string">&quot;/var/tmp/out&quot;</span>).mkdir(parents=<span class="hljs-literal">True</span>, exist_ok=<span class="hljs-literal">True</span>)
+<span class="hljs-keyword">for</span> f <span class="hljs-keyword">in</span> Path(<span class="hljs-string">&quot;/var/log/myapp&quot;</span>).glob(<span class="hljs-string">&quot;*.log&quot;</span>):
+    <span class="hljs-built_in">print</span>(f.name, f.stat().st_size)
+<span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(<span class="hljs-string">&quot;report.txt&quot;</span>, <span class="hljs-string">&quot;w&quot;</span>, encoding=<span class="hljs-string">&quot;utf-8&quot;</span>) <span class="hljs-keyword">as</span> fh:
+    fh.write(<span class="hljs-string">&quot;done\n&quot;</span>)</code></pre></div>
+<h2 id="run-commands">Run commands</h2>
+<div class="code" data-lang="python"><button class="copy" type="button" data-copy="import subprocess
+
+r = subprocess.run([&quot;systemctl&quot;, &quot;is-active&quot;, &quot;nginx&quot;], capture_output=True, text=True, timeout=10)
+print(r.returncode, r.stdout.strip())
+subprocess.run([&quot;tar&quot;, &quot;-czf&quot;, &quot;/tmp/site.tgz&quot;, &quot;/var/www&quot;], check=True)" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">import</span> subprocess
+
+r = subprocess.run([<span class="hljs-string">&quot;systemctl&quot;</span>, <span class="hljs-string">&quot;is-active&quot;</span>, <span class="hljs-string">&quot;nginx&quot;</span>], capture_output=<span class="hljs-literal">True</span>, text=<span class="hljs-literal">True</span>, timeout=<span class="hljs-number">10</span>)
+<span class="hljs-built_in">print</span>(r.returncode, r.stdout.strip())
+subprocess.run([<span class="hljs-string">&quot;tar&quot;</span>, <span class="hljs-string">&quot;-czf&quot;</span>, <span class="hljs-string">&quot;/tmp/site.tgz&quot;</span>, <span class="hljs-string">&quot;/var/www&quot;</span>], check=<span class="hljs-literal">True</span>)</code></pre></div>
+<p>Pass a list, avoid <code>shell=True</code>, always set a timeout.</p>
+<h2 id="json-and-http">JSON and HTTP</h2>
+<div class="code" data-lang="python"><button class="copy" type="button" data-copy="import json
+import os
+import requests
+
+data = json.loads('{&quot;name&quot;: &quot;web-1&quot;, &quot;cpu&quot;: 0.4}')
+print(json.dumps(data, indent=2, sort_keys=True))
+
+resp = requests.get(
+    &quot;https://api.example.com/v1/servers&quot;,
+    headers={&quot;Authorization&quot;: &quot;Bearer &quot; + os.environ[&quot;API_TOKEN&quot;]},
+    params={&quot;limit&quot;: 50},
+    timeout=10,
+)
+resp.raise_for_status()
+items = resp.json()[&quot;items&quot;]" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">import</span> json
+<span class="hljs-keyword">import</span> os
+<span class="hljs-keyword">import</span> requests
+
+data = json.loads(<span class="hljs-string">&#x27;{&quot;name&quot;: &quot;web-1&quot;, &quot;cpu&quot;: 0.4}&#x27;</span>)
+<span class="hljs-built_in">print</span>(json.dumps(data, indent=<span class="hljs-number">2</span>, sort_keys=<span class="hljs-literal">True</span>))
+
+resp = requests.get(
+    <span class="hljs-string">&quot;https://api.example.com/v1/servers&quot;</span>,
+    headers={<span class="hljs-string">&quot;Authorization&quot;</span>: <span class="hljs-string">&quot;Bearer &quot;</span> + os.environ[<span class="hljs-string">&quot;API_TOKEN&quot;</span>]},
+    params={<span class="hljs-string">&quot;limit&quot;</span>: <span class="hljs-number">50</span>},
+    timeout=<span class="hljs-number">10</span>,
+)
+resp.raise_for_status()
+items = resp.json()[<span class="hljs-string">&quot;items&quot;</span>]</code></pre></div>
+<p>Always set <code>timeout</code>, call <code>raise_for_status</code>, read tokens from the environment.</p>
+<h2 id="errors-and-logging">Errors and logging</h2>
+<div class="code" data-lang="python"><button class="copy" type="button" data-copy="import logging
+
+logging.basicConfig(level=logging.INFO, format=&quot;%(asctime)s %(levelname)s %(message)s&quot;)
+log = logging.getLogger(&quot;job&quot;)
+try:
+    risky()
+except ValueError as exc:
+    log.exception(&quot;failed: %s&quot;, exc)
+    raise" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">import</span> logging
+
+logging.basicConfig(level=logging.INFO, <span class="hljs-built_in">format</span>=<span class="hljs-string">&quot;%(asctime)s %(levelname)s %(message)s&quot;</span>)
+log = logging.getLogger(<span class="hljs-string">&quot;job&quot;</span>)
+<span class="hljs-keyword">try</span>:
+    risky()
+<span class="hljs-keyword">except</span> ValueError <span class="hljs-keyword">as</span> exc:
+    log.exception(<span class="hljs-string">&quot;failed: %s&quot;</span>, exc)
+    <span class="hljs-keyword">raise</span></code></pre></div>
+<h2 id="aws-and-azure-sdks">AWS and Azure SDKs</h2>
+<div class="code" data-lang="python"><button class="copy" type="button" data-copy="import boto3
+
+print(boto3.client(&quot;sts&quot;).get_caller_identity()[&quot;Arn&quot;])
+ec2 = boto3.client(&quot;ec2&quot;, region_name=&quot;eu-west-1&quot;)
+for page in ec2.get_paginator(&quot;describe_instances&quot;).paginate():
+    for res in page[&quot;Reservations&quot;]:
+        for inst in res[&quot;Instances&quot;]:
+            print(inst[&quot;InstanceId&quot;])" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">import</span> boto3
+
+<span class="hljs-built_in">print</span>(boto3.client(<span class="hljs-string">&quot;sts&quot;</span>).get_caller_identity()[<span class="hljs-string">&quot;Arn&quot;</span>])
+ec2 = boto3.client(<span class="hljs-string">&quot;ec2&quot;</span>, region_name=<span class="hljs-string">&quot;eu-west-1&quot;</span>)
+<span class="hljs-keyword">for</span> page <span class="hljs-keyword">in</span> ec2.get_paginator(<span class="hljs-string">&quot;describe_instances&quot;</span>).paginate():
+    <span class="hljs-keyword">for</span> res <span class="hljs-keyword">in</span> page[<span class="hljs-string">&quot;Reservations&quot;</span>]:
+        <span class="hljs-keyword">for</span> inst <span class="hljs-keyword">in</span> res[<span class="hljs-string">&quot;Instances&quot;</span>]:
+            <span class="hljs-built_in">print</span>(inst[<span class="hljs-string">&quot;InstanceId&quot;</span>])</code></pre></div>
+<div class="code" data-lang="python"><button class="copy" type="button" data-copy="from azure.identity import DefaultAzureCredential
+from azure.mgmt.compute import ComputeManagementClient
+
+compute = ComputeManagementClient(DefaultAzureCredential(), &quot;SUBSCRIPTION_ID&quot;)
+for vm in compute.virtual_machines.list_all():
+    print(vm.name)" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">from</span> azure.identity <span class="hljs-keyword">import</span> DefaultAzureCredential
+<span class="hljs-keyword">from</span> azure.mgmt.compute <span class="hljs-keyword">import</span> ComputeManagementClient
+
+compute = ComputeManagementClient(DefaultAzureCredential(), <span class="hljs-string">&quot;SUBSCRIPTION_ID&quot;</span>)
+<span class="hljs-keyword">for</span> vm <span class="hljs-keyword">in</span> compute.virtual_machines.list_all():
+    <span class="hljs-built_in">print</span>(vm.name)</code></pre></div>
+<h2 id="cli-tests-packaging">CLI, tests, packaging</h2>
+<div class="code" data-lang="python"><button class="copy" type="button" data-copy="import argparse
+
+p = argparse.ArgumentParser(prog=&quot;tool&quot;)
+p.add_argument(&quot;paths&quot;, nargs=&quot;+&quot;)
+p.add_argument(&quot;--threshold&quot;, type=int, default=85)
+args = p.parse_args()" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">import</span> argparse
+
+p = argparse.ArgumentParser(prog=<span class="hljs-string">&quot;tool&quot;</span>)
+p.add_argument(<span class="hljs-string">&quot;paths&quot;</span>, nargs=<span class="hljs-string">&quot;+&quot;</span>)
+p.add_argument(<span class="hljs-string">&quot;--threshold&quot;</span>, <span class="hljs-built_in">type</span>=<span class="hljs-built_in">int</span>, default=<span class="hljs-number">85</span>)
+args = p.parse_args()</code></pre></div>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="python -m pip install pytest
+python -m pytest -q
+python -m pytest -q -k &quot;threshold&quot; -x
+python -m pip install .
+python -m pip install pipx" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">python -m pip install pytest
+python -m pytest -q
+python -m pytest -q -k <span class="hljs-string">&quot;threshold&quot;</span> -x
+python -m pip install .
+python -m pip install pipx</code></pre></div>
+<p>Mock slow or risky calls with <code>unittest.mock.patch</code>; use the <code>tmp_path</code> fixture for files.</p>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://docs.python.org/3/tutorial/index.html" target="_blank" rel="noopener">The Python tutorial</a><span class="host">docs.python.org</span></li><li><a href="https://docs.python.org/3/library/venv.html" target="_blank" rel="noopener">venv: virtual environments</a><span class="host">docs.python.org</span></li><li><a href="https://requests.readthedocs.io/en/latest/" target="_blank" rel="noopener">Requests documentation</a><span class="host">requests.readthedocs.io</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=38ecb8a8"></script>
+<script>
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

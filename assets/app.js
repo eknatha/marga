@@ -35,11 +35,11 @@ var ICON = {
 /* ---------- storage ---------- */
 var KEY = 'ea.progress.v1';
 var memStore = null;
-function fresh() { return { v: 1, lessons: {}, cards: {}, days: [], path: 'devops' }; }
+function fresh() { return { v: 1, lessons: {}, cards: {}, days: [], path: 'devops', iv: {} }; }
 function load() {
   try {
     var s = localStorage.getItem(KEY);
-    if (s) { var o = JSON.parse(s); if (o && o.v === 1 && o.lessons && o.cards && Array.isArray(o.days)) return o; }
+    if (s) { var o = JSON.parse(s); if (o && o.v === 1 && o.lessons && o.cards && Array.isArray(o.days)) { if (!o.iv || typeof o.iv !== 'object') o.iv = {}; return o; } }
   } catch (x) { /* storage unavailable */ }
   return memStore || fresh();
 }
@@ -105,6 +105,44 @@ function pathProgress(p) {
 }
 function hrefLesson(id) { return '#/lesson/' + id; }
 
+
+/* ---------- print, voice and references ---------- */
+function printBar() {
+  return '<button class="btn btn-quiet" type="button" data-act="print">Print</button>' +
+    '<button class="btn btn-quiet" type="button" data-act="pdf">Save as PDF</button>';
+}
+function refsHtml(list, heading) {
+  if (!list || !list.length) return '';
+  return '<section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">' + (heading || 'Official references') + '</h2>' +
+    '<p class="small">Read the vendor and project documentation for the full, current detail.</p><ul>' +
+    list.map(function (r) { return '<li><a href="' + e(r.u) + '" target="_blank" rel="noopener">' + e(r.t) + '</a><span class="host">' + e(r.u.replace(/^https:\/\/([^\/]+).*$/, '$1')) + '</span></li>'; }).join('') + '</ul></section>';
+}
+function voiceSlot() { return '<div id="voice-slot"></div>'; }
+function wireSay(root) {
+  $$('[data-say]', root || document).forEach(function (b) {
+    if (b.getAttribute('data-wired')) return;
+    b.setAttribute('data-wired', '1');
+    if (window.MargaVoice) MargaVoice.sayButton(b, function () { return b.getAttribute('data-say'); }); else b.hidden = true;
+  });
+}
+function mountVoice() {
+  var slot = $('#voice-slot');
+  if (slot && window.MargaVoice && view.voice) MargaVoice.mount(slot, function () { return $(view.voice); }, view.voiceLabel || '');
+  wireSay(document);
+}
+function printTitle(title) {
+  var old = document.title;
+  document.title = title;
+  setTimeout(function () { document.title = old; }, 1500);
+}
+function doPrint(pdf) {
+  if (window.MargaVoice) MargaVoice.stop();
+  if (pdf) toast('In the print dialog, choose "Save as PDF" as the destination.');
+  var h = $('#main h1');
+  printTitle('MARGA - ' + (h ? h.textContent : 'EknathaLabs'));
+  setTimeout(function () { window.print(); }, pdf ? 400 : 0);
+}
+
 /* ---------- toast ---------- */
 var toastTimer;
 function toast(msg) {
@@ -121,7 +159,7 @@ function renderChrome() {
     '<a class="brand" href="#/"><img src="icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>' +
     '<nav class="topnav" id="topnav" aria-label="Main">' +
     '<a href="#/paths" data-nav="paths">Paths</a><a href="#/cheatsheets" data-nav="cheatsheets">Cheat sheets</a>' +
-    '<a href="#/review" data-nav="review">Review cards</a><a href="#/labs" data-nav="labs">Labs</a><a href="#/progress" data-nav="progress">Progress</a></nav>' +
+    '<a href="#/review" data-nav="review">Review cards</a><a href="#/labs" data-nav="labs">Labs</a><a href="#/progress" data-nav="progress">Progress</a><a href="#/interview" data-nav="interview">InterviewHub</a></nav>' +
     '<div class="tools">' +
     '<button class="btn btn-quiet search-btn" type="button" data-act="search" aria-label="Search lessons and cheat sheets">' + ICON.search + '<span>Search</span><kbd>/</kbd></button>' +
     '<a class="streak' + (st.cur ? ' on' : '') + '" href="#/progress" title="Current streak ' + plural(st.cur, 'day') + ', best ' + plural(st.best, 'day') + '" aria-label="Current streak ' + plural(st.cur, 'day') + '">' + ICON.flame + '<b>' + st.cur + '</b></a>' +
@@ -131,10 +169,10 @@ function renderChrome() {
   $('#footer').innerHTML =
     '<footer class="foot"><div class="wrap foot-in">' +
     '<span>MARGA by EknathaLabs</span>' +
-    '<a href="cheatsheets/">Printable cheat sheets</a><a href="https://eknathalabs.com" target="_blank" rel="noopener">Blog</a>' +
-    '<a href="https://eknathalabs.substack.com" target="_blank" rel="noopener">Newsletter</a>' +
+    '<a href="cheatsheets/">Printable cheat sheets</a><a href="#/interview">InterviewHub</a>' +
     (D.counter ? '<span class="visitors" id="visitors"' + (visitorText ? '' : ' hidden') + '>' + e(visitorText) + '</span>' : '') +
-    '<span class="foot-note">Progress is saved in this browser only.</span></div></footer>';
+    '<span class="foot-note">Progress is saved in this browser only.</span>' +
+    '<p class="foot-promise">Free forever \u00b7 No login \u00b7 No ads \u00b7 No cookies</p></div></footer>';
 }
 
 /* ---------- visitor count (GoatCounter, optional, silent on failure) ---------- */
@@ -184,7 +222,7 @@ function armPipeline() {
 }
 
 /* ---------- views ---------- */
-var view = { title: '', html: '', after: null, nav: '' };
+var view = { title: '', html: '', after: null, nav: '', voice: '', voiceLabel: '' };
 
 function homeView() {
   var p = PATH[S.path] || LIVE[0];
@@ -216,9 +254,13 @@ function homeView() {
     '<div class="rows">' + LIVE.map(pathRow).join('') + '</div>' +
     '<h3 class="sub-h">In development</h3><ul class="planned">' + PLANNED.map(function (x) { return '<li><strong>' + e(x.title) + '</strong><span>' + e(x.summary) + '</span><em>Planned</em></li>'; }).join('') + '</ul></div></section>' +
 
-    '<section class="band alt"><div class="wrap two"><div><h2>A cheat sheet for every tool</h2><p>Linux, Bash, networking, Docker, Kubernetes, Terraform, CI/CD, AWS, Azure, Prometheus and SRE each have a separate, searchable, printable page. They are always open, no progress needed.</p>' +
+    '<section class="band alt"><div class="wrap two"><div><h2>A cheat sheet for every tool</h2><p>Linux, Bash, Python, networking, Docker, Kubernetes, Helm, Terraform, CI/CD, AWS, Azure, Prometheus and SRE each have a separate, searchable page with official references. Print them with a watermark or save them as PDF. They are always open, no progress needed.</p>' +
     '<p><a class="btn btn-quiet" href="#/cheatsheets">Open cheat sheets</a></p></div>' +
     '<ul class="chips">' + Object.keys(SHEETS).map(function (id) { return '<li><a href="#/cheatsheet/' + id + '">' + e(SHEETS[id].title) + '</a></li>'; }).join('') + '</ul></div></section>' +
+
+    '<section class="band"><div class="wrap two"><div><h2>Prepare for the interview</h2><p>InterviewHub has model answers for common DevOps, cloud and SRE questions, grouped by topic and level. Mark what you know, revisit what you do not, and listen to any answer read aloud.</p>' +
+    '<p><a class="btn btn-quiet" href="#/interview">Open InterviewHub</a></p></div>' +
+    '<div class="note-panel"><h3>Listen while you learn</h3><p>Every lesson, cheat sheet and interview answer can be read aloud. Pick any voice installed on your device from the Voice dropdown.</p></div></div></section>' +
 
     '<section class="band"><div class="wrap two"><div><h2>How a lesson works</h2><ol class="steps"><li><strong>Read.</strong> Each lesson explains why, then shows commands with their output.</li><li><strong>Check.</strong> Answer a short quiz. Pass it to mark the lesson done and unlock the next.</li><li><strong>Remember.</strong> Flip the flashcards now, and review them again later from the Review cards page.</li></ol></div>' +
     '<div class="note-panel"><h3>Hands-on labs are planned</h3><p>Browser-based practice with automatic checking is in development. Until then, every lesson includes a written incident walkthrough with sample output so you can follow the reasoning.</p><p><a href="#/labs">What is planned</a></p></div></div></section>' +
@@ -252,10 +294,11 @@ function pathView(id) {
     '<p class="lede">' + e(p.summary) + '</p>' +
     '<dl class="facts"><div><dt>Who it is for</dt><dd>' + e(p.audience) + '</dd></div><div><dt>Study time</dt><dd>About ' + hours(pp.minutes) + '</dd></div><div><dt>Progress</dt><dd>' + pp.done + ' of ' + pp.total + ' lessons</dd></div></dl>' +
     '<div class="actions">' + (next ? '<a class="btn btn-primary" href="' + hrefLesson(next) + '">' + (pp.done ? 'Continue: ' : 'Start: ') + e(LES[next].title) + '</a>' : '<span class="chip pass">Path complete</span>') +
-    '<button class="btn btn-quiet" type="button" data-act="pick-path" data-id="' + p.id + '" data-go="home">Make this my home path</button></div></section>' +
+    '<button class="btn btn-quiet" type="button" data-act="pick-path" data-id="' + p.id + '" data-go="home">Make this my home path</button>' + printBar() + '</div>' + voiceSlot() + '</section>' +
     '<div class="wrap"><div class="pipe-panel">' + pipelineHtml(p, true) + '</div>' +
     '<h2 class="sub-h">What you will be able to do</h2><ul class="outcomes">' + p.outcomes.map(function (o) { return '<li>' + e(o) + '</li>'; }).join('') + '</ul>' +
     '<h2 class="sub-h">Stages</h2><div class="stage-list">' + p.modules.map(function (mid, i) { return stageRow(MOD[mid], i); }).join('') + '</div></div>';
+  view.voice = '#main'; view.voiceLabel = p.title + ' path';
   view.after = armPipeline;
 }
 
@@ -263,7 +306,8 @@ function stageRow(m, i) {
   var s = modStatus(m), n = modCount(m), tot = m.lessons.length;
   var req = m.requires.length ? 'Requires ' + m.requires.map(function (r) { return MOD[r].title; }).join(' and ') : 'No prerequisites';
   return '<article class="srow s-' + s + '"><span class="dot">' + (s === 'pass' ? ICON.check : s === 'lock' ? ICON.lock : '') + '</span>' +
-    '<div><h3><a href="#/module/' + m.id + '">' + e(m.title) + '</a></h3><p>' + e(m.summary) + '</p><p class="small">' + e(req) + '. ' + plural(tot, 'lesson') + ', about ' + hours(m.minutes) + '.</p></div>' +
+    '<div><h3><a href="#/module/' + m.id + '">' + e(m.title) + '</a></h3><p>' + e(m.summary) + '</p><p class="small">' + e(req) + '. ' + plural(tot, 'lesson') + ', about ' + hours(m.minutes) + '.</p>' +
+    '<ol class="topics" aria-label="Topics in ' + e(m.title) + '">' + m.lessons.map(function (lid) { return '<li><a href="' + hrefLesson(lid) + '">' + e(LES[lid].title) + '</a></li>'; }).join('') + '</ol></div>' +
     '<div class="row-stat"><b>' + n + '/' + tot + '</b><span>' + ({ pass: 'Passed', run: 'In progress', ready: 'Ready', lock: 'Locked' }[s]) + '</span></div></article>';
 }
 
@@ -282,7 +326,9 @@ function moduleView(id) {
     '<dl class="facts"><div><dt>Level</dt><dd>' + e(m.level) + '</dd></div><div><dt>Study time</dt><dd>About ' + hours(m.minutes) + '</dd></div><div><dt>Progress</dt><dd>' + n + ' of ' + tot + ' lessons</dd></div></dl>' +
     '<div class="bar wide" role="img" aria-label="' + pct + ' percent complete"><i style="width:' + pct + '%"></i></div>' + lock +
     (sheets.length ? '<p class="small">Cheat sheet: ' + sheets.map(function (k) { return '<a href="#/cheatsheet/' + k + '">' + e(SHEETS[k].title) + '</a>'; }).join(', ') + '</p>' : '') +
-    '</section><div class="wrap"><ol class="jobs">' + m.lessons.map(function (lid, i) { return jobHtml(lid, i); }).join('') + '</ol></div>';
+    '<div class="actions">' + printBar() + '</div>' + voiceSlot() +
+    '</section><div class="wrap"><ol class="jobs">' + m.lessons.map(function (lid, i) { return jobHtml(lid, i); }).join('') + '</ol>' + refsHtml(m.refs, 'Official documentation for this stage') + '</div>';
+  view.voice = '#main'; view.voiceLabel = m.title;
   view.after = null;
 }
 
@@ -322,12 +368,14 @@ function lessonView(mid, slug) {
     '<nav class="crumbs" aria-label="Breadcrumb"><a href="#/paths">Paths</a><a href="#/module/' + m.id + '">' + e(m.title) + '</a></nav>' +
     '<header class="lesson-head"><h1>' + e(l.title) + '</h1><p class="meta"><span>Lesson ' + (i + 1) + ' of ' + m.lessons.length + '</span><span>' + l.minutes + ' min</span>' +
     (st === 'done' ? '<span class="chip pass">Passed</span>' : '') + '</p></header>' +
-    '<div class="lesson-grid"><div class="prose" id="prose">' + l.html + '</div>' + toc + '</div>' +
+    '<div class="actions lesson-tools">' + printBar() + '</div>' + voiceSlot() +
+    '<div class="lesson-grid"><div class="prose" id="prose">' + l.html + refsHtml(l.refs) + '</div>' + toc + '</div>' +
     '<section class="check" id="check" aria-labelledby="check-h"><h2 id="check-h">Lesson check</h2><div id="quiz"></div></section>' +
     '<section class="cardsec" id="cards" aria-labelledby="cards-h"><h2 id="cards-h">Flashcards</h2><div id="deck"></div></section>' +
     '<nav class="pager" aria-label="Lesson navigation">' +
     (prev ? '<a class="btn btn-quiet" href="' + hrefLesson(prev) + '">Previous: ' + e(LES[prev].title) + '</a>' : '<span></span>') +
     '<span id="next-slot">' + nextButton(id, nxt) + '</span></nav></article>';
+  view.voice = '#prose'; view.voiceLabel = l.title;
   view.after = function () {
     var q = $('#quiz'); if (q) startQuiz(id, q);
     var dk = $('#deck'); if (dk) startDeck(dk, l.cards.map(function (c, k) { return { key: id + '#' + k, lesson: id, idx: k, f: c.f, b: c.b }; }), 'lesson');
@@ -362,9 +410,10 @@ function startQuiz(id, root) {
       var item = qs[pos], q = item.q;
       var opts = shuffle(q.options.map(function (o, oi) { return { o: o, oi: oi }; }));
       root.innerHTML = '<div class="qprog" aria-hidden="true"><i style="width:' + (pos / qs.length * 100) + '%"></i></div>' +
-        '<p class="qcount">Question ' + (pos + 1) + ' of ' + qs.length + '</p><h3 class="qtext">' + e(q.q) + '</h3>' +
+        '<p class="qcount">Question ' + (pos + 1) + ' of ' + qs.length + '</p><h3 class="qtext">' + e(q.q) + '</h3><p class="say-row"><button type="button" class="btn btn-quiet say" data-say="' + e(q.q + ' ' + opts.map(function (x, k) { return 'Option ' + String.fromCharCode(65 + k) + '. ' + x.o + '.'; }).join(' ')) + '">Read aloud</button></p>' +
         '<div class="opts" role="group" aria-label="Answer choices">' + opts.map(function (x, k) { return '<button type="button" class="opt" data-oi="' + x.oi + '"><span class="key">' + String.fromCharCode(65 + k) + '</span><span>' + e(x.o) + '</span></button>'; }).join('') + '</div>' +
         '<div class="feedback" id="fb" aria-live="polite"></div>';
+      wireSay(root);
       $$('.opt', root).forEach(function (b) {
         b.addEventListener('click', function () {
           var oi = Number(b.getAttribute('data-oi')), ok = oi === q.answer;
@@ -427,6 +476,7 @@ function startDeck(root, items, mode) {
     var c = queue[0]; flipped = false;
     root.innerHTML = '<p class="qcount">Card ' + Math.min(seen + 1, total) + ' of ' + total + '</p>' +
       '<button type="button" class="card" id="card" aria-live="polite"><span class="side">Question</span><span class="txt">' + e(c.f) + '</span><span class="hint">Select to show the answer</span></button>' +
+      '<p class="say-row"><button type="button" class="btn btn-quiet say" data-say="' + e(c.f) + '">Read aloud</button></p>' +
       '<div class="rate" id="rate" hidden><button class="btn btn-quiet" type="button" data-r="again">Again</button><button class="btn btn-primary" type="button" data-r="good">Got it</button></div>';
     var card = $('#card', root);
     card.addEventListener('click', function () {
@@ -434,7 +484,9 @@ function startDeck(root, items, mode) {
       card.classList.toggle('back', flipped);
       card.innerHTML = '<span class="side">' + (flipped ? 'Answer' : 'Question') + '</span><span class="txt">' + e(flipped ? c.b : c.f) + '</span><span class="hint">' + (flipped ? 'Select to see the question' : 'Select to show the answer') + '</span>';
       $('#rate', root).hidden = !flipped;
+      var sb = $('[data-say]', root); if (sb) sb.setAttribute('data-say', flipped ? c.b : c.f);
     });
+    wireSay(root);
     $$('#rate button', root).forEach(function (b) {
       b.addEventListener('click', function () {
         var good = b.getAttribute('data-r') === 'good';
@@ -494,10 +546,84 @@ function sheetView(id) {
   if (!s) return notFound();
   view.title = s.title + ' cheat sheet | MARGA by EknathaLabs'; view.nav = 'cheatsheets';
   view.html = '<section class="page-head wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="#/cheatsheets">Cheat sheets</a></nav><h1>' + e(s.title) + ' cheat sheet</h1><p class="lede">' + e(s.summary) + '</p>' +
-    '<div class="actions"><button class="btn btn-quiet" type="button" onclick="window.print()">Print or save as PDF</button><a class="btn btn-quiet" href="cheatsheets/' + id + '.html" target="_blank" rel="noopener">Open standalone page</a>' +
-    (s.module && MOD[s.module] ? '<a class="btn btn-quiet" href="#/module/' + s.module + '">Open the ' + e(MOD[s.module].title) + ' stage</a>' : '') + '</div></section>' +
-    '<div class="wrap"><article class="sheet">' + s.html + '</article></div>';
+    '<div class="actions">' + printBar() + '<a class="btn btn-quiet" href="cheatsheets/' + id + '.html" target="_blank" rel="noopener">Open standalone page</a>' +
+    (s.module && MOD[s.module] ? '<a class="btn btn-quiet" href="#/module/' + s.module + '">Open the ' + e(MOD[s.module].title) + ' stage</a>' : '') + '</div>' + voiceSlot() + '</section>' +
+    '<div class="wrap"><article class="sheet">' + s.html + '</article>' + refsHtml(s.refs) + '</div>';
+  view.voice = '.sheet'; view.voiceLabel = s.title + ' cheat sheet';
   view.after = null;
+}
+
+
+/* ----- InterviewHub ----- */
+var IV = D.interview || [];
+var ivFilter = { mod: '', level: '', status: '', q: '' };
+var LEVELS = { junior: 'Junior', mid: 'Mid-level', senior: 'Senior' };
+function ivItems() {
+  var q = ivFilter.q.trim().toLowerCase();
+  return IV.filter(function (x) {
+    if (ivFilter.mod && x.module !== ivFilter.mod) return false;
+    if (ivFilter.level && x.level !== ivFilter.level) return false;
+    var r = (S.iv || {})[x.id];
+    if (ivFilter.status === 'know' && r !== 'know') return false;
+    if (ivFilter.status === 'review' && r !== 'review') return false;
+    if (ivFilter.status === 'new' && r) return false;
+    if (q && (x.q + ' ' + x.text).toLowerCase().indexOf(q) < 0) return false;
+    return true;
+  });
+}
+function ivListHtml(items) {
+  if (!items.length) return '<div class="empty"><h3>No questions match</h3><p>Clear a filter or search for a different term.</p></div>';
+  return items.map(function (x) {
+    var r = (S.iv || {})[x.id] || '';
+    return '<article class="iv' + (r ? ' r-' + r : '') + '" data-id="' + e(x.id) + '">' +
+      '<h3 class="iv-q">' + e(x.q) + '</h3>' +
+      '<p class="iv-meta"><span class="chip">' + e(MOD[x.module] ? MOD[x.module].title : x.module) + '</span><span class="chip lvl-' + x.level + '">' + e(LEVELS[x.level] || x.level) + '</span>' +
+      (r === 'know' ? '<span class="chip pass">Known</span>' : r === 'review' ? '<span class="chip warn">Review</span>' : '') + '</p>' +
+      '<div class="iv-a" id="a-' + e(x.id) + '" hidden>' + x.html + '</div>' +
+      '<div class="actions iv-tools"><button type="button" class="btn btn-quiet" data-act="iv-show" aria-expanded="false" aria-controls="a-' + e(x.id) + '">Show answer</button>' +
+      '<button type="button" class="btn btn-quiet say" data-say="' + e(x.q + ' ' + x.text) + '">Read aloud</button>' +
+      '<span class="iv-rate" hidden><button type="button" class="btn btn-quiet" data-act="iv-rate" data-r="review">Need review</button><button type="button" class="btn btn-primary" data-act="iv-rate" data-r="know">I know this</button></span></div></article>';
+  }).join('');
+}
+function ivStats() {
+  var iv = S.iv || {}, know = 0, rev = 0;
+  IV.forEach(function (x) { if (iv[x.id] === 'know') know++; else if (iv[x.id] === 'review') rev++; });
+  return plural(IV.length, 'question') + ' across ' + plural(MODS.filter(function (m) { return IV.some(function (x) { return x.module === m.id; }); }).length, 'topic') + '. You know ' + know + ', marked ' + rev + ' for review.';
+}
+function interviewView() {
+  view.title = 'InterviewHub | MARGA by EknathaLabs'; view.nav = 'interview';
+  var modOpts = '<option value="">All topics</option>' + MODS.filter(function (m) { return IV.some(function (x) { return x.module === m.id; }); }).map(function (m) { return '<option value="' + m.id + '"' + (ivFilter.mod === m.id ? ' selected' : '') + '>' + e(m.title) + '</option>'; }).join('');
+  var lvOpts = '<option value="">All levels</option>' + Object.keys(LEVELS).map(function (k) { return '<option value="' + k + '"' + (ivFilter.level === k ? ' selected' : '') + '>' + LEVELS[k] + '</option>'; }).join('');
+  var stOpts = [['', 'All questions'], ['new', 'Not rated yet'], ['review', 'Need review'], ['know', 'I know these']].map(function (p) { return '<option value="' + p[0] + '"' + (ivFilter.status === p[0] ? ' selected' : '') + '>' + p[1] + '</option>'; }).join('');
+  view.html = '<section class="page-head wrap"><h1>InterviewHub</h1>' +
+    '<p class="lede">Common DevOps, cloud and SRE interview questions with model answers. Open any question, say your answer out loud first, then compare. Everything here is open: no lesson needs to be passed.</p>' +
+    '<p class="small" id="iv-stats">' + e(ivStats()) + '</p>' +
+    '<div class="actions">' + printBar() + '<button type="button" class="btn btn-quiet" data-act="iv-all" id="iv-all">Show all answers</button></div>' + voiceSlot() +
+    '<div class="iv-filters"><label class="field"><span>Topic</span><select id="iv-mod">' + modOpts + '</select></label>' +
+    '<label class="field"><span>Level</span><select id="iv-level">' + lvOpts + '</select></label>' +
+    '<label class="field"><span>Show</span><select id="iv-status">' + stOpts + '</select></label>' +
+    '<label class="field grow"><span>Search</span><input id="iv-q" type="search" placeholder="Search questions and answers" autocomplete="off" value="' + e(ivFilter.q) + '"></label></div></section>' +
+    '<div class="wrap narrow"><p class="small" id="iv-count" role="status"></p><div id="iv-list"></div></div>';
+  view.voice = '#iv-list'; view.voiceLabel = 'Interview hub';
+  view.after = function () {
+    function paint() {
+      var items = ivItems();
+      $('#iv-list').innerHTML = ivListHtml(items);
+      $('#iv-count').textContent = plural(items.length, 'question') + ' shown.';
+      $('#iv-stats').textContent = ivStats();
+      wireSay($('#iv-list'));
+    }
+    $('#iv-mod').addEventListener('change', function (ev) { ivFilter.mod = ev.target.value; paint(); });
+    $('#iv-level').addEventListener('change', function (ev) { ivFilter.level = ev.target.value; paint(); });
+    $('#iv-status').addEventListener('change', function (ev) { ivFilter.status = ev.target.value; paint(); });
+    $('#iv-q').addEventListener('input', function (ev) { ivFilter.q = ev.target.value; paint(); });
+    paint();
+  };
+}
+function ivToggle(card, open) {
+  var a = $('.iv-a', card), b = $('[data-act=iv-show]', card), r = $('.iv-rate', card);
+  a.hidden = !open; r.hidden = !open;
+  b.setAttribute('aria-expanded', String(open)); b.textContent = open ? 'Hide answer' : 'Show answer';
 }
 
 /* ----- labs ----- */
@@ -510,7 +636,7 @@ function labsView() {
     '<li><strong>Kubernetes and Docker exercises</strong> that match the lesson you just passed, including CKA and CKS style tasks.</li>' +
     '<li><strong>Infrastructure as code exercises</strong> for Terraform plans and state problems.</li></ul>' +
     '<h2>What you can do today</h2><p>Each lesson contains a written incident walkthrough with sample output, a lesson check and flashcards. Cheat sheets cover the commands you will use when labs arrive.</p>' +
-    '<p><a class="btn btn-primary" href="https://eknathalabs.substack.com" target="_blank" rel="noopener">Get launch news in the newsletter</a></p></div>';
+    '<p><a class="btn btn-primary" href="#/paths">Choose a learning path</a></p></div>';
   view.after = null;
 }
 
@@ -546,7 +672,7 @@ function progressView() {
         try {
           var o = JSON.parse(r.result);
           if (!o || o.v !== 1 || typeof o.lessons !== 'object' || !Array.isArray(o.days)) throw new Error('bad');
-          S = { v: 1, lessons: o.lessons || {}, cards: o.cards || {}, days: o.days, path: o.path || 'devops' };
+          S = { v: 1, lessons: o.lessons || {}, cards: o.cards || {}, days: o.days, path: o.path || 'devops', iv: (o.iv && typeof o.iv === 'object') ? o.iv : {} };
           save(); renderChrome(); toast('Progress imported.'); route();
         } catch (x) { toast('That file is not a MARGA progress export.'); }
       };
@@ -560,12 +686,13 @@ var routes = [
   [/^\/$/, homeView], [/^\/paths$/, pathsView], [/^\/path\/([\w-]+)$/, pathView],
   [/^\/module\/([\w-]+)$/, moduleView], [/^\/lesson\/([\w-]+)\/([\w-]+)$/, lessonView],
   [/^\/cheatsheets$/, sheetsView], [/^\/cheatsheet\/([\w-]+)$/, sheetView],
-  [/^\/review$/, reviewView], [/^\/labs$/, labsView], [/^\/progress$/, progressView]
+  [/^\/review$/, reviewView], [/^\/labs$/, labsView], [/^\/progress$/, progressView], [/^\/interview$/, interviewView]
 ];
 function route() {
   var h = location.hash.replace(/^#/, '') || '/';
   if (h.charAt(0) !== '/') h = '/';
   var res;
+  view.voice = ''; view.voiceLabel = '';
   for (var i = 0; i < routes.length; i++) {
     var m = h.match(routes[i][0]);
     if (m) { res = routes[i][1].apply(null, m.slice(1)); break; }
@@ -573,10 +700,12 @@ function route() {
   if (res === undefined && !routes.some(function (r) { return r[0].test(h); })) notFound();
   if (res === 'redirect') return;
   document.title = view.title;
+  if (window.MargaVoice) MargaVoice.stop();
   $('#main').innerHTML = view.html;
   setNav(view.nav);
   window.scrollTo(0, 0);
   if (view.after) view.after();
+  mountVoice();
   var hd = $('#main h1'); if (hd) { hd.setAttribute('tabindex', '-1'); }
 }
 
@@ -662,7 +791,22 @@ document.addEventListener('click', function (ev) {
   var act = t.closest('[data-act]');
   if (!act) return;
   var a = act.getAttribute('data-act');
-  if (a === 'search') openSearch();
+  if (a === 'iv-show') { var cardEl = act.closest('.iv'); ivToggle(cardEl, act.getAttribute('aria-expanded') !== 'true'); }
+  else if (a === 'iv-all') {
+    var openAll = act.getAttribute('data-open') !== '1';
+    $$('#iv-list .iv').forEach(function (c) { ivToggle(c, openAll); });
+    act.setAttribute('data-open', openAll ? '1' : '0'); act.textContent = openAll ? 'Hide all answers' : 'Show all answers';
+  } else if (a === 'iv-rate') {
+    var c2 = act.closest('.iv'), id2 = c2.getAttribute('data-id'), rv = act.getAttribute('data-r');
+    S.iv = S.iv || {}; S.iv[id2] = rv; markActive(); save(); renderChrome(); setNav(view.nav);
+    c2.classList.remove('r-know', 'r-review'); c2.classList.add('r-' + rv);
+    var meta = $('.iv-meta', c2); $$('.chip.pass, .chip.warn', meta).forEach(function (x) { x.remove(); });
+    meta.insertAdjacentHTML('beforeend', rv === 'know' ? '<span class="chip pass">Known</span>' : '<span class="chip warn">Review</span>');
+    var st2 = $('#iv-stats'); if (st2) st2.textContent = ivStats();
+    toast(rv === 'know' ? 'Marked as known.' : 'Marked for review.');
+  } else if (a === 'print') doPrint(false);
+  else if (a === 'pdf') doPrint(true);
+  else if (a === 'search') openSearch();
   else if (a === 'close-search') closeSearch();
   else if (a === 'theme') {
     var n = theme() === 'dark' ? 'light' : 'dark';
