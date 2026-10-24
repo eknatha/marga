@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>systemd and services cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="Manage services, write unit files, read the journal, schedule with timers and harden services.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/systemd.html">
+<meta property="og:title" content="systemd and services cheat sheet">
+<meta property="og:description" content="Manage services, write unit files, read the journal, schedule with timers and harden services.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/systemd.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=0e68a589">
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>systemd and services cheat sheet</h1>
+    <p class="lede">Manage services, write unit files, read the journal, schedule with timers and harden services.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" onclick="window.print()">Print or save as PDF</button></div>
+  </header>
+  <article class="sheet"><h2 id="service-control">Service control</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="systemctl status nginx
+systemctl start nginx
+systemctl stop nginx
+systemctl restart nginx
+systemctl reload nginx                 # reload config without a full restart
+systemctl enable --now nginx           # start now and at boot
+systemctl disable nginx
+systemctl is-active nginx
+systemctl is-enabled nginx
+systemctl list-units --type=service --state=running
+systemctl list-units --failed
+systemctl daemon-reload                # after editing unit files" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">systemctl status nginx
+systemctl start nginx
+systemctl stop nginx
+systemctl restart nginx
+systemctl reload nginx                 <span class="hljs-comment"># reload config without a full restart</span>
+systemctl <span class="hljs-built_in">enable</span> --now nginx           <span class="hljs-comment"># start now and at boot</span>
+systemctl <span class="hljs-built_in">disable</span> nginx
+systemctl is-active nginx
+systemctl is-enabled nginx
+systemctl list-units --<span class="hljs-built_in">type</span>=service --state=running
+systemctl list-units --failed
+systemctl daemon-reload                <span class="hljs-comment"># after editing unit files</span></code></pre></div>
+<h2 id="a-service-unit">A service unit</h2>
+<div class="code" data-lang="ini"><button class="copy" type="button" data-copy="[Unit]
+Description=Shop API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=shop
+Group=shop
+WorkingDirectory=/opt/shop
+EnvironmentFile=/etc/shop/shop.env
+ExecStart=/opt/shop/bin/server --port 8080
+Restart=on-failure
+RestartSec=3
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-section">[Unit]</span>
+<span class="hljs-attr">Description</span>=Shop API
+<span class="hljs-attr">After</span>=network-<span class="hljs-literal">on</span>line.target
+<span class="hljs-attr">Wants</span>=network-<span class="hljs-literal">on</span>line.target
+
+<span class="hljs-section">[Service]</span>
+<span class="hljs-attr">User</span>=shop
+<span class="hljs-attr">Group</span>=shop
+<span class="hljs-attr">WorkingDirectory</span>=/opt/shop
+<span class="hljs-attr">EnvironmentFile</span>=/etc/shop/shop.env
+<span class="hljs-attr">ExecStart</span>=/opt/shop/bin/server --port <span class="hljs-number">8080</span>
+<span class="hljs-attr">Restart</span>=<span class="hljs-literal">on</span>-failure
+<span class="hljs-attr">RestartSec</span>=<span class="hljs-number">3</span>
+<span class="hljs-attr">LimitNOFILE</span>=<span class="hljs-number">65536</span>
+
+<span class="hljs-section">[Install]</span>
+<span class="hljs-attr">WantedBy</span>=multi-user.target</code></pre></div>
+<p>Save as <code>/etc/systemd/system/shop.service</code>, then run <code>systemctl daemon-reload</code> and <code>systemctl enable --now shop</code>.</p>
+<div class="table-wrap"><table><thead><tr>
+<th>Setting</th>
+<th>Meaning</th>
+</tr>
+</thead><tbody><tr>
+<td><code>After=</code></td>
+<td>Start order only</td>
+</tr>
+<tr>
+<td><code>Wants=</code> / <code>Requires=</code></td>
+<td>Soft / hard dependency</td>
+</tr>
+<tr>
+<td><code>Restart=on-failure</code></td>
+<td>Restart after a crash</td>
+</tr>
+<tr>
+<td><code>Type=simple</code></td>
+<td>Default: the main process is <code>ExecStart</code></td>
+</tr>
+<tr>
+<td><code>EnvironmentFile=</code></td>
+<td>Load variables from a file</td>
+</tr>
+</tbody></table></div>
+<h2 id="overrides-without-editing-vendor-files">Overrides without editing vendor files</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="systemctl edit nginx                   # creates a drop-in override
+systemctl cat nginx                    # show the effective unit
+systemctl show nginx -p MainPID,ActiveState,MemoryCurrent" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">systemctl edit nginx                   <span class="hljs-comment"># creates a drop-in override</span>
+systemctl <span class="hljs-built_in">cat</span> nginx                    <span class="hljs-comment"># show the effective unit</span>
+systemctl show nginx -p MainPID,ActiveState,MemoryCurrent</code></pre></div>
+<h2 id="journal">Journal</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="journalctl -u shop                      # one service
+journalctl -u shop -f                   # follow
+journalctl -u shop --since &quot;1 hour ago&quot;
+journalctl -u shop -p err               # errors and worse
+journalctl -b                           # this boot
+journalctl -b -1                        # previous boot
+journalctl --disk-usage
+journalctl --vacuum-time=7d             # trim old entries
+journalctl -o json-pretty -n 1 -u shop" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">journalctl -u shop                      <span class="hljs-comment"># one service</span>
+journalctl -u shop -f                   <span class="hljs-comment"># follow</span>
+journalctl -u shop --since <span class="hljs-string">&quot;1 hour ago&quot;</span>
+journalctl -u shop -p err               <span class="hljs-comment"># errors and worse</span>
+journalctl -b                           <span class="hljs-comment"># this boot</span>
+journalctl -b -1                        <span class="hljs-comment"># previous boot</span>
+journalctl --disk-usage
+journalctl --vacuum-time=7d             <span class="hljs-comment"># trim old entries</span>
+journalctl -o json-pretty -n 1 -u shop</code></pre></div>
+<h2 id="timers-a-modern-alternative-to-cron">Timers (a modern alternative to cron)</h2>
+<div class="code" data-lang="ini"><button class="copy" type="button" data-copy="# /etc/systemd/system/backup.timer
+[Unit]
+Description=Nightly backup
+
+[Timer]
+OnCalendar=*-*-* 02:30:00
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-comment"># /etc/systemd/system/backup.timer</span>
+<span class="hljs-section">[Unit]</span>
+<span class="hljs-attr">Description</span>=Nightly backup
+
+<span class="hljs-section">[Timer]</span>
+<span class="hljs-attr">OnCalendar</span>=*-*-* <span class="hljs-number">02</span>:<span class="hljs-number">30</span>:<span class="hljs-number">00</span>
+<span class="hljs-attr">Persistent</span>=<span class="hljs-literal">true</span>
+<span class="hljs-attr">RandomizedDelaySec</span>=<span class="hljs-number">300</span>
+
+<span class="hljs-section">[Install]</span>
+<span class="hljs-attr">WantedBy</span>=timers.target</code></pre></div>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="systemctl enable --now backup.timer
+systemctl list-timers --all
+systemd-analyze calendar &quot;Mon *-*-* 03:00&quot;   # test a schedule" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">systemctl <span class="hljs-built_in">enable</span> --now backup.timer
+systemctl list-timers --all
+systemd-analyze calendar <span class="hljs-string">&quot;Mon *-*-* 03:00&quot;</span>   <span class="hljs-comment"># test a schedule</span></code></pre></div>
+<p><code>Persistent=true</code> runs a missed job after the machine was off.</p>
+<h2 id="hardening-options">Hardening options</h2>
+<div class="code" data-lang="ini"><button class="copy" type="button" data-copy="[Service]
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/shop
+CapabilityBoundingSet=
+MemoryMax=512M" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-section">[Service]</span>
+<span class="hljs-attr">NoNewPrivileges</span>=<span class="hljs-literal">true</span>
+<span class="hljs-attr">ProtectSystem</span>=strict
+<span class="hljs-attr">ProtectHome</span>=<span class="hljs-literal">true</span>
+<span class="hljs-attr">PrivateTmp</span>=<span class="hljs-literal">true</span>
+<span class="hljs-attr">ReadWritePaths</span>=/var/lib/shop
+<span class="hljs-attr">CapabilityBoundingSet</span>=
+<span class="hljs-attr">MemoryMax</span>=<span class="hljs-number">512</span>M</code></pre></div>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="systemd-analyze security shop.service     # exposure score and suggestions" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">systemd-analyze security shop.service     <span class="hljs-comment"># exposure score and suggestions</span></code></pre></div>
+<h2 id="troubleshooting-a-failing-service">Troubleshooting a failing service</h2>
+<ol>
+<li><code>systemctl status NAME</code> for state, exit code and the last log lines</li>
+<li><code>journalctl -u NAME -b</code> for the full log of this boot</li>
+<li><code>systemctl cat NAME</code> to confirm which unit file and overrides apply</li>
+<li>Run the <code>ExecStart</code> command by hand as the service user</li>
+<li>Check permissions on files, the working directory and ports</li>
+<li><code>systemctl daemon-reload</code> if you edited the unit and nothing changed</li>
+</ol>
+<div class="table-wrap"><table><thead><tr>
+<th>Symptom</th>
+<th>Likely cause</th>
+</tr>
+</thead><tbody><tr>
+<td><code>status=203/EXEC</code></td>
+<td>Wrong path or not executable</td>
+</tr>
+<tr>
+<td><code>status=217/USER</code></td>
+<td>User does not exist</td>
+</tr>
+<tr>
+<td><code>status=200/CHDIR</code></td>
+<td>Missing working directory</td>
+</tr>
+<tr>
+<td>Restart loop</td>
+<td>App crashes; read the journal; check <code>RestartSec</code></td>
+</tr>
+<tr>
+<td><code>start-limit-hit</code></td>
+<td>Too many rapid restarts; fix cause, then <code>systemctl reset-failed NAME</code></td>
+</tr>
+</tbody></table></div>
+</article>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://eknathalabs.com" rel="noopener">Blog</a><a href="https://eknathalabs.substack.com" rel="noopener">Newsletter</a></div></footer>
+<script>
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

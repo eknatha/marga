@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terraform cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="Workflow commands, HCL syntax, state operations, meta-arguments and safe pipeline practices.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/terraform.html">
+<meta property="og:title" content="Terraform cheat sheet">
+<meta property="og:description" content="Workflow commands, HCL syntax, state operations, meta-arguments and safe pipeline practices.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/terraform.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=0e68a589">
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>Terraform cheat sheet</h1>
+    <p class="lede">Workflow commands, HCL syntax, state operations, meta-arguments and safe pipeline practices.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" onclick="window.print()">Print or save as PDF</button></div>
+  </header>
+  <article class="sheet"><h2 id="workflow">Workflow</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="terraform init
+terraform fmt -recursive
+terraform validate
+terraform plan -out=tfplan
+terraform apply tfplan
+terraform destroy
+terraform output
+terraform output -raw bucket_name" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">terraform init
+terraform <span class="hljs-built_in">fmt</span> -recursive
+terraform validate
+terraform plan -out=tfplan
+terraform apply tfplan
+terraform destroy
+terraform output
+terraform output -raw bucket_name</code></pre></div>
+<div class="table-wrap"><table><thead><tr>
+<th>Plan symbol</th>
+<th>Meaning</th>
+</tr>
+</thead><tbody><tr>
+<td><code>+</code></td>
+<td>Create</td>
+</tr>
+<tr>
+<td><code>~</code></td>
+<td>Update in place</td>
+</tr>
+<tr>
+<td><code>-</code></td>
+<td>Destroy</td>
+</tr>
+<tr>
+<td><code>-/+</code></td>
+<td>Replace (destroy and recreate)</td>
+</tr>
+</tbody></table></div>
+<p>Read the summary line and every <code>-</code> or <code>-/+</code> before you apply.</p>
+<h2 id="configuration-skeleton">Configuration skeleton</h2>
+<div class="code" data-lang="hcl"><button class="copy" type="button" data-copy="terraform {
+  required_version = &quot;&gt;= 1.6&quot;
+  required_providers {
+    aws = {
+      source  = &quot;hashicorp/aws&quot;
+      version = &quot;~&gt; 5.0&quot;
+    }
+  }
+}
+
+provider &quot;aws&quot; {
+  region = var.region
+}
+
+variable &quot;region&quot; {
+  type    = string
+  default = &quot;eu-west-1&quot;
+}
+
+resource &quot;aws_s3_bucket&quot; &quot;logs&quot; {
+  bucket = &quot;acme-logs-${var.environment}&quot;
+}
+
+output &quot;bucket_arn&quot; {
+  value = aws_s3_bucket.logs.arn
+}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">terraform</span> {
+<span class="hljs-attr">  required_version</span> = <span class="hljs-string">&quot;&gt;= 1.6&quot;</span>
+  <span class="hljs-keyword">required_providers</span> {
+<span class="hljs-attr">    aws</span> = {
+<span class="hljs-attr">      source</span>  = <span class="hljs-string">&quot;hashicorp/aws&quot;</span>
+<span class="hljs-attr">      version</span> = <span class="hljs-string">&quot;~&gt; 5.0&quot;</span>
+    }
+  }
+}
+
+<span class="hljs-keyword">provider</span> <span class="hljs-string">&quot;aws&quot;</span> {
+<span class="hljs-attr">  region</span> = <span class="hljs-built_in">var</span>.region
+}
+
+<span class="hljs-keyword">variable</span> <span class="hljs-string">&quot;region&quot;</span> {
+<span class="hljs-attr">  type</span>    = string
+<span class="hljs-attr">  default</span> = <span class="hljs-string">&quot;eu-west-1&quot;</span>
+}
+
+<span class="hljs-keyword">resource</span> <span class="hljs-string">&quot;aws_s3_bucket&quot;</span> <span class="hljs-string">&quot;logs&quot;</span> {
+<span class="hljs-attr">  bucket</span> = <span class="hljs-string">&quot;acme-logs-${var.environment}&quot;</span>
+}
+
+<span class="hljs-keyword">output</span> <span class="hljs-string">&quot;bucket_arn&quot;</span> {
+<span class="hljs-attr">  value</span> = aws_s3_bucket.logs.arn
+}</code></pre></div>
+<h2 id="variables">Variables</h2>
+<div class="code" data-lang="hcl"><button class="copy" type="button" data-copy="variable &quot;environment&quot; {
+  type        = string
+  description = &quot;dev, staging or prod&quot;
+  validation {
+    condition     = contains([&quot;dev&quot;, &quot;staging&quot;, &quot;prod&quot;], var.environment)
+    error_message = &quot;Must be dev, staging or prod.&quot;
+  }
+}
+
+variable &quot;db_password&quot; {
+  type      = string
+  sensitive = true
+}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">variable</span> <span class="hljs-string">&quot;environment&quot;</span> {
+<span class="hljs-attr">  type</span>        = string
+<span class="hljs-attr">  description</span> = <span class="hljs-string">&quot;dev, staging or prod&quot;</span>
+  validation {
+<span class="hljs-attr">    condition</span>     = contains([<span class="hljs-string">&quot;dev&quot;</span>, <span class="hljs-string">&quot;staging&quot;</span>, <span class="hljs-string">&quot;prod&quot;</span>], <span class="hljs-built_in">var</span>.environment)
+<span class="hljs-attr">    error_message</span> = <span class="hljs-string">&quot;Must be dev, staging or prod.&quot;</span>
+  }
+}
+
+<span class="hljs-keyword">variable</span> <span class="hljs-string">&quot;db_password&quot;</span> {
+<span class="hljs-attr">  type</span>      = string
+<span class="hljs-attr">  sensitive</span> = <span class="hljs-literal">true</span>
+}</code></pre></div>
+<p>Precedence (low to high): default, <code>TF_VAR_name</code>, <code>terraform.tfvars</code>, <code>-var-file</code>, <code>-var</code>.</p>
+<h2 id="expressions">Expressions</h2>
+<div class="code" data-lang="hcl"><button class="copy" type="button" data-copy="locals {
+  prefix = &quot;shop-${var.environment}&quot;
+  is_prod = var.environment == &quot;prod&quot;
+  names   = [for n in var.names : upper(n)]
+  size    = local.is_prod ? &quot;m5.large&quot; : &quot;t3.micro&quot;
+}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">locals</span> {
+<span class="hljs-attr">  prefix</span> = <span class="hljs-string">&quot;shop-${var.environment}&quot;</span>
+<span class="hljs-attr">  is_prod</span> = <span class="hljs-built_in">var</span>.environment == <span class="hljs-string">&quot;prod&quot;</span>
+<span class="hljs-attr">  names</span>   = [for n in <span class="hljs-built_in">var</span>.names : upper(n)]
+<span class="hljs-attr">  size</span>    = <span class="hljs-built_in">local</span>.is_prod ? <span class="hljs-string">&quot;m5.large&quot;</span> : <span class="hljs-string">&quot;t3.micro&quot;</span>
+}</code></pre></div>
+<div class="table-wrap"><table><thead><tr>
+<th>Function</th>
+<th>Example</th>
+</tr>
+</thead><tbody><tr>
+<td><code>merge(a, b)</code></td>
+<td>Combine maps</td>
+</tr>
+<tr>
+<td><code>lookup(map, key, default)</code></td>
+<td>Safe map access</td>
+</tr>
+<tr>
+<td><code>cidrsubnet(cidr, 8, 1)</code></td>
+<td>Carve a subnet</td>
+</tr>
+<tr>
+<td><code>join(&quot;,&quot;, list)</code></td>
+<td>Make a string</td>
+</tr>
+<tr>
+<td><code>try(expr, fallback)</code></td>
+<td>Fall back on error</td>
+</tr>
+</tbody></table></div>
+<p>Experiment with <code>terraform console</code>.</p>
+<h2 id="meta-arguments">Meta-arguments</h2>
+<div class="code" data-lang="hcl"><button class="copy" type="button" data-copy="resource &quot;aws_subnet&quot; &quot;multi&quot; {
+  for_each          = var.subnets          # map or set, stable keys
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = each.value
+}
+
+resource &quot;aws_instance&quot; &quot;web&quot; {
+  count = var.enabled ? 1 : 0              # on/off switch
+  lifecycle {
+    prevent_destroy       = true
+    create_before_destroy = true
+    ignore_changes        = [tags]
+  }
+}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">resource</span> <span class="hljs-string">&quot;aws_subnet&quot;</span> <span class="hljs-string">&quot;multi&quot;</span> {
+<span class="hljs-attr">  for_each</span>          = <span class="hljs-built_in">var</span>.subnets          <span class="hljs-comment"># map or set, stable keys</span>
+<span class="hljs-attr">  vpc_id</span>            = aws_vpc.main.id
+<span class="hljs-attr">  cidr_block</span>        = <span class="hljs-built_in">each</span>.value
+}
+
+<span class="hljs-keyword">resource</span> <span class="hljs-string">&quot;aws_instance&quot;</span> <span class="hljs-string">&quot;web&quot;</span> {
+<span class="hljs-attr">  count</span> = <span class="hljs-built_in">var</span>.enabled ? <span class="hljs-number">1</span> : <span class="hljs-number">0</span>              <span class="hljs-comment"># on/off switch</span>
+  <span class="hljs-keyword">lifecycle</span> {
+<span class="hljs-attr">    prevent_destroy</span>       = <span class="hljs-literal">true</span>
+<span class="hljs-attr">    create_before_destroy</span> = <span class="hljs-literal">true</span>
+<span class="hljs-attr">    ignore_changes</span>        = [tags]
+  }
+}</code></pre></div>
+<p>Prefer <code>for_each</code> to <code>count</code> for collections; <code>count</code> shifts indexes when an item is removed.</p>
+<h2 id="state">State</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="terraform state list
+terraform state show aws_s3_bucket.logs
+terraform state rm aws_s3_bucket.legacy     # forget, do not delete
+terraform apply -refresh-only               # record reality without changing it
+terraform force-unlock LOCK_ID              # only when no run is active" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">terraform state list
+terraform state show aws_s3_bucket.logs
+terraform state <span class="hljs-built_in">rm</span> aws_s3_bucket.legacy     <span class="hljs-comment"># forget, do not delete</span>
+terraform apply -refresh-only               <span class="hljs-comment"># record reality without changing it</span>
+terraform force-unlock LOCK_ID              <span class="hljs-comment"># only when no run is active</span></code></pre></div>
+<div class="code" data-lang="hcl"><button class="copy" type="button" data-copy="moved {
+  from = aws_s3_bucket.logs
+  to   = aws_s3_bucket.audit_logs
+}
+
+import {
+  to = aws_s3_bucket.legacy
+  id = &quot;acme-legacy-reports&quot;
+}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">moved</span> {
+<span class="hljs-attr">  from</span> = aws_s3_bucket.logs
+<span class="hljs-attr">  to</span>   = aws_s3_bucket.audit_logs
+}
+
+<span class="hljs-keyword">import</span> {
+<span class="hljs-attr">  to</span> = aws_s3_bucket.legacy
+<span class="hljs-attr">  id</span> = <span class="hljs-string">&quot;acme-legacy-reports&quot;</span>
+}</code></pre></div>
+<h2 id="remote-backend">Remote backend</h2>
+<div class="code" data-lang="hcl"><button class="copy" type="button" data-copy="terraform {
+  backend &quot;s3&quot; {
+    bucket       = &quot;acme-terraform-state&quot;
+    key          = &quot;shop/prod/terraform.tfstate&quot;
+    region       = &quot;eu-west-1&quot;
+    encrypt      = true
+    use_lockfile = true
+  }
+}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">terraform</span> {
+  <span class="hljs-keyword">backend</span> <span class="hljs-string">&quot;s3&quot;</span> {
+<span class="hljs-attr">    bucket</span>       = <span class="hljs-string">&quot;acme-terraform-state&quot;</span>
+<span class="hljs-attr">    key</span>          = <span class="hljs-string">&quot;shop/prod/terraform.tfstate&quot;</span>
+<span class="hljs-attr">    region</span>       = <span class="hljs-string">&quot;eu-west-1&quot;</span>
+<span class="hljs-attr">    encrypt</span>      = <span class="hljs-literal">true</span>
+<span class="hljs-attr">    use_lockfile</span> = <span class="hljs-literal">true</span>
+  }
+}</code></pre></div>
+<p>Enable bucket versioning, restrict access, and keep one state per environment.</p>
+<h2 id="modules">Modules</h2>
+<div class="code" data-lang="hcl"><button class="copy" type="button" data-copy="module &quot;site&quot; {
+  source  = &quot;../../modules/static-site&quot;
+  name    = &quot;marketing-prod&quot;
+}
+
+output &quot;site_bucket&quot; {
+  value = module.site.bucket_name
+}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">module</span> <span class="hljs-string">&quot;site&quot;</span> {
+<span class="hljs-attr">  source</span>  = <span class="hljs-string">&quot;../../modules/static-site&quot;</span>
+<span class="hljs-attr">  name</span>    = <span class="hljs-string">&quot;marketing-prod&quot;</span>
+}
+
+<span class="hljs-keyword">output</span> <span class="hljs-string">&quot;site_bucket&quot;</span> {
+<span class="hljs-attr">  value</span> = <span class="hljs-keyword">module</span>.site.bucket_name
+}</code></pre></div>
+<p>Pin versions of modules you do not own. Run <code>terraform init</code> after adding a module.</p>
+<h2 id="pipeline-checks">Pipeline checks</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="terraform fmt -check -recursive
+terraform validate
+tflint
+trivy config .
+terraform plan -detailed-exitcode     # 0 none, 1 error, 2 changes
+terraform test" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">terraform <span class="hljs-built_in">fmt</span> -check -recursive
+terraform validate
+tflint
+trivy config .
+terraform plan -detailed-exitcode     <span class="hljs-comment"># 0 none, 1 error, 2 changes</span>
+terraform <span class="hljs-built_in">test</span></code></pre></div>
+</article>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://eknathalabs.com" rel="noopener">Blog</a><a href="https://eknathalabs.substack.com" rel="noopener">Newsletter</a></div></footer>
+<script>
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

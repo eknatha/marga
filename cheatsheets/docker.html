@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docker and Compose cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="Run, build, inspect, clean up and harden containers, plus everyday Compose commands.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/docker.html">
+<meta property="og:title" content="Docker and Compose cheat sheet">
+<meta property="og:description" content="Run, build, inspect, clean up and harden containers, plus everyday Compose commands.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/docker.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=0e68a589">
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>Docker and Compose cheat sheet</h1>
+    <p class="lede">Run, build, inspect, clean up and harden containers, plus everyday Compose commands.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" onclick="window.print()">Print or save as PDF</button></div>
+  </header>
+  <article class="sheet"><h2 id="run-and-manage">Run and manage</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="docker run -d --name web -p 8080:80 nginx:1.27
+docker run --rm -it alpine:3.20 sh          # throwaway interactive container
+docker ps -a                                 # include stopped
+docker stop web &amp;&amp; docker rm web
+docker exec -it web sh                       # shell in a running container
+docker logs -f --tail 50 web
+docker cp web:/etc/nginx/nginx.conf ./nginx.conf" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">docker run -d --name web -p 8080:80 nginx:1.27
+docker run --<span class="hljs-built_in">rm</span> -it alpine:3.20 sh          <span class="hljs-comment"># throwaway interactive container</span>
+docker ps -a                                 <span class="hljs-comment"># include stopped</span>
+docker stop web &amp;&amp; docker <span class="hljs-built_in">rm</span> web
+docker <span class="hljs-built_in">exec</span> -it web sh                       <span class="hljs-comment"># shell in a running container</span>
+docker logs -f --<span class="hljs-built_in">tail</span> 50 web
+docker <span class="hljs-built_in">cp</span> web:/etc/nginx/nginx.conf ./nginx.conf</code></pre></div>
+<div class="table-wrap"><table><thead><tr>
+<th>Flag</th>
+<th>Meaning</th>
+</tr>
+</thead><tbody><tr>
+<td><code>-d</code></td>
+<td>Run in the background</td>
+</tr>
+<tr>
+<td><code>-p HOST:CONTAINER</code></td>
+<td>Publish a port</td>
+</tr>
+<tr>
+<td><code>-e KEY=value</code></td>
+<td>Set an environment variable</td>
+</tr>
+<tr>
+<td><code>-v NAME:/path</code></td>
+<td>Mount a volume</td>
+</tr>
+<tr>
+<td><code>--network NAME</code></td>
+<td>Join a network</td>
+</tr>
+<tr>
+<td><code>--restart unless-stopped</code></td>
+<td>Restart policy</td>
+</tr>
+<tr>
+<td><code>--memory 512m --cpus 1</code></td>
+<td>Resource limits</td>
+</tr>
+<tr>
+<td><code>--user 10001</code></td>
+<td>Run as a non-root user</td>
+</tr>
+</tbody></table></div>
+<h2 id="build-and-ship">Build and ship</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="docker build -t shop-api:1.8.2 .
+docker build --no-cache -t shop-api:dev .
+docker tag shop-api:1.8.2 registry.example.com/shop-api:1.8.2
+docker push registry.example.com/shop-api:1.8.2
+docker pull registry.example.com/shop-api:1.8.2
+docker history shop-api:1.8.2" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">docker build -t shop-api:1.8.2 .
+docker build --no-cache -t shop-api:dev .
+docker tag shop-api:1.8.2 registry.example.com/shop-api:1.8.2
+docker push registry.example.com/shop-api:1.8.2
+docker pull registry.example.com/shop-api:1.8.2
+docker <span class="hljs-built_in">history</span> shop-api:1.8.2</code></pre></div>
+<h2 id="dockerfile-essentials">Dockerfile essentials</h2>
+<div class="code" data-lang="dockerfile"><button class="copy" type="button" data-copy="FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+USER 10001
+EXPOSE 8080
+CMD [&quot;python&quot;, &quot;app.py&quot;]" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">FROM</span> python:<span class="hljs-number">3.12</span>-slim
+<span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> requirements.txt .</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> pip install --no-cache-dir -r requirements.txt</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> . .</span>
+<span class="hljs-keyword">USER</span> <span class="hljs-number">10001</span>
+<span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">8080</span>
+<span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;python&quot;</span>, <span class="hljs-string">&quot;app.py&quot;</span>]</span></code></pre></div>
+<div class="table-wrap"><table><thead><tr>
+<th>Rule</th>
+<th>Why</th>
+</tr>
+</thead><tbody><tr>
+<td>Copy dependency files first</td>
+<td>Keeps the install layer cached</td>
+</tr>
+<tr>
+<td>Pin base image versions</td>
+<td>Reproducible builds</td>
+</tr>
+<tr>
+<td>Use multi-stage builds</td>
+<td>Small final image without build tools</td>
+</tr>
+<tr>
+<td>Use exec form for <code>CMD</code></td>
+<td>Program is PID 1 and receives signals</td>
+</tr>
+<tr>
+<td>Add <code>.dockerignore</code></td>
+<td>Smaller context, no secrets copied</td>
+</tr>
+</tbody></table></div>
+<h2 id="volumes-and-networks">Volumes and networks</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="docker volume create pgdata
+docker volume ls
+docker volume inspect pgdata
+docker network create backend
+docker network connect backend web
+docker network inspect backend" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">docker volume create pgdata
+docker volume <span class="hljs-built_in">ls</span>
+docker volume inspect pgdata
+docker network create backend
+docker network connect backend web
+docker network inspect backend</code></pre></div>
+<p>On a user-defined network containers resolve each other by name. The default bridge does not.</p>
+<h2 id="inspect-and-debug">Inspect and debug</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="docker inspect web --format '{{.State.ExitCode}} oom={{.State.OOMKilled}}'
+docker inspect web --format '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}'
+docker stats --no-stream
+docker top web
+docker events --since 10m
+docker run --rm -it --entrypoint sh shop-api:1.8.2" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">docker inspect web --format <span class="hljs-string">&#x27;{{.State.ExitCode}} oom={{.State.OOMKilled}}&#x27;</span>
+docker inspect web --format <span class="hljs-string">&#x27;{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}&#x27;</span>
+docker stats --no-stream
+docker top web
+docker events --since 10m
+docker run --<span class="hljs-built_in">rm</span> -it --entrypoint sh shop-api:1.8.2</code></pre></div>
+<div class="table-wrap"><table><thead><tr>
+<th>Exit code</th>
+<th>Meaning</th>
+</tr>
+</thead><tbody><tr>
+<td>0</td>
+<td>Finished normally</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Application error</td>
+</tr>
+<tr>
+<td>125 / 126 / 127</td>
+<td>Docker error / not executable / command not found</td>
+</tr>
+<tr>
+<td>137</td>
+<td>SIGKILL, often out of memory</td>
+</tr>
+<tr>
+<td>139</td>
+<td>Segmentation fault</td>
+</tr>
+<tr>
+<td>143</td>
+<td>SIGTERM, normal stop</td>
+</tr>
+</tbody></table></div>
+<h2 id="clean-up">Clean up</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="docker system df                     # disk used by images, containers, volumes
+docker container prune               # remove stopped containers
+docker image prune -a                # remove unused images
+docker volume prune                  # remove unused volumes (check first)" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">docker system <span class="hljs-built_in">df</span>                     <span class="hljs-comment"># disk used by images, containers, volumes</span>
+docker container prune               <span class="hljs-comment"># remove stopped containers</span>
+docker image prune -a                <span class="hljs-comment"># remove unused images</span>
+docker volume prune                  <span class="hljs-comment"># remove unused volumes (check first)</span></code></pre></div>
+<h2 id="compose">Compose</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="docker compose up -d --build
+docker compose ps
+docker compose logs -f --tail 50 app
+docker compose exec db psql -U app -d appdb
+docker compose config                # validate and print the merged file
+docker compose down                  # keeps volumes
+docker compose down -v               # also deletes volumes: destroys data" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">docker compose up -d --build
+docker compose ps
+docker compose logs -f --<span class="hljs-built_in">tail</span> 50 app
+docker compose <span class="hljs-built_in">exec</span> db psql -U app -d appdb
+docker compose config                <span class="hljs-comment"># validate and print the merged file</span>
+docker compose down                  <span class="hljs-comment"># keeps volumes</span>
+docker compose down -v               <span class="hljs-comment"># also deletes volumes: destroys data</span></code></pre></div>
+<h2 id="hardened-run">Hardened run</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="docker run -d --name api \
+  --user 10001:10001 --read-only --tmpfs /tmp \
+  --cap-drop ALL --security-opt no-new-privileges \
+  --memory 512m --cpus 1 \
+  registry.example.com/shop-api:1.8.2" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">docker run -d --name api \
+  --user 10001:10001 --read-only --tmpfs /tmp \
+  --cap-drop ALL --security-opt no-new-privileges \
+  --memory 512m --cpus 1 \
+  registry.example.com/shop-api:1.8.2</code></pre></div>
+<p>Avoid <code>--privileged</code> and mounting <code>/var/run/docker.sock</code> into containers.</p>
+</article>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://eknathalabs.com" rel="noopener">Blog</a><a href="https://eknathalabs.substack.com" rel="noopener">Newsletter</a></div></footer>
+<script>
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

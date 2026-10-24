@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AWS cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="Identity, networking, compute, storage, cost and incident-response commands for AWS.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/aws.html">
+<meta property="og:title" content="AWS cheat sheet">
+<meta property="og:description" content="Identity, networking, compute, storage, cost and incident-response commands for AWS.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/aws.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=0e68a589">
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>AWS cheat sheet</h1>
+    <p class="lede">Identity, networking, compute, storage, cost and incident-response commands for AWS.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" onclick="window.print()">Print or save as PDF</button></div>
+  </header>
+  <article class="sheet"><h2 id="identity-and-cli">Identity and CLI</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="aws sts get-caller-identity
+aws configure list
+aws iam list-attached-role-policies --role-name shop-api-role
+aws iam simulate-principal-policy \
+  --policy-source-arn arn:aws:iam::123456789012:role/shop-api-role \
+  --action-names s3:GetObject \
+  --resource-arns arn:aws:s3:::acme-uploads/shop/logo.png
+aws iam generate-credential-report" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">aws sts get-caller-identity
+aws configure list
+aws iam list-attached-role-policies --role-name shop-api-role
+aws iam simulate-principal-policy \
+  --policy-source-arn arn:aws:iam::123456789012:role/shop-api-role \
+  --action-names s3:GetObject \
+  --resource-arns arn:aws:s3:::acme-uploads/shop/logo.png
+aws iam generate-credential-report</code></pre></div>
+<p>Use roles and temporary credentials. Deny beats allow. Check who you are before debugging what you may do.</p>
+<h2 id="policy-skeleton">Policy skeleton</h2>
+<div class="code" data-lang="json"><button class="copy" type="button" data-copy="{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Action&quot;: [&quot;s3:GetObject&quot;],
+      &quot;Resource&quot;: &quot;arn:aws:s3:::acme-uploads/shop/*&quot;
+    }
+  ]
+}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;Version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2012-10-17&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;Statement&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+    <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;Effect&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Allow&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;Action&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;s3:GetObject&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;Resource&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;arn:aws:s3:::acme-uploads/shop/*&quot;</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span></code></pre></div>
+<h2 id="networking">Networking</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="aws ec2 describe-vpcs --query 'Vpcs[].{id:VpcId,cidr:CidrBlock}'
+aws ec2 describe-subnets --filters Name=vpc-id,Values=VPC_ID \
+  --query 'Subnets[].{id:SubnetId,az:AvailabilityZone,cidr:CidrBlock}'
+aws ec2 describe-route-tables --filters Name=vpc-id,Values=VPC_ID
+aws ec2 describe-security-groups --group-ids SG_ID
+aws ec2 describe-nat-gateways" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">aws ec2 describe-vpcs --query <span class="hljs-string">&#x27;Vpcs[].{id:VpcId,cidr:CidrBlock}&#x27;</span>
+aws ec2 describe-subnets --filters Name=vpc-id,Values=VPC_ID \
+  --query <span class="hljs-string">&#x27;Subnets[].{id:SubnetId,az:AvailabilityZone,cidr:CidrBlock}&#x27;</span>
+aws ec2 describe-route-tables --filters Name=vpc-id,Values=VPC_ID
+aws ec2 describe-security-groups --group-ids SG_ID
+aws ec2 describe-nat-gateways</code></pre></div>
+<div class="table-wrap"><table><thead><tr>
+<th>Component</th>
+<th>Role</th>
+</tr>
+</thead><tbody><tr>
+<td>Internet gateway</td>
+<td>Route to and from the internet for public subnets</td>
+</tr>
+<tr>
+<td>NAT gateway</td>
+<td>Outbound-only internet for private subnets</td>
+</tr>
+<tr>
+<td>Security group</td>
+<td>Stateful, instance-level firewall</td>
+</tr>
+<tr>
+<td>Network ACL</td>
+<td>Stateless, subnet-level firewall</td>
+</tr>
+<tr>
+<td>VPC endpoint</td>
+<td>Private access to AWS services</td>
+</tr>
+<tr>
+<td>Reachability Analyzer</td>
+<td>Explains why a path is blocked</td>
+</tr>
+</tbody></table></div>
+<h2 id="compute">Compute</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="aws ec2 describe-instances --filters Name=instance-state-name,Values=running \
+  --query 'Reservations[].Instances[].[InstanceId,InstanceType,Tags[?Key==`Name`]|[0].Value]' --output table
+aws ec2 describe-volumes --filters Name=status,Values=available   # unattached disks
+aws autoscaling describe-auto-scaling-groups
+aws eks update-kubeconfig --name CLUSTER --region eu-west-1
+aws lambda list-functions --query 'Functions[].FunctionName'" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">aws ec2 describe-instances --filters Name=instance-state-name,Values=running \
+  --query <span class="hljs-string">&#x27;Reservations[].Instances[].[InstanceId,InstanceType,Tags[?Key==`Name`]|[0].Value]&#x27;</span> --output table
+aws ec2 describe-volumes --filters Name=status,Values=available   <span class="hljs-comment"># unattached disks</span>
+aws autoscaling describe-auto-scaling-groups
+aws eks update-kubeconfig --name CLUSTER --region eu-west-1
+aws lambda list-functions --query <span class="hljs-string">&#x27;Functions[].FunctionName&#x27;</span></code></pre></div>
+<h2 id="storage">Storage</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="aws s3 ls s3://acme-uploads/
+aws s3 sync ./site s3://acme-site --delete
+aws s3api get-bucket-versioning --bucket acme-uploads
+aws s3api put-public-access-block --bucket acme-reports \
+  --public-access-block-configuration \
+  BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">aws s3 <span class="hljs-built_in">ls</span> s3://acme-uploads/
+aws s3 <span class="hljs-built_in">sync</span> ./site s3://acme-site --delete
+aws s3api get-bucket-versioning --bucket acme-uploads
+aws s3api put-public-access-block --bucket acme-reports \
+  --public-access-block-configuration \
+  BlockPublicAcls=<span class="hljs-literal">true</span>,IgnorePublicAcls=<span class="hljs-literal">true</span>,BlockPublicPolicy=<span class="hljs-literal">true</span>,RestrictPublicBuckets=<span class="hljs-literal">true</span></code></pre></div>
+<div class="table-wrap"><table><thead><tr>
+<th>Type</th>
+<th>Service</th>
+</tr>
+</thead><tbody><tr>
+<td>Object</td>
+<td>S3</td>
+</tr>
+<tr>
+<td>Block</td>
+<td>EBS</td>
+</tr>
+<tr>
+<td>Shared file</td>
+<td>EFS, FSx</td>
+</tr>
+</tbody></table></div>
+<h2 id="databases-and-messaging">Databases and messaging</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Need</th>
+<th>Service</th>
+</tr>
+</thead><tbody><tr>
+<td>Relational</td>
+<td>RDS, Aurora</td>
+</tr>
+<tr>
+<td>Key-value</td>
+<td>DynamoDB</td>
+</tr>
+<tr>
+<td>Cache</td>
+<td>ElastiCache</td>
+</tr>
+<tr>
+<td>Queue / pub-sub</td>
+<td>SQS, SNS</td>
+</tr>
+<tr>
+<td>Events</td>
+<td>EventBridge</td>
+</tr>
+<tr>
+<td>Secrets</td>
+<td>Secrets Manager, Parameter Store</td>
+</tr>
+</tbody></table></div>
+<p>Enable Multi-AZ and automated backups. Connect through the DNS endpoint, never an IP.</p>
+<h2 id="logs-and-audit">Logs and audit</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="aws logs tail /aws/lambda/FUNCTION --follow
+aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=DeleteBucket
+aws cloudwatch describe-alarms --state-value ALARM" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">aws logs <span class="hljs-built_in">tail</span> /aws/lambda/FUNCTION --follow
+aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=DeleteBucket
+aws cloudwatch describe-alarms --state-value ALARM</code></pre></div>
+<h2 id="cost">Cost</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="aws ce get-cost-and-usage \
+  --time-period Start=2026-10-01,End=2026-10-24 \
+  --granularity DAILY --metrics UnblendedCost \
+  --group-by Type=DIMENSION,Key=SERVICE" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">aws ce get-cost-and-usage \
+  --time-period Start=2026-10-01,End=2026-10-24 \
+  --granularity DAILY --metrics UnblendedCost \
+  --group-by Type=DIMENSION,Key=SERVICE</code></pre></div>
+<div class="table-wrap"><table><thead><tr>
+<th>Lever</th>
+<th>Action</th>
+</tr>
+</thead><tbody><tr>
+<td>Budgets</td>
+<td>Alerts at 50%, 80%, 100%</td>
+</tr>
+<tr>
+<td>Tags</td>
+<td><code>owner</code>, <code>env</code>, <code>service</code></td>
+</tr>
+<tr>
+<td>Right-size</td>
+<td>Use measured utilization</td>
+</tr>
+<tr>
+<td>Commitments</td>
+<td>Savings plans for steady load</td>
+</tr>
+<tr>
+<td>Clean up</td>
+<td>Unattached volumes, old snapshots, idle load balancers</td>
+</tr>
+</tbody></table></div>
+<h2 id="compromised-key-response">Compromised key response</h2>
+<ol>
+<li>Deactivate the access key</li>
+<li>Review CloudTrail for what it did, including other regions</li>
+<li>Terminate unknown resources and revoke sessions</li>
+<li>Rotate related credentials</li>
+<li>Replace the key with a role</li>
+</ol>
+</article>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://eknathalabs.com" rel="noopener">Blog</a><a href="https://eknathalabs.substack.com" rel="noopener">Newsletter</a></div></footer>
+<script>
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

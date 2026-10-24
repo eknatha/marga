@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Azure cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="Identity, networking, compute, storage, cost and diagnostics commands for Azure.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/azure.html">
+<meta property="og:title" content="Azure cheat sheet">
+<meta property="og:description" content="Identity, networking, compute, storage, cost and diagnostics commands for Azure.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/azure.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=0e68a589">
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>Azure cheat sheet</h1>
+    <p class="lede">Identity, networking, compute, storage, cost and diagnostics commands for Azure.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" onclick="window.print()">Print or save as PDF</button></div>
+  </header>
+  <article class="sheet"><h2 id="account-and-identity">Account and identity</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="az login
+az account show
+az account list --output table
+az account set --subscription SUBSCRIPTION_ID
+az ad signed-in-user show
+az role assignment list --assignee USER_OR_PRINCIPAL_ID --all --output table" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">az login
+az account show
+az account list --output table
+az account <span class="hljs-built_in">set</span> --subscription SUBSCRIPTION_ID
+az ad signed-in-user show
+az role assignment list --assignee USER_OR_PRINCIPAL_ID --all --output table</code></pre></div>
+<div class="table-wrap"><table><thead><tr>
+<th>Concept</th>
+<th>Meaning</th>
+</tr>
+</thead><tbody><tr>
+<td>Tenant</td>
+<td>Microsoft Entra ID directory</td>
+</tr>
+<tr>
+<td>Subscription</td>
+<td>Billing and isolation boundary</td>
+</tr>
+<tr>
+<td>Resource group</td>
+<td>Container for related resources (required)</td>
+</tr>
+<tr>
+<td>Azure RBAC</td>
+<td>Principal + role + scope</td>
+</tr>
+<tr>
+<td>Managed identity</td>
+<td>Identity for a resource, no secret to manage</td>
+</tr>
+</tbody></table></div>
+<p>Common roles: Reader, Contributor, Owner, and many specific data roles such as Storage Blob Data Contributor.</p>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="az role assignment create \
+  --assignee-object-id PRINCIPAL_ID \
+  --assignee-principal-type ServicePrincipal \
+  --role &quot;Storage Blob Data Contributor&quot; \
+  --scope /subscriptions/SUB_ID/resourceGroups/shop-prod" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">az role assignment create \
+  --assignee-object-id PRINCIPAL_ID \
+  --assignee-principal-type ServicePrincipal \
+  --role <span class="hljs-string">&quot;Storage Blob Data Contributor&quot;</span> \
+  --scope /subscriptions/SUB_ID/resourceGroups/shop-prod</code></pre></div>
+<h2 id="resource-groups">Resource groups</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="az group create --name shop-prod --location westeurope
+az group list --output table
+az resource list --resource-group shop-prod --output table
+az group delete --name shop-dev --yes --no-wait" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">az group create --name shop-prod --location westeurope
+az group list --output table
+az resource list --resource-group shop-prod --output table
+az group delete --name shop-dev --<span class="hljs-built_in">yes</span> --no-wait</code></pre></div>
+<h2 id="networking">Networking</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="az network vnet list --output table
+az network vnet subnet list --resource-group shop-prod --vnet-name shop-vnet --output table
+az network nsg list --output table
+az network nsg rule list --resource-group shop-prod --nsg-name app-nsg --output table
+az network watcher test-ip-flow --direction Inbound --protocol TCP \
+  --local 10.20.20.15:5432 --remote 10.20.10.4:50000 \
+  --vm VM_NAME --resource-group shop-prod" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">az network vnet list --output table
+az network vnet subnet list --resource-group shop-prod --vnet-name shop-vnet --output table
+az network nsg list --output table
+az network nsg rule list --resource-group shop-prod --nsg-name app-nsg --output table
+az network watcher test-ip-flow --direction Inbound --protocol TCP \
+  --<span class="hljs-built_in">local</span> 10.20.20.15:5432 --remote 10.20.10.4:50000 \
+  --vm VM_NAME --resource-group shop-prod</code></pre></div>
+<div class="table-wrap"><table><thead><tr>
+<th>Component</th>
+<th>Role</th>
+</tr>
+</thead><tbody><tr>
+<td>VNet and subnets</td>
+<td>Private address space</td>
+</tr>
+<tr>
+<td>NSG</td>
+<td>Stateful allow and deny rules on NIC or subnet</td>
+</tr>
+<tr>
+<td>NAT gateway</td>
+<td>Outbound-only internet</td>
+</tr>
+<tr>
+<td>Private endpoint</td>
+<td>Private IP for a PaaS service</td>
+</tr>
+<tr>
+<td>Network Watcher</td>
+<td>Connection troubleshoot, IP flow verify</td>
+</tr>
+<tr>
+<td>Azure Bastion</td>
+<td>Browser-based admin access with no public SSH</td>
+</tr>
+</tbody></table></div>
+<h2 id="compute">Compute</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="az vm list --show-details --output table
+az vm start --name VM_NAME --resource-group shop-prod
+az vm deallocate --name VM_NAME --resource-group shop-prod   # stops compute billing
+az aks get-credentials --resource-group shop-prod --name shop-aks
+az containerapp list --resource-group shop-prod --output table
+az functionapp list --output table" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">az vm list --show-details --output table
+az vm start --name VM_NAME --resource-group shop-prod
+az vm deallocate --name VM_NAME --resource-group shop-prod   <span class="hljs-comment"># stops compute billing</span>
+az aks get-credentials --resource-group shop-prod --name shop-aks
+az containerapp list --resource-group shop-prod --output table
+az functionapp list --output table</code></pre></div>
+<p>A stopped VM still bills for compute unless it is deallocated.</p>
+<h2 id="storage">Storage</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="az storage account list --output table
+az storage container list --account-name acmeuploads --auth-mode login
+az storage blob upload --account-name acmeuploads --container-name data \
+  --name report.csv --file report.csv --auth-mode login
+az storage account update --name acmeuploads --resource-group shop-prod \
+  --allow-blob-public-access false" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">az storage account list --output table
+az storage container list --account-name acmeuploads --auth-mode login
+az storage blob upload --account-name acmeuploads --container-name data \
+  --name report.csv --file report.csv --auth-mode login
+az storage account update --name acmeuploads --resource-group shop-prod \
+  --allow-blob-public-access <span class="hljs-literal">false</span></code></pre></div>
+<div class="table-wrap"><table><thead><tr>
+<th>Type</th>
+<th>Service</th>
+</tr>
+</thead><tbody><tr>
+<td>Object</td>
+<td>Blob Storage</td>
+</tr>
+<tr>
+<td>Block</td>
+<td>Managed Disks</td>
+</tr>
+<tr>
+<td>Shared file</td>
+<td>Azure Files</td>
+</tr>
+</tbody></table></div>
+<h2 id="secrets-and-monitoring">Secrets and monitoring</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="az keyvault secret show --vault-name shop-kv --name db-password --query value -o tsv
+az monitor activity-log list --offset 1d --output table
+az monitor metrics alert list --resource-group shop-prod --output table" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">az keyvault secret show --vault-name shop-kv --name db-password --query value -o tsv
+az monitor activity-log list --offset 1d --output table
+az monitor metrics alert list --resource-group shop-prod --output table</code></pre></div>
+<h2 id="cost">Cost</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="az consumption usage list --start-date 2026-10-01 --end-date 2026-10-24 --top 20 --output table
+az consumption budget list --output table" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">az consumption usage list --start-date 2026-10-01 --end-date 2026-10-24 --top 20 --output table
+az consumption budget list --output table</code></pre></div>
+<p>Set budgets with alerts, tag resources with <code>owner</code>, <code>env</code> and <code>service</code>, and deallocate or delete idle resources.</p>
+<h2 id="policy-and-governance">Policy and governance</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="az policy assignment list --output table
+az policy state list --resource-group shop-prod --filter &quot;complianceState eq 'NonCompliant'&quot;
+az lock create --name no-delete --lock-type CanNotDelete --resource-group shop-prod" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">az policy assignment list --output table
+az policy state list --resource-group shop-prod --filter <span class="hljs-string">&quot;complianceState eq &#x27;NonCompliant&#x27;&quot;</span>
+az lock create --name no-delete --lock-type CanNotDelete --resource-group shop-prod</code></pre></div>
+<p>Azure Policy enforces rules such as allowed regions and required tags. Resource locks guard against accidental deletion.</p>
+</article>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://eknathalabs.com" rel="noopener">Blog</a><a href="https://eknathalabs.substack.com" rel="noopener">Newsletter</a></div></footer>
+<script>
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

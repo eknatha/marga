@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prometheus and observability cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="Metric types, PromQL patterns, scrape and alert configuration, and the RED, USE and golden-signal checklists.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/prometheus.html">
+<meta property="og:title" content="Prometheus and observability cheat sheet">
+<meta property="og:description" content="Metric types, PromQL patterns, scrape and alert configuration, and the RED, USE and golden-signal checklists.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/prometheus.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=0e68a589">
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>Prometheus and observability cheat sheet</h1>
+    <p class="lede">Metric types, PromQL patterns, scrape and alert configuration, and the RED, USE and golden-signal checklists.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" onclick="window.print()">Print or save as PDF</button></div>
+  </header>
+  <article class="sheet"><h2 id="what-to-measure">What to measure</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Method</th>
+<th>For</th>
+<th>Signals</th>
+</tr>
+</thead><tbody><tr>
+<td>RED</td>
+<td>Request-driven services</td>
+<td>Rate, Errors, Duration</td>
+</tr>
+<tr>
+<td>USE</td>
+<td>Resources</td>
+<td>Utilization, Saturation, Errors</td>
+</tr>
+<tr>
+<td>Golden signals</td>
+<td>Any service</td>
+<td>Latency, traffic, errors, saturation</td>
+</tr>
+</tbody></table></div>
+<p>Use percentiles, not averages, for latency.</p>
+<h2 id="metric-types">Metric types</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Type</th>
+<th>Behaviour</th>
+<th>Query with</th>
+</tr>
+</thead><tbody><tr>
+<td>Counter</td>
+<td>Only increases</td>
+<td><code>rate()</code>, <code>increase()</code></td>
+</tr>
+<tr>
+<td>Gauge</td>
+<td>Up and down</td>
+<td>Direct, <code>avg_over_time</code>, <code>predict_linear</code></td>
+</tr>
+<tr>
+<td>Histogram</td>
+<td>Bucketed observations</td>
+<td><code>histogram_quantile</code> over <code>rate</code> of buckets</td>
+</tr>
+</tbody></table></div>
+<h2 id="promql-patterns">PromQL patterns</h2>
+<div class="code" data-lang="promql"><button class="copy" type="button" data-copy="# Requests per second by route
+sum by (route) (rate(http_requests_total[5m]))
+
+# Error ratio
+sum(rate(http_requests_total{status=~&quot;5..&quot;}[5m]))
+  / sum(rate(http_requests_total[5m]))
+
+# p95 latency per route
+histogram_quantile(0.95,
+  sum by (le, route) (rate(http_request_duration_seconds_bucket[5m])))
+
+# Targets that are down
+up == 0
+
+# Node memory used percent
+100 * (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)
+
+# Disk will fill within 4 hours
+predict_linear(node_filesystem_avail_bytes{mountpoint=&quot;/&quot;}[1h], 4 * 3600) &lt; 0
+
+# Pod restarts in the last hour
+increase(kube_pod_container_status_restarts_total[1h]) &gt; 3
+
+# Top 5 series by value
+topk(5, sum by (pod) (rate(container_cpu_usage_seconds_total[5m])))" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-comment"># Requests per second by route</span>
+<span class="hljs-built_in">sum</span> <span class="hljs-keyword">by</span> (route) (<span class="hljs-built_in">rate</span>(http_requests_total[<span class="hljs-number">5</span>m]))
+
+<span class="hljs-comment"># Error ratio</span>
+<span class="hljs-built_in">sum</span>(<span class="hljs-built_in">rate</span>(http_requests_total{<span class="hljs-attr">status</span>=~<span class="hljs-string">&quot;5..&quot;</span>}[<span class="hljs-number">5</span>m]))
+  / <span class="hljs-built_in">sum</span>(<span class="hljs-built_in">rate</span>(http_requests_total[<span class="hljs-number">5</span>m]))
+
+<span class="hljs-comment"># p95 latency per route</span>
+<span class="hljs-built_in">histogram_quantile</span>(<span class="hljs-number">0.95</span>,
+  <span class="hljs-built_in">sum</span> <span class="hljs-keyword">by</span> (le, route) (<span class="hljs-built_in">rate</span>(http_request_duration_seconds_bucket[<span class="hljs-number">5</span>m])))
+
+<span class="hljs-comment"># Targets that are down</span>
+<span class="hljs-built_in">up</span> == <span class="hljs-number">0</span>
+
+<span class="hljs-comment"># Node memory used percent</span>
+<span class="hljs-number">100</span> * (<span class="hljs-number">1</span> - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)
+
+<span class="hljs-comment"># Disk will fill within 4 hours</span>
+<span class="hljs-built_in">predict_linear</span>(node_filesystem_avail_bytes{<span class="hljs-attr">mountpoint</span>=<span class="hljs-string">&quot;/&quot;</span>}[<span class="hljs-number">1</span>h], <span class="hljs-number">4</span> * <span class="hljs-number">3600</span>) &lt; <span class="hljs-number">0</span>
+
+<span class="hljs-comment"># Pod restarts in the last hour</span>
+<span class="hljs-built_in">increase</span>(kube_pod_container_status_restarts_total[<span class="hljs-number">1</span>h]) &gt; <span class="hljs-number">3</span>
+
+<span class="hljs-comment"># Top 5 series by value</span>
+<span class="hljs-built_in">topk</span>(<span class="hljs-number">5</span>, <span class="hljs-built_in">sum</span> <span class="hljs-keyword">by</span> (pod) (<span class="hljs-built_in">rate</span>(container_cpu_usage_seconds_total[<span class="hljs-number">5</span>m])))</code></pre></div>
+<p>Rules of thumb:</p>
+<ul>
+<li>Never graph a raw counter; wrap it in <code>rate()</code></li>
+<li>Use a <code>rate()</code> window of at least four scrape intervals</li>
+<li>Keep <code>le</code> when aggregating histogram buckets</li>
+<li>Do not average percentiles</li>
+<li>Avoid unbounded labels such as user IDs and raw URLs</li>
+</ul>
+<h2 id="scrape-configuration">Scrape configuration</h2>
+<div class="code" data-lang="yaml"><button class="copy" type="button" data-copy="global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: shop-api
+    metrics_path: /metrics
+    static_configs:
+      - targets: [&quot;shop-api-1:8080&quot;, &quot;shop-api-2:8080&quot;]" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-attr">global:</span>
+  <span class="hljs-attr">scrape_interval:</span> <span class="hljs-string">15s</span>
+<span class="hljs-attr">scrape_configs:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">job_name:</span> <span class="hljs-string">shop-api</span>
+    <span class="hljs-attr">metrics_path:</span> <span class="hljs-string">/metrics</span>
+    <span class="hljs-attr">static_configs:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">targets:</span> [<span class="hljs-string">&quot;shop-api-1:8080&quot;</span>, <span class="hljs-string">&quot;shop-api-2:8080&quot;</span>]</code></pre></div>
+<h2 id="recording-and-alert-rules">Recording and alert rules</h2>
+<div class="code" data-lang="yaml"><button class="copy" type="button" data-copy="groups:
+  - name: shop-api
+    rules:
+      - record: route:http_requests:rate5m
+        expr: sum by (route) (rate(http_requests_total[5m]))
+      - alert: ShopApiHighErrorRatio
+        expr: |
+          sum(rate(http_requests_total{status=~&quot;5..&quot;}[5m]))
+            / sum(rate(http_requests_total[5m])) &gt; 0.02
+        for: 10m
+        labels:
+          severity: page
+        annotations:
+          summary: &quot;Error ratio above 2% for 10 minutes&quot;
+          runbook: &quot;https://runbooks.example.com/shop-api/high-errors&quot;" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-attr">groups:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">shop-api</span>
+    <span class="hljs-attr">rules:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">record:</span> <span class="hljs-string">route:http_requests:rate5m</span>
+        <span class="hljs-attr">expr:</span> <span class="hljs-string">sum</span> <span class="hljs-string">by</span> <span class="hljs-string">(route)</span> <span class="hljs-string">(rate(http_requests_total[5m]))</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">alert:</span> <span class="hljs-string">ShopApiHighErrorRatio</span>
+        <span class="hljs-attr">expr:</span> <span class="hljs-string">|
+          sum(rate(http_requests_total{status=~&quot;5..&quot;}[5m]))
+            / sum(rate(http_requests_total[5m])) &gt; 0.02
+</span>        <span class="hljs-attr">for:</span> <span class="hljs-string">10m</span>
+        <span class="hljs-attr">labels:</span>
+          <span class="hljs-attr">severity:</span> <span class="hljs-string">page</span>
+        <span class="hljs-attr">annotations:</span>
+          <span class="hljs-attr">summary:</span> <span class="hljs-string">&quot;Error ratio above 2% for 10 minutes&quot;</span>
+          <span class="hljs-attr">runbook:</span> <span class="hljs-string">&quot;https://runbooks.example.com/shop-api/high-errors&quot;</span></code></pre></div>
+<h2 id="alertmanager">Alertmanager</h2>
+<div class="code" data-lang="yaml"><button class="copy" type="button" data-copy="route:
+  receiver: team-chat
+  group_by: [alertname, service]
+  group_wait: 30s
+  repeat_interval: 4h
+  routes:
+    - matchers: ['severity=&quot;page&quot;']
+      receiver: on-call-pager
+receivers:
+  - name: team-chat
+  - name: on-call-pager" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-attr">route:</span>
+  <span class="hljs-attr">receiver:</span> <span class="hljs-string">team-chat</span>
+  <span class="hljs-attr">group_by:</span> [<span class="hljs-string">alertname</span>, <span class="hljs-string">service</span>]
+  <span class="hljs-attr">group_wait:</span> <span class="hljs-string">30s</span>
+  <span class="hljs-attr">repeat_interval:</span> <span class="hljs-string">4h</span>
+  <span class="hljs-attr">routes:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">matchers:</span> [<span class="hljs-string">&#x27;severity=&quot;page&quot;&#x27;</span>]
+      <span class="hljs-attr">receiver:</span> <span class="hljs-string">on-call-pager</span>
+<span class="hljs-attr">receivers:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">team-chat</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">on-call-pager</span></code></pre></div>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="amtool alert query --active
+amtool silence add alertname=ShopApiHighErrorRatio --duration=2h --comment=&quot;planned work&quot;
+promtool check rules rules.yml
+promtool check config prometheus.yml" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">amtool alert query --active
+amtool silence add alertname=ShopApiHighErrorRatio --duration=2h --comment=<span class="hljs-string">&quot;planned work&quot;</span>
+promtool check rules rules.yml
+promtool check config prometheus.yml</code></pre></div>
+<h2 id="alert-design">Alert design</h2>
+<ol>
+<li>Must a human act now?</li>
+<li>Is it a symptom users feel?</li>
+<li>Does the page link to a runbook?</li>
+</ol>
+<p>Page on symptoms; ticket for slow-burn causes; dashboards for the rest.</p>
+<h2 id="logs-and-traces">Logs and traces</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Practice</th>
+<th>Why</th>
+</tr>
+</thead><tbody><tr>
+<td>Structured JSON logs</td>
+<td>Fields can be queried</td>
+</tr>
+<tr>
+<td>Request ID and trace ID in every line</td>
+<td>Connects logs, metrics and traces</td>
+</tr>
+<tr>
+<td>Never log secrets or personal data</td>
+<td>Logs are widely copied</td>
+</tr>
+<tr>
+<td>Tail sampling for traces</td>
+<td>Keeps slow and failing requests</td>
+</tr>
+<tr>
+<td>Log to stdout in containers</td>
+<td>The platform collects it</td>
+</tr>
+</tbody></table></div>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="{app=&quot;shop-api&quot;} | json | level=&quot;error&quot; | route=&quot;/checkout&quot;" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">{app=&quot;shop-api&quot;} | json | level=&quot;error&quot; | route=&quot;/checkout&quot;</code></pre></div>
+<h2 id="cardinality-check">Cardinality check</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="curl -s localhost:9090/api/v1/status/tsdb | jq '.data.seriesCountByMetricName[0:5]'" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">curl -s localhost:9090/api/v1/status/tsdb | jq <span class="hljs-string">&#x27;.data.seriesCountByMetricName[0:5]&#x27;</span></code></pre></div>
+</article>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://eknathalabs.com" rel="noopener">Blog</a><a href="https://eknathalabs.substack.com" rel="noopener">Newsletter</a></div></footer>
+<script>
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

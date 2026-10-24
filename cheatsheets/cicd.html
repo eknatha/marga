@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CI/CD cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="Pipeline stages, a Jenkinsfile skeleton, deployment strategies, and declarative delivery commands.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/cicd.html">
+<meta property="og:title" content="CI/CD cheat sheet">
+<meta property="og:description" content="Pipeline stages, a Jenkinsfile skeleton, deployment strategies, and declarative delivery commands.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/cicd.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=0e68a589">
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>CI/CD cheat sheet</h1>
+    <p class="lede">Pipeline stages, a Jenkinsfile skeleton, deployment strategies, and declarative delivery commands.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" onclick="window.print()">Print or save as PDF</button></div>
+  </header>
+  <article class="sheet"><h2 id="terms">Terms</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead><tbody><tr>
+<td>Continuous integration</td>
+<td>Merge often; build and test every change automatically</td>
+</tr>
+<tr>
+<td>Continuous delivery</td>
+<td>Every passing change is releasable; a human chooses when</td>
+</tr>
+<tr>
+<td>Continuous deployment</td>
+<td>Every passing change is released automatically</td>
+</tr>
+</tbody></table></div>
+<h2 id="pipeline-stages">Pipeline stages</h2>
+<ol>
+<li>Checkout the exact revision</li>
+<li>Build the artifact once</li>
+<li>Test: lint and unit tests first, then integration</li>
+<li>Analyze: dependency, secret and image scans</li>
+<li>Publish with an immutable tag</li>
+<li>Deploy to a test environment and run smoke tests</li>
+<li>Promote the same artifact to production and verify</li>
+</ol>
+<p>Build once, deploy many. Order checks by speed.</p>
+<h2 id="jenkinsfile-skeleton">Jenkinsfile skeleton</h2>
+<div class="code" data-lang="groovy"><button class="copy" type="button" data-copy="pipeline {
+  agent { label 'docker' }
+  options {
+    timeout(time: 30, unit: 'MINUTES')
+    disableConcurrentBuilds()
+  }
+  environment {
+    IMAGE = &quot;registry.example.com/shop-api&quot;
+    TAG   = &quot;build-${env.BUILD_NUMBER}&quot;
+  }
+  stages {
+    stage('Test') {
+      parallel {
+        stage('Unit') { steps { sh 'make test' } }
+        stage('Lint') { steps { sh 'make lint' } }
+      }
+    }
+    stage('Build') {
+      steps { sh 'docker build -t &quot;$IMAGE:$TAG&quot; .' }
+    }
+    stage('Push') {
+      when { branch 'main' }
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'registry-creds',
+                                          usernameVariable: 'U', passwordVariable: 'P')]) {
+          sh 'echo &quot;$P&quot; | docker login registry.example.com -u &quot;$U&quot; --password-stdin'
+          sh 'docker push &quot;$IMAGE:$TAG&quot;'
+        }
+      }
+    }
+  }
+  post {
+    always { echo 'done' }
+  }
+}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">pipeline {
+  agent { label <span class="hljs-string">&#x27;docker&#x27;</span> }
+  options {
+    timeout(<span class="hljs-attr">time:</span> <span class="hljs-number">30</span>, <span class="hljs-attr">unit:</span> <span class="hljs-string">&#x27;MINUTES&#x27;</span>)
+    disableConcurrentBuilds()
+  }
+  environment {
+    IMAGE = <span class="hljs-string">&quot;registry.example.com/shop-api&quot;</span>
+    TAG   = <span class="hljs-string">&quot;build-${env.BUILD_NUMBER}&quot;</span>
+  }
+  stages {
+    stage(<span class="hljs-string">&#x27;Test&#x27;</span>) {
+      parallel {
+        stage(<span class="hljs-string">&#x27;Unit&#x27;</span>) { steps { sh <span class="hljs-string">&#x27;make test&#x27;</span> } }
+        stage(<span class="hljs-string">&#x27;Lint&#x27;</span>) { steps { sh <span class="hljs-string">&#x27;make lint&#x27;</span> } }
+      }
+    }
+    stage(<span class="hljs-string">&#x27;Build&#x27;</span>) {
+      steps { sh <span class="hljs-string">&#x27;docker build -t &quot;$IMAGE:$TAG&quot; .&#x27;</span> }
+    }
+    stage(<span class="hljs-string">&#x27;Push&#x27;</span>) {
+      when { branch <span class="hljs-string">&#x27;main&#x27;</span> }
+      steps {
+        withCredentials([usernamePassword(<span class="hljs-attr">credentialsId:</span> <span class="hljs-string">&#x27;registry-creds&#x27;</span>,
+                                          <span class="hljs-symbol">usernameVariable:</span> <span class="hljs-string">&#x27;U&#x27;</span>, <span class="hljs-attr">passwordVariable:</span> <span class="hljs-string">&#x27;P&#x27;</span>)]) {
+          sh <span class="hljs-string">&#x27;echo &quot;$P&quot; | docker login registry.example.com -u &quot;$U&quot; --password-stdin&#x27;</span>
+          sh <span class="hljs-string">&#x27;docker push &quot;$IMAGE:$TAG&quot;&#x27;</span>
+        }
+      }
+    }
+  }
+  post {
+    always { echo <span class="hljs-string">&#x27;done&#x27;</span> }
+  }
+}</code></pre></div>
+<p>Use single quotes around shell commands that reference secrets, so the shell expands them and Groovy does not.</p>
+<h2 id="deployment-strategies">Deployment strategies</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Strategy</th>
+<th>Strength</th>
+<th>Weakness</th>
+</tr>
+</thead><tbody><tr>
+<td>Recreate</td>
+<td>Simple</td>
+<td>Downtime</td>
+</tr>
+<tr>
+<td>Rolling</td>
+<td>No downtime, no extra capacity</td>
+<td>Slower rollback, mixed versions</td>
+</tr>
+<tr>
+<td>Blue-green</td>
+<td>Instant switch and rollback</td>
+<td>Double capacity</td>
+</tr>
+<tr>
+<td>Canary</td>
+<td>Limits blast radius</td>
+<td>Needs traffic control and metrics</td>
+</tr>
+</tbody></table></div>
+<p>Feature flags separate deploy from release. Remove them when done.</p>
+<h2 id="database-changes">Database changes</h2>
+<ol>
+<li>Expand: add new schema compatibly</li>
+<li>Migrate: write both, read new, backfill</li>
+<li>Contract: drop the old schema in a later release</li>
+</ol>
+<h2 id="verification-and-rollback">Verification and rollback</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl rollout status deployment/shop-api -n shop --timeout=180s
+kubectl rollout undo deployment/shop-api -n shop
+curl -fsS https://shop.example.com/healthz/ready" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubectl rollout status deployment/shop-api -n shop --<span class="hljs-built_in">timeout</span>=180s
+kubectl rollout undo deployment/shop-api -n shop
+curl -fsS https://shop.example.com/healthz/ready</code></pre></div>
+<h2 id="delivery-metrics">Delivery metrics</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Metric</th>
+<th>Question</th>
+</tr>
+</thead><tbody><tr>
+<td>Deployment frequency</td>
+<td>How often do we release?</td>
+</tr>
+<tr>
+<td>Lead time for changes</td>
+<td>Commit to production?</td>
+</tr>
+<tr>
+<td>Change failure rate</td>
+<td>Share of releases causing problems?</td>
+</tr>
+<tr>
+<td>Time to restore</td>
+<td>How fast do we recover?</td>
+</tr>
+</tbody></table></div>
+<h2 id="declarative-delivery">Declarative delivery</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="argocd app list
+argocd app diff shop-api-prod
+argocd app sync shop-api-prod
+argocd app history shop-api-prod" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">argocd app list
+argocd app diff shop-api-prod
+argocd app <span class="hljs-built_in">sync</span> shop-api-prod
+argocd app <span class="hljs-built_in">history</span> shop-api-prod</code></pre></div>
+<div class="table-wrap"><table><thead><tr>
+<th>Setting</th>
+<th>Effect</th>
+</tr>
+</thead><tbody><tr>
+<td><code>automated.prune</code></td>
+<td>Delete objects removed from configuration</td>
+</tr>
+<tr>
+<td><code>automated.selfHeal</code></td>
+<td>Revert manual cluster changes</td>
+</tr>
+</tbody></table></div>
+<p>Pull model: credentials stay in the cluster, drift is detected, and rollback is a configuration revert.</p>
+<h2 id="pipeline-security">Pipeline security</h2>
+<ul>
+<li>Secrets come from a secret store, never from files in the source</li>
+<li>Short-lived credentials via identity federation</li>
+<li>Separate plan or build permissions from deploy permissions</li>
+<li>Scan images and dependencies; fail on high severity</li>
+<li>Deploy only from the main branch after review</li>
+</ul>
+</article>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://eknathalabs.com" rel="noopener">Blog</a><a href="https://eknathalabs.substack.com" rel="noopener">Newsletter</a></div></footer>
+<script>
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SRE practices cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="SLO maths, error budget policy, incident roles and updates, postmortem template, toil and reliability patterns.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/sre.html">
+<meta property="og:title" content="SRE practices cheat sheet">
+<meta property="og:description" content="SLO maths, error budget policy, incident roles and updates, postmortem template, toil and reliability patterns.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/sre.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=0e68a589">
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>SRE practices cheat sheet</h1>
+    <p class="lede">SLO maths, error budget policy, incident roles and updates, postmortem template, toil and reliability patterns.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" onclick="window.print()">Print or save as PDF</button></div>
+  </header>
+  <article class="sheet"><h2 id="definitions">Definitions</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead><tbody><tr>
+<td>SLI</td>
+<td>A measurement: good events divided by valid events</td>
+</tr>
+<tr>
+<td>SLO</td>
+<td>Internal target for an SLI over a window</td>
+</tr>
+<tr>
+<td>SLA</td>
+<td>Contract with consequences; looser than the SLO</td>
+</tr>
+<tr>
+<td>Error budget</td>
+<td>1 minus the SLO</td>
+</tr>
+</tbody></table></div>
+<h2 id="downtime-allowed-per-30-days">Downtime allowed per 30 days</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>SLO</th>
+<th>Allowed downtime</th>
+</tr>
+</thead><tbody><tr>
+<td>99%</td>
+<td>about 7 h 12 min</td>
+</tr>
+<tr>
+<td>99.9%</td>
+<td>about 43 min</td>
+</tr>
+<tr>
+<td>99.95%</td>
+<td>about 21 min</td>
+</tr>
+<tr>
+<td>99.99%</td>
+<td>about 4 min</td>
+</tr>
+</tbody></table></div>
+<p>A 30-day window is 43,200 minutes. Multiply by the error budget fraction.</p>
+<h2 id="error-budget-policy">Error budget policy</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Budget state</th>
+<th>Action</th>
+</tr>
+</thead><tbody><tr>
+<td>Healthy</td>
+<td>Ship features, run experiments</td>
+</tr>
+<tr>
+<td>Under 25% left</td>
+<td>Stricter reviews, smaller releases</td>
+</tr>
+<tr>
+<td>Exhausted</td>
+<td>Pause risky releases; prioritize reliability work</td>
+</tr>
+</tbody></table></div>
+<p>Agree the policy before you need it. Never using the budget also means the target may be too strict.</p>
+<h2 id="burn-rate">Burn rate</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Burn rate</th>
+<th>Meaning</th>
+<th>Typical action</th>
+</tr>
+</thead><tbody><tr>
+<td>1</td>
+<td>Budget lasts exactly the window</td>
+<td>Normal</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Budget gone in about 5 days</td>
+<td>Ticket</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Budget gone in about 2 days</td>
+<td>Page</td>
+</tr>
+</tbody></table></div>
+<p>Alert on a long and short window together so you are paged for sustained burn only.</p>
+<h2 id="incident-roles">Incident roles</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Role</th>
+<th>Job</th>
+</tr>
+</thead><tbody><tr>
+<td>Incident commander</td>
+<td>Coordinates and decides; does not debug</td>
+</tr>
+<tr>
+<td>Operations lead</td>
+<td>Investigates and changes systems</td>
+</tr>
+<tr>
+<td>Communications lead</td>
+<td>Posts updates on a schedule</td>
+</tr>
+<tr>
+<td>Scribe</td>
+<td>Keeps the timeline</td>
+</tr>
+</tbody></table></div>
+<h2 id="severity">Severity</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Level</th>
+<th>Impact</th>
+<th>Updates</th>
+</tr>
+</thead><tbody><tr>
+<td>SEV1</td>
+<td>Major outage or data loss</td>
+<td>Every 15 to 30 minutes</td>
+</tr>
+<tr>
+<td>SEV2</td>
+<td>Significant degradation</td>
+<td>Every 30 to 60 minutes</td>
+</tr>
+<tr>
+<td>SEV3</td>
+<td>Minor, workaround exists</td>
+<td>Working hours</td>
+</tr>
+</tbody></table></div>
+<h2 id="incident-sequence">Incident sequence</h2>
+<ol>
+<li>Detect and acknowledge</li>
+<li>Triage: impact, scope, severity, open a channel</li>
+<li>Mitigate first (roll back, fail over, disable a flag)</li>
+<li>Diagnose with evidence; ask what changed</li>
+<li>Resolve and confirm recovery holds</li>
+<li>Schedule the postmortem</li>
+</ol>
+<p>One change at a time, announced before it is made.</p>
+<h2 id="status-update-template">Status update template</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="HH:MM UTC - SEVn - Short title
+Impact: who is affected and how
+Status: what we know and what we are doing
+Next update: HH:MM UTC" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">HH:MM UTC - SEVn - Short title
+Impact: who is affected and how
+Status: what we know and what we are doing
+Next update: HH:MM UTC</code></pre></div>
+<h2 id="postmortem-template">Postmortem template</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Section</th>
+<th>Content</th>
+</tr>
+</thead><tbody><tr>
+<td>Summary</td>
+<td>What broke, how long, who was affected</td>
+</tr>
+<tr>
+<td>Impact</td>
+<td>Users, requests, budget consumed</td>
+</tr>
+<tr>
+<td>Timeline</td>
+<td>Timestamped events</td>
+</tr>
+<tr>
+<td>Contributing factors</td>
+<td>The chain of conditions</td>
+</tr>
+<tr>
+<td>Went well / badly / lucky</td>
+<td>Honest reflection</td>
+</tr>
+<tr>
+<td>Actions</td>
+<td>Specific, owned, dated: prevent, detect, mitigate</td>
+</tr>
+</tbody></table></div>
+<p>Blameless: ask how the system made the mistake easy, not who made it.</p>
+<h2 id="toil">Toil</h2>
+<p>Toil is manual, repetitive, automatable, reactive work with no lasting value that grows with the service.</p>
+<div class="table-wrap"><table><thead><tr>
+<th>Reduce by</th>
+<th>Example</th>
+</tr>
+</thead><tbody><tr>
+<td>Automating</td>
+<td>Script or controller replaces the procedure</td>
+</tr>
+<tr>
+<td>Removing the cause</td>
+<td>Fix the bug instead of restarting</td>
+</tr>
+<tr>
+<td>Self-service</td>
+<td>Developers do it without a ticket</td>
+</tr>
+<tr>
+<td>Stopping</td>
+<td>Drop work that adds no value</td>
+</tr>
+</tbody></table></div>
+<p>Keep toil below about half of an engineer&#39;s time.</p>
+<h2 id="reliability-patterns">Reliability patterns</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Pattern</th>
+<th>Rule</th>
+</tr>
+</thead><tbody><tr>
+<td>Timeouts</td>
+<td>Every network call; shorter than the caller&#39;s deadline</td>
+</tr>
+<tr>
+<td>Retries</td>
+<td>Idempotent only, exponential backoff with jitter, two or three attempts, retry at one layer</td>
+</tr>
+<tr>
+<td>Circuit breaker</td>
+<td>Fail fast when a dependency is failing; closed, open, half-open</td>
+</tr>
+<tr>
+<td>Bulkhead</td>
+<td>Separate pools per dependency</td>
+</tr>
+<tr>
+<td>Graceful degradation</td>
+<td>Optional features fail without breaking the critical path</td>
+</tr>
+<tr>
+<td>Load shedding</td>
+<td>Reject excess requests quickly (429 or 503 with Retry-After)</td>
+</tr>
+<tr>
+<td>Rate limits</td>
+<td>Per-client so one caller cannot harm others</td>
+</tr>
+</tbody></table></div>
+<h2 id="game-day-checklist">Game day checklist</h2>
+<ul>
+<li>Hypothesis written down</li>
+<li>Blast radius limited and agreed</li>
+<li>Abort condition defined</li>
+<li>Quiet period, people watching</li>
+<li>Findings turned into tracked actions</li>
+</ul>
+</article>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://eknathalabs.com" rel="noopener">Blog</a><a href="https://eknathalabs.substack.com" rel="noopener">Newsletter</a></div></footer>
+<script>
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>
