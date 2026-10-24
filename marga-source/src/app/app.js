@@ -170,7 +170,7 @@ function renderChrome() {
   $('#footer').innerHTML =
     '<footer class="foot"><div class="wrap foot-in">' +
     '<span>MARGA by EknathaLabs</span>' +
-    '<a href="cheatsheets/">Printable cheat sheets</a><a href="#/interview">InterviewHub</a><a href="#/practice">Practice</a><a href="#/labs">Labs (planned)</a>' +
+    '<a href="cheatsheets/">Printable cheat sheets</a><a href="#/interview">InterviewHub</a><a href="#/practice">Practice</a><a href="#/glossary">Glossary</a><a href="#/labs">Labs (planned)</a>' +
     (D.counter ? '<span class="visitors" id="visitors" hidden></span>' : '') +
     '<span class="foot-note">Progress is saved in this browser only.</span>' +
     '<p class="foot-promise">Free forever \u00b7 No login \u00b7 No ads \u00b7 No cookies</p><p class="small foot-ver">Version ' + siteVer() + '</p></div></footer>';
@@ -574,6 +574,14 @@ function ivStats() {
   IV.forEach(function (x) { if (iv[x.id] === 'know') know++; else if (iv[x.id] === 'review') rev++; });
   return plural(IV.length, 'question') + ' across ' + plural(MODS.filter(function (m) { return IV.some(function (x) { return x.module === m.id; }); }).length, 'topic') + '. You know ' + know + ', marked ' + rev + ' for review.';
 }
+function interviewDeep(id) {
+  var x = IV.filter(function (q) { return q.id === id; })[0];
+  if (!x) return notFound();
+  ivFilter.mod = x.module; ivFilter.level = ''; ivFilter.status = ''; ivFilter.q = '';
+  interviewView();
+  var base = view.after;
+  view.after = function () { if (base) base(); var c = $('.iv[data-id="' + id + '"]'); if (c) { ivToggle(c, true); try { c.scrollIntoView({ block: 'center' }); } catch (x2) { /* ignore */ } } };
+}
 function interviewView() {
   view.title = 'InterviewHub | MARGA by EknathaLabs'; view.nav = 'interview';
   var modOpts = '<option value="">All topics</option>' + MODS.filter(function (m) { return IV.some(function (x) { return x.module === m.id; }); }).map(function (m) { return '<option value="' + m.id + '"' + (ivFilter.mod === m.id ? ' selected' : '') + '>' + e(m.title) + '</option>'; }).join('');
@@ -657,7 +665,7 @@ function progressView() {
           var o = JSON.parse(r.result);
           if (!o || o.v !== 1 || typeof o.lessons !== 'object' || !Array.isArray(o.days)) throw new Error('bad');
           S = { v: 1, lessons: o.lessons || {}, cards: o.cards || {}, days: o.days, path: o.path || 'devops', iv: (o.iv && typeof o.iv === 'object') ? o.iv : {} };
-          ['cs', 'dr', 'fc'].forEach(function (k) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) S[k] = o[k]; });
+          ['cs', 'dr', 'fc', 'dc', 'py'].forEach(function (k) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) S[k] = o[k]; });
           if (Array.isArray(o.mock)) S.mock = o.mock.slice(-20);
           save(); renderChrome(); toast('Progress imported.'); route();
         } catch (x) { toast('That file is not a MARGA progress export.'); }
@@ -672,7 +680,8 @@ var routes = [
   [/^\/$/, homeView], [/^\/paths$/, pathsView], [/^\/path\/([\w-]+)$/, pathView],
   [/^\/module\/([\w-]+)$/, moduleView], [/^\/lesson\/([\w-]+)\/([\w-]+)$/, lessonView],
   [/^\/cheatsheets$/, sheetsView], [/^\/cheatsheet\/([\w-]+)$/, sheetView],
-  [/^\/review$/, reviewView], [/^\/labs$/, labsView], [/^\/progress$/, progressView], [/^\/interview$/, interviewView]
+  [/^\/review$/, reviewView], [/^\/labs$/, labsView], [/^\/progress$/, progressView], [/^\/interview$/, interviewView],
+  [/^\/interview\/((?!mock$)[\w-]+)$/, interviewDeep]
 ];
 function route() {
   var h = location.hash.replace(/^#/, '') || '/';
@@ -692,65 +701,85 @@ function route() {
   window.scrollTo(0, 0);
   if (view.after) view.after();
   mountVoice();
+  afterHooks.forEach(function (fn) { try { fn(h); } catch (x) { if (window.console) console.error(x); } });
   var hd = $('#main h1'); if (hd) { hd.setAttribute('tabindex', '-1'); }
   if (window.MargaCounter && D.counter) MargaCounter.hit(h === '/' ? '/' : h, view.title);
 }
 
-/* ---------- search ---------- */
-var INDEX = null;
+/* ---------- search (ranking in search.js) ---------- */
+var INDEX = null, GROUPS = ['Lessons', 'Cases', 'Cheat sheets', 'Interview', 'Glossary', 'Practice'];
+function addIdx(kind, group, title, sub, href, body, extra, lesson) { INDEX.push({ kind: kind, group: group, title: title, sub: sub || '', href: href, body: body || '', extra: extra || '', lesson: lesson }); }
 function buildIndex() {
   INDEX = [];
-  MODS.forEach(function (m) { INDEX.push({ kind: 'Stage', title: m.title, sub: m.summary, href: '#/module/' + m.id, hay: (m.title + ' ' + m.summary).toLowerCase(), t: m.title.toLowerCase() }); });
+  MODS.forEach(function (m) { addIdx('Stage', 'Lessons', m.title, m.summary, '#/module/' + m.id, m.summary, '', null); });
   Object.keys(LES).forEach(function (id) {
     var l = LES[id];
-    INDEX.push({ kind: 'Lesson', title: l.title, sub: MOD[l.module].title, href: hrefLesson(id), lesson: id, hay: (l.title + ' ' + l.summary + ' ' + l.toc.map(function (x) { return x.text; }).join(' ')).toLowerCase(), t: l.title.toLowerCase() });
+    addIdx('Lesson', 'Lessons', l.title, MOD[l.module].title, hrefLesson(id), l.summary + ' ' + (l.text || '').slice(0, 9000), l.toc.map(function (x) { return x.text; }).join(' '), id);
   });
-  (D.cases || []).forEach(function (c) { INDEX.push({ kind: 'Case study', title: c.title, sub: c.company + ', ' + c.year, href: '#/cases/' + c.id, hay: (c.title + ' ' + c.company + ' ' + c.area + ' ' + c.what + ' ' + c.cause + ' ' + c.lesson).toLowerCase(), t: c.title.toLowerCase() }); });
-  (D.arch || []).forEach(function (a) { INDEX.push({ kind: 'Post-mortem', title: a.title, sub: a.summary, href: '#/architecture/' + a.id, hay: (a.title + ' ' + a.summary + ' ' + a.text).toLowerCase(), t: a.title.toLowerCase() }); });
-  Object.keys(SHEETS).forEach(function (id) {
-    var s = SHEETS[id];
-    INDEX.push({ kind: 'Cheat sheet', title: s.title, sub: s.summary, href: '#/cheatsheet/' + id, hay: (s.title + ' ' + s.summary + ' ' + s.text).toLowerCase(), t: s.title.toLowerCase() });
-  });
+  (D.cases || []).forEach(function (c) { addIdx('Case study', 'Cases', c.title, c.company + ', ' + c.year, '#/cases/' + c.id, c.what + ' ' + c.cause + ' ' + c.fix + ' ' + c.lesson, c.company + ' ' + c.area); });
+  (D.arch || []).forEach(function (a) { addIdx('Post-mortem', 'Cases', a.title, a.summary, '#/architecture/' + a.id, a.text, a.company); });
+  Object.keys(SHEETS).forEach(function (id) { var x = SHEETS[id]; addIdx('Cheat sheet', 'Cheat sheets', x.title, x.summary, '#/cheatsheet/' + id, x.text, ''); });
+  (D.interview || []).forEach(function (x) { addIdx('Interview', 'Interview', x.q, MOD[x.module] ? MOD[x.module].title : '', '#/interview/' + x.id, x.text, x.level); });
+  (D.glossary || []).forEach(function (g) { addIdx('Glossary', 'Glossary', g.term, g.plain, '#/glossary/' + g.id, g.def, g.aliases.join(' ')); });
+  (D.drills || []).forEach(function (d) { addIdx('Drill', 'Practice', d.title, MOD[d.module] ? MOD[d.module].title : '', '#/drills/' + d.module, d.story + ' ' + d.q, ''); });
+  (window.MARGA_EXPLAINERS || []).forEach(function (x) { addIdx('Explainer', 'Practice', x.title, x.summary, '#/explainers/' + x.id, x.steps.map(function (s) { return s.l + ' ' + s.n; }).join(' '), 'animated how it works'); });
+  [['Subnet and CIDR playground', 'Split networks, check addresses, plan VLSM, summarise routes', '#/subnet', 'ip cidr subnet mask vlsm netmask'],
+   ['YAML playground', 'Check YAML and Kubernetes manifests in the browser', '#/playground/yaml', 'yaml validate kubernetes manifest json lint'],
+   ['Python playground', 'Run Python in the browser', '#/playground/python', 'python run code exercises'],
+   ['Daily challenge', 'One question a day with a streak', '#/daily', 'quiz question streak'],
+   ['Today: interview and case of the day', 'A fresh question and incident every day', '#/today', 'interview of the day case of the day']].forEach(function (x) { addIdx('Tool', 'Practice', x[0], x[1], x[2], x[1], x[3]); });
+  if (window.MargaSearch) MargaSearch.build(INDEX);
 }
 function searchResults(q) {
   if (!INDEX) buildIndex();
-  var terms = q.toLowerCase().split(/\s+/).filter(Boolean);
-  if (!terms.length) return [];
-  var out = [];
-  INDEX.forEach(function (it) {
-    var ok = terms.every(function (t) { return it.hay.indexOf(t) >= 0; });
-    if (!ok) return;
-    var score = 0;
-    terms.forEach(function (t) { if (it.t.indexOf(t) >= 0) score += 3; if (it.t.indexOf(t) === 0) score += 2; });
-    if (it.kind === 'Lesson') score += 1;
-    out.push({ it: it, score: score });
-  });
-  out.sort(function (a, b) { return b.score - a.score; });
-  return out.slice(0, 12).map(function (x) { return x.it; });
+  var out = MargaSearch.query(q, { kind: searchGroup, limit: 12 });
+  return out.map(function (x) { var it = x.it; return { kind: it.kind, title: it.title, sub: it.sub, href: it.href, lesson: it.lesson, snippet: x.snippet }; });
 }
-var sel = 0, results = [], lastFocus = null;
+var sel = 0, results = [], lastFocus = null, searchGroup = '';
+function recents() { try { var r = JSON.parse(localStorage.getItem('ea.recent') || '[]'); return Array.isArray(r) ? r.filter(function (x) { return typeof x === 'string'; }).slice(0, 5) : []; } catch (x) { return []; } }
+function pushRecent(q) {
+  q = (q || '').trim(); if (q.length < 2) return;
+  try { var r = recents().filter(function (x) { return x !== q; }); r.unshift(q); localStorage.setItem('ea.recent', JSON.stringify(r.slice(0, 5))); } catch (x) { /* ignore */ }
+}
 function openSearch() {
-  lastFocus = document.activeElement;
+  lastFocus = document.activeElement; searchGroup = '';
+  if (!INDEX) buildIndex();
   $('#search-root').innerHTML = '<div class="modal" id="smodal"><div class="modal-back" data-act="close-search"></div>' +
-    '<div class="modal-box" role="dialog" aria-modal="true" aria-label="Search"><label class="sr" for="sq">Search lessons and cheat sheets</label>' +
-    '<input id="sq" type="search" placeholder="Search lessons, tools and commands" autocomplete="off">' +
+    '<div class="modal-box" role="dialog" aria-modal="true" aria-label="Search"><label class="sr" for="sq">Search lessons, cases, cheat sheets, interview questions and the glossary</label>' +
+    '<input id="sq" type="search" placeholder="Search lessons, commands, incidents, terms" autocomplete="off">' +
+    '<div class="sfilters" id="sfilters" role="group" aria-label="Filter results"></div>' +
     '<ul id="sres" role="listbox" aria-label="Results"></ul><p class="small" id="shint">Type to search. Use the arrow keys and Enter. Press Escape to close.</p></div></div>';
   var inp = $('#sq'); inp.focus();
+  paintResults('');
   inp.addEventListener('input', function () { results = searchResults(inp.value); sel = 0; paintResults(inp.value); });
   inp.addEventListener('keydown', function (ev) {
     if (ev.key === 'ArrowDown') { ev.preventDefault(); sel = Math.min(sel + 1, results.length - 1); paintResults(inp.value); }
     else if (ev.key === 'ArrowUp') { ev.preventDefault(); sel = Math.max(sel - 1, 0); paintResults(inp.value); }
-    else if (ev.key === 'Enter' && results[sel]) { ev.preventDefault(); go(results[sel]); }
+    else if (ev.key === 'Enter' && results[sel]) { ev.preventDefault(); pushRecent(inp.value); go(results[sel]); }
   });
+}
+function paintFilters(q) {
+  var box = $('#sfilters'); if (!box) return;
+  var cnt = q.trim() ? MargaSearch.counts(q) : {}, total = 0; GROUPS.forEach(function (g) { total += cnt[g] || 0; });
+  box.innerHTML = ['All'].concat(GROUPS).map(function (g) {
+    var on = (g === 'All' ? '' : g) === searchGroup, n = g === 'All' ? total : (cnt[g] || 0);
+    return '<button type="button" class="schip' + (on ? ' on' : '') + '" data-sgroup="' + (g === 'All' ? '' : e(g)) + '" aria-pressed="' + on + '">' + e(g) + (q.trim() ? ' <span>' + n + '</span>' : '') + '</button>';
+  }).join('');
 }
 function paintResults(q) {
   var ul = $('#sres'); if (!ul) return;
-  if (!q.trim()) { ul.innerHTML = ''; $('#shint').textContent = 'Type to search. Use the arrow keys and Enter. Press Escape to close.'; return; }
-  $('#shint').textContent = results.length ? plural(results.length, 'result') : 'Nothing matches "' + q + '". Try a tool name or a command.';
+  paintFilters(q);
+  if (!q.trim()) {
+    var rc = recents();
+    ul.innerHTML = rc.length ? '<li class="srecent-h" role="presentation">Recent searches <button type="button" class="schip" data-sclear="1">Clear</button></li>' + rc.map(function (r) { return '<li class="srecent" role="presentation"><button type="button" class="srecent-b" data-srecent="' + e(r) + '">' + e(r) + '</button></li>'; }).join('') : '';
+    $('#shint').textContent = 'Type to search. Use the arrow keys and Enter. Press Escape to close.'; return;
+  }
+  $('#shint').textContent = results.length ? plural(results.length, 'result') + (searchGroup ? ' in ' + searchGroup : '') : 'Nothing matches "' + q + '"' + (searchGroup ? ' in ' + searchGroup : '') + '. Try a tool name, a command or fewer words.';
   ul.innerHTML = results.map(function (r, i) {
     var locked = r.lesson && lessonState(r.lesson) === 'locked';
-    return '<li role="option" aria-selected="' + (i === sel) + '" class="' + (i === sel ? 'sel' : '') + '" data-i="' + i + '"><span class="k">' + r.kind + '</span><span class="t">' + e(r.title) + (locked ? ' ' + ICON.lock : '') + '</span><span class="s">' + e(r.sub) + '</span></li>';
+    return '<li role="option" aria-selected="' + (i === sel) + '" class="' + (i === sel ? 'sel' : '') + '" data-i="' + i + '"><span class="k">' + r.kind + '</span><span class="t"><span>' + MargaSearch.highlight(r.title, q, e) + '</span>' + (locked ? ICON.lock : '') + '</span><span class="s">' + MargaSearch.highlight(r.snippet || r.sub, q, e) + '</span></li>';
   }).join('');
+  var cur = ul.querySelector('li.sel'); if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: 'nearest' });
 }
 function go(r) { closeSearch(true); location.hash = r.href.replace(/^#/, ''); }
 function closeSearch(skipFocus) { $('#search-root').innerHTML = ''; if (!skipFocus && lastFocus && lastFocus.focus) lastFocus.focus(); }
@@ -776,7 +805,12 @@ document.addEventListener('click', function (ev) {
     return;
   }
   var li = t.closest('#sres li');
-  if (li) { go(results[Number(li.getAttribute('data-i'))]); return; }
+  var sg = t.closest('[data-sgroup]');
+  if (sg) { searchGroup = sg.getAttribute('data-sgroup'); var si = $('#sq'); results = searchResults(si.value); sel = 0; paintResults(si.value); si.focus(); return; }
+  var sr = t.closest('[data-srecent]');
+  if (sr) { var si2 = $('#sq'); si2.value = sr.getAttribute('data-srecent'); results = searchResults(si2.value); sel = 0; paintResults(si2.value); si2.focus(); return; }
+  if (t.closest('[data-sclear]')) { try { localStorage.removeItem('ea.recent'); } catch (x2) { /* ignore */ } paintResults(''); return; }
+  if (li) { pushRecent($('#sq').value); go(results[Number(li.getAttribute('data-i'))]); return; }
   var act = t.closest('[data-act]');
   if (!act) return;
   var a = act.getAttribute('data-act');
@@ -830,6 +864,7 @@ window.addEventListener('hashchange', function () { var nv = $('#topnav'); if (n
 
 /* ---------- extension API (extras.js registers more views through this) ---------- */
 var actions = {};
+var afterHooks = [];
 var api = {
   D: D, MODS: MODS, MOD: MOD, LES: LES, LIVE: LIVE, PATH: PATH, LEVELS: LEVELS, IV: IV,
   $: $, $$: $$, e: e, plural: plural, shuffle: shuffle, hours: hours,
@@ -837,10 +872,13 @@ var api = {
   view: view, toast: toast, printBar: printBar, voiceSlot: voiceSlot, wireSay: wireSay, refsHtml: refsHtml,
   hrefLesson: hrefLesson, isDone: isDone, route: route,
   addRoute: function (re, fn) { routes.push([re, fn]); },
+  afterRoute: function (fn) { afterHooks.push(fn); }, ivListHtml: ivListHtml,
+  lessonState: lessonState, ICON: ICON, S: function () { return S; },
   onAct: function (name, fn) { actions[name] = fn; }
 };
 window.MargaApp = api;
 if (typeof window.MargaExtras === 'function') window.MargaExtras(api);
+if (typeof window.MargaMore === 'function') window.MargaMore(api);
 
 /* ---------- accessibility panel ---------- */
 (function () {
