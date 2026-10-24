@@ -34,11 +34,11 @@ function parse(j) {
   var n = String(raw === undefined ? '' : raw).replace(/[\s  ]/g, ' ').trim();
   return /^\d[\d ,.]*$/.test(n) ? n : '';
 }
+function say(text) { if (target && document.contains(target)) { target.textContent = text; target.hidden = false; } }
 function paint(n) {
   if (!n) return;
   shown = n;
-  var text = n + (n === '1' ? ' visitor' : ' visitors');
-  if (target && document.contains(target)) { target.textContent = text; target.hidden = false; }
+  say(n + (n === '1' ? ' visitor' : ' visitors'));
 }
 function fetchTotal(attempt) {
   if (!code || !window.fetch) return;
@@ -54,13 +54,14 @@ function fetchTotal(attempt) {
     .catch(function (e) {
       MargaCounter.status = 'unavailable'; MargaCounter.error = String(e && e.message || e);
       if (attempt < 3) timers.push(setTimeout(function () { fetchTotal(attempt + 1); }, [1500, 6000, 20000][attempt]));
-      else if (window.console && console.info) console.info('MARGA visitor count unavailable (' + MargaCounter.error + '). In GoatCounter settings, enable "Allow adding visitor counts on your website" and check the site code.');
+      else { if (!shown) say('Visitor count unavailable'); if (window.console && console.info) console.info('MARGA visitor count unavailable (' + MargaCounter.error + '). In GoatCounter settings, enable "Allow adding visitor counts on your website" and check the site code.'); }
     });
 }
 function init(c, el) {
   code = c || '';
   target = typeof el === 'string' ? document.querySelector(el) : el;
   if (!code) return;
+  say('Counting visitors');
   try { var cached = JSON.parse(store(KEY) || 'null'); if (cached && cached.n) paint(cached.n); } catch (x) { /* ignore */ }
   // give a first-visit page view a moment to be recorded, then read the total
   timers.push(setTimeout(function () { fetchTotal(0); }, local() ? 0 : 1200));

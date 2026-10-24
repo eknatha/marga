@@ -32,6 +32,13 @@ function practiceView() {
   var cs = bag('cs'), read = Object.keys(cs).length;
   view.title = 'Practice | MARGA by EknathaLabs'; view.nav = 'practice';
   var items = [
+    ['#/today', 'Today', 'An interview question, a real incident and a quiz question that change every day.', 'New every day'],
+    ['#/daily', 'Daily challenge', 'One quiz question a day from the lessons. Keep the daily streak going.', 'Daily streak ' + (S().dc ? Object.keys(S().dc).length + ' answered' : 'not started')],
+    ['#/explainers', 'Animated explainers', 'Step through DNS, TCP, TLS, pod scheduling, rolling updates, Terraform and a pipeline.', '7 explainers'],
+    ['#/subnet', 'Subnet and CIDR playground', 'Inspect networks, split them, plan VLSM for a VPC and merge routes.', 'Runs in your browser'],
+    ['#/playground/yaml', 'YAML playground', 'Check YAML and Kubernetes manifests, convert to JSON, find risky settings.', 'Runs in your browser'],
+    ['#/playground/python', 'Python playground', 'Write and run Python with built-in tests for eight exercises.', Object.keys(S().py || {}).length + ' of 8 solved'],
+    ['#/glossary', 'Glossary', 'Plain-words meanings for ' + (D.glossary || []).length + ' terms, also shown inside lessons.', (D.glossary || []).length + ' terms'],
     ['#/drills', 'Troubleshooting drills', 'Read real output, find the cause, pick the fix. Three scenarios for every stage.', solved + ' of ' + DRILLS.length + ' solved'],
     ['#/interview/mock', 'Mock interview', 'A timed run of questions for your role. Reveal the model answer, score yourself, find weak topics.', mock.length ? 'Best score ' + best + '%' : 'Not tried yet'],
     ['#/flashcards', 'Interactive flashcards', 'Flip, shuffle and sort cards from every lesson and from InterviewHub. Keyboard friendly.', known + ' cards marked known'],
