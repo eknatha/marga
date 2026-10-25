@@ -1599,6 +1599,126 @@
     "NIST Cybersecurity Framework",
     "https://www.nist.gov/cyberframework"
    ]
+  ],
+  "linux/debugging-a-sick-server": [
+   [
+    "Brendan Gregg: USE Method",
+    "https://www.brendangregg.com/usemethod.html"
+   ],
+   [
+    "strace(1) manual page",
+    "https://man7.org/linux/man-pages/man1/strace.1.html"
+   ]
+  ],
+  "bash/debugging-shell-scripts": [
+   [
+    "ShellCheck",
+    "https://www.shellcheck.net/"
+   ],
+   [
+    "GNU Bash manual: The Set Builtin",
+    "https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html"
+   ]
+  ],
+  "python/debugging-python": [
+   [
+    "Python docs: pdb, the debugger",
+    "https://docs.python.org/3/library/pdb.html"
+   ],
+   [
+    "Python docs: faulthandler",
+    "https://docs.python.org/3/library/faulthandler.html"
+   ]
+  ],
+  "networking/debugging-network-problems": [
+   [
+    "ss(8) manual page",
+    "https://man7.org/linux/man-pages/man8/ss.8.html"
+   ],
+   [
+    "Everything curl",
+    "https://everything.curl.dev/"
+   ]
+  ],
+  "docker/debugging-containers": [
+   [
+    "Docker docs: docker container inspect",
+    "https://docs.docker.com/reference/cli/docker/container/inspect/"
+   ],
+   [
+    "Docker docs: docker container logs",
+    "https://docs.docker.com/reference/cli/docker/container/logs/"
+   ]
+  ],
+  "cicd/debugging-pipelines": [
+   [
+    "Google SRE book: Testing for Reliability",
+    "https://sre.google/sre-book/testing-reliability/"
+   ],
+   [
+    "Continuous Delivery",
+    "https://continuousdelivery.com/"
+   ]
+  ],
+  "kubernetes/debugging-kubernetes-workloads": [
+   [
+    "Kubernetes docs: Debug Pods",
+    "https://kubernetes.io/docs/tasks/debug/debug-application/debug-pods/"
+   ],
+   [
+    "Kubernetes docs: Debug Services",
+    "https://kubernetes.io/docs/tasks/debug/debug-application/debug-service/"
+   ]
+  ],
+  "terraform/debugging-terraform": [
+   [
+    "Terraform docs: Debugging",
+    "https://developer.hashicorp.com/terraform/internals/debugging"
+   ],
+   [
+    "Terraform docs: Moved blocks",
+    "https://developer.hashicorp.com/terraform/language/modules/develop/refactoring"
+   ]
+  ],
+  "cloud/debugging-cloud-outages": [
+   [
+    "AWS: Troubleshooting IAM",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/troubleshoot.html"
+   ],
+   [
+    "AWS: VPC Flow Logs",
+    "https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html"
+   ]
+  ],
+  "observability/debugging-with-telemetry": [
+   [
+    "OpenTelemetry: Signals",
+    "https://opentelemetry.io/docs/concepts/signals/"
+   ],
+   [
+    "Prometheus: Alerting best practices",
+    "https://prometheus.io/docs/practices/alerting/"
+   ]
+  ],
+  "sre/debugging-under-pressure": [
+   [
+    "Google SRE book: Effective Troubleshooting",
+    "https://sre.google/sre-book/effective-troubleshooting/"
+   ],
+   [
+    "Google SRE book: Managing Incidents",
+    "https://sre.google/sre-book/managing-incidents/"
+   ]
+  ],
+  "security/debugging-and-investigating-security-issues": [
+   [
+    "CISA: Incident response",
+    "https://www.cisa.gov/topics/cybersecurity-best-practices"
+   ],
+   [
+    "NIST SP 800-61: Incident handling guide",
+    "https://csrc.nist.gov/pubs/sp/800/61/r2/final"
+   ]
   ]
  },
  "sheets": {
