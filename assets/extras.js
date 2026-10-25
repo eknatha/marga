@@ -195,7 +195,7 @@ function drillsView(mod) {
   view.title = 'Troubleshooting drills | MARGA by EknathaLabs'; view.nav = 'practice';
   var dr = bag('dr'), solved = Object.keys(dr).filter(function (k) { return dr[k].ok; }).length;
   var mods = MODS.filter(function (m) { return DRILLS.some(function (d) { return d.module === m.id; }) && (!mod || m.id === mod); });
-  view.html = head('Troubleshooting drills', 'Each drill shows real-looking output from a failing system. Decide what is wrong and choose the best next step. ' + plural(DRILLS.length, 'drill') + ', three for every stage.',
+  view.html = head('Troubleshooting drills', 'Each drill shows real-looking output from a failing system. Decide what is wrong and choose the best next step. ' + plural(DRILLS.length, 'drill') + ', covering every stage.',
     '<p class="small" id="drill-stats">' + solved + ' of ' + DRILLS.length + ' solved.</p><div class="actions">' + A.printBar() + '</div>' +
     '<div class="iv-filters">' + sel('dr-mod', 'Stage', [['', 'All stages']].concat(MODS.map(function (m) { return [m.id, m.title]; })), mod || '') + '</div>') +
     '<div class="wrap narrow" id="drill-list">' + mods.map(function (m) {

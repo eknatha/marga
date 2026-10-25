@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DevSecOps and security cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="Scanning, secrets, signing, container and cluster hardening, cloud identity checks and incident first steps.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/security.html">
+<meta property="og:title" content="DevSecOps and security cheat sheet">
+<meta property="og:description" content="Scanning, secrets, signing, container and cluster hardening, cloud identity checks and incident first steps.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/security.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=f83a36e9">
+<script src="../assets/a11y.js?v=f83a36e9"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="../#/interview">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>DevSecOps and security cheat sheet</h1>
+    <p class="lede">Scanning, secrets, signing, container and cluster hardening, cloud identity checks and incident first steps.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="scan-code-dependencies-and-images">Scan code, dependencies and images</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="trivy fs --severity HIGH,CRITICAL --exit-code 1 .
+trivy image --ignore-unfixed --severity HIGH,CRITICAL registry.example.com/app:1.4
+trivy config ./terraform
+checkov -d ./terraform
+semgrep scan --config auto .
+syft registry.example.com/app:1.4 -o spdx-json &gt; sbom.json
+grype sbom:./sbom.json --fail-on high" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">trivy fs --severity HIGH,CRITICAL --exit-code 1 .
+trivy image --ignore-unfixed --severity HIGH,CRITICAL registry.example.com/app:1.4
+trivy config ./terraform
+checkov -d ./terraform
+semgrep scan --config auto .
+syft registry.example.com/app:1.4 -o spdx-json &gt; sbom.json
+grype sbom:./sbom.json --fail-on high</code></pre></div>
+<aside class="callout callout-caution"><div class="callout-title">Caution</div><p>A clean scan means no known issues in the packages the tool recognised. It does not prove the application is safe.</p>
+</aside>
+<h2 id="secrets">Secrets</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="trufflehog filesystem . --only-verified
+detect-secrets scan &gt; .secrets.baseline
+aws sts get-caller-identity
+aws iam list-access-keys --user-name deploy
+aws iam update-access-key --user-name deploy --access-key-id AKIA... --status Inactive" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">trufflehog filesystem . --only-verified
+detect-secrets scan &gt; .secrets.baseline
+aws sts get-caller-identity
+aws iam list-access-keys --user-name deploy
+aws iam update-access-key --user-name deploy --access-key-id AKIA... --status Inactive</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Disable or rotate a leaked key first. Removing it from the repository does not make it safe.</p>
+</aside>
+<h2 id="sign-and-verify-artifacts">Sign and verify artifacts</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="cosign generate-key-pair
+cosign sign --key cosign.key registry.example.com/app@sha256:abc123
+cosign verify --key cosign.pub registry.example.com/app@sha256:abc123
+cosign attest --predicate sbom.json --type spdxjson --key cosign.key registry.example.com/app@sha256:abc123" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">cosign generate-key-pair
+cosign sign --key cosign.key registry.example.com/app@sha256:abc123
+cosign verify --key cosign.pub registry.example.com/app@sha256:abc123
+cosign attest --predicate sbom.json --<span class="hljs-built_in">type</span> spdxjson --key cosign.key registry.example.com/app@sha256:abc123</code></pre></div>
+<p>Sign by digest, not by tag. A tag can move.</p>
+<h2 id="harden-containers">Harden containers</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="docker run --rm --read-only --tmpfs /tmp --cap-drop ALL \
+  --security-opt no-new-privileges --pids-limit 200 --memory 256m app:1.4
+docker run --rm --user 65532:65532 app:1.4
+docker scout cves app:1.4" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">docker run --<span class="hljs-built_in">rm</span> --read-only --tmpfs /tmp --cap-drop ALL \
+  --security-opt no-new-privileges --pids-limit 200 --memory 256m app:1.4
+docker run --<span class="hljs-built_in">rm</span> --user 65532:65532 app:1.4
+docker scout cves app:1.4</code></pre></div>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p>Do not use <code>--privileged</code> or mount <code>/var/run/docker.sock</code> into application containers. Both give control of the host.</p>
+</aside>
+<h2 id="kubernetes-security-checks">Kubernetes security checks</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl auth can-i --list -n shop --as system:serviceaccount:shop:web
+kubectl get clusterrolebindings -o wide | grep cluster-admin
+kubectl get pods -A -o jsonpath='{range .items[*]}{.metadata.namespace}{&quot; &quot;}{.metadata.name}{&quot; &quot;}{.spec.containers[*].securityContext.privileged}{&quot;\n&quot;}{end}'
+kubectl label ns shop pod-security.kubernetes.io/enforce=restricted
+kubectl get networkpolicy -A
+kubectl get secret db -n shop -o jsonpath='{.data.password}' | base64 -d" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubectl auth can-i --list -n shop --as system:serviceaccount:shop:web
+kubectl get clusterrolebindings -o wide | grep cluster-admin
+kubectl get pods -A -o jsonpath=<span class="hljs-string">&#x27;{range .items[*]}{.metadata.namespace}{&quot; &quot;}{.metadata.name}{&quot; &quot;}{.spec.containers[*].securityContext.privileged}{&quot;\n&quot;}{end}&#x27;</span>
+kubectl label ns shop pod-security.kubernetes.io/enforce=restricted
+kubectl get networkpolicy -A
+kubectl get secret db -n shop -o jsonpath=<span class="hljs-string">&#x27;{.data.password}&#x27;</span> | <span class="hljs-built_in">base64</span> -d</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>The last command prints a secret to your terminal and shell history. Use it only when needed and clear the output.</p>
+</aside>
+<h2 id="cloud-identity-checks-aws">Cloud identity checks (AWS)</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="aws iam get-account-authorization-details &gt; iam.json
+aws iam generate-credential-report &amp;&amp; aws iam get-credential-report
+aws accessanalyzer list-findings --analyzer-arn ARN
+aws s3api get-public-access-block --bucket NAME
+aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=ConsoleLogin
+aws ec2 describe-security-groups --filters Name=ip-permission.cidr,Values=0.0.0.0/0" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">aws iam get-account-authorization-details &gt; iam.json
+aws iam generate-credential-report &amp;&amp; aws iam get-credential-report
+aws accessanalyzer list-findings --analyzer-arn ARN
+aws s3api get-public-access-block --bucket NAME
+aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=ConsoleLogin
+aws ec2 describe-security-groups --filters Name=ip-permission.cidr,Values=0.0.0.0/0</code></pre></div>
+<h2 id="tls-and-certificates">TLS and certificates</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="openssl s_client -connect example.com:443 -servername example.com &lt;/dev/null | openssl x509 -noout -dates -issuer -subject
+openssl x509 -in cert.pem -noout -text | head -30
+nmap -sV --script ssl-enum-ciphers -p 443 example.com" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">openssl s_client -connect example.com:443 -servername example.com &lt;/dev/null | openssl x509 -noout -dates -issuer -subject
+openssl x509 -<span class="hljs-keyword">in</span> cert.pem -noout -text | <span class="hljs-built_in">head</span> -30
+nmap -sV --script ssl-enum-ciphers -p 443 example.com</code></pre></div>
+<aside class="callout callout-caution"><div class="callout-title">Caution</div><p>Scan only systems you own or have written permission to test.</p>
+</aside>
+<h2 id="incident-first-steps">Incident first steps</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="ss -tunap | head -40
+last -a | head
+sudo journalctl -u sshd --since &quot;1 hour ago&quot; | grep -i &quot;failed\|accepted&quot;
+sudo iptables -I INPUT -s 203.0.113.50 -j DROP
+sudo tcpdump -i eth0 -w /secure/capture.pcap host 203.0.113.50" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">ss -tunap | <span class="hljs-built_in">head</span> -40
+last -a | <span class="hljs-built_in">head</span>
+<span class="hljs-built_in">sudo</span> journalctl -u sshd --since <span class="hljs-string">&quot;1 hour ago&quot;</span> | grep -i <span class="hljs-string">&quot;failed\|accepted&quot;</span>
+<span class="hljs-built_in">sudo</span> iptables -I INPUT -s 203.0.113.50 -j DROP
+<span class="hljs-built_in">sudo</span> tcpdump -i eth0 -w /secure/capture.pcap host 203.0.113.50</code></pre></div>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p>Do not wipe or reboot a suspected compromised host before you have taken a snapshot or memory capture. You will destroy the evidence.</p>
+</aside>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://cheatsheetseries.owasp.org/" target="_blank" rel="noopener">OWASP Cheat Sheet Series</a><span class="host">cheatsheetseries.owasp.org</span></li><li><a href="https://kubernetes.io/docs/concepts/security/" target="_blank" rel="noopener">Kubernetes security documentation</a><span class="host">kubernetes.io</span></li><li><a href="https://www.cisecurity.org/cis-benchmarks" target="_blank" rel="noopener">CIS Benchmarks</a><span class="host">www.cisecurity.org</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=f83a36e9"></script>
+<script src="../assets/counter.js?v=f83a36e9"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>
