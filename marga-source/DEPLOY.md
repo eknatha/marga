@@ -88,3 +88,7 @@ If the number does not appear: open the browser console and look for the "visito
 - Weak-spot review (`#/weak`): quiz questions, drills and flashcards answered wrongly are stored in the `wk` bag of the progress object; a correct answer removes them. It is included in progress export and import.
 - Search: stage filter, "Did you mean" for close typos, and playground exercises and predict questions are indexed.
 - Reminder: the new lessons, predicts, explainers, drills and exercises were written from memory and checked by the build tools and tests, not by a domain reviewer. Spot-check commands, numbers and policy examples before relying on them. External links, the live counter and the Go Playground are not machine-verified.
+
+## Round 7 additions
+- Case studies: 74 (added 18 in `src/cases/04-data-kubernetes-and-change.md`: databases, Kubernetes DNS, cloud networking and cooling, identity, supply chain, ransomware, migrations, Terraform state). Each source URL was opened and read when the entries were written; links can still change over time.
+- About page (`#/about`, nav link after InterviewHub) with the author text and a LinkedIn link.

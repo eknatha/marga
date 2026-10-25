@@ -1261,7 +1261,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const { ctx, page } = await open();
     await go(page, '/');
     const links = await page.locator('#topnav a').allInnerTexts();
-    eq(links.join('|'), 'Skill trees|Cheat sheets|Case studies|Practice|Progress|InterviewHub', 'nav order');
+    eq(links.join('|'), 'Skill trees|Cheat sheets|Case studies|Practice|Progress|InterviewHub|About', 'nav order');
     await nav(page, '/practice');
     eq(await page.locator('.prac li').count(), 19, 'hub cards');
     for (const href of ['#/drills', '#/interview/mock', '#/flashcards', '#/cases', '#/architecture', '#/calculators', '#/review', '#/labs']) ok(await page.locator(`.prac a[href="${href}"]`).count() === 1, 'hub links to ' + href);
@@ -1988,6 +1988,18 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     ok(/terraform/i.test(await page.inputValue('#sq')), 'suggestion applied');
     await page.fill('#sq', 'predict output');
     await page.waitForSelector('#sres li');
+    await ctx.close();
+  });
+
+
+  await test('about page: nav link beside InterviewHub, full text, LinkedIn link', async () => {
+    const { ctx, page } = await open(); await go(page, '/');
+    const links = await page.locator('#topnav a').allTextContents();
+    eq(links[links.indexOf('InterviewHub') + 1], 'About', 'About sits right after InterviewHub: ' + links.join(','));
+    await page.click('#topnav a[data-nav=about]'); await page.waitForSelector('.about');
+    const txt = await page.textContent('.about');
+    ok(/Pure Global Public Good/.test(txt) && /Free forever · No login · No ads · No cookies/.test(txt) && /localStorage/.test(txt) && /14 years/.test(txt), 'text');
+    eq(await page.getAttribute('.about a[href*=linkedin]', 'href'), 'https://www.linkedin.com/in/eknathareddypuli/', 'linkedin');
     await ctx.close();
   });
 
