@@ -588,6 +588,27 @@ function checkPractice() {
     count('case studies');
   }
   for (const m of A.modules) if ((A.cases || []).filter((c) => c.modules.includes(m.id)).length < 2) err('cases', `module ${m.id} has fewer than 2 case studies`);
+  // capstone projects
+  {
+    const pathIds = ['devops', 'cloud', 'sre', 'devsecops'];
+    const caps = A.capstones || [];
+    for (const pid of pathIds) if (caps.filter((c) => c.path === pid).length !== 4) err('capstones', `path ${pid} needs exactly 4 capstones, found ${caps.filter((c) => c.path === pid).length}`);
+    const cids = new Set();
+    for (const c of caps) {
+      const w = `capstone ${c.id}`;
+      if (cids.has(c.id)) err('capstones', `${w}: duplicate id`); cids.add(c.id);
+      if (!pathIds.includes(c.path)) err('capstones', `${w}: unknown path`);
+      if (!['Beginner', 'Intermediate', 'Advanced'].includes(c.level)) err('capstones', `${w}: bad level`);
+      if (!(c.hours >= 2 && c.hours <= 12)) err('capstones', `${w}: bad hours`);
+      if (!c.modules.length || c.modules.some((m) => !mods.has(m))) err('capstones', `${w}: bad module list`);
+      if (c.steps.length < 5) err('capstones', `${w}: needs at least 5 steps`);
+      if (c.check.length < 3) err('capstones', `${w}: needs at least 3 self-check items`);
+      for (const k of ['summary', 'goal', 'build', 'stretch']) if (String(c[k]).length < 20) err('capstones', `${w}: short ${k}`);
+      if (FORBID.test(JSON.stringify(c))) err('capstones', `${w}: contains a forbidden word`);
+      if (/TODO|FIXME|lorem ipsum/i.test(JSON.stringify(c))) err('capstones', `${w}: placeholder text`);
+      count('capstones');
+    }
+  }
   // architecture studies
   if ((A.arch || []).length < 50) err('arch', `need at least 50 architecture studies, found ${(A.arch || []).length}`);
   const calcIds = new Set(require(path.join(SRC, 'app', 'calc.js')).list.map((x) => x.id));

@@ -1263,7 +1263,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const links = await page.locator('#topnav a').allInnerTexts();
     eq(links.join('|'), 'Skill trees|Cheat sheets|Case studies|Practice|Progress|InterviewHub|About', 'nav order');
     await nav(page, '/practice');
-    eq(await page.locator('.prac li').count(), 19, 'hub cards');
+    eq(await page.locator('.prac li').count(), 21, 'hub cards');
     for (const href of ['#/drills', '#/interview/mock', '#/flashcards', '#/cases', '#/architecture', '#/calculators', '#/review', '#/labs']) ok(await page.locator(`.prac a[href="${href}"]`).count() === 1, 'hub links to ' + href);
     await nav(page, '/module/kubernetes');
     ok(await page.locator('a[href="#/drills/kubernetes"]').count() === 1 && await page.locator('a[href="#/cases/kubernetes"]').count() === 1, 'module page links to practice');
@@ -2000,6 +2000,80 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const txt = await page.textContent('.about');
     ok(/Pure Global Public Good/.test(txt) && /Free forever · No login · No ads · No cookies/.test(txt) && /localStorage/.test(txt) && /14 years/.test(txt), 'text');
     eq(await page.getAttribute('.about a[href*=linkedin]', 'href'), 'https://www.linkedin.com/in/eknathareddypuli/', 'linkedin');
+    await ctx.close();
+  });
+
+  await test('capstones: 4 per path, listed on the hub and path pages, steps tick and persist, finished state shows', async () => {
+    const { ctx, page } = await open(); await go(page, '/');
+    eq(data.capstones.length, 16, 'sixteen capstones');
+    for (const pid of ['devops', 'cloud', 'sre', 'devsecops']) eq(data.capstones.filter((c) => c.path === pid).length, 4, pid + ' has four');
+    await nav(page, '/practice'); ok(await page.locator('.prac a[href="#/capstones"]').count() === 1, 'hub card');
+    await nav(page, '/capstones'); await page.waitForSelector('.cap-card');
+    eq(await page.locator('.cap-card').count(), 16, 'all cards listed');
+    await nav(page, '/path/sre'); await page.waitForSelector('.cap-card');
+    eq(await page.locator('.cap-card').count(), 4, 'four on the path page');
+    const c = data.capstones.find((x) => x.path === 'sre');
+    await nav(page, '/capstone/' + c.id); await page.waitForSelector('.cap-step');
+    eq(await page.locator('.cap-step').count(), c.steps.length + c.check.length, 'steps and checks shown');
+    await page.locator('.cap-step input').first().check();
+    ok(/1 of \d+ steps/.test(await page.textContent('#cap-prog')), await page.textContent('#cap-prog'));
+    ok(Object.keys((await progress(page)).cap[c.id]).length === 1, 'tick saved');
+    await page.reload(); await page.waitForSelector('.cap-step');
+    ok(await page.locator('.cap-step input').first().isChecked(), 'tick persists after reload');
+    const n = await page.locator('.cap-step input').count();
+    for (let i = 0; i < n; i++) await page.locator('.cap-step input').nth(i).check();
+    ok(/finished/.test(await page.textContent('#cap-prog')), 'finished');
+    await nav(page, '/capstones'); ok(/Finished/.test(await page.locator('.cap-card', { hasText: c.title }).first().textContent()), 'card shows finished');
+    await nav(page, '/capstone/nope'); await page.waitForSelector('#main h1'); ok(/not found/i.test(await page.textContent('#main h1')), 'unknown id');
+    await ctx.close();
+  });
+
+  await test('debugging lessons: every stage ends with one, with a predict, a diagram and per-option reasons', async () => {
+    const { ctx, page } = await open(); await go(page, '/');
+    await setProgress(page, allDone());
+    for (const m of Object.values(MODS)) {
+      const last = m.lessons[m.lessons.length - 1];
+      ok(/debug|investigating/.test(last), m.id + ' last lesson is a debugging lesson: ' + last);
+    }
+    await go(page, '/lesson/kubernetes/debugging-kubernetes-workloads'); await page.waitForSelector('.predict');
+    ok(await page.locator('.dg-node').count() > 0, 'diagram');
+    await page.waitForSelector('#qstart'); await page.click('#qstart');
+    await page.waitForSelector('.opt'); const qt = await page.textContent('.qtext'); const qq = (await A(page)).lessons['kubernetes/debugging-kubernetes-workloads'].quiz.find((x) => x.q === qt);
+    await page.locator(`.opt:not([data-oi="${qq.answer}"])`).first().click();
+    await page.waitForSelector('.why-others'); ok(/You chose/.test(await page.textContent('#fb')) && /correct answer/i.test(await page.textContent('#fb')), 'wrong answer is explained');
+    await ctx.close();
+  });
+
+  await test('mixed practice: starts a 12-question mix from several stages and finishes', async () => {
+    const { ctx, page } = await open(); await go(page, '/');
+    await setProgress(page, allDone());
+    await go(page, '/mix'); await page.waitForSelector('[data-act=mix-start]'); await page.click('[data-act=mix-start]');
+    for (let i = 0; i < 12; i++) { await page.waitForSelector('.opt[data-ok="1"]'); await page.locator('.opt[data-ok="1"]').first().click(); await page.click('#wnext'); }
+    await page.waitForSelector('.result'); ok(/Mixed practice finished/.test(await page.textContent('#weak-root')), await page.textContent('#weak-root'));
+    await ctx.close();
+  });
+
+  await test('playground aids: support levels fill the editor and the hint ladder is gated', async () => {
+    const { ctx, page } = await open(); await go(page, '/playground/yaml');
+    await page.selectOption('#yx-ex', { index: 1 }); await page.waitForSelector('#aids:not([hidden])');
+    await page.click('[data-act=aids-level][data-lv=study]');
+    const full = await page.inputValue('#yp-in'); ok(full.length > 10, 'study fills the answer');
+    await page.click('[data-act=aids-level][data-lv=finish]');
+    ok(/your turn/i.test(await page.inputValue('#yp-in')), 'finish leaves a gap');
+    await page.click('[data-act=aids-level][data-lv=blank]');
+    await page.click('#aids-next'); ok(/Hint 1/.test(await page.textContent('#aids-steps')), 'first hint');
+    await page.click('#yx-check'); await page.waitForSelector('#yx-res .drill-res.no');
+    await page.click('#aids-next'); ok(/Hint 2/.test(await page.textContent('#aids-steps')), 'second hint');
+    ok(await page.locator('#aids-next').isDisabled() || /Unlocks after/.test(await page.textContent('#aids-gate')), 'partial solution is gated');
+    await ctx.close();
+  });
+
+  await test('home page: no About block at the bottom, and the MARGA brand is large and highlighted', async () => {
+    const { ctx, page } = await open(); await go(page, '/');
+    ok(!/About the Author/i.test(await page.textContent('#main')), 'about block removed from home');
+    const fs0 = await page.$eval('.brand b', (el) => parseFloat(getComputedStyle(el).fontSize));
+    const bg = await page.$eval('.brand b', (el) => getComputedStyle(el).backgroundColor);
+    ok(fs0 >= 24, 'brand font size ' + fs0); ok(bg !== 'rgba(0, 0, 0, 0)', 'brand has a highlight background');
     await ctx.close();
   });
 

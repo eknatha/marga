@@ -92,3 +92,12 @@ If the number does not appear: open the browser console and look for the "visito
 ## Round 7 additions
 - Case studies: 74 (added 18 in `src/cases/04-data-kubernetes-and-change.md`: databases, Kubernetes DNS, cloud networking and cooling, identity, supply chain, ransomware, migrations, Terraform state). Each source URL was opened and read when the entries were written; links can still change over time.
 - About page (`#/about`, nav link after InterviewHub) with the author text and a LinkedIn link.
+
+## Round 8 additions
+- A debugging and troubleshooting lesson is now the last lesson of every stage (12 new lessons, 117 in total). Each has a predict, a clickable diagram, an incident walkthrough, 4 quiz questions with a reason for every wrong option, and 5 flashcards.
+- Explain-the-wrong-answer: after a wrong quiz answer the page shows what you chose, the correct answer and (where authored) why each other option fails. Reasons use ` :: reason` after an option in lesson markdown. Only the new lessons carry them; the older 420 questions still show the short explanation.
+- Interleaved practice (`#/mix`): 12 shuffled questions and drills from stages you have passed.
+- Playground aids on Python, YAML, Go, HCL and SQL: support levels (study the answer, finish a half-solved one, start blank) and a four-step hint ladder (hint, what failed, partial solution after 2 failed checks, full solution after 3).
+- Capstone projects (`#/capstones`): 4 guided builds per path (16), in `src/capstones/<path>.md`. Steps and self-check items are ticked off and saved in the `cap` bag; included in export and import.
+- Home page: the About block at the bottom was removed (the About page remains). The MARGA brand in the header is larger and highlighted.
+- Reminder: lessons, capstones, hints and per-option reasons were written from memory. Spot-check commands and numbers. External links, the live counter and the Go Playground are not machine-verified.

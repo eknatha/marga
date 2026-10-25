@@ -144,6 +144,7 @@ function extractBlocks(body, file) {
   return { body, quiz, cards };
 }
 
+function addOpt(cur, text) { const k = text.indexOf(' :: '); if (k >= 0) { cur.options.push(text.slice(0, k).trim()); cur.ox.push(text.slice(k + 4).trim()); } else { cur.options.push(text.trim()); cur.ox.push(''); } }
 function parseQuiz(src, file) {
   const out = [];
   let cur = null;
@@ -151,10 +152,10 @@ function parseQuiz(src, file) {
   for (const raw of src.split('\n')) {
     const line = raw.trimEnd();
     if (!line.trim()) continue;
-    if (line.startsWith('Q: ')) { push(); cur = { q: line.slice(3).trim(), options: [], answer: -1, why: '' }; }
+    if (line.startsWith('Q: ')) { push(); cur = { q: line.slice(3).trim(), options: [], ox: [], answer: -1, why: '' }; }
     else if (!cur) throw new Error(`${file}: quiz line outside a question: ${line}`);
-    else if (line.startsWith('+ ')) { cur.answer = cur.options.length; cur.options.push(line.slice(2).trim()); }
-    else if (line.startsWith('- ')) cur.options.push(line.slice(2).trim());
+    else if (line.startsWith('+ ')) { cur.answer = cur.options.length; addOpt(cur, line.slice(2)); }
+    else if (line.startsWith('- ')) addOpt(cur, line.slice(2));
     else if (line.startsWith('> ')) cur.why += (cur.why ? ' ' : '') + line.slice(2).trim();
     else throw new Error(`${file}: cannot parse quiz line: ${line}`);
   }
@@ -303,6 +304,31 @@ function loadContent() {
     }
   }
 
+
+  // Capstone projects: src/capstones/<path>.md -> "## Title", key: value lines, then "steps:", "check:" bullet lists
+  const capstones = [];
+  const kdir = path.join(SRC, 'capstones');
+  if (fs.existsSync(kdir)) {
+    for (const f of fs.readdirSync(kdir).filter((x) => x.endsWith('.md')).sort()) {
+      const pid = f.replace(/\.md$/, '');
+      let n = 0;
+      for (const blk of fs.readFileSync(path.join(kdir, f), 'utf8').split(/^## /m).slice(1)) {
+        const nl = blk.indexOf('\n');
+        const title = blk.slice(0, nl).trim();
+        const kv = {}; const lists = { steps: [], check: [] }; let cur = null;
+        for (const line of blk.slice(nl + 1).split('\n')) {
+          const b = line.match(/^- (.+)$/);
+          if (b && cur) { lists[cur].push(b[1].trim()); continue; }
+          const m = line.match(/^([a-z]+):\s*(.*)$/);
+          if (m) { if (m[1] === 'steps' || m[1] === 'check') { cur = m[1]; } else { cur = null; kv[m[1]] = m[2].trim(); } }
+        }
+        for (const k of ['level', 'hours', 'modules', 'summary', 'goal', 'build', 'stretch']) if (!kv[k]) throw new Error(`capstones/${f}: "${title}" is missing ${k}:`);
+        n++;
+        capstones.push({ id: `${pid}-${n}-${slug(title)}`.slice(0, 60).replace(/-+$/, ''), path: pid, n, title, level: kv.level, hours: Number(kv.hours), modules: kv.modules.split(',').map((x) => x.trim()), summary: kv.summary, goal: kv.goal, build: kv.build, steps: lists.steps, check: lists.check, stretch: kv.stretch });
+      }
+    }
+  }
+
   // Architecture post-mortems: src/architecture/<slug>.md -> "# Title", key lines, blank line, markdown body
   const arch = [];
   const adir = path.join(SRC, 'architecture');
@@ -357,7 +383,7 @@ function loadContent() {
     }
   }
   const labs = require('./labs').load(path.join(SRC, 'labs'));
-  return { modules, paths, lessons, sheets, interview, cases, arch, drills, glossary, labs, predicts: PREDICTS };
+  return { modules, paths, lessons, sheets, interview, cases, capstones, arch, drills, glossary, labs, predicts: PREDICTS };
 
 }
 
@@ -466,7 +492,7 @@ function main() {
   const nQuiz = Object.values(data.lessons).reduce((n, l) => n + l.quiz.length, 0);
   const nCards = Object.values(data.lessons).reduce((n, l) => n + l.cards.length, 0);
   const size = fs.statSync(path.join(DIST, 'assets', 'data.js')).size;
-  console.log(`built v${ver}: ${data.modules.length} modules, ${nLessons} lessons, ${nQuiz} quiz questions, ${nCards} flashcards, ${list.length} cheat sheets, ${data.interview.length} interview questions, ${data.cases.length} case studies, ${data.arch.length} architecture studies, ${data.drills.length} drills, ${data.glossary.length} glossary terms, data.js ${(size / 1024).toFixed(0)} KB`);
+  console.log(`built v${ver}: ${data.modules.length} modules, ${nLessons} lessons, ${nQuiz} quiz questions, ${nCards} flashcards, ${list.length} cheat sheets, ${data.interview.length} interview questions, ${data.cases.length} case studies, ${data.capstones.length} capstones, ${data.arch.length} architecture studies, ${data.drills.length} drills, ${data.glossary.length} glossary terms, data.js ${(size / 1024).toFixed(0)} KB`);
 }
 
 main();
