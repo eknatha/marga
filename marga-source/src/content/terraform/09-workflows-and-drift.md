@@ -100,6 +100,20 @@ Treat these as separate, deliberate changes: replacing databases, deleting stora
 
 Someone added an SSH rule in the console during an investigation. The drift check found it. Do not just apply and move on. Ask who added it and why, since an incident may still be in progress. If the access is no longer needed, apply to remove it, which restores the intended state and closes an unreviewed hole. If it is needed, add it to the code through a reviewed change. Then reduce future console edits: restrict write permission in the console to a break-glass role, and make that role's use alert the team.
 
+```diagram
+title: A safe infrastructure change
+node: pr | Pull request | 0 | 1 | Code change and a plan comment. | Without a plan, reviewers guess.
+node: plan | Plan | 1 | 1 | Shows adds, changes and destroys. | A destroy of a database must stop everything.
+node: rev | Review | 2 | 0 | A person checks the plan, not only the code. | Rubber-stamping misses surprises.
+node: app | Apply | 3 | 1 | Applies the saved plan from the pipeline. | Applying from a laptop skips audit and locking.
+node: drift | Drift check | 2 | 2 | A scheduled plan finds manual changes. | Unnoticed drift makes the next apply risky.
+edge: pr | plan
+edge: plan | rev
+edge: rev | app
+edge: app | drift
+edge: drift | pr
+```
+
 ## Common mistakes
 
 - Applying a fresh plan that differs from the one reviewed

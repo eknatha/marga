@@ -88,6 +88,22 @@ True
 
 There is no clean fix for an existing overlap short of re-addressing one network, which usually means rebuilding everything inside it, or adding address translation, which is complex and brittle. The prevention is cheap: **keep one shared plan of address ranges** for every network, VPN and office, and allocate from it. For example, give each environment its own `/16`: `10.10.0.0/16` for production, `10.20.0.0/16` for staging, `10.30.0.0/16` for shared services.
 
+## Predict the subnet
+
+```predict
+Q: How many usable host addresses does 10.0.1.0/24 have?
+???
+254
+> A /24 has 256 addresses. The first is the network and the last is the broadcast, so 254 are usable. In some clouds a few more are reserved.
+```
+
+```predict
+Q: Is 192.168.4.200 inside the network 192.168.4.128/26?
+???
+No. The network covers 192.168.4.128 to 192.168.4.191.
+> A /26 has 64 addresses, so the range ends at .191. The address .200 is outside. Compute the range before trusting your first guess.
+```
+
 ## Common mistakes
 
 - Using the default range for every new network

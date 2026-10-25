@@ -95,6 +95,22 @@ $ terraform force-unlock 3f6c0a1e-...
 
 Then run `terraform plan` to check that state and reality agree. Prevent recurrences by allowing one run per environment at a time in the pipeline, and by never killing an apply mid-way.
 
+## Predict the plan
+
+```predict
+Q: Someone deletes a resource by hand in the console. You run terraform plan. What does it show?
+???
+It shows the resource will be created again.
+> Plan compares code and state with reality after a refresh. Missing in reality means create.
+```
+
+```predict
+Q: Two engineers run apply at the same time against a remote state without locking. What can happen?
+???
+State can be overwritten or corrupted, losing track of resources.
+> Use a backend with locking so a second apply waits or fails.
+```
+
 ## Common mistakes
 
 - Keeping state in a repository or on a laptop

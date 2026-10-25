@@ -132,6 +132,19 @@ $ amtool alert query --active -o json | jq -r '.[].labels.alertname' | sort | un
 
 Three alerts account for 80% of the volume: a CPU alert with no impact, a flapping disk check, and a duplicate of the error-ratio alert. For each ask: was action required? If no, remove it, convert it to a ticket, or lengthen its `for:` period. Add a weekly review of every page: who was paged, was it actionable, what changed. Track pages per shift as a team metric. A healthy target is only a handful per shift, and each one meaningful.
 
+```diagram
+title: From a signal to a person
+node: m | Metric | 0 | 1 | Prometheus evaluates a rule on the data. | Wrong labels make the alert silent.
+node: a | Alert rule | 1 | 1 | Fires after the condition holds for a duration. | A zero duration pages on every blip.
+node: am | Alertmanager | 2 | 0 | Groups, deduplicates and routes alerts. | Wrong routing sends pages to nobody.
+node: p | Pager or chat | 3 | 1 | The on-call person receives it with a runbook link. | Without a runbook the person starts from scratch.
+node: d | Dashboard | 2 | 2 | Shows context for investigation. | Too many panels hide the one that matters.
+edge: m | a
+edge: a | am
+edge: am | p
+edge: a | d
+```
+
 ## Common mistakes
 
 - Paging on causes with no user impact

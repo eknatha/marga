@@ -117,6 +117,20 @@ resp = requests.get(url, timeout=(3.05, 10))   # connect timeout, read timeout
 
 Wrap the call in the session from the previous section so a short outage is retried a few times with backoff, then fails the job quickly with a clear error. A fast failure with a message is always better than a silent hang.
 
+```diagram
+title: A reliable API call from a script
+node: build | Build the request | 0 | 1 | URL, headers, token from the environment and a timeout. | No timeout means a hung server hangs your script forever.
+node: send | Send with retries | 1 | 1 | A session retries on 429 and 5xx with backoff. | Retrying non-idempotent calls can create duplicates.
+node: status | Check the status | 2 | 0 | Call raise_for_status so 4xx and 5xx become errors. | Ignoring status parses an error page as data.
+node: parse | Parse JSON | 2 | 2 | Use response.json() and read fields with get. | A missing key raises KeyError or silently gives None.
+node: out | Use or log the result | 3 | 1 | Return data or log the failure with the request id. | Without the id you cannot find the matching server log.
+edge: build | send
+edge: send | status
+edge: send | parse
+edge: status | out
+edge: parse | out
+```
+
 ## Common mistakes
 
 - Omitting `timeout`, which allows indefinite hangs

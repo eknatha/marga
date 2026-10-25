@@ -119,6 +119,22 @@ $ curl -s localhost:9090/api/v1/status/tsdb | jq '.data.seriesCountByMetricName[
 
 Nearly five million series come from `http_requests_total`. A recent release added a `path` label containing the raw URL, including order numbers (`/orders/48213`). Every order created a new series. Remove the label (or normalise it to the route template `/orders/:id`) in the application, drop the label at scrape time with `metric_relabel_configs` as a stop-gap, and restart. Add an alert on `prometheus_tsdb_head_series` growth and a review check for new labels, because the problem arrived with a code change and will return with another.
 
+## Predict the query
+
+```predict
+Q: A counter http_requests_total grows by 600 in one minute at a steady rate. What does rate(http_requests_total[1m]) return?
+???
+About 10 requests per second.
+> rate gives the per-second average over the window. 600 divided by 60 is 10.
+```
+
+```predict
+Q: An application restarts and its request counter drops back to zero. Does rate() report a large negative value?
+???
+No. Prometheus detects the reset and rate stays correct.
+> Prometheus detects the drop and treats it as a reset, so the rate does not go negative.
+```
+
 ## Common mistakes
 
 - Graphing raw counters

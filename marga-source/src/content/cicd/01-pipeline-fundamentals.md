@@ -77,6 +77,22 @@ registry.example.com/shop-api:2.4.0
 
 Staging ran a build from a release candidate, while production got a **separate rebuild** that picked up a newer dependency version. The artifact that was tested is not the artifact that shipped. Fix the pipeline so one build produces one image tagged with a unique revision, and every environment deploys that exact tag (or digest). Pin dependency versions with a lock file so rebuilds are reproducible. Roll production back to the last good tag while you do it.
 
+## Predict the pipeline
+
+```predict
+Q: A pipeline has stages build, test and deploy. The test stage fails. What should happen to deploy?
+???
+It does not run, and the pipeline reports failure.
+> Stages run in order and stop on failure. A broken change should never reach deployment.
+```
+
+```predict
+Q: Two developers merge within seconds and both pipelines deploy to production. What risk appears?
+???
+The older build can finish last and overwrite the newer one.
+> Use a concurrency group or a queue so only one deploy runs at a time, and deploy a specific version.
+```
+
 ## Common mistakes
 
 - Rebuilding the artifact per environment

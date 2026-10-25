@@ -87,6 +87,20 @@ The fix for now is to bring the old server back, or at least a redirect, until t
 
 > **Tip:** Browsers, the operating system and some applications cache DNS too. A long-running Java process may cache a lookup for the life of the process. If one machine keeps using an old address, restart the application or check its DNS cache settings.
 
+```diagram
+title: How a name becomes an address
+node: app | Application | 0 | 1 | Asks the system resolver for www.example.com. | A wrong resolv.conf means the question goes to the wrong server.
+node: res | Recursive resolver | 1 | 1 | Checks its cache, then walks the tree on your behalf. | A stale cache keeps giving an old address until the TTL ends.
+node: root | Root and TLD servers | 2 | 0 | Point to the servers for .com and then for example.com. | If they cannot be reached, only cached names still work.
+node: auth | Authoritative server | 2 | 2 | Holds the real records and answers with an A or CNAME and a TTL. | A wrong record here is the source of truth for everyone.
+node: ans | Answer and cache | 3 | 1 | The resolver caches the answer and returns it. | A very long TTL makes a change slow to spread.
+edge: app | res
+edge: res | root
+edge: res | auth
+edge: root | ans
+edge: auth | ans
+```
+
 ## Common mistakes
 
 - Switching off the old server immediately after a DNS change

@@ -113,6 +113,26 @@ active
 
 The pattern is general: read the **exit code** and the **first error line**, not the restart loop. Common codes are `203/EXEC` (cannot execute the binary), `200/CHDIR` (bad `WorkingDirectory`), and `217/USER` (the `User=` does not exist).
 
+## Predict the signal
+
+```predict
+Q: You run kill 4321 on a process that has no special signal handler. Which signal is sent, and what usually happens?
+kill 4321
+???
+SIGTERM (15) is sent, and the process exits after it cleans up, if it handles the signal.
+> kill without a number sends SIGTERM, a polite request. SIGKILL (9) is the forced version and gives the program no chance to clean up.
+```
+
+```predict
+Q: A systemd unit has Restart=on-failure. The service exits with code 0 after finishing its work. Does systemd restart it?
+[Service]
+ExecStart=/usr/local/bin/job
+Restart=on-failure
+???
+No. A clean exit with code 0 is not a failure.
+> on-failure restarts for non-zero exit codes, signals and timeouts. Use Restart=always if it must run again after any exit.
+```
+
 ## Common mistakes
 
 - Editing a unit file and forgetting `systemctl daemon-reload`

@@ -89,6 +89,19 @@ $ docker exec app getent hosts db
 
 The command `getent hosts db` inside the app container proves the name now resolves. Make this permanent in the run command (`--network backend`) or, better, define the network in Compose (next lesson) so nobody has to connect things by hand.
 
+```diagram
+title: Where container data and traffic live
+node: ctr | Container | 0 | 1 | A writable layer that disappears with the container. | Data written here is lost when the container is removed.
+node: vol | Volume | 1 | 0 | Managed storage that outlives the container. | Not mounted means no persistence.
+node: bind | Bind mount | 1 | 2 | A host folder mounted inside. | Wrong permissions or path on the host break the app.
+node: net | Bridge network | 2 | 1 | Containers on it reach each other by name; the host publishes ports. | A container on another network cannot resolve the name.
+node: host | Host and port | 3 | 1 | A published port maps to the container port. | Two containers cannot publish the same host port.
+edge: ctr | vol
+edge: ctr | bind
+edge: ctr | net
+edge: net | host
+```
+
 ## Common mistakes
 
 - Keeping database files inside the container

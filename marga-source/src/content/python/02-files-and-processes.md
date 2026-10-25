@@ -129,6 +129,26 @@ def remove(name: str, dry_run: bool = True) -> None:
 
 Default to a dry run, print what would happen, and require an explicit flag for the destructive step.
 
+## Predict the result
+
+```predict
+Q: What happens when this runs and ls fails with a non-zero exit code?
+import subprocess
+subprocess.run(["ls", "/missing"], check=True)
+???
+It raises subprocess.CalledProcessError.
+> check=True turns a non-zero exit code into an exception. Without it the code continues silently with the failure in returncode.
+```
+
+```predict
+Q: A file is opened with the with statement. What is guaranteed when the block ends, even after an error?
+with open("out.txt", "w") as f:
+    f.write("hello")
+???
+The file is closed and the data is flushed.
+> The context manager calls close on exit, including when an exception happens. This avoids leaked handles.
+```
+
 ## Common mistakes
 
 - Using `shell=True` with interpolated values

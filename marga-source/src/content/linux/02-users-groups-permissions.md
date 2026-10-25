@@ -94,6 +94,39 @@ readable
 
 > **Warning:** Do not "fix" permission errors with `chmod -R 777`. It gives every user on the machine write access, hides the real cause and is a common source of security findings.
 
+## Predict the permission
+
+```predict
+Q: A file has mode 640, owner alice, group dev. User bob is in group dev. Can bob read it, and can bob write it?
+ls -l report.txt
+-rw-r----- 1 alice dev 120 Oct 1 09:00 report.txt
+???
+Bob can read it but cannot write it.
+> The group digit is 4, which is read only. Bob matches the group class, so he gets read. Others get nothing. Write would need 660.
+```
+
+```predict
+Q: A directory has mode 750. A user who is not the owner and not in the group runs ls on it. What happens?
+drwxr-x--- 2 alice dev 4096 Oct 1 09:00 private
+???
+Permission denied.
+> The other class has 0, so no read and no execute. The user cannot list it or enter it.
+```
+
+```diagram
+title: How Linux decides if you may open a file
+node: proc | Process | 0 | 1 | A running program carries a user id and group ids. | If it runs as the wrong user, every check below uses the wrong identity.
+node: dir | Directory path | 1 | 0 | Each directory on the path needs execute (x) for the caller. | A missing x on one parent directory blocks access even if the file itself is open.
+node: cls | Owner, group or other | 1 | 2 | The kernel picks one class: owner first, then group, then other. Only that class is used. | Being the owner with fewer rights than the group still gives the owner the smaller set.
+node: bits | Permission bits | 2 | 1 | The r, w and x bits of the chosen class are compared with what is asked. | Wrong bits give Permission denied.
+node: res | Allow or deny | 3 | 1 | The call succeeds or returns an error. ACLs and SELinux can add more checks. | A deny from SELinux looks like a permission error but chmod does not fix it.
+edge: proc | dir
+edge: proc | cls
+edge: dir | bits
+edge: cls | bits
+edge: bits | res
+```
+
 ## Common mistakes
 
 - Forgetting that every parent directory needs the execute bit

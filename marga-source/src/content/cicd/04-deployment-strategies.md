@@ -90,6 +90,19 @@ The new code expects a column that the migration has not created in this environ
 
 The lessons are procedural: run the migration (the **expand** step) as its own earlier release and confirm it before the code that needs it, add a rule that aborts the canary automatically when the error rate climbs above a threshold, and keep connection pools sized so one bad version cannot exhaust the database.
 
+```diagram
+title: A canary release step by step
+node: new | New version | 0 | 1 | Deployed beside the old one with no traffic. | If it fails to start, nothing is lost.
+node: five | 5 percent traffic | 1 | 1 | A small share of users reach it while metrics are watched. | Without metrics you cannot see harm.
+node: gate | Automatic check | 2 | 0 | Compare error rate and latency with the old version. | A weak check lets a bad build through.
+node: full | Full rollout | 3 | 0 | Traffic moves up in steps to 100 percent. | Skipping steps removes the safety.
+node: back | Rollback | 2 | 2 | Traffic returns to the old version in seconds. | A migration that is not reversible makes rollback unsafe.
+edge: new | five
+edge: five | gate
+edge: gate | full
+edge: gate | back
+```
+
 ## Common mistakes
 
 - No rollback plan, or one that was never tried

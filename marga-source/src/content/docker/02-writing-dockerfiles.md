@@ -113,6 +113,27 @@ uid=65532(nonroot) gid=65532(nonroot)
 
 The old image used a full build image as its runtime and never set `USER`. The fix is the multi-stage Dockerfile above. The benefits are measurable: a 98% smaller image, faster pulls and rollouts, fewer packages to patch, and a process that cannot write to most of the filesystem if it is compromised. Add a **vulnerability scan** (for example with Trivy) to your pipeline so a new finding fails the build instead of reaching production.
 
+## Predict the layers
+
+```predict
+Q: A Dockerfile copies the whole source before installing dependencies. You change one line of code. What happens at build time?
+FROM python:3.12
+COPY . /app
+RUN pip install -r /app/requirements.txt
+???
+The copy layer changes, so pip install runs again and the build is slow.
+> Copy requirements.txt first and install, then copy the code. The dependency layer then stays cached when only code changes.
+```
+
+```predict
+Q: A secret is added in one layer and deleted in the next layer. Is it gone from the image?
+COPY key.pem /tmp/key.pem
+RUN rm /tmp/key.pem
+???
+No. It remains in the earlier layer and can be extracted.
+> Layers are additive. Use build secrets or a multi-stage build so the secret never lands in a layer.
+```
+
 ## Common mistakes
 
 - Copying the whole source tree before installing dependencies

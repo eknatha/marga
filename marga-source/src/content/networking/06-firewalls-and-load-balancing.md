@@ -106,6 +106,24 @@ $ curl -s -o /dev/null -w '%{http_code}\n' http://10.0.1.11:8080/health
 
 Two lessons carry over. Health checks should test **what the balancer can actually reach** with a simple, cheap endpoint, and they should **fail on real problems only**. A health endpoint that checks every dependency can take the whole fleet down when one dependency slows, so decide what "healthy" means on purpose.
 
+## Predict the rule match
+
+```predict
+Q: Rules are checked top to bottom and the first match wins. A packet from 203.0.113.9 to port 22 arrives. What happens?
+1 allow tcp from 203.0.113.0/24 to port 22
+2 deny  tcp from any to port 22
+???
+It is allowed by rule 1.
+> The first matching rule decides. Order matters, so put specific allows above broad denies.
+```
+
+```predict
+Q: A load balancer uses round robin across three servers. Server B is slow but passes its health check. What do users see?
+???
+One in three requests is slow.
+> Round robin ignores speed. Use least connections or a health check that tests real work to spot the slow server.
+```
+
 ## Common mistakes
 
 - Setting the default policy to DROP before allowing SSH

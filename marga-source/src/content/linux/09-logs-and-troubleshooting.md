@@ -93,6 +93,20 @@ Logs grow without bound unless rotated. `logrotate` renames, compresses and dele
 
 `copytruncate` copies the log and empties the original so programs that keep the file open do not need a restart. Test a config with `logrotate -d /etc/logrotate.d/app`, which prints what would happen without doing it.
 
+```diagram
+title: Follow a failing service through the logs
+node: sym | Symptom | 0 | 1 | A user reports an error or a monitor fires. | Without a time and a name, you search blindly.
+node: stat | systemctl status | 1 | 0 | Shows state, exit code and the last log lines of the unit. | A recent restart can hide the first failure; look further back.
+node: jour | journalctl -u | 1 | 2 | Shows all unit logs with timestamps. Use --since to narrow. | If the journal is not persistent, logs from before a reboot are gone.
+node: cause | Cause | 2 | 1 | Compare the first error with the last change: a config, a package or a disk. | Fixing the later error instead of the first one leads you away.
+node: fix | Fix and verify | 3 | 1 | Change one thing, restart, and watch the logs confirm the fix. | Changing several things at once makes it unclear what worked.
+edge: sym | stat
+edge: sym | jour
+edge: stat | cause
+edge: jour | cause
+edge: cause | fix
+```
+
 ## Common mistakes
 
 - Reading only the latest lines instead of the minute when the problem occurred

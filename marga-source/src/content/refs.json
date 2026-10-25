@@ -1549,6 +1549,56 @@
     "CISA Known Exploited Vulnerabilities Catalog",
     "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
    ]
+  ],
+  "security/identity-authentication-and-zero-trust": [
+   [
+    "NIST SP 800-207 Zero Trust Architecture",
+    "https://csrc.nist.gov/pubs/sp/800/207/final"
+   ],
+   [
+    "OAuth 2.0 specification",
+    "https://oauth.net/2/"
+   ]
+  ],
+  "security/application-security-for-devops": [
+   [
+    "OWASP Top 10",
+    "https://owasp.org/www-project-top-ten/"
+   ],
+   [
+    "OWASP Cheat Sheet Series",
+    "https://cheatsheetseries.owasp.org/"
+   ]
+  ],
+  "security/policy-as-code-and-compliance": [
+   [
+    "Open Policy Agent documentation",
+    "https://www.openpolicyagent.org/docs/latest/"
+   ],
+   [
+    "Kyverno documentation",
+    "https://kyverno.io/docs/"
+   ]
+  ],
+  "security/network-and-edge-security": [
+   [
+    "CISA: Understanding and responding to DDoS attacks",
+    "https://www.cisa.gov/news-events/news/understanding-and-responding-distributed-denial-service-attacks"
+   ],
+   [
+    "OWASP Transport Layer Security Cheat Sheet",
+    "https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Security_Cheat_Sheet.html"
+   ]
+  ],
+  "security/ransomware-resilience-and-recovery": [
+   [
+    "CISA: StopRansomware guide",
+    "https://www.cisa.gov/stopransomware"
+   ],
+   [
+    "NIST Cybersecurity Framework",
+    "https://www.nist.gov/cyberframework"
+   ]
   ]
  },
  "sheets": {
