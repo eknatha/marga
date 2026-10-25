@@ -855,5 +855,277 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "Share the plan in the pull request", n: "The reviewer reads the plan output rather than only the code, and checks names, counts and sensitive changes." },
     { f: 2, t: 0, l: "Approve or ask for a change", n: "If the plan shows a surprise, the code changes and a new plan is created. Nothing has been applied yet." },
     { f: 0, t: 1, l: "terraform apply plan.bin", n: "Applying the saved plan guarantees that what was reviewed is exactly what runs." }
+  ] },
+{ id: "sec-zero-trust-request", module: "security", title: "How zero trust checks one request", summary: "Identity, device and policy are checked every time.",
+  actors: ["User", "Identity-aware proxy", "Application"],
+  steps: [
+    { f: 0, t: 1, l: "Request a page", n: "The user opens an internal app from a managed laptop. The request goes to the proxy, not straight to the app." },
+    { f: 1, t: 1, l: "Check identity and device", n: "The proxy verifies the sign-in with a hardware key, the device health, and the session age." },
+    { f: 1, t: 1, l: "Check the policy", n: "A central policy says which groups may reach this app and from which device state. A failure stops the request here." },
+    { f: 1, t: 2, l: "Forward with a short-lived token", n: "The proxy passes a signed token that names the user and expires in minutes." },
+    { f: 2, t: 2, l: "Check permission for the action", n: "The application checks that this user may read this record. The proxy check alone is not enough." },
+    { f: 2, t: 0, l: "Return the data and log the decision", n: "Every allow and deny is logged, so an investigator can reconstruct who reached what." }
+  ] },
+{ id: "sec-oauth-oidc-login", module: "security", title: "Sign in with OIDC and call an API", summary: "From login to an access token and a protected call.",
+  actors: ["Browser", "Identity provider", "API"],
+  steps: [
+    { f: 0, t: 1, l: "Redirect to sign in", n: "The app sends the user to the identity provider with its client id, scope and a random state value." },
+    { f: 1, t: 1, l: "Authenticate the user", n: "The user signs in with a passkey. The provider never gives the password to the app." },
+    { f: 1, t: 0, l: "Return a code", n: "The provider redirects back with a one-time authorization code." },
+    { f: 0, t: 1, l: "Exchange the code", n: "The app swaps the code, with a proof key, for an ID token and a short-lived access token." },
+    { f: 0, t: 2, l: "Call the API with the token", n: "The access token is sent in a header, never in the URL." },
+    { f: 2, t: 2, l: "Validate the token", n: "The API checks signature, issuer, audience, expiry and scope before doing any work." },
+    { f: 2, t: 0, l: "Return only allowed data", n: "The response contains only what the scope and the user's permissions allow." }
+  ] },
+{ id: "sec-sql-injection", module: "security", title: "How parameterised queries stop injection", summary: "The same input, treated as text instead of code.",
+  actors: ["Attacker", "Application", "Database"],
+  steps: [
+    { f: 0, t: 1, l: "Send a crafted name", n: "The attacker enters x' OR '1'='1 into a search box." },
+    { f: 1, t: 1, l: "Unsafe version joins strings", n: "The code builds SELECT ... WHERE name = 'x' OR '1'='1' and sends it as text." },
+    { f: 1, t: 2, l: "Database runs the whole text", n: "The condition is always true, so every row is returned." },
+    { f: 2, t: 0, l: "Data leaks", n: "The attacker receives all users. This is the harm of injection." },
+    { f: 1, t: 2, l: "Safe version sends a parameter", n: "The code sends the query with a placeholder and the value separately." },
+    { f: 2, t: 1, l: "Value is treated as data", n: "The database searches for a user literally named x' OR '1'='1 and finds none." }
+  ] },
+{ id: "sec-policy-rollout", module: "security", title: "Rolling out a policy without an outage", summary: "Audit, fix, enforce in stages.",
+  actors: ["Security team", "Cluster", "Service owners"],
+  steps: [
+    { f: 0, t: 1, l: "Install the policy in audit mode", n: "The rule reports violations but blocks nothing." },
+    { f: 1, t: 0, l: "Collect the report", n: "A policy report lists every workload that breaks the rule." },
+    { f: 0, t: 2, l: "Share the list with owners", n: "Each owner gets their findings with a fix example and a deadline." },
+    { f: 2, t: 2, l: "Fix or request an exception", n: "Owners fix the manifests. A rare exception needs a reason, an owner and an end date." },
+    { f: 0, t: 1, l: "Enforce in a test namespace", n: "Enforce mode starts where a failure costs little." },
+    { f: 1, t: 0, l: "Watch the denials", n: "The team checks denied requests and corrects confusing messages." },
+    { f: 0, t: 1, l: "Enforce everywhere", n: "Production follows once the denial rate is near zero. Exceptions expire automatically." }
+  ] },
+{ id: "sec-ransomware-recovery", module: "security", title: "Recovering from ransomware with an immutable backup", summary: "Contain, restore in order, and verify.",
+  actors: ["Responders", "Backup vault", "Production"],
+  steps: [
+    { f: 0, t: 2, l: "Isolate affected systems", n: "Network access is cut and tokens are revoked so the attacker cannot spread or delete more." },
+    { f: 0, t: 1, l: "Confirm the vault is intact", n: "The locked copy in the separate account shows no deletions. Retention is still enforced." },
+    { f: 1, t: 2, l: "Rebuild identity and DNS first", n: "Directory and name servers are rebuilt from known good images and restored from backup." },
+    { f: 1, t: 2, l: "Restore databases to a clean point", n: "The restore point is chosen before the first sign of the intrusion." },
+    { f: 0, t: 2, l: "Redeploy applications from signed builds", n: "Applications are deployed from trusted code, not cleaned in place." },
+    { f: 0, t: 2, l: "Verify and return users in stages", n: "Checks run on each stage before traffic returns. Credentials are rotated." }
+  ] },
+{ id: "x-linux-permission-check", module: "linux", title: "How the kernel checks a file permission", summary: "Owner, group, other and the execute bit on directories.",
+  actors: ["Process", "Kernel", "Filesystem"],
+  steps: [
+    { f: 0, t: 1, l: "open(/srv/app/data.txt)", n: "The program asks the kernel to open a file. The call carries the user and group ids of the process." },
+    { f: 1, t: 2, l: "Walk each directory", n: "The kernel needs execute permission on /, /srv and /srv/app to pass through them." },
+    { f: 2, t: 1, l: "Read the file mode", n: "The filesystem returns the owner, the group and the permission bits of data.txt." },
+    { f: 1, t: 1, l: "Pick one class", n: "If the user is the owner, the owner bits are used. Otherwise the group bits, otherwise the other bits." },
+    { f: 1, t: 1, l: "Compare with the request", n: "Opening for reading needs r. Opening for writing needs w. The decision is made on that one class." },
+    { f: 1, t: 0, l: "Return a handle or an error", n: "A file descriptor on success, or Permission denied. SELinux can still deny after this step." }
+  ] },
+{ id: "x-linux-boot", module: "linux", title: "What happens between power on and a login prompt", summary: "Firmware, boot loader, kernel and systemd.",
+  actors: ["Firmware", "Boot loader", "Kernel", "systemd"],
+  steps: [
+    { f: 0, t: 0, l: "Power on self test", n: "The firmware checks hardware and finds the boot device." },
+    { f: 0, t: 1, l: "Load the boot loader", n: "The firmware starts GRUB from the EFI partition." },
+    { f: 1, t: 2, l: "Load kernel and initramfs", n: "GRUB loads the kernel and a small temporary filesystem with the drivers needed to find the root disk." },
+    { f: 2, t: 2, l: "Mount the real root", n: "The kernel mounts the root filesystem and drops the initramfs." },
+    { f: 2, t: 3, l: "Start PID 1", n: "The kernel starts systemd as the first process." },
+    { f: 3, t: 3, l: "Reach the target", n: "systemd starts services in dependency order until multi-user.target and the login prompt appear." }
+  ] },
+{ id: "x-bash-pipe", module: "bash", title: "How a pipeline connects commands", summary: "Standard output of one command becomes input of the next.",
+  actors: ["Shell", "grep", "wc"],
+  steps: [
+    { f: 0, t: 0, l: "Parse cat log | grep ERROR | wc -l", n: "The shell splits the line at the pipe characters into three commands." },
+    { f: 0, t: 1, l: "Create pipes and start processes", n: "The shell creates a pipe between each pair and starts all commands at the same time." },
+    { f: 1, t: 1, l: "grep reads and filters", n: "grep reads lines from its standard input and prints only those that contain ERROR." },
+    { f: 1, t: 2, l: "Pass matching lines", n: "Matching lines flow through the pipe to wc as they are produced." },
+    { f: 2, t: 2, l: "Count lines", n: "wc -l counts the lines until the pipe closes." },
+    { f: 2, t: 0, l: "Return the status", n: "Without pipefail the shell reports only the status of the last command." }
+  ] },
+{ id: "x-bash-quoting", module: "bash", title: "Why quoting protects a variable", summary: "Word splitting and globbing without quotes.",
+  actors: ["Script", "Shell expansion", "Command"],
+  steps: [
+    { f: 0, t: 0, l: "file=\"my report.txt\"", n: "The variable holds one name with a space inside." },
+    { f: 0, t: 1, l: "Run rm $file", n: "Without quotes the shell expands the variable and then splits it on spaces." },
+    { f: 1, t: 2, l: "Two arguments arrive", n: "rm receives my and report.txt as separate names and may delete the wrong file." },
+    { f: 0, t: 1, l: "Run rm \"$file\"", n: "With quotes the expansion stays one word." },
+    { f: 1, t: 2, l: "One argument arrives", n: "rm receives my report.txt exactly as stored." },
+    { f: 2, t: 0, l: "Safe result", n: "Quote variables by default. Unquoted use is the exception." }
+  ] },
+{ id: "x-python-venv", module: "python", title: "How a virtual environment isolates packages", summary: "Separate site-packages for each project.",
+  actors: ["Developer", "venv", "pip"],
+  steps: [
+    { f: 0, t: 1, l: "python -m venv .venv", n: "A folder is created with its own interpreter link and an empty site-packages." },
+    { f: 0, t: 1, l: "Activate it", n: "The shell puts .venv/bin first in PATH, so python and pip now point there." },
+    { f: 0, t: 2, l: "pip install requests", n: "pip reads the active environment and installs into its site-packages." },
+    { f: 2, t: 1, l: "Packages are stored locally", n: "Nothing is written to the system Python, so other projects are not affected." },
+    { f: 0, t: 2, l: "pip freeze > requirements.txt", n: "The exact versions are recorded so others can rebuild the same environment." },
+    { f: 0, t: 1, l: "Delete and recreate", n: "Removing the folder and reinstalling from the file gives a clean copy." }
+  ] },
+{ id: "x-python-retry", module: "python", title: "Retrying a failed API call with backoff", summary: "Waiting longer after each failure.",
+  actors: ["Script", "API", "Timer"],
+  steps: [
+    { f: 0, t: 1, l: "First request", n: "The script sends the request with a timeout." },
+    { f: 1, t: 0, l: "503 Service Unavailable", n: "The server is busy. The error is temporary, so a retry is allowed." },
+    { f: 0, t: 2, l: "Wait 1 second plus jitter", n: "A small random delay stops many clients from retrying at the same moment." },
+    { f: 0, t: 1, l: "Second request", n: "The script sends the same request again after the wait." },
+    { f: 1, t: 0, l: "503 again", n: "The wait grows to 2 seconds, then 4, up to a limit." },
+    { f: 0, t: 1, l: "Third request succeeds", n: "The call returns 200. If the limit is reached, the script reports the failure instead of looping forever." }
+  ] },
+{ id: "x-net-tcp-handshake", module: "networking", title: "How a TCP connection starts and ends", summary: "SYN, SYN-ACK and ACK, then FIN.",
+  actors: ["Client", "Server"],
+  steps: [
+    { f: 0, t: 1, l: "SYN", n: "The client picks a starting sequence number and asks to connect." },
+    { f: 1, t: 0, l: "SYN-ACK", n: "The server confirms and sends its own starting number." },
+    { f: 0, t: 1, l: "ACK", n: "The client confirms. The connection is open after one and a half round trips." },
+    { f: 0, t: 1, l: "Send data", n: "Data is split into segments, numbered and acknowledged." },
+    { f: 0, t: 1, l: "FIN", n: "One side says it has finished sending." },
+    { f: 1, t: 0, l: "FIN and ACK", n: "The other side closes too. A firewall that drops these packets leaves half open connections." }
+  ] },
+{ id: "x-net-tls", module: "networking", title: "How TLS protects an HTTPS request", summary: "Certificate check and a shared key.",
+  actors: ["Browser", "Server", "CA"],
+  steps: [
+    { f: 0, t: 1, l: "ClientHello", n: "The browser lists the TLS versions and ciphers it supports and the server name." },
+    { f: 1, t: 0, l: "Certificate", n: "The server sends its certificate chain and chooses a cipher." },
+    { f: 0, t: 2, l: "Verify the chain", n: "The browser checks that a trusted authority signed the certificate, the name matches and it has not expired." },
+    { f: 0, t: 1, l: "Key exchange", n: "Both sides compute the same session key without sending it." },
+    { f: 1, t: 0, l: "Finished", n: "Both confirm the handshake. From now on everything is encrypted." },
+    { f: 0, t: 1, l: "Send the HTTP request", n: "The request and the response travel encrypted with the session key." }
+  ] },
+{ id: "x-docker-build-cache", module: "docker", title: "How the Docker build cache decides what to rebuild", summary: "Layers are reused until something changes.",
+  actors: ["Developer", "Builder", "Cache"],
+  steps: [
+    { f: 0, t: 1, l: "docker build .", n: "The builder reads the Dockerfile from top to bottom." },
+    { f: 1, t: 2, l: "Check FROM and COPY requirements", n: "The builder asks whether this instruction and its input files match a cached layer." },
+    { f: 2, t: 1, l: "Cache hit", n: "Unchanged instructions reuse the stored layer, which is almost instant." },
+    { f: 1, t: 1, l: "Find the first change", n: "You edit app code, so the COPY . layer no longer matches." },
+    { f: 1, t: 1, l: "Rebuild from there on", n: "Every later instruction runs again, because each layer depends on the one before." },
+    { f: 1, t: 0, l: "Image ready", n: "Putting rarely changed steps first keeps most of the build cached." }
+  ] },
+{ id: "x-docker-compose-up", module: "docker", title: "What docker compose up does", summary: "Network, volumes and ordered startup.",
+  actors: ["Compose", "Docker engine", "Containers"],
+  steps: [
+    { f: 0, t: 0, l: "Read compose.yaml", n: "Compose parses services, networks, volumes and dependencies." },
+    { f: 0, t: 1, l: "Create the network", n: "A project network is created. Services find each other by name." },
+    { f: 0, t: 1, l: "Create the volumes", n: "Named volumes are created if they do not exist." },
+    { f: 1, t: 2, l: "Start the database", n: "The database container starts and its health check begins." },
+    { f: 2, t: 1, l: "Report healthy", n: "When the check passes, services that depend on it with the healthy condition can start." },
+    { f: 1, t: 2, l: "Start the app", n: "The app connects to db by name and the published port opens on the host." }
+  ] },
+{ id: "x-cicd-pr-flow", module: "cicd", title: "From a pull request to production", summary: "Checks, review, merge and deploy.",
+  actors: ["Developer", "Pipeline", "Reviewer", "Production"],
+  steps: [
+    { f: 0, t: 1, l: "Open a pull request", n: "The pipeline starts with lint, unit tests and scans." },
+    { f: 1, t: 0, l: "Report the checks", n: "Failed checks block the merge and show the log." },
+    { f: 0, t: 2, l: "Ask for review", n: "A reviewer reads the change and the test results." },
+    { f: 2, t: 0, l: "Approve", n: "Approval and green checks unlock the merge." },
+    { f: 1, t: 1, l: "Build once on main", n: "The pipeline builds one artifact and stores it with a version." },
+    { f: 1, t: 3, l: "Deploy the same artifact", n: "The tested artifact is promoted step by step to production with a health check." }
+  ] },
+{ id: "x-cicd-cache", module: "cicd", title: "How a pipeline cache speeds up builds", summary: "Dependencies restored by a key.",
+  actors: ["Job", "Cache store"],
+  steps: [
+    { f: 0, t: 0, l: "Compute the cache key", n: "The key is built from the hash of the lock file, so it changes only when dependencies change." },
+    { f: 0, t: 1, l: "Ask for the key", n: "The job asks the store for an entry with that key." },
+    { f: 1, t: 0, l: "Hit: restore the files", n: "The dependencies are unpacked in seconds." },
+    { f: 0, t: 0, l: "Build and test", n: "Only the project code needs work." },
+    { f: 0, t: 1, l: "Miss: install and save", n: "On a miss the job installs normally and saves the folder under the new key." },
+    { f: 1, t: 0, l: "Next run is faster", n: "Never cache secrets or build outputs that must be fresh." }
+  ] },
+{ id: "x-k8s-pod-start", module: "kubernetes", title: "What happens when you create a pod", summary: "API server, scheduler and kubelet.",
+  actors: ["kubectl", "API server", "Scheduler", "Kubelet"],
+  steps: [
+    { f: 0, t: 1, l: "kubectl apply -f pod.yaml", n: "The request is authenticated, authorized and validated." },
+    { f: 1, t: 1, l: "Store in etcd", n: "The pod object is saved with no node assigned." },
+    { f: 2, t: 1, l: "Scheduler sees an unassigned pod", n: "It filters nodes by resources and rules, then scores them." },
+    { f: 2, t: 1, l: "Bind to a node", n: "The scheduler writes the chosen node name into the pod." },
+    { f: 3, t: 1, l: "Kubelet sees its pod", n: "The kubelet on that node pulls the image and starts the containers." },
+    { f: 3, t: 1, l: "Report Running", n: "Status goes back to the API server and kubectl get pods shows Running." }
+  ] },
+{ id: "x-k8s-hpa", module: "kubernetes", title: "How the horizontal autoscaler adds pods", summary: "Metrics, target and replica count.",
+  actors: ["Metrics server", "Autoscaler", "Deployment"],
+  steps: [
+    { f: 0, t: 0, l: "Collect CPU use", n: "The metrics server reports current CPU use of every pod." },
+    { f: 1, t: 0, l: "Read the average", n: "Every 15 seconds the autoscaler reads the average against the target, for example 60 percent." },
+    { f: 1, t: 1, l: "Compute replicas", n: "desired = current x (current use / target), rounded up." },
+    { f: 1, t: 2, l: "Scale the Deployment", n: "The autoscaler changes the replica count within the min and max limits." },
+    { f: 2, t: 2, l: "New pods start", n: "The scheduler places them if nodes have room. Otherwise a node autoscaler must add a node." },
+    { f: 1, t: 2, l: "Wait before scaling down", n: "A stabilisation window avoids flapping when load drops for a short time." }
+  ] },
+{ id: "x-tf-remote-state", module: "terraform", title: "How remote state and locking protect a team", summary: "One source of truth and one writer at a time.",
+  actors: ["Engineer", "Terraform", "Backend"],
+  steps: [
+    { f: 0, t: 1, l: "terraform apply", n: "Terraform starts and needs the current state." },
+    { f: 1, t: 2, l: "Acquire the lock", n: "The backend records who holds the lock. A second apply waits or fails." },
+    { f: 2, t: 1, l: "Read the state", n: "The latest state is downloaded from the shared backend." },
+    { f: 1, t: 1, l: "Plan and apply", n: "Terraform compares code, state and reality and makes the changes." },
+    { f: 1, t: 2, l: "Write the new state", n: "The updated state is saved with a new version." },
+    { f: 1, t: 2, l: "Release the lock", n: "Others can now run. Versioning allows a rollback of the state file." }
+  ] },
+{ id: "x-tf-module-use", module: "terraform", title: "How a module is reused", summary: "One definition, many environments.",
+  actors: ["Root config", "Module", "Provider"],
+  steps: [
+    { f: 0, t: 1, l: "module \"network\" { source = ... }", n: "The root passes variables such as cidr and name." },
+    { f: 1, t: 1, l: "Define resources", n: "The module creates a VPC, subnets and routes using those inputs." },
+    { f: 1, t: 2, l: "Provider creates them", n: "The provider translates resources into API calls." },
+    { f: 1, t: 0, l: "Return outputs", n: "The module exposes subnet ids as outputs." },
+    { f: 0, t: 0, l: "Use the outputs", n: "Other modules receive the ids by reference." },
+    { f: 0, t: 1, l: "Reuse for staging", n: "Another call with other inputs creates a second copy without copied code." }
+  ] },
+{ id: "x-cloud-assume-role", module: "cloud", title: "How a role gives temporary access", summary: "Assume role and short-lived credentials.",
+  actors: ["Application", "Security token service", "Storage"],
+  steps: [
+    { f: 0, t: 1, l: "Request the role", n: "The application proves its identity, for example with its instance profile." },
+    { f: 1, t: 1, l: "Check the trust policy", n: "The service verifies that this identity may assume this role." },
+    { f: 1, t: 0, l: "Return temporary keys", n: "Credentials with a short expiry are returned." },
+    { f: 0, t: 2, l: "Call storage", n: "The application signs the request with the temporary keys." },
+    { f: 2, t: 2, l: "Check the permission policy", n: "The storage service checks that the role may read this bucket." },
+    { f: 2, t: 0, l: "Return the data", n: "After expiry the keys stop working, so a leak has a short life." }
+  ] },
+{ id: "x-cloud-lambda", module: "cloud", title: "What happens when a function is invoked", summary: "Cold start, run and scale out.",
+  actors: ["Caller", "Function service", "Execution environment"],
+  steps: [
+    { f: 0, t: 1, l: "Invoke the function", n: "An event or an HTTP request arrives." },
+    { f: 1, t: 1, l: "Find a free environment", n: "If a warm one is free, the request goes to it and no start-up cost is paid." },
+    { f: 1, t: 2, l: "Cold start", n: "If none is free, a new environment is created and the code is loaded. This adds latency." },
+    { f: 2, t: 2, l: "Run the handler", n: "The code runs within the memory and time limits." },
+    { f: 2, t: 0, l: "Return the result", n: "The response goes back. The environment stays warm for a while." },
+    { f: 1, t: 2, l: "Scale out", n: "More concurrent requests create more environments, up to the account limit." }
+  ] },
+{ id: "x-obs-trace", module: "observability", title: "How a distributed trace follows a request", summary: "Trace id passed from service to service.",
+  actors: ["Gateway", "Order service", "Payment service", "Trace backend"],
+  steps: [
+    { f: 0, t: 0, l: "Create a trace id", n: "The first service creates a trace id and a root span." },
+    { f: 0, t: 1, l: "Pass the context", n: "The id travels in a request header to the next service." },
+    { f: 1, t: 2, l: "Pass it again", n: "Each service creates a child span and forwards the same trace id." },
+    { f: 2, t: 2, l: "Slow database call", n: "The payment service records a span for a 900 ms query." },
+    { f: 0, t: 3, l: "Export spans", n: "Every service sends its spans to the backend in the background." },
+    { f: 3, t: 3, l: "Assemble the trace", n: "The backend joins spans by trace id and shows where the time went." }
+  ] },
+{ id: "x-obs-log-pipeline", module: "observability", title: "How logs travel from a container to a search page", summary: "Collect, parse, ship and index.",
+  actors: ["Container", "Collector", "Storage", "Search UI"],
+  steps: [
+    { f: 0, t: 0, l: "Write JSON to standard output", n: "The app writes one event per line with level, message and request id." },
+    { f: 1, t: 0, l: "Collector tails the file", n: "An agent on the node reads new lines and adds labels such as pod and namespace." },
+    { f: 1, t: 1, l: "Parse and filter", n: "Fields are parsed, noisy lines are dropped and secrets are masked." },
+    { f: 1, t: 2, l: "Ship in batches", n: "Batches are sent with a buffer and retry, so a short outage loses nothing." },
+    { f: 2, t: 2, l: "Index and store", n: "Events are indexed by time and labels, with a retention period." },
+    { f: 3, t: 2, l: "Query by request id", n: "An engineer searches one request id and sees all events across services." }
+  ] },
+{ id: "x-sre-error-budget", module: "sre", title: "How an error budget guides releases", summary: "Spend, watch and decide.",
+  actors: ["Team", "Monitoring", "Release process"],
+  steps: [
+    { f: 0, t: 0, l: "Set the SLO", n: "For example 99.9 percent of requests succeed over 30 days." },
+    { f: 1, t: 0, l: "Measure the SLI", n: "Monitoring computes the good request ratio all the time." },
+    { f: 1, t: 1, l: "Compute the remaining budget", n: "About 43 minutes of failure per month are allowed at 99.9 percent." },
+    { f: 1, t: 2, l: "Budget is healthy", n: "The team ships features at normal speed." },
+    { f: 1, t: 2, l: "Budget is nearly spent", n: "Releases slow down and reliability work takes priority." },
+    { f: 2, t: 0, l: "Review at the end of the period", n: "The team resets, learns from the burn and adjusts the SLO if needed." }
+  ] },
+{ id: "x-sre-postmortem", module: "sre", title: "From incident to learning", summary: "Timeline, causes and follow up.",
+  actors: ["Incident lead", "Team", "Tracker"],
+  steps: [
+    { f: 0, t: 0, l: "Collect the timeline", n: "Alerts, chat messages and deploys are put in time order." },
+    { f: 0, t: 1, l: "Meet within a few days", n: "A facilitator keeps the review blameless and focuses on systems." },
+    { f: 1, t: 1, l: "Find contributing causes", n: "The group asks why at each step until it reaches process and design gaps." },
+    { f: 1, t: 2, l: "Write action items", n: "Each item has an owner, a due date and a way to check it." },
+    { f: 2, t: 0, l: "Track to completion", n: "Open items are reviewed weekly." },
+    { f: 0, t: 1, l: "Share the lessons", n: "The write-up is shared, so other teams avoid the same failure." }
   ] }
 ];

@@ -292,7 +292,7 @@ function homeView() {
   var nCases = (D.cases || []).length, nArch = (D.arch || []).length, nDrills = (D.drills || []).length, nIv = (IV || []).length, nEx = (window.MARGA_EXPLAINERS || []).length;
   var stats = [[t.total, 'lessons with checks'], [nCases, 'real incidents'], [nDrills, 'troubleshooting drills'], [nIv, 'interview answers'], [nEx, 'animated explainers']].map(function (x) { return '<div><b>' + x[0] + '</b><span>' + x[1] + '</span></div>'; }).join('');
   var TL = [['09:37', 'An engineer runs a command to remove a few servers.'], ['09:37', 'A mistyped input removes far more than intended.', 1], ['After', 'The index and placement subsystems stop serving requests.'], ['Midday', 'A full restart takes much longer than expected.'], ['About four hours', 'S3 is fully back.']];
-  var tools = [['#/subnet', 'Subnet and CIDR', 'Split networks, plan VLSM, merge routes.'], ['#/playground/yaml', 'YAML playground', 'Find errors and risky Kubernetes settings.'], ['#/playground/python', 'Python playground', 'Run Python with built-in tests.'], ['#/playground/go', 'Go playground', '30 Go exercises run on the Go Playground.'], ['#/playground/hcl', 'Terraform playground', '30 HCL exercises checked in the browser.'], ['#/playground/sql', 'SQL for SREs', '20 SQL exercises on a real SQLite engine.'], ['#/explainers', 'Animated explainers', 'DNS, TLS, pods, rolling updates and more.']];
+  var tools = [['#/subnet', 'Subnet and CIDR', 'Split networks, plan VLSM, merge routes.'], ['#/playground/yaml', 'YAML playground', 'Find errors and risky Kubernetes settings.'], ['#/playground/python', 'Python playground', 'Run Python with built-in tests.'], ['#/playground/go', 'Go playground', '50 Go exercises run on the Go Playground.'], ['#/playground/hcl', 'Terraform playground', '50 HCL exercises checked in the browser.'], ['#/playground/sql', 'SQL for SREs', '50 SQL exercises on a real SQLite engine.'], ['#/explainers', 'Animated explainers', 'DNS, TLS, pods, rolling updates and more.']];
   view.html =
     '<section class="hero hero2"><div class="wrap hero-grid2">' +
     '<div class="hero-copy"><h1>Learn to fix production before production breaks.</h1>' +
@@ -520,6 +520,7 @@ function startQuiz(id, root) {
         b.addEventListener('click', function () {
           var oi = Number(b.getAttribute('data-oi')), ok = oi === q.answer;
           if (ok) right++;
+          if (window.MargaFeatures && MargaFeatures.note) MargaFeatures.note('q', id + '#' + item.qi, ok);
           $$('.opt', root).forEach(function (x) {
             x.disabled = true;
             if (Number(x.getAttribute('data-oi')) === q.answer) x.classList.add('right');
@@ -595,6 +596,7 @@ function startDeck(root, items, mode) {
         var cs = cardState(c.key), box = good ? Math.min(cs.box + 1, 5) : 1;
         var due = new Date(); due.setDate(due.getDate() + (good ? INTERVALS[box] : 0));
         S.cards[c.key] = { box: box, due: good ? due.getTime() : Date.now() };
+        if (window.MargaFeatures && MargaFeatures.note) MargaFeatures.note('c', c.key, good);
         markActive(); save(); renderChrome(); setNav(view.nav);
         queue.shift(); seen++;
         if (!good) queue.push(c);
@@ -783,7 +785,7 @@ function progressView() {
           var o = JSON.parse(r.result);
           if (!o || o.v !== 1 || typeof o.lessons !== 'object' || !Array.isArray(o.days)) throw new Error('bad');
           S = { v: 1, lessons: o.lessons || {}, cards: o.cards || {}, days: o.days, path: o.path || 'devops', iv: (o.iv && typeof o.iv === 'object') ? o.iv : {} };
-          ['cs', 'dr', 'fc', 'dc', 'py', 'lab'].forEach(function (k) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) S[k] = o[k]; });
+          ['cs', 'dr', 'fc', 'dc', 'py', 'lab', 'wk'].forEach(function (k) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) S[k] = o[k]; });
           if (Array.isArray(o.mock)) S.mock = o.mock.slice(-20);
           save(); renderChrome(); toast('Progress imported.'); route();
         } catch (x) { toast('That file is not a MARGA progress export.'); }
@@ -826,21 +828,27 @@ function route() {
 
 /* ---------- search (ranking in search.js) ---------- */
 var INDEX = null, GROUPS = ['Lessons', 'Cases', 'Cheat sheets', 'Interview', 'Glossary', 'Practice'];
-function addIdx(kind, group, title, sub, href, body, extra, lesson) { INDEX.push({ kind: kind, group: group, title: title, sub: sub || '', href: href, body: body || '', extra: extra || '', lesson: lesson }); }
+function addIdx(kind, group, title, sub, href, body, extra, lesson, mod) { INDEX.push({ kind: kind, group: group, title: title, sub: sub || '', href: href, body: body || '', extra: extra || '', lesson: lesson, module: mod || '' }); }
 function buildIndex() {
   INDEX = [];
-  MODS.forEach(function (m) { addIdx('Stage', 'Lessons', m.title, m.summary, '#/module/' + m.id, m.summary, '', null); });
+  MODS.forEach(function (m) { addIdx('Stage', 'Lessons', m.title, m.summary, '#/module/' + m.id, m.summary, '', null, m.id); });
   Object.keys(LES).forEach(function (id) {
     var l = LES[id];
-    addIdx('Lesson', 'Lessons', l.title, MOD[l.module].title, hrefLesson(id), l.summary + ' ' + (l.text || '').slice(0, 9000), l.toc.map(function (x) { return x.text; }).join(' '), id);
+    addIdx('Lesson', 'Lessons', l.title, MOD[l.module].title, hrefLesson(id), l.summary + ' ' + (l.text || '').slice(0, 9000), l.toc.map(function (x) { return x.text; }).join(' '), id, l.module);
   });
-  (D.cases || []).forEach(function (c) { addIdx('Case study', 'Cases', c.title, c.company + ', ' + c.year, '#/cases/' + c.id, c.what + ' ' + c.cause + ' ' + c.fix + ' ' + c.lesson, c.company + ' ' + c.area); });
-  (D.arch || []).forEach(function (a) { addIdx('Post-mortem', 'Cases', a.title, a.summary, '#/architecture/' + a.id, a.text, a.company); });
-  Object.keys(SHEETS).forEach(function (id) { var x = SHEETS[id]; addIdx('Cheat sheet', 'Cheat sheets', x.title, x.summary, '#/cheatsheet/' + id, x.text, ''); });
-  (D.interview || []).forEach(function (x) { addIdx('Interview', 'Interview', x.q, MOD[x.module] ? MOD[x.module].title : '', '#/interview/' + x.id, x.text, x.level); });
-  (D.glossary || []).forEach(function (g) { addIdx('Glossary', 'Glossary', g.term, g.plain, '#/glossary/' + g.id, g.def, g.aliases.join(' ')); });
-  (D.drills || []).forEach(function (d) { addIdx('Drill', 'Practice', d.title, MOD[d.module] ? MOD[d.module].title : '', '#/drills/' + d.module, d.story + ' ' + d.q, ''); });
-  (window.MARGA_EXPLAINERS || []).forEach(function (x) { addIdx('Explainer', 'Practice', x.title, x.summary, '#/explainers/' + x.id, x.steps.map(function (s) { return s.l + ' ' + s.n; }).join(' '), 'animated how it works'); });
+  (D.cases || []).forEach(function (c) { addIdx('Case study', 'Cases', c.title, c.company + ', ' + c.year, '#/cases/' + c.id, c.what + ' ' + c.cause + ' ' + c.fix + ' ' + c.lesson, c.company + ' ' + c.area, null, (c.modules || [])[0]); });
+  (D.arch || []).forEach(function (a) { addIdx('Post-mortem', 'Cases', a.title, a.summary, '#/architecture/' + a.id, a.text, a.company, null, (a.modules || [])[0]); });
+  Object.keys(SHEETS).forEach(function (id) { var x = SHEETS[id]; addIdx('Cheat sheet', 'Cheat sheets', x.title, x.summary, '#/cheatsheet/' + id, x.text, '', null, id); });
+  (D.interview || []).forEach(function (x) { addIdx('Interview', 'Interview', x.q, MOD[x.module] ? MOD[x.module].title : '', '#/interview/' + x.id, x.text, x.level, null, x.module); });
+  (D.glossary || []).forEach(function (g) { addIdx('Glossary', 'Glossary', g.term, g.plain, '#/glossary/' + g.id, g.def, g.aliases.join(' '), null, g.module); });
+  (D.drills || []).forEach(function (d) { addIdx('Drill', 'Practice', d.title, MOD[d.module] ? MOD[d.module].title : '', '#/drills/' + d.module, d.story + ' ' + d.q, '', null, d.module); });
+  (window.MARGA_EXPLAINERS || []).forEach(function (x) { addIdx('Explainer', 'Practice', x.title, x.summary, '#/explainers/' + x.id, x.steps.map(function (s) { return s.l + ' ' + s.n; }).join(' '), 'animated how it works', null, x.module); });
+  Object.keys(D.labs || {}).forEach(function (lang) {
+    if (!Array.isArray(D.labs[lang])) return;
+    var nm = { python: 'Python', go: 'Go', hcl: 'Terraform', yaml: 'YAML', sql: 'SQL' }[lang] || lang;
+    D.labs[lang].forEach(function (x) { addIdx('Exercise', 'Practice', x.title, nm + ' playground exercise', '#/playground/' + lang, x.task, lang + ' exercise playground practice'); });
+  });
+  (D.predicts || []).forEach(function (p) { addIdx('Predict', 'Practice', p.q, 'Predict then reveal', p.lesson ? hrefLesson(p.lesson) : '#/daily', p.out + ' ' + (p.why || ''), 'predict output guess', p.lesson, p.lesson ? p.lesson.split('/')[0] : ''); });
   [['Subnet and CIDR playground', 'Split networks, check addresses, plan VLSM, summarise routes', '#/subnet', 'ip cidr subnet mask vlsm netmask'],
    ['YAML playground', 'Check YAML and Kubernetes manifests in the browser', '#/playground/yaml', 'yaml validate kubernetes manifest json lint'],
    ['Python playground', 'Run Python in the browser', '#/playground/python', 'python run code exercises'],
@@ -853,26 +861,28 @@ function buildIndex() {
 }
 function searchResults(q) {
   if (!INDEX) buildIndex();
-  var out = MargaSearch.query(q, { kind: searchGroup, limit: 12 });
+  var out = MargaSearch.query(q, { kind: searchGroup, module: searchStage, limit: 12 });
   return out.map(function (x) { var it = x.it; return { kind: it.kind, title: it.title, sub: it.sub, href: it.href, lesson: it.lesson, snippet: x.snippet }; });
 }
-var sel = 0, results = [], lastFocus = null, searchGroup = '';
+var sel = 0, results = [], lastFocus = null, searchGroup = '', searchStage = '';
 function recents() { try { var r = JSON.parse(localStorage.getItem('ea.recent') || '[]'); return Array.isArray(r) ? r.filter(function (x) { return typeof x === 'string'; }).slice(0, 5) : []; } catch (x) { return []; } }
 function pushRecent(q) {
   q = (q || '').trim(); if (q.length < 2) return;
   try { var r = recents().filter(function (x) { return x !== q; }); r.unshift(q); localStorage.setItem('ea.recent', JSON.stringify(r.slice(0, 5))); } catch (x) { /* ignore */ }
 }
 function openSearch() {
-  lastFocus = document.activeElement; searchGroup = '';
+  lastFocus = document.activeElement; searchGroup = ''; searchStage = '';
   if (!INDEX) buildIndex();
   $('#search-root').innerHTML = '<div class="modal" id="smodal"><div class="modal-back" data-act="close-search"></div>' +
     '<div class="modal-box" role="dialog" aria-modal="true" aria-label="Search"><label class="sr" for="sq">Search lessons, cases, cheat sheets, interview questions and the glossary</label>' +
     '<input id="sq" type="search" placeholder="Search lessons, commands, incidents, terms" autocomplete="off">' +
     '<div class="sfilters" id="sfilters" role="group" aria-label="Filter results"></div>' +
+    '<label class="sstage"><span>Stage</span><select id="sstage"><option value="">All stages</option>' + MODS.map(function (m) { return '<option value="' + e(m.id) + '">' + e(m.title) + '</option>'; }).join('') + '</select></label>' +
     '<ul id="sres" role="listbox" aria-label="Results"></ul><p class="small" id="shint">Type to search. Use the arrow keys and Enter. Press Escape to close.</p></div></div>';
   var inp = $('#sq'); inp.focus();
   paintResults('');
   inp.addEventListener('input', function () { results = searchResults(inp.value); sel = 0; paintResults(inp.value); });
+  $('#sstage').addEventListener('change', function () { searchStage = this.value; results = searchResults(inp.value); sel = 0; paintResults(inp.value); inp.focus(); });
   inp.addEventListener('keydown', function (ev) {
     if (ev.key === 'ArrowDown') { ev.preventDefault(); sel = Math.min(sel + 1, results.length - 1); paintResults(inp.value); }
     else if (ev.key === 'ArrowUp') { ev.preventDefault(); sel = Math.max(sel - 1, 0); paintResults(inp.value); }
@@ -881,7 +891,7 @@ function openSearch() {
 }
 function paintFilters(q) {
   var box = $('#sfilters'); if (!box) return;
-  var cnt = q.trim() ? MargaSearch.counts(q) : {}, total = 0; GROUPS.forEach(function (g) { total += cnt[g] || 0; });
+  var cnt = q.trim() ? MargaSearch.counts(q, searchStage) : {}, total = 0; GROUPS.forEach(function (g) { total += cnt[g] || 0; });
   box.innerHTML = ['All'].concat(GROUPS).map(function (g) {
     var on = (g === 'All' ? '' : g) === searchGroup, n = g === 'All' ? total : (cnt[g] || 0);
     return '<button type="button" class="schip' + (on ? ' on' : '') + '" data-sgroup="' + (g === 'All' ? '' : e(g)) + '" aria-pressed="' + on + '">' + e(g) + (q.trim() ? ' <span>' + n + '</span>' : '') + '</button>';
@@ -895,7 +905,9 @@ function paintResults(q) {
     ul.innerHTML = rc.length ? '<li class="srecent-h" role="presentation">Recent searches <button type="button" class="schip" data-sclear="1">Clear</button></li>' + rc.map(function (r) { return '<li class="srecent" role="presentation"><button type="button" class="srecent-b" data-srecent="' + e(r) + '">' + e(r) + '</button></li>'; }).join('') : '';
     $('#shint').textContent = 'Type to search. Use the arrow keys and Enter. Press Escape to close.'; return;
   }
-  $('#shint').textContent = results.length ? plural(results.length, 'result') + (searchGroup ? ' in ' + searchGroup : '') : 'Nothing matches "' + q + '"' + (searchGroup ? ' in ' + searchGroup : '') + '. Try a tool name, a command or fewer words.';
+  var hint = $('#shint'), alt = results.length ? '' : MargaSearch.suggest(q);
+  hint.textContent = results.length ? plural(results.length, 'result') + (searchGroup ? ' in ' + searchGroup : '') + (searchStage ? ' in ' + MOD[searchStage].title : '') : 'Nothing matches "' + q + '"' + (searchGroup ? ' in ' + searchGroup : '') + (searchStage ? ' in ' + MOD[searchStage].title : '') + '. Try a tool name, a command or fewer words.';
+  if (alt) hint.insertAdjacentHTML('beforeend', ' Did you mean <button type="button" class="schip" data-srecent="' + e(alt) + '">' + e(alt) + '</button>?');
   ul.innerHTML = results.map(function (r, i) {
     var locked = r.lesson && lessonState(r.lesson) === 'locked';
     return '<li role="option" aria-selected="' + (i === sel) + '" class="' + (i === sel ? 'sel' : '') + '" data-i="' + i + '"><span class="k">' + r.kind + '</span><span class="t"><span>' + MargaSearch.highlight(r.title, q, e) + '</span>' + (locked ? ICON.lock : '') + '</span><span class="s">' + MargaSearch.highlight(r.snippet || r.sub, q, e) + '</span></li>';

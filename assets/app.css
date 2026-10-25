@@ -907,3 +907,18 @@ html[data-a-read="on"] .prose h2 { margin-top: 2.2em; }
 #read-bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .1s linear; }
 @media (prefers-reduced-motion: reduce) { #read-bar i { transition: none; } }
 .predict-code code { background: none; padding: 0; color: inherit; border-radius: 0; }
+
+/* search: stage filter */
+.sstage { display: flex; align-items: center; gap: 8px; margin: 8px 0 2px; font: 600 13px var(--sans); }
+.sstage select { font: 500 13px var(--sans); padding: 5px 8px; border-radius: 8px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--text); min-height: 32px; max-width: 70%; }
+
+/* lesson next-step panel */
+.nextstep { margin: 28px 0 8px; padding: 18px 18px 14px; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface); }
+.nextstep h2 { margin: 0 0 10px; font-size: 1.15rem; }
+.ns-main { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 12px; }
+.ns-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.ns-list a { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; text-decoration: none; color: var(--text); min-height: 44px; }
+.ns-list a:hover, .ns-list a:focus-visible { border-color: var(--accent); }
+.ns-k { font: 600 12px var(--sans); color: var(--accent); }
+.ns-t { font-size: .95rem; }
+@media print { .nextstep { display: none; } }

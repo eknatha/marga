@@ -14,8 +14,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=f83a36e9">
-<script src="../assets/a11y.js?v=f83a36e9"></script>
+<link rel="stylesheet" href="../assets/app.css?v=34c4be67">
+<script src="../assets/a11y.js?v=34c4be67"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -123,12 +123,46 @@ last -a | <span class="hljs-built_in">head</span>
 <span class="hljs-built_in">sudo</span> tcpdump -i eth0 -w /secure/capture.pcap host 203.0.113.50</code></pre></div>
 <aside class="callout callout-danger"><div class="callout-title">Danger</div><p>Do not wipe or reboot a suspected compromised host before you have taken a snapshot or memory capture. You will destroy the evidence.</p>
 </aside>
+<h2 id="identity-and-tokens">Identity and tokens</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="echo &quot;$TOKEN&quot; | cut -d. -f2 | base64 -d 2&gt;/dev/null | jq '{iss,aud,exp,scope}'
+aws iam list-users --query 'Users[].UserName' --output text
+aws iam get-user --user-name svc-old --query 'User.PasswordLastUsed'" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;<span class="hljs-variable">$TOKEN</span>&quot;</span> | <span class="hljs-built_in">cut</span> -d. -f2 | <span class="hljs-built_in">base64</span> -d 2&gt;/dev/null | jq <span class="hljs-string">&#x27;{iss,aud,exp,scope}&#x27;</span>
+aws iam list-users --query <span class="hljs-string">&#x27;Users[].UserName&#x27;</span> --output text
+aws iam get-user --user-name svc-old --query <span class="hljs-string">&#x27;User.PasswordLastUsed&#x27;</span></code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>A JWT is signed, not encrypted. Never put secrets in it, and always check signature, issuer, audience and expiry.</p>
+</aside>
+<h2 id="application-and-api-checks">Application and API checks</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="curl -sI https://example.com | grep -iE 'strict-transport|content-security|x-content-type'
+curl -s -o /dev/null -w &quot;%{http_code}\n&quot; https://api.example.com/invoices/10043 -H &quot;Authorization: Bearer $TOKEN&quot;" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">curl -sI https://example.com | grep -iE <span class="hljs-string">&#x27;strict-transport|content-security|x-content-type&#x27;</span>
+curl -s -o /dev/null -w <span class="hljs-string">&quot;%{http_code}\n&quot;</span> https://api.example.com/invoices/10043 -H <span class="hljs-string">&quot;Authorization: Bearer <span class="hljs-variable">$TOKEN</span>&quot;</span></code></pre></div>
+<aside class="callout callout-caution"><div class="callout-title">Caution</div><p>Test only your own systems. A 200 for another customer&#39;s object means object-level authorization is missing.</p>
+</aside>
+<h2 id="policy-as-code">Policy as code</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="opa eval -d policy/ -i plan.json &quot;data.terraform.security.deny&quot;
+kubectl apply -f policy.yaml &amp;&amp; kubectl get policyreport -A" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">opa <span class="hljs-built_in">eval</span> -d policy/ -i plan.json <span class="hljs-string">&quot;data.terraform.security.deny&quot;</span>
+kubectl apply -f policy.yaml &amp;&amp; kubectl get policyreport -A</code></pre></div>
+<aside class="callout callout-tip"><div class="callout-title">Tip</div><p>Start every new policy in audit mode, review violations with owners, then enforce in stages.</p>
+</aside>
+<h2 id="network-and-dns">Network and DNS</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="aws ec2 describe-security-groups --filters Name=ip-permission.cidr,Values=0.0.0.0/0 --query 'SecurityGroups[].GroupId'
+dig +short CNAME promo.example.com
+dig +short TXT example.com | grep -i spf" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">aws ec2 describe-security-groups --filters Name=ip-permission.cidr,Values=0.0.0.0/0 --query <span class="hljs-string">&#x27;SecurityGroups[].GroupId&#x27;</span>
+dig +short CNAME promo.example.com
+dig +short TXT example.com | grep -i spf</code></pre></div>
+<aside class="callout callout-caution"><div class="callout-title">Caution</div><p>A CNAME that points to a deleted cloud resource can be claimed by someone else. Remove dangling records.</p>
+</aside>
+<h2 id="backups-and-recovery">Backups and recovery</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="aws s3api put-object-lock-configuration --bucket backups --object-lock-configuration '{&quot;ObjectLockEnabled&quot;:&quot;Enabled&quot;,&quot;Rule&quot;:{&quot;DefaultRetention&quot;:{&quot;Mode&quot;:&quot;COMPLIANCE&quot;,&quot;Days&quot;:30}}}'
+aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=DeleteSnapshot --max-results 5" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">aws s3api put-object-lock-configuration --bucket backups --object-lock-configuration <span class="hljs-string">&#x27;{&quot;ObjectLockEnabled&quot;:&quot;Enabled&quot;,&quot;Rule&quot;:{&quot;DefaultRetention&quot;:{&quot;Mode&quot;:&quot;COMPLIANCE&quot;,&quot;Days&quot;:30}}}&#x27;</span>
+aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=DeleteSnapshot --max-results 5</code></pre></div>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p>Backups reachable with production credentials will be deleted first. Keep an immutable copy in a separate account and test restores.</p>
+</aside>
 </article>
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://cheatsheetseries.owasp.org/" target="_blank" rel="noopener">OWASP Cheat Sheet Series</a><span class="host">cheatsheetseries.owasp.org</span></li><li><a href="https://kubernetes.io/docs/concepts/security/" target="_blank" rel="noopener">Kubernetes security documentation</a><span class="host">kubernetes.io</span></li><li><a href="https://www.cisecurity.org/cis-benchmarks" target="_blank" rel="noopener">CIS Benchmarks</a><span class="host">www.cisecurity.org</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=f83a36e9"></script>
-<script src="../assets/counter.js?v=f83a36e9"></script>
+<script src="../assets/voice.js?v=34c4be67"></script>
+<script src="../assets/counter.js?v=34c4be67"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
