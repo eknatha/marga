@@ -753,3 +753,43 @@ def: Signed metadata that states which source, builder and inputs produced an ar
 module: security
 plain: A firewall rule for pods.
 def: A Kubernetes object that controls which pods may talk to which other pods and endpoints. A default deny policy blocks all traffic until others allow it.
+
+## Zero trust
+module: security
+plain: Do not trust a request because of where it comes from.
+def: A model in which every request is authenticated and authorized using identity, device state and policy, with least privilege and continuous logging, instead of trusting the internal network.
+
+## OIDC
+module: security
+plain: A standard way to sign in with an identity provider.
+def: OpenID Connect, an identity layer on top of OAuth 2.0 that returns an ID token describing the authenticated user.
+
+## Mutual TLS
+module: security
+plain: Both sides of a connection show a certificate.
+def: TLS in which the client also presents a certificate, so each service can verify exactly who is calling it.
+
+## Passkey
+module: security
+plain: A phishing-resistant sign-in key stored on a device.
+def: A credential based on public key cryptography that is bound to the real site address, so a look-alike site cannot use it.
+
+## Policy as code
+module: security
+plain: Security rules written so a machine can check them.
+def: Rules expressed in a language such as Rego or in Kubernetes policy objects, versioned and enforced automatically in pipelines, admission control and cloud accounts.
+
+## Immutable backup
+module: security
+plain: A backup nobody can delete early.
+def: A copy protected by a retention lock so it cannot be changed or removed until the retention period ends, even by an administrator.
+
+## Egress filtering
+module: security
+plain: Controlling what your servers may connect to.
+def: Limiting outbound traffic to approved destinations so a compromised host cannot easily download tools or send data out.
+
+## Subdomain takeover
+module: security
+plain: Someone claims a name you forgot to clean up.
+def: An attack on a DNS record that points to a deleted cloud resource, which lets another party serve content under your domain.

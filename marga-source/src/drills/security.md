@@ -111,3 +111,53 @@ Pipeline step "sign-image": skipped (flag SKIP_SIGN=1 was set for a hotfix)
 - Remove the signature check from the policy permanently
 - Retag the image as latest
 why: The policy did what it was designed to do: it stopped an unsigned artifact. Skipping the signing step in a hotfix defeats the control. Fix the pipeline so signing is quick and mandatory, and deploy the signed digest.
+
+## Admin login from a new country at 03:00
+level: mid
+A security alert fires for an administrator account.
+
+```text
+03:02:11 sign-in success user=ops-admin ip=198.51.100.77 country=XX method=password+push
+03:02:11 mfa push approved after 14 prompts in 9 minutes
+03:04:40 iam CreateAccessKey user=ops-admin
+03:05:02 iam AttachUserPolicy user=ops-admin policy=AdministratorAccess
+```
+? What is the best immediate response?
++ Revoke the sessions and keys, reset the password, investigate the new key, and move administrators to phishing-resistant keys
+- Ignore it because the second factor was approved
+- Delete the CloudTrail logs to reduce noise
+- Wait until morning to ask the user
+why: Fourteen prompts followed by an approval is MFA fatigue. The new access key is persistence. Contain first, keep the logs for evidence, then replace push approval with hardware keys or passkeys.
+
+## Customer reads another customer's invoice
+level: mid
+A support ticket says changing the number in a URL shows other data.
+
+```text
+GET /api/invoices/10042 -> 200 owner=acme
+GET /api/invoices/10043 -> 200 owner=globex   (token belongs to acme)
+Code: invoice = db.get(id); return invoice   # no owner check
+```
+? What is the right fix?
++ Check on the server that the invoice belongs to the caller on every request, and alert on sequential reads
+- Hide the invoice numbers in the front end
+- Block the user agent of the customer
+- Add a longer password policy
+why: This is broken object-level authorization. Random identifiers help but do not replace a server-side ownership check.
+
+## New policy broke a Friday deployment
+level: senior
+Enforcement of a new Kubernetes policy started this afternoon.
+
+```text
+Error from server: admission webhook "require-non-root" denied the request:
+Containers must set runAsNonRoot to true.
+deployment/payments-api: 0/3 replicas available after restart
+Policy mode changed from Audit to Enforce at 15:40, no audit period
+```
+? What should the team do?
++ Roll the policy back to audit, fix the workloads with their owners, grant owned and expiring exceptions where needed, then enforce in stages
+- Delete the payments-api deployment
+- Disable admission control for the whole cluster permanently
+- Add privileged: true to every pod
+why: Audit first shows what would break. Enforcement without that step turns a good control into an outage and makes teams distrust the policy.
