@@ -50,6 +50,8 @@ function practiceView() {
     ['#/cases', 'Real-world case studies', plural(CASES.length, 'incident') + ' from cloud providers, networks and software supply chains, with the lesson from each.', read + ' of ' + CASES.length + ' read'],
     ['#/architecture', 'Architecture post-mortems', plural(ARCH.length, 'detailed review') + ' with timelines, trade-offs and calculators you can change.', 'Calculators included'],
     ['#/calculators', 'Trade-off calculators', 'Error budgets, redundancy, cloud cost, recovery time, retry storms, cells and capacity.', '7 calculators'],
+    ['#/capstones', 'Capstone projects', 'Four guided builds for each path, with steps to tick off and a self-check at the end.', (window.MargaFeatures && MargaFeatures.capCount ? MargaFeatures.capCount() : '16 projects')],
+    ['#/mix', 'Mixed practice', 'Twelve questions and drills from different stages in a shuffled order. Interleaving helps long-term memory.', 'Uses the lessons you passed'],
     ['#/weak', 'Weak-spot review', 'Questions, drills and flashcards you missed come back here until you get them right.', (window.MargaFeatures && MargaFeatures.weakCount ? MargaFeatures.weakCount() : 0) + ' to review'],
     ['#/review', 'Review due cards', 'Spaced repetition for the lessons you have passed.', 'Cards come back when due'],
     ['#/labs', 'Hands-on labs', 'Planned. Not available yet.', 'Planned']

@@ -342,9 +342,7 @@ function homeView() {
     '<div class="note-panel"><h3>Listen while you learn</h3><p>Every lesson, cheat sheet and interview answer can be read aloud. Pick any voice installed on your device from the Voice dropdown.</p></div></div></section>' +
 
     '<section class="band"><div class="wrap two"><div><h2>How a lesson works</h2><ol class="steps"><li><strong>Read.</strong> Each lesson explains why, then shows commands with their output.</li><li><strong>Check.</strong> Answer a short quiz. Pass it to mark the lesson done and unlock the next.</li><li><strong>Remember.</strong> Flip the flashcards now, and review them again later from the Review cards page.</li></ol></div>' +
-    '<div class="note-panel"><h3>Hands-on labs are planned</h3><p>Browser-based practice with automatic checking is in development. Until then, every lesson includes a written incident walkthrough with sample output so you can follow the reasoning.</p><p><a href="#/labs">What is planned</a></p></div></div></section>' +
-
-    '<section class="band alt"><div class="wrap"><h2>About the author</h2><p class="prose-narrow">Eknatha Reddy is a Senior Platform Engineer and SRE with 14+ years in enterprise infrastructure, Linux, virtualization and production support. The lessons are written from incidents and migrations, not from vendor slides.</p></div></section>';
+    '<div class="note-panel"><h3>Hands-on labs are planned</h3><p>Browser-based practice with automatic checking is in development. Until then, every lesson includes a written incident walkthrough with sample output so you can follow the reasoning.</p><p><a href="#/labs">What is planned</a></p></div></div></section>';
   view.after = function () { armTree(); armTerm(); };
 }
 
@@ -397,7 +395,7 @@ function pathView(id) {
     '<button class="btn btn-quiet" type="button" data-act="pick-path" data-id="' + p.id + '" data-go="home">Make this my home path</button>' + printBar() + '</div>' + voiceSlot() + '</section>' +
     '<div class="wrap"><div class="pipe-panel">' + treeHtml(p) + '</div>' +
     '<h2 class="sub-h">What you will be able to do</h2><ul class="outcomes">' + p.outcomes.map(function (o) { return '<li>' + e(o) + '</li>'; }).join('') + '</ul>' +
-    '<h2 class="sub-h">Stages</h2><div class="stage-list">' + p.modules.map(function (mid, i) { return stageRow(MOD[mid], i); }).join('') + '</div></div>';
+    (window.MargaFeatures && MargaFeatures.pathCaps ? MargaFeatures.pathCaps(p.id) : '') + '<h2 class="sub-h">Stages</h2><div class="stage-list">' + p.modules.map(function (mid, i) { return stageRow(MOD[mid], i); }).join('') + '</div></div>';
   view.voice = '#main'; view.voiceLabel = p.title + ' path';
   view.after = armTree;
 }
@@ -495,6 +493,18 @@ function nextButton(id, nxt) {
 }
 
 /* ----- quiz ----- */
+function wrongExplain(q, oi, ok) {
+  var ox = q.ox || [], any = ox.some(function (x) { return x; }), h = '';
+  if (!ok) {
+    h += '<p class="wrong-pick"><strong>You chose:</strong> ' + e(q.options[oi]) + (ox[oi] ? '. ' + e(ox[oi]) : '. It does not answer the question as asked.') + '</p>' +
+      '<p class="wrong-right"><strong>The correct answer:</strong> ' + e(q.options[q.answer]) + '</p>';
+  }
+  if (any) {
+    var rest = q.options.map(function (o, i) { return i !== q.answer && i !== oi && ox[i] ? '<li><strong>' + e(o) + '</strong>: ' + e(ox[i]) + '</li>' : ''; }).join('');
+    if (rest) h += '<details class="why-others"' + (ok ? '' : ' open') + '><summary>Why the other options are wrong</summary><ul>' + rest + '</ul></details>';
+  }
+  return h;
+}
 function startQuiz(id, root) {
   var l = LES[id];
   var need = Math.ceil(l.quiz.length * PASS_RATIO);
@@ -527,7 +537,7 @@ function startQuiz(id, root) {
           });
           if (!ok) b.classList.add('wrong');
           var last = pos === qs.length - 1;
-          $('#fb', root).innerHTML = '<p class="' + (ok ? 'ok' : 'bad') + '"><strong>' + (ok ? 'Correct.' : 'Not quite.') + '</strong> ' + e(q.why) + '</p>' +
+          $('#fb', root).innerHTML = '<p class="' + (ok ? 'ok' : 'bad') + '"><strong>' + (ok ? 'Correct.' : 'Not quite.') + '</strong> ' + e(q.why) + '</p>' + wrongExplain(q, oi, ok) +
             '<button class="btn btn-primary" type="button" id="qnext">' + (last ? 'See result' : 'Next question') + '</button>';
           var nb = $('#qnext', root); nb.focus();
           nb.addEventListener('click', function () { if (last) finish(); else { pos++; ask(); } });
@@ -785,7 +795,7 @@ function progressView() {
           var o = JSON.parse(r.result);
           if (!o || o.v !== 1 || typeof o.lessons !== 'object' || !Array.isArray(o.days)) throw new Error('bad');
           S = { v: 1, lessons: o.lessons || {}, cards: o.cards || {}, days: o.days, path: o.path || 'devops', iv: (o.iv && typeof o.iv === 'object') ? o.iv : {} };
-          ['cs', 'dr', 'fc', 'dc', 'py', 'lab', 'wk'].forEach(function (k) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) S[k] = o[k]; });
+          ['cs', 'dr', 'fc', 'dc', 'py', 'lab', 'wk', 'cap'].forEach(function (k) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) S[k] = o[k]; });
           if (Array.isArray(o.mock)) S.mock = o.mock.slice(-20);
           save(); renderChrome(); toast('Progress imported.'); route();
         } catch (x) { toast('That file is not a MARGA progress export.'); }

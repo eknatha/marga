@@ -518,6 +518,7 @@ var PY_EX = [
     tests: 'assert usable_hosts("10.0.0.0/24") == 254\nassert usable_hosts("10.0.0.0/31") == 2\nassert usable_hosts("10.0.0.5/32") == 1\nassert usable_hosts("192.168.1.130/26") == 62\n' }
 ];
 PY_EX = PY_EX.concat((D.labs && D.labs.python) || []);
+window.MARGA_PY_EX = PY_EX;
 function pyLoad() {
   if (PY.py) return Promise.resolve(PY.py);
   if (PY.promise) return PY.promise;
@@ -586,7 +587,9 @@ A.onAct('py-check', function () {
       $('#py-res').innerHTML = '<div class="drill-res ok"><p><strong>All checks passed.</strong> ' + plural(Object.keys(bag('py')).length, 'exercise') + ' solved.</p></div>';
     } else {
       var msg = r.err ? pyErrText(r.err).split('\n').slice(-1)[0] : 'Not passed.';
-      $('#py-res').innerHTML = '<div class="drill-res no"><p><strong>Not yet.</strong> ' + e(msg) + '</p></div>';
+      var fl = '', mm = r.err ? String(r.err.message || r.err).match(/line (\d+)/) : null;
+      if (mm) fl = (x.tests.split('\n')[parseInt(mm[1], 10) - 1] || '').trim();
+      $('#py-res').innerHTML = '<div class="drill-res no"' + (fl ? ' data-fail="' + e(fl) + '"' : '') + '><p><strong>Not yet.</strong> ' + e(msg) + '</p></div>';
     }
   });
 });
