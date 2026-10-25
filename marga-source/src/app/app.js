@@ -469,7 +469,8 @@ function lessonView(mid, slug) {
     '<nav class="crumbs" aria-label="Breadcrumb"><a href="#/paths">Paths</a><a href="#/module/' + m.id + '">' + e(m.title) + '</a></nav>' +
     '<header class="lesson-head"><h1>' + e(l.title) + '</h1><p class="meta"><span>Lesson ' + (i + 1) + ' of ' + m.lessons.length + '</span><span>' + l.minutes + ' min</span>' +
     (st === 'done' ? '<span class="chip pass">Passed</span>' : '') + '</p></header>' +
-    '<div class="actions lesson-tools">' + printBar() + '</div>' + voiceSlot() +
+    '<div class="actions lesson-tools">' + printBar() + '<button type="button" class="btn btn-quiet" data-act="read-toggle" aria-pressed="false">Reading mode</button></div>' + voiceSlot() +
+    (window.MargaFeatures ? MargaFeatures.levelsHtml(l) : '') +
     '<div class="lesson-grid"><div class="prose" id="prose">' + l.html + refsHtml(l.refs) + '</div>' + toc + '</div>' +
     '<section class="check" id="check" aria-labelledby="check-h"><h2 id="check-h">Lesson check</h2><div id="quiz"></div></section>' +
     '<section class="cardsec" id="cards" aria-labelledby="cards-h"><h2 id="cards-h">Flashcards</h2><div id="deck"></div></section>' +
@@ -954,8 +955,7 @@ document.addEventListener('click', function (ev) {
   else if (a === 'close-search') closeSearch();
   else if (a === 'theme') {
     var n = theme() === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', n);
-    try { localStorage.setItem('ea.theme', n); } catch (x) { /* ignore */ }
+    if (window.MargaA11y) { MargaA11y.set('theme', n); MargaA11y.sync(); } else { document.documentElement.setAttribute('data-theme', n); try { localStorage.setItem('ea.theme', n); } catch (x) { /* ignore */ } }
     renderChrome(); setNav(view.nav);
   } else if (a === 'menu') {
     var nav = $('#topnav'), open = !nav.classList.contains('open');
@@ -1000,6 +1000,7 @@ window.MargaApp = api;
 if (typeof window.MargaExtras === 'function') window.MargaExtras(api);
 if (typeof window.MargaMore === 'function') window.MargaMore(api);
 if (typeof window.MargaLabs === 'function') window.MargaLabs(api);
+if (typeof window.MargaFeatures === 'function') window.MargaFeatures(api);
 
 /* ---------- accessibility panel ---------- */
 (function () {

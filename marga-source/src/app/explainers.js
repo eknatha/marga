@@ -689,5 +689,171 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "terraform plan", n: "The plan compares the configuration with the state. Differences show where the code does not match the real settings." },
     { f: 1, t: 0, l: "Show a diff", n: "For example, the tags in the code are missing in reality. The engineer adjusts the code until the plan shows no changes." },
     { f: 0, t: 1, l: "Review before apply", n: "Only when the plan is clean or shows changes you want do you apply. From now on, changes go through code." }
+  ] },
+{ id: "sec-secret-injection", module: "security", title: "How an app gets a secret without storing it", summary: "Workload identity, a secrets manager and a short-lived credential.",
+  actors: ["Application", "Identity service", "Secrets manager"],
+  steps: [
+    { f: 0, t: 0, l: "Start up with no secret inside", n: "The container image holds no passwords. It only knows where to ask and which identity it runs as." },
+    { f: 0, t: 1, l: "Prove who I am", n: "The platform gives the pod or function a signed identity token. The app presents it to the identity service." },
+    { f: 1, t: 1, l: "Check the token", n: "The identity service verifies the signature, the issuer and the audience, and maps the workload to a role." },
+    { f: 1, t: 0, l: "Short-lived access token", n: "The service returns temporary credentials that expire in about an hour. Nothing long-lived is stored on disk." },
+    { f: 0, t: 2, l: "Read database/password", n: "The app asks the secrets manager for one secret, using the temporary credentials." },
+    { f: 2, t: 2, l: "Check the policy and log", n: "The manager checks that this role may read only this secret, then writes an audit record of who read it and when." },
+    { f: 2, t: 0, l: "Return the secret value", n: "The app keeps the value in memory and connects to the database. A rotation job changes the secret on a schedule." }
+  ] },
+{ id: "sec-pipeline-gates", module: "security", title: "Security gates in a pull request", summary: "Scans that run before code can merge.",
+  actors: ["Developer", "Pipeline", "Scanners", "Reviewer"],
+  steps: [
+    { f: 0, t: 1, l: "Open pull request", n: "The developer pushes a branch and opens a pull request, which triggers the pipeline on a clean, isolated runner." },
+    { f: 1, t: 2, l: "Scan for secrets", n: "A scanner reads the diff and the history of the branch for keys and tokens. A match stops the pipeline at once." },
+    { f: 1, t: 2, l: "Scan dependencies and code", n: "Software composition analysis lists known vulnerabilities in libraries. Static analysis flags unsafe code patterns." },
+    { f: 1, t: 2, l: "Scan Terraform and the image", n: "Infrastructure checks find open firewalls. The image scan reports packages with known fixes." },
+    { f: 2, t: 1, l: "Report: 1 high with a fix", n: "Results are summarised in the pull request. The policy fails the build for high findings that have a fix." },
+    { f: 0, t: 0, l: "Fix the finding", n: "The developer updates the library, pushes again and the scans repeat. Small fixes are cheap at this stage." },
+    { f: 3, t: 1, l: "Review and approve", n: "A reviewer sees green checks, reads the change and approves. The branch rules block merge without both." }
+  ] },
+{ id: "sec-image-signing", module: "security", title: "Signing an image and verifying it at deploy time", summary: "From build to a cluster that only runs trusted images.",
+  actors: ["Pipeline", "Registry", "Signing service", "Cluster admission"],
+  steps: [
+    { f: 0, t: 0, l: "Build the image", n: "The pipeline builds on a clean runner from pinned inputs and records an SBOM." },
+    { f: 0, t: 1, l: "Push and get a digest", n: "The registry stores the image and returns its digest, a hash of the content that cannot change." },
+    { f: 0, t: 2, l: "Sign the digest", n: "The pipeline asks the signing service to sign the digest with a key or an identity bound token. The signature is stored next to the image." },
+    { f: 3, t: 1, l: "Deploy request for the digest", n: "Later, someone applies a deployment. The admission controller looks up the image reference before the pod is created." },
+    { f: 3, t: 2, l: "Verify signature and policy", n: "The controller checks that the signature is valid and was made by the expected pipeline identity." },
+    { f: 3, t: 3, l: "Allow or deny", n: "A valid signature lets the pod start. An unsigned or altered image is rejected with a clear message." },
+    { f: 3, t: 0, l: "Report the denial", n: "The deny event reaches the team. This is how a tampered or untested image is stopped before it runs." }
+  ] },
+{ id: "sec-pod-network-policy", module: "security", title: "How a default deny network policy works", summary: "Blocking all pod traffic, then allowing only what is needed.",
+  actors: ["Web pod", "Network plugin", "API pod", "Database pod"],
+  steps: [
+    { f: 0, t: 2, l: "Call the API pod", n: "Before any policy exists, every pod can reach every other pod. This is what an attacker relies on after a breach." },
+    { f: 1, t: 1, l: "Apply default deny", n: "A policy that selects all pods and lists no allowed ingress is applied. The plugin programs rules on every node." },
+    { f: 0, t: 3, l: "Web pod tries the database", n: "The web pod connects directly to the database. The plugin drops the packet because no rule allows it." },
+    { f: 1, t: 1, l: "Add an allow rule", n: "The team adds a policy: the API pod may reach the database on port 5432. Everything else stays blocked." },
+    { f: 2, t: 3, l: "API pod connects", n: "The plugin matches the labels of the source and port. The connection is allowed and works as before." },
+    { f: 0, t: 2, l: "Web pod calls the API", n: "A second allow rule permits web to API on port 8080. The path the application needs is open." },
+    { f: 1, t: 1, l: "Everything else is denied", n: "A compromised web pod can now reach only one port on one service, which limits what an attacker can do." }
+  ] },
+{ id: "sec-incident-contain", module: "security", title: "The first hour of a security incident", summary: "Detect, contain, preserve evidence and start recovery.",
+  actors: ["Alert system", "On-call", "Incident commander", "Cloud account"],
+  steps: [
+    { f: 0, t: 1, l: "Alert: shell in a production container", n: "A runtime detection fires. It names the pod, the user and the command that started." },
+    { f: 1, t: 1, l: "Confirm it is real", n: "The on-call checks the deploy log and the audit trail. Nobody has a reason to be in that container." },
+    { f: 1, t: 2, l: "Declare an incident", n: "The on-call pages the incident commander, who opens a channel, assigns roles and starts a timeline." },
+    { f: 2, t: 3, l: "Contain without destroying", n: "The commander has the pod isolated with a deny network policy, and the service account token revoked. Pods are not deleted yet." },
+    { f: 1, t: 3, l: "Preserve evidence", n: "A snapshot of the volume and the pod logs are copied to a protected location for the investigation." },
+    { f: 2, t: 3, l: "Rotate and rebuild", n: "Secrets the pod could read are rotated. The workload is redeployed from a known good, signed image." },
+    { f: 2, t: 2, l: "Communicate and review", n: "Stakeholders get updates on a schedule. Afterward the team holds a blameless review and ships the control changes." }
+  ] },
+{ id: "exit-code-pipeline", module: "bash", title: "How exit codes and pipefail decide success", summary: "Why a failed step inside a pipe can go unnoticed.",
+  actors: ["Script", "Command A", "Command B"],
+  steps: [
+    { f: 0, t: 1, l: "Run: A | B", n: "The shell starts both commands, with the output of A connected to the input of B." },
+    { f: 1, t: 1, l: "A fails with status 2", n: "The first command hits an error, for example a missing file, and exits with status 2." },
+    { f: 2, t: 2, l: "B runs on empty input", n: "B receives no data, finishes normally and exits with status 0." },
+    { f: 0, t: 0, l: "Pipeline status: 0", n: "Without pipefail the pipeline reports the status of the last command only, so the failure of A is hidden." },
+    { f: 0, t: 0, l: "Add set -o pipefail", n: "With pipefail the pipeline returns the status of the last command that failed, which is 2." },
+    { f: 0, t: 0, l: "set -e stops the script", n: "Now the script exits at that line instead of going on with bad data. Use it together with checks of results that matter." }
+  ] },
+{ id: "blue-green-switch", module: "cicd", title: "Switching traffic with a blue-green deploy", summary: "Two identical environments and a fast, safe switch.",
+  actors: ["Pipeline", "Router", "Blue (live)", "Green (new)"],
+  steps: [
+    { f: 2, t: 2, l: "Blue serves all users", n: "The current version runs in the blue environment and receives all traffic." },
+    { f: 0, t: 3, l: "Deploy the new version to green", n: "The pipeline installs the new version in an identical idle environment. Users do not see it." },
+    { f: 0, t: 3, l: "Smoke tests and warm-up", n: "Automated checks call the green environment directly. Caches are warmed so the first users do not see slow pages." },
+    { f: 0, t: 1, l: "Switch the router to green", n: "One configuration change sends new requests to green. Existing connections finish on blue." },
+    { f: 1, t: 3, l: "Watch the metrics", n: "Error rate and latency on green are compared with the blue baseline for several minutes." },
+    { f: 0, t: 1, l: "If bad, switch back", n: "Rollback is the same single switch in the other direction. Blue is still running and untouched." },
+    { f: 0, t: 2, l: "Retire blue later", n: "After a safe period, blue is kept as the next idle environment. Database changes must work for both versions." }
+  ] },
+{ id: "vpc-endpoint", module: "cloud", title: "Reaching cloud storage privately with an endpoint", summary: "Keeping traffic off the internet and off the NAT gateway.",
+  actors: ["App in private subnet", "Route table", "VPC endpoint", "Object storage"],
+  steps: [
+    { f: 0, t: 0, l: "Needs a file from storage", n: "The application uses the storage API name. DNS resolves it to a private address when an endpoint exists." },
+    { f: 0, t: 1, l: "Look up the route", n: "The route table has an entry that sends the storage prefix to the endpoint, not to the NAT gateway." },
+    { f: 1, t: 2, l: "Traffic enters the endpoint", n: "The packet goes through the provider network inside your virtual network. It never touches the public internet." },
+    { f: 2, t: 3, l: "Request reaches storage", n: "The service receives the request and sees that it comes from the endpoint of your network." },
+    { f: 3, t: 3, l: "Check the endpoint policy", n: "A policy on the endpoint and one on the bucket both allow only your account. A request for another account bucket is denied." },
+    { f: 3, t: 0, l: "Response returns the same way", n: "The data comes back through the endpoint. There is no NAT data charge and no public path to monitor." }
+  ] },
+{ id: "docker-healthcheck", module: "docker", title: "How a container health check works", summary: "From a probe command to a restart decision.",
+  actors: ["Docker daemon", "Container", "Orchestrator"],
+  steps: [
+    { f: 1, t: 1, l: "Application starts", n: "The process starts and needs a few seconds before it can serve requests." },
+    { f: 0, t: 1, l: "Run the health command", n: "At each interval the daemon runs the command from HEALTHCHECK inside the container, for example a request to /health." },
+    { f: 1, t: 0, l: "Exit 1: unhealthy", n: "The command fails because the app is not ready. The status is starting during the start period, then counts failures." },
+    { f: 0, t: 0, l: "Retries reached", n: "After the set number of failures in a row the status changes to unhealthy." },
+    { f: 0, t: 2, l: "Report the status", n: "The status is visible in docker ps and to the orchestrator, which can stop sending traffic to it." },
+    { f: 2, t: 1, l: "Replace the container", n: "The orchestrator or a restart policy replaces the unhealthy container. The cause should still be found in the logs." }
+  ] },
+{ id: "k8s-config-reload", module: "kubernetes", title: "How a ConfigMap change reaches a pod", summary: "Env vars versus mounted files and why pods need a restart sometimes.",
+  actors: ["Engineer", "API server", "Kubelet", "Pod"],
+  steps: [
+    { f: 0, t: 1, l: "Update the ConfigMap", n: "The engineer applies a changed ConfigMap. The API server stores the new version in etcd." },
+    { f: 2, t: 1, l: "Watch for changes", n: "The kubelet on each node watches the objects used by its pods and sees the update." },
+    { f: 2, t: 3, l: "Update mounted files", n: "For a ConfigMap mounted as files, the kubelet refreshes the files after a short delay. A program that reads them again sees the new values." },
+    { f: 3, t: 3, l: "Environment variables stay old", n: "Values copied into environment variables at start-up do not change. The process keeps what it was given." },
+    { f: 0, t: 1, l: "Roll the deployment", n: "To apply env changes, the engineer restarts the rollout, or uses a checksum annotation so a change triggers a new revision." },
+    { f: 1, t: 3, l: "New pods start with new values", n: "Pods are replaced gradually, each reading the current ConfigMap, with readiness checks protecting traffic." }
+  ] },
+{ id: "linux-oom-score", module: "linux", title: "How the kernel chooses which process to kill", summary: "Out of memory, OOM scores and what you can do about it.",
+  actors: ["Process", "Kernel", "Administrator"],
+  steps: [
+    { f: 0, t: 1, l: "Ask for more memory", n: "A service keeps allocating memory. The kernel agrees as long as free memory or swap exists." },
+    { f: 1, t: 1, l: "Memory runs out", n: "No free pages are left and reclaiming cache does not help. The kernel must free memory or stop." },
+    { f: 1, t: 1, l: "Score every process", n: "The kernel gives each process a badness score based on memory use, adjusted by oom_score_adj." },
+    { f: 1, t: 0, l: "Kill the highest score", n: "The process with the highest score receives SIGKILL. It has no chance to log or clean up." },
+    { f: 1, t: 2, l: "Message in dmesg", n: "The kernel logs the victim and the memory state. The administrator finds it with dmesg or the journal." },
+    { f: 2, t: 0, l: "Fix the cause", n: "Set limits with cgroups, fix the leak, add memory or protect key services with a lower oom_score_adj." }
+  ] },
+{ id: "http-redirect-hsts", module: "networking", title: "HTTP to HTTPS and HSTS", summary: "Why the first request is the weak one.",
+  actors: ["Browser", "Web server"],
+  steps: [
+    { f: 0, t: 1, l: "GET http://shop.example.com", n: "The user types the name without a scheme, so the browser tries plain HTTP first." },
+    { f: 1, t: 0, l: "301 to https://", n: "The server redirects to HTTPS. This first request travelled unencrypted and could be altered by someone on the path." },
+    { f: 0, t: 1, l: "GET https://shop.example.com", n: "The browser connects with TLS and verifies the certificate before sending the request." },
+    { f: 1, t: 0, l: "Strict-Transport-Security header", n: "The response says: always use HTTPS for this name for the next year, including subdomains if you choose." },
+    { f: 0, t: 0, l: "Remember the rule", n: "The browser stores the HSTS policy. Later visits skip the plain HTTP step completely." },
+    { f: 0, t: 0, l: "Preload for the first visit", n: "Sites can join a preload list built into browsers, so even the very first visit is protected." }
+  ] },
+{ id: "alert-to-dashboard", module: "observability", title: "From an alert to the cause", summary: "How metrics, traces and logs work together in an investigation.",
+  actors: ["Alert", "Engineer", "Metrics", "Traces", "Logs"],
+  steps: [
+    { f: 0, t: 1, l: "High error rate on checkout", n: "The alert fires on a symptom: 6 percent of requests fail. It links to a dashboard and a runbook." },
+    { f: 1, t: 2, l: "Open the dashboard", n: "The graph shows errors began at 14:05, right after a deployment marker. One service stands out." },
+    { f: 1, t: 3, l: "Open a failing trace", n: "A trace of one failed request shows the time spent. The call to the payment service takes 30 seconds then fails." },
+    { f: 1, t: 4, l: "Search logs by trace ID", n: "Logs from the payment service for that trace show connection pool exhausted. The cause is clear." },
+    { f: 1, t: 1, l: "Mitigate first", n: "The engineer rolls back the 14:00 release. The error rate returns to normal within minutes." },
+    { f: 1, t: 1, l: "Write down the timeline", n: "Notes from the alert, graphs and log lines go into the incident record for the review." }
+  ] },
+{ id: "python-context-manager", module: "python", title: "How a with block cleans up", summary: "Files and locks that are closed even when errors occur.",
+  actors: ["Your code", "with statement", "File"],
+  steps: [
+    { f: 0, t: 1, l: "with open(path) as f:", n: "The with statement calls the object enter method. For a file this opens it and returns the file object." },
+    { f: 1, t: 2, l: "File is open", n: "Your block runs using f. The operating system holds a file descriptor until it is released." },
+    { f: 0, t: 0, l: "An exception is raised", n: "Midway through the block an error occurs, such as a parse failure on a bad line." },
+    { f: 1, t: 2, l: "exit runs anyway", n: "Python calls the exit method before the exception continues. The file is closed." },
+    { f: 1, t: 0, l: "Exception continues", n: "The error is passed to the caller or handler, with no leaked file descriptor left behind." },
+    { f: 0, t: 0, l: "Same idea for locks and connections", n: "Any object with enter and exit works, and contextlib helps you write your own for temporary directories or timers." }
+  ] },
+{ id: "slo-review-meeting", module: "sre", title: "The weekly reliability review", summary: "Using the error budget to decide what to do next.",
+  actors: ["SRE", "Product team", "Dashboard"],
+  steps: [
+    { f: 0, t: 2, l: "Open the SLO dashboard", n: "The review starts with the facts: current availability, budget left and the burn rate of the past week." },
+    { f: 2, t: 0, l: "62 percent of the budget used", n: "At day 20 of 28, more than half of the budget is spent, and most of it by one incident." },
+    { f: 0, t: 1, l: "Discuss the cause", n: "The group looks at the incident review. Two action items are still open, one of them a missing alert." },
+    { f: 1, t: 0, l: "Plan for risky changes", n: "The product team lists releases planned for the next week. One touches the same component." },
+    { f: 0, t: 1, l: "Decide with the policy", n: "The error budget policy says: slow risky releases and finish reliability work first when more than half is gone." },
+    { f: 0, t: 0, l: "Record the decision", n: "The decisions and owners are written down, and the next review checks them. The numbers, not opinions, set the pace." }
+  ] },
+{ id: "tf-plan-review", module: "terraform", title: "Reading a plan before you apply", summary: "Spotting replacements and surprises.",
+  actors: ["Engineer", "Terraform", "Reviewer"],
+  steps: [
+    { f: 0, t: 1, l: "terraform plan -out=plan.bin", n: "Terraform reads the state and the real resources, then computes the difference to the code." },
+    { f: 1, t: 0, l: "Plan: 1 to add, 1 to change, 1 to destroy", n: "The summary is the first thing to read. A destroy that you did not expect is a stop sign." },
+    { f: 0, t: 0, l: "Look for forces replacement", n: "Lines marked forces replacement mean the old resource is deleted and a new one created, which may lose data." },
+    { f: 0, t: 2, l: "Share the plan in the pull request", n: "The reviewer reads the plan output rather than only the code, and checks names, counts and sensitive changes." },
+    { f: 2, t: 0, l: "Approve or ask for a change", n: "If the plan shows a surprise, the code changes and a new plan is created. Nothing has been applied yet." },
+    { f: 0, t: 1, l: "terraform apply plan.bin", n: "Applying the saved plan guarantees that what was reviewed is exactly what runs." }
   ] }
 ];

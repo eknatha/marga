@@ -4,6 +4,8 @@
 'use strict';
 var KEY = 'ea.a11y';
 var OPTIONS = [
+  { id: 'theme', label: 'Colour theme', values: [['auto', 'Match my device'], ['light', 'Light'], ['dark', 'Dark']], def: 'auto' },
+  { id: 'read', label: 'Reading mode', values: [['off', 'Off'], ['on', 'On: narrow column, larger text, no side panels']], def: 'off' },
   { id: 'fs', label: 'Text size', values: [['100', 'Standard'], ['115', 'Large'], ['130', 'Larger'], ['150', 'Largest']], def: '100' },
   { id: 'font', label: 'Font', values: [['default', 'Standard'], ['atkinson', 'Atkinson Hyperlegible'], ['dyslexic', 'OpenDyslexic']], def: 'default' },
   { id: 'lh', label: 'Line spacing', values: [['normal', 'Standard'], ['relaxed', 'Relaxed'], ['loose', 'Loose']], def: 'normal' },
@@ -25,16 +27,21 @@ function read() {
   var s = {}, raw = null;
   try { raw = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (x) { raw = null; }
   OPTIONS.forEach(function (o) { s[o.id] = raw && valid(o.id, raw[o.id]) ? raw[o.id] : o.def; });
+  s.theme = 'auto'; try { var t = localStorage.getItem('ea.theme'); if (t === 'light' || t === 'dark') s.theme = t; } catch (x2) { /* ignore */ }
   return s;
 }
 var cur = read();
+function sysTheme() { try { return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; } catch (x) { return 'light'; } }
 function apply(s) {
   var h = document.documentElement;
-  OPTIONS.forEach(function (o) { if (s[o.id] === o.def) h.removeAttribute('data-a-' + o.id); else h.setAttribute('data-a-' + o.id, s[o.id]); });
+  OPTIONS.forEach(function (o) { if (o.id === 'theme') return; if (s[o.id] === o.def) h.removeAttribute('data-a-' + o.id); else h.setAttribute('data-a-' + o.id, s[o.id]); });
+  h.setAttribute('data-theme', s.theme === 'auto' ? sysTheme() : s.theme);
 }
+try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () { if (cur.theme === 'auto') apply(cur); }); } catch (x3) { /* ignore */ }
 function persist() {
   var diff = {}, any = false;
-  OPTIONS.forEach(function (o) { if (cur[o.id] !== o.def) { diff[o.id] = cur[o.id]; any = true; } });
+  OPTIONS.forEach(function (o) { if (o.id !== 'theme' && cur[o.id] !== o.def) { diff[o.id] = cur[o.id]; any = true; } });
+  try { if (cur.theme === 'auto') localStorage.removeItem('ea.theme'); else localStorage.setItem('ea.theme', cur.theme); } catch (x4) { /* ignore */ }
   try { if (any) localStorage.setItem(KEY, JSON.stringify(diff)); else localStorage.removeItem(KEY); } catch (x) { /* ignore */ }
 }
 function set(id, v) { if (!valid(id, v)) return false; cur[id] = v; apply(cur); persist(); return true; }
