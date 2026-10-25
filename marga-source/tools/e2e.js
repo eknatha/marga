@@ -1143,7 +1143,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
 
   await test('troubleshooting drills: 5 per module, answer, explanation, retry, progress', async () => {
     const { ctx, page, issues } = await open();
-    for (const m of data.modules) eq(data.drills.filter((d) => d.module === m.id).length, 7, `drills for ${m.id}`);
+    for (const m of data.modules) ok(data.drills.filter((d) => d.module === m.id).length >= 7, `drills for ${m.id}`);
     for (const d of data.drills) ok(d.options.length >= 3 && d.options.filter((o) => o.ok).length === 1 && d.evidence.length > 20 && d.why.length > 40, `drill ${d.id} well formed`);
     await go(page, '/drills/linux');
     eq(await page.locator('.drill').count(), 7, 'seven drills on the page');
@@ -1164,7 +1164,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const dr = (await progress(page)).dr;
     const ids = Object.keys(dr);
     ok(ids.length === 2 && ids.filter((k) => dr[k].ok).length === 1, 'progress recorded: ' + JSON.stringify(dr));
-    ok(/1 of 84 solved/.test(await page.textContent('#drill-stats')), 'stats');
+    ok(/1 of 87 solved/.test(await page.textContent('#drill-stats')), 'stats');
     await page.reload(); await page.waitForSelector('.drill');
     eq(await page.locator('.drill.solved').count(), 1, 'solved state persists');
     await page.selectOption('#dr-mod', 'docker'); await page.waitForSelector('#dg-docker');
@@ -1263,7 +1263,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const links = await page.locator('#topnav a').allInnerTexts();
     eq(links.join('|'), 'Skill trees|Cheat sheets|Case studies|Practice|Progress|InterviewHub', 'nav order');
     await nav(page, '/practice');
-    eq(await page.locator('.prac li').count(), 18, 'hub cards');
+    eq(await page.locator('.prac li').count(), 19, 'hub cards');
     for (const href of ['#/drills', '#/interview/mock', '#/flashcards', '#/cases', '#/architecture', '#/calculators', '#/review', '#/labs']) ok(await page.locator(`.prac a[href="${href}"]`).count() === 1, 'hub links to ' + href);
     await nav(page, '/module/kubernetes');
     ok(await page.locator('a[href="#/drills/kubernetes"]').count() === 1 && await page.locator('a[href="#/cases/kubernetes"]').count() === 1, 'module page links to practice');
@@ -1760,7 +1760,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       await page.selectOption('#lab-ex', x.id); await page.fill('#lab-code', x.sol); await page.click('#lab-check');
       await page.waitForSelector('#lab-res .drill-res.ok', { timeout: 8000 });
     }
-    ok(/41 of 41 exercises solved/.test(await page.textContent('#lab-count')), 'count: ' + await page.textContent('#lab-count'));
+    ok(/50 of 50 exercises solved/.test(await page.textContent('#lab-count')), 'count: ' + await page.textContent('#lab-count'));
     await page.selectOption('#lab-ex', 'free'); await page.fill('#lab-code', 'SELECT name FROM services WHERE tier = 1 ORDER BY name'); await page.click('#lab-run');
     await page.waitForSelector('#lab-out table'); eq(await page.locator('#lab-out tbody tr').count(), 3, 'free query rows');
     await page.fill('#lab-code', 'SELEC oops'); await page.click('#lab-run'); await page.waitForSelector('#lab-res .drill-res.no');
@@ -1770,13 +1770,13 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
   await test('labs: Terraform (HCL) playground accepts every solution, explains a syntax error with its line', async () => {
     const { ctx, page } = await open(); await go(page, '/playground/hcl');
     const labs = await page.evaluate(() => window.ACADEMY.labs.hcl.map((x) => ({ id: x.id, sol: x.sol, start: x.start })));
-    eq(labs.length, 30, 'thirty exercises');
+    eq(labs.length, 50, 'fifty exercises');
     for (const x of labs) {
       await page.selectOption('#lab-ex', x.id);
       await page.fill('#lab-code', x.start); await page.click('#lab-check'); await page.waitForSelector('#lab-res .drill-res.no');
       await page.fill('#lab-code', x.sol); await page.click('#lab-check'); await page.waitForSelector('#lab-res .drill-res.ok');
     }
-    ok(/30 of 30/.test(await page.textContent('#lab-count')), 'all solved');
+    ok(/50 of 50/.test(await page.textContent('#lab-count')), 'all solved');
     await page.selectOption('#lab-ex', 'free'); await page.fill('#lab-code', 'resource "aws_s3_bucket" "x" {\n  bucket = "a"\n');
     await page.click('#lab-check'); await page.waitForSelector('#lab-res .drill-res.no');
     ok(/Line 1/.test(await page.textContent('#lab-res')) && /never closed/.test(await page.textContent('#lab-res')), 'syntax message: ' + await page.textContent('#lab-res'));
@@ -1788,15 +1788,15 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
   await test('labs: YAML exercises are checked against the file in the editor', async () => {
     const { ctx, page } = await open(); await go(page, '/playground/yaml');
     const labs = await page.evaluate(() => window.ACADEMY.labs.yaml.map((x) => ({ id: x.id, sol: x.sol })));
-    eq(labs.length, 30, 'thirty exercises');
+    eq(labs.length, 50, 'fifty exercises');
     for (const x of labs) {
       await page.selectOption('#yx-ex', x.id); await page.click('#yx-check'); await page.waitForSelector('#yx-res .drill-res.no');
       await page.fill('#yp-in', x.sol); await page.click('#yx-check'); await page.waitForSelector('#yx-res .drill-res.ok');
     }
-    ok(/30 of 30 solved/.test(await page.textContent('#yx-count')), 'count');
+    ok(/50 of 50 solved/.test(await page.textContent('#yx-count')), 'count');
     await page.selectOption('#yx-ex', 'indent'); await page.fill('#yp-in', 'a:\n  b: 1\n c: 2\n'); await page.click('#yx-check');
     await page.waitForSelector('#yx-res .drill-res.no'); ok(/Invalid YAML/.test(await page.textContent('#yx-res')), 'invalid yaml message');
-    const keep = await progress(page); ok(Object.keys(keep.lab).length === 30, 'progress saved: ' + Object.keys(keep.lab).length);
+    const keep = await progress(page); ok(Object.keys(keep.lab).length === 50, 'progress saved: ' + Object.keys(keep.lab).length);
     await ctx.close();
   });
 
@@ -1826,7 +1826,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
 
   await test('labs: Python playground lists the extra exercises and the hub counts every playground', async () => {
     const { ctx, page } = await open(); await go(page, '/playground/python');
-    ok(await page.locator('#py-ex option').count() >= 31, 'python options: ' + await page.locator('#py-ex option').count());
+    ok(await page.locator('#py-ex option').count() >= 50, 'python options: ' + await page.locator('#py-ex option').count());
     await page.selectOption('#py-ex', 'bucket'); ok(/token/i.test(await page.textContent('#py-task')), 'task shown');
     await go(page, '/practice');
     for (const h of ['#/playground/go', '#/playground/hcl', '#/playground/sql']) eq(await page.locator(`.prac a[href="${h}"]`).count(), 1, 'hub links to ' + h);
@@ -1913,6 +1913,81 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await page.locator('.tab', { hasText: 'DevSecOps' }).click(); await page.waitForSelector('.node[data-id="security"]');
     eq(await page.locator('.node').count(), 11, 'devsecops tree has 11 skills');
     eq(await page.locator('.node[data-id="security"].s-lock').count(), 1, 'security is locked at the start');
+    await ctx.close();
+  });
+
+
+  await test('next step panel: first lesson says take the check, a passed lesson links onward with related practice', async () => {
+    const { ctx, page } = await open(); await go(page, '/lesson/linux/filesystem-and-navigation');
+    await page.waitForSelector('#next-step');
+    ok(/Take the lesson check/.test(await page.textContent('#next-step')), 'check first');
+    ok((await page.locator('#next-step .ns-list a').count()) >= 4, 'related links');
+    const hrefs = await page.locator('#next-step .ns-list a').evaluateAll((a) => a.map((x) => x.getAttribute('href')));
+    ok(hrefs.some((h) => /^#\/drills\/linux/.test(h)) && hrefs.some((h) => /^#\/cheatsheet\/linux/.test(h)), 'drill and sheet: ' + hrefs.join(' '));
+    await page.waitForSelector('#qstart'); await takeQuiz(page, 'linux/filesystem-and-navigation', 0); await page.waitForSelector('.result.pass');
+    await page.waitForFunction(() => /Next lesson/.test(document.querySelector('#next-step').textContent), null, { timeout: 5000 });
+    await ctx.close();
+  });
+
+  await test('weak spots: missed quiz questions and drills are listed, a correct answer clears them, a review session works', async () => {
+    const { ctx, page } = await open(); await go(page, '/lesson/linux/filesystem-and-navigation');
+    await page.waitForSelector('#qstart'); await takeQuiz(page, 'linux/filesystem-and-navigation', 4);
+    await page.waitForSelector('.result.fail');
+    let wk = (await progress(page)).wk || {};
+    ok(Object.keys(wk).filter((k) => k.startsWith('q:')).length >= 4, 'quiz misses saved: ' + Object.keys(wk).join(','));
+    await go(page, '/drills/linux'); await page.waitForSelector('.drill');
+    const card = page.locator('.drill').first();
+    await card.locator('input[value="0"]').first().check(); await card.locator('[data-act=drill-check]').click();
+    wk = (await progress(page)).wk || {};
+    ok(Object.keys(wk).some((k) => k.startsWith('d:')), 'drill miss saved');
+    await go(page, '/weak'); await page.waitForSelector('#weak-count');
+    ok(/5 to review/.test(await page.textContent('#weak-count')), await page.textContent('#weak-count'));
+    await page.click('[data-act=weak-start]');
+    for (let i = 0; i < 5; i++) {
+      await page.waitForSelector('.opt[data-ok="1"]');
+      await page.locator('.opt[data-ok="1"]').first().click(); await page.click('#wnext');
+    }
+    ok(/5 cleared/.test(await page.textContent('#weak-root')), await page.textContent('#weak-root'));
+    wk = (await progress(page)).wk || {}; eq(Object.keys(wk).length, 0, 'list empty after clearing');
+    await nav(page, '/practice'); await nav(page, '/weak'); await page.waitForSelector('#weak-root .empty');
+    await go(page, '/practice'); ok(/Weak-spot review/.test(await page.textContent('.prac')), 'hub card');
+    await ctx.close();
+  });
+
+  await test('weak spots: a hard flashcard is listed and comes back until marked Got it', async () => {
+    const { ctx, page } = await open(); await go(page, '/');
+    const prog = allDone(); prog.wk = { 'c:linux/filesystem-and-navigation#0': { k: 'c', r: 'linux/filesystem-and-navigation#0', n: 2, at: 1 } };
+    await setProgress(page, prog);
+    await go(page, '/weak'); await page.waitForSelector('[data-act=weak-start]'); await page.click('[data-act=weak-start]');
+    await page.click('#wcard'); await page.click('[data-act=weak-card][data-r=again]');
+    await page.waitForSelector('.result'); ok(/1 still weak/.test(await page.textContent('#weak-root')), 'still weak');
+    eq(Object.keys((await progress(page)).wk).length, 1, 'kept');
+    await nav(page, '/practice'); await nav(page, '/weak'); await page.click('[data-act=weak-start]'); await page.click('#wcard'); await page.click('[data-act=weak-card][data-r=good]');
+    await page.waitForSelector('.result'); eq(Object.keys((await progress(page)).wk).length, 0, 'cleared');
+    await ctx.close();
+  });
+
+  await test('search: exercises and predicts are indexed, stage filter narrows, a close typo gets a suggestion', async () => {
+    const { ctx, page } = await open(); await go(page, '/');
+    await page.keyboard.press('/'); await page.fill('#sq', 'token bucket');
+    await page.waitForSelector('#sres li');
+    ok((await page.locator('#sres li .k').allTextContents()).includes('Exercise'), 'exercise found');
+    await page.fill('#sq', 'rollback');
+    await page.waitForSelector('#sres li');
+    const all = await page.locator('#sres li').count();
+    await page.selectOption('#sstage', 'cicd');
+    await page.waitForTimeout(100);
+    const some = await page.locator('#sres li').count();
+    ok(some >= 1 && some <= all, `stage filter ${some} of ${all}`);
+    ok(/in CI\/CD|in .*CI/i.test(await page.textContent('#shint')), 'hint names the stage: ' + await page.textContent('#shint'));
+    await page.selectOption('#sstage', '');
+    await page.fill('#sq', 'terrafrmm');
+    await page.waitForFunction(() => /Did you mean/.test(document.querySelector('#shint').textContent));
+    await page.click('#shint [data-srecent]');
+    await page.waitForSelector('#sres li');
+    ok(/terraform/i.test(await page.inputValue('#sq')), 'suggestion applied');
+    await page.fill('#sq', 'predict output');
+    await page.waitForSelector('#sres li');
     await ctx.close();
   });
 

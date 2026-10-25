@@ -79,3 +79,12 @@ If the number does not appear: open the browser console and look for the "visito
 - The daily challenge shows a bonus drill and a predict item chosen from the date.
 - SQL for SREs has 41 exercises. Troubleshooting drills: 7 per stage (84). Animated explainers: 77. Architecture post-mortems: 50, each with a "Lessons learned" section.
 - All post-mortems, drills and explainers were written from memory against the cited sources. Spot-check dates, numbers and URLs before relying on them.
+
+## Round 6 additions
+- DevSecOps stage now has 12 lessons (added: identity and zero trust, application security, policy as code, network and edge security, ransomware resilience). Refs, levels text, cheat sheet, interview questions, glossary, drills (10) and explainers were extended.
+- Predict-then-reveal and a clickable diagram now appear in the other 11 stages as well (35 predicts and 19 diagrams in total).
+- Every playground now has 50 exercises: Python (8 built in + 42), Go, Terraform (HCL), YAML and SQL. Run `node tools/labs-verify.js` (Go needs a local Go toolchain).
+- Animated explainers: 104. Each lesson page ends with a "What to do next" panel (next lesson or check, related drill, explainer, post-mortem, interview question, cheat sheet, playground).
+- Weak-spot review (`#/weak`): quiz questions, drills and flashcards answered wrongly are stored in the `wk` bag of the progress object; a correct answer removes them. It is included in progress export and import.
+- Search: stage filter, "Did you mean" for close typos, and playground exercises and predict questions are indexed.
+- Reminder: the new lessons, predicts, explainers, drills and exercises were written from memory and checked by the build tools and tests, not by a domain reviewer. Spot-check commands, numbers and policy examples before relying on them. External links, the live counter and the Go Playground are not machine-verified.
