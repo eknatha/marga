@@ -77,7 +77,7 @@ function goCompile(code) {
 function goText(r) { return (r.Events || []).map(function (ev) { return ev.Message; }).join(''); }
 function goView() {
   view.title = 'Go playground | MARGA by EknathaLabs'; view.nav = 'practice';
-  view.html = head('Go playground', 'Thirty Go exercises for operations work: errors, goroutines, JSON, networking and testing. Press Run to compile and run your code on the public Go Playground at go.dev. Your code is sent there when you run it, and nowhere else.') +
+  view.html = head('Go playground', 'Fifty Go exercises for operations work: errors, goroutines, JSON, networking and testing. Press Run to compile and run your code on the public Go Playground at go.dev. Your code is sent there when you run it, and nowhere else.') +
     shell({ lang: 'go', free: 'Free play (no check)', editor: 'Go code', rows: 18,
       buttons: '<button type="button" class="btn btn-primary" id="lab-run" data-act="go-run">Run (Ctrl+Enter)</button><button type="button" class="btn btn-quiet" id="lab-check" data-act="go-check">Check my answer</button><button type="button" class="btn btn-quiet" data-act="go-copy">Copy code</button>',
       post: '<p class="small">Programs run for at most a few seconds with no network access. The Go Playground is run by the Go team; if it is not reachable you will see a message, and you can copy the code and run it with <code>go run</code> on your own machine. Check compares the printed output with the expected output of the exercise.</p>' });
@@ -117,7 +117,7 @@ function hclEval(text, x) {
 }
 function hclView() {
   view.title = 'Terraform (HCL) playground | MARGA by EknathaLabs'; view.nav = 'practice';
-  view.html = head('Terraform (HCL) playground', 'Thirty exercises in Terraform configuration language. Write the HCL and press Check. The page reads your file, finds syntax mistakes with a line number, and checks that the right blocks and arguments are there. It does not run Terraform or talk to any cloud, and nothing leaves your browser.') +
+  view.html = head('Terraform (HCL) playground', 'Fifty exercises in Terraform configuration language. Write the HCL and press Check. The page reads your file, finds syntax mistakes with a line number, and checks that the right blocks and arguments are there. It does not run Terraform or talk to any cloud, and nothing leaves your browser.') +
     shell({ lang: 'hcl', free: 'Free play (syntax and risk check)', editor: 'Terraform (HCL) code', rows: 16,
       buttons: '<button type="button" class="btn btn-primary" id="lab-check" data-act="hcl-check">Check my answer (Ctrl+Enter)</button>',
       post: '<div id="lab-lint"></div><p class="small">This is a structure check, not <code>terraform validate</code>. It does not know every provider argument, so a file can pass here and still fail with real Terraform. Use it to practise the language.</p>' });
@@ -180,7 +180,7 @@ function sqlSchemaHtml() {
 }
 function sqlView() {
   view.title = 'SQL for SREs | MARGA by EknathaLabs'; view.nav = 'practice';
-  view.html = head('SQL for SREs', 'Twenty exercises that use SQL the way an on-call engineer does: deploys, incidents, alerts and SLO numbers. A real SQLite database runs inside your browser, works offline after the first load, and nothing leaves your device.') +
+  view.html = head('SQL for SREs', 'Fifty exercises that use SQL the way an on-call engineer does: deploys, incidents, alerts and SLO numbers. A real SQLite database runs inside your browser, works offline after the first load, and nothing leaves your device.') +
     shell({ lang: 'sql', free: 'Free play (any query)', editor: 'SQL query', rows: 8,
       buttons: '<button type="button" class="btn btn-primary" id="lab-run" data-act="sql-run" disabled>Run (Ctrl+Enter)</button><button type="button" class="btn btn-quiet" id="lab-check" data-act="sql-check" disabled>Check my answer</button>',
       pre: '<p class="small" id="sql-state" role="status" aria-live="polite">Loading the SQL engine...</p>' + sqlSchemaHtml() });

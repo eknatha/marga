@@ -57,6 +57,7 @@ function query(q, opts) {
   for (var i = 0; i < items.length; i++) {
     var r = items[i];
     if (kind && r.it.group !== kind) continue;
+    if (opts.module && r.it.module !== opts.module) continue;
     var total = 0, ok = true, exact = 0;
     for (var k = 0; k < terms.length; k++) {
       var sc = termScore(terms[k], r, true);
@@ -72,15 +73,59 @@ function query(q, opts) {
   out.sort(function (a, b) { return b.score - a.score || (a.it.title < b.it.title ? -1 : 1); });
   return out.slice(0, opts.limit || 30);
 }
-function counts(q) {
+function counts(q, module) {
   var terms = tokens(q), c = {};
   if (!terms.length) return c;
   for (var i = 0; i < items.length; i++) {
     var r = items[i], ok = true;
+    if (module && r.it.module !== module) continue;
     for (var k = 0; k < terms.length; k++) if (!termScore(terms[k], r, true)) { ok = false; break; }
     if (ok) c[r.it.group] = (c[r.it.group] || 0) + 1;
   }
   return c;
+}
+
+/* "Did you mean": for each query term that matches nothing, find the closest word used in titles (edit distance 2 or less). */
+var vocab = null;
+function lev(a, b, max) {
+  var la = a.length, lb = b.length;
+  if (Math.abs(la - lb) > max) return max + 1;
+  var prev = [], cur, i, j;
+  for (j = 0; j <= lb; j++) prev[j] = j;
+  for (i = 1; i <= la; i++) {
+    cur = [i]; var rowMin = i;
+    for (j = 1; j <= lb; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1));
+      if (cur[j] < rowMin) rowMin = cur[j];
+    }
+    if (rowMin > max) return max + 1;
+    prev = cur;
+  }
+  return prev[lb];
+}
+function buildVocab() {
+  var m = {};
+  items.forEach(function (r) { (r.t + ' ' + r.x).split(' ').forEach(function (w) { if (w.length >= 4) m[w] = (m[w] || 0) + 1; }); });
+  vocab = Object.keys(m).map(function (w) { return [w, m[w]]; });
+}
+function suggest(q) {
+  var terms = tokens(q);
+  if (!terms.length) return '';
+  if (!vocab) buildVocab();
+  var changed = false, out = terms.map(function (t) {
+    if (t.length < 4) return t;
+    var hit = false;
+    for (var i = 0; i < items.length && !hit; i++) if (termScore(t, items[i], false)) hit = true;
+    if (hit) return t;
+    var best = null, bd = 3, bf = 0;
+    for (var v = 0; v < vocab.length; v++) {
+      var d = lev(t, vocab[v][0], 2);
+      if (d < bd || (d === bd && vocab[v][1] > bf)) { bd = d; bf = vocab[v][1]; best = vocab[v][0]; }
+    }
+    if (best && bd <= 2) { changed = true; return best; }
+    return t;
+  });
+  return changed ? out.join(' ') : '';
 }
 function highlight(text, q, esc) {
   var terms = tokens(q).filter(function (t) { return t.length > 1; });
@@ -91,6 +136,6 @@ function highlight(text, q, esc) {
   });
   return s;
 }
-var api = { build: build, query: query, counts: counts, highlight: highlight, tokens: tokens, dist1: dist1 };
+var api = { build: build, query: query, counts: counts, suggest: suggest, highlight: highlight, tokens: tokens, dist1: dist1 };
 if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.MargaSearch = api;
 })(typeof window !== 'undefined' ? window : this);

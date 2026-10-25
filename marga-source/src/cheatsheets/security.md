@@ -97,3 +97,50 @@ sudo tcpdump -i eth0 -w /secure/capture.pcap host 203.0.113.50
 ```
 
 > **Danger:** Do not wipe or reboot a suspected compromised host before you have taken a snapshot or memory capture. You will destroy the evidence.
+
+## Identity and tokens
+
+```bash
+echo "$TOKEN" | cut -d. -f2 | base64 -d 2>/dev/null | jq '{iss,aud,exp,scope}'
+aws iam list-users --query 'Users[].UserName' --output text
+aws iam get-user --user-name svc-old --query 'User.PasswordLastUsed'
+```
+
+> **Warning:** A JWT is signed, not encrypted. Never put secrets in it, and always check signature, issuer, audience and expiry.
+
+## Application and API checks
+
+```bash
+curl -sI https://example.com | grep -iE 'strict-transport|content-security|x-content-type'
+curl -s -o /dev/null -w "%{http_code}\n" https://api.example.com/invoices/10043 -H "Authorization: Bearer $TOKEN"
+```
+
+> **Caution:** Test only your own systems. A 200 for another customer's object means object-level authorization is missing.
+
+## Policy as code
+
+```bash
+opa eval -d policy/ -i plan.json "data.terraform.security.deny"
+kubectl apply -f policy.yaml && kubectl get policyreport -A
+```
+
+> **Tip:** Start every new policy in audit mode, review violations with owners, then enforce in stages.
+
+## Network and DNS
+
+```bash
+aws ec2 describe-security-groups --filters Name=ip-permission.cidr,Values=0.0.0.0/0 --query 'SecurityGroups[].GroupId'
+dig +short CNAME promo.example.com
+dig +short TXT example.com | grep -i spf
+```
+
+> **Caution:** A CNAME that points to a deleted cloud resource can be claimed by someone else. Remove dangling records.
+
+## Backups and recovery
+
+```bash
+aws s3api put-object-lock-configuration --bucket backups --object-lock-configuration '{"ObjectLockEnabled":"Enabled","Rule":{"DefaultRetention":{"Mode":"COMPLIANCE","Days":30}}}'
+aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=DeleteSnapshot --max-results 5
+```
+
+> **Danger:** Backups reachable with production credentials will be deleted first. Keep an immutable copy in a separate account and test restores.

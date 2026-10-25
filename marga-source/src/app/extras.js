@@ -40,7 +40,7 @@ function practiceView() {
     ['#/subnet', 'Subnet and CIDR playground', 'Inspect networks, split them, plan VLSM for a VPC and merge routes.', 'Runs in your browser'],
     ['#/playground/yaml', 'YAML playground', 'Check YAML and Kubernetes manifests, convert to JSON, find risky settings, and practise with ' + labN('yaml') + ' exercises.', labDone('yaml') + ' of ' + labN('yaml') + ' solved'],
     ['#/playground/python', 'Python playground', 'Write and run Python with built-in tests for ' + (8 + labN('python')) + ' exercises.', Object.keys(S().py || {}).length + ' of ' + (8 + labN('python')) + ' solved'],
-    ['#/playground/go', 'Go playground', 'Thirty Go exercises for operations work, run on the public Go Playground.', labDone('go') + ' of ' + labN('go') + ' solved'],
+    ['#/playground/go', 'Go playground', 'Fifty Go exercises for operations work, run on the public Go Playground.', labDone('go') + ' of ' + labN('go') + ' solved'],
     ['#/playground/hcl', 'Terraform (HCL) playground', 'Write Terraform configuration and get it checked: variables, resources, modules, state and lifecycle.', labDone('hcl') + ' of ' + labN('hcl') + ' solved'],
     ['#/playground/sql', 'SQL for SREs', 'Query deploys, incidents, alerts and SLO data with a real SQLite database in your browser.', labDone('sql') + ' of ' + labN('sql') + ' solved'],
     ['#/glossary', 'Glossary', 'Plain-words meanings for ' + (D.glossary || []).length + ' terms, also shown inside lessons.', (D.glossary || []).length + ' terms'],
@@ -50,6 +50,7 @@ function practiceView() {
     ['#/cases', 'Real-world case studies', plural(CASES.length, 'incident') + ' from cloud providers, networks and software supply chains, with the lesson from each.', read + ' of ' + CASES.length + ' read'],
     ['#/architecture', 'Architecture post-mortems', plural(ARCH.length, 'detailed review') + ' with timelines, trade-offs and calculators you can change.', 'Calculators included'],
     ['#/calculators', 'Trade-off calculators', 'Error budgets, redundancy, cloud cost, recovery time, retry storms, cells and capacity.', '7 calculators'],
+    ['#/weak', 'Weak-spot review', 'Questions, drills and flashcards you missed come back here until you get them right.', (window.MargaFeatures && MargaFeatures.weakCount ? MargaFeatures.weakCount() : 0) + ' to review'],
     ['#/review', 'Review due cards', 'Spaced repetition for the lessons you have passed.', 'Cards come back when due'],
     ['#/labs', 'Hands-on labs', 'Planned. Not available yet.', 'Planned']
   ];
@@ -211,7 +212,7 @@ A.onAct('drill-check', function (b) {
   var picked = $('input[type=radio]:checked', card), res = $('.drill-res', card);
   if (!picked) { A.toast('Choose an answer first.'); return; }
   var ok = picked.value === '1', m = bag('dr'), rec = m[id] || { n: 0, ok: false };
-  rec.n++; if (ok) rec.ok = true; m[id] = rec; A.markActive(); A.save(); A.renderChrome(); A.setNav(view.nav);
+  rec.n++; if (ok) rec.ok = true; m[id] = rec; if (window.MargaFeatures && MargaFeatures.note) MargaFeatures.note('d', id, ok); A.markActive(); A.save(); A.renderChrome(); A.setNav(view.nav);
   $$('input[type=radio]', card).forEach(function (r) { r.disabled = true; var l = r.closest('label'); l.classList.toggle('good', r.value === '1'); l.classList.toggle('bad', r === picked && !ok); });
   res.hidden = false; res.className = 'drill-res ' + (ok ? 'ok' : 'no');
   res.innerHTML = '<p><strong>' + (ok ? 'Correct.' : 'Not quite.') + '</strong> ' + e(d.why) + '</p>' + (ok ? '' : '<p><button type="button" class="btn btn-quiet" data-act="drill-retry">Try again</button></p>');
