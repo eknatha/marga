@@ -26,6 +26,12 @@ A power problem in one facility whose backup power did not work as designed, and
 - AWS said it would repair the generator control equipment and review the procedures for testing the backup power.
 - It also worked on the control plane so that it did not rely on a single zone during recovery, and on the load balancer behaviour.
 
+## Lessons learned
+- Test the full power chain, including generator controls, on a schedule.
+- Run across zones, and rehearse failing over.
+- Recover storage in stages so the control plane is not overloaded.
+- Remove dependencies between zones in load balancing.
+
 ## Trade-offs to weigh
 - **Two zones against three.** Two zones double your cost. A third zone gives spare room after the loss of one.
 - **Testing backup power against risk.** Generator tests carry risk, and untested generators fail when the storm comes.

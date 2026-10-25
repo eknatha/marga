@@ -25,6 +25,12 @@ There was no failure of design so much as a planning gap: demand was far outside
 - Capacity and database limits were raised in stages, and the team gained experience in running at scale with a live game.
 - The approach of staged regional releases became a model for later launches.
 
+## Lessons learned
+- Plan capacity with a range that includes ten times the forecast, and make growth steps quick.
+- Use load shedding and queues so the service degrades instead of failing.
+- Test with realistic traffic, including retries from clients when the service is slow.
+- Launch in stages by region so you can learn before the whole world arrives.
+
 ## Trade-offs to weigh
 - **Launch everywhere or stage it.** A staged launch limits risk and delays revenue and excitement.
 - **Provision for the worst case or scale on demand.** Provisioning ahead costs money for idle capacity. Scaling on demand needs headroom in quotas and database limits.

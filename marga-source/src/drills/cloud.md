@@ -87,3 +87,35 @@ Cost by service (this month vs last):
 - Move the S3 buckets to another region
 - Turn off the load balancer
 why: The jump is in NAT gateway data processing, which costs per gigabyte. A change such as a new job pulling large images or objects over the internet path can cause it. Flow logs show the source and destination. VPC endpoints for object storage and the container registry remove that traffic from the NAT gateway.
+
+## Instance cannot reach the internet
+level: junior
+A new server in a private subnet cannot download updates.
+
+```text
+$ curl -m 5 https://example.com
+curl: (28) Connection timed out
+Route table (private subnet): 10.0.0.0/16 local
+```
+? What is missing?
++ A route to a NAT gateway for 0.0.0.0/0, which itself sits in a public subnet with an internet gateway route
+- A larger instance type
+- A new DNS server
+- A bigger disk
+why: The private route table has only the local route, so traffic to the internet has nowhere to go. Add a default route to a NAT gateway. If you only need object storage or a registry, a private endpoint avoids NAT data charges.
+
+## Autoscaling group keeps replacing healthy instances
+level: mid
+Instances are terminated and relaunched every few minutes.
+
+```text
+Activity: Terminating EC2 instance i-0a1b ... Cause: instance failed ELB health check
+Health check: HTTP :80 /health, interval 10s, timeout 2s, unhealthy threshold 2
+App start time: about 90 seconds
+```
+? What is the best fix?
++ Set a health check grace period longer than the start time, and relax the check settings
+- Use a bigger instance
+- Disable autoscaling
+- Remove the load balancer
+why: The group checks health before the app has finished starting, so it kills it and starts another, in a loop. A grace period of 120 seconds or more avoids that. Also make /health report ready only when dependencies are available.

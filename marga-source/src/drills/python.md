@@ -94,3 +94,42 @@ Maximum resident set size: 7340032 kB
 - Use readlines with a larger buffer
 - Convert the file to a list of lists first
 why: readlines builds a list of every line in memory. A file object is an iterator, so for line in f reads one buffered line at a time and uses a small, constant amount of memory. Use with open(path) as f so that the file is closed even if an error occurs.
+
+## Script works locally but not in the container
+level: junior
+A script imports a library without errors on a laptop but fails in the container.
+
+```text
+$ docker run --rm tools:1.0 python report.py
+Traceback (most recent call last):
+  File "report.py", line 1, in <module>
+    import yaml
+ModuleNotFoundError: No module named 'yaml'
+requirements.txt: (no pyyaml line)
+```
+? What is the fix?
++ Add pyyaml to requirements with a pinned version and install the file in the image build
+- Copy the laptop site-packages into the image
+- Use python2
+- Ignore the error
+why: The laptop had the package installed globally by chance. The image only has what the build installs. Declare every dependency in requirements, pin versions, and build from that file so that environments match.
+
+## Retries make an outage worse
+level: senior
+A client library retries failed calls immediately in a loop.
+
+```text
+def call(url):
+    while True:
+        try:
+            return requests.get(url, timeout=2).json()
+        except Exception:
+            pass
+Server: 5xx rate 40%, request rate 6x normal
+```
+? What should change?
++ Limit attempts, wait with exponential back-off and jitter, retry only errors that are safe to retry, and stop when the failure persists
+- Retry faster
+- Catch no exceptions at all
+- Remove the timeout
+why: Immediate unlimited retries multiply the load on a struggling server and keep it down. Bounded retries with back-off and jitter spread the load and give it time to recover. Only retry idempotent calls, and surface a clear error in the end.

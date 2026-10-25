@@ -98,3 +98,37 @@ shop/api   latest   1.4GB
 - Switch the tag to latest
 - Run docker system prune on the nodes
 why: The final image still contains the compiler, the module cache and the source. A multi-stage build keeps those in the build stage. The runtime stage can be a minimal base or distroless image, which gives a much smaller image, a faster pull and fewer packages to patch.
+
+## Container cannot reach another container by name
+level: junior
+Two containers started with docker run cannot find each other by name.
+
+```text
+$ docker run -d --name db postgres:16
+$ docker run --rm app:1.0 ping db
+ping: db: Name or service not known
+```
+? What is the fix?
++ Put both containers on a user-defined network, because the default bridge has no name resolution between containers
+- Install ping in the image
+- Expose port 5432
+- Use the latest tag
+why: Containers on the default bridge network can only talk by IP. A user-defined bridge network includes DNS-based name resolution. With Compose this is done for you.
+
+## Build is not using the cache
+level: mid
+Every build reinstalls all dependencies, even for a one-line code change.
+
+```text
+FROM node:20-slim
+WORKDIR /app
+COPY . .
+RUN npm ci
+CMD ["node", "server.js"]
+```
+? What change fixes it?
++ Copy package.json and the lock file first, run npm ci, and only then copy the rest of the source
+- Add --no-cache to the build
+- Remove the WORKDIR line
+- Use the latest tag
+why: Docker caches each layer until an earlier layer changes. COPY . . changes with every edit, so the install runs again. Copying only the dependency files first keeps that layer cached until they change.

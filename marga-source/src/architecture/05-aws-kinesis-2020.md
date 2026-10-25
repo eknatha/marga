@@ -28,6 +28,12 @@ The design made resource use per server grow with fleet size, and nothing warned
 - Alarms were added for thread counts and other resources, and the change process includes a check against limits.
 - AWS worked on cell-based isolation of the Kinesis front end and on reducing dependencies, including its own use of Cognito and CloudWatch.
 
+## Lessons learned
+- Watch limits that grow with fleet size, such as thread and connection counts, and alert before the cap.
+- Add servers in cells so adding capacity does not touch everything at once.
+- Make the status page and monitoring independent of the failing service.
+- Plan for slow, ordered restarts and test them.
+
 ## Trade-offs to weigh
 - **Many small servers against a few big ones.** Small servers lose less when one fails, but they may need more connections and coordination.
 - **All-to-all communication.** It keeps every server up to date, but costs grow faster than the fleet.

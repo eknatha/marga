@@ -26,6 +26,12 @@ An operating system update which, with a known interaction, removed network conf
 - Datadog disabled the automatic update of the affected package, and checked the staggering of its operating system updates.
 - It also said it would test recovery with a loss of capacity in multiple regions at once, and improve its tools for rebuilding nodes in bulk.
 
+## Lessons learned
+- Stagger operating system updates across regions and providers.
+- Test what a package update does to the networking configuration.
+- Prepare to rebuild many nodes at once, and rehearse it.
+- Remember that a shared image or package source links supposedly independent systems.
+
 ## Trade-offs to weigh
 - **Automatic security updates against staged updates.** Fast patches close holes quickly. A lagging canary group finds bad updates first.
 - **Multi-cloud against shared dependencies.** Using several providers protects against one provider. A common base image or package source links them.

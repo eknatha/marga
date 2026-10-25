@@ -95,3 +95,38 @@ Backend processing time for /export: 90 s
 - Disable TLS
 - Reduce the DNS TTL
 why: The load balancer closes a connection that has had no traffic for 60 seconds, and the export is silent for 90 seconds. More servers do not change that. The cleaner design is to start the job and let the client poll or receive a callback. Otherwise raise the idle timeout, and make sure the backend timeout is longer than the one on the balancer.
+
+## HTTPS works in a browser but fails in a script
+level: mid
+A health check script fails with a certificate error while the site opens fine in a browser.
+
+```text
+$ curl https://api.internal.example.com/health
+curl: (60) SSL certificate problem: unable to get local issuer certificate
+$ openssl s_client -connect api.internal.example.com:443 -showcerts | grep -c BEGIN
+1
+```
+? What is the most likely cause?
++ The server sends only its own certificate and not the intermediate. Browsers can fetch the missing one, but curl cannot. Serve the full chain
+- The server clock is slow
+- TLS 1.3 is disabled
+- DNS is wrong
+why: A complete chain includes the leaf and any intermediate certificates. Browsers sometimes fill in gaps, which hides the problem. Install the full chain on the server and check with openssl s_client or an online chain checker.
+
+## Connections hang only for some clients
+level: senior
+Small requests work, but large downloads stall for clients behind a VPN.
+
+```text
+$ ping -M do -s 1472 files.example.com
+ping: local error: message too long, mtu=1400
+$ ping -M do -s 1372 files.example.com
+64 bytes from 203.0.113.20: time=41 ms
+Firewall: ICMP type 3 code 4 dropped
+```
+? What is the likely problem?
++ A path MTU problem: the firewall drops ICMP fragmentation needed messages, so large packets are silently lost. Allow that ICMP type or clamp the TCP MSS
+- The DNS TTL is too high
+- The load balancer needs more memory
+- The file is corrupt
+why: Path MTU discovery relies on ICMP type 3 code 4. When it is blocked, the sender never learns to use smaller packets. Small packets pass, large ones vanish. Allow the message or clamp MSS on the tunnel.

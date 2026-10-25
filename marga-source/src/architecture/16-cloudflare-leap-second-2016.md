@@ -26,6 +26,12 @@ The code assumed that time never goes backward, and it used the wall clock inste
 - Cloudflare fixed the code to avoid a negative duration, and noted that Go has since added monotonic clock readings to its time package.
 - The company also described the lesson for other teams: use a monotonic clock for durations and do not assume that time is always increasing.
 
+## Lessons learned
+- Use a monotonic clock to measure durations and never assume wall time moves forward.
+- Test code with simulated clock jumps, including the leap second.
+- Treat a negative duration as a possible input and handle it without a crash.
+- Roll out fixes in stages, even in an urgent situation.
+
 ## Trade-offs to weigh
 - **Wall clock against monotonic clock.** The wall clock matches what people see. A monotonic clock never jumps, but cannot be compared across machines.
 - **Smearing against stepping.** Some operators spread a leap second over hours. That avoids a repeated second, and it makes servers disagree briefly.

@@ -27,6 +27,12 @@ A manual deployment with no check that every server matched, old code left in pr
 - The regulator ordered the firm to improve its controls on market access, and the firm was later acquired by another company.
 - The industry took away several lessons: automate deployments, verify every host after rollout, remove dead code, and never reuse a flag for a new meaning.
 
+## Lessons learned
+- Automate deployments and verify that every host runs the intended version.
+- Remove dead code and never give an old flag a new meaning.
+- Have an emergency stop and a tested rollback, and know when rolling back is unsafe.
+- Treat alerts that arrive before the event as a trigger to stop.
+
 ## Trade-offs to weigh
 - **Manual speed against automation.** A hand copy is quick for one change. It does not scale and nothing proves it worked on every host.
 - **Reusing a flag against adding a new one.** Reuse avoids a schema change, but an old binary can read it differently.

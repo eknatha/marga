@@ -81,3 +81,35 @@ Action items:
 - Delete the document to keep the team calm
 - Add more reminders to double check
 why: People will always make mistakes, so a reminder is not a control. A blameless review asks why the action was easy and the consequence large. Good action items change the system: guard rails for production contexts, confirmations, smaller blast radius, and a faster rollback, each with an owner and a date.
+
+## Alert fires but nothing is wrong
+level: mid
+An alert pages the on-call every night at 02:00 and resolves itself.
+
+```text
+Alert: DiskUsageHigh on batch-3 (> 85%)
+Pattern: fires at 02:00 during the nightly job, falls to 40% at 02:30
+Pages in last 30 days: 29, actions taken: 0
+```
+? What is the best change?
++ Remove the page. Use a forecast or a rate-based alert on time until full, or a ticket for the nightly peak, and fix the cause if the job is wasteful
+- Ask the on-call to ignore it
+- Raise the threshold to 99 percent
+- Add a second person to the rotation
+why: An alert that fires with no action is toil and trains people to ignore pages. The disk does recover, so a better signal is whether it will fill before cleanup. Review alerts regularly and delete or downgrade ones that do not need a human.
+
+## Release causes a latency regression
+level: mid
+After a release, the p99 latency doubles but errors stay at zero.
+
+```text
+SLO: 99% of requests under 800 ms over 28 days
+Before: p99 610 ms   After release v3.4: p99 1290 ms
+Error budget used this week: 62%
+```
+? What should the team do first?
++ Roll back or pause the rollout to protect the budget, then find the cause. Latency counts against the SLO even with no errors
+- Wait to see if it improves
+- Change the SLO to 99 percent under 2 seconds
+- Remove the dashboard
+why: A latency SLO is about user experience, so slow successes burn the budget. Reduce impact first by rolling back. Then bisect the changes, check dependencies and database queries, and decide through the error budget policy whether to freeze other releases.

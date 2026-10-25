@@ -26,6 +26,12 @@ A race condition in DNS automation, together with a lack of safety checks on sta
 - AWS disabled the DNS automation worldwide while it fixed the race condition and added protection.
 - It also said it would add tests, improve the throttling of work during recovery, and add checks to the network load balancer.
 
+## Lessons learned
+- Protect automation from stale work, with checks that an older plan cannot replace a newer one.
+- Add a safety check so a record can never be set to empty.
+- Throttle recovery work so dependent services do not overload each other.
+- Keep manual recovery tools for the case in which automation is the broken part.
+
 ## Trade-offs to weigh
 - **Automation against manual control.** Automation updates thousands of records safely most of the time. A bug in it can remove a record for everybody.
 - **Self-healing against manual recovery.** Self-healing helps when the failure is expected. Here the repair path itself was broken.

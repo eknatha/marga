@@ -95,3 +95,42 @@ CRON[3012]: (CRON) info (No MTA installed, discarding output)
 - Cron cannot run at 2 AM
 - The script needs a newer kernel
 why: Cron runs jobs with a minimal environment, often only /usr/bin:/bin. Your shell finds the script because of your PATH or current directory. Use absolute paths, set PATH in the crontab, and redirect output, for example >> /var/log/backup.log 2>&1, so errors are visible.
+
+## Server runs out of memory and a process vanishes
+level: mid
+A service disappears with no crash message in its own log.
+
+```text
+$ dmesg -T | grep -i "killed process"
+[Tue Oct 21 03:12:55] Out of memory: Killed process 4412 (java) total-vm:9123456kB
+$ free -m
+              total  used  free  available
+Mem:           7900  7650   120       80
+Swap:             0     0     0
+```
+? What happened?
++ The kernel OOM killer ended the largest process when memory ran out. Find the memory growth, set limits and consider swap or more RAM
+- The service was stopped by systemd normally
+- The disk filled up
+- A firewall rule killed it
+why: dmesg shows the kernel killing a process because available memory was almost zero and there was no swap. The application never got a chance to log. Check what grew, add limits, and alert on available memory before it reaches the floor.
+
+## Cannot SSH in with a key that worked yesterday
+level: mid
+Key authentication to a server now fails.
+
+```text
+$ ssh -v deploy@10.0.3.12
+debug1: Offering public key: /home/me/.ssh/id_ed25519
+debug1: Authentications that can continue: publickey
+Permission denied (publickey).
+On the server: ls -ld /home/deploy /home/deploy/.ssh
+drwxrwxrwx 5 deploy deploy /home/deploy
+drwx------ 2 deploy deploy /home/deploy/.ssh
+```
+? What is the likely cause?
++ The home directory is writable by everyone, so sshd refuses the key because of its strict permission checks. Remove the extra write permissions
+- The key has expired by age
+- The server clock is wrong
+- SSH needs port 2222
+why: With StrictModes on, sshd rejects keys when the home directory or .ssh has loose permissions. The server logs say so, for example in journalctl -u ssh. Use chmod go-w on the home directory, and 700 and 600 for .ssh and authorized_keys.

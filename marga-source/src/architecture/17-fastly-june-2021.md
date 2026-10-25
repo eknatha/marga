@@ -27,6 +27,12 @@ A latent software bug, released weeks earlier, that a valid customer setting act
 - Fastly said it would fix the bug and deploy the fix, and review its processes and test coverage.
 - It also said it would evaluate its architecture to make the service more resilient to such changes.
 
+## Lessons learned
+- Release software in stages, and also stage the data and customer configuration that exercise it.
+- Test the paths that unusual valid settings can reach.
+- Detect fast, then communicate while the fix is in progress.
+- Reduce the share of the network that a single customer setting can affect.
+
 ## Trade-offs to weigh
 - **Fast propagation of customer changes.** Customers expect changes to apply in seconds. It is also how one change reaches all points of presence.
 - **Shared platform against isolation.** A shared network lowers the cost. One customer's input can affect the others.

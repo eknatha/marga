@@ -28,6 +28,12 @@ Metadata requests had become expensive, and servers retried without enough backo
 - Storage servers were changed so that they back off and keep serving what they already know instead of giving up when an answer is late.
 - Monitoring and the procedure for recovering the metadata service were improved.
 
+## Lessons learned
+- Make clients back off after errors, because retries can turn a small fault into a large one.
+- Separate the metadata service from the data path so a metadata load spike does not stop storage.
+- Add limits that protect shared services from one busy tenant or one bad update.
+- Test capacity changes and failure at full scale, not only in small test environments.
+
 ## Trade-offs to weigh
 - **Retries against stability.** Retries hide short failures but multiply load when a dependency struggles. Backoff, jitter and budgets limit the damage.
 - **Fail closed against fail open.** A server that stops serving when it is unsure is safe for data and bad for availability. Serving the last known state is the reverse.

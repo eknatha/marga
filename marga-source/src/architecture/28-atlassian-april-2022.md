@@ -26,6 +26,12 @@ Confusing identifiers across teams, a deletion script with a permanent mode and 
 - Atlassian said it would use only soft deletion for such scripts, with a delay before permanent removal, and add checks on the scale of a deletion.
 - It also said it would test its restore at a greater scale, and improve its incident communications to customers.
 
+## Lessons learned
+- Use soft deletion with a delay for any destructive script.
+- Use unambiguous identifiers, and check the type of ID that a script receives.
+- Test the restore of many tenants at once.
+- Add a check that blocks a script that would affect too many objects.
+
 ## Trade-offs to weigh
 - **Soft delete against storage cost.** Keeping deleted data costs money and gives time to notice a mistake.
 - **Tenant by tenant restore against bulk.** A per-tenant process is safe. For hundreds of tenants it takes weeks.

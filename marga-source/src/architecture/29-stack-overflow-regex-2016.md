@@ -26,6 +26,12 @@ A regular expression with catastrophic backtracking, applied to untrusted input 
 - Stack Overflow replaced the expression with a plain string trim, and added a time limit to expression matching.
 - The team also reviewed its other patterns, and its health checks, to see how one slow request could cause the loss of many servers.
 
+## Lessons learned
+- Avoid regular expressions that can backtrack badly on user input, and limit their run time.
+- Restrict input length for text that is processed on every request.
+- Make health checks tell a slow request apart from a dead server.
+- Capture traces of slow requests to find the cause quickly.
+
 ## Trade-offs to weigh
 - **Regular expressions against plain code.** A pattern is short. Simple loops are longer but have predictable run time.
 - **Input limits against flexibility.** A length limit on posts would have helped. Users complain when valid posts are refused.

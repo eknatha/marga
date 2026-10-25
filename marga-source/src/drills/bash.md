@@ -96,3 +96,40 @@ Job for app.service ... started
 - Redirect errors to /dev/null
 - Run the script twice
 why: By default bash continues after a failed command. set -e ends the script when a command fails, -u treats an unset variable as an error, and pipefail makes a pipeline fail when any part fails. They have limits, for example inside conditions, so also check the results of the steps that matter. Silencing errors only hides the problem.
+
+## Script behaves differently under cron
+level: mid
+A script that parses JSON works in a terminal but fails in a scheduled job.
+
+```text
+$ crontab -l
+*/5 * * * * /opt/bin/check.sh
+
+$ cat /var/log/check.log
+/opt/bin/check.sh: line 7: jq: command not found
+```
+? What is the most likely cause?
++ Cron runs with a minimal PATH, so jq is not found. Use the full path to jq or set PATH at the top of the script
+- jq is not installed on any server
+- The script needs to run as root
+- The time zone is wrong
+why: Interactive shells load profiles that extend PATH. Cron does not. Set PATH explicitly in the script or crontab and use absolute paths for tools. Redirect output so such errors are visible.
+
+## Variable is empty inside a pipeline loop
+level: mid
+A counter set inside a loop is zero after the loop.
+
+```text
+count=0
+cat hosts.txt | while read h; do
+  count=$((count+1))
+done
+echo "hosts: $count"
+hosts: 0
+```
+? Why does this happen and how do you fix it?
++ The pipeline runs the loop in a subshell, so changes are lost. Read from a redirect instead: while read h; do ...; done < hosts.txt
+- Bash cannot do arithmetic
+- The file is empty
+- The variable name is reserved
+why: Each side of a pipe runs in its own subshell, so variables set there disappear when it ends. A redirect keeps the loop in the current shell. This is a common cause of counters and lists that stay empty.

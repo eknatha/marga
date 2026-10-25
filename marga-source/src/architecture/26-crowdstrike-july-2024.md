@@ -26,6 +26,12 @@ A mismatch between a content template and the sensor interpreter, with checks th
 - CrowdStrike said it would add validation and tests for the content and the interpreter, and run staged deployments, starting with a canary group.
 - It also gave customers more control over when content updates arrive, and published an analysis of the root cause.
 
+## Lessons learned
+- Validate content files with the same rigour as code, and test the interpreter with each template.
+- Deploy updates to a small group first and widen only when it is healthy.
+- Give customers control over when content arrives.
+- Plan how to recover many machines when a boot fails.
+
 ## Trade-offs to weigh
 - **Instant protection against staged rollout.** Fast delivery blocks new attacks sooner. A staged one limits the cost of a mistake.
 - **Kernel access against stability.** A kernel driver can see more, and its crash stops the entire machine.

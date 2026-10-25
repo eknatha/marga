@@ -26,6 +26,12 @@ A configuration error on one backbone router was accepted without a check that i
 - Cloudflare reviewed its backbone change procedure and added checks before configuration reaches production routers.
 - The company also said it would improve how it tests and stages network changes.
 
+## Lessons learned
+- Check backbone changes before they reach production routers, and stage them.
+- Put limits on how much traffic a single site can attract.
+- Keep traffic shifting tools simple, so engineers can drain a site fast.
+- Monitor for sudden shifts of traffic between sites.
+
 ## Trade-offs to weigh
 - **Shared backbone against isolated sites.** Sharing capacity makes the network efficient. It also lets one fault reach many sites.
 - **Fast change against staged rollout.** Network changes are often applied by hand to one device. A staged rollout is slower but limits damage.

@@ -28,6 +28,12 @@ A command with global effect passed through a faulty audit check. The design of 
 - Facebook reviewed the intersection of DNS health checks and BGP behaviour, and stress-tested failure of the backbone.
 - Out-of-band access and the process for physical access during an emergency were reviewed.
 
+## Lessons learned
+- Audit changes to backbone configuration before they apply, and test the audit tool itself.
+- Keep out-of-band access that does not depend on the network being repaired.
+- Design recovery for the case in which every system, including badge doors and chat, is down.
+- Avoid health checks that withdraw every route when the data centre cannot reach the backbone.
+
 ## Trade-offs to weigh
 - **Health-driven withdrawal.** Removing unhealthy servers from routing is good for isolated faults and harmful when every server looks unhealthy at once.
 - **Tight physical security against emergency access.** Strong controls protect hardware but delay repairs.

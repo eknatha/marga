@@ -25,6 +25,12 @@ A configuration change with a wrong ordering of rules was released to some of th
 - Cloudflare said it would stage network changes in smaller and less busy groups first.
 - It also said it would review its change process, including peer review of such changes and clearer visibility of the configuration that will be applied.
 
+## Lessons learned
+- Roll out network changes to quiet sites before busy ones, in small batches.
+- Verify the order and effect of rules with a simulator before applying them.
+- Allow time between batches to see problems.
+- Have a fast, tested way to revert a router configuration.
+
 ## Trade-offs to weigh
 - **Big batches against small ones.** Fewer, larger batches finish the migration sooner. Small batches take longer and limit the damage.
 - **Quiet sites first against busy sites first.** Quiet sites are safer to test on. They may also hide problems that only appear under load.

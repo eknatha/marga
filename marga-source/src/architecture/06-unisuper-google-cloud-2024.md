@@ -26,6 +26,12 @@ A misconfiguration on the provider side, with a deletion that cascaded to everyt
 - Google Cloud reviewed the provisioning path and added safeguards.
 - UniSuper's independent backup was the deciding factor in recovery, and its value was publicly acknowledged.
 
+## Lessons learned
+- Keep backups with a different provider or in a separate account, so one fault cannot delete both copies.
+- Test a full restore from the independent backup on a schedule.
+- Protect backups with immutability and separate credentials.
+- Ask your provider how deletion of an account or private cloud is guarded.
+
 ## Trade-offs to weigh
 - **Backups in one place against backups in another.** A second provider costs money and adds work, and protects against account-level failure, provider outages and some attacks.
 - **Convenience against separation of duties.** Putting backups under different credentials and ownership makes mistakes and attacks harder to spread.

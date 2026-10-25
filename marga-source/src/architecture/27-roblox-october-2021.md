@@ -27,6 +27,12 @@ Two independent issues, one in a feature and one in a storage engine, which only
 - Roblox said it would move to multiple availability zones and data centres, to reduce the blast radius.
 - It also planned changes to separate its monitoring from the systems it watches, and to review how it uses Consul.
 
+## Lessons learned
+- Keep monitoring independent of the services it watches.
+- Limit the scale of one cluster, and use more cells.
+- Introduce new features of a critical dependency gradually.
+- Practise a cold start with empty caches.
+
 ## Trade-offs to weigh
 - **Own hardware against public cloud.** Owning gives control and cost benefits. Scaling or replacing hardware during an incident takes days.
 - **Shared infrastructure services against separation.** A common discovery service is easy. Everything depends on it.

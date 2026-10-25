@@ -723,3 +723,33 @@ module: sre
 plain: A switch that stops calling a failing service.
 def: A pattern that stops requests to a failing dependency for a while so it can recover.
 
+
+## SBOM
+module: security
+plain: A parts list for software.
+def: A software bill of materials lists every component and version inside an artifact, so you can tell quickly whether a newly announced vulnerability affects you.
+
+## STRIDE
+module: security
+plain: A checklist of six kinds of threat.
+def: Spoofing, Tampering, Repudiation, Information disclosure, Denial of service and Elevation of privilege, used to ask what can go wrong in a design.
+
+## SAST
+module: security
+plain: Scanning source code for unsafe patterns.
+def: Static application security testing analyses code without running it and flags patterns such as injection and unsafe functions.
+
+## Software supply chain
+module: security
+plain: Everything that goes into building and delivering your software.
+def: The libraries, base images, build tools, runners and pipelines that produce an artifact. An attack on any of them can reach production.
+
+## Provenance
+module: security
+plain: A record of where an artifact came from.
+def: Signed metadata that states which source, builder and inputs produced an artifact, which lets a deployment verify it.
+
+## Network policy
+module: security
+plain: A firewall rule for pods.
+def: A Kubernetes object that controls which pods may talk to which other pods and endpoints. A default deny policy blocks all traffic until others allow it.

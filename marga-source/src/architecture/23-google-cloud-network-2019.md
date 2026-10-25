@@ -27,6 +27,12 @@ A configuration change was applied to more servers than intended, and the contro
 - Google said it would stop the automation until safeguards were added, and fix the bugs.
 - It also planned to improve the isolation of its control plane, and the tools that engineers use during an incident, so that they do not rely on the congested network.
 
+## Lessons learned
+- Check the target list of maintenance operations against a hard upper limit.
+- Isolate the control plane from the network that it manages.
+- Give operators tools that work during congestion.
+- Run bug-prone automation in stages with a clear emergency stop.
+
 ## Trade-offs to weigh
 - **Shared control plane against separate one.** Sharing is simple. A fault in the network also removes the means to repair it.
 - **Automatic maintenance against manual.** Automation scales to many servers, and a wrong target list scales as well.

@@ -84,3 +84,36 @@ Lock Info:
 - Disable locking in the backend
 - Copy the state to your laptop and apply from there
 why: The lock stops two writers from corrupting the state. It is a safety feature. Check with the person or the pipeline first. Force-unlock is for a stale lock after a crash. Never bypass locking, because a race can lose resources from state.
+
+## Plan shows changes nobody made
+level: mid
+A plan on an unchanged repository wants to modify a security group.
+
+```text
+~ aws_security_group.web
+    ~ ingress = [
+        - { cidr_blocks = ["0.0.0.0/0"], from_port = 22, to_port = 22 },
+      ]
+```
+? What most likely happened?
++ Someone changed the security group in the console, so the real state drifted from the code. Find out why before applying, because the plan would remove that rule
+- Terraform has a bug
+- The provider is too old
+- The state file is empty
+why: Drift is a difference between code and reality. Apply would put things back to what the code says. First check the change history: someone may have added a rule for a real reason, and the right fix might be a code change. Also restrict console changes.
+
+## Module change affects many environments
+level: senior
+A small change to a shared module will be used by 14 stacks.
+
+```text
+module "network" { source = "internal/network" version = "~> 2.0" }
+Change: renames variable cidr to vpc_cidr (no default)
+Consumers: 14 stacks track "~> 2.0"
+```
+? How should the change be released?
++ Treat it as a breaking change: publish a new major version, keep the old variable working or document migration, and let each stack upgrade through its own plan
+- Merge it and let the stacks fail
+- Edit every stack by hand in one go
+- Delete the old version
+why: Renaming a required input breaks every consumer on the next init. Semantic versioning tells people what is safe to take. A major version and a migration note let teams upgrade at their own pace and read the plan first.

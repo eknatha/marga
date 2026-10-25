@@ -27,6 +27,12 @@ A code path without a null check or a feature flag, a global replication that ga
 - Google froze changes to the service and said it would add error handling and modularize the architecture to fail open.
 - It also said it would add feature flags for each new check, stop global replication of metadata without staged rollout, and add randomized back-off after crashes.
 
+## Lessons learned
+- Put new features behind a flag, with a safe default and error handling.
+- Do not replicate policy data worldwide in one step.
+- Add jitter and back-off when many tasks restart together.
+- Make the checker fail open for failures that are not security decisions, where this is safe.
+
 ## Trade-offs to weigh
 - **Instant global replication against staged.** Instant gives consistent policy. A staged rollout would have limited the damage to one region.
 - **Fail open against fail closed.** If the checker fails open, requests pass without checks. If it fails closed, everything stops.

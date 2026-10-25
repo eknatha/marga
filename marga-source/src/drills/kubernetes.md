@@ -106,3 +106,41 @@ GET /healthz 404
 - The service has no selector
 - The pods need more CPU
 why: A rolling update only removes old pods when new ones report ready. Here the probe gets a 404, so the new pods never become ready and the old ones stay. This is the safety feature working. Check what changed in the release, and use kubectl rollout undo to go back if users are affected.
+
+## Service has no endpoints
+level: junior
+Requests to a Service fail, though the pods are running.
+
+```text
+$ kubectl get endpoints web -n shop
+NAME   ENDPOINTS   AGE
+web    <none>      3d
+$ kubectl get svc web -n shop -o jsonpath='{.spec.selector}'
+{"app":"web-app"}
+$ kubectl get pods -n shop --show-labels
+web-6d4c-x2   1/1  Running  app=web
+```
+? What is wrong?
++ The Service selector app=web-app does not match the pod label app=web, so no endpoints are created
+- The pods need more memory
+- The node is out of disk
+- The ingress controller is down
+why: A Service finds pods through label selectors. If they do not match, the endpoint list is empty. Fix the selector or the labels, then check that the endpoints list the pod IPs.
+
+## Pod is OOMKilled after a traffic spike
+level: mid
+A pod restarts during peak traffic with no errors in its log.
+
+```text
+$ kubectl describe pod api-5f | grep -A4 "Last State"
+Last State:  Terminated
+  Reason:    OOMKilled
+  Exit Code: 137
+Limits: memory 256Mi   Requests: memory 128Mi
+```
+? What should you do?
++ Check the real memory peak with metrics, raise the limit and request to match, and add a horizontal autoscaler if load is the cause
+- Remove all resource limits
+- Delete the node
+- Change the restart policy to Never
+why: The kernel killed the container for passing its 256 MiB limit, so the process had no chance to log. Measure peak use, set the limit with headroom, and keep requests near typical use so scheduling stays accurate.

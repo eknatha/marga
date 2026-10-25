@@ -26,6 +26,12 @@ An assumption that a query would always return the same number of rows, a hard l
 - Cloudflare said it would treat internally generated configuration files with the same care as user input.
 - It also planned global kill switches for features, a review of failure modes in the proxy modules, and limits on error reports that used up CPU.
 
+## Lessons learned
+- Treat internally generated files as untrusted input with size and shape checks.
+- Add global kill switches for features that load generated data.
+- Stage the distribution of generated files, and keep the last known good file.
+- Make error reporting cheap, so debugging does not add to the load.
+
 ## Trade-offs to weigh
 - **Fast global propagation against staged rollout.** Fast distribution reacts quickly to attacks. It also spreads a bad file quickly.
 - **Fixed limits against dynamic sizes.** Fixed buffers are fast and predictable. They fail hard when the data grows.

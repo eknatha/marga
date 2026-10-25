@@ -28,6 +28,12 @@ The rule contained a regular expression that could backtrack heavily on certain 
 - Protections that limit how much CPU any rule can use were restored and strengthened.
 - The deployment system, the kill switch and the dashboards were reviewed.
 
+## Lessons learned
+- Test patterns against worst-case input, and prefer matching engines that cannot backtrack without limit.
+- Release rule changes in stages with health checks, like any other code.
+- Keep a global kill switch that works even when the main tools are slow.
+- Make sure the people who fix the incident can still reach their tools during it.
+
 ## Trade-offs to weigh
 - **Fast protection against safe rollout.** Global releases within seconds defend customers from new attacks, but also spread a mistake just as quickly.
 - **Expressive rules against bounded cost.** Full regular expressions are powerful and can be unbounded. Engines with guaranteed time are safer and restrict some patterns.

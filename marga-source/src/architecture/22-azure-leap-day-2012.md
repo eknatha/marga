@@ -26,6 +26,12 @@ A date calculation that did not handle the leap day, and failure handling that t
 - Microsoft fixed the date handling and reviewed other code for the same kind of mistake.
 - It also changed how the platform tells software failures from hardware failures, and improved its communication about the incident.
 
+## Lessons learned
+- Handle dates carefully, including leap days, and test them with a simulated clock.
+- Do not treat a software fault as a hardware fault and retry it on other machines.
+- Add brakes that stop automatic recovery from spreading a bug.
+- Keep update paths separate from the production network or protect them with staged rollout.
+
 ## Trade-offs to weigh
 - **Automatic recovery against stopping early.** Moving a failed workload to other servers is helpful for hardware. When the cause is code, it spreads the failure.
 - **Fast patching against staged patching.** The fix was urgent and an update to running servers disrupted others.

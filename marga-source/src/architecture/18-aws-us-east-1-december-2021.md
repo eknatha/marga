@@ -26,6 +26,12 @@ A latent defect in the automation that handled scaling activity led to a surge o
 - AWS disabled the scaling activity that caused the surge, until it could be fixed.
 - It also deployed new network configurations for the devices, and said it would improve monitoring and the way the Service Health Dashboard works during events.
 
+## Lessons learned
+- Separate monitoring and operator tools from the network that they watch.
+- Limit retries and add jitter, so clients do not sustain a surge.
+- Put limits on automated scaling activity, and test it at scale.
+- Make status communication work when the usual systems are degraded.
+
 ## Trade-offs to weigh
 - **Shared internal network against separate monitoring.** A shared network is simpler. When it is congested, you lose both service and view.
 - **Aggressive retry against back-off.** Retries help in short faults. In congestion they keep the surge alive.

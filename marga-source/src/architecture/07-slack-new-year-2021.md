@@ -27,6 +27,12 @@ A network limit was reached on a day with a known traffic pattern, and signals u
 - Slack changed autoscaling so it does not scale in when signs point to network trouble, and increased headroom for provisioning.
 - More load testing and monitoring of the network were added.
 
+## Lessons learned
+- Load test for the return from a quiet period, such as the first working day after a holiday.
+- Scale infrastructure, including network capacity, before the peak and watch the limits of cloud components.
+- Keep dependencies of the monitoring system as small as possible.
+- Practise autoscaling limits and recovery with the actual traffic pattern.
+
 ## Trade-offs to weigh
 - **Autoscaling against pre-provisioning.** Autoscaling saves money in quiet times. For known peaks, scaling ahead is more predictable.
 - **Single metric against several signals.** CPU is easy but can be misleading. Request latency, queue depth and network drops describe the user's experience better.

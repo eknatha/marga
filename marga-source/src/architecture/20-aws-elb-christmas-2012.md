@@ -26,6 +26,12 @@ A person had access to production data without a safeguard for destructive actio
 - AWS made changes so that access to production data requires a specific approval each time.
 - The company also changed its recovery tooling, to restore state faster, and improved its detection of the issue.
 
+## Lessons learned
+- Make destructive operations on production data need a specific approval.
+- Keep a tested, quick way to restore state to a point in time.
+- Separate people who run maintenance from the data paths where a mistake is worst.
+- Tell customers early, particularly on busy days.
+
 ## Trade-offs to weigh
 - **Operator access against safety.** Operators need access to fix things. A change request makes careless actions less likely and slows emergency work.
 - **Snapshots against live replication.** A replica copies a mistaken delete. A snapshot lets you go back, at the cost of data newer than the snapshot.

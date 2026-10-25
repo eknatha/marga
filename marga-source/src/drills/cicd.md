@@ -84,3 +84,39 @@ A reviewer finds an API token in the output of a pipeline job.
 - Make the repository private and keep the token
 - Shorten the retention of the logs only
 why: Anyone who could read the log may have copied the token, so it must be treated as exposed. Rotate first. Then fix the cause: shell tracing printed the command, and an echo printed the value. Use the masking feature of the CI system, keep secrets out of the command line where possible, and give each token the smallest scope.
+
+## Pipeline is slow and getting slower
+level: mid
+Builds took 6 minutes last quarter. They now take 28.
+
+```text
+Stage            Duration
+checkout         0:20
+install deps     9:40   (no cache hit)
+unit tests       11:10  (single worker)
+build image      4:30
+deploy           2:20
+```
+? Which change is likely to help most?
++ Cache dependencies by lock file hash and split the tests across parallel workers
+- Remove the unit tests
+- Add a second deploy stage
+- Run the pipeline less often
+why: Two stages account for most of the time. A dependency cache keyed on the lock file avoids the download, and parallel workers cut the test stage. Removing tests trades speed for risk. Measure each stage after the change.
+
+## Deploy job applied to the wrong environment
+level: senior
+A change meant for staging was released to production.
+
+```text
+deploy:
+  script: kubectl apply -f k8s/ 
+  variables: { KUBECONFIG: $PROD_KUBECONFIG }
+  rules: [ { if: $CI_COMMIT_BRANCH } ]
+```
+? What went wrong and how would you prevent it?
++ The job runs for every branch with the production credential. Restrict it to the protected release branch, use separate environments with approvals, and give staging jobs only staging credentials
+- Rename the variable
+- Ask developers to be careful
+- Use a longer timeout
+why: Any branch could deploy to production because the rule has no limits and the credential was available to every job. Protected environments, branch rules and per-environment credentials make the safe path the default.

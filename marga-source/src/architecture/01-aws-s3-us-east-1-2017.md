@@ -29,6 +29,12 @@ A tool allowed capacity to be removed too quickly and without a minimum. Combine
 - The Service Health Dashboard was changed so that it no longer depended on S3 in a single region.
 - AWS audited other tools that remove or restart capacity.
 
+## Lessons learned
+- Limit how fast and how far a tool can remove capacity, and block removals below a safe minimum.
+- Rehearse the full restart of big systems, because recovery that was never tested is slower than expected.
+- Split large pools into cells so that one mistake and one restart stay small.
+- Keep status and communication tools independent of the service they report on.
+
 ## Trade-offs to weigh
 - **Speed against safety.** Removing capacity quickly helps in an emergency, but it is also how a typo becomes an outage. A rate limit makes routine work slower.
 - **Big pools against cells.** One large pool is simpler and uses capacity efficiently. Many cells shrink the damage of one mistake, but add routing, deployment work and spare capacity in every cell.

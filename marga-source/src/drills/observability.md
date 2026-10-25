@@ -83,3 +83,37 @@ Active series: 1.2M before, 38M after
 - The server needs a faster disk only
 - Counters must be changed to gauges
 why: Each unique combination of label values is a separate time series that costs memory. Unbounded values such as user IDs make the count grow without limit. Label by the route pattern (for example /users/:id), status class and method, and put the detail into logs or traces where it is searchable.
+
+## Dashboard shows healthy but users complain
+level: mid
+The average latency graph is flat, yet users report slow pages.
+
+```text
+Dashboard: avg latency 180 ms (flat)
+Histogram: p50 90 ms, p95 400 ms, p99 6200 ms
+Share of requests above 5 s: 1.8%
+```
+? What is the lesson?
++ Averages hide slow tails. Alert and report on percentiles such as p95 and p99, and on the share of requests that miss the objective
+- Users are mistaken
+- Latency must be measured in seconds only
+- The graph is correct, so no action is needed
+why: A small share of very slow requests barely moves the mean, but it is the experience of real users. Percentiles from histograms show the tail. Tie alerts to an SLO such as 99 percent of requests under one second.
+
+## Logs are missing during an incident
+level: mid
+The team cannot find the logs for a failing pod after it restarted.
+
+```text
+$ kubectl logs api-7c9 -n shop
+Error from server (BadRequest): container "api" is waiting to start
+$ kubectl logs api-7c9 -n shop --previous
+unable to retrieve container logs for containerd://3f2a...
+Node: ip-10-0-4-22 (replaced by autoscaler 40 minutes ago)
+```
+? What should the team put in place?
++ Ship logs off the node to a central store as they are written, so they outlive pods and nodes
+- Keep nodes forever
+- Log less
+- Check logs by SSH only
+why: Local container logs go away with the pod or node. A log agent that streams to central storage keeps them searchable during and after an incident. Add retention and access control, and index fields such as trace ID to find related events.

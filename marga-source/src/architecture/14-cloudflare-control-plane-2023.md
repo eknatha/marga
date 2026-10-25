@@ -26,6 +26,12 @@ The failover design had not been tested as a whole, and some services depended o
 - Cloudflare said it would remove the dependencies on the main site, so that the standby could carry the load.
 - It also set out regular full failover tests, and reviewed which services were critical and needed high availability.
 
+## Lessons learned
+- Test a complete failover of the control plane with the main site off.
+- Find hidden dependencies on the main data centre and remove them.
+- Keep customer traffic independent of the control plane, as this event showed.
+- Order and document the start-up of services from cold.
+
 ## Trade-offs to weigh
 - **Separate data plane and control plane.** This kept customer traffic flowing. The price is two systems with different availability goals.
 - **Testing a failover against its risk.** A full test can cause an outage. Not testing makes a worse outage nearly certain.

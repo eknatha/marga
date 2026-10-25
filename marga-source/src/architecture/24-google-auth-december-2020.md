@@ -26,6 +26,12 @@ A migration left an important service with a usage figure of zero, and the quota
 - Google fixed the migration, and added safeguards against a drastic cut in quota.
 - It said it would also improve its monitoring, and check the alerts and the tools that engineers rely on during such events.
 
+## Lessons learned
+- Treat quota cuts as dangerous changes and add a floor and a delay.
+- Register all usage in a migration, and compare old and new figures before switching.
+- Alert on authentication errors at once, because they spread to everything.
+- Practise recovery of the sign-in service on its own.
+
 ## Trade-offs to weigh
 - **Automatic quota against manual quota.** Automation avoids waste. It will also act on wrong data at full speed.
 - **Hard stop against graceful decline.** A quota that blocks writes stops abuse. A gradual limit would have given warning.
