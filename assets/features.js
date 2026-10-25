@@ -105,11 +105,11 @@ window.MargaFeatures = function (A) {
   function resolve(it) {
     if (it.k === 'q') {
       var p = it.r.split('#'), l = A.LES[p[0]], q = l && l.quiz[Number(p[1])];
-      return q ? { kind: 'q', title: q.q, from: l.title, opts: q.options.map(function (o, i) { return { t: o, ok: i === q.answer }; }), why: q.why, href: A.hrefLesson(p[0]) } : null;
+      return q ? { kind: 'q', stage: A.MOD[l.module].title, title: q.q, from: l.title, opts: q.options.map(function (o, i) { return { t: o, ok: i === q.answer, x: (q.ox || [])[i] || '' }; }), why: q.why, href: A.hrefLesson(p[0]) } : null;
     }
     if (it.k === 'd') {
       var d = (D.drills || []).filter(function (x) { return x.id === it.r; })[0];
-      return d ? { kind: 'd', title: d.q, from: d.title, story: d.story, evidence: d.evidence, opts: d.options.map(function (o) { return { t: o.t, ok: !!o.ok }; }), why: d.why, href: '#/drills/' + d.module } : null;
+      return d ? { kind: 'd', stage: A.MOD[d.module] ? A.MOD[d.module].title : '', title: d.q, from: d.title, story: d.story, evidence: d.evidence, opts: d.options.map(function (o) { return { t: o.t, ok: !!o.ok }; }), why: d.why, href: '#/drills/' + d.module } : null;
     }
     if (it.k === 'c') {
       var c = it.r.split('#'), ls = A.LES[c[0]], cd = ls && ls.cards[Number(c[1])];
@@ -143,11 +143,15 @@ window.MargaFeatures = function (A) {
   });
   function weakAsk() {
     var root = $('#weak-root'); if (!root) return;
+    if (WS.pos >= WS.list.length && WS.mode === 'mix') {
+      root.innerHTML = '<div class="result pass"><h3>Mixed practice finished</h3><p>' + WS.cleared + ' of ' + WS.list.length + ' right. ' + (WS.again ? 'The ones you missed are now on your <a href="#/weak">weak-spot list</a>.' : 'Nothing to add to your weak-spot list.') + '</p><div class="actions"><button type="button" class="btn btn-primary" data-act="mix-start">Another mix</button><a class="btn btn-quiet" href="#/practice">Back to practice</a></div></div>';
+      return;
+    }
     if (WS.pos >= WS.list.length) {
       root.innerHTML = '<div class="result pass"><h3>Review finished</h3><p>' + WS.cleared + ' cleared, ' + WS.again + ' still weak. ' + (WS.again ? 'They stay on the list for next time.' : 'Nice work.') + '</p><div class="actions"><a class="btn btn-primary" href="#/weak">Check the list</a><a class="btn btn-quiet" href="#/practice">Back to practice</a></div></div>';
       return;
     }
-    var it = WS.list[WS.pos], head = '<div class="qprog" aria-hidden="true"><i style="width:' + (WS.pos / WS.list.length * 100) + '%"></i></div><p class="qcount">' + KIND[it.k] + ' ' + (WS.pos + 1) + ' of ' + WS.list.length + ' <span class="small">from ' + e(it.from) + '</span></p>';
+    var it = WS.list[WS.pos], head = '<div class="qprog" aria-hidden="true"><i style="width:' + (WS.pos / WS.list.length * 100) + '%"></i></div><p class="qcount">' + KIND[it.k] + ' ' + (WS.pos + 1) + ' of ' + WS.list.length + ' <span class="small">' + (it.stage ? e(it.stage) + ': ' : 'from ') + e(it.from) + '</span></p>';
     if (it.k === 'c') {
       root.innerHTML = head + '<button type="button" class="card" id="wcard"><span class="side">Question</span><span class="txt">' + e(it.title) + '</span><span class="hint">Select to show the answer</span></button>' +
         '<div class="rate" id="wrate" hidden><button class="btn btn-quiet" type="button" data-act="weak-card" data-r="again">Again</button><button class="btn btn-primary" type="button" data-act="weak-card" data-r="good">Got it</button></div>';
@@ -156,7 +160,7 @@ window.MargaFeatures = function (A) {
     }
     var opts = A.shuffle(it.opts);
     root.innerHTML = head + (it.story ? '<p>' + e(it.story) + '</p>' : '') + (it.evidence ? '<pre class="evidence" tabindex="0"><code>' + e(it.evidence) + '</code></pre>' : '') + '<h3 class="qtext">' + e(it.title) + '</h3>' +
-      '<div class="opts" role="group" aria-label="Answer choices">' + opts.map(function (o, i) { return '<button type="button" class="opt" data-act="weak-pick" data-ok="' + (o.ok ? '1' : '0') + '"><span class="key">' + String.fromCharCode(65 + i) + '</span><span>' + e(o.t) + '</span></button>'; }).join('') + '</div><div class="feedback" id="wfb" aria-live="polite"></div>';
+      '<div class="opts" role="group" aria-label="Answer choices">' + opts.map(function (o, i) { return '<button type="button" class="opt" data-act="weak-pick" data-ok="' + (o.ok ? '1' : '0') + '" data-x="' + e(o.x || '') + '"><span class="key">' + String.fromCharCode(65 + i) + '</span><span>' + e(o.t) + '</span></button>'; }).join('') + '</div><div class="feedback" id="wfb" aria-live="polite"></div>';
   }
   function weakDone(ok) {
     var it = WS.list[WS.pos];
@@ -170,9 +174,193 @@ window.MargaFeatures = function (A) {
     var root = $('#weak-root'), ok = b.getAttribute('data-ok') === '1', it = WS.list[WS.pos];
     $$('.opt', root).forEach(function (x) { x.disabled = true; if (x.getAttribute('data-ok') === '1') x.classList.add('right'); });
     if (!ok) b.classList.add('wrong');
-    $('#wfb').innerHTML = '<p class="' + (ok ? 'ok' : 'bad') + '"><strong>' + (ok ? 'Correct. Removed from your list.' : 'Not quite. It stays on your list.') + '</strong> ' + e(it.why) + '</p><button class="btn btn-primary" type="button" id="wnext">' + (WS.pos === WS.list.length - 1 ? 'Finish' : 'Next') + '</button>';
+    var cx = b.getAttribute('data-x');
+    $('#wfb').innerHTML = '<p class="' + (ok ? 'ok' : 'bad') + '"><strong>' + (ok ? (WS.mode === 'mix' ? 'Correct.' : 'Correct. Removed from your list.') : (WS.mode === 'mix' ? 'Not quite. Added to your weak-spot list.' : 'Not quite. It stays on your list.')) + '</strong> ' + e(it.why) + '</p>' + (!ok ? '<p class="wrong-pick"><strong>You chose:</strong> ' + e(b.querySelector('span:last-child').textContent) + (cx ? '. ' + e(cx) : '') + '</p><p class="wrong-right"><strong>The correct answer:</strong> ' + e($('.opt[data-ok="1"]', root).querySelector('span:last-child').textContent) + '</p>' : '') + '<button class="btn btn-primary" type="button" id="wnext">' + (WS.pos === WS.list.length - 1 ? 'Finish' : 'Next') + '</button>';
     var nb = $('#wnext'); nb.focus(); nb.addEventListener('click', function () { weakDone(ok); });
   });
+
+
+  /* ---------------------------------------------------------- interleaved practice: a mix from many stages */
+  function mixPool() {
+    var ids = Object.keys(A.LES).filter(function (id) { return A.isDone(id); }), fallback = ids.length < 3;
+    if (fallback) ids = Object.keys(A.LES);
+    var by = {};
+    ids.forEach(function (id) {
+      var l = A.LES[id];
+      l.quiz.forEach(function (q, qi) { (by[l.module] = by[l.module] || []).push({ k: 'q', r: id + '#' + qi }); });
+    });
+    (D.drills || []).forEach(function (d) { if (fallback || by[d.module]) (by[d.module] = by[d.module] || []).push({ k: 'd', r: d.id }); });
+    return { by: by, fallback: fallback };
+  }
+  function mixPick(n) {
+    var pool = mixPool(), mods = A.shuffle(Object.keys(pool.by)), lists = {}, out = [];
+    mods.forEach(function (m) { lists[m] = A.shuffle(pool.by[m].slice()); });
+    var i = 0, guard = 0;
+    while (out.length < n && guard++ < 500 && mods.length) {
+      var m = mods[i % mods.length], it = lists[m].shift();
+      if (it) { var r = resolve(it); if (r) { r.k = it.k; r.rk = it.r; r.n = 0; out.push(r); } }
+      if (!lists[m].length) { mods.splice(i % mods.length, 1); if (!mods.length) break; continue; }
+      i++;
+    }
+    return out;
+  }
+  A.addRoute(/^\/mix$/, function () {
+    view.title = 'Mixed practice | MARGA by EknathaLabs'; view.nav = 'practice';
+    var pool = mixPool(), n = 0; Object.keys(pool.by).forEach(function (m) { n += pool.by[m].length; });
+    view.html = '<section class="page-head wrap"><h1>Mixed practice</h1><p class="lede">Questions from different stages in a shuffled order. Mixing topics feels harder than studying one at a time, and it helps you remember more.</p></section>' +
+      '<div class="wrap narrow" id="weak-root"><p>' + n + ' questions and drills from ' + Object.keys(pool.by).length + ' stages' + (pool.fallback ? ' (pass a few lessons and the mix will use only what you have studied)' : ', taken from the lessons you passed') + '.</p>' +
+      '<div class="actions"><button type="button" class="btn btn-primary" data-act="mix-start">Start a mix of 12</button></div></div>';
+    view.after = null;
+  });
+  A.onAct('mix-start', function () {
+    WS = { list: mixPick(12), pos: 0, cleared: 0, again: 0, mode: 'mix' };
+    if (!WS.list.length) { A.toast('No questions available yet.'); return; }
+    weakAsk();
+  });
+
+
+
+  /* ---------------------------------------------------------- capstone projects: guided builds with step checklists */
+  function capBag() { var st = A.state(); if (!st.cap || typeof st.cap !== 'object' || Array.isArray(st.cap)) st.cap = {}; return st.cap; }
+  function capList() { return (A.D && A.D.capstones) || []; }
+  function capDone(c) { var b = capBag()[c.id] || {}, n = 0; for (var i = 0; i < c.steps.length; i++) if (b['s' + i]) n++; return n; }
+  function capCheckDone(c) { var b = capBag()[c.id] || {}, n = 0; for (var i = 0; i < c.check.length; i++) if (b['c' + i]) n++; return n; }
+  function capFinished(c) { return capDone(c) === c.steps.length && capCheckDone(c) === c.check.length; }
+  function inl(t) { return esc(t).replace(/`([^`]+)`/g, '<code>$1</code>'); }
+  var PATH_NAMES = { devops: 'DevOps Engineer', cloud: 'Cloud Engineer', sre: 'Site Reliability Engineer', devsecops: 'DevSecOps Engineer' };
+  function capCard(c) {
+    var d = capDone(c), t = c.steps.length, fin = capFinished(c);
+    return '<article class="row cap-card"><div class="row-main"><h3><a href="#/capstone/' + esc(c.id) + '">' + esc(c.title) + '</a></h3><p>' + esc(c.summary) + '</p>' +
+      '<p class="small">' + esc(c.level) + ' &middot; about ' + c.hours + ' hours &middot; ' + esc(c.modules.join(', ')) + '</p></div>' +
+      '<div class="row-side"><span class="chip' + (fin ? ' pass' : '') + '">' + (fin ? 'Finished' : d + ' of ' + t + ' steps') + '</span></div></article>';
+  }
+  function capCount() { var l = capList(), f = 0; l.forEach(function (c) { if (capFinished(c)) f++; }); return f + ' of ' + l.length + ' finished'; }
+  function pathCaps(pid) {
+    var l = capList().filter(function (c) { return c.path === pid; });
+    if (!l.length) return '';
+    return '<h2 class="sub-h">Capstone projects</h2><p class="lede-s">Four guided builds that put this path together. Tick off each step as you go.</p><div class="cap-cards">' + l.map(capCard).join('') + '</div>';
+  }
+  A.addRoute(/^\/capstones$/, function () {
+    view.title = 'Capstone projects | MARGA by EknathaLabs'; view.nav = 'practice';
+    var l = capList();
+    view.html = '<section class="page-head wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="#/practice">Practice</a></nav><h1>Capstone projects</h1><p class="lede">Each path ends with four guided builds. You make something real, check it against a list, and keep it as proof of what you can do. ' + capCount() + '.</p></section>' +
+      '<div class="wrap">' + Object.keys(PATH_NAMES).map(function (pid) {
+        var items = l.filter(function (c) { return c.path === pid; });
+        return '<h2 class="sub-h" id="cap-' + pid + '">' + esc(PATH_NAMES[pid]) + ' path</h2><div class="cap-cards">' + items.map(capCard).join('') + '</div>';
+      }).join('') + '</div>';
+    view.after = null;
+  });
+  A.addRoute(/^\/capstone\/([\w-]+)$/, function (cid) {
+    var c = capList().filter(function (x) { return x.id === cid; })[0];
+    if (!c) { view.title = 'Not found | MARGA'; view.nav = 'practice'; view.html = '<section class="page-head wrap"><h1>Capstone not found</h1><p><a href="#/capstones">See all capstone projects</a></p></section>'; view.after = null; return; }
+    var b = capBag()[c.id] || {};
+    function box(k, text, i) { return '<li><label class="cap-step"><input type="checkbox" data-act="cap-tick" data-id="' + esc(c.id) + '" data-k="' + k + i + '"' + (b[k + i] ? ' checked' : '') + '> <span>' + inl(text) + '</span></label></li>'; }
+    view.title = c.title + ' | Capstone | MARGA by EknathaLabs'; view.nav = 'practice';
+    view.html = '<section class="page-head wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="#/capstones">Capstone projects</a></nav><h1>' + esc(c.title) + '</h1><p class="lede">' + esc(c.summary) + '</p>' +
+      '<dl class="facts"><div><dt>Path</dt><dd>' + esc(PATH_NAMES[c.path] || c.path) + '</dd></div><div><dt>Level</dt><dd>' + esc(c.level) + '</dd></div><div><dt>Time</dt><dd>About ' + c.hours + ' hours</dd></div><div><dt>Progress</dt><dd id="cap-prog"></dd></div></dl></section>' +
+      '<div class="wrap narrow prose cap-body"><h2>Goal</h2><p>' + inl(c.goal) + '</p><h2>What you will build</h2><p>' + inl(c.build) + '</p>' +
+      '<h2>Related stages</h2><p>' + c.modules.map(function (mid) { var mm = A.MOD[mid]; return mm ? '<a href="#/module/' + esc(mid) + '">' + esc(mm.title) + '</a>' : esc(mid); }).join(', ') + '</p>' +
+      '<h2>Steps</h2><ol class="cap-list">' + c.steps.map(function (t, i) { return box('s', t, i); }).join('') + '</ol>' +
+      '<h2>Self-check</h2><p>You are done when every line is true.</p><ul class="cap-list">' + c.check.map(function (t, i) { return box('c', t, i); }).join('') + '</ul>' +
+      '<h2>Stretch goal</h2><p>' + inl(c.stretch) + '</p>' +
+      '<p class="small">Your ticks are saved only in this browser. Work in a test account or a local cluster, and delete what you create so nothing keeps billing.</p></div>';
+    view.after = function () { capPaint(c); };
+  });
+  window.MargaFeatures.capCount = capCount;
+  window.MargaFeatures.pathCaps = pathCaps;
+  function capPaint(c) {
+    var el = $('#cap-prog'); if (!el) return;
+    var d = capDone(c), k = capCheckDone(c);
+    el.textContent = d + ' of ' + c.steps.length + ' steps, ' + k + ' of ' + c.check.length + ' checks' + (capFinished(c) ? ' (finished)' : '');
+  }
+  A.onAct('cap-tick', function (el) {
+    var id = el.getAttribute('data-id'), k = el.getAttribute('data-k'), bag = capBag();
+    var b = bag[id] || (bag[id] = {});
+    if (el.checked) b[k] = 1; else delete b[k];
+    var c = capList().filter(function (x) { return x.id === id; })[0];
+    if (c) capPaint(c);
+    A.markActive(); A.save(); A.renderChrome();
+  });
+
+  /* ---------------------------------------------------------- playground learning aids: worked-example fading and a hint ladder */
+  var CFG = [
+    { sel: '#lab-ex', code: '#lab-code', res: '#lab-res', anchor: '#lab-hintbox', lang: function () { var l = $('.lab'); return l ? l.getAttribute('data-lang') : ''; } },
+    { sel: '#yx-ex', code: '#yp-in', res: '#yx-res', anchor: '#yx-hintbox', lang: function () { return 'yaml'; } },
+    { sel: '#py-ex', code: '#py-code', res: '#py-res', anchor: '#py-hintbox', lang: function () { return 'python'; } }
+  ];
+  var AID = { cfg: null, fails: 0, rung: 0, id: '' };
+  function exList(lang) { return lang === 'python' ? (window.MARGA_PY_EX || (D.labs || {}).python || []) : ((D.labs || {})[lang] || []); }
+  function curEx() {
+    if (!AID.cfg) return null; var sel = $(AID.cfg.sel); if (!sel || sel.value === 'free') return null;
+    var l = exList(AID.cfg.lang()); for (var i = 0; i < l.length; i++) if (l[i].id === sel.value) return l[i]; return null;
+  }
+  function comment(lang) { return lang === 'go' ? '// ' : lang === 'sql' ? '-- ' : '# '; }
+  function halfOf(x, lang) {
+    var sol = x.sol.replace(/\n+$/, '');
+    if (lang === 'sql') { var w = sol.split(/\s+/), k = Math.max(2, Math.ceil(w.length / 2)); return w.slice(0, k).join(' ') + '\n' + comment(lang) + 'your turn: finish the query\n'; }
+    var ln = sol.split('\n'), keep = ln.length <= 2 ? 1 : Math.max(2, Math.ceil(ln.length / 2));
+    return ln.slice(0, keep).join('\n') + '\n' + comment(lang) + 'your turn: finish this\n';
+  }
+  function solvedCount(lang) {
+    var st = A.state(); if (lang === 'python') return Object.keys(st.py || {}).length;
+    var m = st.lab || {}; return Object.keys(m).filter(function (k) { return k.indexOf(lang + ':') === 0; }).length;
+  }
+  function setCode(txt) { var ed = $(AID.cfg.code); if (!ed) return; ed.value = txt; ed.dispatchEvent(new Event('input')); }
+  function aidsPaint() {
+    var box = $('#aids'); if (!box || !AID.cfg) return;
+    var x = curEx(); box.hidden = !x; if (!x) return;
+    var lang = AID.cfg.lang(), n = solvedCount(lang), sug = n < 3 ? 'study' : n < 8 ? 'finish' : 'blank';
+    $$('.seg-b', box).forEach(function (b) { b.classList.toggle('suggest', b.getAttribute('data-lv') === sug); });
+    $('#aids-suggest').textContent = 'Suggested for you: ' + ({ study: 'study the answer first', finish: 'finish a half-solved one', blank: 'start from a blank file' }[sug]) + ' (you have solved ' + n + ').';
+    if (AID.id !== x.id) { AID.id = x.id; AID.fails = 0; AID.rung = 0; $('#aids-steps').innerHTML = ''; }
+    aidsNextBtn();
+  }
+  function aidsNextBtn() {
+    var b = $('#aids-next'); if (!b) return;
+    var t = ['Show hint 1: the exercise hint', 'Show hint 2: what failed', 'Show hint 3: a partial solution', 'Show hint 4: the full solution'];
+    b.hidden = AID.rung >= 4; b.textContent = t[AID.rung] || '';
+    var need = AID.rung === 2 ? 2 : AID.rung === 3 ? 3 : 0;
+    $('#aids-gate').textContent = need && AID.fails < need ? 'Unlocks after ' + need + ' failed checks. You have ' + AID.fails + '.' : '';
+    b.disabled = !!(need && AID.fails < need);
+  }
+  function firstFail() {
+    var r = $(AID.cfg.res), f = r && $('.drill-res.no', r); if (!f) return '';
+    var df = f.getAttribute('data-fail'); if (df) return 'The first test that failed is: ' + df;
+    var li = $('li', f); if (li) return li.textContent;
+    return f.textContent.replace(/^\s*(Not yet\.|Error\.)\s*/, '').trim();
+  }
+  A.onAct('aids-level', function (b) {
+    var x = curEx(); if (!x) return; var lv = b.getAttribute('data-lv'), lang = AID.cfg.lang();
+    $$('#aids .seg-b').forEach(function (y) { y.setAttribute('aria-pressed', String(y === b)); });
+    setCode(lv === 'study' ? x.sol : lv === 'finish' ? halfOf(x, lang) : x.start);
+    $('#aids-note').textContent = lv === 'study' ? 'The full answer is in the editor. Read it, say what each part does, then try Finish it.' : lv === 'finish' ? 'The first half is written. Complete the rest and press Check.' : 'You are on your own now. Use the hint ladder if you get stuck.';
+  });
+  A.onAct('aids-next', function () {
+    var x = curEx(); if (!x) return; var ol = $('#aids-steps'), html = '', lang = AID.cfg.lang();
+    if (AID.rung === 0) html = '<strong>Hint 1.</strong> ' + e(x.hint || 'Re-read the task and the first line of your code.');
+    else if (AID.rung === 1) { var f = firstFail(); html = '<strong>Hint 2.</strong> ' + (f ? 'Look at this first: ' + e(f) : 'Press Check first. This step then points at the first thing that failed.'); }
+    else if (AID.rung === 2) html = '<strong>Hint 3.</strong> A partial solution. Complete the rest yourself:<pre class="evidence"><code>' + e(halfOf(x, lang)) + '</code></pre>';
+    else html = '<strong>Hint 4.</strong> The full solution:<pre class="evidence"><code>' + e(x.sol) + '</code></pre>';
+    ol.insertAdjacentHTML('beforeend', '<li>' + html + '</li>'); AID.rung++; aidsNextBtn();
+  });
+  function aidsInit() {
+    var cfg = null; CFG.forEach(function (c) { if (!cfg && $(c.sel)) cfg = c; });
+    if (!cfg) { AID.cfg = null; return; }
+    AID.cfg = cfg;
+    if (!$('#aids')) {
+      var anchor = $(cfg.anchor); if (!anchor) return;
+      anchor.insertAdjacentHTML('afterend', '<div class="aids" id="aids" hidden><p class="aids-h"><strong>Support level</strong> <span id="aids-suggest" class="small"></span></p>' +
+        '<div class="seg" role="group" aria-label="Support level"><button type="button" class="seg-b" data-act="aids-level" data-lv="study" aria-pressed="false">Study the answer</button><button type="button" class="seg-b" data-act="aids-level" data-lv="finish" aria-pressed="false">Finish it</button><button type="button" class="seg-b" data-act="aids-level" data-lv="blank" aria-pressed="false">Start blank</button></div>' +
+        '<p class="small" id="aids-note" aria-live="polite"></p><div class="aids-ladder"><p class="aids-h"><strong>Stuck?</strong> <span class="small">Hints come one step at a time.</span></p><ol id="aids-steps"></ol><button type="button" class="btn btn-quiet" id="aids-next" data-act="aids-next">Show the first hint</button> <span class="small" id="aids-gate"></span></div></div>');
+      var res = $(cfg.res);
+      if (res && window.MutationObserver) new MutationObserver(function () {
+        if (!$('.drill-res.no', res)) return;
+        AID.fails++; aidsNextBtn();
+      }).observe(res, { childList: true, subtree: true });
+    }
+    aidsPaint();
+  }
+  document.addEventListener('change', function (ev) { if (ev.target && /^(lab-ex|yx-ex|py-ex)$/.test(ev.target.id)) { setTimeout(aidsPaint, 0); } });
 
   /* ---------------------------------------------------------- lesson next-step panel */
   var PLAY = { python: 'python', bash: 'python', linux: 'python', terraform: 'hcl', cloud: 'hcl', kubernetes: 'yaml', docker: 'yaml', cicd: 'yaml', security: 'yaml', sre: 'sql', observability: 'sql' };
@@ -209,6 +397,7 @@ window.MargaFeatures = function (A) {
   }
 
   A.afterRoute(function () {
+    aidsInit();
     nextPanel();
     syncRead();
     if (!/^#\/daily\/?$/.test(location.hash) || $('#daily-bonus')) return;
