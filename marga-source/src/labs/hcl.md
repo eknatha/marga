@@ -765,3 +765,480 @@ resource "aws_instance" "web" {
 match resource.aws_instance.web.user_data #!/bin/bash
 match resource.aws_instance.web.user_data dnf install -y nginx
 eq resource.aws_instance.web.user_data_replace_on_change true
+
+## An S3 bucket with versioning
+id: s3version
+task: Create an aws_s3_bucket named logs with bucket "acme-logs-prod". Add an aws_s3_bucket_versioning named logs that references the bucket id and sets versioning_configuration status to "Enabled".
+hint: Reference the bucket as aws_s3_bucket.logs.id. The versioning_configuration block has a status argument.
+@@ start
+# Write your configuration here
+@@ sol
+resource "aws_s3_bucket" "logs" {
+  bucket = "acme-logs-prod"
+}
+
+resource "aws_s3_bucket_versioning" "logs" {
+  bucket = aws_s3_bucket.logs.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+@@ checks
+eq resource.aws_s3_bucket.logs.bucket acme-logs-prod
+match resource.aws_s3_bucket_versioning.logs.bucket aws_s3_bucket\.logs\.id
+eq resource.aws_s3_bucket_versioning.logs.versioning_configuration.status Enabled
+
+## Block public access on a bucket
+id: s3public
+task: Add an aws_s3_bucket_public_access_block named logs for the bucket aws_s3_bucket.logs.id. Turn on all four settings: block_public_acls, block_public_policy, ignore_public_acls and restrict_public_buckets.
+hint: All four are boolean arguments. Set each to true.
+@@ start
+resource "aws_s3_bucket" "logs" {
+  bucket = "acme-logs-prod"
+}
+@@ sol
+resource "aws_s3_bucket" "logs" {
+  bucket = "acme-logs-prod"
+}
+
+resource "aws_s3_bucket_public_access_block" "logs" {
+  bucket                  = aws_s3_bucket.logs.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+@@ checks
+match resource.aws_s3_bucket_public_access_block.logs.bucket aws_s3_bucket\.logs\.id
+eq resource.aws_s3_bucket_public_access_block.logs.block_public_acls true
+eq resource.aws_s3_bucket_public_access_block.logs.block_public_policy true
+eq resource.aws_s3_bucket_public_access_block.logs.ignore_public_acls true
+eq resource.aws_s3_bucket_public_access_block.logs.restrict_public_buckets true
+
+## An IAM role for EC2
+id: iamrole
+task: Create an aws_iam_role named app with name "app-role" and an assume_role_policy written with jsonencode that lets the service ec2.amazonaws.com assume it (action sts:AssumeRole, effect Allow).
+hint: jsonencode takes an object. The principal is { Service = "ec2.amazonaws.com" }.
+@@ start
+# Write your configuration here
+@@ sol
+resource "aws_iam_role" "app" {
+  name = "app-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Action    = "sts:AssumeRole"
+      Principal = { Service = "ec2.amazonaws.com" }
+    }]
+  })
+}
+@@ checks
+eq resource.aws_iam_role.app.name app-role
+match resource.aws_iam_role.app.assume_role_policy jsonencode
+match resource.aws_iam_role.app.assume_role_policy sts:AssumeRole
+match resource.aws_iam_role.app.assume_role_policy ec2\.amazonaws\.com
+
+## A launch template
+id: launchtpl
+task: Create an aws_launch_template named web with name_prefix "web-", image_id "ami-0abc1234", instance_type "t3.small" and update_default_version true.
+hint: Everything here is a plain argument on the resource.
+@@ start
+# Write your configuration here
+@@ sol
+resource "aws_launch_template" "web" {
+  name_prefix           = "web-"
+  image_id              = "ami-0abc1234"
+  instance_type         = "t3.small"
+  update_default_version = true
+}
+@@ checks
+eq resource.aws_launch_template.web.name_prefix web-
+eq resource.aws_launch_template.web.image_id ami-0abc1234
+eq resource.aws_launch_template.web.instance_type t3.small
+eq resource.aws_launch_template.web.update_default_version true
+
+## Use a variable with a list type
+id: listvar
+task: Declare a variable allowed_cidrs of type list(string) with the default ["10.0.0.0/8", "192.168.0.0/16"] and a description.
+hint: The type is written list(string). The default is a list in square brackets.
+@@ start
+# Write your configuration here
+@@ sol
+variable "allowed_cidrs" {
+  type        = list(string)
+  description = "CIDR ranges allowed to connect"
+  default     = ["10.0.0.0/8", "192.168.0.0/16"]
+}
+@@ checks
+eq variable.allowed_cidrs.type list(string)
+has variable.allowed_cidrs.default
+has variable.allowed_cidrs.description
+match variable.allowed_cidrs.default 10\.0\.0\.0/8
+
+## A map variable for instance sizes
+id: mapvar
+task: Declare a variable sizes of type map(string) with the default { dev = "t3.micro", prod = "m5.large" }. Add a local value size that picks the entry for var.environment with lookup(var.sizes, var.environment, "t3.micro").
+hint: locals holds name = expression pairs. lookup takes the map, the key and a default.
+@@ start
+variable "environment" {
+  type = string
+}
+@@ sol
+variable "environment" {
+  type = string
+}
+
+variable "sizes" {
+  type = map(string)
+  default = {
+    dev  = "t3.micro"
+    prod = "m5.large"
+  }
+}
+
+locals {
+  size = lookup(var.sizes, var.environment, "t3.micro")
+}
+@@ checks
+eq variable.sizes.type map(string)
+has variable.sizes.default
+match locals.size lookup\(var\.sizes
+
+## Output a list with a splat
+id: splat
+task: Given aws_instance.web with count = 3, write an output named ids whose value is aws_instance.web[*].id.
+hint: The splat expression collects an attribute from every instance.
+@@ start
+resource "aws_instance" "web" {
+  count         = 3
+  ami           = "ami-0abc1234"
+  instance_type = "t3.micro"
+}
+@@ sol
+resource "aws_instance" "web" {
+  count         = 3
+  ami           = "ami-0abc1234"
+  instance_type = "t3.micro"
+}
+
+output "ids" {
+  value = aws_instance.web[*].id
+}
+@@ checks
+eq resource.aws_instance.web.count 3
+match output.ids.value aws_instance\.web\[\*\]\.id
+
+## Conditional resource creation
+id: createif
+task: Create aws_s3_bucket.audit with bucket "acme-audit" only when var.enable_audit is true. Declare the variable enable_audit as a bool with the default false.
+hint: count = var.enable_audit ? 1 : 0.
+@@ start
+# Write your configuration here
+@@ sol
+variable "enable_audit" {
+  type    = bool
+  default = false
+}
+
+resource "aws_s3_bucket" "audit" {
+  count  = var.enable_audit ? 1 : 0
+  bucket = "acme-audit"
+}
+@@ checks
+eq variable.enable_audit.type bool
+eq variable.enable_audit.default false
+match resource.aws_s3_bucket.audit.count var\.enable_audit \? 1 : 0
+eq resource.aws_s3_bucket.audit.bucket acme-audit
+
+## Tag every resource with merge
+id: mergetags
+task: Add a local value tags that merges var.extra_tags into the map { team = "platform", managed_by = "terraform" } with merge(). Use local.tags as the tags of aws_s3_bucket.data (bucket "acme-data").
+hint: merge({ ... }, var.extra_tags) returns one map.
+@@ start
+variable "extra_tags" {
+  type    = map(string)
+  default = {}
+}
+@@ sol
+variable "extra_tags" {
+  type    = map(string)
+  default = {}
+}
+
+locals {
+  tags = merge({ team = "platform", managed_by = "terraform" }, var.extra_tags)
+}
+
+resource "aws_s3_bucket" "data" {
+  bucket = "acme-data"
+  tags   = local.tags
+}
+@@ checks
+match locals.tags merge\(
+match locals.tags var\.extra_tags
+eq resource.aws_s3_bucket.data.bucket acme-data
+match resource.aws_s3_bucket.data.tags local\.tags
+
+## A CloudWatch alarm
+id: alarm
+task: Create an aws_cloudwatch_metric_alarm named cpu_high with alarm_name "cpu-high", namespace "AWS/EC2", metric_name "CPUUtilization", comparison_operator "GreaterThanThreshold", threshold 80, period 300, evaluation_periods 2 and statistic "Average".
+hint: All of these are plain arguments.
+@@ start
+# Write your configuration here
+@@ sol
+resource "aws_cloudwatch_metric_alarm" "cpu_high" {
+  alarm_name          = "cpu-high"
+  namespace           = "AWS/EC2"
+  metric_name         = "CPUUtilization"
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = 80
+  period              = 300
+  evaluation_periods  = 2
+  statistic           = "Average"
+}
+@@ checks
+eq resource.aws_cloudwatch_metric_alarm.cpu_high.alarm_name cpu-high
+eq resource.aws_cloudwatch_metric_alarm.cpu_high.metric_name CPUUtilization
+eq resource.aws_cloudwatch_metric_alarm.cpu_high.comparison_operator GreaterThanThreshold
+eq resource.aws_cloudwatch_metric_alarm.cpu_high.threshold 80
+eq resource.aws_cloudwatch_metric_alarm.cpu_high.evaluation_periods 2
+
+## A DNS record
+id: route53
+task: Create an aws_route53_record named www in the zone var.zone_id with name "www.example.com", type "CNAME", ttl 300 and records ["lb.example.com"].
+hint: records is a list of strings.
+@@ start
+variable "zone_id" {
+  type = string
+}
+@@ sol
+variable "zone_id" {
+  type = string
+}
+
+resource "aws_route53_record" "www" {
+  zone_id = var.zone_id
+  name    = "www.example.com"
+  type    = "CNAME"
+  ttl     = 300
+  records = ["lb.example.com"]
+}
+@@ checks
+match resource.aws_route53_record.www.zone_id var\.zone_id
+eq resource.aws_route53_record.www.name www.example.com
+eq resource.aws_route53_record.www.type CNAME
+eq resource.aws_route53_record.www.ttl 300
+match resource.aws_route53_record.www.records lb\.example\.com
+
+## An Azure resource group
+id: azrg
+task: Configure the azurerm provider with an empty features block, then create an azurerm_resource_group named main with name "rg-app-prod" and location "westeurope".
+hint: The azurerm provider requires a features {} block.
+@@ start
+# Write your configuration here
+@@ sol
+provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_resource_group" "main" {
+  name     = "rg-app-prod"
+  location = "westeurope"
+}
+@@ checks
+has provider.azurerm
+eq resource.azurerm_resource_group.main.name rg-app-prod
+eq resource.azurerm_resource_group.main.location westeurope
+
+## An Azure storage account
+id: azstorage
+task: Create an azurerm_storage_account named logs in azurerm_resource_group.main. Set name "acmelogs001", account_tier "Standard", account_replication_type "GRS" and min_tls_version "TLS1_2". Use the resource group name and location by reference.
+hint: Reference azurerm_resource_group.main.name and azurerm_resource_group.main.location.
+@@ start
+resource "azurerm_resource_group" "main" {
+  name     = "rg-app-prod"
+  location = "westeurope"
+}
+@@ sol
+resource "azurerm_resource_group" "main" {
+  name     = "rg-app-prod"
+  location = "westeurope"
+}
+
+resource "azurerm_storage_account" "logs" {
+  name                     = "acmelogs001"
+  resource_group_name      = azurerm_resource_group.main.name
+  location                 = azurerm_resource_group.main.location
+  account_tier             = "Standard"
+  account_replication_type = "GRS"
+  min_tls_version          = "TLS1_2"
+}
+@@ checks
+eq resource.azurerm_storage_account.logs.name acmelogs001
+match resource.azurerm_storage_account.logs.resource_group_name azurerm_resource_group\.main\.name
+eq resource.azurerm_storage_account.logs.account_replication_type GRS
+eq resource.azurerm_storage_account.logs.min_tls_version TLS1_2
+
+## A for_each over a set of users
+id: foreachiam
+task: Create one aws_iam_user named team for each name in the set ["ann", "bob", "cho"] with for_each = toset(var.users). Declare variable users as list(string) with that default. Use each.key as the user name.
+hint: toset converts the list. Inside the block, each.key is the current value.
+@@ start
+# Write your configuration here
+@@ sol
+variable "users" {
+  type    = list(string)
+  default = ["ann", "bob", "cho"]
+}
+
+resource "aws_iam_user" "team" {
+  for_each = toset(var.users)
+  name     = each.key
+}
+@@ checks
+eq variable.users.type list(string)
+match resource.aws_iam_user.team.for_each toset\(var\.users\)
+match resource.aws_iam_user.team.name each\.key
+
+## Ignore changes made outside Terraform
+id: ignorechg
+task: In aws_autoscaling_group.web (min_size 1, max_size 6, desired_capacity 2) add a lifecycle block that ignores changes to desired_capacity, because the autoscaler changes it.
+hint: lifecycle { ignore_changes = [desired_capacity] }.
+@@ start
+resource "aws_autoscaling_group" "web" {
+  min_size         = 1
+  max_size         = 6
+  desired_capacity = 2
+}
+@@ sol
+resource "aws_autoscaling_group" "web" {
+  min_size         = 1
+  max_size         = 6
+  desired_capacity = 2
+
+  lifecycle {
+    ignore_changes = [desired_capacity]
+  }
+}
+@@ checks
+eq resource.aws_autoscaling_group.web.max_size 6
+match resource.aws_autoscaling_group.web.lifecycle.ignore_changes desired_capacity
+
+## A terraform_remote_state data source
+id: remotestate
+task: Read outputs from another stack with a terraform_remote_state data source named network. Use the s3 backend with bucket "acme-tfstate", key "network/terraform.tfstate" and region "eu-west-1".
+hint: data "terraform_remote_state" "network" { backend = "s3" config = { ... } }.
+@@ start
+# Write your configuration here
+@@ sol
+data "terraform_remote_state" "network" {
+  backend = "s3"
+  config = {
+    bucket = "acme-tfstate"
+    key    = "network/terraform.tfstate"
+    region = "eu-west-1"
+  }
+}
+@@ checks
+eq data.terraform_remote_state.network.backend s3
+src bucket\s*=\s*"acme-tfstate"
+src key\s*=\s*"network/terraform.tfstate"
+src region\s*=\s*"eu-west-1"
+
+## A null_resource-free trigger with terraform_data
+id: terraformdata
+task: Create a terraform_data resource named bootstrap with triggers_replace set to var.version, so that it is replaced when the version changes. Declare variable version as string.
+hint: terraform_data has an argument triggers_replace.
+@@ start
+# Write your configuration here
+@@ sol
+variable "version" {
+  type = string
+}
+
+resource "terraform_data" "bootstrap" {
+  triggers_replace = var.version
+}
+@@ checks
+eq variable.version.type string
+match resource.terraform_data.bootstrap.triggers_replace var\.version
+
+## Sensitive output marked correctly
+id: sensout2
+task: Declare a variable api_token of type string marked sensitive = true, and an output named token_hint with the value substr(var.api_token, 0, 4) that is also sensitive.
+hint: Both blocks take sensitive = true.
+@@ start
+# Write your configuration here
+@@ sol
+variable "api_token" {
+  type      = string
+  sensitive = true
+}
+
+output "token_hint" {
+  value     = substr(var.api_token, 0, 4)
+  sensitive = true
+}
+@@ checks
+eq variable.api_token.sensitive true
+eq output.token_hint.sensitive true
+match output.token_hint.value substr\(var\.api_token
+
+## Check a required provider with an alias
+id: aliasprov
+task: Add a second aws provider with alias "dr" in region "us-east-1" next to the default one in "eu-west-1". Create aws_s3_bucket.replica with bucket "acme-replica" that uses provider = aws.dr.
+hint: The provider argument on a resource is written provider = aws.dr, without quotes.
+@@ start
+provider "aws" {
+  region = "eu-west-1"
+}
+@@ sol
+provider "aws" {
+  region = "eu-west-1"
+}
+
+provider "aws" {
+  alias  = "dr"
+  region = "us-east-1"
+}
+
+resource "aws_s3_bucket" "replica" {
+  provider = aws.dr
+  bucket   = "acme-replica"
+}
+@@ checks
+eq resource.aws_s3_bucket.replica.bucket acme-replica
+match resource.aws_s3_bucket.replica.provider aws\.dr
+src alias\s*=\s*"dr"
+src us-east-1
+
+## Name resources with a local prefix
+id: tflocalexec
+task: Use a local value named name_prefix built with format("%s-%s", var.project, var.environment). Declare both variables as string, and create aws_s3_bucket.assets with bucket "${local.name_prefix}-assets".
+hint: Interpolate a local inside a string with ${local.name_prefix}.
+@@ start
+# Write your configuration here
+@@ sol
+variable "project" {
+  type = string
+}
+
+variable "environment" {
+  type = string
+}
+
+locals {
+  name_prefix = format("%s-%s", var.project, var.environment)
+}
+
+resource "aws_s3_bucket" "assets" {
+  bucket = "${local.name_prefix}-assets"
+}
+@@ checks
+eq variable.project.type string
+eq variable.environment.type string
+match locals.name_prefix format\(
+match resource.aws_s3_bucket.assets.bucket local\.name_prefix

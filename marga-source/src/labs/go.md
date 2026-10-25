@@ -1377,3 +1377,766 @@ func main() {
 api up
 db down
 
+## Max of a slice
+id: maxslice
+task: Write maxOf(nums []int) (int, bool). It returns the largest value and true, or 0 and false for an empty slice. Print the result for 4, 9, 2 and then for an empty slice.
+hint: Return early for an empty slice. Track the largest value while looping.
+@@ start
+package main
+
+import "fmt"
+
+func maxOf(nums []int) (int, bool) {
+	return 0, false
+}
+
+func main() {
+	fmt.Println(maxOf([]int{4, 9, 2}))
+	fmt.Println(maxOf(nil))
+}
+@@ sol
+package main
+
+import "fmt"
+
+func maxOf(nums []int) (int, bool) {
+	if len(nums) == 0 {
+		return 0, false
+	}
+	m := nums[0]
+	for _, n := range nums[1:] {
+		if n > m {
+			m = n
+		}
+	}
+	return m, true
+}
+
+func main() {
+	fmt.Println(maxOf([]int{4, 9, 2}))
+	fmt.Println(maxOf(nil))
+}
+@@ expect
+9 true
+0 false
+
+## Reverse a string
+id: reversestr
+task: Write reverse(s string) string that reverses a string, including non-ASCII characters. Print reverse("deploy") and reverse("héllo").
+hint: Convert to []rune, swap from both ends, convert back.
+@@ start
+package main
+
+import "fmt"
+
+func reverse(s string) string {
+	return s
+}
+
+func main() {
+	fmt.Println(reverse("deploy"))
+	fmt.Println(reverse("héllo"))
+}
+@@ sol
+package main
+
+import "fmt"
+
+func reverse(s string) string {
+	r := []rune(s)
+	for i, j := 0, len(r)-1; i < j; i, j = i+1, j-1 {
+		r[i], r[j] = r[j], r[i]
+	}
+	return string(r)
+}
+
+func main() {
+	fmt.Println(reverse("deploy"))
+	fmt.Println(reverse("héllo"))
+}
+@@ expect
+yolped
+olléh
+
+## Count words case-insensitively
+id: wordfold
+task: Write count(words []string) map[string]int that counts words ignoring case. Print the counts for Error, error, WARN, error in sorted key order, one per line as key=value.
+hint: strings.ToLower for the key. Sort the keys before printing because map order is random.
+@@ start
+package main
+
+import "fmt"
+
+func count(words []string) map[string]int {
+	return map[string]int{}
+}
+
+func main() {
+	m := count([]string{"Error", "error", "WARN", "error"})
+	fmt.Println(len(m))
+}
+@@ sol
+package main
+
+import (
+	"fmt"
+	"sort"
+	"strings"
+)
+
+func count(words []string) map[string]int {
+	m := map[string]int{}
+	for _, w := range words {
+		m[strings.ToLower(w)]++
+	}
+	return m
+}
+
+func main() {
+	m := count([]string{"Error", "error", "WARN", "error"})
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		fmt.Printf("%s=%d\n", k, m[k])
+	}
+}
+@@ expect
+error=3
+warn=1
+
+## A struct with a method
+id: structmethod
+task: Define type Server struct with Name string and CPU int. Add a method Label() string that returns Name and CPU like "web-1 (4 cpu)". Print the label for Server{"web-1", 4}.
+hint: A method is a function with a receiver: func (s Server) Label() string.
+@@ start
+package main
+
+import "fmt"
+
+type Server struct {
+	Name string
+	CPU  int
+}
+
+func main() {
+	s := Server{"web-1", 4}
+	fmt.Println(s.Name)
+}
+@@ sol
+package main
+
+import "fmt"
+
+type Server struct {
+	Name string
+	CPU  int
+}
+
+func (s Server) Label() string {
+	return fmt.Sprintf("%s (%d cpu)", s.Name, s.CPU)
+}
+
+func main() {
+	s := Server{"web-1", 4}
+	fmt.Println(s.Label())
+}
+@@ expect
+web-1 (4 cpu)
+
+## Build a set from a slice
+id: setdedupe
+task: Write union(a, b []string) []string that returns the sorted unique values from both slices. Print union of [b a] and [c b].
+hint: Use map[string]bool as a set, then collect and sort the keys.
+@@ start
+package main
+
+import "fmt"
+
+func union(a, b []string) []string {
+	return append(a, b...)
+}
+
+func main() {
+	fmt.Println(union([]string{"b", "a"}, []string{"c", "b"}))
+}
+@@ sol
+package main
+
+import (
+	"fmt"
+	"sort"
+)
+
+func union(a, b []string) []string {
+	set := map[string]bool{}
+	for _, v := range append(append([]string{}, a...), b...) {
+		set[v] = true
+	}
+	out := make([]string, 0, len(set))
+	for k := range set {
+		out = append(out, k)
+	}
+	sort.Strings(out)
+	return out
+}
+
+func main() {
+	fmt.Println(union([]string{"b", "a"}, []string{"c", "b"}))
+}
+@@ expect
+[a b c]
+
+## Parse an integer with a default
+id: atoidefault
+task: Write port(s string, def int) int. It parses s with strconv.Atoi and returns def when parsing fails or the value is outside 1 to 65535. Print port("8080", 80), port("abc", 80) and port("70000", 80).
+hint: Check the error first, then the range.
+@@ start
+package main
+
+import "fmt"
+
+func port(s string, def int) int {
+	return def
+}
+
+func main() {
+	fmt.Println(port("8080", 80), port("abc", 80), port("70000", 80))
+}
+@@ sol
+package main
+
+import (
+	"fmt"
+	"strconv"
+)
+
+func port(s string, def int) int {
+	n, err := strconv.Atoi(s)
+	if err != nil || n < 1 || n > 65535 {
+		return def
+	}
+	return n
+}
+
+func main() {
+	fmt.Println(port("8080", 80), port("abc", 80), port("70000", 80))
+}
+@@ expect
+8080 80 80
+
+## A channel as a work queue
+id: chanqueue
+task: Start one goroutine that sends the numbers 1 to 5 on a channel and closes it. In main, receive with range and print the sum.
+hint: The sender must close the channel so the range loop ends.
+@@ start
+package main
+
+import "fmt"
+
+func main() {
+	ch := make(chan int)
+	sum := 0
+	fmt.Println(sum, ch == nil)
+}
+@@ sol
+package main
+
+import "fmt"
+
+func main() {
+	ch := make(chan int)
+	go func() {
+		for i := 1; i <= 5; i++ {
+			ch <- i
+		}
+		close(ch)
+	}()
+	sum := 0
+	for v := range ch {
+		sum += v
+	}
+	fmt.Println(sum)
+}
+@@ expect
+15
+
+## Protect a counter with a mutex
+id: mutexcounter
+task: Start 50 goroutines that each add 1 to a shared counter, guarded by sync.Mutex. Wait with sync.WaitGroup and print the counter.
+hint: Lock before the increment and unlock after it. Call wg.Add(1) before starting each goroutine.
+@@ start
+package main
+
+import "fmt"
+
+func main() {
+	counter := 0
+	fmt.Println(counter)
+}
+@@ sol
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func main() {
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+	counter := 0
+	for i := 0; i < 50; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			mu.Lock()
+			counter++
+			mu.Unlock()
+		}()
+	}
+	wg.Wait()
+	fmt.Println(counter)
+}
+@@ expect
+50
+
+## Select with a default
+id: selectdefault
+task: Make a buffered channel of size 1. Try to send "a" twice using select with a default case. Print "sent a" when the send works and "full" when it does not.
+hint: select { case ch <- v: ... default: ... } never blocks.
+@@ start
+package main
+
+import "fmt"
+
+func main() {
+	ch := make(chan string, 1)
+	fmt.Println(len(ch))
+}
+@@ sol
+package main
+
+import "fmt"
+
+func main() {
+	ch := make(chan string, 1)
+	for i := 0; i < 2; i++ {
+		select {
+		case ch <- "a":
+			fmt.Println("sent a")
+		default:
+			fmt.Println("full")
+		}
+	}
+}
+@@ expect
+sent a
+full
+
+## Format a table row
+id: printfwidth
+task: Print three rows with fmt.Printf using a left-aligned name column of width 8 and a right-aligned number column of width 5: api 12, db 7, cache 130.
+hint: Use %-8s and %5d in the format string.
+@@ start
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("api", 12)
+}
+@@ sol
+package main
+
+import "fmt"
+
+func main() {
+	rows := []struct {
+		n string
+		v int
+	}{{"api", 12}, {"db", 7}, {"cache", 130}}
+	for _, r := range rows {
+		fmt.Printf("%-8s%5d\n", r.n, r.v)
+	}
+}
+@@ expect
+api        12
+db          7
+cache     130
+
+## Check an error with errors.Is
+id: errorsis
+task: Define var ErrNotFound = errors.New("not found"). Write find(id int) error that returns fmt.Errorf("find %d: %w", id, ErrNotFound) when id is 0, otherwise nil. Print whether errors.Is(find(0), ErrNotFound) and errors.Is(find(1), ErrNotFound).
+hint: The %w verb wraps the error so errors.Is can unwrap it.
+@@ start
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+var ErrNotFound = errors.New("not found")
+
+func find(id int) error {
+	return nil
+}
+
+func main() {
+	fmt.Println(errors.Is(find(0), ErrNotFound), errors.Is(find(1), ErrNotFound))
+}
+@@ sol
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+var ErrNotFound = errors.New("not found")
+
+func find(id int) error {
+	if id == 0 {
+		return fmt.Errorf("find %d: %w", id, ErrNotFound)
+	}
+	return nil
+}
+
+func main() {
+	fmt.Println(errors.Is(find(0), ErrNotFound), errors.Is(find(1), ErrNotFound))
+}
+@@ expect
+true false
+
+## Read lines from a string reader
+id: bufioreader
+task: Use bufio.NewScanner on strings.NewReader of "a\nb\n\nc" and print how many non-empty lines there are.
+hint: Loop with scanner.Scan() and use scanner.Text().
+@@ start
+package main
+
+import "fmt"
+
+func main() {
+	n := 0
+	fmt.Println(n)
+}
+@@ sol
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"strings"
+)
+
+func main() {
+	sc := bufio.NewScanner(strings.NewReader("a\nb\n\nc"))
+	n := 0
+	for sc.Scan() {
+		if sc.Text() != "" {
+			n++
+		}
+	}
+	fmt.Println(n)
+}
+@@ expect
+3
+
+## Decode JSON into a struct slice
+id: jsonslice
+task: Decode the JSON [{"name":"api","up":true},{"name":"db","up":false}] into a slice of structs with json tags and print the names of the services that are down.
+hint: Tag fields like `json:"name"`, then json.Unmarshal into a slice.
+@@ start
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("none")
+}
+@@ sol
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type Svc struct {
+	Name string `json:"name"`
+	Up   bool   `json:"up"`
+}
+
+func main() {
+	data := `[{"name":"api","up":true},{"name":"db","up":false}]`
+	var list []Svc
+	if err := json.Unmarshal([]byte(data), &list); err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+	for _, s := range list {
+		if !s.Up {
+			fmt.Println(s.Name)
+		}
+	}
+}
+@@ expect
+db
+
+## Check an HTTP status class
+id: statusclass
+task: Write class(code int) string that returns "ok" for 200 to 299, "client" for 400 to 499, "server" for 500 to 599, and "other" otherwise. Print class for 204, 404, 503 and 301.
+hint: A switch with no tag and case conditions reads cleanly.
+@@ start
+package main
+
+import "fmt"
+
+func class(code int) string {
+	return "other"
+}
+
+func main() {
+	for _, c := range []int{204, 404, 503, 301} {
+		fmt.Println(c, class(c))
+	}
+}
+@@ sol
+package main
+
+import "fmt"
+
+func class(code int) string {
+	switch {
+	case code >= 200 && code < 300:
+		return "ok"
+	case code >= 400 && code < 500:
+		return "client"
+	case code >= 500 && code < 600:
+		return "server"
+	}
+	return "other"
+}
+
+func main() {
+	for _, c := range []int{204, 404, 503, 301} {
+		fmt.Println(c, class(c))
+	}
+}
+@@ expect
+204 ok
+404 client
+503 server
+301 other
+
+## Sort structs by two keys
+id: sortslice
+task: Sort a slice of Incident{Sev int, Name string} by severity ascending, then by name. Print each as sev:name for (2,"db"), (1,"web"), (2,"api"), (1,"auth").
+hint: sort.Slice with a less function that compares Sev first and Name when they are equal.
+@@ start
+package main
+
+import "fmt"
+
+type Incident struct {
+	Sev  int
+	Name string
+}
+
+func main() {
+	list := []Incident{{2, "db"}, {1, "web"}, {2, "api"}, {1, "auth"}}
+	for _, i := range list {
+		fmt.Printf("%d:%s\n", i.Sev, i.Name)
+	}
+}
+@@ sol
+package main
+
+import (
+	"fmt"
+	"sort"
+)
+
+type Incident struct {
+	Sev  int
+	Name string
+}
+
+func main() {
+	list := []Incident{{2, "db"}, {1, "web"}, {2, "api"}, {1, "auth"}}
+	sort.Slice(list, func(a, b int) bool {
+		if list[a].Sev != list[b].Sev {
+			return list[a].Sev < list[b].Sev
+		}
+		return list[a].Name < list[b].Name
+	})
+	for _, i := range list {
+		fmt.Printf("%d:%s\n", i.Sev, i.Name)
+	}
+}
+@@ expect
+1:auth
+1:web
+2:api
+2:db
+
+## Run a function with a timeout using a ticker
+id: ticker
+task: Use time.NewTicker with a 10 ms interval. Read three ticks, stop the ticker, and print "ticks: 3".
+hint: defer ticker.Stop(), then receive from ticker.C three times in a loop.
+@@ start
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("ticks: 0")
+}
+@@ sol
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	t := time.NewTicker(10 * time.Millisecond)
+	defer t.Stop()
+	n := 0
+	for n < 3 {
+		<-t.C
+		n++
+	}
+	fmt.Printf("ticks: %d\n", n)
+}
+@@ expect
+ticks: 3
+
+## Embed a struct
+id: embed
+task: Define Base with Name string and a method Hello() string returning "hi NAME". Define Worker that embeds Base and has Queue string. Create Worker{Base{"w1"}, "jobs"} and print w.Hello() and w.Queue.
+hint: Embedding promotes the methods and fields of Base to Worker.
+@@ start
+package main
+
+import "fmt"
+
+type Base struct{ Name string }
+
+type Worker struct {
+	Base
+	Queue string
+}
+
+func main() {
+	w := Worker{Base{"w1"}, "jobs"}
+	fmt.Println(w.Name)
+}
+@@ sol
+package main
+
+import "fmt"
+
+type Base struct{ Name string }
+
+func (b Base) Hello() string { return "hi " + b.Name }
+
+type Worker struct {
+	Base
+	Queue string
+}
+
+func main() {
+	w := Worker{Base{"w1"}, "jobs"}
+	fmt.Println(w.Hello())
+	fmt.Println(w.Queue)
+}
+@@ expect
+hi w1
+jobs
+
+## Closures for counters
+id: closure
+task: Write counter() func() int that returns a function which gives 1, 2, 3 on successive calls. Make two counters and print a(), a(), b(), a().
+hint: Declare a variable inside counter and return a function that increments it.
+@@ start
+package main
+
+import "fmt"
+
+func counter() func() int {
+	return func() int { return 0 }
+}
+
+func main() {
+	a, b := counter(), counter()
+	fmt.Println(a(), a(), b(), a())
+}
+@@ sol
+package main
+
+import "fmt"
+
+func counter() func() int {
+	n := 0
+	return func() int {
+		n++
+		return n
+	}
+}
+
+func main() {
+	a, b := counter(), counter()
+	fmt.Println(a(), a(), b(), a())
+}
+@@ expect
+1 2 1 3
+
+## Variadic helper
+id: variadic
+task: Write joinNonEmpty(sep string, parts ...string) string that joins only the non-empty parts. Print joinNonEmpty("-", "web", "", "prod") and joinNonEmpty("-").
+hint: Collect non-empty parts in a slice and call strings.Join.
+@@ start
+package main
+
+import "fmt"
+
+func joinNonEmpty(sep string, parts ...string) string {
+	return ""
+}
+
+func main() {
+	fmt.Println(joinNonEmpty("-", "web", "", "prod"))
+	fmt.Printf("[%s]\n", joinNonEmpty("-"))
+}
+@@ sol
+package main
+
+import (
+	"fmt"
+	"strings"
+)
+
+func joinNonEmpty(sep string, parts ...string) string {
+	var keep []string
+	for _, p := range parts {
+		if p != "" {
+			keep = append(keep, p)
+		}
+	}
+	return strings.Join(keep, sep)
+}
+
+func main() {
+	fmt.Println(joinNonEmpty("-", "web", "", "prod"))
+	fmt.Printf("[%s]\n", joinNonEmpty("-"))
+}
+@@ expect
+web-prod
+[]
+

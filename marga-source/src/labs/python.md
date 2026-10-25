@@ -522,3 +522,339 @@ assert explain_exit(143) == "killed by signal 15"
 assert explain_exit(127) == "command not found"
 assert explain_exit(126) == "not executable"
 assert explain_exit(1) == "error"
+
+## Parse a key=value log line
+id: kvline
+task: Write parse_kv(line) that turns 'level=error svc=api code=502' into a dict {"level": "error", "svc": "api", "code": "502"}. Values stay strings.
+hint: Split on spaces, then split each piece once on the equals sign.
+@@ start
+def parse_kv(line):
+    pass
+@@ sol
+def parse_kv(line):
+    out = {}
+    for part in line.split():
+        k, _, v = part.partition("=")
+        out[k] = v
+    return out
+@@ tests
+assert parse_kv("level=error svc=api code=502") == {"level": "error", "svc": "api", "code": "502"}
+assert parse_kv("a=1") == {"a": "1"}
+assert parse_kv("") == {}
+
+## Count status codes
+id: statuscount
+task: Write count_codes(lines) that takes access log lines such as '10.0.0.1 GET /x 200' and returns a dict of status code to count. The code is the last field.
+hint: collections.Counter is a good fit.
+@@ start
+def count_codes(lines):
+    pass
+@@ sol
+from collections import Counter
+
+def count_codes(lines):
+    return dict(Counter(l.split()[-1] for l in lines if l.strip()))
+@@ tests
+logs = ["1.1.1.1 GET /a 200", "1.1.1.2 GET /b 500", "1.1.1.3 GET /c 200", ""]
+assert count_codes(logs) == {"200": 2, "500": 1}
+assert count_codes([]) == {}
+
+## Find the slowest endpoint
+id: slowest
+task: Write slowest(samples) where samples is a list of (path, milliseconds) tuples. Return the path with the highest average time.
+hint: Group the times by path in a dict of lists, then use max with a key.
+@@ start
+def slowest(samples):
+    pass
+@@ sol
+def slowest(samples):
+    groups = {}
+    for path, ms in samples:
+        groups.setdefault(path, []).append(ms)
+    return max(groups, key=lambda p: sum(groups[p]) / len(groups[p]))
+@@ tests
+assert slowest([("/a", 10), ("/b", 50), ("/a", 20), ("/b", 70)]) == "/b"
+assert slowest([("/x", 5)]) == "/x"
+assert slowest([("/a", 100), ("/a", 100), ("/b", 150)]) == "/b"
+
+## Validate an IPv4 address
+id: ipv4
+task: Write is_ipv4(text) that returns True for a valid dotted IPv4 address and False otherwise. Four parts, each 0 to 255, digits only.
+hint: Split on dots, check there are four parts, and test isdigit and the range.
+@@ start
+def is_ipv4(text):
+    pass
+@@ sol
+def is_ipv4(text):
+    parts = text.split(".")
+    if len(parts) != 4:
+        return False
+    return all(p.isdigit() and 0 <= int(p) <= 255 for p in parts)
+@@ tests
+assert is_ipv4("10.0.0.1") is True
+assert is_ipv4("256.1.1.1") is False
+assert is_ipv4("1.2.3") is False
+assert is_ipv4("a.b.c.d") is False
+assert is_ipv4("0.0.0.0") is True
+
+## Convert an IP address to an integer
+id: ip2int
+task: Write ip_to_int(ip) that converts '192.168.1.10' to its integer value (192*2^24 + 168*2^16 + 1*2^8 + 10).
+hint: Shift the running total left by 8 bits for each part and add the part.
+@@ start
+def ip_to_int(ip):
+    pass
+@@ sol
+def ip_to_int(ip):
+    n = 0
+    for part in ip.split("."):
+        n = (n << 8) + int(part)
+    return n
+@@ tests
+assert ip_to_int("0.0.0.1") == 1
+assert ip_to_int("192.168.1.10") == 3232235786
+assert ip_to_int("255.255.255.255") == 4294967295
+
+## Is an address inside a CIDR range?
+id: incidr
+task: Write in_cidr(ip, cidr) that returns True when ip is inside cidr, for example in_cidr("10.1.2.3", "10.1.0.0/16"). Use the ipaddress module.
+hint: ipaddress.ip_address(ip) in ipaddress.ip_network(cidr).
+@@ start
+def in_cidr(ip, cidr):
+    pass
+@@ sol
+import ipaddress
+
+def in_cidr(ip, cidr):
+    return ipaddress.ip_address(ip) in ipaddress.ip_network(cidr)
+@@ tests
+assert in_cidr("10.1.2.3", "10.1.0.0/16") is True
+assert in_cidr("10.2.0.1", "10.1.0.0/16") is False
+assert in_cidr("192.168.1.5", "192.168.1.0/24") is True
+
+## Group consecutive duplicates
+id: collapse
+task: Write collapse(lines) that removes consecutive duplicate lines, like uniq. ["a","a","b","a"] becomes ["a","b","a"].
+hint: Keep a result list and append only when the line differs from the last one.
+@@ start
+def collapse(lines):
+    pass
+@@ sol
+def collapse(lines):
+    out = []
+    for l in lines:
+        if not out or out[-1] != l:
+            out.append(l)
+    return out
+@@ tests
+assert collapse(["a", "a", "b", "a"]) == ["a", "b", "a"]
+assert collapse([]) == []
+assert collapse(["x", "x", "x"]) == ["x"]
+
+## Mask a password in a URL
+id: urlmask
+task: Write mask_url(url) that replaces the password in 'postgres://user:secret@db:5432/app' with ***. URLs without a password stay unchanged.
+hint: A regular expression like ://([^:/@]+):[^@]+@ works.
+@@ start
+def mask_url(url):
+    pass
+@@ sol
+import re
+
+def mask_url(url):
+    return re.sub(r"://([^:/@]+):[^@]+@", r"://\1:***@", url)
+@@ tests
+assert mask_url("postgres://user:secret@db:5432/app") == "postgres://user:***@db:5432/app"
+assert mask_url("https://example.com/path") == "https://example.com/path"
+
+## Read a JSON list of events
+id: jsonerrors
+task: Write error_services(text) where text is a JSON array like '[{"svc":"api","level":"error"},{"svc":"db","level":"info"}]'. Return a sorted list of unique service names that have level "error".
+hint: json.loads, then a set comprehension.
+@@ start
+def error_services(text):
+    pass
+@@ sol
+import json
+
+def error_services(text):
+    return sorted({e["svc"] for e in json.loads(text) if e.get("level") == "error"})
+@@ tests
+t = '[{"svc":"api","level":"error"},{"svc":"db","level":"info"},{"svc":"api","level":"error"},{"svc":"auth","level":"error"}]'
+assert error_services(t) == ["api", "auth"]
+assert error_services("[]") == []
+
+## Compute a checksum of text
+id: checksum
+task: Write sha256_hex(text) that returns the SHA-256 hash of the text (encoded as UTF-8) as a lowercase hex string.
+hint: hashlib.sha256(text.encode()).hexdigest().
+@@ start
+def sha256_hex(text):
+    pass
+@@ sol
+import hashlib
+
+def sha256_hex(text):
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+@@ tests
+assert sha256_hex("") == "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+assert sha256_hex("abc") == "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+
+## Build a query string
+id: querystring
+task: Write build_query(params) that turns {"q": "disk full", "page": 2} into 'q=disk%20full&page=2'. Keep the dict order and encode spaces as %20.
+hint: urllib.parse.quote encodes one value. Join the pairs with &.
+@@ start
+def build_query(params):
+    pass
+@@ sol
+from urllib.parse import quote
+
+def build_query(params):
+    return "&".join(f"{k}={quote(str(v))}" for k, v in params.items())
+@@ tests
+assert build_query({"q": "disk full", "page": 2}) == "q=disk%20full&page=2"
+assert build_query({}) == ""
+assert build_query({"a": "b&c"}) == "a=b%26c"
+
+## Find the first failing check
+id: firstfail
+task: Write first_failure(results) where results is a list of (name, ok) tuples. Return the name of the first check with ok False, or None if all passed.
+hint: Loop and return as soon as you see a False.
+@@ start
+def first_failure(results):
+    pass
+@@ sol
+def first_failure(results):
+    for name, ok in results:
+        if not ok:
+            return name
+    return None
+@@ tests
+assert first_failure([("lint", True), ("test", False), ("scan", False)]) == "test"
+assert first_failure([("lint", True)]) is None
+assert first_failure([]) is None
+
+## Compute an error budget in minutes
+id: budgetmin
+task: Write budget_minutes(slo_percent, days) that returns the allowed downtime in minutes, rounded to 1 decimal. For 99.9 percent over 30 days the answer is 43.2.
+hint: total minutes = days * 24 * 60. Allowed = total * (100 - slo) / 100.
+@@ start
+def budget_minutes(slo_percent, days):
+    pass
+@@ sol
+def budget_minutes(slo_percent, days):
+    return round(days * 24 * 60 * (100 - slo_percent) / 100, 1)
+@@ tests
+assert budget_minutes(99.9, 30) == 43.2
+assert budget_minutes(99.0, 30) == 432.0
+assert budget_minutes(99.99, 7) == 1.0
+
+## Pick the oldest files to delete
+id: oldfiles
+task: Write to_delete(files, keep) where files is a list of (name, age_days) tuples. Keep the newest keep files and return the names of the rest, oldest first.
+hint: Sort by age descending, then slice off the first len(files) - keep items.
+@@ start
+def to_delete(files, keep):
+    pass
+@@ sol
+def to_delete(files, keep):
+    ordered = sorted(files, key=lambda f: f[1], reverse=True)
+    cut = max(len(ordered) - keep, 0)
+    return [n for n, _ in ordered[:cut]]
+@@ tests
+files = [("a", 5), ("b", 30), ("c", 1), ("d", 12)]
+assert to_delete(files, 2) == ["b", "d"]
+assert to_delete(files, 10) == []
+assert to_delete(files, 0) == ["b", "d", "a", "c"]
+
+## Merge two inventories
+id: inventory
+task: Write merge_inventory(a, b) where each is a dict of hostname to list of tags. Return one dict with the tags combined, without duplicates, sorted.
+hint: Loop over both dicts and use a set per host.
+@@ start
+def merge_inventory(a, b):
+    pass
+@@ sol
+def merge_inventory(a, b):
+    out = {}
+    for src in (a, b):
+        for host, tags in src.items():
+            out.setdefault(host, set()).update(tags)
+    return {h: sorted(t) for h, t in out.items()}
+@@ tests
+a = {"web1": ["prod", "eu"], "db1": ["prod"]}
+b = {"web1": ["eu", "canary"], "cache1": ["dev"]}
+r = merge_inventory(a, b)
+assert r["web1"] == ["canary", "eu", "prod"]
+assert r["db1"] == ["prod"] and r["cache1"] == ["dev"]
+
+## Check disk usage thresholds
+id: diskwarn
+task: Write disk_alerts(usage) where usage maps a mount to a percent. Return a sorted list of (mount, level) where level is "critical" at 90 or more and "warning" at 80 or more. Skip the rest.
+hint: Check the higher threshold first.
+@@ start
+def disk_alerts(usage):
+    pass
+@@ sol
+def disk_alerts(usage):
+    out = []
+    for mount, pct in usage.items():
+        if pct >= 90:
+            out.append((mount, "critical"))
+        elif pct >= 80:
+            out.append((mount, "warning"))
+    return sorted(out)
+@@ tests
+u = {"/": 45, "/var": 91, "/data": 80, "/tmp": 79}
+assert disk_alerts(u) == [("/data", "warning"), ("/var", "critical")]
+assert disk_alerts({}) == []
+
+## Chunk a list for rate limits
+id: chunkrate
+task: Write plan_batches(items, size, pause) that returns a list of (batch, wait) pairs. Each batch has up to size items. The wait before the first batch is 0 and before every other batch is pause seconds.
+hint: Slice with range(0, len(items), size).
+@@ start
+def plan_batches(items, size, pause):
+    pass
+@@ sol
+def plan_batches(items, size, pause):
+    out = []
+    for i in range(0, len(items), size):
+        out.append((items[i:i + size], 0 if i == 0 else pause))
+    return out
+@@ tests
+assert plan_batches([1, 2, 3, 4, 5], 2, 10) == [([1, 2], 0), ([3, 4], 10), ([5], 10)]
+assert plan_batches([], 3, 5) == []
+
+## Redact emails from text
+id: redact
+task: Write redact(text) that replaces every email address with [email]. An address is non-space characters, an at sign, and a domain with a dot.
+hint: A pattern like \S+@\S+\.\S+ is enough for this exercise.
+@@ start
+def redact(text):
+    pass
+@@ sol
+import re
+
+def redact(text):
+    return re.sub(r"\S+@\S+\.\S+", "[email]", text)
+@@ tests
+assert redact("mail ann@example.com now") == "mail [email] now"
+assert redact("a@b.io and c@d.org") == "[email] and [email]"
+assert redact("no address here") == "no address here"
+
+## Next run of a fixed interval job
+id: nextrun
+task: Write next_run(last, interval) where last is seconds since midnight of the last run and interval is seconds. Return the next run time, wrapped into a 24 hour day (86400 seconds).
+hint: Add the two values and use the modulo operator.
+@@ start
+def next_run(last, interval):
+    pass
+@@ sol
+def next_run(last, interval):
+    return (last + interval) % 86400
+@@ tests
+assert next_run(3600, 900) == 4500
+assert next_run(86000, 900) == 500
+assert next_run(0, 86400) == 0

@@ -901,3 +901,586 @@ eq stages test
 eq unit.stage test
 eq unit.script make test
 eq unit.artifacts.expire_in 1 week
+
+## A Namespace with labels
+id: namespace
+task: Write a Namespace named "payments" with the labels team: payments and env: prod.
+hint: Labels live under metadata.labels.
+@@ start
+apiVersion: v1
+kind: Namespace
+@@ sol
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: payments
+  labels:
+    team: payments
+    env: prod
+@@ checks
+eq kind Namespace
+eq metadata.name payments
+eq metadata.labels.team payments
+eq metadata.labels.env prod
+
+## A ServiceAccount without a token mount
+id: sa
+task: Write a ServiceAccount named "reporter" in the namespace "payments" with automountServiceAccountToken set to false.
+hint: automountServiceAccountToken is a top-level field next to metadata.
+@@ start
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: reporter
+@@ sol
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: reporter
+  namespace: payments
+automountServiceAccountToken: false
+@@ checks
+eq kind ServiceAccount
+eq metadata.namespace payments
+eq automountServiceAccountToken false
+
+## A read-only root filesystem
+id: readonlyfs
+task: Write a Pod "tight" with one container "app" (image registry.example.com/app:1.0) whose securityContext sets readOnlyRootFilesystem to true and allowPrivilegeEscalation to false.
+hint: The container securityContext sits under spec.containers.
+@@ start
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tight
+spec:
+  containers:
+    - name: app
+      image: registry.example.com/app:1.0
+@@ sol
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tight
+spec:
+  containers:
+    - name: app
+      image: registry.example.com/app:1.0
+      securityContext:
+        readOnlyRootFilesystem: true
+        allowPrivilegeEscalation: false
+@@ checks
+eq spec.containers.securityContext.readOnlyRootFilesystem true
+eq spec.containers.securityContext.allowPrivilegeEscalation false
+
+## Drop all Linux capabilities
+id: dropcaps
+task: Write a Pod "caps" with a container "app" (image registry.example.com/app:1.0) that drops ALL capabilities and adds only NET_BIND_SERVICE.
+hint: securityContext.capabilities has drop and add lists.
+@@ start
+apiVersion: v1
+kind: Pod
+metadata:
+  name: caps
+spec:
+  containers:
+    - name: app
+      image: registry.example.com/app:1.0
+@@ sol
+apiVersion: v1
+kind: Pod
+metadata:
+  name: caps
+spec:
+  containers:
+    - name: app
+      image: registry.example.com/app:1.0
+      securityContext:
+        capabilities:
+          drop: ["ALL"]
+          add: ["NET_BIND_SERVICE"]
+@@ checks
+eq spec.containers.securityContext.capabilities.drop ALL
+eq spec.containers.securityContext.capabilities.add NET_BIND_SERVICE
+
+## A startup probe
+id: startup
+task: Write a Pod "slow" with a container "app" (image registry.example.com/slow:1.0) and a startupProbe that does an httpGet on /healthz port 8080 with failureThreshold 30 and periodSeconds 5.
+hint: A startup probe gives slow applications time before liveness checks begin.
+@@ start
+apiVersion: v1
+kind: Pod
+metadata:
+  name: slow
+spec:
+  containers:
+    - name: app
+      image: registry.example.com/slow:1.0
+@@ sol
+apiVersion: v1
+kind: Pod
+metadata:
+  name: slow
+spec:
+  containers:
+    - name: app
+      image: registry.example.com/slow:1.0
+      startupProbe:
+        httpGet:
+          path: /healthz
+          port: 8080
+        failureThreshold: 30
+        periodSeconds: 5
+@@ checks
+eq spec.containers.startupProbe.httpGet.path /healthz
+eq spec.containers.startupProbe.httpGet.port 8080
+eq spec.containers.startupProbe.failureThreshold 30
+eq spec.containers.startupProbe.periodSeconds 5
+
+## An init container
+id: initcontainer
+task: Write a Pod "web" with an init container "wait-db" (image busybox:1.36, command sh -c "until nc -z db 5432; do sleep 2; done") and a main container "app" (image registry.example.com/app:1.0).
+hint: initContainers is a sibling of containers under spec.
+@@ start
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web
+spec:
+  containers:
+    - name: app
+      image: registry.example.com/app:1.0
+@@ sol
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web
+spec:
+  initContainers:
+    - name: wait-db
+      image: busybox:1.36
+      command: ["sh", "-c", "until nc -z db 5432; do sleep 2; done"]
+  containers:
+    - name: app
+      image: registry.example.com/app:1.0
+@@ checks
+eq spec.initContainers.name wait-db
+eq spec.initContainers.image busybox:1.36
+eq spec.containers.name app
+
+## A sidecar that shares an emptyDir
+id: sidecar
+task: Write a Pod "logger" with two containers: "app" (image registry.example.com/app:1.0) and "shipper" (image registry.example.com/shipper:1.0). Both mount an emptyDir volume named logs at /var/log/app.
+hint: Define the volume under spec.volumes and mount it in each container with volumeMounts.
+@@ start
+apiVersion: v1
+kind: Pod
+metadata:
+  name: logger
+spec:
+  containers:
+    - name: app
+      image: registry.example.com/app:1.0
+@@ sol
+apiVersion: v1
+kind: Pod
+metadata:
+  name: logger
+spec:
+  volumes:
+    - name: logs
+      emptyDir: {}
+  containers:
+    - name: app
+      image: registry.example.com/app:1.0
+      volumeMounts:
+        - name: logs
+          mountPath: /var/log/app
+    - name: shipper
+      image: registry.example.com/shipper:1.0
+      volumeMounts:
+        - name: logs
+          mountPath: /var/log/app
+@@ checks
+eq spec.volumes.name logs
+eq spec.containers.name shipper
+eq spec.containers.volumeMounts.mountPath /var/log/app
+count spec.containers == 2
+
+## A PodDisruptionBudget
+id: pdb
+task: Write a PodDisruptionBudget "api" that keeps at least 2 pods of the app: api selector available during voluntary disruptions.
+hint: apiVersion policy/v1. spec.minAvailable and spec.selector.matchLabels.
+@@ start
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: api
+@@ sol
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: api
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: api
+@@ checks
+eq kind PodDisruptionBudget
+eq spec.minAvailable 2
+eq spec.selector.matchLabels.app api
+
+## Node affinity for a dedicated pool
+id: nodeaffinity
+task: Write a Pod "batch" (container "job", image registry.example.com/job:1.0) that must run on nodes labelled pool=batch, using requiredDuringSchedulingIgnoredDuringExecution node affinity.
+hint: affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms with matchExpressions.
+@@ start
+apiVersion: v1
+kind: Pod
+metadata:
+  name: batch
+spec:
+  containers:
+    - name: job
+      image: registry.example.com/job:1.0
+@@ sol
+apiVersion: v1
+kind: Pod
+metadata:
+  name: batch
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: pool
+                operator: In
+                values: ["batch"]
+  containers:
+    - name: job
+      image: registry.example.com/job:1.0
+@@ checks
+eq spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms.matchExpressions.key pool
+eq spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms.matchExpressions.operator In
+eq spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms.matchExpressions.values batch
+
+## A toleration for a tainted node
+id: toleration
+task: Write a Pod "gpu" (container "train", image registry.example.com/train:1.0) that tolerates the taint dedicated=gpu with effect NoSchedule.
+hint: tolerations is a list under spec with key, operator, value and effect.
+@@ start
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu
+spec:
+  containers:
+    - name: train
+      image: registry.example.com/train:1.0
+@@ sol
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu
+spec:
+  tolerations:
+    - key: dedicated
+      operator: Equal
+      value: gpu
+      effect: NoSchedule
+  containers:
+    - name: train
+      image: registry.example.com/train:1.0
+@@ checks
+eq spec.tolerations.key dedicated
+eq spec.tolerations.value gpu
+eq spec.tolerations.effect NoSchedule
+
+## A rolling update strategy
+id: rolling
+task: Write a Deployment "api" with 4 replicas, label app: api, image registry.example.com/api:1.0 and a RollingUpdate strategy with maxUnavailable 0 and maxSurge 1.
+hint: spec.strategy.type and spec.strategy.rollingUpdate.
+@@ start
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+@@ sol
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api
+          image: registry.example.com/api:1.0
+@@ checks
+eq spec.replicas 4
+eq spec.strategy.type RollingUpdate
+eq spec.strategy.rollingUpdate.maxUnavailable 0
+eq spec.strategy.rollingUpdate.maxSurge 1
+
+## A StatefulSet with storage
+id: statefulset
+task: Write a StatefulSet "db" with serviceName "db", 3 replicas, label app: db, container "pg" (image postgres:16) and a volumeClaimTemplate named data that requests 10Gi with ReadWriteOnce.
+hint: volumeClaimTemplates sits under spec, next to template.
+@@ start
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db
+@@ sol
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db
+spec:
+  serviceName: db
+  replicas: 3
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+        - name: pg
+          image: postgres:16
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
+@@ checks
+eq kind StatefulSet
+eq spec.serviceName db
+eq spec.replicas 3
+eq spec.volumeClaimTemplates.metadata.name data
+eq spec.volumeClaimTemplates.spec.resources.requests.storage 10Gi
+
+## A DaemonSet on every node
+id: daemonset
+task: Write a DaemonSet "node-agent" with label app: node-agent and one container "agent" (image registry.example.com/agent:1.0).
+hint: A DaemonSet needs a selector that matches the template labels, like a Deployment.
+@@ start
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-agent
+@@ sol
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-agent
+spec:
+  selector:
+    matchLabels:
+      app: node-agent
+  template:
+    metadata:
+      labels:
+        app: node-agent
+    spec:
+      containers:
+        - name: agent
+          image: registry.example.com/agent:1.0
+@@ checks
+eq kind DaemonSet
+eq spec.selector.matchLabels.app node-agent
+eq spec.template.metadata.labels.app node-agent
+eq spec.template.spec.containers.name agent
+
+## A ResourceQuota for a namespace
+id: quota
+task: Write a ResourceQuota "team-quota" in the namespace "payments" limiting pods to 20, requests.cpu to "10" and requests.memory to 20Gi.
+hint: Quota limits live under spec.hard.
+@@ start
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: team-quota
+@@ sol
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: team-quota
+  namespace: payments
+spec:
+  hard:
+    pods: "20"
+    requests.cpu: "10"
+    requests.memory: 20Gi
+@@ checks
+eq metadata.namespace payments
+eq spec.hard.pods 20
+src requests\.memory:\s*20Gi
+
+## A LimitRange with defaults
+id: limitrange
+task: Write a LimitRange "defaults" in the namespace "payments" that gives containers a default request of cpu 100m and memory 128Mi, and a default limit of cpu 500m and memory 512Mi.
+hint: spec.limits is a list. type Container, with defaultRequest and default.
+@@ start
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: defaults
+  namespace: payments
+@@ sol
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: defaults
+  namespace: payments
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 100m
+        memory: 128Mi
+      default:
+        cpu: 500m
+        memory: 512Mi
+@@ checks
+eq spec.limits.type Container
+eq spec.limits.defaultRequest.cpu 100m
+eq spec.limits.default.memory 512Mi
+
+## An ExternalName service
+id: externalname
+task: Write a Service "billing-db" of type ExternalName that points to the host db.billing.example.com.
+hint: spec.type ExternalName and spec.externalName.
+@@ start
+apiVersion: v1
+kind: Service
+metadata:
+  name: billing-db
+@@ sol
+apiVersion: v1
+kind: Service
+metadata:
+  name: billing-db
+spec:
+  type: ExternalName
+  externalName: db.billing.example.com
+@@ checks
+eq spec.type ExternalName
+eq spec.externalName db.billing.example.com
+
+## A multi-document file
+id: multidoc
+task: Write one file with two documents separated by ---: a Namespace "shop" and a ServiceAccount "shop-sa" in that namespace.
+hint: Separate the documents with a line that contains three dashes.
+@@ start
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: shop
+@@ sol
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: shop
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: shop-sa
+  namespace: shop
+@@ checks
+docs 2
+eq @0 kind Namespace
+eq @1 kind ServiceAccount
+eq @1 metadata.namespace shop
+
+## A CI job with variables
+id: cijob2
+task: Write a CI file with stages build and test, a variable GOFLAGS: "-mod=readonly" at the top, and a job "unit" in the test stage that runs "go test ./...".
+hint: The top level holds stages, variables and one key per job.
+@@ start
+stages:
+  - build
+  - test
+@@ sol
+stages:
+  - build
+  - test
+variables:
+  GOFLAGS: "-mod=readonly"
+unit:
+  stage: test
+  script:
+    - go test ./...
+@@ checks
+len stages == 2
+eq variables.GOFLAGS -mod=readonly
+eq unit.stage test
+eq unit.script go test ./...
+
+## A Compose service with a healthcheck
+id: composehealth
+task: Write a Compose file with a service "db" using image postgres:16 and a healthcheck that runs ["CMD-SHELL", "pg_isready -U postgres"] every 10s with 5 retries.
+hint: healthcheck has test, interval and retries.
+@@ start
+services:
+  db:
+    image: postgres:16
+@@ sol
+services:
+  db:
+    image: postgres:16
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      retries: 5
+@@ checks
+eq services.db.image postgres:16
+eq services.db.healthcheck.interval 10s
+eq services.db.healthcheck.retries 5
+match services.db.healthcheck.test pg_isready
+
+## An Ansible task with a handler
+id: ansiblehandler
+task: Write an Ansible play for hosts "web" with a task that copies nginx.conf to /etc/nginx/nginx.conf and notifies the handler "restart nginx". Define that handler with the service module (name nginx, state restarted).
+hint: notify on the task, and handlers at the same level as tasks.
+@@ start
+- hosts: web
+  tasks: []
+@@ sol
+- hosts: web
+  tasks:
+    - name: Copy nginx config
+      ansible.builtin.copy:
+        src: nginx.conf
+        dest: /etc/nginx/nginx.conf
+      notify: restart nginx
+  handlers:
+    - name: restart nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
+@@ checks
+eq @0 hosts web
+eq @0 tasks.notify restart nginx
+eq @0 handlers.name restart nginx
+src state:\s*restarted

@@ -33,3 +33,27 @@ I combine severity with context: is the component reachable and loaded, is the s
 ## Explain how you would respond to a suspected compromise of a production server.
 level: senior
 Confirm and scope the event, then contain: isolate the host from the network and disable any credentials it held, while preserving a disk snapshot and memory capture for evidence. Investigate with logs to find the entry point and lateral movement, rotate secrets, rebuild from a known good image rather than cleaning in place, and restore service. Keep a timeline, limit the incident channel, involve legal staff if personal data may be affected, and run a blameless review that produces control changes.
+
+## What is the difference between authentication and authorization, and where do teams get it wrong?
+level: junior
+Authentication proves who the caller is. Authorization decides what that caller may do with a specific action or object. Teams often check only that a user is logged in, so changing an identifier in a request returns somebody else's data. Authorization must be enforced on the server for every object.
+
+## How do OAuth 2.0 and OpenID Connect relate?
+level: mid
+OAuth 2.0 is about delegated authorization: an application receives a token with limited scope to act on a user's behalf. OpenID Connect adds an authentication layer on top, with an ID token that tells the application who the user is. Validate signature, issuer, audience and expiry, keep access tokens short-lived, and request the smallest scope.
+
+## What does zero trust mean in practice?
+level: mid
+It means no request is trusted because of its network location. Every request is authenticated and authorized using identity, device state and policy, access is least privilege and time-limited, the network is segmented, and every decision is logged. You start with administrator and production access rather than trying to change everything at once.
+
+## How would you roll out a policy that blocks risky Kubernetes pods?
+level: mid
+I would write it as code, start in audit mode to list violations, work with owning teams to fix them or grant exceptions that have an owner, reason and expiry, then enforce in stages by namespace or environment. I would keep the policy in version control, test it in the pipeline, and report violations over time.
+
+## How do you protect backups against ransomware?
+level: senior
+Follow 3-2-1, and make at least one copy immutable with a retention lock and one isolated in a separate account with separate credentials and multi-factor authentication. Alert on deletions and retention changes, encrypt with keys managed separately, and test restores against RTO and RPO. Keep the recovery runbook offline and recover in order: identity and DNS, network, data, applications, users.
+
+## An internal service has no authentication because it is on a private network. What is your view?
+level: senior
+Network location is weak proof of identity, because one compromised host or a request forgery flaw reaches everything inside. I would add service identity with mutual TLS or workload identity, authorize each caller, segment the network, filter egress, and log access. Doing this for the most sensitive services first is practical.

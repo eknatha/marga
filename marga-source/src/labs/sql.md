@@ -366,3 +366,84 @@ hint: Compare each service ratio with a scalar subquery of the global ratio.
 SELECT service_id, SUM(failed), SUM(total) FROM slo_daily GROUP BY service_id;
 @@ sol
 SELECT s.name FROM slo_daily d JOIN services s ON s.id = d.service_id GROUP BY s.name HAVING SUM(d.failed) * 1.0 / SUM(d.total) > (SELECT SUM(failed) * 1.0 / SUM(total) FROM slo_daily) ORDER BY s.name;
+
+## Services with bad deploys
+id: multirollback
+task: Show each service name that had at least one deploy with status 'rolled_back' or 'failed', with the count of those deploys. Order by count (highest first) then name.
+hint: GROUP BY the service, with status IN ('rolled_back','failed') in WHERE.
+@@ start
+SELECT name FROM services;
+@@ sol
+SELECT s.name, COUNT(*) AS bad FROM deploys d JOIN services s ON s.id = d.service_id WHERE d.status IN ('rolled_back', 'failed') GROUP BY s.id ORDER BY bad DESC, s.name;
+
+## Longest incident per team
+id: longestteam
+task: For each team, show the team and the longest resolved incident in minutes (rounded to whole minutes). Order by minutes descending, then team.
+hint: Join incidents to services, filter resolved_at IS NOT NULL, then MAX over the julianday difference.
+@@ start
+SELECT team FROM services;
+@@ sol
+SELECT s.team, ROUND(MAX((julianday(i.resolved_at) - julianday(i.started_at)) * 24 * 60)) AS minutes FROM incidents i JOIN services s ON s.id = i.service_id WHERE i.resolved_at IS NOT NULL GROUP BY s.team ORDER BY minutes DESC, s.team;
+
+## Alerts that fired before the incident started
+id: alertfirst
+task: List alert name and service name where the alert fired within 10 minutes before an incident for the same service started. Order by alert fired time.
+hint: Join alerts and incidents on service_id, then compare julianday values.
+@@ start
+SELECT name FROM alerts;
+@@ sol
+SELECT a.name, s.name AS service FROM alerts a JOIN incidents i ON i.service_id = a.service_id JOIN services s ON s.id = a.service_id WHERE (julianday(i.started_at) - julianday(a.fired_at)) * 24 * 60 BETWEEN 0 AND 10 ORDER BY a.fired_at, a.id;
+
+## Days with p99 above 800 ms
+id: slowdays
+task: Show service name, day and p99_ms for every day where p99_ms was above 800. Order by p99_ms descending then day.
+hint: Join slo_daily to services and filter p99_ms > 800.
+@@ start
+SELECT day, p99_ms FROM slo_daily;
+@@ sol
+SELECT s.name, d.day, d.p99_ms FROM slo_daily d JOIN services s ON s.id = d.service_id WHERE d.p99_ms > 800 ORDER BY d.p99_ms DESC, d.day;
+
+## Share of deploys that succeed per deployer
+id: deployersucc
+task: For each deployer show the number of deploys and the percentage with status 'ok' rounded to 0 decimals. Order by percentage descending, then deployer.
+hint: SUM(status = 'ok') counts successes in SQLite.
+@@ start
+SELECT deployer FROM deploys;
+@@ sol
+SELECT deployer, COUNT(*) AS deploys, ROUND(100.0 * SUM(status = 'ok') / COUNT(*)) AS pct_ok FROM deploys GROUP BY deployer ORDER BY pct_ok DESC, deployer;
+
+## Services without any deploy in the last data window
+id: nodeploy
+task: Which services have no deploy at all after '2026-03-05 00:00:00'? Show their names ordered by name.
+hint: NOT EXISTS with a correlated subquery, or LEFT JOIN with a date filter in the ON clause.
+@@ start
+SELECT name FROM services;
+@@ sol
+SELECT s.name FROM services s WHERE NOT EXISTS (SELECT 1 FROM deploys d WHERE d.service_id = s.id AND d.deployed_at > '2026-03-05 00:00:00') ORDER BY s.name;
+
+## Rank services by incident count
+id: rankinc
+task: Show each service name, its incident count and its rank by incident count (1 is highest) using RANK(). Order by rank, then name.
+hint: RANK() OVER (ORDER BY COUNT(*) DESC) works together with GROUP BY.
+@@ start
+SELECT name FROM services;
+@@ sol
+SELECT s.name, COUNT(i.id) AS incidents, RANK() OVER (ORDER BY COUNT(i.id) DESC) AS rnk FROM services s LEFT JOIN incidents i ON i.service_id = s.id GROUP BY s.id ORDER BY rnk, s.name;
+
+## Running total of failed requests
+id: runningfail
+task: For service id 1, show day, failed and the running total of failed requests ordered by day.
+hint: SUM(failed) OVER (ORDER BY day) is a running total.
+@@ start
+SELECT day, failed FROM slo_daily WHERE service_id = 1;
+@@ sol
+SELECT day, failed, SUM(failed) OVER (ORDER BY day) AS running_failed FROM slo_daily WHERE service_id = 1 ORDER BY day;
+
+## Pages that were never acknowledged, by alert name
+id: unackname
+task: For each alert name, count the paged alerts (paged = 1) that were never acknowledged (acked_at IS NULL). Show only names with at least one, ordered by count descending then name.
+hint: WHERE paged = 1 AND acked_at IS NULL, then GROUP BY name.
+@@ start
+SELECT name FROM alerts;
+@@ sol
+SELECT name, COUNT(*) AS n FROM alerts WHERE paged = 1 AND acked_at IS NULL GROUP BY name ORDER BY n DESC, name;
