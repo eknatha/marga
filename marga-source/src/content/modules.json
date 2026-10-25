@@ -96,5 +96,15 @@
     "requires": [
       "observability"
     ]
+  },
+  {
+    "id": "security",
+    "title": "DevSecOps and security",
+    "summary": "Build security into delivery: threat modeling, secrets, pipeline and supply chain checks, container and Kubernetes hardening, cloud identity and incident response.",
+    "level": "Intermediate",
+    "requires": [
+      "cicd",
+      "docker"
+    ]
   }
 ]

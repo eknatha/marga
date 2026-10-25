@@ -1,0 +1,402 @@
+{
+"linux/filesystem-and-navigation": {
+"s": "Think of Linux files as one big tree of folders that starts at a single root. Commands like cd and ls are how you walk around the tree and look at what is on each branch.",
+"i": "Everything hangs under / in one hierarchy. I use pwd, cd, ls -la, find and tree to move and search, and I know the key directories: /etc for config, /var for logs and state, /home for users, /tmp for scratch."
+},
+"linux/users-groups-permissions": {
+"s": "Every file has an owner, a group and a rule for who may read, write or run it, like a door with three kinds of keys: owner, team and everyone else.",
+"i": "Permissions are read, write and execute for user, group and others, shown as rwx and set with chmod and chown. I use groups for shared access, sudo for limited admin rights, and special bits like setgid on shared directories."
+},
+"linux/processes-and-services": {
+"s": "A process is a running program. systemd is the manager that starts important programs at boot and restarts them if they crash, like a building manager for background jobs.",
+"i": "I inspect processes with ps and top, send signals with kill, and manage services with systemctl and unit files. Restart policies, dependencies and journalctl give me control and the logs to debug failures."
+},
+"linux/disks-and-filesystems": {
+"s": "A disk is cut into partitions, each formatted with a filesystem, then attached to a folder. That is how a new drive becomes usable space.",
+"i": "I list devices with lsblk, create filesystems with mkfs, mount them, and make mounts permanent in /etc/fstab using UUIDs. I watch both block and inode use with df -h and df -i."
+},
+"linux/lvm-and-raid": {
+"s": "LVM lets you treat several disks as one flexible pool you can grow or shrink. RAID copies or spreads data across disks so one failure does not lose it.",
+"i": "LVM has physical volumes, volume groups and logical volumes, so I can extend storage online with lvextend and resize2fs. RAID levels trade capacity, speed and redundancy. RAID is not a backup."
+},
+"linux/package-management": {
+"s": "A package manager is an app store for servers. It installs software and its dependencies, and updates everything in one go.",
+"i": "I use apt or dnf to install, update and remove packages, manage repositories and keys, pin or hold versions, and verify signatures. I patch on a schedule and test before production."
+},
+"linux/ssh-and-remote-access": {
+"s": "SSH is a locked, encrypted tunnel to another computer. Your private key is the key, and the server holds a matching lock.",
+"i": "I use key authentication, disable password and root login, set options in sshd_config, use ~/.ssh/config for hosts, jump hosts and agent forwarding with care, and port forwarding for tunnels."
+},
+"linux/cron-and-timers": {
+"s": "Cron is an alarm clock for commands. You say when, and the system runs the job for you.",
+"i": "I schedule with crontab syntax or systemd timers. Timers add logging, dependencies and missed-run catch up. I use absolute paths, set the environment, capture output and avoid overlapping runs with locks."
+},
+"linux/logs-and-troubleshooting": {
+"s": "Logs are the diary of the system. When something breaks, read the diary near the time it happened.",
+"i": "I check journalctl and files in /var/log, filter by unit and time, and follow with -f. I build a timeline, form a hypothesis, test one change at a time and write down what I found."
+},
+"linux/performance-triage": {
+"s": "When a server is slow, ask four questions in order: is the CPU busy, is memory short, is the disk waiting, or is the network the limit?",
+"i": "I use the USE method with uptime, top, vmstat, iostat, free and ss. High load with low CPU points to I/O wait. I find the top consumers, then decide whether to tune, limit or scale."
+},
+"linux/boot-and-kernel": {
+"s": "Booting is a relay race: firmware starts the bootloader, which starts the kernel, which starts the first program, systemd.",
+"i": "BIOS or UEFI, GRUB, kernel and initramfs, then systemd targets. For recovery I use rescue mode, edit the kernel line, repair fstab or reinstall the bootloader from a live image."
+},
+"linux/security-hardening": {
+"s": "Hardening means closing doors and windows you do not use: fewer services, strict permissions, updates and a record of who did what.",
+"i": "I patch, remove unneeded packages, restrict SSH, use a firewall, apply least privilege with sudo, enable auditd and file integrity checks, and follow a benchmark such as CIS."
+},
+"bash/script-basics": {
+"s": "A shell script is a list of commands saved in a file so you can run them again. It saves you from typing the same steps every day.",
+"i": "I start with a shebang, use variables with quotes, read arguments with $1 and $@, check exit codes with $?, and make the file executable. I run ShellCheck to catch mistakes."
+},
+"bash/control-flow-and-functions": {
+"s": "Scripts can make choices with if, repeat work with loops and group steps into functions, just like instructions with conditions in a recipe.",
+"i": "I use if and case with [[ ]] tests, for and while loops, and functions with local variables and return codes. I keep functions small and handle errors in each."
+},
+"bash/text-processing": {
+"s": "grep finds lines, sed edits them and awk works on columns. Together they turn messy output into the answer you need.",
+"i": "I use grep for filtering, sed for substitutions, awk for fields and sums, sort and uniq -c for counts, and pipes to combine them. I test on a copy before using sed -i."
+},
+"bash/advanced-patterns": {
+"s": "Advanced scripts take options, hold lists in arrays and print multi-line text with here-documents, so they behave like proper tools.",
+"i": "I parse options with getopts, use arrays and associative arrays, here-documents for templates, process substitution, and always quote expansions to handle spaces safely."
+},
+"bash/apis-and-json": {
+"s": "curl talks to web services and jq picks values out of the JSON that comes back, like asking a question and highlighting the answer.",
+"i": "I call APIs with curl -fsS, set headers and tokens from the environment, parse with jq -r, check status codes, handle pagination and retries, and never print secrets."
+},
+"bash/safe-automation": {
+"s": "Safe scripts stop at the first problem, clean up after themselves and cannot run twice at once, like a careful checklist with an undo.",
+"i": "I use set -euo pipefail, trap for cleanup, lock files or flock to prevent overlap, dry-run modes, logging and idempotent steps so reruns are harmless."
+},
+"python/basics-and-environments": {
+"s": "Python is a readable language. A virtual environment is a private toolbox for one project so libraries do not clash.",
+"i": "I create venvs, pin dependencies in requirements files, use functions, dictionaries and comprehensions, and follow PEP 8. I keep projects isolated for reproducible builds."
+},
+"python/files-and-processes": {
+"s": "Scripts read and write files, start other programs and must handle errors calmly instead of crashing.",
+"i": "I use pathlib, with blocks, subprocess.run with check and timeouts, try and except for specific errors, and logging instead of print for operational scripts."
+},
+"python/http-apis-and-json": {
+"s": "Python can call web services and read JSON replies as dictionaries, so you can automate anything with an API.",
+"i": "I use requests with timeouts and sessions, check status codes, parse JSON, handle pagination, retry with back-off, and keep tokens in environment variables."
+},
+"python/cloud-sdks": {
+"s": "SDKs let Python control cloud accounts directly: list servers, create buckets, read secrets, all from code.",
+"i": "I use boto3 and the Azure SDK with roles and default credential chains, paginate list calls, handle throttling, and write idempotent scripts with dry-run modes."
+},
+"python/testing-and-packaging": {
+"s": "Tests prove your script still works after changes. Packaging turns it into a command anyone can install.",
+"i": "I write pytest tests with fixtures and mocks, run them in CI, and package with pyproject.toml and an entry point so the tool installs with pip and runs with a command name."
+},
+"networking/ip-addressing-and-subnets": {
+"s": "An IP address is a home address for a machine. A subnet is a neighbourhood, and the mask says how big it is.",
+"i": "I read CIDR notation, compute network and broadcast addresses and usable hosts, use private ranges from RFC 1918, and plan non-overlapping subnets."
+},
+"networking/dns": {
+"s": "DNS is the phone book of the internet. It turns names people remember into addresses computers use.",
+"i": "A resolver walks from root to TLD to authoritative servers, caches answers by TTL, and uses record types A, AAAA, CNAME, MX and TXT. I debug with dig and check TTLs and delegation."
+},
+"networking/http-and-tls": {
+"s": "HTTP is how browsers ask for pages. TLS wraps it in encryption and proves the site is who it says it is.",
+"i": "HTTP uses methods and status codes. TLS does a handshake, verifies a certificate chain, and sets session keys. I debug with curl -v and openssl s_client, and watch certificate expiry."
+},
+"networking/routing-and-nat": {
+"s": "Routers pass traffic between networks, and NAT lets many private machines share one public address.",
+"i": "Packets follow the longest matching route to a gateway. NAT rewrites source addresses and tracks connections. I read routing tables with ip route and trace paths with traceroute."
+},
+"networking/troubleshooting-toolkit": {
+"s": "Debug a network from the bottom up: cable and link, then address, then route, then name, then port, then application.",
+"i": "I test layer by layer with ip, ping, traceroute, dig, ss, nc and curl, and capture traffic with tcpdump when needed. I isolate whether the fault is local, in the path or at the target."
+},
+"networking/firewalls-and-load-balancing": {
+"s": "A firewall is a guard that checks who may enter. A load balancer is a host who sends each guest to a table with space.",
+"i": "Firewalls allow or deny by address, port and state. Load balancers distribute traffic at layer 4 or 7 with health checks and algorithms like round robin and least connections."
+},
+"networking/vpn-and-tunnels": {
+"s": "A VPN is a private tunnel through the public internet, so remote machines act as if they were on the same network.",
+"i": "Site-to-site and client VPNs use IPsec or WireGuard to encrypt traffic between networks. I plan non-overlapping ranges, routes, MTU and DNS, and use private links when stable latency matters."
+},
+"docker/containers-and-images": {
+"s": "An image is a recipe frozen into a package. A container is one running copy of it, isolated from the rest of the machine.",
+"i": "Containers are processes isolated with namespaces and limited with cgroups. Images are layered and immutable. I use docker run, ps, logs and exec, and pin image versions."
+},
+"docker/writing-dockerfiles": {
+"s": "A Dockerfile is the step-by-step recipe for an image. Good recipes are short, cached well and leave out tools you do not need.",
+"i": "I order instructions for cache use, use multi-stage builds, a small base, a non-root user, .dockerignore, and exec-form CMD so signals reach the app."
+},
+"docker/volumes-and-networking": {
+"s": "Containers forget everything when removed, so volumes keep data. Networks let containers talk to each other by name.",
+"i": "I use named volumes for state, bind mounts for development, user-defined bridge networks for name resolution, and publish only the ports that need to be reachable."
+},
+"docker/compose": {
+"s": "Compose describes several containers in one file, so you can start a whole app with a single command.",
+"i": "I define services, networks, volumes, health checks and dependencies in a Compose file, use env files, and use profiles for optional services. It is great for local environments and small deployments."
+},
+"docker/registries-and-supply-chain": {
+"s": "A registry is a warehouse for images. You must trust what you pull, so pin exact versions and check signatures.",
+"i": "I use private registries, tag by version and digest, scan images, sign them, and allow only approved sources. I avoid latest in production."
+},
+"docker/runtimes-oci-and-podman": {
+"s": "Docker is one tool among many that follow the same open standard, so images work across them.",
+"i": "The OCI defines image and runtime specs. containerd and runc run containers under Docker and Kubernetes. Podman runs daemonless and rootless with a Docker-compatible CLI."
+},
+"docker/security-and-troubleshooting": {
+"s": "Run containers with the fewest powers possible, and when one stops, read its exit code to learn why.",
+"i": "I run as non-root, drop capabilities, use read-only filesystems and avoid privileged mode. Exit 137 means SIGKILL, often out of memory, and I check inspect, logs and stats."
+},
+"cicd/pipeline-fundamentals": {
+"s": "A pipeline is an assembly line for code: build, test, package and deliver, the same way every time.",
+"i": "CI merges and tests often. CD delivers to environments through stages with automated checks. Pipelines give fast feedback, repeatability and an audit trail."
+},
+"cicd/building-a-pipeline": {
+"s": "A Jenkinsfile writes the assembly line as code, so the pipeline lives with the project and can be reviewed.",
+"i": "I use declarative pipelines with stages, agents, environment, credentials binding, post actions and parallel steps, and keep logic in shared libraries."
+},
+"cicd/testing-and-quality-gates": {
+"s": "Tests catch mistakes early. Quality gates stop a bad change from moving forward.",
+"i": "I follow the test pyramid: many fast unit tests, fewer integration tests, few end-to-end tests. Gates check coverage, linting, scans and test results before promotion."
+},
+"cicd/deployment-strategies": {
+"s": "There are several ways to release: swap everything, replace slowly, or try on a few users first, each with different risk.",
+"i": "Rolling, blue-green and canary deployments trade speed, cost and risk. I add health checks, automatic rollback, feature flags and metrics to decide whether to proceed."
+},
+"cicd/versioning-and-artifacts": {
+"s": "Each build gets a unique label and is stored once, so what you test is exactly what you ship.",
+"i": "I use semantic versioning, build once and promote the same artifact, store it in a registry, and record the commit and build number for traceability."
+},
+"cicd/pipeline-security": {
+"s": "The pipeline can deploy to production, so attackers want it. Protect secrets, check dependencies and sign what you build.",
+"i": "I use short-lived credentials, isolated runners, protected branches, pinned dependencies, scans, SBOMs and signed artifacts, and I treat pipeline files as sensitive code."
+},
+"cicd/declarative-delivery-with-argo-cd": {
+"s": "Instead of pushing changes into a cluster, you describe the desired state in a repository and a tool keeps the cluster matching it.",
+"i": "A controller such as Argo CD or Flux compares the repository with the cluster and syncs differences. This gives audit history, easy rollback by revert, and drift correction."
+},
+"kubernetes/architecture": {
+"s": "Kubernetes has a control plane that decides and worker nodes that do the work, like managers and staff in a restaurant.",
+"i": "The API server, etcd, scheduler and controllers form the control plane. Nodes run kubelet, a container runtime and kube-proxy. Controllers reconcile desired and actual state."
+},
+"kubernetes/pods-and-deployments": {
+"s": "A pod is the smallest unit and holds one or more containers. A Deployment keeps the right number of pods running and updates them safely.",
+"i": "Deployments manage ReplicaSets for rolling updates and rollbacks. Probes decide when a pod is ready or should restart. I set resources and labels carefully."
+},
+"kubernetes/services-and-ingress": {
+"s": "Pods come and go, so a Service gives a stable address. Ingress lets outside traffic in by host and path.",
+"i": "Services select pods by labels and load balance with ClusterIP, NodePort or LoadBalancer. Ingress and controllers route HTTP by rules and terminate TLS. DNS gives service names."
+},
+"kubernetes/config-and-secrets": {
+"s": "ConfigMaps hold settings and Secrets hold private values, kept apart from the container image.",
+"i": "I inject them as environment variables or files, restrict access with RBAC, enable encryption at rest, and prefer an external secrets store for sensitive data."
+},
+"kubernetes/storage": {
+"s": "Some apps need data to survive restarts. Persistent volumes provide disks that follow the app.",
+"i": "PVs and PVCs separate supply from request, storage classes provision dynamically, and StatefulSets give stable identity and storage. I back up data and test restores."
+},
+"kubernetes/jobs-cronjobs-daemonsets": {
+"s": "Jobs run a task until it finishes, CronJobs repeat it on a schedule, and DaemonSets put one copy on every node.",
+"i": "I use Jobs with backoff limits and completions, CronJobs with concurrency policy, and DaemonSets for agents such as log shippers and node monitors."
+},
+"kubernetes/resources-and-quotas": {
+"s": "Requests tell Kubernetes how much a pod needs. Limits cap how much it may take, so neighbours are not starved.",
+"i": "The scheduler uses requests. Limits are enforced with throttling for CPU and OOM kill for memory. QoS classes decide eviction order, and quotas cap a namespace."
+},
+"kubernetes/autoscaling": {
+"s": "Autoscaling adds or removes pods and nodes as demand changes, like opening more checkout lanes at busy times.",
+"i": "HPA scales pods on metrics, VPA adjusts requests, KEDA scales on events, and the cluster autoscaler adds nodes for pending pods. Requests must be accurate for any of it to work."
+},
+"kubernetes/rbac-and-security": {
+"s": "RBAC decides who may do what in the cluster. Security contexts limit what each container may do.",
+"i": "Roles and bindings grant verbs on resources. I use service accounts per workload, Pod Security Standards, non-root and read-only settings, and policy engines for guardrails."
+},
+"kubernetes/scheduling-and-troubleshooting": {
+"s": "If a pod will not start, ask where it is stuck: not scheduled, not pulled, not running or not ready.",
+"i": "I use describe, events, logs and previous logs. Pending points to resources or constraints, ImagePullBackOff to registry or credentials, CrashLoopBackOff to the app. I use selectors, taints and affinity for placement."
+},
+"kubernetes/helm-and-kustomize": {
+"s": "Helm packages an app with settings you can change. Kustomize layers small changes on top of plain files.",
+"i": "Helm uses charts, values and releases with upgrade and rollback. Kustomize uses bases and overlays with patches. I review rendered output before applying."
+},
+"kubernetes/crds-and-operators": {
+"s": "You can teach Kubernetes new kinds of objects, and an operator is a robot that manages them for you.",
+"i": "A CRD extends the API. A controller watches resources and reconciles state, which is the operator pattern for databases and other complex software."
+},
+"kubernetes/cni-and-cluster-networking": {
+"s": "Every pod gets its own address, and a network plugin makes sure they can all reach each other.",
+"i": "CNI plugins set up pod networking with overlays or routing. NetworkPolicies restrict flows and need a plugin that enforces them. I debug with exec, DNS checks and policy review."
+},
+"kubernetes/cluster-install-upgrade-etcd": {
+"s": "Building a cluster, upgrading it and backing up its brain, etcd, are the core admin duties.",
+"i": "I use kubeadm to install and upgrade one minor version at a time, drain nodes, and take etcd snapshots with etcdctl, then test restore."
+},
+"kubernetes/cka-cks-exam-strategy": {
+"s": "The certification exams are hands-on. Speed comes from practice with kubectl and the docs.",
+"i": "I set aliases and autocompletion, use imperative commands and dry-run to generate YAML, search the allowed docs, flag hard questions to return to, and rehearse in timed labs."
+},
+"terraform/iac-and-hcl-basics": {
+"s": "Infrastructure as code means describing servers and networks in text files so they can be reviewed and repeated.",
+"i": "Terraform uses declarative HCL, a plan that shows changes, and apply to make them. Code in version control gives history, review and repeatable environments."
+},
+"terraform/providers-and-resources": {
+"s": "A provider is the plugin that talks to a cloud. Resources are the things you want, such as a server or a bucket.",
+"i": "I configure providers with versions, declare resources and reference attributes, use data sources to read existing items, and rely on the dependency graph for ordering."
+},
+"terraform/variables-and-outputs": {
+"s": "Variables are the inputs, outputs are the results, and locals are handy names for values you reuse.",
+"i": "I declare typed variables with defaults and validation, use tfvars files per environment, mark outputs sensitive where needed, and use locals to avoid repetition."
+},
+"terraform/expressions-and-dynamic-blocks": {
+"s": "Expressions let one block create many similar things instead of copying code.",
+"i": "count and for_each create multiple resources, for expressions transform data, conditionals toggle features, and dynamic blocks build repeated nested settings."
+},
+"terraform/state": {
+"s": "State is Terraform's memory of what it built. Lose it or share it badly and you will have problems.",
+"i": "State maps code to real resources. Use a remote backend with locking and encryption, avoid manual edits, and use state commands and import carefully."
+},
+"terraform/modules": {
+"s": "A module is a reusable package of Terraform, like a function for infrastructure.",
+"i": "Modules take inputs, return outputs and hide detail. I version them, keep them focused, and document and test them. Root modules compose them per environment."
+},
+"terraform/secrets-and-sensitive-data": {
+"s": "Never put passwords in code. Terraform can read them from safe places and hide them in output.",
+"i": "I mark values sensitive, fetch from a secrets manager, avoid plain text in variables, and protect state because it can hold secrets."
+},
+"terraform/aws-and-azure-end-to-end": {
+"s": "Putting it together: network, compute, load balancer and database, built from code on either cloud.",
+"i": "I build a VPC or VNet, subnets, security rules, instances or scale sets, a load balancer and a database in modules, then outputs for what is deployed."
+},
+"terraform/workflows-and-drift": {
+"s": "Teams use pull requests, plans and checks to change infrastructure safely, and watch for changes made by hand.",
+"i": "I run fmt, validate and plan in CI, require review, apply from a pipeline, detect drift with scheduled plans, and test modules with tools such as terraform test."
+},
+"cloud/cloud-fundamentals": {
+"s": "The cloud is renting computing instead of buying it. You pay for what you use and the provider runs the hardware.",
+"i": "IaaS, PaaS and SaaS differ by who manages what. Regions and availability zones give resilience. The shared responsibility model divides security duties."
+},
+"cloud/identity-and-access": {
+"s": "Identity decides who can do what. Give each person and program the smallest set of permissions.",
+"i": "IAM users, groups, roles and policies. I use roles with temporary credentials, MFA, least privilege, and review access with analysers and logs."
+},
+"cloud/virtual-networks": {
+"s": "A virtual network is your own private network inside the cloud, with subnets, routes and firewalls you control.",
+"i": "VPCs and VNets have public and private subnets, route tables, gateways, security groups and network ACLs. I use NAT for outbound access and private endpoints for services."
+},
+"cloud/compute-and-storage": {
+"s": "Choose where code runs, such as virtual machines or containers, and where data lives, such as objects, blocks or files.",
+"i": "I match instance types to workloads, use autoscaling, and pick object, block or file storage by access pattern. I use snapshots, lifecycle rules and encryption."
+},
+"cloud/dns-and-cdn": {
+"s": "DNS sends users to the right place, and a CDN keeps copies of content near them so pages load faster.",
+"i": "Route 53 and Azure DNS provide routing policies and health checks. CloudFront and Front Door cache at the edge, terminate TLS and absorb load. I control caching with headers."
+},
+"cloud/serverless": {
+"s": "Serverless runs your code only when something happens, and you do not manage servers.",
+"i": "Functions react to events, scale automatically and bill by use. I watch cold starts, timeouts, concurrency and idempotency, and design around events and queues."
+},
+"cloud/kubernetes-on-cloud": {
+"s": "EKS and AKS run the Kubernetes control plane for you, so you manage workloads and nodes.",
+"i": "Managed control planes reduce operations work. I handle node groups, IAM integration, networking, upgrades, load balancers and cost."
+},
+"cloud/monitoring-and-logging": {
+"s": "Cloud monitors collect numbers and logs from your resources so you can see problems and be alerted.",
+"i": "CloudWatch and Azure Monitor collect metrics, logs and traces. I create alarms, dashboards and log queries, and set retention to control cost."
+},
+"cloud/security-and-governance": {
+"s": "Guardrails keep teams safe by default: policies that block risky settings before they cause harm.",
+"i": "I use organisation policies, SCPs or Azure Policy, encryption, audit logs, tagging and compliance checks, and separate accounts for blast radius control."
+},
+"cloud/managed-services-and-cost": {
+"s": "Managed services save work, and cost tracking stops surprise bills.",
+"i": "I use managed databases and queues for reliability, design for failure across zones, tag resources, set budgets and alerts, and use reserved or spot capacity where it fits."
+},
+"observability/observability-fundamentals": {
+"s": "Observability means being able to ask new questions of a running system using what it emits: metrics, logs and traces.",
+"i": "Monitoring watches known failures. Observability helps explain unknown ones. The three signals are metrics, logs and traces, joined by shared identifiers."
+},
+"observability/metrics-and-prometheus": {
+"s": "Metrics are numbers over time. Prometheus collects them and lets you ask questions with a query language.",
+"i": "Prometheus scrapes targets, stores time series with labels, and PromQL computes rates and percentiles. I watch cardinality and use histograms for latency."
+},
+"observability/logs-and-traces": {
+"s": "Logs tell what happened. Traces follow one request across many services to show where time went.",
+"i": "I use structured logs with request IDs and trace IDs, sample traces, and move from a metric spike to the trace to the log line that explains it."
+},
+"observability/log-pipelines": {
+"s": "A log pipeline collects logs from everywhere, cleans them and stores them so they can be searched.",
+"i": "Agents such as Fluent Bit ship logs to Loki or Elasticsearch. I parse, filter, add metadata, control retention and index only what I need for cost."
+},
+"observability/opentelemetry": {
+"s": "OpenTelemetry is a common way to collect metrics, logs and traces from any language and send them anywhere.",
+"i": "It provides SDKs, auto-instrumentation and a collector with receivers, processors and exporters. It avoids vendor lock-in and uses consistent context propagation."
+},
+"observability/synthetic-and-blackbox-monitoring": {
+"s": "A blackbox probe checks your site from outside like a user would, even if the inside looks fine.",
+"i": "I run probes for HTTP, TCP and DNS from several places, alert on failures and latency, and check certificate expiry. They catch what internal metrics cannot."
+},
+"observability/alerting-and-dashboards": {
+"s": "A good alert wakes someone only when users are hurt. A good dashboard shows the answer at a glance.",
+"i": "I alert on symptoms and SLO burn rate, include runbooks, avoid noise, and design dashboards with the four golden signals: latency, traffic, errors and saturation."
+},
+"sre/slos-and-error-budgets": {
+"s": "An SLO is a promise about reliability, and the error budget is how much failure you may spend before slowing down.",
+"i": "SLIs measure user experience, SLOs set the target over a window, and the budget is one minus the target. Burn rates drive alerts and release decisions."
+},
+"sre/incident-response": {
+"s": "In an incident, roles and calm communication matter as much as technical skill.",
+"i": "I use an incident commander, communications and operations roles, mitigate before diagnosing, keep a timeline, update stakeholders, and follow with a blameless review."
+},
+"sre/postmortems-and-toil": {
+"s": "A postmortem learns from failure without blaming people. Toil is repetitive work that should be automated away.",
+"i": "I write a timeline, causes, impact and action items with owners. I measure toil, rank it, and automate the highest-return tasks."
+},
+"sre/reliability-patterns": {
+"s": "Patterns such as timeouts, retries and circuit breakers keep one failing part from bringing everything down.",
+"i": "I use timeouts, bounded retries with jitter, circuit breakers, bulkheads, load shedding, graceful degradation and redundancy across zones."
+},
+"sre/on-call": {
+"s": "On-call should be sustainable: clear alerts, good handoffs and a fair rotation.",
+"i": "I design rotations with primary and secondary, page on symptoms, keep runbooks current, track pager load and reduce noise so people stay healthy."
+},
+"sre/capacity-planning": {
+"s": "Capacity planning makes sure you have enough resources before demand arrives.",
+"i": "I forecast from growth and seasonality, load test to find limits, keep headroom for zone loss, and set autoscaling and alerts on saturation."
+},
+"sre/chaos-engineering-and-game-days": {
+"s": "Chaos engineering breaks things on purpose in a safe way, to find weaknesses before real failures do.",
+"i": "I form a hypothesis about steady state, inject a limited failure, observe, and fix gaps. Game days practise the human side, and disaster recovery drills test restores."
+},
+"sre/change-management-and-releases": {
+"s": "Most outages come from changes, so release carefully with checks and an easy way back.",
+"i": "I use progressive delivery, feature flags, canaries, change windows for risk, automated rollback and clear ownership of each change."
+},
+"security/security-mindset-and-threat-modeling": {
+"s": "Think like an attacker while you design. Draw the system and ask what could go wrong at each step.",
+"i": "Shift left, least privilege and defence in depth. I run STRIDE sessions on a diagram with trust boundaries and track findings as work with owners."
+},
+"security/secrets-management": {
+"s": "A secret is anything that lets someone act as you. Keep them out of code and hand them out only when needed.",
+"i": "Inject at run time from a secrets manager, use workload identity and short-lived credentials, scan for leaks, and rotate first when one leaks."
+},
+"security/securing-the-pipeline": {
+"s": "Check everything that goes into your software and prove what comes out.",
+"i": "I add SAST, SCA, secret, IaC and image scans with sensible gates, generate SBOMs, sign artifacts, pin dependencies by digest and harden runners."
+},
+"security/container-and-image-security": {
+"s": "Make containers boring to attack: small images, no root, few powers.",
+"i": "Minimal or distroless base, non-root user, read-only filesystem, dropped capabilities, seccomp, scanning, signing and no privileged mode or Docker socket mounts."
+},
+"security/kubernetes-security": {
+"s": "In a cluster, shrink what each pod can see and do, and what an attacker can reach from it.",
+"i": "Least-privilege RBAC and service accounts, Pod Security Standards, admission policies, default deny network policies, encrypted secrets and runtime detection."
+},
+"security/cloud-security-and-iam": {
+"s": "In the cloud, identity and configuration are the perimeter. Give narrow roles and watch the logs.",
+"i": "Roles over keys, MFA and SSO, account separation with guardrails, encryption and private endpoints, protected audit logs and IaC plus posture scanning."
+},
+"security/vulnerability-management-and-security-incidents": {
+"s": "You cannot fix everything, so rank by real risk, fix on a clock, and be ready when something gets through.",
+"i": "I prioritise by exposure, exploitation and data, agree patch SLAs, detect with logs, and respond with contain, preserve evidence, eradicate, recover and learn."
+}
+}
