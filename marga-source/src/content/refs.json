@@ -153,6 +153,28 @@
     "SRE book: postmortem culture",
     "https://sre.google/sre-book/postmortem-culture/"
    ]
+  ],
+  "security": [
+   [
+    "OWASP projects and cheat sheets",
+    "https://owasp.org/"
+   ],
+   [
+    "NIST Secure Software Development Framework",
+    "https://csrc.nist.gov/projects/ssdf"
+   ],
+   [
+    "SLSA supply chain levels",
+    "https://slsa.dev/"
+   ],
+   [
+    "Kubernetes security documentation",
+    "https://kubernetes.io/docs/concepts/security/"
+   ],
+   [
+    "CIS Benchmarks",
+    "https://www.cisecurity.org/cis-benchmarks"
+   ]
   ]
  },
  "lessons": {
@@ -1457,6 +1479,76 @@
     "OpenFeature documentation",
     "https://openfeature.dev/docs/reference/intro"
    ]
+  ],
+  "security/security-mindset-and-threat-modeling": [
+   [
+    "OWASP Threat Modeling",
+    "https://owasp.org/www-community/Threat_Modeling"
+   ],
+   [
+    "NIST Secure Software Development Framework",
+    "https://csrc.nist.gov/projects/ssdf"
+   ]
+  ],
+  "security/secrets-management": [
+   [
+    "OWASP Secrets Management Cheat Sheet",
+    "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html"
+   ],
+   [
+    "Kubernetes Secrets",
+    "https://kubernetes.io/docs/concepts/configuration/secret/"
+   ]
+  ],
+  "security/securing-the-pipeline": [
+   [
+    "SLSA supply chain levels",
+    "https://slsa.dev/"
+   ],
+   [
+    "OWASP CI/CD Security Cheat Sheet",
+    "https://cheatsheetseries.owasp.org/cheatsheets/CI_CD_Security_Cheat_Sheet.html"
+   ]
+  ],
+  "security/container-and-image-security": [
+   [
+    "Docker security documentation",
+    "https://docs.docker.com/engine/security/"
+   ],
+   [
+    "OWASP Docker Security Cheat Sheet",
+    "https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html"
+   ]
+  ],
+  "security/kubernetes-security": [
+   [
+    "Kubernetes security documentation",
+    "https://kubernetes.io/docs/concepts/security/"
+   ],
+   [
+    "Pod Security Standards",
+    "https://kubernetes.io/docs/concepts/security/pod-security-standards/"
+   ]
+  ],
+  "security/cloud-security-and-iam": [
+   [
+    "AWS IAM best practices",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+   ],
+   [
+    "Microsoft cloud security benchmark",
+    "https://learn.microsoft.com/en-us/security/benchmark/azure/overview"
+   ]
+  ],
+  "security/vulnerability-management-and-security-incidents": [
+   [
+    "NIST Computer Security Incident Handling Guide",
+    "https://csrc.nist.gov/pubs/sp/800/61/r2/final"
+   ],
+   [
+    "CISA Known Exploited Vulnerabilities Catalog",
+    "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+   ]
   ]
  },
  "sheets": {
@@ -1654,6 +1746,20 @@
    [
     "Helm: chart best practices",
     "https://helm.sh/docs/chart_best_practices/"
+   ]
+  ],
+  "security": [
+   [
+    "OWASP Cheat Sheet Series",
+    "https://cheatsheetseries.owasp.org/"
+   ],
+   [
+    "Kubernetes security documentation",
+    "https://kubernetes.io/docs/concepts/security/"
+   ],
+   [
+    "CIS Benchmarks",
+    "https://www.cisecurity.org/cis-benchmarks"
    ]
   ]
  }

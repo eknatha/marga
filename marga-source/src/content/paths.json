@@ -85,6 +85,35 @@
         "Run a healthy on-call rotation and plan capacity before it runs out.",
         "Practise failure with game days and manage change safely."
       ]
+    },
+    {
+      "id": "devsecops",
+      "title": "DevSecOps Engineer",
+      "summary": "Secure delivery from code to cloud: pipeline and supply chain controls, hardened containers and clusters, secrets, cloud identity and security incident response.",
+      "audience": "DevOps, platform and security engineers who own the safety of what ships.",
+      "modules": [
+        "linux",
+        "bash",
+        "python",
+        "networking",
+        "docker",
+        "cicd",
+        "kubernetes",
+        "terraform",
+        "cloud",
+        "security",
+        "observability"
+      ],
+      "outcomes": [
+        "Run a threat modeling session and turn findings into tracked work.",
+        "Keep secrets out of code and images, and use short-lived credentials.",
+        "Add dependency, code, infrastructure and image scanning to a pipeline with sensible gates.",
+        "Produce an SBOM and sign artifacts so deployments can verify them.",
+        "Harden containers and Kubernetes workloads with least privilege and network policies.",
+        "Design least-privilege cloud identity and protect audit logs.",
+        "Prioritise vulnerabilities by real risk and meet agreed fix times.",
+        "Lead the first hour of a security incident while preserving evidence."
+      ]
     }
   ],
   "planned": [
@@ -92,11 +121,6 @@
       "id": "platform",
       "title": "Platform Engineer",
       "summary": "Build internal developer platforms, golden paths and self-service infrastructure."
-    },
-    {
-      "id": "devsecops",
-      "title": "DevSecOps Engineer",
-      "summary": "Secure pipelines, images, clusters and cloud accounts from the start."
     },
     {
       "id": "k8s-admin",
