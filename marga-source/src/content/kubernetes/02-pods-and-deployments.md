@@ -115,6 +115,24 @@ $ kubectl describe pod shop-api-84c6b7d4f-ddddd -n shop | tail -5
 
 The new Pod runs but never becomes ready, so the rollout cannot continue. This is the strategy working as designed: the three healthy old Pods keep serving and users noticed nothing. Look at its logs (`kubectl logs shop-api-84c6b7d4f-ddddd -n shop`), find the cause, then either ship a fix or abandon the release with `kubectl rollout undo`. After a failed attempt, `kubectl rollout status` returns an error once the progress deadline passes, which your pipeline can use to fail the deploy automatically.
 
+## Predict the rollout
+
+```predict
+Q: A Deployment has 3 replicas, maxUnavailable 1 and maxSurge 1. You update the image. How many pods can be unavailable at one time?
+???
+At most one.
+> maxUnavailable caps pods that are not ready during the rollout. maxSurge allows one extra pod, so up to four can exist.
+```
+
+```predict
+Q: A pod's readiness probe fails. Is the pod restarted?
+readinessProbe:
+  httpGet: {path: /ready, port: 8080}
+???
+No. It is removed from Service endpoints until it passes.
+> A failing readiness probe stops traffic. A failing liveness probe is what causes a restart.
+```
+
 ## Common mistakes
 
 - No readiness probe, so traffic arrives before the app can handle it

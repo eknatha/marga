@@ -93,6 +93,19 @@ $ aws ec2 describe-security-groups --group-ids sg-0db123 \
 
 The database group allows port 5432 only from `sg-0app111`, but the new server was launched with a different group, `sg-0app222`. Attach the correct group (or add a rule referencing the new one), retest with `nc`, and confirm the application connects. Because the rule referenced a group rather than a fixed IP, fixing group membership was enough. A "refused" error instead would have meant traffic arrived but nothing listened, which sends you to the database process rather than the network.
 
+```diagram
+title: A three tier network in the cloud
+node: net | Internet | 0 | 1 | Users reach the public load balancer. | Open rules beyond 80 and 443 expose more.
+node: pub | Public subnet | 1 | 1 | Holds load balancers and NAT. | A server here with a public IP is directly exposed.
+node: app | Private app subnet | 2 | 0 | Application servers with no public IP. | Missing NAT means they cannot download updates.
+node: db | Private data subnet | 2 | 2 | Databases that accept traffic only from the app tier. | A broad rule exposes data.
+node: nat | NAT gateway | 3 | 0 | Allows outbound traffic from private subnets. | If it fails, patches and external calls stop.
+edge: net | pub
+edge: pub | app
+edge: app | db
+edge: app | nat
+```
+
 ## Common mistakes
 
 - Overlapping address ranges between networks

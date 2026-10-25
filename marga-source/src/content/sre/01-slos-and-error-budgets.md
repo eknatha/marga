@@ -101,6 +101,22 @@ Budget spent (12 days):
 
 Two events made up 95% of the loss. The agreed response is to pause non-urgent feature releases for the service, spend the sprint on the causes (a safer rollout with automatic canary abort, and timeout and fallback behaviour for the payment provider), and review again when the budget recovers as the window moves on. Importantly, the conversation was about data and a policy everyone had signed up to, not about whose fault it was. If the budget is *never* used, that is also a signal: the target may be too strict, and you could be shipping faster.
 
+## Predict the budget
+
+```predict
+Q: An SLO is 99.9 percent over 30 days. About how many minutes of downtime does the error budget allow?
+???
+About 43 minutes.
+> 30 days is 43,200 minutes. One tenth of one percent of that is 43.2 minutes.
+```
+
+```predict
+Q: A service has used 80 percent of its budget in the first week. What is a sensible response?
+???
+Slow risky releases and fix reliability work first.
+> The budget is a tool for deciding. High burn early means the rest of the period is at risk.
+```
+
 ## Common mistakes
 
 - Setting SLOs at 100% or at whatever the service happens to do today

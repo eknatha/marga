@@ -119,6 +119,19 @@ shop-api-84c6b7d4f-ddddd   1/1     Running   app=shop-backend,pod-template-hash=
 
 `<none>` is the clue. The Service selects `app=shop-api`, but the Pods carry `app=shop-backend`, so nothing matches. Fix the label in the Deployment template or the selector in the Service so they agree, apply, and check that the endpoints list appears. A second cause of empty endpoints is Pods that are running but not **ready**, so always look at both labels and the READY column. A third is the wrong `targetPort`, which gives you endpoints but connection refused.
 
+```diagram
+title: How a request reaches a pod
+node: cl | Client | 0 | 1 | Sends HTTPS to the public name. | A wrong DNS record sends it elsewhere.
+node: lb | Load balancer | 1 | 1 | Forwards to the ingress controller. | If its health check fails, no traffic passes.
+node: ing | Ingress | 2 | 0 | Matches host and path and picks a Service. | A wrong path rule returns 404 from the controller.
+node: svc | Service | 2 | 2 | Gives a stable address and selects pods by label. | A selector that matches no pods gives empty endpoints.
+node: pod | Pod | 3 | 1 | Receives the request on the container port. | A wrong targetPort gives connection refused.
+edge: cl | lb
+edge: lb | ing
+edge: ing | svc
+edge: svc | pod
+```
+
 ## Common mistakes
 
 - Mismatched labels between Service selector and Pods

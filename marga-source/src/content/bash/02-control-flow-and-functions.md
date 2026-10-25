@@ -123,6 +123,27 @@ log "shop is healthy"
 
 Now the script only reports success when the health endpoint answers, and on failure it prints the last log lines so the person on call sees the cause immediately.
 
+## Predict the output
+
+```predict
+Q: What does this script print?
+name="web 01"
+for w in $name; do echo "[$w]"; done
+???
+[web] on one line and [01] on the next.
+> Without quotes around $name the shell splits on spaces. Write for w in "$name" to keep one item.
+```
+
+```predict
+Q: What is the exit status shown by echo $? at the end?
+grep -q root /etc/passwd
+false
+echo $?
+???
+1
+> $? holds the status of the most recent command, which is false. The grep result was overwritten.
+```
+
 ## Common mistakes
 
 - Using `[ $var = x ]` with an unquoted variable that can be empty

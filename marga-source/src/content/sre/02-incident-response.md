@@ -95,6 +95,20 @@ IC: Hypothesis: release 3.2.0. Dana, roll back now. We will watch error rate for
 
 One change at a time, announced before it is made, with a metric to watch afterwards. The rollback restores service within four minutes, and because only one change was made, the cause is clear. The other changes (the database scale-up) are queued for review rather than left in place without understanding.
 
+```diagram
+title: The shape of an incident
+node: det | Detect | 0 | 1 | An alert or a customer report starts the incident. | A slow detection means longer impact.
+node: tri | Triage and declare | 1 | 1 | Set severity, name an incident lead and open a channel. | Without a lead everyone investigates and nobody decides.
+node: mit | Mitigate | 2 | 0 | Restore service first: rollback, failover or disable a feature. | Digging for root cause first prolongs the outage.
+node: com | Communicate | 2 | 2 | Regular updates to stakeholders and a status page. | Silence creates extra interruptions.
+node: rev | Review | 3 | 1 | A blameless review with action items and owners. | Without follow-up the same incident returns.
+edge: det | tri
+edge: tri | mit
+edge: tri | com
+edge: mit | rev
+edge: com | rev
+```
+
 ## Common mistakes
 
 - Debugging before mitigating

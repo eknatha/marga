@@ -107,6 +107,22 @@ $ aws iam simulate-principal-policy \
 
 The simulation reports an implicit deny: the policy on the role lists the key prefix `shop/` but the real object is stored at `Shop/logo.png`, and S3 key names are case-sensitive. Correct the resource path in the policy or the application, and the request succeeds. If the cause had been KMS, the error would have mentioned the key. Reading the denied action and resource carefully saves hours.
 
+## Predict the access
+
+```predict
+Q: A policy allows s3:GetObject on a bucket, and another policy has an explicit Deny for the same action. What is the result?
+???
+Access is denied.
+> An explicit deny always wins over any allow. Use it for guardrails.
+```
+
+```predict
+Q: A server needs to read one bucket. Which is safer: an access key in a config file, or a role attached to the instance?
+???
+The role attached to the instance.
+> A role gives short-lived credentials that rotate automatically and are not stored on disk.
+```
+
 ## Common mistakes
 
 - Using the root account or a global administrator for daily work

@@ -113,6 +113,20 @@ find "$backup_dir" -name 'db-*.sql.gz' -mtime +7 -delete   # only after a verifi
 
 If `pg_dump` fails, `pipefail` stops the script before any deletion. The size and integrity checks catch truncated output. Old backups are removed only after a new one has been verified. Finally, a **restore test** matters more than any check: schedule a monthly job that actually restores the latest backup into a scratch database.
 
+```diagram
+title: Where a safe script protects you
+node: start | Start | 0 | 1 | The script begins with set -euo pipefail and a trap for cleanup. | Without it, an error in the middle is ignored and the script goes on.
+node: check | Validate input | 1 | 0 | Check that required variables are set and paths are not empty. | An empty variable in rm -rf $DIR/ can become rm -rf /.
+node: dry | Dry run | 1 | 2 | Print the actions first with a --dry-run flag. | Skipping it means the first real run is also the first test.
+node: act | Do the work | 2 | 1 | Use quoted variables, a lock file and clear logging. | Two copies running at once can corrupt data without a lock.
+node: end | Cleanup and exit code | 3 | 1 | The trap removes temp files and returns a meaningful code. | If the exit code is always 0, the scheduler thinks a failure succeeded.
+edge: start | check
+edge: start | dry
+edge: check | act
+edge: dry | act
+edge: act | end
+```
+
 ## Common mistakes
 
 - Cleaning up old data before confirming the new data is good
