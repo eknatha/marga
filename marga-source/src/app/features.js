@@ -73,6 +73,25 @@ window.MargaFeatures = function (A) {
       '<div class="predict-out" hidden><p class="predict-ans"><strong>Answer:</strong> ' + e(p.out) + '</p>' + (p.why ? '<p>' + e(p.why) + '</p>' : '') + '<p class="small">From the lesson <a href="' + A.hrefLesson(p.lesson) + '">' + e((A.LES[p.lesson] || {}).title || '') + '</a>.</p></div></div>';
   }
 
+
+  /* ---------------------------------------------------------- About page */
+  A.addRoute(/^\/about$/, function () {
+    view.title = 'About | MARGA by EknathaLabs'; view.nav = 'about';
+    view.html = '<section class="page-head wrap"><h1>About the Author</h1></section>' +
+      '<div class="wrap narrow prose about">' +
+      '<p><strong>Eknatha Reddy Puli</strong> is a Senior Platform Engineer and SRE with over 14 years of experience managing enterprise infrastructure, Linux environments, and critical virtualization layers. <a href="https://www.linkedin.com/in/eknathareddypuli/" target="_blank" rel="noopener noreferrer">Connect on LinkedIn</a>.</p>' +
+      '<p>MARGA, part of the EknathaLabs ecosystem, was born out of a simple mission: to make world-class DevOps and SRE education free and accessible to everyone globally. Every lesson, playground task, and troubleshooting drill on this platform is forged from real-world production incidents and complex data migrations, not vendor slides.</p>' +
+      '<h2>Our Commitment: A Pure Global Public Good</h2>' +
+      '<p class="about-pledge"><strong>Free forever · No login · No ads · No cookies</strong></p>' +
+      '<p>Most ed-tech platforms lock real troubleshooting tools behind paywalls, leaving self-directed learners in emerging markets at a massive disadvantage. MARGA changes that.</p>' +
+      '<p>We do not collect your data, we do not track your habits, and we do not sell ads. The platform is designed from the ground up to be an open, serverless engineering laboratory that scales effortlessly to millions of students worldwide. We believe the tech industry thrives when knowledge is shared transparently, not gatekept.</p>' +
+      '<h2>Privacy-First, Offline-Resilient Progress</h2>' +
+      '<p>Because we use no tracking scripts and require zero account sign-ups, your curriculum checkpoints, playground status indicators, and completed Skill Tree nodes are saved securely on your device using your browser\'s local storage (localStorage). Your data never leaves your computer. You can cache the core tracks, step away from the internet, and practice deep infrastructure triage completely offline, anytime, anywhere.</p>' +
+      '<p>Education should be a human right, not a subscription tier. MARGA is our contribution to empowering the next generation of global infrastructure engineers, completely free.</p>' +
+      '</div>';
+    view.after = null;
+  });
+
   /* ---------------------------------------------------------- weak spots: what you missed comes back */
   function wk() { var st = A.state(); if (!st.wk || typeof st.wk !== 'object' || Array.isArray(st.wk)) st.wk = {}; return st.wk; }
   function note(kind, key, ok) {

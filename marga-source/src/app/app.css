@@ -913,3 +913,6 @@ html[data-a-read="on"] .prose h2 { margin-top: 2.2em; }
 .ns-k { font: 600 12px var(--sans); color: var(--accent); }
 .ns-t { font-size: .95rem; }
 @media print { .nextstep { display: none; } }
+
+.about h2 { margin-top: 1.6em; }
+.about-pledge { font-size: 1.1rem; padding: 10px 14px; border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 6px; }
