@@ -70,3 +70,12 @@ If the number does not appear: open the browser console and look for the "visito
 - Skill tree branches glow when the parent skill is mastered and the child is ready or in progress. They refresh from the storage event, so a lesson passed in another tab updates the tree.
 - Warnings: `> **Danger:**`, `> **Caution:**` and `> **Warning:**` blockquotes get an icon and distinct styles (also in print).
 - Content added from memory (explainers, drills, 30 architecture post-mortems) should be spot-checked against the cited sources.
+
+## Round 5 additions
+- New stage "DevSecOps and security" (`src/content/security`, 7 lessons, cheat sheet, interview questions, drills, explainers) and a live DevSecOps Engineer path with its own skill tree.
+- Lesson blocks: ```predict (Q: line, optional code, `???`, answer, `>` explanation) and ```diagram (title, `node: id | label | col | row | what it does | what fails`, `edge: a | b`). Both are checked by `tools/validate.js`.
+- "Explain it to me like..." text for every lesson is in `src/content/levels.json` (new, practitioner, interview).
+- The Aa panel now has Colour theme (match device, light, dark) and Reading mode. Lessons also have a Reading mode button.
+- The daily challenge shows a bonus drill and a predict item chosen from the date.
+- SQL for SREs has 41 exercises. Troubleshooting drills: 7 per stage (84). Animated explainers: 77. Architecture post-mortems: 50, each with a "Lessons learned" section.
+- All post-mortems, drills and explainers were written from memory against the cited sources. Spot-check dates, numbers and URLs before relying on them.

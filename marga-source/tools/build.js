@@ -18,7 +18,7 @@ const SRC = path.join(ROOT, 'src');
 const DIST = path.join(ROOT, 'dist');
 const DOMAIN = 'marga.eknathalabs.com';
 // GoatCounter site code for the visitor count (https://CODE.goatcounter.com). Empty string disables it.
-const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js'];
+const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'features.js'];
 const COUNTER = process.env.MARGA_COUNTER !== undefined ? process.env.MARGA_COUNTER : 'marga-eknathalabs';
 const SITE = 'https://' + DOMAIN;
 
@@ -76,6 +76,8 @@ function makeMarkdown() {
       code(code, info) {
         const lang = (info || '').split(/\s+/)[0];
         if (lang === 'console') return renderConsole(code);
+        if (lang === 'predict') return renderPredict(code);
+        if (lang === 'diagram') return renderDiagram(code);
         const body = highlight(code, lang);
         return `<div class="code" data-lang="${esc(lang || 'text')}"><button class="copy" type="button" data-copy="${esc(code)}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">${body}</code></pre></div>\n`;
       },
@@ -175,7 +177,47 @@ function plain(html) {
   return html.replace(/<button[\s\S]*?<\/button>/g, ' ').replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/\s+/g, ' ').trim();
 }
 
+
+/* ---------- predict-then-reveal and diagram blocks ---------- */
+function renderPredict(code) {
+  const parts = code.split(/^\?\?\?\s*$/m);
+  if (parts.length !== 2) throw new Error('predict block needs a line with ??? between the question and the answer');
+  const qm = parts[0].match(/^Q:\s*([^\n]+)\n?([\s\S]*)$/);
+  if (!qm) throw new Error('predict block must start with "Q: ..."');
+  const shown = qm[2].trim();
+  const am = parts[1].split(/^>\s*/m);
+  const out = am[0].trim(), why = (am[1] || '').trim();
+  return `<div class="predict"><p class="predict-q"><strong>Predict first.</strong> ${esc(qm[1])}</p>` +
+    (shown ? `<pre class="predict-code" tabindex="0"><code>${esc(shown)}</code></pre>` : '') +
+    `<label class="predict-l">Your guess<textarea rows="2" class="predict-guess" placeholder="Type what you expect, then reveal the answer."></textarea></label>` +
+    `<button type="button" class="btn btn-primary" data-act="predict-reveal" aria-expanded="false">Reveal the answer</button>` +
+    `<div class="predict-out" hidden><p class="predict-ans"><strong>Answer:</strong> ${esc(out)}</p>${why ? `<p>${esc(why)}</p>` : ''}</div></div>\n`;
+}
+function renderDiagram(code) {
+  const nodes = [], edges = []; let title = '';
+  for (const raw of code.split('\n')) {
+    const ln = raw.trim(); if (!ln) continue;
+    let m;
+    if ((m = ln.match(/^title:\s*(.+)$/))) title = m[1];
+    else if ((m = ln.match(/^node:\s*(.+)$/))) { const f = m[1].split('|').map((x) => x.trim()); if (f.length !== 6) throw new Error('diagram node needs 6 fields: ' + ln.slice(0, 60)); nodes.push({ id: f[0], label: f[1], x: Number(f[2]), y: Number(f[3]), role: f[4], fail: f[5] }); }
+    else if ((m = ln.match(/^edge:\s*(.+)$/))) { const f = m[1].split('|').map((x) => x.trim()); edges.push(f); }
+    else throw new Error('bad diagram line: ' + ln.slice(0, 60));
+  }
+  if (nodes.length < 3) throw new Error('diagram needs at least 3 nodes');
+  const cols = Math.max(...nodes.map((n) => n.x)) + 1, rows = Math.max(...nodes.map((n) => n.y)) + 1;
+  const cx = (n) => ((n.x + 0.5) / cols) * 100, cy = (n) => ((n.y + 0.5) / rows) * 100;
+  const byId = Object.fromEntries(nodes.map((n) => [n.id, n]));
+  const lines = edges.map(([a, b]) => { if (!byId[a] || !byId[b]) throw new Error('diagram edge to unknown node ' + a + ' ' + b); return `<line x1="${cx(byId[a]).toFixed(1)}" y1="${cy(byId[a]).toFixed(1)}" x2="${cx(byId[b]).toFixed(1)}" y2="${cy(byId[b]).toFixed(1)}"/>`; }).join('');
+  const btns = nodes.map((n) => `<button type="button" class="dg-node" data-act="dg-pick" data-id="${esc(n.id)}" style="left:${cx(n).toFixed(1)}%;top:${cy(n).toFixed(1)}%;width:${(88 / cols).toFixed(1)}%" aria-pressed="false">${esc(n.label)}</button>`).join('');
+  const dl = nodes.map((n) => `<div class="dg-item" data-id="${esc(n.id)}"><dt>${esc(n.label)}</dt><dd><span class="dg-k">What it does:</span> ${esc(n.role)}</dd><dd><span class="dg-k">If it fails or is weak:</span> ${esc(n.fail)}</dd></div>`).join('');
+  return `<figure class="dg" data-rows="${rows}" style="--rows:${rows}"><figcaption class="dg-title">${esc(title || 'Diagram')}</figcaption>` +
+    `<div class="dg-stage"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">${lines}</svg>${btns}</div>` +
+    `<p class="dg-hint small">Select a component to see what it does and what happens when it fails.</p><div class="dg-live" role="status" aria-live="polite"></div><dl class="dg-list">${dl}</dl></figure>\n`;
+}
+
 /* ---------- load content ---------- */
+const PREDICTS = [];
+const LEVELS = (() => { try { return JSON.parse(fs.readFileSync(path.join(SRC, 'content', 'levels.json'), 'utf8')); } catch (x) { return {}; } })();
 function loadContent() {
   const modules = JSON.parse(fs.readFileSync(path.join(SRC, 'content', 'modules.json'), 'utf8'));
   const paths = JSON.parse(fs.readFileSync(path.join(SRC, 'content', 'paths.json'), 'utf8'));
@@ -190,10 +232,11 @@ function loadContent() {
       const raw = fs.readFileSync(path.join(dir, f), 'utf8');
       const { meta, body } = parseFrontmatter(raw, `${mod.id}/${f}`);
       const { body: md, quiz, cards } = extractBlocks(body, `${mod.id}/${f}`);
+      for (const pm of md.matchAll(/```predict\n([\s\S]*?)```/g)) { const pp = pm[1].split(/^\?\?\?\s*$/m); const qm = pp[0].match(/^Q:\s*([^\n]+)\n?([\s\S]*)$/); const am = (pp[1] || '').split(/^>\s*/m); PREDICTS.push({ lesson: id, q: qm[1], shown: qm[2].trim(), out: am[0].trim(), why: (am[1] || '').trim() }); }
       const { marked, state } = makeMarkdown();
       const html = marked.parse(md);
       lessons[id] = {
-        id, module: mod.id, slug, title: meta.title, minutes: Number(meta.minutes || 10), summary: meta.summary || '',
+        id, module: mod.id, slug, title: meta.title, minutes: Number(meta.minutes || 10), summary: meta.summary || '', lv: LEVELS[id] || null,
         html, toc: state.toc, quiz, cards, text: plain(html).slice(0, 4000)
       };
       mod.lessons.push(id);
@@ -314,7 +357,7 @@ function loadContent() {
     }
   }
   const labs = require('./labs').load(path.join(SRC, 'labs'));
-  return { modules, paths, lessons, sheets, interview, cases, arch, drills, glossary, labs };
+  return { modules, paths, lessons, sheets, interview, cases, arch, drills, glossary, labs, predicts: PREDICTS };
 
 }
 

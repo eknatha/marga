@@ -361,6 +361,12 @@ function checkCode() {
       count('card blocks');
       const bad = b.code.split('\n').filter((l) => l.trim() && !l.includes(' :: '));
       if (bad.length) msg = `card lines without " :: ": ${bad[0].slice(0, 50)}`;
+    } else if (lang === 'predict') {
+      count('predict blocks');
+      if (!/^Q: .+/m.test(b.code) || !/^\?\?\?\s*$/m.test(b.code)) msg = 'predict block needs a Q: line and a ??? separator';
+    } else if (lang === 'diagram') {
+      count('diagram blocks');
+      if ((b.code.match(/^node:/gm) || []).length < 3) msg = 'diagram needs at least 3 nodes';
     } else if (lang === 'text' || lang === '') {
       if (!lang) msg = 'code fence without a language';
     } else {
@@ -492,7 +498,7 @@ function checkBudgets() {
 
 
 // ---------------------------------------------------------------- 8. references, interview, promise, voice, print
-const REF_HOSTS = /^https:\/\/([a-z0-9-]+\.)*(kubernetes\.io|docker\.com|hashicorp\.com|terraform\.io|aws\.amazon\.com|microsoft\.com|azure\.com|prometheus\.io|sre\.google|python\.org|man7\.org|rfc-editor\.org|opentelemetry\.io|grafana\.com|helm\.sh|kernel\.org|gnu\.org|redhat\.com|ubuntu\.com|debian\.org|nginx\.org|openssh\.com|argoproj\.github\.io|cncf\.io|opencontainers\.org|github\.com|cloud\.google\.com|cloudflare\.com|iptables\.org|netfilter\.org|systemd\.io|freedesktop\.org|kubectl\.docs\.kubernetes\.io|kustomize\.io|pypa\.io|pytest\.org|readthedocs\.io|postgresql\.org|jenkins\.io|semver\.org|owasp\.org|nist\.gov|slsa\.dev|sigstore\.dev|open-policy-agent\.org|aquasec\.com|trivy\.dev|podman\.io|buildah\.io|etcd\.io|cni\.dev|istio\.io|envoyproxy\.io|linuxfoundation\.org|cisecurity\.org|google\.com|w3\.org|ietf\.org|letsencrypt\.org|github\.io|gitlab\.com|hashicorp\.github\.io|opengroup\.org|jq\.dev|jqlang\.github\.io|curl\.se|openssl\.org|lvm2\.sourceware\.org|sourceware\.org|kernel\.dk|brendangregg\.com|netflix\.github\.io|principlesofchaos\.org|litmuschaos\.io|chaos-mesh\.org|pagerduty\.com|atlassian\.com|dora\.dev|12factor\.net|martinfowler\.com|apache\.org|elastic\.co|fluentbit\.io|fluentd\.org|vector\.dev|jaegertracing\.io|loki\.io|thanos\.io|victoriametrics\.com|containerd\.io|continuousdelivery\.com|keepachangelog\.com|fluxcd\.io|keda\.sh|karpenter\.sh|cilium\.io|openfeature\.dev|selinuxproject\.org|shellcheck\.net|everything\.curl\.dev|jqlang\.org|amazonaws\.com|mozilla\.org|tcpdump\.org|wireshark\.org|wireguard\.com|nftables\.org)(\/|$)/;
+const REF_HOSTS = /^https:\/\/([a-z0-9-]+\.)*(kubernetes\.io|docker\.com|hashicorp\.com|terraform\.io|aws\.amazon\.com|microsoft\.com|azure\.com|prometheus\.io|sre\.google|python\.org|man7\.org|rfc-editor\.org|opentelemetry\.io|grafana\.com|helm\.sh|kernel\.org|gnu\.org|redhat\.com|ubuntu\.com|debian\.org|nginx\.org|openssh\.com|argoproj\.github\.io|cncf\.io|opencontainers\.org|github\.com|cloud\.google\.com|cloudflare\.com|iptables\.org|netfilter\.org|systemd\.io|freedesktop\.org|kubectl\.docs\.kubernetes\.io|kustomize\.io|pypa\.io|pytest\.org|readthedocs\.io|postgresql\.org|jenkins\.io|semver\.org|owasp\.org|nist\.gov|slsa\.dev|sigstore\.dev|open-policy-agent\.org|aquasec\.com|trivy\.dev|podman\.io|buildah\.io|etcd\.io|cni\.dev|istio\.io|envoyproxy\.io|linuxfoundation\.org|cisecurity\.org|google\.com|w3\.org|ietf\.org|letsencrypt\.org|github\.io|gitlab\.com|hashicorp\.github\.io|opengroup\.org|jq\.dev|jqlang\.github\.io|curl\.se|openssl\.org|lvm2\.sourceware\.org|sourceware\.org|kernel\.dk|brendangregg\.com|netflix\.github\.io|principlesofchaos\.org|litmuschaos\.io|chaos-mesh\.org|pagerduty\.com|atlassian\.com|dora\.dev|12factor\.net|martinfowler\.com|apache\.org|elastic\.co|fluentbit\.io|fluentd\.org|vector\.dev|jaegertracing\.io|loki\.io|thanos\.io|victoriametrics\.com|containerd\.io|continuousdelivery\.com|keepachangelog\.com|fluxcd\.io|keda\.sh|karpenter\.sh|cilium\.io|openfeature\.dev|selinuxproject\.org|shellcheck\.net|everything\.curl\.dev|jqlang\.org|amazonaws\.com|mozilla\.org|tcpdump\.org|wireshark\.org|wireguard\.com|nftables\.org|cisa\.gov)(\/|$)/;
 function checkExtras() {
   // official references on every lesson, module and sheet
   const checkRefs = (what, refs) => {
@@ -583,12 +589,12 @@ function checkPractice() {
   }
   for (const m of A.modules) if ((A.cases || []).filter((c) => c.modules.includes(m.id)).length < 2) err('cases', `module ${m.id} has fewer than 2 case studies`);
   // architecture studies
-  if ((A.arch || []).length < 8) err('arch', `need at least 8 architecture studies, found ${(A.arch || []).length}`);
+  if ((A.arch || []).length < 50) err('arch', `need at least 50 architecture studies, found ${(A.arch || []).length}`);
   const calcIds = new Set(require(path.join(SRC, 'app', 'calc.js')).list.map((x) => x.id));
   for (const a of A.arch || []) {
     const w = `architecture ${a.id}`;
     if (!a.title || !a.html || a.html.length < 2000) err('arch', `${w}: missing or short body`);
-    for (const h of ['The system', 'Timeline as reported', 'Root cause', 'Trade-offs to weigh']) if (!a.html.includes(h)) err('arch', `${w}: missing section "${h}"`);
+    for (const h of ['The system', 'Timeline as reported', 'Root cause', 'Lessons learned', 'Trade-offs to weigh']) if (!a.html.includes(h)) err('arch', `${w}: missing section "${h}"`);
     if (!Array.isArray(a.sources) || !a.sources.length || a.sources.some((x) => !https(x.u))) err('arch', `${w}: needs https sources`);
     if (!Array.isArray(a.calcs) || !a.calcs.length || a.calcs.some((x) => !calcIds.has(x))) err('arch', `${w}: calculators missing or unknown: ${JSON.stringify(a.calcs)}`);
     if (FORBID.test(a.html + a.title + JSON.stringify(a.sources))) err('arch', `${w}: contains a forbidden word`);
@@ -652,7 +658,7 @@ function checkMore() {
   for (const m of A.modules) if ((A.glossary || []).filter((g) => g.module === m.id).length < 4) err('glossary', `module ${m.id} has fewer than 4 terms`);
   // explainers
   const ex = (() => { const w = { window: {} }; vm.runInNewContext(read(path.join(DIST, 'assets', 'explainers.js')), w); return w.window.MARGA_EXPLAINERS || []; })();
-  if (ex.length < 60) err('explainers', `need at least 60, found ${ex.length}`);
+  if (ex.length < 75) err('explainers', `need at least 75, found ${ex.length}`);
   for (const m of mods) if (ex.filter((x) => x.module === m).length < 5) err("explainers", `module ${m} needs at least 5 explainers`);
   for (const x of ex) {
     if (!mods.has(x.module)) err('explainers', `${x.id}: unknown module`);

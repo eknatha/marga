@@ -81,6 +81,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
   const progress = (page) => page.evaluate(() => JSON.parse(localStorage.getItem('ea.progress.v1') || 'null'));
   const setProgress = async (page, obj) => { await page.evaluate((o) => localStorage.setItem('ea.progress.v1', JSON.stringify(o)), obj); await page.reload(); await page.waitForSelector('#main'); };
   const emptyProgress = () => ({ v: 1, lessons: {}, cards: {}, days: [], path: 'devops', iv: {} });
+  const allDone = () => { const p = emptyProgress(); p.lessons = doneMap(Object.values(MODS).flatMap((m) => m.lessons)); return p; };
   const doneMap = (ids) => Object.fromEntries(ids.map((id) => [id, { done: true, best: 100, at: 1, attempts: 1 }]));
 
   // Answer the quiz of the currently open lesson. wrongCount questions are answered wrongly.
@@ -165,9 +166,9 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await go(page, '/paths');
     const live = await page.locator('.path-row, .row').count();
     const text = await page.evaluate(() => document.body.innerText);
-    for (const t of ['DevOps Engineer', 'Cloud Engineer', 'Site Reliability Engineer']) ok(text.includes(t), `missing path ${t}`);
-    for (const t of ['Platform Engineer', 'DevSecOps', 'Kubernetes Administrator', 'MLOps']) ok(text.includes(t), `missing planned ${t}`);
-    eq(await page.locator('.planned li em').count() >= 4, true, 'planned badges');
+    for (const t of ['DevOps Engineer', 'Cloud Engineer', 'Site Reliability Engineer', 'DevSecOps Engineer']) ok(text.includes(t), `missing path ${t}`);
+    for (const t of ['Platform Engineer', 'Kubernetes Administrator', 'MLOps']) ok(text.includes(t), `missing planned ${t}`);
+    eq(await page.locator('.planned li em').count() >= 3, true, 'planned badges');
     ok(live >= 3, 'path rows');
     eq(issues.length, 0, issues.join(' | '));
     await ctx.close();
@@ -1142,10 +1143,10 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
 
   await test('troubleshooting drills: 5 per module, answer, explanation, retry, progress', async () => {
     const { ctx, page, issues } = await open();
-    for (const m of data.modules) eq(data.drills.filter((d) => d.module === m.id).length, 5, `drills for ${m.id}`);
+    for (const m of data.modules) eq(data.drills.filter((d) => d.module === m.id).length, 7, `drills for ${m.id}`);
     for (const d of data.drills) ok(d.options.length >= 3 && d.options.filter((o) => o.ok).length === 1 && d.evidence.length > 20 && d.why.length > 40, `drill ${d.id} well formed`);
     await go(page, '/drills/linux');
-    eq(await page.locator('.drill').count(), 5, 'five drills on the page');
+    eq(await page.locator('.drill').count(), 7, 'seven drills on the page');
     const first = page.locator('.drill').nth(0), second = page.locator('.drill').nth(1);
     await first.locator('[data-act=drill-check]').click();
     ok(/Choose an answer/.test(await page.textContent('#toast')), 'asks for an answer first');
@@ -1163,7 +1164,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const dr = (await progress(page)).dr;
     const ids = Object.keys(dr);
     ok(ids.length === 2 && ids.filter((k) => dr[k].ok).length === 1, 'progress recorded: ' + JSON.stringify(dr));
-    ok(/1 of 55 solved/.test(await page.textContent('#drill-stats')), 'stats');
+    ok(/1 of 84 solved/.test(await page.textContent('#drill-stats')), 'stats');
     await page.reload(); await page.waitForSelector('.drill');
     eq(await page.locator('.drill.solved').count(), 1, 'solved state persists');
     await page.selectOption('#dr-mod', 'docker'); await page.waitForSelector('#dg-docker');
@@ -1648,7 +1649,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
   await test('landing page: hero, roles, stats, terminal, incident teaser, tools, placement link', async () => {
     const { ctx, page } = await open(); await go(page, '/');
     ok(/Learn to fix production/.test(await page.textContent('.hero h1')), 'headline');
-    eq(await page.locator('.role').count(), 3, 'three role cards');
+    eq(await page.locator('.role').count(), 4, 'four role cards');
     const second = await page.locator('.role').nth(1).getAttribute('data-id');
     await page.locator('.role').nth(1).click(); await page.waitForSelector('.role.on');
     eq(await page.locator('.role.on').getAttribute('data-id'), second, 'role card switches the path');
@@ -1740,8 +1741,8 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
   await test('cheat sheets: every sheet has warning callouts and many commands', async () => {
     const { ctx, page } = await open();
     for (const id of Object.keys(data.sheets)) {
-      await go(page, '/cheatsheet/' + id); await page.waitForSelector('.callout-warning');
-      ok(await page.locator('.callout-warning').count() >= 4, id + ' warnings');
+      await go(page, '/cheatsheet/' + id); await page.waitForSelector('.callout-warning, .callout-danger');
+      ok(await page.locator('.callout-warning, .callout-danger, .callout-caution').count() >= 4, id + ' warnings');
       ok(await page.locator('.code pre').count() >= 6, id + ' code blocks');
     }
     await ctx.close();
@@ -1751,7 +1752,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const { ctx, page } = await open(); await go(page, '/playground/sql');
     await page.waitForFunction(() => /ready/.test(document.querySelector('#sql-state').textContent), null, { timeout: 30000 });
     const labs = await page.evaluate(() => window.ACADEMY.labs.sql.map((x) => ({ id: x.id, sol: x.sol })));
-    ok(labs.length >= 20, 'sql exercises: ' + labs.length);
+    ok(labs.length >= 40, 'sql exercises: ' + labs.length);
     await page.selectOption('#lab-ex', labs[0].id);
     await page.fill('#lab-code', 'SELECT 1'); await page.click('#lab-check');
     await page.waitForSelector('#lab-res .drill-res.no');
@@ -1759,7 +1760,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       await page.selectOption('#lab-ex', x.id); await page.fill('#lab-code', x.sol); await page.click('#lab-check');
       await page.waitForSelector('#lab-res .drill-res.ok', { timeout: 8000 });
     }
-    ok(/20 of 20 exercises solved/.test(await page.textContent('#lab-count')), 'count: ' + await page.textContent('#lab-count'));
+    ok(/41 of 41 exercises solved/.test(await page.textContent('#lab-count')), 'count: ' + await page.textContent('#lab-count'));
     await page.selectOption('#lab-ex', 'free'); await page.fill('#lab-code', 'SELECT name FROM services WHERE tier = 1 ORDER BY name'); await page.click('#lab-run');
     await page.waitForSelector('#lab-out table'); eq(await page.locator('#lab-out tbody tr').count(), 3, 'free query rows');
     await page.fill('#lab-code', 'SELEC oops'); await page.click('#lab-run'); await page.waitForSelector('#lab-res .drill-res.no');
@@ -1853,6 +1854,65 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const { ctx, page } = await open(); await go(page, '/cheatsheets');
     const r = await page.evaluate(async () => { const t = await (await fetch('cheatsheets/kubernetes.html')).text(); return { d: (t.match(/callout-danger/g) || []).length, w: (t.match(/callout-warning/g) || []).length }; });
     ok(r.d + r.w >= 3, 'callouts on sheet: ' + JSON.stringify(r));
+    await ctx.close();
+  });
+
+  await test('features: explain-it-like levels, predict-then-reveal and clickable diagrams work in a lesson', async () => {
+    const { ctx, page } = await open(); await go(page, '/'); await setProgress(page, allDone());
+    await go(page, '/module/security');
+    ok(await page.locator('.node, .lesson-row, a[href*="security/"]').count() >= 1, 'security module page');
+    await go(page, '/lesson/security/secrets-management');
+    await page.waitForSelector('.levels');
+    ok(/plain words/i.test(await page.textContent('#lv-body')) === false, 'practitioner view by default');
+    await page.click('[data-lv=new]'); ok(/In plain words/.test(await page.textContent('#lv-body')), 'beginner text');
+    await page.click('[data-lv=int]'); ok(/strong short answer/i.test(await page.textContent('#lv-body')), 'interview text');
+    await page.reload(); await page.waitForSelector('.levels');
+    eq(await page.getAttribute('[data-lv=int]', 'aria-pressed'), 'true', 'level remembered');
+    await page.waitForSelector('.predict');
+    ok(await page.locator('.predict-out').isHidden(), 'answer hidden first');
+    await page.fill('.predict-guess', 'no'); await page.click('[data-act=predict-reveal]');
+    ok(await page.locator('.predict-out').isVisible(), 'answer revealed');
+    eq(await page.getAttribute('[data-act=predict-reveal]', 'aria-expanded'), 'true', 'aria-expanded');
+    await go(page, '/lesson/security/kubernetes-security'); await page.waitForSelector('.dg');
+    ok(await page.locator('.dg-node').count() >= 3, 'diagram nodes');
+    await page.locator('.dg-node').first().click();
+    ok((await page.textContent('.dg-live')).length > 40, 'live text'); eq(await page.locator('.dg-node[aria-pressed=true]').count(), 1, 'one pressed');
+    await ctx.close();
+  });
+
+  await test('features: reading mode and colour theme options in the Aa panel', async () => {
+    const { ctx, page } = await open(); await go(page, '/'); await setProgress(page, allDone()); await go(page, '/lesson/security/secrets-management');
+    await page.click('[data-act=read-toggle]');
+    eq(await page.evaluate(() => document.documentElement.getAttribute('data-a-read')), 'on', 'reading mode on');
+    eq(await page.evaluate(() => getComputedStyle(document.querySelector('.toc')).display), 'none', 'toc hidden');
+    await page.waitForSelector('#read-bar');
+    await page.reload(); await page.waitForSelector('.prose');
+    eq(await page.evaluate(() => document.documentElement.getAttribute('data-a-read')), 'on', 'reading mode remembered');
+    await page.click('[data-act=a11y]'); await page.selectOption('#a11y-theme', 'dark');
+    eq(await page.evaluate(() => document.documentElement.getAttribute('data-theme')), 'dark', 'dark theme');
+    await page.selectOption('#a11y-theme', 'auto');
+    eq(await page.evaluate(() => document.documentElement.getAttribute('data-theme')), 'light', 'auto follows the device (light in tests)');
+    await page.selectOption('#a11y-read', 'off');
+    eq(await page.evaluate(() => document.documentElement.getAttribute('data-a-read')), null, 'reading mode off');
+    await ctx.close();
+  });
+
+  await test('daily challenge: bonus drill and predict item appear and the drill can be answered', async () => {
+    const { ctx, page } = await open(); await go(page, '/daily');
+    await page.waitForSelector('#daily-bonus .drill'); ok(await page.locator('#daily-bonus .predict').count() === 1, 'predict bonus');
+    await page.locator('#daily-bonus .drill input').first().check(); await page.click('#daily-bonus [data-act=drill-check]');
+    await page.waitForSelector('#daily-bonus .drill-res:not([hidden])');
+    await page.click('#daily-bonus [data-act=predict-reveal]'); ok(await page.locator('#daily-bonus .predict-out').isVisible(), 'reveal');
+    await ctx.close();
+  });
+
+  await test('devsecops: path, skill tree node and requirements', async () => {
+    const { ctx, page } = await open(); await go(page, '/paths');
+    await page.waitForSelector('.tab'); const tabs = await page.locator('.tab').allTextContents();
+    ok(tabs.some((t) => /DevSecOps/.test(t)), 'tab: ' + tabs.join(','));
+    await page.locator('.tab', { hasText: 'DevSecOps' }).click(); await page.waitForSelector('.node[data-id="security"]');
+    eq(await page.locator('.node').count(), 11, 'devsecops tree has 11 skills');
+    eq(await page.locator('.node[data-id="security"].s-lock').count(), 1, 'security is locked at the start');
     await ctx.close();
   });
 
