@@ -418,5 +418,53 @@
  "security/ransomware-resilience-and-recovery": {
   "s": "Keep backups the attacker cannot touch and practise restoring them.",
   "i": "Follow 3-2-1 plus immutable and isolated copies, separate backup credentials, tested restores against RTO and RPO, ordered recovery (identity first), rebuild from known good images, and limit blast radius."
+ },
+ "linux/debugging-a-sick-server": {
+  "s": "Check a slow server in a fixed order instead of guessing.",
+  "i": "Walk the USE method: uptime and top for CPU, free for available memory, df and df -i, iostat, ss; then ps, lsof and strace to name the process, and read journalctl and dmesg for OOM kills."
+ },
+ "bash/debugging-shell-scripts": {
+  "s": "Make a script show its work and fail loudly.",
+  "i": "Use bash -x with a PS4 of file and line, set -Eeuo pipefail with an ERR trap, bash -n and shellcheck, and reproduce cron with env -i, a short PATH and a log redirect."
+ },
+ "python/debugging-python": {
+  "s": "Read the error from the bottom and look before you guess.",
+  "i": "Read tracebacks bottom-up, use logging with log.exception, breakpoint and pdb, faulthandler and py-spy dump for hangs, add timeouts to network calls, and shrink the failing input into a test."
+ },
+ "networking/debugging-network-problems": {
+  "s": "Test one layer at a time to find which one is broken.",
+  "i": "Climb address, route, DNS, port, TLS and application with ip, dig, nc, openssl s_client and curl -v; tell refused from timed out; use ss and tcpdump; mind DNS TTL caching."
+ },
+ "docker/debugging-containers": {
+  "s": "A dead container leaves its exit code, logs and config behind.",
+  "i": "Read exit codes (137, OOMKilled), docker logs, inspect, events and stats; run with --entrypoint sh, use a netshoot sidecar for shell-less images, and bind to 0.0.0.0."
+ },
+ "cicd/debugging-pipelines": {
+  "s": "Tell real failures from flaky ones, and fix drift.",
+  "i": "Read the first error, reproduce in the same image, pin versions with lockfiles and npm ci, key caches on lockfile hashes, track flaky tests, and check secrets without printing them."
+ },
+ "kubernetes/debugging-kubernetes-workloads": {
+  "s": "Match the Pod state to the one command that explains it.",
+  "i": "Use get, describe, events, logs --previous, exec and kubectl debug ephemeral containers; read Pending, ImagePullBackOff, CrashLoopBackOff and not-Ready; check endpoints, selectors, probes, DNS and NetworkPolicy."
+ },
+ "terraform/debugging-terraform": {
+  "s": "Know whether the config, state, provider or plan is at fault.",
+  "i": "Use validate, plan -out and show, TF_LOG=DEBUG, plan -refresh-only, state list and show, moved blocks, import, state mv and rm, prevent_destroy, and careful force-unlock."
+ },
+ "cloud/debugging-cloud-outages": {
+  "s": "Cloud failures are identity, network, quota or provider.",
+  "i": "Use get-caller-identity, policy simulation and audit logs for AccessDenied; check security groups, routes, ACLs and flow logs; handle quotas with backoff and jitter; find who changed what."
+ },
+ "observability/debugging-with-telemetry": {
+  "s": "Metrics say what, traces say where, logs say why.",
+  "i": "Slice metrics by route and version, follow a trace to the slow span, jump to logs by trace id, avoid high-cardinality labels, and alert on missing data and a dead man's switch."
+ },
+ "sre/debugging-under-pressure": {
+  "s": "Stop the harm first, then find the cause.",
+  "i": "Mitigate by rollback or flag, work hypotheses one change at a time, assign commander, operations, communications and scribe roles, keep a timeline, verify user recovery, run a blameless review."
+ },
+ "security/debugging-and-investigating-security-issues": {
+  "s": "Investigate without destroying evidence, and fix controls without removing them.",
+  "i": "Triage with who, where, what, when; trace in audit logs; preserve then contain reversibly; disable and rotate leaked keys; read admission and policy denials and fix the workload."
  }
 }
