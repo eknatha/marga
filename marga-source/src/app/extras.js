@@ -51,6 +51,8 @@ function practiceView() {
     ['#/architecture', 'Architecture post-mortems', plural(ARCH.length, 'detailed review') + ' with timelines, trade-offs and calculators you can change.', 'Calculators included'],
     ['#/calculators', 'Trade-off calculators', 'Error budgets, redundancy, cloud cost, recovery time, retry storms, cells and capacity.', '7 calculators'],
     ['#/capstones', 'Capstone projects', 'Four guided builds for each path, with steps to tick off and a self-check at the end.', (window.MargaFeatures && MargaFeatures.capCount ? MargaFeatures.capCount() : '16 projects')],
+    ['#/games', 'Incident games', 'Be on call for a realistic outage in every stage. Choose what to do and see what each choice leads to.', (window.MargaFeatures && MargaFeatures.gameCount ? MargaFeatures.gameCount() : '12 games')],
+    ['#/reading', 'Reading lists', 'Official documentation, specifications and articles to read next, for every stage.', '72 resources'],
     ['#/mix', 'Mixed practice', 'Twelve questions and drills from different stages in a shuffled order. Interleaving helps long-term memory.', 'Uses the lessons you passed'],
     ['#/weak', 'Weak-spot review', 'Questions, drills and flashcards you missed come back here until you get them right.', (window.MargaFeatures && MargaFeatures.weakCount ? MargaFeatures.weakCount() : 0) + ' to review'],
     ['#/review', 'Review due cards', 'Spaced repetition for the lessons you have passed.', 'Cards come back when due'],
