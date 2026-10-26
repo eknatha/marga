@@ -466,5 +466,169 @@
  "security/debugging-and-investigating-security-issues": {
   "s": "Investigate without destroying evidence, and fix controls without removing them.",
   "i": "Triage with who, where, what, when; trace in audit logs; preserve then contain reversibly; disable and rotate leaked keys; read admission and policy denials and fix the workload."
+ },
+ "linux/namespaces-and-cgroups": {
+  "s": "A container is a normal process with a limited view and a limited budget.",
+  "i": "Namespaces (pid, net, mnt, uts, user) limit what a process sees; cgroups limit CPU, memory and pids; memory overrun gives OOM kill 137, CPU overrun throttles; inspect with lsns, nsenter and /sys/fs/cgroup."
+ },
+ "linux/working-efficiently-in-the-terminal": {
+  "s": "Small terminal habits save time and prevent mistakes.",
+  "i": "Use history search, line shortcuts, tmux for sessions that survive disconnects, sudoedit, aliases, a prompt that marks production, and dotfiles kept under version control."
+ },
+ "bash/arrays-and-parameter-expansion": {
+  "s": "Bash can hold lists and trim text without extra programs.",
+  "i": "Use indexed and associative arrays, quote \"${arr[@]}\", mapfile for lines, and parameter expansion such as :-, :?, %, ##, / and case changes."
+ },
+ "bash/building-and-testing-shell-tools": {
+  "s": "Turn a script into a small tool with options, exit codes and tests.",
+  "i": "Use getopts, a main function guarded for sourcing, usage errors to stderr with code 64, dry runs, bats tests and shellcheck in the pipeline."
+ },
+ "python/concurrency-for-operations": {
+  "s": "Run many slow calls at once, with limits.",
+  "i": "Use ThreadPoolExecutor with max_workers and timeouts for I/O, asyncio with a semaphore, subprocess with lists and timeouts, and collect errors instead of stopping."
+ },
+ "python/writing-command-line-tools": {
+  "s": "A good tool has help, clear output and sane exit codes.",
+  "i": "Use argparse with subcommands, config order of option, environment, file, default, logs to stderr and results to stdout, a testable main(argv), and a project.scripts entry point."
+ },
+ "networking/ipv6-essentials": {
+  "s": "IPv6 has much longer addresses but the same ideas.",
+  "i": "128-bit addresses with :: shortening, /64 subnets, SLAAC and DHCPv6, link-local fe80::, neighbour discovery over ICMPv6 (do not block it), and dual-stack pitfalls such as AAAA records without firewall rules."
+ },
+ "networking/latency-mtu-and-network-performance": {
+  "s": "Slow can mean far, thin, lossy or too-big packets.",
+  "i": "Separate latency from bandwidth, remember window over RTT, read mtr loss correctly, find MTU black holes with ping -M do, clamp MSS and allow needed ICMP."
+ },
+ "docker/buildkit-caching-and-multi-arch": {
+  "s": "Fast, safe builds that run on any CPU.",
+  "i": "Order layers by change rate, use cache mounts and registry caches, pass secrets with --mount=type=secret not ARG, and build amd64 and arm64 with buildx."
+ },
+ "docker/container-logging-and-resource-limits": {
+  "s": "Logs, health and limits keep containers manageable.",
+  "i": "Log to stdout, rotate json-file logs, write honest health checks, set memory, cpus, pids and ulimits from measured use, and alert on restarts."
+ },
+ "cicd/release-management-and-feature-flags": {
+  "s": "Deploy often, release carefully.",
+  "i": "Separate deploy from release with flags that have safe defaults, owners and removal dates, promote one artifact through environments, use canaries and kill switches, and keep schema changes rollback-safe."
+ },
+ "cicd/fast-pipelines-caching-parallelism-monorepos": {
+  "s": "Measure, parallelise, cache correctly, run only what changed.",
+  "i": "Time each stage, run independent jobs and test shards in parallel, key caches on lockfile hashes, use affected-only builds in monorepos, and cancel outdated runs."
+ },
+ "kubernetes/probes-metrics-and-logging": {
+  "s": "Tell Kubernetes what healthy means and make the cluster observable.",
+  "i": "Startup, readiness and liveness probes (liveness never checks dependencies), metrics server versus Prometheus and kube-state-metrics, and node-level log agents plus events."
+ },
+ "kubernetes/service-mesh-and-mtls": {
+  "s": "A mesh moves encryption, identity and traffic rules into the platform.",
+  "i": "Data and control planes, mTLS with workload identity and authorization policy, traffic splitting with timeouts and limited retries, permissive then strict rollout, and the cost in resources and debugging."
+ },
+ "terraform/testing-terraform": {
+  "s": "Catch infrastructure mistakes early and cheaply.",
+  "i": "Layer fmt, validate, tflint, security scans and plan policy checks, then terraform test with plan or apply and mocks, and use isolated accounts with clean-up for integration tests."
+ },
+ "terraform/environments-and-team-workflows": {
+  "s": "Layout and workflow decide how safe a team can be.",
+  "i": "Directories per environment versus workspaces, split state by lifecycle, versioned modules, plan on review and apply the saved plan after approval, short-lived pipeline credentials."
+ },
+ "cloud/high-availability-and-disaster-recovery": {
+  "s": "Choose how much failure to survive, then prove it.",
+  "i": "Failure domains, RTO and RPO, backup and restore, pilot light, warm standby, active-active, replication is not backup, and timed restore and failover drills."
+ },
+ "cloud/landing-zones-and-multi-account-strategy": {
+  "s": "Accounts are the strongest boundary in the cloud.",
+  "i": "Organisation hierarchy with security, infrastructure, workload and sandbox units, guardrail policies, central locked logging, hub networking, single sign-on and automated account vending."
+ },
+ "observability/red-use-and-golden-signals": {
+  "s": "A small standard set of signals for every system.",
+  "i": "RED for services, USE for resources, the four golden signals, percentiles from histograms aggregated before the quantile, and a standard dashboard layout."
+ },
+ "observability/telemetry-cost-and-cardinality": {
+  "s": "Treat telemetry as a budgeted product.",
+  "i": "Control metric cardinality with bounded labels, cut log volume with levels and tiers, tail-sample traces, downsample old metrics and attribute cost to teams."
+ },
+ "sre/production-readiness-reviews": {
+  "s": "Find the gaps before launch, not after.",
+  "i": "A scenario-driven checklist covering ownership, SLOs, alerts, capacity, rollout and rollback, recovery, security and docs, with owned findings and accepted risks."
+ },
+ "sre/incident-communication-and-stakeholders": {
+  "s": "Good updates make incidents shorter and calmer.",
+  "i": "Impact-based severity, separate response and updates channels, status updates with impact, status and next time, early customer messages, rotation and handover in long incidents."
+ },
+ "security/detection-and-security-logging": {
+  "s": "Log the right events, protect them, and alert on what matters.",
+  "i": "Cloud, identity, Kubernetes, host and application logs shipped to a locked central store, behaviour-based detections in Sigma-style rules with runbooks, canary tokens, precision tracking and ATT&CK gaps."
+ },
+ "security/encryption-and-key-management": {
+  "s": "Encryption is only as good as its keys.",
+  "i": "At rest, in transit and in use protect different threats; use a KMS with envelope encryption, separate key admins from data readers, rotate keys, slow hashing for passwords, and never disable certificate checks."
+ },
+ "ansible/ansible-basics-inventory-and-ad-hoc": {
+  "s": "Ansible is a way to tell many servers what they should look like from one place. You list your servers, then run a small job on all of them over a normal login.",
+  "i": "Agentless push over SSH from a control node. An inventory groups hosts, and ad-hoc commands run one idempotent module at a time with --become, --check and --limit for control."
+ },
+ "ansible/playbooks-tasks-and-idempotence": {
+  "s": "A playbook is a recipe for a server written in a simple list. You can follow it again and again and it only does the work that is still needed.",
+  "i": "YAML plays map hosts to tasks that call modules. Good tasks are idempotent, so a second run reports changed=0. I preview with --check --diff and test on one host with --limit."
+ },
+ "ansible/variables-facts-and-templates": {
+  "s": "Variables are labels for values that differ between servers, like a port number. Templates are text files with blanks that Ansible fills in for each server.",
+  "i": "Values live in group_vars and host_vars with specific beating general and -e beating all. Facts describe each host, and Jinja2 templates render config files, validated before they replace the live file."
+ },
+ "ansible/handlers-conditionals-and-loops": {
+  "s": "Sometimes a job should only happen if something else changed, like restarting a service only after its settings changed. These tools let a recipe make such decisions.",
+  "i": "when gates tasks, loop repeats them, handlers run once at the end when notified by a change, and block/rescue/always handle failure. Tags and --limit let me run parts of a play."
+ },
+ "ansible/roles-and-collections": {
+  "s": "A role is a labelled box of related jobs, like everything needed to set up a web server. You can reuse the same box in many recipes.",
+  "i": "Roles have a standard layout with defaults, tasks, handlers and templates, and prefixed variables. Collections ship modules and roles, and I pin versions in requirements.yml for repeatable runs."
+ },
+ "ansible/vault-secrets-and-safe-practice": {
+  "s": "Passwords must never sit in plain text next to your recipes. Ansible Vault locks them in a safe that only opens with a key.",
+  "i": "Vault encrypts files or strings, with separate vault IDs per environment and the password kept outside the repository. no_log keeps secrets out of output, and the automation account gets least privilege."
+ },
+ "ansible/ansible-at-scale": {
+  "s": "When you update hundreds of servers, you do a few first, check they are healthy, then continue. If something goes wrong you stop before everyone is affected.",
+  "i": "serial, max_fail_percentage and health-check retries give canary and rolling updates. ansible-lint and Molecule test roles, forks and pipelining speed up runs, and Terraform provisions while Ansible configures."
+ },
+ "ansible/debugging-ansible-runs": {
+  "s": "When a run fails, first work out whether it could not reach the server, could not get permission, had the wrong data, or the task itself failed.",
+  "i": "I read the error, use ssh -vvv and -vvv for connection problems, ansible-inventory --host and debug for data, --start-at-task and --step to resume, and assert to fail early with clear messages."
+ },
+ "databases/relational-fundamentals-and-sql": {
+  "s": "A database is a set of tables like spreadsheets that follow rules. SQL is the language for asking them questions and changing them.",
+  "i": "Tables, keys and constraints enforce structure. I use SELECT with JOIN and GROUP BY, wrap risky writes in transactions with a count check, use read-only roles, and check size and sessions with catalog views."
+ },
+ "databases/indexes-and-query-plans": {
+  "s": "An index is like the index of a book. It helps the database find rows without reading every page, but it takes space and slows down writes a bit.",
+  "i": "B-tree indexes speed lookups at a write cost. I read EXPLAIN ANALYZE for scan types and estimate gaps, mind composite column order, and build with CREATE INDEX CONCURRENTLY on live tables."
+ },
+ "databases/transactions-and-locking": {
+  "s": "A transaction is a bundle of changes that all happen or none happen. While it is open, others may have to wait for the rows it touched.",
+  "i": "ACID, isolation levels and MVCC explain behaviour. Long or idle in transaction sessions hold locks and block cleanup, so I set lock and idle timeouts and find root blockers with pg_blocking_pids."
+ },
+ "databases/backups-and-recovery": {
+  "s": "A backup is a spare copy you can bring back. It only counts if you have practised bringing it back.",
+  "i": "Logical dumps and physical base backups plus archived WAL give point-in-time recovery. I set RPO and RTO with the business, keep copies elsewhere and immutable, monitor freshness, and run restore drills."
+ },
+ "databases/replication-and-failover": {
+  "s": "A replica is a live copy of the database on another machine. If the main one breaks, a replica can take over, but it might be a few moments behind.",
+  "i": "Primary and replica with async or sync replication, lag monitoring, and failover that needs quorum, fencing and client redirection to avoid split brain. A replica is not a backup."
+ },
+ "databases/performance-and-connection-pooling": {
+  "s": "When a database is slow it is usually asking too much work of too few resources. You measure first, then fix the biggest cost.",
+  "i": "I rank pg_stat_statements by total time, check cache hit ratio and memory settings, put PgBouncer in front to cap connections, and watch autovacuum and bloat. I change one thing and measure."
+ },
+ "databases/safe-schema-migrations": {
+  "s": "Changing a live database is like changing a car tyre while driving. You do it in small safe steps so the service keeps running.",
+  "i": "Versioned migrations with lock_timeout, CONCURRENTLY and NOT VALID constraints, expand and contract for renames, batched backfills, and a rehearsal on production-sized data."
+ },
+ "databases/nosql-caches-and-choosing": {
+  "s": "There are different kinds of data stores for different jobs. A cache keeps popular answers close so the main database is not asked the same thing again and again.",
+  "i": "I choose by access pattern, consistency need and operability. Cache-aside needs TTL jitter and stampede protection, Redis needs maxmemory and no KEYS, and a cache is not durable storage."
+ },
+ "databases/debugging-database-problems": {
+  "s": "When the database has trouble, look carefully before touching anything. Many quick fixes can lose data.",
+  "i": "Triage by symptom: slow, hanging, full or unreachable. Look at sessions, locks, disk, WAL and slots, take the safest reversible action first, never delete data directory files, and confirm recovery."
  }
 }

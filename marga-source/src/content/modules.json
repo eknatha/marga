@@ -106,5 +106,23 @@
       "cicd",
       "docker"
     ]
+  },
+  {
+    "id": "ansible",
+    "title": "Ansible and configuration management",
+    "summary": "Describe servers in inventories and playbooks, keep them consistent with idempotent roles, protect secrets with Vault and roll changes out safely.",
+    "level": "Intermediate",
+    "requires": [
+      "bash"
+    ]
+  },
+  {
+    "id": "databases",
+    "title": "Databases for operators",
+    "summary": "Run relational databases with confidence: SQL, indexes and plans, transactions, backups, replication, safe migrations, caches and incident triage.",
+    "level": "Intermediate",
+    "requires": [
+      "networking"
+    ]
   }
 ]
