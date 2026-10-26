@@ -1127,5 +1127,485 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Write action items", n: "Each item has an owner, a due date and a way to check it." },
     { f: 2, t: 0, l: "Track to completion", n: "Open items are reviewed weekly." },
     { f: 0, t: 1, l: "Share the lessons", n: "The write-up is shared, so other teams avoid the same failure." }
+  ] },
+{ id: "x-linux-namespaces", module: "linux", title: "What a namespace changes for a process", summary: "How the kernel gives a process its own view of the system.",
+  actors: ["Container runtime", "Kernel", "Process", "Host"],
+  steps: [
+    { f: 0, t: 1, l: "Create with new namespaces", n: "The runtime asks the kernel to start a process with new pid, mount, network and hostname namespaces, using clone or unshare." },
+    { f: 1, t: 2, l: "Process starts inside", n: "The process begins running, but the kernel gives it a separate list of process ids, mounts and network interfaces." },
+    { f: 2, t: 2, l: "Sees itself as pid 1", n: "Inside the pid namespace the first process is pid 1, and it cannot see any process of the host in its own process list." },
+    { f: 2, t: 1, l: "Lists network interfaces", n: "The network namespace has only the interfaces that were attached to it, such as one virtual interface and the loopback." },
+    { f: 3, t: 1, l: "Host still sees everything", n: "From the host the same process has a normal pid, and tools like lsns and nsenter can enter its namespaces to debug it." },
+    { f: 0, t: 3, l: "Enter to debug", n: "nsenter runs a host tool inside the namespaces of the process, which helps when the container image has no tools of its own." }
+  ] },
+{ id: "x-linux-cgroup-throttle", module: "linux", title: "Memory limit versus CPU limit in a cgroup", summary: "Why going over memory kills a process but going over CPU only slows it.",
+  actors: ["Process", "cgroup controller", "Kernel scheduler", "Monitoring"],
+  steps: [
+    { f: 0, t: 1, l: "Runs with limits set", n: "The group has memory.max of 512 MB and a CPU quota of half a core, written as files under /sys/fs/cgroup." },
+    { f: 0, t: 2, l: "Wants a full core", n: "The process has plenty of work and asks the scheduler for CPU time all the time." },
+    { f: 1, t: 2, l: "Quota used up", n: "After using its quota in the period, the group is paused until the next period starts, so work is spread out over more time." },
+    { f: 2, t: 3, l: "nr_throttled rises", n: "cpu.stat counts throttled periods. Latency rises but nothing is killed, which makes this problem easy to miss." },
+    { f: 0, t: 1, l: "Memory grows past the limit", n: "Memory use reaches memory.max and the kernel cannot reclaim enough pages from the group." },
+    { f: 1, t: 0, l: "OOM kill, exit 137", n: "The kernel kills a process in the group. The runtime reports exit code 137 and OOMKilled, and memory.events counts the kill." }
+  ] },
+{ id: "x-linux-inode-exhaustion", module: "linux", title: "Out of space with free space", summary: "How a filesystem can refuse new files while df shows free blocks.",
+  actors: ["Application", "Filesystem", "Operator", "Cleanup job"],
+  steps: [
+    { f: 0, t: 1, l: "Create a session file", n: "The application creates a small file for each user session in one directory." },
+    { f: 1, t: 1, l: "Allocate an inode", n: "Every file needs an inode (a file record) in addition to data blocks, and the number of inodes is fixed when the filesystem is made." },
+    { f: 0, t: 1, l: "Millions of small files", n: "Over weeks the directory holds nearly thirteen million tiny files, because the cleanup job has been failing quietly." },
+    { f: 1, t: 0, l: "No space left on device", n: "All inodes are used, so a new file fails with ENOSPC even though most blocks are free." },
+    { f: 2, t: 1, l: "Run df -h and df -i", n: "df -h shows 60 percent free, but df -i shows 100 percent of inodes used, which names the real problem." },
+    { f: 2, t: 3, l: "Remove old files, fix the job", n: "The operator deletes old session files, repairs the cleanup job and adds an alert on inode use." }
+  ] },
+{ id: "x-linux-package-verify", module: "linux", title: "How a package install is verified", summary: "Why apt and dnf check signatures before installing.",
+  actors: ["Admin", "Package manager", "Repository", "Local keyring"],
+  steps: [
+    { f: 0, t: 1, l: "apt install nginx", n: "The admin asks the package manager to install a package and its dependencies." },
+    { f: 1, t: 2, l: "Fetch repository metadata", n: "The package manager downloads the signed list of packages and versions, named Release or repomd." },
+    { f: 1, t: 3, l: "Verify the metadata signature", n: "It checks the signature with the repository public key stored in the local keyring. A bad signature stops everything." },
+    { f: 1, t: 2, l: "Download the package", n: "Package files are fetched, and their checksums must match the signed metadata." },
+    { f: 1, t: 1, l: "Check checksums and dependencies", n: "The package manager compares each hash with the signed list and resolves which other packages are needed." },
+    { f: 1, t: 0, l: "Install and run scripts", n: "Files are unpacked and maintainer scripts run as root, which is why you only trust repositories you have checked." }
+  ] },
+{ id: "x-bash-getopts", module: "bash", title: "How getopts reads options", summary: "How a script turns -d dir -n into variables.",
+  actors: ["Caller", "Script", "getopts", "Variables"],
+  steps: [
+    { f: 0, t: 1, l: "rotate.sh -d /tmp -k 7 -n", n: "The caller starts the script with short options. -d and -k take a value, and -n is a flag." },
+    { f: 1, t: 2, l: "getopts \":d:k:nh\" opt", n: "The option string lists the valid letters. A colon after a letter means that the option needs a value." },
+    { f: 2, t: 3, l: "Set opt and OPTARG", n: "Each call sets opt to the letter and OPTARG to its value, so the case statement can copy it into a variable." },
+    { f: 1, t: 3, l: "Store dir, keep and dry", n: "The script assigns the values to local variables and uses defaults for options that were not given." },
+    { f: 2, t: 1, l: "Unknown option gives ?", n: "If the caller passes -x, getopts sets opt to a question mark and the script prints usage to standard error." },
+    { f: 1, t: 0, l: "Exit code 64 on bad usage", n: "The script exits with 64, the usage error convention, so callers and pipelines can tell a mistake from a failure." }
+  ] },
+{ id: "x-bash-quoted-array", module: "bash", title: "Why \"${files[@]}\" matters", summary: "What happens to names with spaces when expanding arrays.",
+  actors: ["Script", "Array", "Shell expansion", "Command"],
+  steps: [
+    { f: 0, t: 1, l: "files=(\"a b\" c)", n: "The array holds two elements. The first one contains a space." },
+    { f: 0, t: 2, l: "for f in ${files[@]}", n: "Without quotes the shell expands the array and then splits the result on spaces, so the first name becomes two words." },
+    { f: 2, t: 3, l: "Loop sees a, b and c", n: "The loop body runs three times, with names that do not exist. A backup or a delete would act on the wrong things." },
+    { f: 0, t: 2, l: "for f in \"${files[@]}\"", n: "With double quotes each element is kept as one word, whatever characters it contains." },
+    { f: 2, t: 3, l: "Loop sees \"a b\" and c", n: "The loop runs twice with the real names, so the command acts on exactly the files in the array." },
+    { f: 0, t: 3, l: "Compare counts", n: "A careful script also compares how many items it found with how many it processed, which catches this kind of error." }
+  ] },
+{ id: "x-bash-pipefail", module: "bash", title: "What pipefail changes", summary: "How a failure in the middle of a pipeline is noticed.",
+  actors: ["Script", "Command one", "Command two", "Shell status"],
+  steps: [
+    { f: 0, t: 1, l: "curl -s url | jq .name", n: "The script downloads data and pipes it to a second command." },
+    { f: 1, t: 1, l: "curl fails, exit 22", n: "The server returned an error, so curl exits with a failure code and prints nothing useful." },
+    { f: 2, t: 2, l: "jq reads empty input", n: "jq gets empty input, prints nothing and exits with 0, because an empty input is valid for it." },
+    { f: 3, t: 0, l: "Default: status 0", n: "Without pipefail the pipeline status is the status of the last command, so the script thinks all is well." },
+    { f: 0, t: 3, l: "set -o pipefail", n: "With pipefail the pipeline returns the failing status of any command in it, here the 22 from curl." },
+    { f: 3, t: 0, l: "set -e now stops", n: "Combined with set -e, the script stops at the failed download instead of carrying on with empty data." }
+  ] },
+{ id: "x-bash-cron-env", module: "bash", title: "Why a script works by hand but not in cron", summary: "How the cron environment differs from your login shell.",
+  actors: ["Admin", "Login shell", "cron", "Script"],
+  steps: [
+    { f: 0, t: 1, l: "Test in terminal", n: "The admin runs the script by hand. It works because the login shell has a long PATH and the right working directory." },
+    { f: 2, t: 3, l: "cron starts the script", n: "cron runs the command with a minimal environment: a short PATH, no profile files and the home directory as the current directory." },
+    { f: 3, t: 3, l: "aws: command not found", n: "The tool lives in /usr/local/bin which is not in cron PATH, so the script fails on its first call." },
+    { f: 3, t: 2, l: "Output is mailed or lost", n: "cron sends output to local mail or drops it, so nobody sees the error unless the script writes a log." },
+    { f: 0, t: 3, l: "Reproduce with env -i", n: "Running the script with env -i and a short PATH shows the same error in a terminal." },
+    { f: 0, t: 3, l: "Fix the script", n: "The admin uses full paths, sets PATH at the top, changes to the script directory and redirects output to a log file." }
+  ] },
+{ id: "x-python-threadpool", module: "python", title: "A thread pool running 100 checks", summary: "How a worker limit keeps a script fast and polite.",
+  actors: ["Script", "Thread pool", "Remote service", "Results"],
+  steps: [
+    { f: 0, t: 1, l: "Submit 100 tasks", n: "The script submits one task for each URL and the pool holds them in a queue." },
+    { f: 1, t: 2, l: "20 workers call out", n: "Only max_workers tasks run at the same time, so the remote service sees at most 20 requests in parallel." },
+    { f: 2, t: 1, l: "Replies arrive", n: "Each worker waits for its reply. While it waits it releases the interpreter lock, so other workers can run." },
+    { f: 1, t: 3, l: "Collect with as_completed", n: "Results are handled as soon as each task finishes, in any order, so slow tasks do not delay fast ones." },
+    { f: 2, t: 1, l: "One call times out", n: "A task that exceeds its timeout raises an error, and the script records the failure instead of stopping." },
+    { f: 0, t: 3, l: "Report problems", n: "At the end the script prints how many checks failed and which ones, so nothing is lost silently." }
+  ] },
+{ id: "x-python-asyncio", module: "python", title: "asyncio with a semaphore", summary: "How one thread handles many network calls at once.",
+  actors: ["Main coroutine", "Event loop", "Semaphore", "Remote service"],
+  steps: [
+    { f: 0, t: 1, l: "gather(*tasks)", n: "The program creates one coroutine for each URL and asks the event loop to run them all." },
+    { f: 1, t: 2, l: "Acquire a slot", n: "Each coroutine waits for the semaphore, which allows at most 50 calls at once." },
+    { f: 2, t: 3, l: "Send the request", n: "A coroutine that got a slot sends its request and then yields control instead of blocking the thread." },
+    { f: 1, t: 1, l: "Switch to another task", n: "While one call waits for the network, the loop runs another coroutine, so one thread keeps many calls in flight." },
+    { f: 3, t: 1, l: "Reply arrives", n: "When the response comes in, the loop resumes the waiting coroutine and releases the semaphore slot." },
+    { f: 1, t: 0, l: "Exceptions as results", n: "With return_exceptions set, a failed call is returned as a value and does not cancel the others." }
+  ] },
+{ id: "x-python-argparse", module: "python", title: "From command line to function call", summary: "How argparse validates input before your code runs.",
+  actors: ["User", "Shell", "argparse", "main()"],
+  steps: [
+    { f: 0, t: 1, l: "svcctl status web --json", n: "The user types a command with a subcommand, a name and a flag." },
+    { f: 1, t: 2, l: "Pass argv", n: "The shell splits the line into a list of words, which becomes sys.argv in Python." },
+    { f: 2, t: 2, l: "Match the subparser", n: "argparse finds the status subcommand, checks that the name is present and converts types such as --timeout to float." },
+    { f: 2, t: 0, l: "Usage error: exit 2", n: "If something is wrong, argparse prints usage and a clear message to standard error and exits with code 2." },
+    { f: 2, t: 3, l: "Call main logic", n: "With valid input, your function receives an object with the fields, and the code does not parse text itself." },
+    { f: 3, t: 0, l: "Result on stdout", n: "The tool prints its result, such as JSON, to standard output and logs to standard error, and returns an exit code." }
+  ] },
+{ id: "x-python-traceback", module: "python", title: "Reading a traceback from the bottom", summary: "How to find the cause of an exception quickly.",
+  actors: ["Developer", "Traceback", "Source code", "Test"],
+  steps: [
+    { f: 0, t: 1, l: "Run the script", n: "The script fails and Python prints a traceback with several frames." },
+    { f: 0, t: 1, l: "Read the last line first", n: "The final line names the error and the value, for example KeyError: qty. It is the answer to what went wrong." },
+    { f: 1, t: 2, l: "Open the frame above", n: "The line above the error shows the file and line where it happened, and the code is displayed next to it." },
+    { f: 0, t: 2, l: "Work upwards for context", n: "The frames above show how the program got there, so you can see which input led to the failing line." },
+    { f: 0, t: 3, l: "Write a failing test", n: "The developer copies the smallest failing input into a test, which proves the bug and guards against its return." },
+    { f: 0, t: 2, l: "Fix and re-run", n: "The code is changed, for example with a default, and the test and the script now pass." }
+  ] },
+{ id: "x-net-ipv6-slaac", module: "networking", title: "How a host gets an IPv6 address", summary: "Router advertisements and stateless autoconfiguration.",
+  actors: ["Host", "Router", "Neighbours", "DNS server"],
+  steps: [
+    { f: 0, t: 0, l: "Make a link-local address", n: "The interface builds an fe80:: address for itself, which works only on this network segment." },
+    { f: 0, t: 2, l: "Check the address is unique", n: "The host asks the neighbours whether anyone else uses the address, using ICMPv6 neighbour discovery." },
+    { f: 0, t: 1, l: "Router solicitation", n: "The host asks any router on the segment to announce itself, instead of waiting for the next periodic message." },
+    { f: 1, t: 0, l: "Router advertisement", n: "The router replies with the network prefix, usually a /64, the default route and sometimes DNS server addresses." },
+    { f: 0, t: 0, l: "Build a global address", n: "The host combines the prefix with an interface identifier and now has a routable address, with no server keeping a lease." },
+    { f: 0, t: 3, l: "Find DNS and go", n: "The host learns DNS servers from the advertisement or DHCPv6, and can open connections over IPv6." }
+  ] },
+{ id: "x-net-happy-eyeballs", module: "networking", title: "Why a broken IPv6 path makes a site slow", summary: "How clients choose between IPv6 and IPv4 and what a timeout costs.",
+  actors: ["Browser", "DNS", "IPv6 path", "IPv4 path"],
+  steps: [
+    { f: 0, t: 1, l: "Look up AAAA and A", n: "The browser asks for both IPv6 and IPv4 addresses of the site." },
+    { f: 1, t: 0, l: "Two answers", n: "DNS returns an AAAA record and an A record, because the site was set up for both." },
+    { f: 0, t: 2, l: "Try IPv6 first", n: "Clients prefer IPv6, so the first connection attempt goes to the IPv6 address." },
+    { f: 2, t: 0, l: "No reply", n: "The firewall in front of the site allows only IPv4, so the IPv6 packets are dropped and nothing comes back." },
+    { f: 0, t: 3, l: "Fall back to IPv4", n: "Modern clients start an IPv4 attempt after a short delay, but older ones wait for the full timeout before they try." },
+    { f: 3, t: 0, l: "Connected, but late", n: "Users on IPv6-first networks see a delay of seconds or more. Testing with curl -6 finds the problem quickly." }
+  ] },
+{ id: "x-net-mtu-blackhole", module: "networking", title: "An MTU black hole in a VPN", summary: "Why small packets work and large ones hang.",
+  actors: ["Client", "VPN tunnel", "Router with filter", "Server"],
+  steps: [
+    { f: 0, t: 3, l: "Small request", n: "A short SSH login or a health check fits into small packets, so everything seems to work." },
+    { f: 3, t: 0, l: "Large response", n: "The server sends full-size packets of 1500 bytes with the do-not-fragment flag set." },
+    { f: 1, t: 1, l: "Tunnel adds headers", n: "The VPN wraps each packet in extra headers, so the usable size drops to about 1400 bytes." },
+    { f: 1, t: 2, l: "Packet too big", n: "A router on the path cannot forward the packet and should send back an ICMP message asking for smaller packets." },
+    { f: 2, t: 3, l: "ICMP is filtered", n: "A firewall drops that ICMP message, so the server never learns that it must send smaller packets." },
+    { f: 3, t: 0, l: "Connection stalls", n: "The server keeps resending large packets that never arrive. Lowering the MTU or clamping the MSS fixes it." }
+  ] },
+{ id: "x-net-tcp-window", module: "networking", title: "Why a fast link can still be slow", summary: "How round trip time limits one TCP connection.",
+  actors: ["Sender", "Network", "Receiver", "Operator"],
+  steps: [
+    { f: 0, t: 1, l: "Send a window of data", n: "TCP lets the sender have only a limited amount of unacknowledged data in flight, called the window." },
+    { f: 1, t: 2, l: "Travel 150 ms", n: "The data crosses an ocean and takes about 75 milliseconds one way." },
+    { f: 2, t: 0, l: "Acknowledgement returns", n: "The sender can only send more when acknowledgements arrive, one round trip later." },
+    { f: 0, t: 0, l: "Throughput is window over RTT", n: "With a 64 KB window and a 150 ms round trip the sender cannot exceed roughly 3.5 megabits per second." },
+    { f: 3, t: 0, l: "Measure with iperf3", n: "The operator runs a single stream and then four parallel streams to see how much the window is the limit." },
+    { f: 3, t: 2, l: "Choose a remedy", n: "Use larger buffers, parallel connections, a closer endpoint or a CDN, rather than buying a bigger link." }
+  ] },
+{ id: "x-docker-buildkit-cache", module: "docker", title: "How layer caching speeds up a build", summary: "What stays cached and what is rebuilt after a code change.",
+  actors: ["Developer", "BuildKit", "Layer cache", "Registry"],
+  steps: [
+    { f: 0, t: 1, l: "docker build", n: "The developer changes one source file and builds the image again." },
+    { f: 1, t: 2, l: "FROM and WORKDIR match", n: "The first instructions are identical to the last build, so their layers come straight from the cache." },
+    { f: 1, t: 2, l: "COPY requirements.txt matches", n: "The dependency list did not change, so the cache is valid and the install step is skipped." },
+    { f: 1, t: 2, l: "COPY . . differs", n: "The changed file makes this layer different, so it and every following layer are rebuilt." },
+    { f: 1, t: 3, l: "Push with cache export", n: "In a pipeline the cache is exported to a registry, so a clean runner can import it and avoid starting from zero." },
+    { f: 1, t: 0, l: "Fast build", n: "Only the last layers were rebuilt, and the build took seconds instead of minutes." }
+  ] },
+{ id: "x-docker-secret-mount", module: "docker", title: "Passing a secret to a build safely", summary: "Why a secret mount leaves nothing in the image.",
+  actors: ["Developer", "BuildKit", "Build container", "Final image"],
+  steps: [
+    { f: 0, t: 1, l: "--secret id=npmrc", n: "The developer passes the file to the build as a secret, instead of as an ARG or COPY." },
+    { f: 1, t: 2, l: "Mount for one RUN only", n: "BuildKit mounts the secret in memory at /root/.npmrc, only while that RUN instruction executes." },
+    { f: 2, t: 2, l: "npm ci uses it", n: "The package manager reads the token from the mounted file and downloads private packages." },
+    { f: 2, t: 1, l: "Mount disappears", n: "When the instruction ends the mount is removed, and nothing is written into the layer." },
+    { f: 1, t: 3, l: "Layers created", n: "The image layers contain the installed packages but not the credentials." },
+    { f: 0, t: 3, l: "Check history", n: "docker history on the finished image shows no token, which a security scan can verify." }
+  ] },
+{ id: "x-docker-oom", module: "docker", title: "What happens when a container hits its memory limit", summary: "From growth to restart.",
+  actors: ["Application", "Container cgroup", "Kernel", "Docker"],
+  steps: [
+    { f: 0, t: 1, l: "Memory grows", n: "A cache without a size limit holds more entries every minute." },
+    { f: 1, t: 1, l: "Approach 512 MB", n: "The cgroup limit is 512 MB, and the kernel starts to reclaim pages from the container, which slows it." },
+    { f: 0, t: 1, l: "Needs more memory", n: "The application asks for pages that the kernel cannot give without going over the limit." },
+    { f: 2, t: 0, l: "OOM killer", n: "The kernel kills the largest process in the container with SIGKILL. The process has no chance to log or clean up." },
+    { f: 3, t: 3, l: "Record exit 137", n: "Docker sees the exit, records exit code 137 and OOMKilled true in the container state." },
+    { f: 3, t: 0, l: "Restart policy", n: "If a policy is set, Docker restarts the container, and the cycle repeats until the cause is fixed." }
+  ] },
+{ id: "x-docker-multiarch", module: "docker", title: "A multi-architecture image", summary: "How one tag works on amd64 and arm64.",
+  actors: ["Developer", "buildx", "Registry", "Docker host"],
+  steps: [
+    { f: 0, t: 1, l: "buildx --platform amd64,arm64", n: "The developer asks for two platforms in a single build." },
+    { f: 1, t: 1, l: "Build each platform", n: "buildx builds one image per platform, with native builders or emulation, and the Go or Node tools target the right CPU." },
+    { f: 1, t: 2, l: "Push images and manifest list", n: "The registry stores both images and a manifest list that maps platform to image digest." },
+    { f: 3, t: 2, l: "Pull the tag", n: "A host asks for shop:1.4.2 and tells the registry its CPU architecture." },
+    { f: 2, t: 3, l: "Send the matching image", n: "The registry returns the image that matches the host, so an arm64 laptop and an amd64 server use the same tag." },
+    { f: 3, t: 3, l: "Run without exec format error", n: "The binary matches the CPU, so the container starts. A single-platform image would fail with exec format error." }
+  ] },
+{ id: "x-cicd-feature-flag", module: "cicd", title: "A gradual release with a feature flag", summary: "Deploy first, release later, and switch off in seconds.",
+  actors: ["Pipeline", "Application", "Flag service", "Users"],
+  steps: [
+    { f: 0, t: 1, l: "Deploy with flag off", n: "The new code reaches production, but the flag is off, so nobody sees the new behaviour." },
+    { f: 1, t: 2, l: "Ask for the flag value", n: "On each request the application asks the flag service whether the feature is on for this user, with a safe default." },
+    { f: 2, t: 1, l: "Staff only", n: "The flag is first enabled for employees, who test the feature on the real system." },
+    { f: 2, t: 1, l: "One percent of users", n: "The flag is raised to one percent, chosen by a stable hash of the user id, while error rates are watched." },
+    { f: 1, t: 3, l: "Problem seen", n: "Error rate rises for the group with the flag on. The owner turns the flag off." },
+    { f: 2, t: 1, l: "Back to normal in seconds", n: "No redeploy is needed. The old behaviour returns for everyone, and the fix is released later." }
+  ] },
+{ id: "x-cicd-test-sharding", module: "cicd", title: "Splitting tests across parallel jobs", summary: "How a long test stage becomes short.",
+  actors: ["Pipeline", "Shard 1", "Shard 2", "Timing data"],
+  steps: [
+    { f: 0, t: 3, l: "Read previous timings", n: "The pipeline loads the durations recorded from earlier runs to know which tests are slow." },
+    { f: 0, t: 1, l: "Start shard one", n: "The first job gets a share of tests with a similar total duration." },
+    { f: 0, t: 2, l: "Start shard two", n: "The second job runs at the same time with the rest of the tests." },
+    { f: 1, t: 0, l: "Report results", n: "Each shard reports its results as soon as it finishes. Failure in any shard fails the stage." },
+    { f: 2, t: 3, l: "Update timings", n: "Every shard writes new durations, so the next split is better balanced." },
+    { f: 0, t: 0, l: "Merge reports", n: "The pipeline combines the reports into one view. The stage takes the time of the slowest shard, not the sum." }
+  ] },
+{ id: "x-cicd-cache-key", module: "cicd", title: "A dependency cache keyed on the lockfile", summary: "Why the key decides if the cache is safe.",
+  actors: ["Pipeline", "Lockfile", "Cache store", "Package registry"],
+  steps: [
+    { f: 0, t: 1, l: "Hash the lockfile", n: "The pipeline computes a hash of package-lock.json. The hash is the cache key." },
+    { f: 0, t: 2, l: "Look for the key", n: "The cache store is asked for an entry with that exact key." },
+    { f: 2, t: 0, l: "Hit: restore download cache", n: "If the dependencies did not change, the saved downloads are restored in seconds." },
+    { f: 0, t: 3, l: "Miss: install from registry", n: "If the lockfile changed, the key is new, so packages are downloaded and installed." },
+    { f: 0, t: 2, l: "Save under the new key", n: "After a successful install the download directory is stored with the new key for later runs." },
+    { f: 0, t: 0, l: "Never stale", n: "A branch-name key could serve old packages after a lockfile change. A lockfile hash cannot." }
+  ] },
+{ id: "x-cicd-argocd-sync", module: "cicd", title: "The Argo CD sync loop", summary: "How the cluster is pulled towards the declared state.",
+  actors: ["Developer", "Config repository", "Argo CD", "Cluster"],
+  steps: [
+    { f: 0, t: 1, l: "Merge a manifest change", n: "The developer changes the image tag in a manifest and merges it after review." },
+    { f: 2, t: 1, l: "Detect the new revision", n: "Argo CD polls the repository, or receives a notice, and sees a new revision of the desired state." },
+    { f: 2, t: 3, l: "Read live state", n: "It reads the objects that currently run in the cluster." },
+    { f: 2, t: 2, l: "Compute the difference", n: "Desired and live state are compared. The application is shown as OutOfSync with the exact differences." },
+    { f: 2, t: 3, l: "Apply the change", n: "With automated sync, Argo CD applies the new manifests, and Kubernetes rolls out the new version." },
+    { f: 3, t: 2, l: "Report health", n: "Argo CD watches the rollout and shows Synced and Healthy. If someone edits the cluster by hand, it shows the drift and can revert it." }
+  ] },
+{ id: "x-k8s-probes", module: "kubernetes", title: "Startup, readiness and liveness probes", summary: "Which probe controls what.",
+  actors: ["Kubelet", "Container", "Service endpoints", "Operator"],
+  steps: [
+    { f: 0, t: 1, l: "Startup probe", n: "While the app is starting, the kubelet runs only the startup probe. Other probes wait until it succeeds." },
+    { f: 1, t: 0, l: "Startup succeeds", n: "After the application is up, the startup probe passes and the other probes begin." },
+    { f: 0, t: 1, l: "Readiness probe", n: "The kubelet checks whether the app can serve traffic right now, for example by calling /ready." },
+    { f: 0, t: 2, l: "Failure removes from endpoints", n: "If readiness fails, the Pod is taken out of the Service endpoints. It is not restarted." },
+    { f: 0, t: 1, l: "Liveness probe", n: "A separate check detects a stuck process, for example a frozen event loop." },
+    { f: 0, t: 1, l: "Liveness failure restarts", n: "After several failures the kubelet restarts the container. A liveness check on the database would restart every Pod during a database fault." }
+  ] },
+{ id: "x-k8s-mesh-mtls", module: "kubernetes", title: "A request inside a service mesh", summary: "How sidecars add identity and encryption.",
+  actors: ["Checkout app", "Checkout proxy", "Payments proxy", "Payments app"],
+  steps: [
+    { f: 0, t: 1, l: "Plain call to payments", n: "The application calls http://payments as usual. It knows nothing about certificates." },
+    { f: 1, t: 1, l: "Intercept and look up", n: "The sidecar proxy catches the outgoing call and finds the destination from the mesh configuration." },
+    { f: 1, t: 2, l: "Mutual TLS handshake", n: "Both proxies present short-lived certificates that name their workload identities and set up an encrypted connection." },
+    { f: 2, t: 2, l: "Check authorization policy", n: "The receiving proxy checks that the checkout identity is allowed to call POST /charge." },
+    { f: 2, t: 3, l: "Forward in plain form", n: "If the policy allows it, the proxy delivers the request to the payments container on the same Pod." },
+    { f: 3, t: 0, l: "Reply with telemetry", n: "The reply goes back the same way, and both proxies record request counts, errors and latency for the mesh dashboards." }
+  ] },
+{ id: "x-k8s-rbac-check", module: "kubernetes", title: "How the API server decides on a request", summary: "Authentication, authorization and admission.",
+  actors: ["kubectl", "API server", "RBAC", "Admission"],
+  steps: [
+    { f: 0, t: 1, l: "kubectl delete pod web", n: "The request reaches the API server with a client certificate or token." },
+    { f: 1, t: 1, l: "Authenticate", n: "The server works out who is calling: a user, a group or a service account." },
+    { f: 1, t: 2, l: "Authorize", n: "RBAC looks for a role binding that grants the verb delete on pods in this namespace to the caller." },
+    { f: 2, t: 1, l: "Deny or allow", n: "With no matching rule the answer is Forbidden. Kubernetes is deny by default, so nothing is allowed unless a rule says so." },
+    { f: 1, t: 3, l: "Admission controllers", n: "Mutating and validating policies can change or reject the request, for example a rule against privileged Pods." },
+    { f: 1, t: 0, l: "Write to etcd and reply", n: "If every step passes, the change is stored in etcd and the caller receives the result." }
+  ] },
+{ id: "x-k8s-pvc-binding", module: "kubernetes", title: "From a claim to a mounted volume", summary: "How storage reaches a Pod.",
+  actors: ["Developer", "PersistentVolumeClaim", "Provisioner", "Pod"],
+  steps: [
+    { f: 0, t: 1, l: "Create a claim", n: "The developer asks for 20 GB of storage with a storage class, without choosing a disk." },
+    { f: 1, t: 2, l: "Provisioner sees the claim", n: "The storage class names a provisioner, which notices that a new claim needs a volume." },
+    { f: 2, t: 2, l: "Create the disk", n: "The provisioner creates the disk in the cloud or storage system and registers a PersistentVolume for it." },
+    { f: 1, t: 1, l: "Bind claim and volume", n: "Kubernetes binds the claim to the new volume. The claim status changes from Pending to Bound." },
+    { f: 3, t: 1, l: "Pod uses the claim", n: "The Pod refers to the claim by name and the scheduler places it on a node that can reach the disk." },
+    { f: 3, t: 3, l: "Mount into the container", n: "The kubelet attaches and mounts the disk, and the container reads and writes data that survives restarts." }
+  ] },
+{ id: "x-tf-test-layers", module: "terraform", title: "Testing layers for Terraform changes", summary: "From a quick format check to a real deployment.",
+  actors: ["Developer", "Pipeline", "Plan policy", "Test account"],
+  steps: [
+    { f: 0, t: 1, l: "Push a change", n: "The developer opens a pull request that changes a module." },
+    { f: 1, t: 1, l: "fmt, validate, tflint", n: "Within seconds these tools find style problems, wrong references and invalid values, without any cloud call." },
+    { f: 1, t: 1, l: "Security scan", n: "A scanner reads the code for public storage, open ports and missing encryption." },
+    { f: 1, t: 2, l: "Check the plan", n: "The plan is converted to JSON and policies reject, for example, public ingress to a database." },
+    { f: 1, t: 3, l: "Integration test", n: "For widely used modules, terraform test creates real resources with random names in a separate account." },
+    { f: 3, t: 1, l: "Destroy and report", n: "The test removes its resources, and the result is posted to the pull request before anyone reviews the change." }
+  ] },
+{ id: "x-tf-moved-block", module: "terraform", title: "Renaming a resource without destroying it", summary: "How a moved block keeps the object.",
+  actors: ["Developer", "Terraform", "State", "Cloud"],
+  steps: [
+    { f: 0, t: 0, l: "Rename in code", n: "The developer changes aws_db_instance.main to aws_db_instance.database for a naming rule." },
+    { f: 1, t: 2, l: "Look up the new address", n: "Terraform does not find aws_db_instance.database in the state, so it sees a new resource." },
+    { f: 1, t: 3, l: "Plan: destroy and create", n: "The plan shows the old database destroyed and a new empty one created. This is the dangerous result." },
+    { f: 0, t: 0, l: "Add a moved block", n: "The developer adds a block that says from the old address to the new address." },
+    { f: 1, t: 2, l: "Plan again", n: "Terraform renames the entry in the state and the plan says no changes for the database." },
+    { f: 1, t: 3, l: "Apply changes nothing real", n: "The cloud resource stays untouched. Only the address in the state changed." }
+  ] },
+{ id: "x-tf-apply-saved-plan", module: "terraform", title: "Reviewing and applying the same plan", summary: "Why the pipeline applies the saved plan file.",
+  actors: ["Author", "Pipeline", "Reviewer", "Cloud"],
+  steps: [
+    { f: 0, t: 1, l: "Open a pull request", n: "The author pushes the change and the pipeline starts." },
+    { f: 1, t: 1, l: "terraform plan -out=tfplan", n: "The plan is saved to a file and its readable form is posted as a comment." },
+    { f: 2, t: 1, l: "Read the plan", n: "The reviewer checks the plan for destroys, replacements and surprises, not only the code." },
+    { f: 2, t: 1, l: "Approve and merge", n: "After approval, the change is merged to the main branch." },
+    { f: 1, t: 3, l: "terraform apply tfplan", n: "The pipeline applies the saved plan, so exactly what was approved is what runs, even if the cloud changed meanwhile." },
+    { f: 1, t: 0, l: "Plan again to confirm", n: "A final plan should say no changes. If it does not, the author looks at drift before the next change." }
+  ] },
+{ id: "x-tf-state-split", module: "terraform", title: "Splitting state to shorten plans", summary: "Why separate stacks are faster and safer.",
+  actors: ["Engineer", "Network stack", "App stack", "Data stack"],
+  steps: [
+    { f: 0, t: 1, l: "Change a security group", n: "The engineer needs an urgent change in the network." },
+    { f: 1, t: 1, l: "Plan reads 80 resources", n: "Only the resources of the network stack are refreshed, so the plan takes about a minute." },
+    { f: 2, t: 2, l: "App deploy runs at the same time", n: "Another team applies the app stack at the same time, with its own state and lock, so no one waits." },
+    { f: 1, t: 2, l: "Publish outputs", n: "The network stack exposes subnet ids as outputs, or they are found by tags with data sources." },
+    { f: 2, t: 1, l: "Read network values", n: "The app stack reads what it needs, without owning or changing those resources." },
+    { f: 3, t: 3, l: "Database state is separate", n: "A mistake in the app code cannot destroy the data stack, because it is a separate state with separate permissions." }
+  ] },
+{ id: "x-cloud-pilot-light", module: "cloud", title: "Failover with a pilot light", summary: "How a small standby grows when the main region fails.",
+  actors: ["Users", "Primary region", "DNS health check", "Secondary region"],
+  steps: [
+    { f: 0, t: 1, l: "Normal traffic", n: "All users reach the primary region while data is replicated to the secondary region." },
+    { f: 3, t: 3, l: "Standby stays small", n: "The secondary holds replicated data and minimal core services, so the cost stays low." },
+    { f: 1, t: 1, l: "Region fails", n: "A regional outage makes the primary unreachable for users." },
+    { f: 2, t: 2, l: "Health check fails", n: "The DNS health check sees repeated failures and marks the primary unhealthy." },
+    { f: 2, t: 3, l: "Scale up the standby", n: "Automation, defined as code, builds out the application tier in the secondary region and promotes the replica database." },
+    { f: 0, t: 3, l: "Traffic moves", n: "DNS now answers with the secondary region, and the recovery time is the time to scale up plus DNS caching." }
+  ] },
+{ id: "x-cloud-landing-zone", module: "cloud", title: "A guardrail in a multi-account setup", summary: "Why even an administrator cannot turn off audit logs.",
+  actors: ["Team admin", "Workload account", "Organisation policy", "Log archive account"],
+  steps: [
+    { f: 0, t: 1, l: "Try to stop audit logging", n: "An administrator in a workload account tries to disable the audit trail." },
+    { f: 1, t: 2, l: "Request is evaluated", n: "The request is checked against permissions in the account and against policies attached higher up in the organisation." },
+    { f: 2, t: 1, l: "Explicit deny", n: "A service control policy denies the stop and delete actions on audit logging for all accounts below it." },
+    { f: 1, t: 0, l: "Access denied", n: "The administrator receives an error, whatever permissions they hold in the account." },
+    { f: 1, t: 3, l: "Logs keep flowing", n: "Audit events continue to a central log archive that workload administrators cannot change." },
+    { f: 2, t: 3, l: "Alert on the attempt", n: "The attempt itself is recorded and a detection rule notifies the security team." }
+  ] },
+{ id: "x-cloud-cdn-oac", module: "cloud", title: "A private bucket behind a CDN", summary: "How a static site is served without making storage public.",
+  actors: ["Browser", "CDN edge", "Origin access control", "Private bucket"],
+  steps: [
+    { f: 0, t: 1, l: "Request /index.html", n: "The browser connects to the CDN over HTTPS using the site domain and a valid certificate." },
+    { f: 1, t: 1, l: "Check the edge cache", n: "If the file is cached at this location, the CDN answers at once with no request to the origin." },
+    { f: 1, t: 2, l: "Cache miss: sign the request", n: "On a miss, the CDN signs the origin request with its own identity." },
+    { f: 2, t: 3, l: "Bucket accepts only the CDN", n: "The bucket policy allows reads only from this CDN distribution, and public access is blocked." },
+    { f: 3, t: 1, l: "Return the object", n: "The object travels back to the edge with cache headers such as max-age." },
+    { f: 1, t: 0, l: "Serve and cache", n: "The CDN returns the file and keeps a copy. Direct requests to the bucket address still fail." }
+  ] },
+{ id: "x-cloud-policy-eval", module: "cloud", title: "How the cloud decides to allow a request", summary: "Identity policy, resource policy and explicit deny.",
+  actors: ["Caller", "Provider API", "Policy engine", "Resource"],
+  steps: [
+    { f: 0, t: 1, l: "GetObject on a bucket", n: "A role calls the storage API with temporary credentials." },
+    { f: 1, t: 2, l: "Gather policies", n: "The engine collects the identity policies, resource policy, permissions boundary and organisation policies." },
+    { f: 2, t: 2, l: "Look for an explicit deny", n: "Any matching deny ends the evaluation with a refusal, whatever allows exist." },
+    { f: 2, t: 2, l: "Look for an allow", n: "If there is no deny, at least one statement must allow the action on this resource for this caller." },
+    { f: 2, t: 1, l: "Decision", n: "No matching allow means a default deny. The result is returned to the API." },
+    { f: 1, t: 3, l: "Allow or AccessDenied", n: "On allow the object is read. On deny the error names the action and resource, and the audit log records the caller." }
+  ] },
+{ id: "x-obs-red-drilldown", module: "observability", title: "From a RED alert to a cause", summary: "Using the standard dashboard to narrow down.",
+  actors: ["On-call", "Dashboard", "Trace store", "Log store"],
+  steps: [
+    { f: 0, t: 1, l: "Latency alert fires", n: "The p99 for checkout is above its objective, and the alert links to the service dashboard." },
+    { f: 1, t: 0, l: "Errors flat, duration up", n: "Rate and errors look normal, but the duration panel shows a long tail, so the problem is slowness." },
+    { f: 0, t: 1, l: "Split by version", n: "Filtering by version shows that only the new release is slow." },
+    { f: 0, t: 2, l: "Open a slow trace", n: "An example slow trace shows nine seconds waiting for a database connection." },
+    { f: 2, t: 3, l: "Jump to logs by trace id", n: "The trace id leads to a log line: connection pool exhausted, waiting for a free connection." },
+    { f: 0, t: 0, l: "Act", n: "The on-call engineer rolls back or raises the pool size, and watches the same p99 panel recover." }
+  ] },
+{ id: "x-obs-cardinality", module: "observability", title: "How one label creates millions of series", summary: "Why request ids do not belong on metrics.",
+  actors: ["Developer", "Application", "Metrics server", "Operator"],
+  steps: [
+    { f: 0, t: 1, l: "Add request_id label", n: "A developer adds the request id as a label on a request counter to help debugging." },
+    { f: 1, t: 2, l: "Each request is new", n: "Every request creates a label value never seen before, so the server must create a new time series each time." },
+    { f: 2, t: 2, l: "Memory grows", n: "The head block holds all active series in memory, and memory use rises with every request." },
+    { f: 2, t: 3, l: "Queries slow down", n: "Dashboards that touch the metric time out, and the server restarts when it runs out of memory." },
+    { f: 3, t: 2, l: "Find the culprit", n: "The operator lists metrics by series count and sees the counter with millions of series." },
+    { f: 3, t: 1, l: "Remove and move to logs", n: "The label is removed, relabel rules drop the existing series, and the request id stays in logs and traces." }
+  ] },
+{ id: "x-obs-tail-sampling", module: "observability", title: "Tail sampling in a collector", summary: "Keeping the traces that matter.",
+  actors: ["Service A", "Service B", "Collector", "Trace store"],
+  steps: [
+    { f: 0, t: 1, l: "Request with trace id", n: "Service A calls B and passes the trace context, so both record spans for the same trace." },
+    { f: 0, t: 2, l: "Spans sent to collector", n: "Both services send their spans to a collector without deciding what to keep." },
+    { f: 1, t: 2, l: "Late span arrives", n: "The collector holds spans in memory for a decision period, such as ten seconds, until the trace is complete." },
+    { f: 2, t: 2, l: "Evaluate policies", n: "If the trace has an error or took over a second, it is kept. Other traces are kept at a rate of five percent." },
+    { f: 2, t: 3, l: "Store kept traces", n: "Only the chosen traces are written, so storage cost drops, but every failure is still available." },
+    { f: 2, t: 2, l: "Drop the rest", n: "Dropped traces still count in metrics, so rates and error ratios remain correct." }
+  ] },
+{ id: "x-obs-otel-collector", module: "observability", title: "The path of telemetry through a collector", summary: "Receive, process, export.",
+  actors: ["Application", "Receiver", "Processor", "Backend"],
+  steps: [
+    { f: 0, t: 1, l: "Send OTLP data", n: "The application sends metrics, logs and traces with the OpenTelemetry protocol to the local collector." },
+    { f: 1, t: 2, l: "Hand over to processors", n: "The receiver turns the data into an internal format and passes it down the pipeline." },
+    { f: 2, t: 2, l: "Add and remove attributes", n: "A processor adds the environment and cluster name, and removes fields that contain personal data." },
+    { f: 2, t: 2, l: "Batch and limit memory", n: "Batches reduce the number of requests, and a memory limiter protects the collector under load." },
+    { f: 2, t: 3, l: "Export to backends", n: "Exporters send traces to the tracing system, metrics to the metrics store and logs to the log store." },
+    { f: 3, t: 0, l: "Change backend without code", n: "Switching vendors only changes the exporter configuration. The application code stays the same." }
+  ] },
+{ id: "x-sre-prr", module: "sre", title: "A production readiness review", summary: "How a team finds gaps before launch.",
+  actors: ["Service team", "Reviewers", "Checklist", "Launch"],
+  steps: [
+    { f: 0, t: 1, l: "Request a review", n: "The team asks for a review six weeks before launch, while design changes are still cheap." },
+    { f: 1, t: 2, l: "Use the checklist as prompts", n: "Reviewers go through ownership, SLOs, alerts, capacity, rollout, recovery and security." },
+    { f: 1, t: 0, l: "Ask what happens when", n: "Questions are scenarios, such as what happens when the main dependency becomes slow, not yes or no checks." },
+    { f: 0, t: 2, l: "Record findings", n: "Each gap becomes an item with an owner and a priority: must fix, should fix or accepted risk." },
+    { f: 0, t: 3, l: "Fix the must-do items", n: "The team adds a rollback test, a runbook and an alert on user impact before the date." },
+    { f: 1, t: 3, l: "Agree to launch", n: "Reviewers confirm the launch criteria are met, and the accepted risks are written down with a name." }
+  ] },
+{ id: "x-sre-incident-comms", module: "sre", title: "Communication during an incident", summary: "Who tells whom what and when.",
+  actors: ["Commander", "Responders", "Comms lead", "Customers and support"],
+  steps: [
+    { f: 0, t: 1, l: "Declare and assign roles", n: "The commander opens an incident channel, names the roles and sets a severity based on impact." },
+    { f: 2, t: 3, l: "First status update", n: "Within minutes the comms lead posts a short update: who is affected, what we are doing, when the next update comes." },
+    { f: 1, t: 1, l: "Investigate and mitigate", n: "Responders work in their channel, make one change at a time and announce each change." },
+    { f: 1, t: 0, l: "Report findings", n: "The operations lead tells the commander what was found. The commander decides about a rollback or a fail-over." },
+    { f: 2, t: 3, l: "Regular updates", n: "Updates follow the schedule even when there is no news, so support and customers are not left guessing." },
+    { f: 0, t: 3, l: "Resolve and follow up", n: "After user metrics are verified, the all-clear goes out, and a blameless review is scheduled within a few days." }
+  ] },
+{ id: "x-sre-load-shedding", module: "sre", title: "Load shedding under overload", summary: "Protecting the service by refusing some work.",
+  actors: ["Clients", "Load balancer", "Service", "Dependency"],
+  steps: [
+    { f: 0, t: 1, l: "Traffic doubles", n: "A marketing email sends twice the normal traffic in a few minutes." },
+    { f: 1, t: 2, l: "Queues build up", n: "Requests wait for threads, latency grows, and clients retry, which adds even more load." },
+    { f: 2, t: 2, l: "Detect overload", n: "The service sees that its queue is longer than a limit, or that waiting time is above its target." },
+    { f: 2, t: 0, l: "Reject low priority work fast", n: "Optional requests get a quick 503 with a retry-after header, while checkout requests are still served." },
+    { f: 2, t: 3, l: "Dependency stays healthy", n: "Fewer calls reach the database, so it does not fall over and slow everything even more." },
+    { f: 0, t: 0, l: "Clients back off", n: "Well-behaved clients wait with exponential backoff and jitter, and the surge passes without a full outage." }
+  ] },
+{ id: "x-sre-toil-automation", module: "sre", title: "Turning toil into automation", summary: "How a repeated manual task is removed.",
+  actors: ["On-call engineer", "Ticket queue", "Automation", "Service"],
+  steps: [
+    { f: 0, t: 1, l: "Same ticket again", n: "The engineer clears a full disk by hand for the fourth time this month, following the same five steps." },
+    { f: 0, t: 1, l: "Measure the toil", n: "The team records minutes per week spent on it. It is manual, repetitive and grows with the service." },
+    { f: 0, t: 2, l: "Write the automation", n: "A script with checks and a dry run runs the cleanup, and a review makes sure it is safe." },
+    { f: 2, t: 3, l: "Trigger from an alert", n: "The disk-full alert starts the automation, which frees space and records what it did." },
+    { f: 2, t: 0, l: "Report the action", n: "The on-call person receives a note instead of a page when the automation succeeds." },
+    { f: 0, t: 1, l: "Fix the cause", n: "The team removes the source of the growth, so the automation becomes a safety net and not a daily habit." }
+  ] },
+{ id: "x-sec-kms-envelope", module: "security", title: "Envelope encryption with a KMS", summary: "How data is protected without exposing the master key.",
+  actors: ["Application", "KMS", "Data key", "Storage"],
+  steps: [
+    { f: 0, t: 1, l: "Request a data key", n: "The application asks the key management service for a new data key under a named master key." },
+    { f: 1, t: 2, l: "Return two copies", n: "The service returns the data key in plain form and the same key encrypted under the master key." },
+    { f: 0, t: 2, l: "Encrypt the data", n: "The application encrypts the data locally with the plain key and then removes it from memory." },
+    { f: 0, t: 3, l: "Store ciphertext and wrapped key", n: "The encrypted data and the encrypted data key are stored together." },
+    { f: 0, t: 1, l: "Later: decrypt the data key", n: "To read the data, the application sends the wrapped key to the KMS, which checks policy and logs the call." },
+    { f: 1, t: 0, l: "Return the plain key", n: "Only roles allowed to use the master key can get the data key back, and the master key never leaves the service." }
+  ] },
+{ id: "x-sec-detection", module: "security", title: "From a log event to a detection", summary: "How a suspicious action becomes an alert.",
+  actors: ["Cloud account", "Central log store", "Detection rule", "Security analyst"],
+  steps: [
+    { f: 0, t: 1, l: "Audit event shipped", n: "Every control plane call is sent within minutes to a central, protected log store." },
+    { f: 1, t: 2, l: "Rule evaluates events", n: "A rule looks for audit logging being stopped, a new access key for a service user, or a root login." },
+    { f: 2, t: 3, l: "Alert with context", n: "The alert includes who, from which address, what changed and links to recent activity of that identity." },
+    { f: 3, t: 3, l: "Triage", n: "The analyst compares with the normal pattern and decides: true positive, false positive or unknown." },
+    { f: 3, t: 0, l: "Contain", n: "If it is real, the analyst disables the key or isolates the host reversibly, and keeps evidence." },
+    { f: 3, t: 2, l: "Tune the rule", n: "Known automation is added to an allow list and the rule precision is tracked, so alerts stay trustworthy." }
+  ] },
+{ id: "x-sec-secret-scan-block", module: "security", title: "A secret scanner in the pipeline", summary: "How a leaked token is stopped before it is merged.",
+  actors: ["Developer", "Pipeline", "Secret scanner", "Security team"],
+  steps: [
+    { f: 0, t: 1, l: "Push a change", n: "The developer accidentally includes an access key in a configuration file." },
+    { f: 1, t: 2, l: "Scan the diff", n: "The scanner looks for known token formats and high-entropy strings in the changed lines." },
+    { f: 2, t: 1, l: "Finding reported", n: "The scanner reports the file and line, and the pipeline fails before the merge." },
+    { f: 1, t: 0, l: "Developer sees the failure", n: "The message says what was found, and explains that the key must be treated as exposed, even if the change is never merged." },
+    { f: 0, t: 3, l: "Rotate the key", n: "The developer revokes the key and gets a new one from the secret manager, which is read at run time." },
+    { f: 3, t: 1, l: "Keep the control on", n: "The security team makes the scanner a required check and reviews how many findings occur each month." }
+  ] },
+{ id: "x-sec-admission-deny", module: "security", title: "An admission policy rejecting a Pod", summary: "How a security rule is enforced before a workload runs.",
+  actors: ["Developer", "API server", "Policy engine", "Cluster"],
+  steps: [
+    { f: 0, t: 1, l: "Apply a Deployment", n: "The developer applies a manifest whose container runs as root with a privileged flag." },
+    { f: 1, t: 1, l: "Authenticate and authorize", n: "The request passes authentication and RBAC, because the developer may create Deployments." },
+    { f: 1, t: 2, l: "Call the admission policy", n: "The API server sends the object to the policy engine for validation." },
+    { f: 2, t: 2, l: "Evaluate the rules", n: "The engine finds that the rule requires non-root and no privileged mode, and the Pod breaks both." },
+    { f: 2, t: 0, l: "Deny with a message", n: "The request is rejected with a clear message naming the rule and the field to change." },
+    { f: 0, t: 3, l: "Fix and apply again", n: "The developer sets runAsNonRoot and removes privileged. The Pod is accepted and scheduled." }
   ] }
 ];

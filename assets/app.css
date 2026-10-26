@@ -955,3 +955,24 @@ html[data-a-read="on"] .prose h2 { margin-top: 2.2em; }
 .cap-body ol.cap-list { counter-reset: none; }
 .lede-s { color: var(--muted); margin: 0 0 .8rem; }
 .cap-cards { border-top: 1px solid var(--line); }
+
+/* reading lists and incident games */
+.reading { list-style: none; padding: 0; margin: 0 0 1.2rem; }
+.reading li { padding: .65rem 0; border-top: 1px solid var(--line); line-height: 1.5; }
+.gm-intro { font-size: 1.05rem; line-height: 1.6; padding: .8rem 1rem; border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; }
+.gm-scene { padding: 1rem 1.1rem; border: 1px solid var(--line); border-radius: 10px; line-height: 1.6; margin: .8rem 0; }
+.gm-choices { list-style: none; padding: 0; margin: 0; display: grid; gap: .5rem; }
+.gm-choice { width: 100%; text-align: left; white-space: normal; line-height: 1.45; }
+.gm-fb { padding: 1rem 1.1rem; border-radius: 10px; border: 1px solid var(--line); margin: .8rem 0; line-height: 1.55; }
+.gm-fb.gm-2 { border-color: #1a8f4c; }
+.gm-fb.gm-1 { border-color: #b7791f; }
+.gm-fb.gm-0 { border-color: #c0392b; }
+.gm-end { padding: 1rem 1.1rem; border-radius: 10px; border: 2px solid var(--line); line-height: 1.6; }
+.gm-end-win { border-color: #1a8f4c; }
+.gm-end-ok { border-color: #b7791f; }
+.gm-end-fail { border-color: #c0392b; }
+.gm-log { padding-left: 1.2rem; }
+.gm-log li { margin: .5rem 0; }
+.gm-list { margin: 0 0 1rem; }
+p code, li code, td code { overflow-wrap: anywhere; }
+.predict-q, .predict-ans { overflow-wrap: anywhere; }

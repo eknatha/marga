@@ -87,6 +87,7 @@ window.MargaFeatures = function (A) {
       '<p>We do not collect your data, we do not track your habits, and we do not sell ads. The platform is designed from the ground up to be an open, serverless engineering laboratory that scales effortlessly to millions of students worldwide. We believe the tech industry thrives when knowledge is shared transparently, not gatekept.</p>' +
       '<h2>Privacy-First, Offline-Resilient Progress</h2>' +
       '<p>Because we use no tracking scripts and require zero account sign-ups, your curriculum checkpoints, playground status indicators, and completed Skill Tree nodes are saved securely on your device using your browser\'s local storage (localStorage). Your data never leaves your computer. You can cache the core tracks, step away from the internet, and practice deep infrastructure triage completely offline, anytime, anywhere.</p>' +
+      '<p class="small">Reuse of this material is welcome with credit. See the <a href="#/license">open content license</a>.</p>' +
       '<p>Education should be a human right, not a subscription tier. MARGA is our contribution to empowering the next generation of global infrastructure engineers, completely free.</p>' +
       '</div>';
     view.after = null;
@@ -281,6 +282,120 @@ window.MargaFeatures = function (A) {
     if (c) capPaint(c);
     A.markActive(); A.save(); A.renderChrome();
   });
+
+
+  /* ---------------------------------------------------------- reading lists per stage */
+  function readingFor(mid) { return ((D.reading || {})[mid]) || []; }
+  function readingHtml(mid) {
+    var l = readingFor(mid);
+    if (!l.length) return '';
+    return '<ul class="reading">' + l.map(function (r) {
+      return '<li><a href="' + esc(r.u) + '" target="_blank" rel="noopener noreferrer">' + esc(r.t) + '</a> <span class="chip">' + esc(r.kind) + '</span><br><span class="small">' + esc(r.by) + '. ' + esc(r.why) + '</span></li>';
+    }).join('') + '</ul>';
+  }
+  A.addRoute(/^\/reading$/, function () {
+    view.title = 'Reading lists | MARGA by EknathaLabs'; view.nav = 'practice';
+    view.html = '<section class="page-head wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="#/practice">Practice</a></nav><h1>Reading lists</h1><p class="lede">Where to go next for each stage: official documentation, specifications, books and articles that practising engineers return to. Links open on other sites, so they need a network connection.</p></section>' +
+      '<div class="wrap">' + D.modules.map(function (m) { return '<h2 class="sub-h" id="read-' + esc(m.id) + '">' + esc(m.title) + '</h2>' + readingHtml(m.id); }).join('') + '</div>';
+    view.after = null;
+  });
+
+  /* ---------------------------------------------------------- open content license */
+  A.addRoute(/^\/license$/, function () {
+    view.title = 'Open content license | MARGA by EknathaLabs'; view.nav = 'about';
+    view.html = '<section class="page-head wrap"><h1>Open content license</h1><p class="lede">MARGA by EknathaLabs is free to learn from, and free to reuse with credit.</p></section>' +
+      '<div class="wrap narrow prose about">' +
+      '<h2>Copyright</h2><p>Copyright &copy; 2026 EknathaLabs. MARGA by EknathaLabs, at marga.eknathalabs.com.</p>' +
+      '<h2>The learning content</h2><p>All lessons, quiz questions, flashcards, drills, case study summaries, explainers, incident games, capstone projects, reading lists, cheat sheets and glossary entries on MARGA by EknathaLabs are licensed under the <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">Creative Commons Attribution 4.0 International license (CC BY 4.0)</a>.</p>' +
+      '<p>You may copy, share, translate, adapt and use the content for any purpose, including teaching and commercial training, as long as you give credit and say if you made changes.</p>' +
+      '<h2>How to give credit</h2><p>Use this line, or something close to it, next to the material you reuse:</p><pre class="evidence"><code>Source: MARGA by EknathaLabs (https://marga.eknathalabs.com), licensed under CC BY 4.0.</code></pre>' +
+      '<h2>The site source code</h2><p>The code that runs the site is released under the MIT License. You may use, copy, modify and distribute it, provided that the copyright notice and the license text stay with it. The full text is in the file <code>LICENSE.md</code> in the source download.</p>' +
+      '<h2>What this license does not cover</h2><ul>' +
+      '<li>The name MARGA, the name EknathaLabs and the logo are not licensed for use as your own brand. You may refer to them to give credit.</li>' +
+      '<li>Linked websites, documents, standards and company incident reports belong to their owners. Case studies give a short summary in our own words and link to the original source.</li>' +
+      '<li>Fonts and third-party libraries keep their own licenses.</li></ul>' +
+      '<h2>No warranty</h2><p>The material is provided as it is, without any warranty. It was written to teach, not as advice for your particular systems. Test commands in a safe environment before using them in production, and check facts against the official documentation linked from each lesson.</p>' +
+      '<p class="about-pledge"><strong>Free forever &middot; No login &middot; No ads &middot; No cookies</strong></p>' +
+      '</div>';
+    view.after = null;
+  });
+
+  /* ---------------------------------------------------------- incident games */
+  function gameList() { return D.games || []; }
+  function gmBag() { var st = A.state(); if (!st.gm || typeof st.gm !== 'object' || Array.isArray(st.gm)) st.gm = {}; return st.gm; }
+  var GM = null;
+  var RANK = { win: 3, ok: 2, fail: 1 };
+  var OUTLABEL = { win: 'Resolved well', ok: 'Resolved, with lessons', fail: 'Went badly' };
+  function gameCard(g) {
+    var r = gmBag()[g.id], m = A.MOD[g.module];
+    return '<article class="row game-card"><div class="row-main"><h3><a href="#/game/' + esc(g.id) + '">' + esc(g.title) + '</a></h3><p>' + esc(g.summary) + '</p>' +
+      '<p class="small">' + esc(m ? m.title : g.module) + ' &middot; ' + esc(g.level) + ' &middot; about ' + g.minutes + ' minutes</p></div>' +
+      '<div class="row-side"><span class="chip' + (r && r.best === 'win' ? ' pass' : '') + '">' + (r ? 'Best: ' + OUTLABEL[r.best] : 'Not played') + '</span></div></article>';
+  }
+  function gameCount() { var b = gmBag(), n = 0; gameList().forEach(function (g) { if (b[g.id] && b[g.id].best === 'win') n++; }); return n + ' of ' + gameList().length + ' resolved well'; }
+  window.MargaFeatures.gameCount = gameCount;
+  function gamesForModule(mid) {
+    var l = gameList().filter(function (g) { return g.module === mid; });
+    if (!l.length) return '';
+    return '<div class="gm-list">' + l.map(gameCard).join('') + '</div>';
+  }
+  window.MargaFeatures.moduleExtras = function (mid) {
+    var g = gamesForModule(mid), r = readingHtml(mid);
+    return (g ? '<h2 class="sub-h">Incident game</h2><p class="lede-s">Make the calls during a realistic outage and see what each choice leads to.</p>' + g : '') +
+      (r ? '<h2 class="sub-h">Reading list</h2>' + r + '<p class="small"><a href="#/reading">See the reading lists for every stage</a></p>' : '');
+  };
+  A.addRoute(/^\/games$/, function () {
+    view.title = 'Incident games | MARGA by EknathaLabs'; view.nav = 'practice';
+    var l = gameList();
+    view.html = '<section class="page-head wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="#/practice">Practice</a></nav><h1>Incident games</h1><p class="lede">You are on call. Each game is a real kind of outage told in steps. Choose what to do, see what happens, and learn why. There is more than one way through, and some ways make things worse. ' + gameCount() + '.</p></section>' +
+      '<div class="wrap">' + A.D.modules.map(function (m) {
+        var items = l.filter(function (g) { return g.module === m.id; });
+        return items.length ? '<h2 class="sub-h">' + esc(m.title) + '</h2><div class="cap-cards">' + items.map(gameCard).join('') + '</div>' : '';
+      }).join('') + '</div>';
+    view.after = null;
+  });
+  A.addRoute(/^\/game\/([\w-]+)$/, function (gid) {
+    var g = gameList().filter(function (x) { return x.id === gid; })[0];
+    if (!g) { view.title = 'Not found | MARGA'; view.nav = 'practice'; view.html = '<section class="page-head wrap"><h1>Game not found</h1><p><a href="#/games">See all incident games</a></p></section>'; view.after = null; return; }
+    GM = { g: g, at: g.start, pts: 0, max: 0, log: [] };
+    view.title = g.title + ' | Incident game | MARGA by EknathaLabs'; view.nav = 'practice';
+    var les = A.LES[g.lesson];
+    view.html = '<section class="page-head wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="#/games">Incident games</a></nav><h1>' + esc(g.title) + '</h1><p class="lede">' + esc(g.summary) + '</p>' +
+      '<p class="small">' + esc(g.level) + ' &middot; about ' + g.minutes + ' minutes' + (les ? ' &middot; Related lesson: <a href="' + A.hrefLesson(g.lesson) + '">' + esc(les.title) + '</a>' : '') + '</p></section>' +
+      '<div class="wrap narrow"><div id="gm-root" aria-live="polite"></div></div>';
+    view.after = function () { gmPaint(); };
+  });
+  function gmPaint(fb) {
+    var root = $('#gm-root'); if (!root || !GM) return;
+    var g = GM.g, sc = g.scenes[GM.at], html = '';
+    if (GM.at === g.start && !GM.log.length && !fb) html += '<p class="gm-intro">' + esc(g.intro) + '</p>';
+    if (fb) {
+      html += '<div class="gm-fb gm-' + fb.pts + '" role="status"><p><strong>' + (fb.pts === 2 ? 'Good call.' : fb.pts === 1 ? 'Acceptable, but not the best.' : 'That made things worse or wasted time.') + '</strong> ' + esc(fb.fb) + '</p><div class="actions"><button type="button" class="btn btn-primary" data-act="gm-next" data-to="' + esc(fb.to) + '">Continue</button></div></div>';
+      root.innerHTML = html; var b = $('[data-act=gm-next]', root); if (b) b.focus(); return;
+    }
+    if (sc.end) {
+      var best = gmBag()[g.id], rank = RANK[sc.end];
+      if (!best || RANK[best.best] < rank) gmBag()[g.id] = { best: sc.end, n: ((best && best.n) || 0) + 1 };
+      else best.n = (best.n || 0) + 1;
+      A.markActive(); A.save(); A.renderChrome();
+      html += '<div class="gm-end gm-end-' + sc.end + '"><h2>' + OUTLABEL[sc.end] + '</h2><p>' + esc(sc.text) + '</p><p><strong>What to take away.</strong> ' + esc(sc.takeaway) + '</p>' +
+        '<p class="small">Good decisions: ' + GM.pts + ' of ' + GM.max + ' points.</p></div>' +
+        '<h3 class="sub-h">Your decisions</h3><ol class="gm-log">' + GM.log.map(function (x) { return '<li><span class="small">' + esc(x.scene) + '</span><br>' + esc(x.choice) + ' <span class="chip' + (x.pts === 2 ? ' pass' : '') + '">' + (x.pts === 2 ? 'Best' : x.pts === 1 ? 'Acceptable' : 'Poor') + '</span></li>'; }).join('') + '</ol>' +
+        '<div class="actions"><button type="button" class="btn btn-primary" data-act="gm-again">Play again and try other choices</button> <a class="btn btn-quiet" href="#/games">More games</a></div>';
+      root.innerHTML = html; return;
+    }
+    html += '<div class="gm-scene"><p>' + esc(sc.text) + '</p></div><p class="gm-q"><strong>What do you do?</strong></p><ul class="gm-choices">' +
+      sc.choices.map(function (c, i) { return '<li><button type="button" class="btn btn-quiet gm-choice" data-act="gm-pick" data-i="' + i + '">' + esc(c.t) + '</button></li>'; }).join('') + '</ul>';
+    root.innerHTML = html;
+  }
+  A.onAct('gm-pick', function (b) {
+    if (!GM) return;
+    var sc = GM.g.scenes[GM.at], c = sc.choices[Number(b.getAttribute('data-i'))]; if (!c) return;
+    GM.pts += c.pts; GM.max += 2; GM.log.push({ scene: sc.text.length > 90 ? sc.text.slice(0, 90) + '...' : sc.text, choice: c.t, pts: c.pts });
+    GM.at = c.to; gmPaint({ pts: c.pts, fb: c.fb, to: c.to });
+  });
+  A.onAct('gm-next', function () { gmPaint(); var h = $('#gm-root'); if (h) h.scrollIntoView({ block: 'start' }); });
+  A.onAct('gm-again', function () { if (!GM) return; GM = { g: GM.g, at: GM.g.start, pts: 0, max: 0, log: [] }; gmPaint(); });
 
   /* ---------------------------------------------------------- playground learning aids: worked-example fading and a hint ladder */
   var CFG = [
