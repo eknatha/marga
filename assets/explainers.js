@@ -1607,5 +1607,106 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "Evaluate the rules", n: "The engine finds that the rule requires non-root and no privileged mode, and the Pod breaks both." },
     { f: 2, t: 0, l: "Deny with a message", n: "The request is rejected with a clear message naming the rule and the field to change." },
     { f: 0, t: 3, l: "Fix and apply again", n: "The developer sets runAsNonRoot and removes privileged. The Pod is accepted and scheduled." }
+  ] },
+  { id: "x-ans-run", module: "ansible", title: "What happens when you run a playbook", summary: "From the command to a changed server, step by step.",
+  actors: ["Engineer", "Control node", "Managed node"],
+  steps: [
+    { f: 0, t: 1, l: "Run ansible-playbook", n: "The engineer runs the command with an inventory and a playbook file." },
+    { f: 1, t: 1, l: "Read inventory and playbook", n: "The control node builds the host list and the ordered list of tasks for each host." },
+    { f: 1, t: 2, l: "Connect over SSH", n: "Ansible opens an SSH session to each managed node using the configured user and key." },
+    { f: 1, t: 2, l: "Send a module", n: "For each task, a small Python module is copied to the managed node and run." },
+    { f: 2, t: 2, l: "Compare and change", n: "The module checks the current state and changes the system only if it differs from the request." },
+    { f: 2, t: 1, l: "Report the result", n: "The module returns ok, changed or failed as JSON and is removed from the node." },
+    { f: 1, t: 0, l: "Show the recap", n: "The engineer sees counts per host, and a second run should show changed=0." }
+  ] },
+  { id: "x-ans-handler", module: "ansible", title: "A template change triggering a reload", summary: "How a handler runs once when configuration changes.",
+  actors: ["Playbook", "Template task", "Handler queue", "Web server"],
+  steps: [
+    { f: 0, t: 1, l: "Run the template task", n: "The play reaches the task that renders the web server configuration." },
+    { f: 1, t: 3, l: "Write the file if different", n: "The rendered text is compared with the file on the server and written only if it differs." },
+    { f: 1, t: 2, l: "Notify the handler", n: "Because the file changed, the task queues the handler named Reload nginx." },
+    { f: 0, t: 1, l: "Run later tasks", n: "Other tasks run. More tasks that change things can notify the same handler." },
+    { f: 0, t: 2, l: "End of the play", n: "When all tasks finish for the host, the queued handlers are due." },
+    { f: 2, t: 3, l: "Reload once", n: "The handler reloads the web server a single time, even if several tasks notified it." }
+  ] },
+  { id: "x-ans-vault", module: "ansible", title: "How Vault protects a password in a run", summary: "Where the secret is encrypted and where it appears in clear text.",
+  actors: ["Repository", "Engineer or pipeline", "Control node", "Target host"],
+  steps: [
+    { f: 0, t: 0, l: "Store the secret encrypted", n: "The password sits in the repository inside an encrypted vault file." },
+    { f: 1, t: 2, l: "Provide the vault password", n: "At run time the vault password is typed or fetched from a secret store, never read from the repository." },
+    { f: 2, t: 0, l: "Fetch the file", n: "The control node reads the encrypted file and decrypts it in memory." },
+    { f: 2, t: 2, l: "Render the task", n: "The task uses the value, and no_log keeps it out of console output and logs." },
+    { f: 2, t: 3, l: "Write the secret safely", n: "The password goes into a file on the host with strict owner and permissions." },
+    { f: 3, t: 3, l: "Service reads the file", n: "The application reads the password locally. No other user on the host can read it." }
+  ] },
+  { id: "x-ans-rolling", module: "ansible", title: "A rolling update with a canary", summary: "How serial batches and health checks limit damage.",
+  actors: ["Playbook", "Load balancer", "Canary host", "Remaining hosts"],
+  steps: [
+    { f: 0, t: 1, l: "Drain the first host", n: "The play asks the load balancer to stop sending traffic to the canary host." },
+    { f: 0, t: 2, l: "Update the canary", n: "The new package is installed and the service restarted on that host only." },
+    { f: 2, t: 2, l: "Wait for health", n: "The play retries the health endpoint until it answers or the retry limit is reached." },
+    { f: 0, t: 1, l: "Return it to service", n: "If healthy, the canary goes back into the load balancer and receives real traffic." },
+    { f: 0, t: 3, l: "Continue in waves", n: "The play repeats the same steps for the next batch, then the next." },
+    { f: 0, t: 0, l: "Stop on failure", n: "If failures pass max_fail_percentage the play stops and the remaining hosts stay on the old version." }
+  ] },
+  { id: "x-ans-tf", module: "ansible", title: "Terraform and Ansible working together", summary: "Provisioning first, configuration second.",
+  actors: ["Terraform", "Cloud", "Inventory", "Ansible"],
+  steps: [
+    { f: 0, t: 1, l: "Create the servers", n: "Terraform asks the cloud to create networks, instances and security rules." },
+    { f: 1, t: 0, l: "Return the addresses", n: "The cloud reports the new instance addresses, which Terraform records in state and outputs." },
+    { f: 2, t: 1, l: "Build the inventory", n: "A dynamic inventory plugin lists current instances by tag or reads the outputs." },
+    { f: 3, t: 2, l: "Select the hosts", n: "Ansible reads the inventory and groups the new hosts by role." },
+    { f: 3, t: 1, l: "Configure over SSH", n: "Ansible installs packages, writes files and starts services on each instance." },
+    { f: 3, t: 0, l: "Report back", n: "A clean second run shows changed=0. Later infrastructure changes go back through Terraform." }
+  ] },
+  { id: "x-db-query", module: "databases", title: "How a query reaches the data", summary: "What the database does between your SQL and the answer.",
+  actors: ["Client", "Planner", "Index and table", "Write-ahead log"],
+  steps: [
+    { f: 0, t: 1, l: "Send SQL", n: "The client sends a query over a connection to the database." },
+    { f: 1, t: 1, l: "Parse and plan", n: "The planner checks the syntax and estimates the cost of different ways to run it." },
+    { f: 1, t: 2, l: "Choose an index", n: "If an index fits and the query returns few rows, the plan uses it instead of scanning the table." },
+    { f: 2, t: 2, l: "Read the rows", n: "Needed pages come from memory if cached, or from disk if not." },
+    { f: 2, t: 0, l: "Return the result", n: "The matching rows travel back to the client." },
+    { f: 0, t: 3, l: "A write is logged first", n: "For an update the change is written to the log and flushed before the commit is acknowledged." }
+  ] },
+  { id: "x-db-lock", module: "databases", title: "How a long transaction blocks a migration", summary: "One idle session can stop a busy table.",
+  actors: ["Report session", "ALTER TABLE", "App queries", "Database"],
+  steps: [
+    { f: 0, t: 3, l: "Open a transaction", n: "A reporting session starts a transaction and reads the orders table, then stays open." },
+    { f: 1, t: 3, l: "Ask for a strong lock", n: "A migration runs ALTER TABLE and needs a lock that conflicts with the open transaction." },
+    { f: 1, t: 1, l: "Wait in the queue", n: "The ALTER cannot proceed and waits for the report to finish." },
+    { f: 2, t: 3, l: "New queries queue behind it", n: "Normal application queries now wait behind the queued ALTER." },
+    { f: 3, t: 2, l: "Connections pile up", n: "The connection pool fills with waiting statements and the application times out." },
+    { f: 1, t: 3, l: "Cancel the ALTER", n: "Cancelling the migration releases the queue at once. Setting lock_timeout would have done this automatically." }
+  ] },
+  { id: "x-db-pitr", module: "databases", title: "Point-in-time recovery", summary: "Restoring to the minute before a mistake.",
+  actors: ["Primary", "Archive", "Restore host", "Operator"],
+  steps: [
+    { f: 0, t: 1, l: "Archive the log continuously", n: "As changes are made, the write-ahead log segments are copied to the archive." },
+    { f: 1, t: 1, l: "Keep a base backup", n: "A full physical backup is taken regularly and stored with the archive." },
+    { f: 3, t: 3, l: "Choose the target time", n: "After a bad delete at 14:00, the operator picks 13:59 as the recovery target." },
+    { f: 1, t: 2, l: "Restore the base backup", n: "The restore host receives the latest base backup taken before that time." },
+    { f: 1, t: 2, l: "Replay the log", n: "Archived log segments are applied until the target time is reached." },
+    { f: 2, t: 3, l: "Verify and promote", n: "The operator checks the data, then promotes the restored server or copies back the missing rows." }
+  ] },
+  { id: "x-db-failover", module: "databases", title: "A safe database failover", summary: "Quorum, fencing, promotion and redirection.",
+  actors: ["Health checks", "Quorum", "Replica", "Clients"],
+  steps: [
+    { f: 0, t: 1, l: "Primary stops answering", n: "Several health checks fail, and the group votes on whether the primary is really down." },
+    { f: 1, t: 1, l: "Reach agreement", n: "A majority agrees, which avoids acting on one lost network packet." },
+    { f: 1, t: 1, l: "Fence the old primary", n: "The old primary is cut off so it cannot accept writes if it comes back." },
+    { f: 1, t: 2, l: "Pick the best replica", n: "The most up-to-date replica is chosen to limit lost commits." },
+    { f: 2, t: 2, l: "Promote it", n: "The replica stops replaying and becomes the new primary." },
+    { f: 2, t: 3, l: "Redirect clients", n: "A proxy, virtual address or DNS change sends clients to the new primary, and connections reconnect." }
+  ] },
+  { id: "x-db-pool", module: "databases", title: "Why a connection pooler helps", summary: "Many clients sharing a few database connections.",
+  actors: ["App instances", "Pooler", "Database", "Monitoring"],
+  steps: [
+    { f: 0, t: 1, l: "Hundreds of clients connect", n: "Each application instance opens its pool to the pooler instead of the database." },
+    { f: 1, t: 2, l: "Few real connections", n: "The pooler keeps a small set of server connections open to the database." },
+    { f: 0, t: 1, l: "A transaction starts", n: "A client sends a transaction and the pooler assigns it a free server connection." },
+    { f: 1, t: 2, l: "Run and release", n: "When the transaction ends, the server connection returns to the pool for another client." },
+    { f: 2, t: 3, l: "Stable resources", n: "The database sees a steady, small number of sessions and keeps memory for queries." },
+    { f: 3, t: 1, l: "Watch the queue", n: "Monitoring shows clients waiting for a connection, which tells you when to tune or scale." }
   ] }
 ];

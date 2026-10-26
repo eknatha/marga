@@ -172,7 +172,7 @@ function renderChrome() {
   $('#footer').innerHTML =
     '<footer class="foot"><div class="wrap foot-in">' +
     '<span>MARGA by EknathaLabs</span>' +
-    '<a href="cheatsheets/">Printable cheat sheets</a><a href="#/interview">InterviewHub</a><a href="#/practice">Practice</a><a href="#/glossary">Glossary</a><a href="#/labs">Labs (planned)</a><a href="#/license">Open content license</a>' +
+    '<a href="cheatsheets/">Printable cheat sheets</a><a href="#/interview">InterviewHub</a><a href="#/practice">Practice</a><a href="#/glossary">Glossary</a><a href="#/labs">Labs (planned)</a><a href="#/badges">Badges</a><a href="#/license">Open content license</a>' +
     '<span class="foot-note">Progress is saved in this browser only.</span>' +
     '<p class="foot-promise">Free forever \u00b7 No login \u00b7 No ads \u00b7 No cookies</p><p class="small foot-ver">Version ' + siteVer() + '</p></div></footer>';
   if (window.MargaCounter && D.counter) MargaCounter.rebind('#visitors');
@@ -551,6 +551,7 @@ function startQuiz(id, root) {
         var prev = S.lessons[id] || {};
         S.lessons[id] = { done: true, best: Math.max(prev.best || 0, pct), at: prev.at || Date.now(), attempts: (prev.attempts || 0) + 1 };
         markActive(); save(); renderChrome(); setNav('paths');
+        if (window.MargaBadges && MargaBadges.check) MargaBadges.check(true);
         var msg = '';
         if (!before && modDone(mod)) {
           var opened = MODS.filter(function (x) { return x.requires.indexOf(mod.id) >= 0 && modUnlocked(x); });
@@ -795,7 +796,7 @@ function progressView() {
           var o = JSON.parse(r.result);
           if (!o || o.v !== 1 || typeof o.lessons !== 'object' || !Array.isArray(o.days)) throw new Error('bad');
           S = { v: 1, lessons: o.lessons || {}, cards: o.cards || {}, days: o.days, path: o.path || 'devops', iv: (o.iv && typeof o.iv === 'object') ? o.iv : {} };
-          ['cs', 'dr', 'fc', 'dc', 'py', 'lab', 'wk', 'cap', 'gm'].forEach(function (k) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) S[k] = o[k]; });
+          ['cs', 'dr', 'fc', 'dc', 'py', 'lab', 'wk', 'cap', 'gm', 'bd'].forEach(function (k) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) S[k] = o[k]; });
           if (Array.isArray(o.mock)) S.mock = o.mock.slice(-20);
           save(); renderChrome(); toast('Progress imported.'); route();
         } catch (x) { toast('That file is not a MARGA progress export.'); }
@@ -849,6 +850,7 @@ function buildIndex() {
   (D.cases || []).forEach(function (c) { addIdx('Case study', 'Cases', c.title, c.company + ', ' + c.year, '#/cases/' + c.id, c.what + ' ' + c.cause + ' ' + c.fix + ' ' + c.lesson, c.company + ' ' + c.area, null, (c.modules || [])[0]); });
   (D.arch || []).forEach(function (a) { addIdx('Post-mortem', 'Cases', a.title, a.summary, '#/architecture/' + a.id, a.text, a.company, null, (a.modules || [])[0]); });
   Object.keys(SHEETS).forEach(function (id) { var x = SHEETS[id]; addIdx('Cheat sheet', 'Cheat sheets', x.title, x.summary, '#/cheatsheet/' + id, x.text, '', null, id); });
+  (D.walkthroughs || []).forEach(function (w) { addIdx('Walkthrough', 'Practice', w.title, w.summary, '#/walkthrough/' + w.id, w.text, 'architecture design system walkthrough', null, (w.modules || [])[0]); });
   (D.interview || []).forEach(function (x) { addIdx('Interview', 'Interview', x.q, MOD[x.module] ? MOD[x.module].title : '', '#/interview/' + x.id, x.text, x.level, null, x.module); });
   (D.glossary || []).forEach(function (g) { addIdx('Glossary', 'Glossary', g.term, g.plain, '#/glossary/' + g.id, g.def, g.aliases.join(' '), null, g.module); });
   (D.drills || []).forEach(function (d) { addIdx('Drill', 'Practice', d.title, MOD[d.module] ? MOD[d.module].title : '', '#/drills/' + d.module, d.story + ' ' + d.q, '', null, d.module); });
@@ -1023,6 +1025,7 @@ if (typeof window.MargaExtras === 'function') window.MargaExtras(api);
 if (typeof window.MargaMore === 'function') window.MargaMore(api);
 if (typeof window.MargaLabs === 'function') window.MargaLabs(api);
 if (typeof window.MargaFeatures === 'function') window.MargaFeatures(api);
+if (typeof window.MargaBadges === 'function') window.MargaBadges(api);
 
 /* ---------- accessibility panel ---------- */
 (function () {

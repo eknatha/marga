@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ansible cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="Inventory, ad-hoc commands, playbook structure, variables, handlers, roles, Vault and safe rollout flags.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/ansible.html">
+<meta property="og:title" content="Ansible cheat sheet">
+<meta property="og:description" content="Inventory, ad-hoc commands, playbook structure, variables, handlers, roles, Vault and safe rollout flags.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/ansible.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=d19c6eb0">
+<script src="../assets/a11y.js?v=d19c6eb0"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="../#/interview">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>Ansible cheat sheet</h1>
+    <p class="lede">Inventory, ad-hoc commands, playbook structure, variables, handlers, roles, Vault and safe rollout flags.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="ad-hoc-commands">Ad-hoc commands</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="ansible all -i inventory.ini -m ping
+ansible web -i inventory.ini -m command -a &quot;uptime&quot;
+ansible web -i inventory.ini -m apt -a &quot;name=nginx state=present&quot; --become
+ansible-inventory -i inventory.ini --graph
+ansible-inventory -i inventory.ini --host web1.example.com" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">ansible all -i inventory.ini -m ping
+ansible web -i inventory.ini -m <span class="hljs-built_in">command</span> -a <span class="hljs-string">&quot;uptime&quot;</span>
+ansible web -i inventory.ini -m apt -a <span class="hljs-string">&quot;name=nginx state=present&quot;</span> --become
+ansible-inventory -i inventory.ini --graph
+ansible-inventory -i inventory.ini --host web1.example.com</code></pre></div>
+<div class="table-wrap"><table><thead><tr>
+<th>Flag</th>
+<th>Meaning</th>
+</tr>
+</thead><tbody><tr>
+<td><code>-m</code></td>
+<td>Module to run</td>
+</tr>
+<tr>
+<td><code>-a</code></td>
+<td>Module arguments</td>
+</tr>
+<tr>
+<td><code>--become</code></td>
+<td>Run with elevated rights</td>
+</tr>
+<tr>
+<td><code>--limit</code></td>
+<td>Restrict to some hosts</td>
+</tr>
+<tr>
+<td><code>--check</code></td>
+<td>Show what would change</td>
+</tr>
+</tbody></table></div>
+<h2 id="running-playbooks">Running playbooks</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="ansible-playbook -i inventory.ini site.yml
+ansible-playbook site.yml --syntax-check
+ansible-playbook site.yml --check --diff --limit web1.example.com
+ansible-playbook site.yml --tags config --skip-tags slow
+ansible-playbook site.yml --start-at-task &quot;Render nginx configuration&quot;
+ansible-playbook site.yml --list-tasks" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">ansible-playbook -i inventory.ini site.yml
+ansible-playbook site.yml --syntax-check
+ansible-playbook site.yml --check --diff --<span class="hljs-built_in">limit</span> web1.example.com
+ansible-playbook site.yml --tags config --skip-tags slow
+ansible-playbook site.yml --start-at-task <span class="hljs-string">&quot;Render nginx configuration&quot;</span>
+ansible-playbook site.yml --list-tasks</code></pre></div>
+<h2 id="playbook-skeleton">Playbook skeleton</h2>
+<div class="code" data-lang="yaml"><button class="copy" type="button" data-copy="- name: Configure web servers
+  hosts: web
+  become: true
+  vars:
+    app_port: 8080
+  tasks:
+    - name: Install nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+    - name: Render configuration
+      ansible.builtin.template:
+        src: shop.conf.j2
+        dest: /etc/nginx/conf.d/shop.conf
+        validate: &quot;nginx -t -c /etc/nginx/nginx.conf&quot;
+      notify: Reload nginx
+  handlers:
+    - name: Reload nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Configure</span> <span class="hljs-string">web</span> <span class="hljs-string">servers</span>
+  <span class="hljs-attr">hosts:</span> <span class="hljs-string">web</span>
+  <span class="hljs-attr">become:</span> <span class="hljs-literal">true</span>
+  <span class="hljs-attr">vars:</span>
+    <span class="hljs-attr">app_port:</span> <span class="hljs-number">8080</span>
+  <span class="hljs-attr">tasks:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Install</span> <span class="hljs-string">nginx</span>
+      <span class="hljs-attr">ansible.builtin.apt:</span>
+        <span class="hljs-attr">name:</span> <span class="hljs-string">nginx</span>
+        <span class="hljs-attr">state:</span> <span class="hljs-string">present</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Render</span> <span class="hljs-string">configuration</span>
+      <span class="hljs-attr">ansible.builtin.template:</span>
+        <span class="hljs-attr">src:</span> <span class="hljs-string">shop.conf.j2</span>
+        <span class="hljs-attr">dest:</span> <span class="hljs-string">/etc/nginx/conf.d/shop.conf</span>
+        <span class="hljs-attr">validate:</span> <span class="hljs-string">&quot;nginx -t -c /etc/nginx/nginx.conf&quot;</span>
+      <span class="hljs-attr">notify:</span> <span class="hljs-string">Reload</span> <span class="hljs-string">nginx</span>
+  <span class="hljs-attr">handlers:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Reload</span> <span class="hljs-string">nginx</span>
+      <span class="hljs-attr">ansible.builtin.service:</span>
+        <span class="hljs-attr">name:</span> <span class="hljs-string">nginx</span>
+        <span class="hljs-attr">state:</span> <span class="hljs-string">reloaded</span></code></pre></div>
+<p>Read the recap: a clean second run shows <code>changed=0</code>.</p>
+<h2 id="control-flow">Control flow</h2>
+<div class="code" data-lang="yaml"><button class="copy" type="button" data-copy="- name: Only on Debian
+  ansible.builtin.apt:
+    name: nginx
+  when: ansible_facts['os_family'] == &quot;Debian&quot;
+
+- name: Make users
+  ansible.builtin.user:
+    name: &quot;{{ item }}&quot;
+  loop: [alice, bob]" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Only</span> <span class="hljs-string">on</span> <span class="hljs-string">Debian</span>
+  <span class="hljs-attr">ansible.builtin.apt:</span>
+    <span class="hljs-attr">name:</span> <span class="hljs-string">nginx</span>
+  <span class="hljs-attr">when:</span> <span class="hljs-string">ansible_facts[&#x27;os_family&#x27;]</span> <span class="hljs-string">==</span> <span class="hljs-string">&quot;Debian&quot;</span>
+
+<span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Make</span> <span class="hljs-string">users</span>
+  <span class="hljs-attr">ansible.builtin.user:</span>
+    <span class="hljs-attr">name:</span> <span class="hljs-string">&quot;<span class="hljs-template-variable">{{ item }}</span>&quot;</span>
+  <span class="hljs-attr">loop:</span> [<span class="hljs-string">alice</span>, <span class="hljs-string">bob</span>]</code></pre></div>
+<div class="table-wrap"><table><thead><tr>
+<th>Tool</th>
+<th>Use</th>
+</tr>
+</thead><tbody><tr>
+<td><code>when</code></td>
+<td>Run a task only if true</td>
+</tr>
+<tr>
+<td><code>loop</code></td>
+<td>Repeat for each item</td>
+</tr>
+<tr>
+<td><code>block</code> / <code>rescue</code> / <code>always</code></td>
+<td>Try, catch, finally</td>
+</tr>
+<tr>
+<td><code>changed_when: false</code></td>
+<td>Mark a read-only task as unchanged</td>
+</tr>
+<tr>
+<td><code>no_log: true</code></td>
+<td>Hide secrets from output</td>
+</tr>
+</tbody></table></div>
+<h2 id="roles-and-collections">Roles and collections</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="ansible-galaxy init roles/nginx
+ansible-galaxy install -r requirements.yml
+ansible-galaxy collection list" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">ansible-galaxy init roles/nginx
+ansible-galaxy install -r requirements.yml
+ansible-galaxy collection list</code></pre></div>
+<p>Pin versions in <code>requirements.yml</code>. Put overridable settings in <code>defaults/main.yml</code> and prefix variable names with the role name.</p>
+<h2 id="vault">Vault</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="ansible-vault create group_vars/prod/vault.yml
+ansible-vault edit group_vars/prod/vault.yml
+ansible-vault encrypt_string 'value' --name 'vault_db_password'
+ansible-playbook site.yml --vault-id prod@prompt" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">ansible-vault create group_vars/prod/vault.yml
+ansible-vault edit group_vars/prod/vault.yml
+ansible-vault encrypt_string <span class="hljs-string">&#x27;value&#x27;</span> --name <span class="hljs-string">&#x27;vault_db_password&#x27;</span>
+ansible-playbook site.yml --vault-id prod@prompt</code></pre></div>
+<p>Keep the vault password out of the repository.</p>
+<h2 id="safe-rollout">Safe rollout</h2>
+<div class="code" data-lang="yaml"><button class="copy" type="button" data-copy="- hosts: web
+  serial: &quot;20%&quot;
+  max_fail_percentage: 10" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-bullet">-</span> <span class="hljs-attr">hosts:</span> <span class="hljs-string">web</span>
+  <span class="hljs-attr">serial:</span> <span class="hljs-string">&quot;20%&quot;</span>
+  <span class="hljs-attr">max_fail_percentage:</span> <span class="hljs-number">10</span></code></pre></div>
+<p>Test with <code>ansible-lint</code> and Molecule. Use a canary batch and a health check before continuing.</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Symptom</th>
+<th>First step</th>
+</tr>
+</thead><tbody><tr>
+<td>UNREACHABLE, publickey</td>
+<td><code>ssh -vvv</code> with the same user and key</td>
+</tr>
+<tr>
+<td>Missing sudo password</td>
+<td>Check <code>become</code> and sudoers</td>
+</tr>
+<tr>
+<td>Missing variable</td>
+<td><code>ansible-inventory --host</code>, add <code>default</code> or <code>assert</code></td>
+</tr>
+<tr>
+<td>Slow run</td>
+<td><code>gather_facts: false</code>, more forks, <code>profile_tasks</code></td>
+</tr>
+</tbody></table></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>ansible-playbook</code> without <code>--limit</code> or <code>serial</code> changes every host in the group at once. Test on one host first.</p>
+</aside>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p>Never commit the vault password next to the encrypted files. It cancels the protection.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>ignore_errors: true</code> hides failures and lets later tasks run on a broken base. Fix the cause or use <code>rescue</code>.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>shell</code> and <code>command</code> always report <code>changed</code> unless you add <code>creates</code> or <code>changed_when</code>.</p>
+</aside>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://docs.ansible.com/ansible/latest/" target="_blank" rel="noopener">Ansible documentation</a><span class="host">docs.ansible.com</span></li><li><a href="https://ansible.readthedocs.io/projects/lint/" target="_blank" rel="noopener">Ansible Lint</a><span class="host">ansible.readthedocs.io</span></li><li><a href="https://galaxy.ansible.com/" target="_blank" rel="noopener">Ansible Galaxy</a><span class="host">galaxy.ansible.com</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free forever · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=d19c6eb0"></script>
+<script src="../assets/counter.js?v=d19c6eb0"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>
