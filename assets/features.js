@@ -370,7 +370,7 @@ window.MargaFeatures = function (A) {
   }
   window.MargaFeatures.moduleExtras = function (mid) {
     var g = gamesForModule(mid), r = readingHtml(mid);
-    return (window.MargaBadges && MargaBadges.moduleLine ? MargaBadges.moduleLine(mid) : '') + (g ? '<h2 class="sub-h">Incident game</h2><p class="lede-s">Make the calls during a realistic outage and see what each choice leads to.</p>' + g : '') +
+    return (window.MargaBadges && MargaBadges.moduleLine ? MargaBadges.moduleLine(mid) : '') + (window.MargaTermLabs && MargaTermLabs.moduleLine ? MargaTermLabs.moduleLine(mid) : '') + (g ? '<h2 class="sub-h">Incident game</h2><p class="lede-s">Make the calls during a realistic outage and see what each choice leads to.</p>' + g : '') +
       (r ? '<h2 class="sub-h">Reading list</h2>' + r + '<p class="small"><a href="#/reading">See the reading lists for every stage</a></p>' : '');
   };
   A.addRoute(/^\/games$/, function () {

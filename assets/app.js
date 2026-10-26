@@ -172,7 +172,7 @@ function renderChrome() {
   $('#footer').innerHTML =
     '<footer class="foot"><div class="wrap foot-in">' +
     '<span>MARGA by EknathaLabs</span>' +
-    '<a href="cheatsheets/">Printable cheat sheets</a><a href="#/interview">InterviewHub</a><a href="#/practice">Practice</a><a href="#/glossary">Glossary</a><a href="#/labs">Labs (planned)</a><a href="#/badges">Badges</a><a href="#/license">Open content license</a>' +
+    '<a href="cheatsheets/">Printable cheat sheets</a><a href="#/interview">InterviewHub</a><a href="#/practice">Practice</a><a href="#/glossary">Glossary</a><a href="#/terminal-labs">Terminal labs</a><a href="#/badges">Badges</a><a href="#/license">Open content license</a>' +
     '<span class="foot-note">Progress is saved in this browser only.</span>' +
     '<p class="foot-promise">Free forever \u00b7 No login \u00b7 No ads \u00b7 No cookies</p><p class="small foot-ver">Version ' + siteVer() + '</p></div></footer>';
   if (window.MargaCounter && D.counter) MargaCounter.rebind('#visitors');
@@ -342,7 +342,7 @@ function homeView() {
     '<div class="note-panel"><h3>Listen while you learn</h3><p>Every lesson, cheat sheet and interview answer can be read aloud. Pick any voice installed on your device from the Voice dropdown.</p></div></div></section>' +
 
     '<section class="band"><div class="wrap two"><div><h2>How a lesson works</h2><ol class="steps"><li><strong>Read.</strong> Each lesson explains why, then shows commands with their output.</li><li><strong>Check.</strong> Answer a short quiz. Pass it to mark the lesson done and unlock the next.</li><li><strong>Remember.</strong> Flip the flashcards now, and review them again later from the Review cards page.</li></ol></div>' +
-    '<div class="note-panel"><h3>Hands-on labs are planned</h3><p>Browser-based practice with automatic checking is in development. Until then, every lesson includes a written incident walkthrough with sample output so you can follow the reasoning.</p><p><a href="#/labs">What is planned</a></p></div></div></section>';
+    '<div class="note-panel"><h3>Terminal labs</h3><p>Break-and-fix practice for Linux, Shell, Networking and Python, in a simulated terminal in your browser, with automatic checks. It is a simulation, not a real server. Labs for Kubernetes, Docker and Terraform are still planned.</p><p><a href="#/terminal-labs">Open the terminal labs</a> | <a href="#/labs">What is planned</a></p></div></div></section>';
   view.after = function () { armTree(); armTerm(); };
 }
 
@@ -752,13 +752,12 @@ function ivToggle(card, open) {
 /* ----- labs ----- */
 function labsView() {
   view.title = 'Labs | MARGA by EknathaLabs'; view.nav = 'labs';
-  view.html = '<section class="page-head wrap"><h1>Hands-on labs</h1><p class="lede">Planned. Labs are not available yet, and nothing on this site depends on them.</p></section>' +
-    '<div class="wrap narrow prose"><h2>What is planned</h2><ul>' +
-    '<li><strong>Terminal practice in the browser</strong> for Linux and Bash, with each task checked automatically.</li>' +
-    '<li><strong>Break and fix scenarios</strong> where a service is failing and you find the cause, based on real incidents.</li>' +
+  view.html = '<section class="page-head wrap"><h1>Hands-on labs</h1><p class="lede">Terminal labs for Linux, Shell, Networking and Python are available. The labs listed under planned are not available yet, and nothing on this site depends on them.</p></section>' +
+    '<div class="wrap narrow prose"><h2>Available now</h2><p><strong>Terminal labs</strong> are break-and-fix exercises in a simulated terminal in your browser. They are checked automatically. They are a simulation, not a real server.</p><p><a class="btn btn-primary" href="#/terminal-labs">Open the terminal labs</a></p><h2>What is planned</h2><ul>' +
+    '<li><strong>More break-and-fix scenarios</strong> based on real incidents, beyond the four stages that have terminal labs.</li>' +
     '<li><strong>Kubernetes and Docker exercises</strong> that match the lesson you just passed, including CKA and CKS style tasks.</li>' +
     '<li><strong>Infrastructure as code exercises</strong> for Terraform plans and state problems.</li></ul>' +
-    '<h2>What you can do today</h2><p>Each lesson contains a written incident walkthrough with sample output, a lesson check and flashcards. Cheat sheets cover the commands you will use when labs arrive.</p>' +
+    '<h2>What you can do today</h2><p>Each lesson contains a written incident walkthrough with sample output, a lesson check and flashcards. Cheat sheets cover the commands you will use in the labs.</p>' +
     '<p><a class="btn btn-primary" href="#/paths">Choose a learning path</a></p></div>';
   view.after = null;
 }
@@ -796,7 +795,7 @@ function progressView() {
           var o = JSON.parse(r.result);
           if (!o || o.v !== 1 || typeof o.lessons !== 'object' || !Array.isArray(o.days)) throw new Error('bad');
           S = { v: 1, lessons: o.lessons || {}, cards: o.cards || {}, days: o.days, path: o.path || 'devops', iv: (o.iv && typeof o.iv === 'object') ? o.iv : {} };
-          ['cs', 'dr', 'fc', 'dc', 'py', 'lab', 'wk', 'cap', 'gm', 'bd'].forEach(function (k) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) S[k] = o[k]; });
+          ['cs', 'dr', 'fc', 'dc', 'py', 'lab', 'wk', 'cap', 'gm', 'bd', 'tl'].forEach(function (k) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) S[k] = o[k]; });
           if (Array.isArray(o.mock)) S.mock = o.mock.slice(-20);
           save(); renderChrome(); toast('Progress imported.'); route();
         } catch (x) { toast('That file is not a MARGA progress export.'); }
@@ -1024,6 +1023,7 @@ window.MargaApp = api;
 if (typeof window.MargaExtras === 'function') window.MargaExtras(api);
 if (typeof window.MargaMore === 'function') window.MargaMore(api);
 if (typeof window.MargaLabs === 'function') window.MargaLabs(api);
+if (typeof window.MargaTermLabs === 'function') window.MargaTermLabs(api);
 if (typeof window.MargaFeatures === 'function') window.MargaFeatures(api);
 if (typeof window.MargaBadges === 'function') window.MargaBadges(api);
 
