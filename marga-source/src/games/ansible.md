@@ -1,0 +1,55 @@
+## The playbook that took down checkout
+module: ansible
+level: Advanced
+minutes: 6
+lesson: ansible/ansible-at-scale
+summary: A library upgrade must reach 240 web servers during a busy afternoon. Decide how to roll it out.
+intro: Marketing has a sale tonight. A security fix for a shared library must reach all 240 web servers today. Your playbook works on staging and takes four minutes to run on all hosts at once.
+
+### s1
+text: The playbook has no serial setting. What do you do before running it?
+- Run it on all hosts now, since staging was fine => end-fail | 0 | If the new library has a startup bug, all 240 servers fail together and checkout goes down.
+- Add serial, a canary batch and a health check, then test with check mode on one host => s2 | 2 | A small first batch limits damage and gives you evidence.
+- Run it only after midnight with no changes => s3 | 1 | Timing helps, but the lack of batches and health checks is still the real risk.
+
+### s2
+text: You add serial 2 for the first batch, then 20 percent, and max_fail_percentage 10. What should happen between batches?
+- Drain the host from the load balancer, update, wait for the health endpoint, and put it back => s4 | 2 | Waiting on real readiness prevents sending users to a broken host.
+- Sleep 30 seconds and continue => s4 | 0 | A fixed sleep guesses at readiness and passes broken hosts.
+- Nothing, the batches are enough => s4 | 1 | Batches help, but without checks bad hosts keep taking traffic.
+
+### s3
+text: The run is delayed but unchanged. At midnight a colleague asks why it still touches every host at once. What do you do?
+- Rework it with serial, health checks and a canary before running => s2 | 2 | Good, change the design rather than just the clock.
+- Run it anyway, the traffic is lower => end-fail | 0 | Lower traffic does not make a total outage acceptable.
+
+### s4
+text: The canary batch finishes and the second host reports a failed health check. The play stops. What now?
+- Investigate the failing host with ssh and logs, fix the cause, and re-run on that batch with --limit => s5 | 2 | The stop rule worked. Fix the cause before continuing.
+- Remove max_fail_percentage and rerun to push through => end-fail | 0 | You would deploy the bug fleet-wide.
+- Add ignore_errors to the health task => end-fail | 0 | That hides the exact signal that protected you.
+
+### s5
+text: The cause was a missing configuration variable for the new version on hosts in one group. How do you finish?
+- Add the variable in group_vars, add an assert for it, rerun the canary, then continue the waves => s6 | 2 | The assert makes the same mistake fail early next time.
+- Patch the file on the failing hosts by hand => s6 | 0 | Manual fixes drift and will be overwritten or forgotten.
+
+### s6
+text: All batches succeeded. What is the last step before closing the change?
+- Run the playbook again to confirm changed=0 and check the error rate on the dashboard => end-win | 2 | A clean second run and real traffic metrics confirm the fleet matches the description.
+- Close it, the recap was green => end-ok | 1 | Probably fine, but one extra check is cheap.
+
+### end-win
+end: win
+text: The fleet is patched without a single failed checkout. The canary and health check caught a real problem on two hosts before customers saw it.
+takeaway: Roll out in batches, wait on health, stop on failure, and prove the result with a clean second run.
+
+### end-ok
+end: ok
+text: The change shipped, but you relied on the recap alone. Nothing broke this time.
+takeaway: Add a metric check after the final wave. A green recap does not show user impact.
+
+### end-fail
+end: fail
+text: Checkout went down across the fleet at the worst possible moment. Rolling back took longer than the original change.
+takeaway: Never change every host at once. Batch, check health and set a stop rule before you start.

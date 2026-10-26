@@ -793,3 +793,73 @@ def: Limiting outbound traffic to approved destinations so a compromised host ca
 module: security
 plain: Someone claims a name you forgot to clean up.
 def: An attack on a DNS record that points to a deleted cloud resource, which lets another party serve content under your domain.
+
+## Inventory
+module: ansible
+plain: The list of servers Ansible manages.
+def: A file or dynamic source that names hosts and groups, and holds variables for them.
+
+## Playbook
+module: ansible
+plain: A recipe of tasks for your servers.
+def: A YAML file with one or more plays, each mapping hosts to an ordered list of tasks.
+
+## Idempotent task
+module: ansible
+plain: Doing it twice gives the same result as doing it once.
+def: A property of a task or module: after the desired state exists, running again changes nothing.
+
+## Handler
+module: ansible
+plain: A job that runs only if something changed.
+def: A task triggered by notify, run once at the end of a play, typically to reload or restart a service.
+
+## Ansible Role
+module: ansible
+plain: A reusable box of related jobs.
+def: A directory layout of tasks, handlers, templates, defaults and files for one purpose, reusable across playbooks.
+
+## Ansible Vault
+module: ansible
+plain: A lock for secrets stored with your recipes.
+def: Ansible's encryption of files or values, opened with a vault password kept outside the repository.
+
+## Primary key
+module: databases
+plain: The unique label of a row.
+def: A column or set of columns that uniquely identifies each row in a table and cannot be null.
+
+## Index
+module: databases
+plain: A shortcut for finding rows quickly.
+def: A sorted structure maintained by the database that avoids scanning the whole table, at the cost of space and slower writes.
+
+## Transaction
+module: databases
+plain: A bundle of changes that succeed or fail together.
+def: A group of statements applied atomically, with isolation from concurrent work and durability once committed.
+
+## Write-ahead log
+module: databases
+plain: A diary of changes written before the data.
+def: A sequential log of changes flushed to disk before commit, used for crash recovery, replication and point-in-time recovery.
+
+## Replication lag
+module: databases
+plain: How far behind a copy is.
+def: The delay between a change on the primary and its application on a replica.
+
+## Connection pooler
+module: databases
+plain: A shared set of database connections.
+def: A proxy such as PgBouncer that multiplexes many client connections onto few server connections.
+
+## Split brain
+module: databases
+plain: Two servers both think they are the boss.
+def: A failure where two nodes both accept writes as primary, producing conflicting data.
+
+## Cache stampede
+module: databases
+plain: Everyone rebuilds the same expired answer at once.
+def: Many requests miss on an expired hot key simultaneously and overload the source of truth.
