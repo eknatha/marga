@@ -14,7 +14,9 @@
         "cicd",
         "kubernetes",
         "terraform",
+        "ansible",
         "cloud",
+        "databases",
         "observability"
       ],
       "outcomes": [
@@ -26,7 +28,9 @@
         "Provision infrastructure with Terraform and keep state safe.",
         "Add metrics, logs and alerts so you know when a release hurts users.",
         "Write Python and Bash automation that talks to APIs and cloud SDKs.",
-        "Operate across AWS and Azure well enough to deploy a full stack."
+        "Operate across AWS and Azure well enough to deploy a full stack.",
+        "Keep fleets of servers consistent with Ansible inventories, playbooks and roles.",
+        "Operate relational databases: indexes, backups, replication and safe schema changes."
       ]
     },
     {
@@ -40,6 +44,7 @@
         "python",
         "networking",
         "cloud",
+        "databases",
         "terraform",
         "docker",
         "kubernetes",
@@ -54,7 +59,8 @@
         "Run managed Kubernetes and ship to it from a pipeline.",
         "Track cost and apply well-architected practices.",
         "Build serverless and managed Kubernetes workloads, and secure them with governance controls.",
-        "Script cloud tasks with Python and the CLI."
+        "Script cloud tasks with Python and the CLI.",
+        "Run managed and self-hosted databases with backups, failover and tested restores."
       ]
     },
     {
@@ -71,7 +77,9 @@
         "cicd",
         "kubernetes",
         "terraform",
+        "ansible",
         "cloud",
+        "databases",
         "observability",
         "sre"
       ],
@@ -83,7 +91,8 @@
         "Write blameless postmortems that lead to real fixes.",
         "Find toil and replace it with automation.",
         "Run a healthy on-call rotation and plan capacity before it runs out.",
-        "Practise failure with game days and manage change safely."
+        "Practise failure with game days and manage change safely.",
+        "Reason about database failure modes, recovery targets and safe change rollouts."
       ]
     },
     {
@@ -100,7 +109,9 @@
         "cicd",
         "kubernetes",
         "terraform",
+        "ansible",
         "cloud",
+        "databases",
         "security",
         "observability"
       ],
@@ -112,7 +123,8 @@
         "Harden containers and Kubernetes workloads with least privilege and network policies.",
         "Design least-privilege cloud identity and protect audit logs.",
         "Prioritise vulnerabilities by real risk and meet agreed fix times.",
-        "Lead the first hour of a security incident while preserving evidence."
+        "Lead the first hour of a security incident while preserving evidence.",
+        "Protect automation secrets with Vault and keep database backups, access and migrations safe."
       ]
     }
   ],
