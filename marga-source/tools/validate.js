@@ -498,7 +498,7 @@ function checkBudgets() {
 
 
 // ---------------------------------------------------------------- 8. references, interview, promise, voice, print
-const REF_HOSTS = /^https:\/\/([a-z0-9-]+\.)*(kubernetes\.io|docker\.com|hashicorp\.com|terraform\.io|aws\.amazon\.com|microsoft\.com|azure\.com|prometheus\.io|sre\.google|python\.org|man7\.org|rfc-editor\.org|opentelemetry\.io|grafana\.com|helm\.sh|kernel\.org|gnu\.org|redhat\.com|ubuntu\.com|debian\.org|nginx\.org|openssh\.com|argoproj\.github\.io|cncf\.io|opencontainers\.org|github\.com|cloud\.google\.com|cloudflare\.com|iptables\.org|netfilter\.org|systemd\.io|freedesktop\.org|kubectl\.docs\.kubernetes\.io|kustomize\.io|pypa\.io|pytest\.org|readthedocs\.io|postgresql\.org|jenkins\.io|semver\.org|owasp\.org|nist\.gov|slsa\.dev|sigstore\.dev|open-policy-agent\.org|aquasec\.com|trivy\.dev|podman\.io|buildah\.io|etcd\.io|cni\.dev|istio\.io|envoyproxy\.io|linuxfoundation\.org|cisecurity\.org|google\.com|w3\.org|ietf\.org|letsencrypt\.org|github\.io|gitlab\.com|hashicorp\.github\.io|opengroup\.org|jq\.dev|jqlang\.github\.io|curl\.se|openssl\.org|lvm2\.sourceware\.org|sourceware\.org|kernel\.dk|brendangregg\.com|netflix\.github\.io|principlesofchaos\.org|litmuschaos\.io|chaos-mesh\.org|pagerduty\.com|atlassian\.com|dora\.dev|12factor\.net|martinfowler\.com|apache\.org|elastic\.co|fluentbit\.io|fluentd\.org|vector\.dev|jaegertracing\.io|loki\.io|thanos\.io|victoriametrics\.com|containerd\.io|continuousdelivery\.com|keepachangelog\.com|fluxcd\.io|keda\.sh|karpenter\.sh|cilium\.io|openfeature\.dev|selinuxproject\.org|shellcheck\.net|everything\.curl\.dev|jqlang\.org|amazonaws\.com|mozilla\.org|tcpdump\.org|wireshark\.org|wireguard\.com|nftables\.org|cisa\.gov|oauth\.net|openpolicyagent\.org|kyverno\.io)(\/|$)/;
+const REF_HOSTS = /^https:\/\/([a-z0-9-]+\.)*(kubernetes\.io|docker\.com|hashicorp\.com|terraform\.io|aws\.amazon\.com|microsoft\.com|azure\.com|prometheus\.io|sre\.google|python\.org|man7\.org|rfc-editor\.org|opentelemetry\.io|grafana\.com|helm\.sh|kernel\.org|gnu\.org|redhat\.com|ubuntu\.com|debian\.org|nginx\.org|openssh\.com|argoproj\.github\.io|cncf\.io|opencontainers\.org|github\.com|cloud\.google\.com|cloudflare\.com|iptables\.org|netfilter\.org|systemd\.io|freedesktop\.org|kubectl\.docs\.kubernetes\.io|kustomize\.io|pypa\.io|pytest\.org|readthedocs\.io|postgresql\.org|jenkins\.io|semver\.org|owasp\.org|nist\.gov|slsa\.dev|sigstore\.dev|open-policy-agent\.org|aquasec\.com|trivy\.dev|podman\.io|buildah\.io|etcd\.io|cni\.dev|istio\.io|envoyproxy\.io|linuxfoundation\.org|cisecurity\.org|google\.com|w3\.org|ietf\.org|letsencrypt\.org|github\.io|gitlab\.com|hashicorp\.github\.io|opengroup\.org|jq\.dev|jqlang\.github\.io|curl\.se|openssl\.org|lvm2\.sourceware\.org|sourceware\.org|kernel\.dk|brendangregg\.com|netflix\.github\.io|principlesofchaos\.org|litmuschaos\.io|chaos-mesh\.org|pagerduty\.com|atlassian\.com|dora\.dev|12factor\.net|martinfowler\.com|apache\.org|elastic\.co|fluentbit\.io|fluentd\.org|vector\.dev|jaegertracing\.io|loki\.io|thanos\.io|victoriametrics\.com|containerd\.io|continuousdelivery\.com|keepachangelog\.com|fluxcd\.io|keda\.sh|karpenter\.sh|cilium\.io|openfeature\.dev|selinuxproject\.org|shellcheck\.net|everything\.curl\.dev|jqlang\.org|amazonaws\.com|mozilla\.org|tcpdump\.org|wireshark\.org|wireguard\.com|nftables\.org|cisa\.gov|oauth\.net|openpolicyagent\.org|kyverno\.io|mitre\.org|opengroup\.org|sigstore\.dev)(\/|$)/;
 function checkExtras() {
   // official references on every lesson, module and sheet
   const checkRefs = (what, refs) => {
@@ -588,6 +588,47 @@ function checkPractice() {
     count('case studies');
   }
   for (const m of A.modules) if ((A.cases || []).filter((c) => c.modules.includes(m.id)).length < 2) err('cases', `module ${m.id} has fewer than 2 case studies`);
+  // reading lists
+  for (const m of A.modules) {
+    const list = (A.reading || {})[m.id] || [];
+    if (list.length < 5) err('reading', `module ${m.id} needs at least 5 reading items, found ${list.length}`);
+    for (const r of list) {
+      const w = `reading ${m.id}: ${r.t}`;
+      if (!r.t || !r.by || !r.kind || !r.why || String(r.why).length < 30) err('reading', `${w}: missing field or short reason`);
+      if (!REF_HOSTS.test(r.u || '')) err('reading', `${w}: host not on the allow list: ${r.u}`);
+      if (FORBID.test(JSON.stringify(r))) err('reading', `${w}: forbidden word`);
+      count('reading items');
+    }
+  }
+  // incident games
+  {
+    const gs = A.games || [];
+    for (const m of A.modules) if (gs.filter((g) => g.module === m.id).length < 1) err('games', `module ${m.id} has no incident game`);
+    const gids = new Set();
+    for (const g of gs) {
+      const w = `game ${g.id}`;
+      if (gids.has(g.id)) err('games', `${w}: duplicate id`); gids.add(g.id);
+      if (!mods.has(g.module)) err('games', `${w}: bad module`);
+      if (!A.lessons[g.lesson]) err('games', `${w}: unknown lesson ${g.lesson}`);
+      if (!['Beginner', 'Intermediate', 'Advanced'].includes(g.level)) err('games', `${w}: bad level`);
+      const ids = Object.keys(g.scenes);
+      if (ids.length < 6) err('games', `${w}: needs at least 6 scenes`);
+      const ends = ids.filter((i) => g.scenes[i].end);
+      if (!ends.some((i) => g.scenes[i].end === 'win')) err('games', `${w}: needs a winning ending`);
+      if (!ends.some((i) => g.scenes[i].end === 'fail')) err('games', `${w}: needs a failing ending`);
+      const seen = new Set(); const stack = [g.start];
+      while (stack.length) { const i = stack.pop(); if (seen.has(i)) continue; seen.add(i); const sc = g.scenes[i]; if (!sc) { err('games', `${w}: missing scene ${i}`); continue; } for (const c of sc.choices) stack.push(c.to); }
+      for (const i of ids) {
+        const sc = g.scenes[i];
+        if (!seen.has(i)) err('games', `${w}: scene ${i} is unreachable`);
+        if (!sc.text || sc.text.length < 40) err('games', `${w}: scene ${i} has short text`);
+        if (sc.end) { if (sc.choices.length) err('games', `${w}: ending ${i} has choices`); if (!sc.takeaway || sc.takeaway.length < 30) err('games', `${w}: ending ${i} needs a takeaway`); }
+        else { if (sc.choices.length < 2) err('games', `${w}: scene ${i} needs at least 2 choices`); for (const c of sc.choices) if (c.fb.length < 20) err('games', `${w}: scene ${i} has a short feedback`); }
+      }
+      if (FORBID.test(JSON.stringify(g)) || /TODO|FIXME|lorem ipsum/i.test(JSON.stringify(g))) err('games', `${w}: forbidden or placeholder text`);
+      count('incident games');
+    }
+  }
   // capstone projects
   {
     const pathIds = ['devops', 'cloud', 'sre', 'devsecops'];

@@ -329,6 +329,42 @@ function loadContent() {
     }
   }
 
+
+  // Incident games: src/games/<module>.md -> "## Title" with header lines, then "### id" scenes
+  const games = [];
+  const gdir = path.join(SRC, 'games');
+  if (fs.existsSync(gdir)) {
+    for (const f of fs.readdirSync(gdir).filter((x) => x.endsWith('.md')).sort()) {
+      for (const blk of fs.readFileSync(path.join(gdir, f), 'utf8').split(/^## /m).slice(1)) {
+        const parts = blk.split(/^### /m);
+        const head = parts[0], nl = head.indexOf('\n');
+        const title = head.slice(0, nl).trim();
+        const kv = {};
+        for (const line of head.slice(nl + 1).split('\n')) { const m = line.match(/^([a-z]+):\s*(.+)$/); if (m) kv[m[1]] = m[2].trim(); }
+        for (const k of ['module', 'level', 'minutes', 'lesson', 'summary', 'intro']) if (!kv[k]) throw new Error(`games/${f}: "${title}" is missing ${k}:`);
+        const scenes = {}; const order = [];
+        for (const sc of parts.slice(1)) {
+          const sl = sc.indexOf('\n'); const id = sc.slice(0, sl).trim();
+          const o = { id, text: '', choices: [] };
+          for (const line of sc.slice(sl + 1).split('\n')) {
+            let m;
+            if ((m = line.match(/^text:\s*(.+)$/))) o.text = m[1].trim();
+            else if ((m = line.match(/^end:\s*(win|ok|fail)\s*$/))) o.end = m[1];
+            else if ((m = line.match(/^takeaway:\s*(.+)$/))) o.takeaway = m[1].trim();
+            else if ((m = line.match(/^- (.+?) => ([\w-]+) \| ([0-2]) \| (.+)$/))) o.choices.push({ t: m[1].trim(), to: m[2], pts: Number(m[3]), fb: m[4].trim() });
+          }
+          if (scenes[id]) throw new Error(`games/${f}: "${title}" has a duplicate scene ${id}`);
+          scenes[id] = o; order.push(id);
+        }
+        games.push({ id: slug(title), title, module: kv.module, level: kv.level, minutes: Number(kv.minutes), lesson: kv.lesson, summary: kv.summary, intro: kv.intro, start: order[0], scenes });
+      }
+    }
+  }
+
+  // Reading lists: src/content/reading.json { module: [{t,by,u,kind,why}] }
+  const readingFile = path.join(SRC, 'content', 'reading.json');
+  const reading = fs.existsSync(readingFile) ? JSON.parse(fs.readFileSync(readingFile, 'utf8')) : {};
+
   // Architecture post-mortems: src/architecture/<slug>.md -> "# Title", key lines, blank line, markdown body
   const arch = [];
   const adir = path.join(SRC, 'architecture');
@@ -383,7 +419,7 @@ function loadContent() {
     }
   }
   const labs = require('./labs').load(path.join(SRC, 'labs'));
-  return { modules, paths, lessons, sheets, interview, cases, capstones, arch, drills, glossary, labs, predicts: PREDICTS };
+  return { modules, paths, lessons, sheets, interview, cases, capstones, reading, games, arch, drills, glossary, labs, predicts: PREDICTS };
 
 }
 
@@ -492,7 +528,7 @@ function main() {
   const nQuiz = Object.values(data.lessons).reduce((n, l) => n + l.quiz.length, 0);
   const nCards = Object.values(data.lessons).reduce((n, l) => n + l.cards.length, 0);
   const size = fs.statSync(path.join(DIST, 'assets', 'data.js')).size;
-  console.log(`built v${ver}: ${data.modules.length} modules, ${nLessons} lessons, ${nQuiz} quiz questions, ${nCards} flashcards, ${list.length} cheat sheets, ${data.interview.length} interview questions, ${data.cases.length} case studies, ${data.capstones.length} capstones, ${data.arch.length} architecture studies, ${data.drills.length} drills, ${data.glossary.length} glossary terms, data.js ${(size / 1024).toFixed(0)} KB`);
+  console.log(`built v${ver}: ${data.modules.length} modules, ${nLessons} lessons, ${nQuiz} quiz questions, ${nCards} flashcards, ${list.length} cheat sheets, ${data.interview.length} interview questions, ${data.cases.length} case studies, ${data.capstones.length} capstones, ${data.games.length} games, ${data.arch.length} architecture studies, ${data.drills.length} drills, ${data.glossary.length} glossary terms, data.js ${(size / 1024).toFixed(0)} KB`);
 }
 
 main();

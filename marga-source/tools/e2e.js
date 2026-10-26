@@ -657,7 +657,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       const { ctx, page, issues } = await open({ viewport: vp.viewport });
       await go(page, '/');
       await setProgress(page, unlockedAll());
-      const routes = ['/', '/paths', ...data.paths.live.map((p) => `/path/${p.id}`), ...data.modules.map((m) => `/module/${m.id}`), '/cheatsheets', ...Object.keys(data.sheets).map((s) => `/cheatsheet/${s}`), '/review', '/labs', '/progress', '/interview', '/practice', '/cases', '/architecture', ...data.arch.map((a) => `/architecture/${a.id}`), '/calculators', '/drills', ...data.modules.map((m) => `/drills/${m.id}`), '/interview/mock', '/flashcards', '/today', '/daily', '/glossary', '/glossary/inode', '/placement', '/playground/go', '/playground/hcl', '/playground/sql', '/explainers', ...EXPL_IDS.map((x) => `/explainers/${x}`), '/subnet', '/playground/yaml', '/playground/python', ...allLessons.map((l) => `/lesson/${l}`)];
+      const routes = ['/', '/paths', ...data.paths.live.map((p) => `/path/${p.id}`), ...data.modules.map((m) => `/module/${m.id}`), '/cheatsheets', ...Object.keys(data.sheets).map((s) => `/cheatsheet/${s}`), '/review', '/labs', '/progress', '/interview', '/practice', '/cases', '/architecture', ...data.arch.map((a) => `/architecture/${a.id}`), '/calculators', '/drills', ...data.modules.map((m) => `/drills/${m.id}`), '/interview/mock', '/flashcards', '/today', '/daily', '/glossary', '/glossary/inode', '/placement', '/playground/go', '/playground/hcl', '/playground/sql', '/explainers', ...EXPL_IDS.map((x) => `/explainers/${x}`), '/subnet', '/playground/yaml', '/playground/python', '/games', '/reading', '/license', '/capstones', ...data.games.map((g) => `/game/${g.id}`), ...data.capstones.map((c) => `/capstone/${c.id}`), ...allLessons.map((l) => `/lesson/${l}`)];
       const problems = [];
       for (const r of routes) {
         await nav(page, r);
@@ -1263,7 +1263,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const links = await page.locator('#topnav a').allInnerTexts();
     eq(links.join('|'), 'Skill trees|Cheat sheets|Case studies|Practice|Progress|InterviewHub|About', 'nav order');
     await nav(page, '/practice');
-    eq(await page.locator('.prac li').count(), 21, 'hub cards');
+    eq(await page.locator('.prac li').count(), 23, 'hub cards');
     for (const href of ['#/drills', '#/interview/mock', '#/flashcards', '#/cases', '#/architecture', '#/calculators', '#/review', '#/labs']) ok(await page.locator(`.prac a[href="${href}"]`).count() === 1, 'hub links to ' + href);
     await nav(page, '/module/kubernetes');
     ok(await page.locator('a[href="#/drills/kubernetes"]').count() === 1 && await page.locator('a[href="#/cases/kubernetes"]').count() === 1, 'module page links to practice');
@@ -2074,6 +2074,52 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const fs0 = await page.$eval('.brand b', (el) => parseFloat(getComputedStyle(el).fontSize));
     const bg = await page.$eval('.brand b', (el) => getComputedStyle(el).backgroundColor);
     ok(fs0 >= 24, 'brand font size ' + fs0); ok(bg !== 'rgba(0, 0, 0, 0)', 'brand has a highlight background');
+    await ctx.close();
+  });
+
+  await test('license page: MARGA by EknathaLabs, CC BY 4.0, linked from the footer', async () => {
+    const { ctx, page } = await open(); await go(page, '/');
+    await page.click('#footer a[href="#/license"]'); await page.waitForSelector('.about');
+    const txt = await page.textContent('#main');
+    ok(/MARGA by EknathaLabs/.test(txt) && /CC BY 4\.0/.test(txt) && /MIT License/.test(txt) && /No warranty/.test(txt), 'license text');
+    ok(/Source: MARGA by EknathaLabs/.test(await page.textContent('.about pre')), 'attribution line');
+    await ctx.close();
+  });
+
+  await test('reading lists: six items per stage on the module page and on the reading page', async () => {
+    const { ctx, page } = await open(); await go(page, '/');
+    for (const m of data.modules) eq((data.reading[m.id] || []).length, 6, m.id + ' reading items');
+    await nav(page, '/reading'); await page.waitForSelector('.reading');
+    eq(await page.locator('.reading li').count(), 72, 'all items listed');
+    ok(await page.locator('.reading a[target=_blank][rel*=noopener]').count() === 72, 'links open safely');
+    await nav(page, '/module/sre'); await page.waitForSelector('.reading');
+    eq(await page.locator('.reading li').count(), 6, 'items on module page');
+    await ctx.close();
+  });
+
+  await test('incident games: one per stage, a choice shows feedback, a game reaches an ending and is remembered', async () => {
+    const { ctx, page } = await open(); await go(page, '/');
+    eq(data.games.length, 12, 'twelve games');
+    for (const m of data.modules) ok(data.games.some((g) => g.module === m.id), m.id + ' has a game');
+    await nav(page, '/practice'); ok(await page.locator('.prac a[href="#/games"]').count() === 1, 'hub card');
+    await nav(page, '/games'); await page.waitForSelector('.game-card'); eq(await page.locator('.game-card').count(), 12, 'all games listed');
+    const g = data.games[0];
+    await nav(page, '/game/' + g.id); await page.waitForSelector('.gm-choice');
+    ok(/on call|You are|It is/.test(await page.textContent('.gm-intro')), 'intro shown');
+    // always take the best choice until an ending
+    for (let i = 0; i < 20; i++) {
+      if (await page.locator('.gm-end').count()) break;
+      await page.waitForSelector('.gm-choice');
+      const sc = g.scenes; const text = await page.textContent('.gm-scene');
+      const scene = Object.values(sc).find((x) => x.text === text.trim());
+      const best = scene.choices.findIndex((c) => c.pts === 2);
+      await page.locator('.gm-choice').nth(best).click();
+      await page.waitForSelector('.gm-fb'); ok(/Good call/.test(await page.textContent('.gm-fb')), 'feedback shown');
+      await page.click('[data-act=gm-next]');
+    }
+    await page.waitForSelector('.gm-end'); ok(/Resolved well/.test(await page.textContent('.gm-end')), 'best path wins');
+    eq((await progress(page)).gm[g.id].best, 'win', 'remembered');
+    await page.click('[data-act=gm-again]'); await page.waitForSelector('.gm-choice');
     await ctx.close();
   });
 

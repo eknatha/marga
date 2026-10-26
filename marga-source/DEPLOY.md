@@ -101,3 +101,11 @@ If the number does not appear: open the browser console and look for the "visito
 - Capstone projects (`#/capstones`): 4 guided builds per path (16), in `src/capstones/<path>.md`. Steps and self-check items are ticked off and saved in the `cap` bag; included in export and import.
 - Home page: the About block at the bottom was removed (the About page remains). The MARGA brand in the header is larger and highlighted.
 - Reminder: lessons, capstones, hints and per-option reasons were written from memory. Spot-check commands and numbers. External links, the live counter and the Go Playground are not machine-verified.
+
+## Round 9 additions
+- Lessons: 141 (two new lessons per stage, 24 in all, placed before each stage's debugging lesson, which stays last). Refs and levels text were added for each.
+- Animated explainers: 152 (48 new, four per stage, covering the new lessons and earlier gaps).
+- Incident games (`#/games`): 12 branching on-call scenarios, one per stage, in `src/games/<module>.md`. Each choice is scored 0 to 2 with feedback; endings are win, ok or fail; results are stored in the `gm` bag (kept on import).
+- Reading lists (`#/reading` and each module page): six resources per stage in `src/content/reading.json`. URLs were written from memory and hosts are checked against the allow list in `tools/validate.js`; open them to confirm they still resolve.
+- Open content license page (`#/license`, footer link, `LICENSE.md`): learning content under CC BY 4.0 with the credit line "MARGA by EknathaLabs", site code under the MIT License. Confirm these licence choices are the ones you want before publishing.
+- Reminder: all new lessons, scenarios, explainers and reading entries were written from memory. Spot-check commands, numbers and links. The live counter, external links and the Go Playground are not machine-verified.
