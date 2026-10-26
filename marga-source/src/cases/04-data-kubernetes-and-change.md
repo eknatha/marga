@@ -2,7 +2,7 @@
 company: Sentry
 year: 2015
 area: Databases
-modules: linux, observability, sre
+modules: linux, observability, sre, databases
 source: Sentry engineering blog | https://blog.sentry.io/transaction-id-wraparound-in-postgres
 what: On Monday 20 July 2015 the hosted Sentry service was down for most of the US working day because its main Postgres database stopped accepting writes.
 cause: Postgres uses a limited counter for transaction IDs and needs routine vacuuming to recycle them. A write-heavy workload and very large tables let autovacuum fall behind. When the counter neared its limit, Postgres halted writes on purpose to avoid corrupting data visibility. One autovacuum run also failed without a clear log message.
@@ -13,7 +13,7 @@ lesson: Monitor the age of transaction IDs and the progress of autovacuum before
 company: Mailchimp (Mandrill)
 year: 2019
 area: Databases
-modules: sre, observability, linux
+modules: sre, observability, linux, databases
 source: Mailchimp write-up | https://mailchimp.com/what-we-learned-from-the-recent-mandrill-outage/
 what: From 4 February 2019 Mandrill, the transactional email service of Mailchimp, was impaired for about 41 hours and queues took until 6 February to return to normal.
 cause: One database shard received more writes than the others because of uneven hashing. Autovacuum fell behind, so the shard hit the Postgres transaction ID limit and entered safety shutdown. The risk had been noted three months earlier but judged not urgent. Retried writes added load, queued jobs filled the disks of application servers, and the first error was buried in unrelated log noise.
@@ -79,7 +79,7 @@ lesson: Treat configuration as code with staged rollout and fast rollback, and k
 company: GoCardless
 year: 2017
 area: Databases
-modules: linux, sre, observability
+modules: linux, sre, observability, databases
 source: GoCardless incident review | https://gocardless.com/blog/incident-review-api-and-dashboard-outage-on-10th-october/
 what: On 10 October 2017 the API and dashboard of a payments company were down for 1 hour and 50 minutes.
 cause: The primary Postgres node failed when a RAID array lost three disks. The cluster automation then failed to promote a replica because a cluster setting, a restricted virtual address and a crash of a Postgres process on the replica coincided. A recovery that should have taken one or two minutes took almost two hours.

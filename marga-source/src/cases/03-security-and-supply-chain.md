@@ -2,7 +2,7 @@
 company: Equifax
 year: 2017
 area: Security
-modules: linux, cloud, sre, security
+modules: linux, cloud, sre, security, ansible
 source: US GAO report | https://www.gao.gov/products/gao-18-559
 what: In 2017 attackers stole personal data of about 147 million people from a credit reporting company.
 cause: A known flaw in the Apache Struts web framework was not patched on a public web application, and the tool that should have inspected traffic had an expired certificate, so the attack was not seen for months.

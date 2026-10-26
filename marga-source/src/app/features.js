@@ -284,6 +284,35 @@ window.MargaFeatures = function (A) {
   });
 
 
+  /* ---------------------------------------------------------- architecture walkthroughs */
+  function wtList() { return (D.walkthroughs || []); }
+  function wtChips(ids) { return ids.map(function (mid) { var mm = A.MOD[mid]; return mm ? '<a class="chip" href="#/module/' + esc(mid) + '">' + esc(mm.title) + '</a>' : ''; }).join(' '); }
+  A.addRoute(/^\/walkthroughs$/, function () {
+    view.title = 'Architecture walkthroughs | MARGA by EknathaLabs'; view.nav = 'practice';
+    var l = wtList();
+    view.html = '<section class="page-head wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="#/practice">Practice</a></nav><h1>Architecture walkthroughs</h1>' +
+      '<p class="lede">' + l.length + ' reference designs of common systems. Each shows the components, follows one request through them, explains why it is built that way, and marks where it breaks.</p>' +
+      '<p class="small">These are teaching designs that show common patterns. They are not the internal designs of any real company.</p></section>' +
+      '<div class="wrap"><div class="cap-cards">' + l.map(function (w) {
+        return '<article class="row cap-card"><div class="row-main"><h3><a href="#/walkthrough/' + esc(w.id) + '">' + esc(w.title) + '</a></h3><p>' + esc(w.summary) + '</p><p class="small">' + esc(w.level) + '</p></div></article>';
+      }).join('') + '</div></div>';
+    view.after = null;
+  });
+  A.addRoute(/^\/walkthrough\/([\w-]+)$/, function (wid) {
+    var l = wtList(), i = -1; l.forEach(function (x, k) { if (x.id === wid) i = k; });
+    if (i < 0) { view.title = 'Not found | MARGA'; view.nav = 'practice'; view.html = '<section class="page-head wrap"><h1>Walkthrough not found</h1><p><a href="#/walkthroughs">See all architecture walkthroughs</a></p></section>'; view.after = null; return; }
+    var w = l[i], prev = l[i - 1], next = l[i + 1];
+    var rel = (w.lessons || []).map(function (id) { var ls = A.LES[id]; return ls ? '<li><a href="' + A.hrefLesson(id) + '">' + esc(ls.title) + '</a></li>' : ''; }).join('');
+    view.title = w.title + ' | Architecture walkthrough | MARGA by EknathaLabs'; view.nav = 'practice';
+    view.html = '<section class="page-head wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="#/walkthroughs">Architecture walkthroughs</a></nav><h1>' + esc(w.title) + '</h1><p class="lede">' + esc(w.summary) + '</p>' +
+      '<p class="small">' + esc(w.level) + '. Related stages: ' + wtChips(w.modules) + '</p></section>' +
+      '<div class="wrap narrow"><article class="prose arch" id="wt-body">' + w.html + '</article>' +
+      (rel ? '<section aria-label="Related lessons"><h2 class="sub-h">Lessons that explain the parts</h2><ul class="reading">' + rel + '</ul></section>' : '') +
+      '<nav class="pager" aria-label="Other walkthroughs">' + (prev ? '<a href="#/walkthrough/' + esc(prev.id) + '">Previous: ' + esc(prev.title) + '</a>' : '<span></span>') + (next ? '<a href="#/walkthrough/' + esc(next.id) + '">Next: ' + esc(next.title) + '</a>' : '<span></span>') + '</nav></div>';
+    view.after = null;
+  });
+  window.MargaFeatures.wtCount = function () { return wtList().length; };
+
   /* ---------------------------------------------------------- reading lists per stage */
   function readingFor(mid) { return ((D.reading || {})[mid]) || []; }
   function readingHtml(mid) {
@@ -341,7 +370,7 @@ window.MargaFeatures = function (A) {
   }
   window.MargaFeatures.moduleExtras = function (mid) {
     var g = gamesForModule(mid), r = readingHtml(mid);
-    return (g ? '<h2 class="sub-h">Incident game</h2><p class="lede-s">Make the calls during a realistic outage and see what each choice leads to.</p>' + g : '') +
+    return (window.MargaBadges && MargaBadges.moduleLine ? MargaBadges.moduleLine(mid) : '') + (g ? '<h2 class="sub-h">Incident game</h2><p class="lede-s">Make the calls during a realistic outage and see what each choice leads to.</p>' + g : '') +
       (r ? '<h2 class="sub-h">Reading list</h2>' + r + '<p class="small"><a href="#/reading">See the reading lists for every stage</a></p>' : '');
   };
   A.addRoute(/^\/games$/, function () {

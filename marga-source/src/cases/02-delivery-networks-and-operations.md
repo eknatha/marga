@@ -24,7 +24,7 @@ lesson: A latent bug can wait for the right input. Detect quickly, be able to ro
 company: Roblox
 year: 2021
 area: Cloud outage
-modules: cloud, observability, sre
+modules: cloud, observability, sre, databases
 source: Roblox blog | https://corp.roblox.com/newsroom/2021/10/roblox-return-to-service-10-28-10-31-2021
 what: In late October 2021 Roblox was unavailable for around three days, affecting millions of players.
 cause: The Consul service discovery cluster degraded under heavy load after a new streaming feature was enabled and a storage performance issue in the underlying database. Roblox's monitoring also depended on Consul, so engineers could not see well.
@@ -35,7 +35,7 @@ lesson: Understand the load profile of shared infrastructure, and keep observabi
 company: Atlassian
 year: 2022
 area: Human error
-modules: cloud, sre, bash
+modules: cloud, sre, bash, databases
 source: Atlassian post-incident review | https://www.atlassian.com/engineering/post-incident-review-april-2022-outage
 what: In April 2022 Atlassian accidentally deleted the cloud sites of around 400 customers. Some customers were without service for up to two weeks.
 cause: A maintenance script was given the wrong list of identifiers, and it used a permanent deletion method instead of marking items for deletion. Restoring individual sites was a manual process that had never been done at that scale.
@@ -46,7 +46,7 @@ lesson: Make deletion reversible, validate script input, and practise restoring 
 company: Knight Capital Group
 year: 2012
 area: Deployment and release
-modules: cicd, sre
+modules: cicd, sre, ansible
 source: SEC administrative order | https://www.sec.gov/files/litigation/admin/2013/34-70694.pdf
 what: On 1 August 2012 a trading firm lost about 440 million dollars in roughly 45 minutes when its systems sent a flood of unintended orders.
 cause: A new feature was deployed by hand to eight servers, but one server was missed. A flag reused from older code activated unused code on that server. There was no kill switch, and alerts were not acted on.
@@ -57,7 +57,7 @@ lesson: Automate and verify deployments, remove dead code, and give operators a 
 company: CrowdStrike
 year: 2024
 area: Deployment and release
-modules: cicd, linux, sre
+modules: cicd, linux, sre, ansible
 source: CrowdStrike root cause analysis | https://www.crowdstrike.com/wp-content/uploads/2024/08/Channel-File-291-Incident-Root-Cause-Analysis-08.06.2024.pdf
 what: On 19 July 2024 a security update caused millions of Windows computers to crash and fail to restart. Airlines, hospitals and banks were disrupted worldwide.
 cause: A content update defined a template with more input fields than the sensor code expected. The mismatch caused an out-of-bounds memory read in a kernel driver. The update went to all customers at once, and validation did not catch the mismatch.
@@ -101,7 +101,7 @@ lesson: Use safe string functions where you can, set time limits on regexes, and
 company: Instapaper
 year: 2017
 area: Database
-modules: linux, cloud, sre
+modules: linux, cloud, sre, databases
 source: Instapaper blog | https://medium.com/making-instapaper/instapaper-outage-cause-recovery-3c32a7e9cc5f
 what: In February 2017 Instapaper was unavailable for more than a day. Users could not read saved articles.
 cause: The main database reached the maximum file size of its file system, which was about 2 TB on the ext3 file system the instances were using. Writes then failed and could not be fixed in place.

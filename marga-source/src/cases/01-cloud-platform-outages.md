@@ -134,7 +134,7 @@ lesson: Roll network changes out in small batches and block commands that touch 
 company: Microsoft
 year: 2025
 area: Configuration change
-modules: cloud, networking, cicd
+modules: cloud, networking, cicd, ansible
 source: Azure post-incident review | https://azure.status.microsoft/en-us/status/history/
 what: In October 2025 Azure Front Door, Microsoft's global content delivery and routing service, had a major outage that affected Azure portal pages, websites and Microsoft services.
 cause: A configuration change was deployed that bypassed the usual safety checks because of a software defect. Invalid configuration spread to many edge locations.
