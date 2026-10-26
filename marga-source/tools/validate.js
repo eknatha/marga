@@ -791,6 +791,57 @@ function checkMore() {
   stats['glossary terms'] = (A.glossary || []).length;
 }
 
+function checkTermLabs() {
+  const FORBID = /\bgit/i, EMOJI = /\p{Extended_Pictographic}/u, ARROW = /[←→⇒]/;
+  const labs = A.termlabs || [];
+  const parsed = require('./termlabs').load(path.join(SRC, 'termlabs'));
+  parsed.forEach((l) => (l.errors || []).forEach((m) => err('termlabs', `${l.id || l.title}: ${m}`)));
+  if (labs.length !== parsed.length) err('termlabs', 'data.js does not match src/termlabs');
+  const KNOWN = new Set(['file', 'contains', 'equals', 'mode', 'owner', 'unchanged', 'service', 'proc', 'disk', 'cron', 'ran', 'group', 'cmd']);
+  const MODS = ['linux', 'bash', 'networking', 'python'], LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
+  const ids = new Set();
+  for (const m of MODS) if (labs.filter((l) => l.module === m).length < 6) err('termlabs', `${m}: need at least 6 labs`);
+  for (const l of labs) {
+    const w = l.id || l.title;
+    if (!/^[a-z0-9-]+$/.test(l.id || '')) err('termlabs', `${w}: bad id`);
+    if (ids.has(l.id)) err('termlabs', `${w}: duplicate id`); ids.add(l.id);
+    if (!MODS.includes(l.module)) err('termlabs', `${w}: unknown module ${l.module}`);
+    if (!LEVELS.includes(l.level)) err('termlabs', `${w}: bad level ${l.level}`);
+    if (!(l.minutes >= 5 && l.minutes <= 60)) err('termlabs', `${w}: minutes out of range`);
+    if (l.lesson && !lessons[l.lesson]) err('termlabs', `${w}: lesson ${l.lesson} does not exist`);
+    if (l.lesson && !l.lesson.startsWith(l.module + '/')) err('termlabs', `${w}: lesson is not in the same stage`);
+    if (!l.title || !l.summary || (l.story || '').length < 60 || (l.explain || '').length < 60) err('termlabs', `${w}: missing title, summary, story or explanation`);
+    if ((l.goals || []).length < 2) err('termlabs', `${w}: need at least 2 goals`);
+    if ((l.hints || []).length < 3) err('termlabs', `${w}: need at least 3 hints`);
+    if (!(l.solution || '').trim()) err('termlabs', `${w}: missing solution`);
+    if (!/simulated/i.test(l.engine || '')) err('termlabs', `${w}: engine line must say the environment is simulated`);
+    if (!(l.checks || []).length) err('termlabs', `${w}: no checks`);
+    for (const c of l.checks || []) {
+      if (!KNOWN.has(c.t)) err('termlabs', `${w}: unknown check type ${c.t}`);
+      if (!c.label) err('termlabs', `${w}: a check has no label`);
+      if (c.t === 'cmd' && !c.run) err('termlabs', `${w}: cmd check without run`);
+    }
+    const txt = JSON.stringify(l);
+    if (FORBID.test(txt)) err('termlabs', `${w}: contains a forbidden word`);
+    if (EMOJI.test(txt)) err('termlabs', `${w}: contains an emoji`);
+    if (ARROW.test(txt)) err('termlabs', `${w}: contains an arrow glyph`);
+    if (/TODO|FIXME|lorem ipsum/i.test(txt)) err('termlabs', `${w}: placeholder text`);
+    if (/undefined|NaN|\[object Object\]/.test(`${l.title} ${l.summary} ${l.story} ${l.goals.join(' ')} ${l.hints.join(' ')} ${l.explain}`)) err('termlabs', `${w}: bad rendered text`);
+  }
+  for (const f of ['term-fs', 'term-parse', 'term-exec', 'term-cmds', 'term-text', 'term-awk', 'term-jq', 'term-sys', 'term-net', 'term-labs', 'termlabs-ui']) {
+    const t = read(path.join(SRC, 'app', f + '.js'));
+    if (FORBID.test(t)) err('termlabs', `${f}.js contains a forbidden word`);
+    if (EMOJI.test(t) || ARROW.test(t)) err('termlabs', `${f}.js contains an emoji or arrow glyph`);
+    if (/TODO|FIXME/.test(t)) err('termlabs', `${f}.js has a placeholder`);
+    if (!fs.existsSync(path.join(DIST, 'assets', f + '.js'))) err('termlabs', `${f}.js missing from dist`);
+  }
+  const sw = read(path.join(DIST, 'sw.js'));
+  for (const f of ['term-fs.js', 'term-labs.js', 'termlabs-ui.js']) if (!sw.includes('assets/' + f)) err('termlabs', `${f} is not in the offline precache`);
+  const html = read(path.join(DIST, 'index.html'));
+  if (/assets\/term-fs\.js/.test(html)) err('termlabs', 'the engine must not be loaded on every page');
+  count('terminal labs', labs.length);
+}
+
 // ---------------------------------------------------------------- run
 const steps = [
   ['content schema', checkSchema],
@@ -802,7 +853,8 @@ const steps = [
   ['size budgets', checkBudgets],
   ['references, interview, footer, voice, print', checkExtras],
   ['case studies, architecture, drills, accessibility, counter', checkPractice],
-  ['glossary, explainers, search, subnet, playgrounds', checkMore]
+  ['glossary, explainers, search, subnet, playgrounds', checkMore],
+  ['terminal labs', checkTermLabs]
 ];
 for (const [name, fn] of steps) {
   const before = errors.length;

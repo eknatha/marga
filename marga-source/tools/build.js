@@ -18,7 +18,9 @@ const SRC = path.join(ROOT, 'src');
 const DIST = path.join(ROOT, 'dist');
 const DOMAIN = 'marga.eknathalabs.com';
 // GoatCounter site code for the visitor count (https://CODE.goatcounter.com). Empty string disables it.
-const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'features.js', 'badges.js'];
+const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js'];
+// terminal lab engine: loaded only when a terminal lab is opened, but cached for offline use
+const ENGINE = ['term-fs.js', 'term-parse.js', 'term-exec.js', 'term-cmds.js', 'term-text.js', 'term-awk.js', 'term-jq.js', 'term-sys.js', 'term-net.js', 'term-labs.js'];
 const COUNTER = process.env.MARGA_COUNTER !== undefined ? process.env.MARGA_COUNTER : 'marga-eknathalabs';
 const SITE = 'https://' + DOMAIN;
 
@@ -436,7 +438,8 @@ function loadContent() {
     }
   }
   const labs = require('./labs').load(path.join(SRC, 'labs'));
-  return { modules, paths, lessons, sheets, interview, cases, capstones, walkthroughs, reading, games, arch, drills, glossary, labs, predicts: PREDICTS };
+  const termlabs = require('./termlabs').load(path.join(SRC, 'termlabs')).map((l) => { const o = { ...l }; delete o.errors; delete o.file; return o; });
+  return { modules, paths, lessons, sheets, interview, cases, capstones, walkthroughs, reading, games, arch, drills, glossary, labs, termlabs, predicts: PREDICTS };
 
 }
 
@@ -494,11 +497,11 @@ function main() {
   const css = fontCss() + read('app/app.css');
   const js = read('app/app.js');
   const dataJs = 'window.ACADEMY=' + JSON.stringify({ domain: DOMAIN, counter: COUNTER, ...data }).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029') + ';';
-  const ver = crypto.createHash('sha1').update(css + js + dataJs + EXTRA.map((f) => read('app/' + f)).join('')).digest('hex').slice(0, 8);
+  const ver = crypto.createHash('sha1').update(css + js + dataJs + EXTRA.concat(ENGINE).map((f) => read('app/' + f)).join('')).digest('hex').slice(0, 8);
 
   write('assets/app.css', css);
   write('assets/app.js', js);
-  EXTRA.forEach((f) => write('assets/' + f, read('app/' + f)));
+  EXTRA.concat(ENGINE).forEach((f) => write('assets/' + f, read('app/' + f)));
   // SQLite for the SQL playground (vendored sql.js 1.x browser build), loaded only when that page is opened
   write('assets/sql-wasm.js', fs.readFileSync(path.join(ROOT, 'node_modules/sql.js/dist/sql-wasm-browser.js'), 'utf8').split('\n').map((ln) => (/^\s*\/\//.test(ln) && /(\bgi\w+\.com|\bTO\w+:)/.test(ln) ? '// (comment removed)' : ln)).join('\n'));
   fs.copyFileSync(path.join(ROOT, 'node_modules/sql.js/dist/sql-wasm-browser.wasm'), path.join(DIST, 'assets/sql-wasm.wasm'));
@@ -535,7 +538,7 @@ function main() {
   }, null, 2));
   write('icon.svg', read('app/icon.svg'));
 
-  const precache = ['./', 'index.html', 'assets/app.css', 'assets/app.js', 'assets/data.js', ...EXTRA.map((f) => 'assets/' + f), 'icon.svg', 'manifest.webmanifest', 'cheatsheets/']
+  const precache = ['./', 'index.html', 'assets/app.css', 'assets/app.js', 'assets/data.js', ...EXTRA.concat(ENGINE).map((f) => 'assets/' + f), 'icon.svg', 'manifest.webmanifest', 'cheatsheets/']
     .concat(Object.keys(fonts).map((f) => 'assets/fonts/' + f))
     .concat(list.map((s) => `cheatsheets/${s.id}.html`));
   write('sw.js', read('app/sw.js').replace('{{VER}}', ver).replace('{{FILES}}', JSON.stringify(precache)));

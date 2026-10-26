@@ -10,3 +10,6 @@ Live: https://marga.eknathalabs.com
     npm run e2e        # browser tests (npx playwright install chromium first)
 
 See DEPLOY.md for hosting, DNS and the visitor counter.
+
+## Terminal labs
+24 break-and-fix labs (Linux, Shell, Networking, Python) run in a simulated terminal in the browser. Sources: `src/termlabs/*.md`; engine: `src/app/term-*.js`; UI: `src/app/termlabs-ui.js`. It is a simulation, not a real server. Verify with `node tools/terminal-verify.js` and `node tools/term-diff.js`. See DEPLOY.md, Round 11.
