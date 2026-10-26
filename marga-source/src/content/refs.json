@@ -175,6 +175,34 @@
     "CIS Benchmarks",
     "https://www.cisecurity.org/cis-benchmarks"
    ]
+  ],
+  "ansible": [
+   [
+    "Ansible documentation",
+    "https://docs.ansible.com/ansible/latest/"
+   ],
+   [
+    "Ansible Lint",
+    "https://ansible.readthedocs.io/projects/lint/"
+   ],
+   [
+    "Ansible Galaxy",
+    "https://galaxy.ansible.com/"
+   ]
+  ],
+  "databases": [
+   [
+    "PostgreSQL documentation",
+    "https://www.postgresql.org/docs/current/"
+   ],
+   [
+    "MySQL reference manual",
+    "https://dev.mysql.com/doc/refman/8.0/en/"
+   ],
+   [
+    "Redis documentation",
+    "https://redis.io/docs/latest/"
+   ]
   ]
  },
  "lessons": {
@@ -1719,6 +1747,488 @@
     "NIST SP 800-61: Incident handling guide",
     "https://csrc.nist.gov/pubs/sp/800/61/r2/final"
    ]
+  ],
+  "linux/namespaces-and-cgroups": [
+   [
+    "namespaces(7) manual page",
+    "https://man7.org/linux/man-pages/man7/namespaces.7.html"
+   ],
+   [
+    "cgroups(7) manual page",
+    "https://man7.org/linux/man-pages/man7/cgroups.7.html"
+   ]
+  ],
+  "linux/working-efficiently-in-the-terminal": [
+   [
+    "GNU Bash manual: Command line editing",
+    "https://www.gnu.org/software/bash/manual/html_node/Command-Line-Editing.html"
+   ],
+   [
+    "Bash history facilities",
+    "https://www.gnu.org/software/bash/manual/html_node/Bash-History-Facilities.html"
+   ]
+  ],
+  "bash/arrays-and-parameter-expansion": [
+   [
+    "GNU Bash manual: Arrays",
+    "https://www.gnu.org/software/bash/manual/html_node/Arrays.html"
+   ],
+   [
+    "GNU Bash manual: Shell parameter expansion",
+    "https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html"
+   ]
+  ],
+  "bash/building-and-testing-shell-tools": [
+   [
+    "ShellCheck",
+    "https://www.shellcheck.net/"
+   ],
+   [
+    "GNU Bash manual: Bourne shell builtins (getopts)",
+    "https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html"
+   ]
+  ],
+  "python/concurrency-for-operations": [
+   [
+    "Python docs: concurrent.futures",
+    "https://docs.python.org/3/library/concurrent.futures.html"
+   ],
+   [
+    "Python docs: asyncio",
+    "https://docs.python.org/3/library/asyncio.html"
+   ]
+  ],
+  "python/writing-command-line-tools": [
+   [
+    "Python docs: argparse",
+    "https://docs.python.org/3/library/argparse.html"
+   ],
+   [
+    "Python Packaging User Guide",
+    "https://packaging.python.org/en/latest/"
+   ]
+  ],
+  "networking/ipv6-essentials": [
+   [
+    "RFC 4291: IPv6 Addressing Architecture",
+    "https://www.rfc-editor.org/rfc/rfc4291"
+   ],
+   [
+    "RFC 4861: Neighbor Discovery for IPv6",
+    "https://www.rfc-editor.org/rfc/rfc4861"
+   ]
+  ],
+  "networking/latency-mtu-and-network-performance": [
+   [
+    "RFC 1191: Path MTU Discovery",
+    "https://www.rfc-editor.org/rfc/rfc1191"
+   ],
+   [
+    "Brendan Gregg: Linux Performance",
+    "https://www.brendangregg.com/linuxperf.html"
+   ]
+  ],
+  "docker/buildkit-caching-and-multi-arch": [
+   [
+    "Docker docs: Build cache",
+    "https://docs.docker.com/build/cache/"
+   ],
+   [
+    "Docker docs: Multi-platform builds",
+    "https://docs.docker.com/build/building/multi-platform/"
+   ]
+  ],
+  "docker/container-logging-and-resource-limits": [
+   [
+    "Docker docs: Logging drivers",
+    "https://docs.docker.com/engine/logging/configure/"
+   ],
+   [
+    "Docker docs: Resource constraints",
+    "https://docs.docker.com/engine/containers/resource_constraints/"
+   ]
+  ],
+  "cicd/release-management-and-feature-flags": [
+   [
+    "OpenFeature",
+    "https://openfeature.dev/"
+   ],
+   [
+    "Continuous Delivery",
+    "https://continuousdelivery.com/"
+   ]
+  ],
+  "cicd/fast-pipelines-caching-parallelism-monorepos": [
+   [
+    "Continuous Delivery: Deployment pipeline",
+    "https://continuousdelivery.com/implementing/patterns/"
+   ],
+   [
+    "DORA research",
+    "https://dora.dev/"
+   ]
+  ],
+  "kubernetes/probes-metrics-and-logging": [
+   [
+    "Kubernetes docs: Configure liveness, readiness and startup probes",
+    "https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/"
+   ],
+   [
+    "Kubernetes docs: Logging architecture",
+    "https://kubernetes.io/docs/concepts/cluster-administration/logging/"
+   ]
+  ],
+  "kubernetes/service-mesh-and-mtls": [
+   [
+    "Istio docs: Security",
+    "https://istio.io/latest/docs/concepts/security/"
+   ],
+   [
+    "Envoy docs",
+    "https://www.envoyproxy.io/docs/envoy/latest/"
+   ]
+  ],
+  "terraform/testing-terraform": [
+   [
+    "Terraform docs: Tests",
+    "https://developer.hashicorp.com/terraform/language/tests"
+   ],
+   [
+    "Terraform docs: terraform validate",
+    "https://developer.hashicorp.com/terraform/cli/commands/validate"
+   ]
+  ],
+  "terraform/environments-and-team-workflows": [
+   [
+    "Terraform docs: Workspaces",
+    "https://developer.hashicorp.com/terraform/language/state/workspaces"
+   ],
+   [
+    "Terraform docs: Remote state",
+    "https://developer.hashicorp.com/terraform/language/state/remote"
+   ]
+  ],
+  "cloud/high-availability-and-disaster-recovery": [
+   [
+    "AWS Well-Architected: Reliability pillar",
+    "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html"
+   ],
+   [
+    "AWS: Disaster recovery of workloads",
+    "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-workloads-on-aws.html"
+   ]
+  ],
+  "cloud/landing-zones-and-multi-account-strategy": [
+   [
+    "AWS: Organizing your AWS environment",
+    "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/organizing-your-aws-environment.html"
+   ],
+   [
+    "Azure: Landing zones",
+    "https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/"
+   ]
+  ],
+  "observability/red-use-and-golden-signals": [
+   [
+    "Google SRE book: Monitoring Distributed Systems",
+    "https://sre.google/sre-book/monitoring-distributed-systems/"
+   ],
+   [
+    "Brendan Gregg: The USE Method",
+    "https://www.brendangregg.com/usemethod.html"
+   ]
+  ],
+  "observability/telemetry-cost-and-cardinality": [
+   [
+    "Prometheus: Instrumentation practices",
+    "https://prometheus.io/docs/practices/instrumentation/"
+   ],
+   [
+    "OpenTelemetry: Sampling",
+    "https://opentelemetry.io/docs/concepts/sampling/"
+   ]
+  ],
+  "sre/production-readiness-reviews": [
+   [
+    "Google SRE book: Launch coordination checklist",
+    "https://sre.google/sre-book/launch-checklist/"
+   ],
+   [
+    "Google SRE workbook: Production readiness",
+    "https://sre.google/workbook/table-of-contents/"
+   ]
+  ],
+  "sre/incident-communication-and-stakeholders": [
+   [
+    "Google SRE book: Managing Incidents",
+    "https://sre.google/sre-book/managing-incidents/"
+   ],
+   [
+    "Atlassian: Incident management handbook",
+    "https://www.atlassian.com/incident-management"
+   ]
+  ],
+  "security/detection-and-security-logging": [
+   [
+    "NIST SP 800-92: Guide to Computer Security Log Management",
+    "https://csrc.nist.gov/pubs/sp/800/92/final"
+   ],
+   [
+    "OWASP: Logging Cheat Sheet",
+    "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html"
+   ]
+  ],
+  "security/encryption-and-key-management": [
+   [
+    "NIST SP 800-57: Key management",
+    "https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final"
+   ],
+   [
+    "OWASP: Cryptographic Storage Cheat Sheet",
+    "https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html"
+   ]
+  ],
+  "ansible/ansible-basics-inventory-and-ad-hoc": [
+   [
+    "Ansible getting started",
+    "https://docs.ansible.com/ansible/latest/getting_started/index.html"
+   ],
+   [
+    "Building an inventory",
+    "https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html"
+   ],
+   [
+    "Introduction to ad hoc commands",
+    "https://docs.ansible.com/ansible/latest/command_guide/intro_adhoc.html"
+   ]
+  ],
+  "ansible/playbooks-tasks-and-idempotence": [
+   [
+    "Ansible playbooks",
+    "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html"
+   ],
+   [
+    "Validating tasks: check mode and diff mode",
+    "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_checkmode.html"
+   ],
+   [
+    "Working with playbooks",
+    "https://docs.ansible.com/ansible/latest/playbook_guide/index.html"
+   ]
+  ],
+  "ansible/variables-facts-and-templates": [
+   [
+    "Using variables",
+    "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html"
+   ],
+   [
+    "Templating with Jinja2",
+    "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_templating.html"
+   ],
+   [
+    "Discovering variables: facts",
+    "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_vars_facts.html"
+   ]
+  ],
+  "ansible/handlers-conditionals-and-loops": [
+   [
+    "Handlers",
+    "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_handlers.html"
+   ],
+   [
+    "Conditionals",
+    "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_conditionals.html"
+   ],
+   [
+    "Loops",
+    "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_loops.html"
+   ],
+   [
+    "Blocks and error handling",
+    "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_error_handling.html"
+   ]
+  ],
+  "ansible/roles-and-collections": [
+   [
+    "Roles",
+    "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html"
+   ],
+   [
+    "Using collections",
+    "https://docs.ansible.com/ansible/latest/collections_guide/index.html"
+   ],
+   [
+    "Galaxy user guide",
+    "https://docs.ansible.com/ansible/latest/galaxy/user_guide.html"
+   ]
+  ],
+  "ansible/vault-secrets-and-safe-practice": [
+   [
+    "Protecting sensitive data with Ansible Vault",
+    "https://docs.ansible.com/ansible/latest/vault_guide/index.html"
+   ],
+   [
+    "Keeping secrets out of logs (no_log)",
+    "https://docs.ansible.com/ansible/latest/reference_appendices/logging.html"
+   ],
+   [
+    "Privilege escalation (become)",
+    "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_privilege_escalation.html"
+   ]
+  ],
+  "ansible/ansible-at-scale": [
+   [
+    "Controlling playbook execution: strategies and batches",
+    "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_strategies.html"
+   ],
+   [
+    "Ansible Lint",
+    "https://ansible.readthedocs.io/projects/lint/"
+   ],
+   [
+    "Molecule",
+    "https://ansible.readthedocs.io/projects/molecule/"
+   ]
+  ],
+  "ansible/debugging-ansible-runs": [
+   [
+    "Debugging tasks",
+    "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_debugger.html"
+   ],
+   [
+    "Ansible FAQ",
+    "https://docs.ansible.com/ansible/latest/reference_appendices/faq.html"
+   ],
+   [
+    "Validating tasks: check mode and diff mode",
+    "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_checkmode.html"
+   ]
+  ],
+  "databases/relational-fundamentals-and-sql": [
+   [
+    "PostgreSQL tutorial",
+    "https://www.postgresql.org/docs/current/tutorial.html"
+   ],
+   [
+    "Constraints",
+    "https://www.postgresql.org/docs/current/ddl-constraints.html"
+   ],
+   [
+    "Monitoring database activity",
+    "https://www.postgresql.org/docs/current/monitoring-stats.html"
+   ]
+  ],
+  "databases/indexes-and-query-plans": [
+   [
+    "Indexes",
+    "https://www.postgresql.org/docs/current/indexes.html"
+   ],
+   [
+    "Using EXPLAIN",
+    "https://www.postgresql.org/docs/current/using-explain.html"
+   ],
+   [
+    "CREATE INDEX",
+    "https://www.postgresql.org/docs/current/sql-createindex.html"
+   ]
+  ],
+  "databases/transactions-and-locking": [
+   [
+    "Transaction isolation",
+    "https://www.postgresql.org/docs/current/transaction-iso.html"
+   ],
+   [
+    "Explicit locking",
+    "https://www.postgresql.org/docs/current/explicit-locking.html"
+   ],
+   [
+    "Monitoring database activity",
+    "https://www.postgresql.org/docs/current/monitoring-stats.html"
+   ]
+  ],
+  "databases/backups-and-recovery": [
+   [
+    "Backup and restore",
+    "https://www.postgresql.org/docs/current/backup.html"
+   ],
+   [
+    "Continuous archiving and point-in-time recovery",
+    "https://www.postgresql.org/docs/current/continuous-archiving.html"
+   ],
+   [
+    "pgBackRest",
+    "https://pgbackrest.org/"
+   ]
+  ],
+  "databases/replication-and-failover": [
+   [
+    "High availability, load balancing and replication",
+    "https://www.postgresql.org/docs/current/high-availability.html"
+   ],
+   [
+    "Log-shipping standby servers",
+    "https://www.postgresql.org/docs/current/warm-standby.html"
+   ],
+   [
+    "Patroni",
+    "https://patroni.readthedocs.io/"
+   ]
+  ],
+  "databases/performance-and-connection-pooling": [
+   [
+    "pg_stat_statements",
+    "https://www.postgresql.org/docs/current/pgstatstatements.html"
+   ],
+   [
+    "Routine vacuuming",
+    "https://www.postgresql.org/docs/current/routine-vacuuming.html"
+   ],
+   [
+    "PgBouncer configuration",
+    "https://www.pgbouncer.org/config.html"
+   ]
+  ],
+  "databases/safe-schema-migrations": [
+   [
+    "ALTER TABLE",
+    "https://www.postgresql.org/docs/current/sql-altertable.html"
+   ],
+   [
+    "CREATE INDEX",
+    "https://www.postgresql.org/docs/current/sql-createindex.html"
+   ],
+   [
+    "MySQL online DDL",
+    "https://dev.mysql.com/doc/refman/8.0/en/innodb-online-ddl.html"
+   ]
+  ],
+  "databases/nosql-caches-and-choosing": [
+   [
+    "Redis documentation",
+    "https://redis.io/docs/latest/"
+   ],
+   [
+    "MongoDB manual",
+    "https://www.mongodb.com/docs/manual/"
+   ],
+   [
+    "Amazon DynamoDB developer guide",
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html"
+   ]
+  ],
+  "databases/debugging-database-problems": [
+   [
+    "Monitoring database activity",
+    "https://www.postgresql.org/docs/current/monitoring-stats.html"
+   ],
+   [
+    "Explicit locking",
+    "https://www.postgresql.org/docs/current/explicit-locking.html"
+   ],
+   [
+    "Replication slots",
+    "https://www.postgresql.org/docs/current/warm-standby.html"
+   ]
   ]
  },
  "sheets": {
@@ -1930,6 +2440,34 @@
    [
     "CIS Benchmarks",
     "https://www.cisecurity.org/cis-benchmarks"
+   ]
+  ],
+  "ansible": [
+   [
+    "Ansible documentation",
+    "https://docs.ansible.com/ansible/latest/"
+   ],
+   [
+    "Ansible Lint",
+    "https://ansible.readthedocs.io/projects/lint/"
+   ],
+   [
+    "Ansible Galaxy",
+    "https://galaxy.ansible.com/"
+   ]
+  ],
+  "databases": [
+   [
+    "PostgreSQL SQL commands",
+    "https://www.postgresql.org/docs/current/sql-commands.html"
+   ],
+   [
+    "EXPLAIN",
+    "https://www.postgresql.org/docs/current/using-explain.html"
+   ],
+   [
+    "Backup and restore",
+    "https://www.postgresql.org/docs/current/backup.html"
    ]
   ]
  }
