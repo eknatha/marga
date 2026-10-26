@@ -18,7 +18,7 @@ const SRC = path.join(ROOT, 'src');
 const DIST = path.join(ROOT, 'dist');
 const DOMAIN = 'marga.eknathalabs.com';
 // GoatCounter site code for the visitor count (https://CODE.goatcounter.com). Empty string disables it.
-const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'features.js'];
+const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'features.js', 'badges.js'];
 const COUNTER = process.env.MARGA_COUNTER !== undefined ? process.env.MARGA_COUNTER : 'marga-eknathalabs';
 const SITE = 'https://' + DOMAIN;
 
@@ -305,6 +305,23 @@ function loadContent() {
   }
 
 
+  // Architecture walkthroughs: src/walkthroughs/NN-slug.md -> "# Title", key: value lines, blank line, markdown body (diagram and predict blocks allowed)
+  const walkthroughs = [];
+  const wdir = path.join(SRC, 'walkthroughs');
+  if (fs.existsSync(wdir)) {
+    for (const f of fs.readdirSync(wdir).filter((x) => x.endsWith('.md')).sort()) {
+      const raw = fs.readFileSync(path.join(wdir, f), 'utf8');
+      const tm = raw.match(/^# (.+)\n/);
+      if (!tm) throw new Error(`walkthroughs/${f}: needs a "# Title" first line`);
+      const [head, ...restParts] = raw.slice(tm[0].length).split(/\n\s*\n/);
+      const kv = {};
+      for (const line of head.split('\n')) { const m = line.match(/^([a-z]+):\s*(.+)$/); if (m) kv[m[1]] = m[2].trim(); }
+      for (const k of ['level', 'modules', 'lessons', 'summary']) if (!kv[k]) throw new Error(`walkthroughs/${f}: missing ${k}:`);
+      const html = makeMarkdown().marked.parse(restParts.join('\n\n'));
+      walkthroughs.push({ id: f.replace(/\.md$/, '').replace(/^\d+-/, ''), title: tm[1].trim(), level: kv.level, modules: kv.modules.split(',').map((x) => x.trim()), lessons: kv.lessons.split(',').map((x) => x.trim()), summary: kv.summary, html, text: plain(html) });
+    }
+  }
+
   // Capstone projects: src/capstones/<path>.md -> "## Title", key: value lines, then "steps:", "check:" bullet lists
   const capstones = [];
   const kdir = path.join(SRC, 'capstones');
@@ -419,7 +436,7 @@ function loadContent() {
     }
   }
   const labs = require('./labs').load(path.join(SRC, 'labs'));
-  return { modules, paths, lessons, sheets, interview, cases, capstones, reading, games, arch, drills, glossary, labs, predicts: PREDICTS };
+  return { modules, paths, lessons, sheets, interview, cases, capstones, walkthroughs, reading, games, arch, drills, glossary, labs, predicts: PREDICTS };
 
 }
 
