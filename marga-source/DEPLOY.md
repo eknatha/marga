@@ -150,3 +150,12 @@ If the number does not appear: open the browser console and look for the "visito
 - Two ways to learn: the home page has two doors, "Learn by skill" and "Learn by path", and six goal starters. New pages: `#/skills` (every skill with time, prerequisites as advice, paths that use it), `#/build-path` and `#/build-path/<goal>` (pick skills, get the dependencies added and an ordered plan; the plan can be saved in the browser), and `#/testout/<skill>` (ten questions from across a skill; eight right marks every lesson passed). Locked skill pages now offer a test-out of the missing prerequisite. Source: `src/app/choose.js`.
 - Counts: 15 skills, 196 lessons, 40 games, 216 explainers, 72 terminal labs.
 - Content was written from memory. Spot-check commands and examples before relying on them.
+## Round 15 additions
+
+- New skills: **Go for DevOps engineers** (10 lessons, no prerequisites, placed after Python in all four paths) and **Helm for beginners** (8 lessons, requires Kubernetes, placed after Kubernetes). Each has a cheat sheet, interview answers, drills, glossary terms, 6 reading items, tagged case studies and badges.
+- Incident games: 3 for Go and 2 for Helm. Every game answer now shows an **Explanation.** paragraph followed by an **Example.** paragraph.
+- Linux for engineers: 5 new kernel lessons (modules and sysctl, memory and the OOM killer, system calls with strace and perf, filesystems and the page cache, kernel networking and conntrack). The debugging lesson stays last.
+- 47 new animated explainers covering Go, Helm, the Linux kernel and every other skill.
+- A Certifications icon in the top navigation links to https://certs.eknathalabs.com (new tab).
+- Rule change: the ban on the word "git" was narrowed to hosting and brand words (`/\bgit(hub|lab|ops|leaks|ea)/i`), so the Git skill can name the tool.
+- Go and Helm have no terminal labs (Go has the existing playground exercises).

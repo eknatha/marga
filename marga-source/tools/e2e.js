@@ -1265,7 +1265,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const { ctx, page } = await open();
     await go(page, '/');
     const links = await page.locator('#topnav a').allInnerTexts();
-    eq(links.join('|'), 'Skills|Skill trees|Cheat sheets|Case studies|Practice|Progress|InterviewHub|About', 'nav order');
+    eq(links.join('|'), 'Skills|Skill trees|Certifications (opens in a new tab)|Cheat sheets|Case studies|Practice|Progress|InterviewHub|About', 'nav order');
     await nav(page, '/practice');
     eq(await page.locator('.prac li').count(), 25, 'hub cards');
     for (const href of ['#/drills', '#/interview/mock', '#/flashcards', '#/cases', '#/architecture', '#/calculators', '#/review', '#/terminal-labs']) ok(await page.locator(`.prac a[href="${href}"]`).count() === 1, 'hub links to ' + href);
@@ -1749,13 +1749,13 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const { ctx, page } = await open(); await go(page, '/paths');
     await page.waitForSelector('.tree .node');
     ok(/Skill trees/.test(await page.textContent('#main h1')), 'page title');
-    eq(await page.locator('.node').count(), 13, 'devops tree has 13 skills');
+    eq(await page.locator('.node').count(), 15, 'devops tree has 15 skills');
     ok(await page.locator('.tier').count() >= 3, 'several tiers');
-    eq(await page.locator('.node.s-ready').count(), 2, 'only the two foundations (Linux and Git) are ready at the start');
+    eq(await page.locator('.node.s-ready').count(), 3, 'only the three foundations (Linux, Git and Go) are ready at the start');
     ok(await page.locator('.node.s-lock').count() >= 5, 'dependent skills are locked');
     await page.waitForFunction(() => document.querySelectorAll('.tree-lines path').length >= 9);
     await page.locator('.tab').nth(2).click(); await page.waitForSelector('.node[data-id="sre"]');
-    eq(await page.locator('.node').count(), 14, 'sre tree has 14 skills');
+    eq(await page.locator('.node').count(), 16, 'sre tree has 16 skills');
     const prog = emptyProgress(); prog.lessons = doneMap(MODS.linux.lessons);
     await setProgress(page, prog); await nav(page, '/paths'); await page.waitForSelector('.tree .node');
     eq(await page.locator('.node[data-id="linux"].s-pass').count(), 1, 'linux is mastered');
@@ -1937,7 +1937,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await page.waitForSelector('.tab'); const tabs = await page.locator('.tab').allTextContents();
     ok(tabs.some((t) => /DevSecOps/.test(t)), 'tab: ' + tabs.join(','));
     await page.locator('.tab', { hasText: 'DevSecOps' }).click(); await page.waitForSelector('.node[data-id="security"]');
-    eq(await page.locator('.node').count(), 14, 'devsecops tree has 14 skills');
+    eq(await page.locator('.node').count(), 16, 'devsecops tree has 16 skills');
     eq(await page.locator('.node[data-id="security"].s-lock').count(), 1, 'security is locked at the start');
     await ctx.close();
   });
@@ -2125,7 +2125,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
 
   await test('incident games: one per stage, a choice shows feedback, a game reaches an ending and is remembered', async () => {
     const { ctx, page } = await open(); await go(page, '/');
-    eq(data.games.length, 40, '40 games');
+    eq(data.games.length, 45, '45 games');
     for (const m of data.modules) ok(data.games.some((g) => g.module === m.id), m.id + ' has a game');
     await nav(page, '/practice'); ok(await page.locator('.prac a[href="#/games"]').count() === 1, 'hub card');
     await nav(page, '/games'); await page.waitForSelector('.game-card'); eq(await page.locator('.game-card').count(), data.games.length, 'all games listed');
@@ -2152,7 +2152,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
   await test('incident games: every game explains every choice with an example, and the summary shows a better move', async () => {
     const { ctx, page } = await open(); await go(page, '/');
     const fresh = data.games.filter((g) => Object.values(g.scenes).some((s) => s.choices.some((c) => /Example: /.test(c.fb))));
-    eq(fresh.length, 40, 'games with worked examples');
+    eq(fresh.length, 45, 'games with worked examples');
     for (const g of fresh) for (const sc of Object.values(g.scenes)) for (const c of sc.choices) ok(/ Example: /.test(c.fb) && c.fb.length > 30, g.id + ': ' + c.t);
     const g = fresh[0];
     await nav(page, '/game/' + g.id); await page.waitForSelector('.gm-choice');
@@ -2164,7 +2164,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       const pick = i === 0 ? scene.choices.findIndex((c) => c.pts === 1) : scene.choices.findIndex((c) => c.pts === 2);
       await page.locator('.gm-choice').nth(pick).click();
       await page.waitForSelector('.gm-fb .gm-ex');
-      ok(/Example\./.test(await page.textContent('.gm-fb')), 'example shown after a choice');
+      ok(/Explanation\./.test(await page.textContent('.gm-fb')) && /Example\./.test(await page.textContent('.gm-fb')), 'explanation and example shown after a choice');
       await page.click('[data-act=gm-next]');
     }
     await page.waitForSelector('.gm-end');
@@ -2218,12 +2218,12 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
   }
   const bytesOf = (file) => fs.readFileSync(file);
 
-  await test('badges: the wall lists 15 stage and 4 path badges, locked ones show progress, and the hub links to it', async () => {
+  await test('badges: the wall lists 17 stage and 4 path badges, locked ones show progress, and the hub links to it', async () => {
     const { ctx, page, issues } = await open();
     await go(page, '/badges');
     eq(await page.locator('.bd-card').count(), data.modules.length + data.paths.live.length, 'badge cards');
     eq(await page.locator('.bd-card.on').count(), 0, 'none earned at first');
-    ok(/You have earned 0 of 19/.test(await page.textContent('#main')), 'count text');
+    ok(/You have earned 0 of 21/.test(await page.textContent('#main')), 'count text');
     const t = await page.textContent('.bd-caution');
     ok(/Not a certification/.test(t), 'caution on wall');
     await nav(page, '/badge/stage-ansible');
@@ -2362,12 +2362,12 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await ctx.close();
   });
 
-  await test('badges: finishing every stage earns all 15 stage badges and 4 path badges; shapes differ and the light and dark variants both draw', async () => {
+  await test('badges: finishing every stage earns all 17 stage badges and 4 path badges; shapes differ and the light and dark variants both draw', async () => {
     const { ctx, page } = await open();
     await go(page, '/'); await setProgress(page, allDone());
     await nav(page, '/badges'); await page.waitForSelector('.bd-card');
-    eq(await page.locator('.bd-card.on').count(), 19, 'all earned');
-    ok(/You have earned 19 of 19/.test(await page.textContent('#main')), 'count');
+    eq(await page.locator('.bd-card.on').count(), 21, 'all earned');
+    ok(/You have earned 21 of 21/.test(await page.textContent('#main')), 'count');
     ok(!/certified/i.test(await page.textContent('#main')), 'never says certified');
     await nav(page, '/badge/path-devops'); await page.waitForSelector('#bd-show svg');
     ok(await page.locator('#bd-show svg polygon').count() >= 2, 'path badge is a hexagon');
@@ -2765,6 +2765,29 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await go(page, '/lesson/git/' + m.lessons[1].split('/')[1]); await page.waitForSelector('#prose');
     ok(await page.locator('#prose pre code').count() >= 3, 'code examples render');
     ok(/git restore/.test(await page.textContent('#prose')), 'the word git is allowed in the git skill');
+    await ctx.close();
+  });
+
+  await test('go and helm skills, kernel lessons and the certifications link', async () => {
+    const gm = data.modules.find((x) => x.id === 'go'), hm = data.modules.find((x) => x.id === 'helm');
+    eq(gm.lessons.length, 10, 'ten go lessons'); ok(/debugging/.test(gm.lessons[9]), 'go ends with debugging'); eq(gm.requires.length, 0, 'go has no prerequisites');
+    eq(hm.lessons.length, 8, 'eight helm lessons'); ok(/debugging/.test(hm.lessons[7]), 'helm ends with debugging'); eq(hm.requires.join(), 'kubernetes', 'helm requires kubernetes');
+    for (const id of ['go', 'helm']) {
+      ok(data.interview.filter((x) => x.module === id).length >= 8, id + ' interview');
+      ok(data.drills.filter((x) => x.module === id).length >= 8, id + ' drills');
+      ok(EXPL_IDS.filter((x) => new RegExp('^x-' + id + '-').test(x)).length >= 12, id + ' explainers');
+    }
+    eq(data.games.filter((x) => x.module === 'go').length, 3, 'go incident games');
+    eq(data.games.filter((x) => x.module === 'helm').length, 2, 'helm games');
+    for (const p of data.paths.live) { ok(p.modules.indexOf('go') > p.modules.indexOf('python'), p.id + ' go after python'); ok(p.modules.indexOf('helm') > p.modules.indexOf('kubernetes'), p.id + ' helm after kubernetes'); }
+    const lx = data.modules.find((x) => x.id === 'linux');
+    ok(lx.lessons.length >= 22 && /debugging/.test(lx.lessons[lx.lessons.length - 1]), 'linux ends with debugging');
+    for (const sl of ['kernel-modules-sysctl-and-boot-parameters', 'processes-memory-and-the-oom-killer', 'system-calls-strace-and-perf']) ok(lx.lessons.some((l) => l.endsWith(sl)), 'kernel lesson ' + sl);
+    const { ctx, page } = await open();
+    await go(page, '/');
+    const a = page.locator('#topnav a.nav-certs');
+    eq(await a.getAttribute('href'), 'https://certs.eknathalabs.com', 'certs href'); eq(await a.getAttribute('target'), '_blank', 'opens in new tab'); ok(/noopener/.test(await a.getAttribute('rel')), 'noopener');
+    ok(/Certifications/.test(await a.textContent()), 'accessible name');
     await ctx.close();
   });
 
