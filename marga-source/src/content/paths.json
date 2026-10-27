@@ -7,6 +7,7 @@
       "audience": "Sysadmins, developers and support engineers moving into DevOps roles.",
       "modules": [
         "linux",
+        "git",
         "bash",
         "python",
         "networking",
@@ -30,7 +31,8 @@
         "Write Python and Bash automation that talks to APIs and cloud SDKs.",
         "Operate across AWS and Azure well enough to deploy a full stack.",
         "Keep fleets of servers consistent with Ansible inventories, playbooks and roles.",
-        "Operate relational databases: indexes, backups, replication and safe schema changes."
+        "Operate relational databases: indexes, backups, replication and safe schema changes.",
+        "Use Git daily: branches, merges, rebase, pull requests, tags and recovery with the reflog."
       ]
     },
     {
@@ -40,6 +42,7 @@
       "audience": "Engineers who build and operate infrastructure in public cloud accounts.",
       "modules": [
         "linux",
+        "git",
         "bash",
         "python",
         "networking",
@@ -70,6 +73,7 @@
       "audience": "Operations and platform engineers who own uptime and on-call.",
       "modules": [
         "linux",
+        "git",
         "bash",
         "python",
         "networking",
@@ -102,6 +106,7 @@
       "audience": "DevOps, platform and security engineers who own the safety of what ships.",
       "modules": [
         "linux",
+        "git",
         "bash",
         "python",
         "networking",
