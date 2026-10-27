@@ -2271,5 +2271,476 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "Sparse checkout of one folder", n: "Only the service folder and shared libraries appear in the working tree." },
     { f: 2, t: 0, l: "Build starts in seconds", n: "The first build step runs after a clone that takes seconds instead of minutes." },
     { f: 0, t: 2, l: "Deepen only if needed", n: "If a tool needs history, such as git describe, the job fetches more commits before it runs." }
+  ] },
+{ id: "x-go-build-run", module: "go", title: "From go build to a running program", summary: "How source files become one static binary and start running.",
+  actors: ["Developer", "go command", "Compiler and linker", "Binary"],
+  steps: [
+    { f: 0, t: 1, l: "go build ./cmd/api", n: "The go command reads go.mod to find the module and the packages that the program imports." },
+    { f: 1, t: 1, l: "Resolve dependencies", n: "Dependencies come from the module cache, and go.sum checksums are verified so downloaded code matches what was recorded." },
+    { f: 1, t: 2, l: "Compile packages", n: "Each package is compiled once and cached, so a rebuild only recompiles what changed." },
+    { f: 2, t: 2, l: "Link into one executable", n: "The linker joins your code, dependencies and the Go runtime into one file with no separate runtime to install." },
+    { f: 2, t: 3, l: "Write the binary", n: "The result is a single file, static when CGO is disabled, which runs on a minimal container image." },
+    { f: 0, t: 3, l: "./api", n: "Starting the file runs the runtime first, which sets up the scheduler and memory manager, then calls main." }
+  ] },
+{ id: "x-go-goroutine-scheduler", module: "go", title: "How goroutines are scheduled", summary: "How many goroutines share a few operating system threads.",
+  actors: ["Your code", "Go scheduler", "OS thread", "Run queue"],
+  steps: [
+    { f: 0, t: 1, l: "go handle(req)", n: "The go statement creates a goroutine with a small stack and hands it to the scheduler." },
+    { f: 1, t: 3, l: "Put it on a run queue", n: "New goroutines wait on a queue attached to a logical processor, ready to run." },
+    { f: 1, t: 2, l: "Assign to a thread", n: "The scheduler lets an operating system thread pick a goroutine and run it until it blocks or is preempted." },
+    { f: 2, t: 2, l: "Goroutine blocks on I/O", n: "When a goroutine waits for a network read, the thread does not wait with it." },
+    { f: 1, t: 3, l: "Park it, run another", n: "The scheduler parks the blocked goroutine and runs the next one from the queue on the same thread." },
+    { f: 1, t: 0, l: "Wake on ready", n: "When the network data arrives, the goroutine becomes runnable again and continues where it stopped." }
+  ] },
+{ id: "x-go-channel-handoff", module: "go", title: "Channels hand off values safely", summary: "How an unbuffered channel synchronises a sender and a receiver.",
+  actors: ["Producer", "Channel", "Consumer"],
+  steps: [
+    { f: 0, t: 0, l: "Compute a result", n: "The producer goroutine finishes some work and has a value ready." },
+    { f: 0, t: 1, l: "ch <- result", n: "The send blocks on an unbuffered channel until a receiver is ready, so both sides meet." },
+    { f: 2, t: 1, l: "result := <-ch", n: "The consumer reaches the receive and the value is handed over directly." },
+    { f: 1, t: 2, l: "Value delivered", n: "Both goroutines continue. The hand-off also guarantees that writes before the send are visible after the receive." },
+    { f: 0, t: 1, l: "close(ch)", n: "The producer closes the channel when it has nothing more to send." },
+    { f: 2, t: 2, l: "range ends", n: "The consumer loop over the channel finishes when it is closed and empty, so it can exit cleanly." }
+  ] },
+{ id: "x-go-context-cancel", module: "go", title: "Cancelling work with context", summary: "How one cancellation stops every goroutine a request started.",
+  actors: ["Handler", "Context", "Worker A", "Worker B"],
+  steps: [
+    { f: 0, t: 1, l: "WithTimeout(ctx, 2s)", n: "The handler derives a context with a deadline from the request context and defers cancel." },
+    { f: 0, t: 2, l: "Start worker A with ctx", n: "Each worker receives the context as its first parameter." },
+    { f: 0, t: 3, l: "Start worker B with ctx", n: "Both workers share the same cancellation signal." },
+    { f: 1, t: 1, l: "Deadline passes", n: "After two seconds the context closes its Done channel and records the reason." },
+    { f: 1, t: 2, l: "Done channel closed", n: "Worker A sees ctx.Done in its select and stops waiting on the slow call." },
+    { f: 1, t: 3, l: "Done channel closed", n: "Worker B stops too, so no goroutine is left running for a request that has already failed." },
+    { f: 0, t: 0, l: "Return error", n: "The handler returns a timeout error to the client and the resources are released." }
+  ] },
+{ id: "x-go-http-request", module: "go", title: "A request through net/http", summary: "How a Go server routes and answers one HTTP request.",
+  actors: ["Client", "Server", "Mux", "Handler"],
+  steps: [
+    { f: 0, t: 1, l: "GET /orders/42", n: "The client connects and sends the request. The server runs each connection in its own goroutine." },
+    { f: 1, t: 1, l: "Parse request", n: "net/http parses the method, path, headers and creates a request with a context." },
+    { f: 1, t: 2, l: "Match route", n: "The mux finds the handler registered for the method and path pattern." },
+    { f: 2, t: 3, l: "Call handler", n: "The handler reads the path value, checks input and calls the store with the request context." },
+    { f: 3, t: 3, l: "Encode JSON", n: "The handler sets the content type and writes the encoded response, handling encoding errors." },
+    { f: 3, t: 0, l: "200 OK + body", n: "The response goes back. If the client disconnects, the request context is cancelled." }
+  ] },
+{ id: "x-go-graceful-shutdown", module: "go", title: "Graceful shutdown", summary: "How a Go service finishes in-flight requests before exiting.",
+  actors: ["Orchestrator", "Service", "Server", "In-flight request"],
+  steps: [
+    { f: 0, t: 1, l: "SIGTERM", n: "The orchestrator asks the service to stop, usually with a grace period before killing it." },
+    { f: 1, t: 1, l: "Mark not ready", n: "The readiness endpoint starts failing so the load balancer stops sending new requests." },
+    { f: 1, t: 2, l: "Server.Shutdown(ctx)", n: "Shutdown closes listeners and waits for active requests, up to a deadline." },
+    { f: 3, t: 2, l: "Finish response", n: "The in-flight request completes normally and the connection closes." },
+    { f: 1, t: 1, l: "Cancel background work", n: "A root context is cancelled so workers flush and stop." },
+    { f: 1, t: 0, l: "Exit 0", n: "The process exits cleanly before the grace period ends, with no dropped requests." }
+  ] },
+{ id: "x-go-error-wrapping", module: "go", title: "Wrapping and checking errors", summary: "How context is added to an error without losing the cause.",
+  actors: ["Low-level code", "Service layer", "Handler", "Logger"],
+  steps: [
+    { f: 0, t: 0, l: "os.Open fails", n: "The standard library returns an error that wraps the system error for a missing file." },
+    { f: 0, t: 1, l: "return err", n: "The service layer receives it and does not hide it." },
+    { f: 1, t: 1, l: "fmt.Errorf(\"load config: %w\", err)", n: "Wrapping with the %w verb adds context and keeps the original error inside." },
+    { f: 1, t: 2, l: "Return wrapped error", n: "The handler receives an error whose message shows the full path of the failure." },
+    { f: 2, t: 2, l: "errors.Is(err, fs.ErrNotExist)", n: "The handler can still test for the original cause through the wrapping." },
+    { f: 2, t: 3, l: "Log once with context", n: "The error is logged at the edge with request details instead of at every layer." }
+  ] },
+{ id: "x-go-test-table", module: "go", title: "A table-driven test run", summary: "How go test runs many cases of one function.",
+  actors: ["go test", "Test function", "Subtest", "Result"],
+  steps: [
+    { f: 0, t: 1, l: "Find TestParse", n: "go test builds the package with its test files and calls each function that starts with Test." },
+    { f: 1, t: 1, l: "Define cases table", n: "The test holds a slice of cases with a name, input and expected output." },
+    { f: 1, t: 2, l: "t.Run(case.name)", n: "Each case runs as a subtest, so failures name the exact case." },
+    { f: 2, t: 2, l: "Compare got and want", n: "The subtest checks the result and calls t.Errorf when it differs." },
+    { f: 2, t: 3, l: "Pass or fail per case", n: "Results are collected per subtest and shown with -v." },
+    { f: 0, t: 3, l: "-race and -cover", n: "Adding flags checks data races and reports which lines the tests touched." }
+  ] },
+{ id: "x-go-race-condition", module: "go", title: "A data race and its fix", summary: "How two goroutines corrupt a counter and how a mutex fixes it.",
+  actors: ["Goroutine A", "Counter", "Goroutine B", "Mutex"],
+  steps: [
+    { f: 0, t: 1, l: "Read count = 5", n: "Goroutine A reads the value before incrementing." },
+    { f: 2, t: 1, l: "Read count = 5", n: "Goroutine B reads the same value at the same moment." },
+    { f: 0, t: 1, l: "Write count = 6", n: "Goroutine A writes six back to the counter." },
+    { f: 2, t: 1, l: "Write count = 6", n: "B also writes six, so one increment is lost. This is a data race." },
+    { f: 0, t: 3, l: "Lock before change", n: "With a mutex, A takes the lock first and B has to wait." },
+    { f: 2, t: 1, l: "Read 6, write 7", n: "After A unlocks, B sees six and writes seven. Run go test -race to catch the unsafe version." }
+  ] },
+{ id: "x-go-container-build", module: "go", title: "A multi-stage Go image", summary: "How a Go program ends up in a tiny container.",
+  actors: ["Dockerfile", "Build stage", "Final stage", "Registry"],
+  steps: [
+    { f: 0, t: 1, l: "FROM golang AS build", n: "The first stage has the full toolchain needed to compile." },
+    { f: 1, t: 1, l: "Copy go.mod, download modules", n: "Copying the module files first lets Docker reuse the download layer when only code changes." },
+    { f: 1, t: 1, l: "CGO_ENABLED=0 go build", n: "The program is compiled into a static binary with no external libraries." },
+    { f: 1, t: 2, l: "COPY --from=build /app", n: "Only the binary is copied into the final image." },
+    { f: 2, t: 2, l: "USER nonroot", n: "The final image runs as a non-root user on a minimal base such as distroless." },
+    { f: 2, t: 3, l: "Push image", n: "The result is tens of megabytes, which pulls and starts quickly." }
+  ] },
+{ id: "x-go-pprof-profile", module: "go", title: "Profiling a slow Go service", summary: "How pprof shows where CPU time goes.",
+  actors: ["Engineer", "Service", "pprof endpoint", "Flame graph"],
+  steps: [
+    { f: 0, t: 1, l: "Notice high CPU", n: "Dashboards show the service using more CPU for the same traffic." },
+    { f: 0, t: 2, l: "Fetch 30 s profile", n: "The engineer requests a CPU profile from the internal debug port during load." },
+    { f: 2, t: 2, l: "Sample stacks", n: "The runtime samples call stacks about 100 times per second for the duration." },
+    { f: 2, t: 3, l: "Render flame graph", n: "Wide boxes show functions that use the most time." },
+    { f: 0, t: 3, l: "Find JSON encoding in a loop", n: "The widest box is repeated encoding of the same value, which can be cached." },
+    { f: 0, t: 1, l: "Fix and compare", n: "After the change a new profile shows the box gone and CPU use down." }
+  ] },
+{ id: "x-go-goroutine-leak", module: "go", title: "How a goroutine leaks", summary: "How an abandoned sender blocks forever and memory grows.",
+  actors: ["Handler", "Worker goroutine", "Channel", "Metrics"],
+  steps: [
+    { f: 0, t: 1, l: "Start worker", n: "The handler starts a goroutine that will send its result on an unbuffered channel." },
+    { f: 0, t: 0, l: "Timeout, return", n: "The handler gives up after a timeout and returns an error to the client." },
+    { f: 1, t: 1, l: "Worker finishes later", n: "The slow call completes after the handler is gone." },
+    { f: 1, t: 2, l: "Send blocks", n: "The send waits for a receiver that will never come." },
+    { f: 2, t: 3, l: "Goroutine count rises", n: "Every timed-out request leaves one blocked goroutine, so memory grows steadily." },
+    { f: 0, t: 1, l: "Fix with ctx and buffer", n: "Using select on ctx.Done and a buffer of one lets the worker exit and the count stays flat." }
+  ] },
+{ id: "x-go-modules-checksum", module: "go", title: "Modules and go.sum", summary: "How Go verifies dependencies.",
+  actors: ["Developer", "go.mod", "Module proxy", "go.sum"],
+  steps: [
+    { f: 0, t: 1, l: "go get example.com/lib@v1.4.0", n: "A dependency is added with an exact version in go.mod." },
+    { f: 1, t: 2, l: "Download module", n: "The go command fetches the module, usually through a proxy." },
+    { f: 2, t: 3, l: "Record hash", n: "The content hash is written to go.sum." },
+    { f: 0, t: 3, l: "Commit both files", n: "Both files are committed so every machine builds the same code." },
+    { f: 2, t: 3, l: "Later build compares", n: "On another machine, the downloaded content must match the recorded hash." },
+    { f: 3, t: 0, l: "Mismatch fails the build", n: "If the content differs, the build stops, which protects against tampered or changed modules." }
+  ] },
+{ id: "x-helm-install-flow", module: "helm", title: "What helm install does", summary: "From command to objects running in the cluster.",
+  actors: ["Engineer", "Helm CLI", "Kubernetes API", "Release Secret"],
+  steps: [
+    { f: 0, t: 1, l: "helm install shop-web ./chart -f prod.yaml", n: "The command names the release, the chart and the values files." },
+    { f: 1, t: 1, l: "Merge values", n: "Chart defaults, values files and --set flags are merged in order of priority." },
+    { f: 1, t: 1, l: "Render templates", n: "The templates are rendered into plain Kubernetes manifests using the merged values." },
+    { f: 1, t: 2, l: "Send manifests", n: "Helm sends the rendered objects to the API server using your kubeconfig." },
+    { f: 1, t: 3, l: "Store revision 1", n: "The release record with chart, values and manifest is stored as a Secret in the namespace." },
+    { f: 2, t: 0, l: "Pods start", n: "The cluster creates the objects and pods start. helm status shows the release as deployed." }
+  ] },
+{ id: "x-helm-upgrade-atomic", module: "helm", title: "An atomic upgrade that rolls back", summary: "How --atomic protects a release from a bad rollout.",
+  actors: ["Pipeline", "Helm", "Cluster", "Release history"],
+  steps: [
+    { f: 0, t: 1, l: "helm upgrade --atomic --wait", n: "The pipeline asks for an upgrade that must become healthy before it counts as done." },
+    { f: 1, t: 3, l: "Create revision 5", n: "Helm records a new revision as pending-upgrade." },
+    { f: 1, t: 2, l: "Apply new manifests", n: "The Deployment is updated and new pods start with the new image." },
+    { f: 2, t: 2, l: "Readiness probe fails", n: "The new pods never become ready, because the app crashes on startup." },
+    { f: 1, t: 2, l: "Timeout reached, roll back", n: "After the timeout Helm re-applies the manifest of revision 4." },
+    { f: 1, t: 0, l: "Exit with error", n: "The pipeline fails while the site keeps serving the old version." }
+  ] },
+{ id: "x-helm-values-merge", module: "helm", title: "How values are merged", summary: "Which setting wins when several sources provide the same key.",
+  actors: ["Chart values.yaml", "values-prod.yaml", "--set flag", "Final values"],
+  steps: [
+    { f: 0, t: 3, l: "replicaCount: 2", n: "The chart supplies a default for every setting it supports." },
+    { f: 1, t: 3, l: "replicaCount: 4", n: "The environment file overrides the default for production." },
+    { f: 2, t: 3, l: "replicaCount=6", n: "A --set flag on the command line has the highest priority and wins." },
+    { f: 0, t: 3, l: "hosts: [a, b]", n: "The chart default list has two hosts." },
+    { f: 1, t: 3, l: "hosts: [c]", n: "The environment list replaces the whole default list, not just one item." },
+    { f: 3, t: 3, l: "helm get values -a", n: "After installing, this command shows exactly which values were used." }
+  ] },
+{ id: "x-helm-template-render", module: "helm", title: "Rendering a template", summary: "How curly braces become YAML.",
+  actors: ["values.yaml", "Template file", "Template engine", "Manifest"],
+  steps: [
+    { f: 1, t: 1, l: "replicas: {{ .Values.replicaCount }}", n: "The template contains a placeholder for the value." },
+    { f: 0, t: 2, l: "replicaCount: 4", n: "The engine reads the value from the merged settings." },
+    { f: 2, t: 2, l: "Evaluate pipes and functions", n: "Functions such as default, quote and toYaml transform values." },
+    { f: 2, t: 2, l: "Trim whitespace", n: "Dashes in braces remove blank lines and keep the indentation valid." },
+    { f: 2, t: 3, l: "replicas: 4", n: "The result is a plain Kubernetes manifest with no braces left." },
+    { f: 3, t: 3, l: "helm template shows it", n: "Running helm template prints the result so you can check it before applying." }
+  ] },
+{ id: "x-helm-rollback", module: "helm", title: "Rolling back a release", summary: "How a rollback creates a new revision from an older one.",
+  actors: ["Engineer", "Helm", "Release history", "Cluster"],
+  steps: [
+    { f: 0, t: 1, l: "helm history shop-web", n: "The engineer lists revisions and finds the last good one, revision 7." },
+    { f: 1, t: 2, l: "Read revision 7", n: "Helm loads the stored manifest and values of that revision." },
+    { f: 0, t: 1, l: "helm rollback shop-web 7 --wait", n: "The rollback command is issued and waits for readiness." },
+    { f: 1, t: 3, l: "Apply old manifest", n: "The objects are patched back to the state described in revision 7." },
+    { f: 1, t: 2, l: "Record revision 9", n: "A new revision is stored. History only grows." },
+    { f: 3, t: 0, l: "Pods ready", n: "The previous version serves traffic again. Data changes are not undone." }
+  ] },
+{ id: "x-helm-secret-leak", module: "helm", title: "Why secrets do not belong in values", summary: "Where a password in values ends up.",
+  actors: ["Developer", "Repository", "Helm release", "Reader"],
+  steps: [
+    { f: 0, t: 1, l: "Commit values-prod.yaml", n: "A password is committed in a values file." },
+    { f: 1, t: 1, l: "Stays in history", n: "Deleting the line later does not remove it from past commits and clones." },
+    { f: 0, t: 2, l: "helm upgrade -f values-prod.yaml", n: "The value is passed to the chart and stored in the release Secret." },
+    { f: 3, t: 2, l: "helm get values", n: "Anyone who can read the release Secret can print the password." },
+    { f: 0, t: 0, l: "Rotate the password", n: "Treat the secret as exposed and change it." },
+    { f: 0, t: 2, l: "Use existingSecret", n: "The chart now takes only the name of a Secret created by a secret manager." }
+  ] },
+{ id: "x-helm-dependency-update", module: "helm", title: "Updating chart dependencies", summary: "How a subchart is pinned and fetched.",
+  actors: ["Chart.yaml", "helm dependency update", "Repository", "Chart.lock"],
+  steps: [
+    { f: 0, t: 1, l: "dependencies: redis 19.6.2", n: "The chart lists the dependency with a version and a repository." },
+    { f: 1, t: 2, l: "Download the chart", n: "Helm fetches the exact version from the repository or registry." },
+    { f: 1, t: 1, l: "Save into charts/", n: "The package is stored in the charts folder of your chart." },
+    { f: 1, t: 3, l: "Write digest", n: "The lock file records the exact version and a digest." },
+    { f: 3, t: 3, l: "Commit Chart.lock", n: "Committing the lock keeps builds repeatable." },
+    { f: 1, t: 3, l: "helm dependency build", n: "CI rebuilds from the lock and does not pick up unreviewed updates." }
+  ] },
+{ id: "x-helm-oci-publish", module: "helm", title: "Publishing a chart to an OCI registry", summary: "From chart folder to a versioned package.",
+  actors: ["Developer", "Helm", "Registry", "Cluster"],
+  steps: [
+    { f: 0, t: 1, l: "helm package ./chart", n: "The chart is packed into a versioned .tgz file." },
+    { f: 0, t: 1, l: "helm registry login", n: "Helm authenticates to the registry." },
+    { f: 1, t: 2, l: "helm push chart.tgz oci://...", n: "The package is uploaded as an OCI artifact next to container images." },
+    { f: 2, t: 2, l: "Store immutable version", n: "The registry keeps the version and can sign or scan it." },
+    { f: 3, t: 2, l: "helm install oci://...", n: "A cluster pipeline pulls the exact version." },
+    { f: 2, t: 3, l: "Return the chart", n: "The pipeline now installs the same package that was reviewed." }
+  ] },
+{ id: "x-helm-hook-migration", module: "helm", title: "A pre-upgrade migration hook", summary: "How a Job runs before the new version starts.",
+  actors: ["Helm", "Hook Job", "Database", "Deployment"],
+  steps: [
+    { f: 0, t: 0, l: "Start upgrade", n: "Helm renders all templates, including those marked as hooks." },
+    { f: 0, t: 1, l: "Run pre-upgrade Job", n: "The hook Job is created before the other objects are changed." },
+    { f: 1, t: 2, l: "Apply schema change", n: "The Job runs the migration against the database." },
+    { f: 1, t: 0, l: "Job completed", n: "Helm waits for the Job and continues only if it succeeded." },
+    { f: 0, t: 3, l: "Update Deployment", n: "Now the new application version is rolled out." },
+    { f: 0, t: 1, l: "Delete policy removes Job", n: "A delete policy cleans up the finished Job. A failed hook stops the whole upgrade." }
+  ] },
+{ id: "x-helm-pending-upgrade", module: "helm", title: "A release stuck in pending-upgrade", summary: "How an interrupted job blocks later deployments.",
+  actors: ["Pipeline", "Helm", "Release history", "On-call engineer"],
+  steps: [
+    { f: 0, t: 1, l: "helm upgrade starts", n: "The pipeline begins an upgrade." },
+    { f: 1, t: 2, l: "Record pending-upgrade", n: "Helm stores the new revision in a pending state." },
+    { f: 0, t: 0, l: "Runner is killed", n: "The CI runner is terminated before Helm finishes." },
+    { f: 0, t: 1, l: "Next run", n: "A later pipeline run starts another upgrade." },
+    { f: 1, t: 0, l: "another operation is in progress", n: "Helm refuses because the last revision never finished." },
+    { f: 3, t: 1, l: "helm rollback to deployed revision", n: "The engineer rolls back to the last deployed revision, which resets the state, and the next upgrade works." }
+  ] },
+{ id: "x-helm-test-hook", module: "helm", title: "Running helm test", summary: "How a smoke test pod checks a release.",
+  actors: ["Engineer", "Helm", "Test pod", "Application"],
+  steps: [
+    { f: 0, t: 1, l: "helm test shop-web", n: "After a deploy, the engineer or pipeline asks Helm to run the chart tests." },
+    { f: 1, t: 2, l: "Create test pod", n: "Helm creates the Pod marked with the test hook." },
+    { f: 2, t: 3, l: "curl the service", n: "The test pod calls the application the way a client would." },
+    { f: 3, t: 2, l: "200 OK", n: "A healthy application answers." },
+    { f: 2, t: 1, l: "Exit 0", n: "The pod exits successfully and Helm reports the test as passed." },
+    { f: 1, t: 0, l: "Pipeline continues", n: "A failed test fails the job and can trigger a rollback." }
+  ] },
+{ id: "x-helm-diff-drift", module: "helm", title: "Detecting drift before an upgrade", summary: "How a diff shows changes made outside Helm.",
+  actors: ["Engineer", "helm diff", "Stored release", "Live cluster"],
+  steps: [
+    { f: 0, t: 1, l: "helm diff upgrade", n: "Before applying, the engineer asks what would change." },
+    { f: 1, t: 2, l: "Read last manifest", n: "The plugin loads the manifest of the stored release." },
+    { f: 1, t: 3, l: "Read live objects", n: "It also reads the objects as they are in the cluster." },
+    { f: 1, t: 1, l: "Render new manifest", n: "The new chart and values are rendered." },
+    { f: 1, t: 0, l: "Show differences", n: "The output shows a replica count that someone edited by hand, plus the planned changes." },
+    { f: 0, t: 0, l: "Decide", n: "The engineer decides whether to keep or overwrite the manual change and records it in version control." }
+  ] },
+{ id: "x-linux-syscall", module: "linux", title: "A system call, step by step", summary: "How a program asks the kernel to read a file.",
+  actors: ["Program", "C library", "Kernel", "Disk"],
+  steps: [
+    { f: 0, t: 1, l: "read(fd, buf, 4096)", n: "The program calls a library function and does not touch the hardware itself." },
+    { f: 1, t: 2, l: "Trap into the kernel", n: "The library puts the call number in a register and executes an instruction that switches the CPU to kernel mode." },
+    { f: 2, t: 2, l: "Check descriptor and permissions", n: "The kernel finds the open file from the descriptor and checks that reading is allowed." },
+    { f: 2, t: 3, l: "Cache miss: read block", n: "If the page cache does not hold the data, the kernel asks the disk for it." },
+    { f: 3, t: 2, l: "Data arrives", n: "The block is placed in the page cache and the process is woken." },
+    { f: 2, t: 0, l: "Return bytes read", n: "The kernel copies the data to the program buffer and switches back to user mode. strace shows this exchange." }
+  ] },
+{ id: "x-linux-oom-kill", module: "linux", title: "How the OOM killer acts", summary: "What happens when memory runs out.",
+  actors: ["Application", "Kernel allocator", "Reclaim", "OOM killer"],
+  steps: [
+    { f: 0, t: 1, l: "Request more memory", n: "The application touches new pages and the kernel needs physical memory for them." },
+    { f: 1, t: 2, l: "Free page cache, swap pages", n: "The kernel first reclaims cache and swaps out cold pages." },
+    { f: 2, t: 1, l: "Nothing left to reclaim", n: "If reclaim fails, allocation cannot succeed." },
+    { f: 1, t: 3, l: "Invoke OOM killer", n: "The kernel scores processes by memory use and their oom_score_adj." },
+    { f: 3, t: 0, l: "SIGKILL the victim", n: "The chosen process is killed immediately and cannot clean up." },
+    { f: 3, t: 3, l: "Log the decision", n: "dmesg shows the killed process, its memory use and a table of candidates." }
+  ] },
+{ id: "x-linux-page-cache-write", module: "linux", title: "A write and fsync", summary: "Why a write can return before data is on disk.",
+  actors: ["Application", "Page cache", "Kernel flusher", "Disk"],
+  steps: [
+    { f: 0, t: 1, l: "write(fd, data)", n: "The application writes and the kernel copies the data into a page of the cache." },
+    { f: 1, t: 0, l: "Return immediately", n: "The call returns quickly while the page is marked dirty." },
+    { f: 0, t: 1, l: "fsync(fd)", n: "The application asks that its data reach stable storage." },
+    { f: 1, t: 2, l: "Start writeback", n: "The dirty pages are handed to the flusher." },
+    { f: 2, t: 3, l: "Write blocks and flush", n: "The device receives the data and flushes its own cache." },
+    { f: 3, t: 0, l: "fsync returns", n: "Only now is the data safe against power loss. This is why databases are limited by disk latency." }
+  ] },
+{ id: "x-linux-boot-kernel", module: "linux", title: "From power on to login", summary: "The main stages of a Linux boot.",
+  actors: ["Firmware", "Bootloader", "Kernel", "systemd"],
+  steps: [
+    { f: 0, t: 0, l: "Self-test and find boot device", n: "The firmware tests hardware and chooses a boot entry." },
+    { f: 0, t: 1, l: "Load the bootloader", n: "GRUB or a similar loader starts from the boot partition." },
+    { f: 1, t: 2, l: "Load kernel and initramfs", n: "The bootloader loads the kernel with its command line and a small temporary root filesystem." },
+    { f: 2, t: 2, l: "Initialise hardware, mount root", n: "The kernel loads drivers, assembles storage and mounts the real root filesystem." },
+    { f: 2, t: 3, l: "Start PID 1", n: "The kernel starts systemd as the first process." },
+    { f: 3, t: 3, l: "Reach the default target", n: "systemd starts services in dependency order until the login prompt or network services are ready." }
+  ] },
+{ id: "x-linux-conntrack-full", module: "linux", title: "A full connection tracking table", summary: "Why new connections fail while CPU is idle.",
+  actors: ["Client", "NAT gateway", "conntrack table", "Kernel log"],
+  steps: [
+    { f: 0, t: 1, l: "New connection", n: "A client opens a connection through the gateway." },
+    { f: 1, t: 2, l: "Create tracking entry", n: "The kernel needs a table entry to track and translate the flow." },
+    { f: 2, t: 2, l: "Table at the limit", n: "The table already holds nf_conntrack_max entries." },
+    { f: 1, t: 3, l: "table full, dropping packet", n: "The kernel drops the packet and logs a message." },
+    { f: 0, t: 0, l: "Retry and time out", n: "The client sees timeouts although the application servers are idle." },
+    { f: 1, t: 2, l: "Raise limit, cut timeouts", n: "The operator raises the limit with memory in mind and shortens timeouts." }
+  ] },
+{ id: "x-linux-sysctl-persist", module: "linux", title: "Changing a kernel setting for good", summary: "Runtime change versus persistent change.",
+  actors: ["Engineer", "sysctl", "Running kernel", "/etc/sysctl.d"],
+  steps: [
+    { f: 0, t: 1, l: "sysctl -w net.core.somaxconn=4096", n: "The engineer changes the value on the running system." },
+    { f: 1, t: 2, l: "Kernel updates the value", n: "The new limit applies immediately to new listeners." },
+    { f: 0, t: 0, l: "Reboot later", n: "On reboot, the change is not remembered." },
+    { f: 2, t: 2, l: "Old default returns", n: "The kernel boots with its built-in default and the problem comes back." },
+    { f: 0, t: 3, l: "Write 90-net.conf", n: "The engineer saves the setting in a file under /etc/sysctl.d." },
+    { f: 0, t: 1, l: "sysctl --system", n: "Reloading applies it now and the file applies it at every boot." }
+  ] },
+{ id: "x-bash-pipeline", module: "bash", title: "How a pipeline runs", summary: "Processes connected by pipes.",
+  actors: ["Shell", "grep", "sort", "uniq"],
+  steps: [
+    { f: 0, t: 0, l: "Parse the line", n: "The shell splits the command line at pipe characters." },
+    { f: 0, t: 1, l: "Start grep", n: "The shell starts each command as a process and connects standard output to the next input." },
+    { f: 0, t: 2, l: "Start sort", n: "All commands run at the same time, linked by pipes." },
+    { f: 1, t: 2, l: "Stream matching lines", n: "Data flows from grep into sort as it is produced." },
+    { f: 2, t: 3, l: "Sorted lines to uniq", n: "sort needs all input before it can output, then uniq counts duplicates." },
+    { f: 3, t: 0, l: "Exit status", n: "The pipeline returns the status of the last command unless pipefail is set." }
+  ] },
+{ id: "x-python-requests-retry", module: "python", title: "A request with retry and backoff", summary: "How a script survives a flaky API.",
+  actors: ["Script", "HTTP client", "API", "Timer"],
+  steps: [
+    { f: 0, t: 1, l: "get(url, timeout=5)", n: "The script sets a timeout so it never waits forever." },
+    { f: 1, t: 2, l: "Request", n: "The client sends the request over the network with the timeout set." },
+    { f: 2, t: 1, l: "503 Service Unavailable", n: "The API reports a temporary problem." },
+    { f: 1, t: 3, l: "Wait 1 s plus jitter", n: "The client waits before trying again, with random jitter." },
+    { f: 1, t: 2, l: "Retry", n: "The second attempt is sent after the pause to give the API time to recover." },
+    { f: 2, t: 0, l: "200 OK", n: "The result is returned. After a few failures the client stops and raises a clear error." }
+  ] },
+{ id: "x-net-http-keepalive", module: "networking", title: "Keep-alive connections", summary: "Why reusing a connection saves time.",
+  actors: ["Client", "Server", "Handshake", "Pool"],
+  steps: [
+    { f: 0, t: 2, l: "First request: TCP and TLS", n: "A new connection needs a TCP handshake and a TLS handshake before data." },
+    { f: 0, t: 1, l: "GET /a", n: "The first request is sent over the new connection." },
+    { f: 1, t: 0, l: "200 + Connection kept", n: "The server keeps the connection open." },
+    { f: 0, t: 3, l: "Return to pool", n: "The client keeps the connection in a pool." },
+    { f: 0, t: 1, l: "GET /b on same connection", n: "The next request skips the handshakes and starts at once." },
+    { f: 1, t: 0, l: "Idle timeout closes it", n: "Unused connections are closed by timeouts. Middleboxes may close them earlier." }
+  ] },
+{ id: "x-net-load-balancer-failover", module: "networking", title: "Failing over with a health check", summary: "How a load balancer stops sending to a broken server.",
+  actors: ["Client", "Load balancer", "Server A", "Server B"],
+  steps: [
+    { f: 0, t: 1, l: "Request", n: "A client sends a request to the load balancer address." },
+    { f: 1, t: 2, l: "Forward to A", n: "The balancer picks a healthy server." },
+    { f: 1, t: 2, l: "Health check fails", n: "Server A stops answering the check path." },
+    { f: 1, t: 1, l: "Mark A unhealthy", n: "After several failures the balancer removes A from rotation." },
+    { f: 0, t: 1, l: "Next request", n: "New requests keep arriving while server A is still broken." },
+    { f: 1, t: 3, l: "Forward to B", n: "Traffic goes to the remaining healthy server until A passes checks again." }
+  ] },
+{ id: "x-docker-container-start", module: "docker", title: "What docker run does", summary: "From image to running process.",
+  actors: ["CLI", "Docker daemon", "Registry", "Kernel"],
+  steps: [
+    { f: 0, t: 1, l: "docker run -p 8080:80 web", n: "The CLI sends the request to the daemon." },
+    { f: 1, t: 2, l: "Pull missing layers", n: "If the image is not local, the daemon downloads the layers." },
+    { f: 1, t: 1, l: "Create container filesystem", n: "Layers are stacked read-only with a writable layer on top." },
+    { f: 1, t: 3, l: "Set up namespaces and cgroups", n: "The kernel isolates processes, network and mounts and applies resource limits." },
+    { f: 1, t: 3, l: "Start the process", n: "The image command becomes process 1 in the container." },
+    { f: 3, t: 0, l: "Port mapped", n: "Traffic to host port 8080 reaches port 80 in the container." }
+  ] },
+{ id: "x-cicd-canary", module: "cicd", title: "A canary release", summary: "Sending a small share of traffic to the new version.",
+  actors: ["Pipeline", "Router", "Stable version", "Canary version"],
+  steps: [
+    { f: 0, t: 3, l: "Deploy canary", n: "The pipeline starts the new version beside the old one." },
+    { f: 0, t: 1, l: "Send 5 percent", n: "The router sends a small share of traffic to the canary." },
+    { f: 1, t: 3, l: "Watch errors and latency", n: "Metrics from the canary are compared with the stable version." },
+    { f: 3, t: 0, l: "Healthy", n: "If the canary meets the targets, the pipeline continues." },
+    { f: 0, t: 1, l: "Increase to 50, then 100", n: "Traffic is shifted in steps with checks between them." },
+    { f: 0, t: 2, l: "Roll back if worse", n: "If error rates rise, traffic returns to the stable version at once." }
+  ] },
+{ id: "x-k8s-rolling-update", module: "kubernetes", title: "A rolling update", summary: "How a Deployment replaces pods without downtime.",
+  actors: ["Engineer", "Deployment", "New pods", "Old pods"],
+  steps: [
+    { f: 0, t: 1, l: "Set new image", n: "The engineer changes the image in the Deployment." },
+    { f: 1, t: 2, l: "Create one new pod", n: "The controller adds a pod with the new template, within maxSurge." },
+    { f: 2, t: 2, l: "Readiness passes", n: "The new pod receives traffic only after its readiness probe succeeds." },
+    { f: 1, t: 3, l: "Terminate one old pod", n: "An old pod is stopped, within maxUnavailable." },
+    { f: 1, t: 2, l: "Repeat", n: "The controller continues in small steps until all pods are new." },
+    { f: 1, t: 0, l: "Rollout complete", n: "kubectl rollout status reports success. A failing probe stops the rollout and keeps old pods." }
+  ] },
+{ id: "x-k8s-crashloop", module: "kubernetes", title: "Why a pod is in CrashLoopBackOff", summary: "How restarts slow down after repeated failure.",
+  actors: ["kubelet", "Container", "API server", "Engineer"],
+  steps: [
+    { f: 0, t: 1, l: "Start container", n: "The kubelet starts the container." },
+    { f: 1, t: 1, l: "Process exits with an error", n: "The application stops because of bad configuration." },
+    { f: 0, t: 1, l: "Restart after delay", n: "The kubelet restarts it after a short delay." },
+    { f: 1, t: 1, l: "Exits again", n: "The same error repeats on every start because nothing has changed." },
+    { f: 0, t: 2, l: "Report CrashLoopBackOff", n: "The delay grows up to five minutes and the pod status shows the back-off." },
+    { f: 3, t: 2, l: "kubectl logs --previous", n: "The engineer reads the last run logs and describe events to find the cause." }
+  ] },
+{ id: "x-tf-plan-apply", module: "terraform", title: "Plan and apply", summary: "How Terraform compares code, state and reality.",
+  actors: ["Engineer", "Terraform", "State file", "Cloud API"],
+  steps: [
+    { f: 0, t: 1, l: "terraform plan", n: "The engineer asks what would change." },
+    { f: 1, t: 2, l: "Read state", n: "Terraform loads what it believes exists." },
+    { f: 1, t: 3, l: "Refresh real resources", n: "It queries the cloud for the current settings." },
+    { f: 1, t: 0, l: "Show the plan", n: "The plan lists additions, changes and destroys for review." },
+    { f: 0, t: 1, l: "terraform apply", n: "After approval, Terraform makes the calls." },
+    { f: 1, t: 2, l: "Update state", n: "The state is written with the new resource IDs." }
+  ] },
+{ id: "x-cloud-iam-assume-role", module: "cloud", title: "Assuming a role", summary: "How a service gets temporary credentials.",
+  actors: ["Service", "Identity service", "Role policy", "Resource"],
+  steps: [
+    { f: 0, t: 1, l: "Request a role", n: "The service asks to assume a role." },
+    { f: 1, t: 2, l: "Check trust policy", n: "The trust policy says who may assume the role." },
+    { f: 2, t: 1, l: "Allowed", n: "The check passes because the caller identity is on the trust list." },
+    { f: 1, t: 0, l: "Temporary credentials", n: "The service receives credentials that expire soon." },
+    { f: 0, t: 3, l: "Call the resource", n: "The service calls the resource with them." },
+    { f: 3, t: 0, l: "Allowed by permissions", n: "The permission policy of the role limits what succeeds. No long-term keys are stored." }
+  ] },
+{ id: "x-obs-trace-request", module: "observability", title: "One request traced across services", summary: "How a trace connects spans.",
+  actors: ["User", "Gateway", "Orders service", "Database"],
+  steps: [
+    { f: 0, t: 1, l: "Request", n: "The user request reaches the gateway, which creates a trace ID." },
+    { f: 1, t: 2, l: "Call with trace header", n: "The ID travels in a header to the next service." },
+    { f: 2, t: 3, l: "Query", n: "The orders service starts a span for its database query." },
+    { f: 3, t: 2, l: "Slow result", n: "The query takes 900 ms, far longer than the other steps." },
+    { f: 2, t: 1, l: "Response", n: "The span ends and the response returns." },
+    { f: 1, t: 0, l: "Trace shows the slow span", n: "In the trace view, the long database span is clearly the cause." }
+  ] },
+{ id: "x-sre-error-budget", module: "sre", title: "Spending an error budget", summary: "How an SLO guides release decisions.",
+  actors: ["Team", "SLO", "Error budget", "Release process"],
+  steps: [
+    { f: 0, t: 1, l: "Set 99.9 percent", n: "The team agrees on a target for successful requests." },
+    { f: 1, t: 2, l: "Allow 0.1 percent errors", n: "The remaining allowance is the error budget for the period." },
+    { f: 2, t: 2, l: "Incident burns 60 percent", n: "An outage uses most of the budget." },
+    { f: 2, t: 3, l: "Slow down risky changes", n: "With little budget left, the team focuses on reliability work." },
+    { f: 0, t: 3, l: "Fix causes", n: "Work is prioritised on the causes of the outage." },
+    { f: 2, t: 3, l: "Budget recovers", n: "When the period resets or the budget is healthy, normal releases continue." }
+  ] },
+{ id: "x-sec-secret-rotation", module: "security", title: "Rotating a leaked secret", summary: "The order of actions after a secret leaks.",
+  actors: ["Responder", "Secret manager", "Service", "Audit log"],
+  steps: [
+    { f: 0, t: 1, l: "Revoke the old secret", n: "The first step makes the leaked value useless." },
+    { f: 1, t: 1, l: "Create a new secret", n: "A new value is generated in the secret manager." },
+    { f: 1, t: 2, l: "Service reads new value", n: "Services fetch the new secret at the next refresh or restart." },
+    { f: 0, t: 3, l: "Check usage logs", n: "The responder looks for use of the old secret from unknown addresses." },
+    { f: 0, t: 2, l: "Clean history", n: "Copies in repositories and tickets are removed." },
+    { f: 0, t: 0, l: "Prevent a repeat", n: "Scanning, shorter lifetimes and review of the cause close the incident." }
+  ] },
+{ id: "x-ansible-playbook-run", module: "ansible", title: "A playbook run", summary: "How Ansible changes servers over SSH.",
+  actors: ["Control node", "Inventory", "Web server", "Handler"],
+  steps: [
+    { f: 0, t: 1, l: "ansible-playbook site.yml", n: "The control node reads the playbook and selects hosts from the inventory." },
+    { f: 1, t: 0, l: "Hosts web1, web2", n: "The inventory returns the matching hosts and variables." },
+    { f: 0, t: 2, l: "Gather facts over SSH", n: "Ansible connects and collects information about each server." },
+    { f: 0, t: 2, l: "Run tasks", n: "Each task is a module with a desired state, run on every host." },
+    { f: 2, t: 3, l: "Config changed: notify", n: "A changed file notifies a handler." },
+    { f: 3, t: 2, l: "Restart once at end", n: "The handler restarts the service once. A second run reports no changes, which shows idempotence." }
+  ] },
+{ id: "x-db-replication-lag", module: "databases", title: "Replication and lag", summary: "Why a read replica may return old data.",
+  actors: ["Application", "Primary", "Replica", "Log"],
+  steps: [
+    { f: 0, t: 1, l: "Write order", n: "The application writes to the primary." },
+    { f: 1, t: 3, l: "Append to log", n: "The primary records the change in its log." },
+    { f: 3, t: 2, l: "Ship the log", n: "The replica receives and applies the changes." },
+    { f: 0, t: 2, l: "Read immediately", n: "A read on the replica comes before the change is applied." },
+    { f: 2, t: 0, l: "Old value", n: "The application sees stale data. This delay is called replication lag." },
+    { f: 0, t: 1, l: "Read from primary when needed", n: "Read-your-writes cases use the primary or wait for the replica." }
+  ] },
+{ id: "x-git-cherry-pick", module: "git", title: "Cherry-pick a fix", summary: "Copying one commit to another branch.",
+  actors: ["Developer", "main", "release branch", "Reviewer"],
+  steps: [
+    { f: 0, t: 1, l: "Fix merged on main", n: "The fix is committed and reviewed on main first." },
+    { f: 0, t: 2, l: "git switch release/3.2", n: "The developer switches to the release branch." },
+    { f: 0, t: 2, l: "git cherry-pick abc1234", n: "Git creates a new commit with the same change on top of the branch." },
+    { f: 2, t: 2, l: "Resolve conflicts if any", n: "If the surrounding code differs, the developer edits and continues." },
+    { f: 2, t: 3, l: "Open a pull request", n: "The release change is reviewed like any other." },
+    { f: 3, t: 2, l: "Merge and tag", n: "After checks pass, the fix is merged and a patch release is tagged." }
   ] }
 ];

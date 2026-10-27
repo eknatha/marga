@@ -396,7 +396,7 @@ window.MargaFeatures = function (A) {
   });
   function gmFbHtml(t) {
     var i = t.indexOf(' Example: ');
-    return i < 0 ? esc(t) : esc(t.slice(0, i)) + '</p><p class="gm-ex"><strong>Example.</strong> ' + esc(t.slice(i + 10));
+    return i < 0 ? '<strong>Explanation.</strong> ' + esc(t) : '<strong>Explanation.</strong> ' + esc(t.slice(0, i)) + '</p><p class="gm-ex"><strong>Example.</strong> ' + esc(t.slice(i + 10));
   }
   function gmPaint(fb) {
     var root = $('#gm-root'); if (!root || !GM) return;

@@ -156,7 +156,7 @@ lesson: Date arithmetic needs a real library and edge-case tests. Make failure h
 company: Cloudflare
 year: 2019
 area: Deployment and release
-modules: cloud, python, cicd, sre
+modules: cloud, python, cicd, sre, go
 source: Cloudflare blog | https://blog.cloudflare.com/details-of-the-cloudflare-outage-on-july-2-2019/
 what: In July 2019 Cloudflare's network returned errors for about half an hour. CPU use across its servers rose to the limit and web traffic stopped being served.
 cause: A new web application firewall rule contained a regular expression with catastrophic backtracking. It was deployed to every server at once, and there was no limit on the CPU time one rule could use.
@@ -255,7 +255,7 @@ lesson: Autoscale on signals that reflect real demand, and keep spare capacity f
 company: Niantic
 year: 2016
 area: Capacity and scaling
-modules: cloud, kubernetes, sre
+modules: cloud, kubernetes, sre, go
 source: Google Cloud blog | https://cloud.google.com/blog/products/containers-kubernetes/bringing-pokemon-go-to-life-on-google-cloud
 what: Pokemon Go launched in mid 2016 and traffic was many times what the team had planned for. It still stayed up much of the time on containers running on Kubernetes.
 cause: The launch plan assumed a much smaller audience. Demand reached roughly 50 times the original target, so capacity, quotas and database limits were all tested at once.

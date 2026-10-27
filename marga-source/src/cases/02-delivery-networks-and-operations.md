@@ -68,7 +68,7 @@ lesson: Roll out every change, including data and content, in stages, and watch 
 company: Reddit
 year: 2023
 area: Kubernetes
-modules: kubernetes, networking, sre
+modules: kubernetes, networking, sre, helm
 source: Reddit engineering | https://www.reddit.com/r/RedditEng/comments/11xx5o0/you_broke_reddit_the_piday_outage/
 what: On 14 March 2023 Reddit was down or degraded for several hours after an upgrade of a Kubernetes cluster.
 cause: The upgrade changed how nodes are labelled. The network layer's route reflectors were selected by a node label that no longer matched, so routes were lost and Pods lost their network connectivity. The rollback was hard because the upgrade was not simple to reverse.
@@ -145,7 +145,7 @@ lesson: Do not make your pipeline depend directly on a public service. Mirror wh
 company: Kubernetes community
 year: 2025
 area: Kubernetes
-modules: kubernetes, docker, cicd
+modules: kubernetes, docker, cicd, helm
 source: Kubernetes blog | https://kubernetes.io/blog/2025/03/24/ingress-nginx-cve-2025-1974/
 what: In March 2025 a serious flaw was published in the ingress-nginx controller, a very widely used component in Kubernetes clusters. An attacker who could reach the admission controller might run code in it.
 cause: The admission controller built NGINX configuration from Ingress objects and could be tricked into including attacker-supplied settings. It also had wide access to Secrets in the cluster.

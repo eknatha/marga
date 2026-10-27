@@ -160,7 +160,7 @@ function renderChrome() {
     '<header class="topbar"><div class="wrap topbar-in">' +
     '<a class="brand" href="#/"><img src="icon.svg" alt="" width="26" height="26"><span><b>MARGA</b></span></a>' +
     '<nav class="topnav" id="topnav" aria-label="Main">' +
-    '<a href="#/skills" data-nav="skills">Skills</a><a href="#/paths" data-nav="paths">Skill trees</a><a href="#/cheatsheets" data-nav="cheatsheets">Cheat sheets</a>' +
+    '<a href="#/skills" data-nav="skills">Skills</a><a href="#/paths" data-nav="paths">Skill trees</a><a class="nav-certs" href="https://certs.eknathalabs.com" target="_blank" rel="noopener" title="Certifications (opens in a new tab)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="9" r="5.5"/><path d="M9.5 9l1.8 1.8 3.2-3.4"/><path d="M8.5 13.8L7 21l5-2.6 5 2.6-1.5-7.2"/></svg><span class="sr">Certifications (opens in a new tab)</span></a><a href="#/cheatsheets" data-nav="cheatsheets">Cheat sheets</a>' +
     '<a href="#/cases" data-nav="cases">Case studies</a><a href="#/practice" data-nav="practice">Practice</a><a href="#/progress" data-nav="progress">Progress</a><a href="#/interview" data-nav="interview">InterviewHub</a><a href="#/about" data-nav="about">About</a></nav>' +
     '<div class="tools">' +
     '<button class="btn btn-quiet search-btn" type="button" data-act="search" aria-label="Search lessons and cheat sheets">' + ICON.search + '<span>Search</span><kbd>/</kbd></button>' +
