@@ -7,6 +7,13 @@
     "requires": []
   },
   {
+    "id": "git",
+    "title": "Git and version control",
+    "summary": "Track changes with Git: commits, branches, merging, rebase, remotes, pull requests, tags, hooks, large repositories, and recovery when things go wrong.",
+    "level": "Beginner",
+    "requires": []
+  },
+  {
     "id": "bash",
     "title": "Shell scripting",
     "summary": "Write Bash scripts that fail loudly, run safely, parse JSON from APIs and replace repetitive manual work.",

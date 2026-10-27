@@ -614,5 +614,49 @@
    "kind": "Reference",
    "why": "Which schema changes run online and which block, with the options to control them."
   }
+ ],
+ "git": [
+  {
+   "t": "Pro Git",
+   "by": "Scott Chacon and Ben Straub",
+   "u": "https://git-scm.com/book/en/v2",
+   "kind": "Book",
+   "why": "The free, official book. Chapters 2 and 3 cover everything in the first half of this stage."
+  },
+  {
+   "t": "Git reference manual",
+   "by": "The Git project",
+   "u": "https://git-scm.com/docs",
+   "kind": "Reference",
+   "why": "Every command and option, with examples. Use it to check exact behaviour of a flag."
+  },
+  {
+   "t": "Atlassian Git tutorials",
+   "by": "Atlassian",
+   "u": "https://www.atlassian.com/git/tutorials",
+   "kind": "Tutorial",
+   "why": "Clear diagrams of branching, merging and rebasing, and a comparison of team workflows."
+  },
+  {
+   "t": "Patterns for Managing Source Code Branches",
+   "by": "Martin Fowler",
+   "u": "https://martinfowler.com/articles/branching-patterns.html",
+   "kind": "Article",
+   "why": "Explains the trade-offs between trunk-based development, feature branches and release branches."
+  },
+  {
+   "t": "Semantic Versioning 2.0.0",
+   "by": "Tom Preston-Werner",
+   "u": "https://semver.org/",
+   "kind": "Specification",
+   "why": "The short specification behind MAJOR.MINOR.PATCH, useful when you tag releases."
+  },
+  {
+   "t": "Keep a Changelog",
+   "by": "Olivier Lacan",
+   "u": "https://keepachangelog.com/",
+   "kind": "Guide",
+   "why": "A simple format for release notes that people can read, to pair with your tags."
+  }
  ]
 }

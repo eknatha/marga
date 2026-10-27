@@ -742,5 +742,45 @@
  "databases/schema-design-for-operations": {
   "s": "A well-labelled warehouse with shelves per month is easy to tidy. A single huge pile with no labels is not.",
   "i": "I choose stable keys and proper types, add constraints from the start, partition growing tables, and design changes that can be made safely."
+ },
+ "git/first-repository-and-commits": {
+  "s": "A commit is a photo of your whole project at one moment, with a note on the back saying why it was taken. The staging area is where you arrange what goes into the next photo.",
+  "i": "I explain that Git stores snapshots with a history, use git add and git commit to make small clear commits, read history with log, diff and show, and keep generated files and secrets out with .gitignore."
+ },
+ "git/staging-undoing-and-stashing": {
+  "s": "Restore is an eraser for your draft, amend is correcting the last page before you hand it in, and revert is publishing a correction notice after the page is already out.",
+  "i": "I choose restore for edits, amend for the unpushed last commit, revert for shared commits, reset carefully, and stash to park work."
+ },
+ "git/branches-and-merging": {
+  "s": "A branch is a bookmark in a book. You can start a new bookmark, write a different ending, and later decide whether to merge the pages back.",
+  "i": "I use short-lived branches, merge with fast-forward or merge commits, resolve conflicts carefully, and test the merged result."
+ },
+ "git/rebase-and-clean-history": {
+  "s": "Merge keeps a diary of what really happened. Rebase rewrites your notes into a clean draft before showing them to others, which is fine only before anyone has copied your notes.",
+  "i": "I rebase my own unpushed branches, tidy with interactive rebase, use force-with-lease on feature branches, and never rewrite shared history."
+ },
+ "git/remotes-fetch-pull-and-push": {
+  "s": "Your clone is a notebook copied from the shared one. Fetch checks what changed in the original, pull copies the changes in, push hands your pages back.",
+  "i": "I use fetch to look first, choose merge or rebase on pull, set upstreams, resolve rejected pushes by integrating, and avoid plain force."
+ },
+ "git/team-workflows-pull-requests-and-reviews": {
+  "s": "A pull request is a proposal letter attached to your change. The branch protection rules are the front door policy: nobody walks into main without ID.",
+  "i": "I choose a workflow that fits the team, keep pull requests small and clear, protect main with reviews and checks, and use CODEOWNERS for sensitive paths."
+ },
+ "git/tags-releases-and-versioning": {
+  "s": "A branch is a moving bookmark; a tag is a permanent label glued onto one page. Version numbers on those labels tell readers what kind of change to expect.",
+  "i": "I tag releases with annotated tags, follow semantic versioning, branch hotfixes from tags, and never move published tags."
+ },
+ "git/hooks-signing-and-secrets-in-history": {
+  "s": "A leaked key is a house key left in a public photo. Photoshopping the key out of the next picture does nothing; you must change the lock.",
+  "i": "I use hooks and server checks to stop secrets, sign important commits, and respond to leaks by revoking first, then cleaning history and preventing a repeat."
+ },
+ "git/large-repositories-submodules-and-worktrees": {
+  "s": "A huge library does not need to be carried home. Borrow only the shelf you need (sparse), take photocopies of the page headings first (partial), or take just today's edition (shallow).",
+  "i": "I use shallow, partial and sparse clones for speed, keep large files out of history or in LFS, choose between submodules and packages deliberately, and use worktrees for parallel work."
+ },
+ "git/debugging-git-problems": {
+  "s": "The reflog is the black-box recorder for your repository. Bisect is a 20-questions game that finds the broken commit. Blame tells you whom to ask, not whom to scold.",
+  "i": "I recover work with the reflog, find regressions with bisect, understand history with blame and log search, and read git status to handle detached HEAD and unfinished operations."
  }
 }
