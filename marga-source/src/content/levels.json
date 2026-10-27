@@ -782,5 +782,97 @@
  "git/debugging-git-problems": {
   "s": "The reflog is the black-box recorder for your repository. Bisect is a 20-questions game that finds the broken commit. Blame tells you whom to ask, not whom to scold.",
   "i": "I recover work with the reflog, find regressions with bisect, understand history with blame and log search, and read git status to handle detached HEAD and unfinished operations."
+ },
+ "go/why-go-and-your-first-program": {
+  "s": "Go turns your program into one self-contained file, like a sealed lunchbox. You do not need to bring a kitchen to the server.",
+  "i": "I explain why Go suits operations tools, create a module, build and cross-compile a static binary, and use gofmt, vet and mod tidy."
+ },
+ "go/types-structs-slices-and-maps": {
+  "s": "A slice is a window onto a row of boxes, not a new row. A map is a coat-check where a missing ticket gives you an empty hand, not an error.",
+  "i": "I use zero values, slices, maps and structs correctly, avoid nil map writes and shared-slice surprises, and choose value or pointer receivers."
+ },
+ "go/functions-errors-and-defer": {
+  "s": "Instead of shouting when something breaks, Go functions hand you a note saying what went wrong. You add your own note on top before passing it on, so the last reader sees the whole story.",
+  "i": "I return and wrap errors with context, inspect them with errors.Is and errors.As, use defer for cleanup, and reserve panic for bugs."
+ },
+ "go/interfaces-and-packages": {
+  "s": "An interface is a job description. Anyone who can do the tasks may take the job, and your test can hire a stand-in.",
+  "i": "I define small interfaces at the point of use, write fakes for tests, and organise packages with clear boundaries and no cycles."
+ },
+ "go/goroutines-channels-and-sync": {
+  "s": "A goroutine is a helper you can hire cheaply. Channels are the conveyor belt between them, and a mutex is a single key to a shared drawer.",
+  "i": "I start goroutines safely, coordinate them with WaitGroups and channels, protect shared data, bound concurrency, and use the race detector."
+ },
+ "go/context-timeouts-and-cancellation": {
+  "s": "A context is a stopwatch and an emergency stop button that you hand to every helper. If time runs out or someone presses stop, they all put their tools down.",
+  "i": "I pass contexts with timeouts, respect cancellation in loops, set HTTP timeouts, and shut services down gracefully before the grace period ends."
+ },
+ "go/http-services-and-json": {
+  "s": "A Go service is a front desk: it checks the request, answers in a clear format, logs the visit, and has a sign saying whether the desk is open.",
+  "i": "I build handlers with the standard router, decode and validate JSON, add middleware, expose liveness and readiness, and reuse a tuned HTTP client."
+ },
+ "go/testing-benchmarks-and-tooling": {
+  "s": "Table-driven tests are an exam paper with many questions: each row is a question, and the failure message names the one you got wrong.",
+  "i": "I write table-driven tests with fakes and temp dirs, use coverage and benchmarks sensibly, and run vet, race and vulnerability checks in CI."
+ },
+ "go/building-containers-and-cli-tools": {
+  "s": "Go builds your program into a sealed box. A multi-stage Dockerfile ships only the box, not the whole workshop used to make it.",
+  "i": "I build CLI tools with clear flags and exit codes, embed versions, create small multi-stage images with non-root users, and choose suitable base images."
+ },
+ "go/debugging-go-programs": {
+  "s": "pprof is an X-ray for a running program, and the stack trace is its black box recorder. Take the photo before you restart the patient.",
+  "i": "I read panics and goroutine dumps, find leaks and races, profile CPU and memory with pprof, and capture evidence before restarting."
+ },
+ "helm/what-helm-is-and-why-use-it": {
+  "s": "A chart is a recipe, values are the guest count and diet, and a release is the dinner you cooked today. You can cook the same recipe many times with different guests.",
+  "i": "I explain charts, releases, repositories and values, install a chart and inspect it, and know that Helm applies changes only when told."
+ },
+ "helm/installing-charts-and-values": {
+  "s": "Defaults are the factory settings. Your values file is a sticky note saying what to change, and helm template lets you read the final instructions before you start.",
+  "i": "I read chart defaults, pin versions, override values with files and --set, know the precedence and list behaviour, and preview before installing."
+ },
+ "helm/anatomy-of-a-chart": {
+  "s": "A chart folder is a flat-pack furniture box: parts list (Chart.yaml), options (values.yaml), the parts themselves (templates) and instructions (NOTES.txt).",
+  "i": "I know each file in a chart, set chart and app versions correctly, design a clean values interface, and lint and render charts in CI."
+ },
+ "helm/templates-and-the-go-template-language": {
+  "s": "Templating is mail merge for YAML. The braces are the blanks, and indentation is the one thing you must never get wrong.",
+  "i": "I use values, conditions, loops, helpers, toYaml with nindent and required, control whitespace, and test charts with several values files."
+ },
+ "helm/upgrade-rollback-and-release-history": {
+  "s": "Each upgrade is a numbered save point. Rolling back loads an earlier save of the objects, but it cannot undo what happened to your saved data outside the game.",
+  "i": "I upgrade with wait and atomic, read history, roll back to known good revisions knowing what is not restored, and uninstall with care."
+ },
+ "helm/values-per-environment-and-secrets": {
+  "s": "Values are a notice board anyone on the team can read. A secret belongs in a locked cabinet, and the chart only needs the cabinet number.",
+  "i": "I layer values per environment, validate them, keep secrets out of values and release history, and use references to secrets created securely."
+ },
+ "helm/dependencies-subcharts-and-registries": {
+  "s": "A dependency is an ingredient bought from another shop. A lock file notes the exact brand and batch, and a mirror is keeping a spare in your own pantry.",
+  "i": "I declare and lock dependencies, pass values to subcharts, publish charts to an OCI registry, and update versions through reviewed changes."
+ },
+ "helm/debugging-helm-releases": {
+  "s": "Debugging Helm is a funnel: does it render, does the API accept it, do the pods come up. Find the stage where it stops and look only there.",
+  "i": "I separate render, API and rollout failures, recover stuck releases with rollback, understand hooks and tests, and detect drift before upgrading."
+ },
+ "linux/kernel-modules-sysctl-and-boot-parameters": {
+  "s": "The kernel is a house with a fuse box. sysctl flips switches while the lights are on, boot parameters are the settings you can only change at the main panel, and dmesg is the buzzer that tells you which circuit tripped.",
+  "i": "I load and block modules, tune and persist sysctl settings, change boot parameters safely, and read kernel messages for evidence."
+ },
+ "linux/processes-memory-and-the-oom-killer": {
+  "s": "Memory is a hotel: guests (page cache) stay in empty rooms until a paying guest arrives. A full-looking lobby is fine. The trouble is when paying guests cannot get a room and security (the OOM killer) removes someone.",
+  "i": "I read memory numbers correctly, detect swapping and pressure, investigate OOM kills including cgroup limits, and size containers from measurements."
+ },
+ "linux/system-calls-strace-and-perf": {
+  "s": "System calls are a program asking a clerk (the kernel) for everything. strace is a recording of every request and reply at the counter, perf is a stopwatch on who spends the day busy.",
+  "i": "I explain system calls, trace processes with strace to find missing files, hangs and slow calls, and profile CPU with perf."
+ },
+ "linux/filesystems-page-cache-and-io": {
+  "s": "The page cache is a desk where the clerk keeps papers before filing them in the cabinet. Work is quick, but a power cut loses what was still on the desk unless someone asks for it to be filed at once, which is fsync.",
+  "i": "I explain the page cache and writeback, use fsync correctly, find slow devices with iostat, and diagnose inode, descriptor and read-only problems."
+ },
+ "linux/networking-in-the-kernel-sockets-and-conntrack": {
+  "s": "A listening socket is a restaurant host with a waiting list. If the kitchen is slow the list overflows and diners walk away, and conntrack is the reservation book that has run out of pages.",
+  "i": "I read ss output and TCP states, diagnose accept queue overflow, CLOSE_WAIT and port exhaustion, and recognise conntrack table exhaustion."
  }
 }

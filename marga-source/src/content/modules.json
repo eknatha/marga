@@ -131,5 +131,21 @@
     "requires": [
       "networking"
     ]
+  },
+  {
+    "id": "go",
+    "title": "Go for DevOps engineers",
+    "summary": "Write small, fast, reliable Go services and tools: types, errors, interfaces, goroutines, context, HTTP, testing, containers and debugging.",
+    "level": "Intermediate",
+    "requires": []
+  },
+  {
+    "id": "helm",
+    "title": "Helm for beginners",
+    "summary": "Package, configure, upgrade and roll back Kubernetes applications with Helm: charts, values, templates, releases, dependencies and debugging.",
+    "level": "Beginner",
+    "requires": [
+      "kubernetes"
+    ]
   }
 ]
