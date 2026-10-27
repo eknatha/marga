@@ -1,6 +1,6 @@
 # MARGA by EknathaLabs
 
-Role-based DevOps, cloud and SRE training: 14 modules, 186 lessons with quizzes and flashcards, 14 printable cheat sheets, InterviewHub, spoken voice, and watermarked print or PDF. Static site, works offline, progress stays in the browser. Free forever, no login, no ads, no cookies.
+Role-based DevOps, cloud and SRE training: 15 modules, 196 lessons with quizzes and flashcards, 14 printable cheat sheets, InterviewHub, spoken voice, and watermarked print or PDF. Static site, works offline, progress stays in the browser. Free forever, no login, no ads, no cookies.
 
 Live: https://marga.eknathalabs.com
 

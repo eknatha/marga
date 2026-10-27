@@ -173,7 +173,7 @@ function checkStrings() {
     path.join(DIST, 'CNAME')
   ].filter((p, i, a) => fs.existsSync(p) && a.indexOf(p) === i);
 
-  const gitRe = /\bgit/i;
+  const gitRe = /\bgit(hub|lab|ops|leaks|ea)/i;
   const emojiRe = /\p{Extended_Pictographic}/u;
   for (const f of files) {
     const text = read(f);
@@ -498,7 +498,7 @@ function checkBudgets() {
 
 
 // ---------------------------------------------------------------- 8. references, interview, promise, voice, print
-const REF_HOSTS = /^https:\/\/([a-z0-9-]+\.)*(kubernetes\.io|docker\.com|hashicorp\.com|terraform\.io|aws\.amazon\.com|microsoft\.com|azure\.com|prometheus\.io|sre\.google|python\.org|man7\.org|rfc-editor\.org|opentelemetry\.io|grafana\.com|helm\.sh|kernel\.org|gnu\.org|redhat\.com|ubuntu\.com|debian\.org|nginx\.org|openssh\.com|argoproj\.github\.io|cncf\.io|opencontainers\.org|github\.com|cloud\.google\.com|cloudflare\.com|iptables\.org|netfilter\.org|systemd\.io|freedesktop\.org|kubectl\.docs\.kubernetes\.io|kustomize\.io|pypa\.io|pytest\.org|readthedocs\.io|postgresql\.org|jenkins\.io|semver\.org|owasp\.org|nist\.gov|slsa\.dev|sigstore\.dev|open-policy-agent\.org|aquasec\.com|trivy\.dev|podman\.io|buildah\.io|etcd\.io|cni\.dev|istio\.io|envoyproxy\.io|linuxfoundation\.org|cisecurity\.org|google\.com|w3\.org|ietf\.org|letsencrypt\.org|github\.io|gitlab\.com|hashicorp\.github\.io|opengroup\.org|jq\.dev|jqlang\.github\.io|curl\.se|openssl\.org|lvm2\.sourceware\.org|sourceware\.org|kernel\.dk|brendangregg\.com|netflix\.github\.io|principlesofchaos\.org|litmuschaos\.io|chaos-mesh\.org|pagerduty\.com|atlassian\.com|dora\.dev|12factor\.net|martinfowler\.com|apache\.org|elastic\.co|fluentbit\.io|fluentd\.org|vector\.dev|jaegertracing\.io|loki\.io|thanos\.io|victoriametrics\.com|containerd\.io|continuousdelivery\.com|keepachangelog\.com|fluxcd\.io|keda\.sh|karpenter\.sh|cilium\.io|openfeature\.dev|selinuxproject\.org|shellcheck\.net|everything\.curl\.dev|jqlang\.org|amazonaws\.com|mozilla\.org|tcpdump\.org|wireshark\.org|wireguard\.com|nftables\.org|cisa\.gov|oauth\.net|openpolicyagent\.org|kyverno\.io|mitre\.org|opengroup\.org|sigstore\.dev|ansible\.com|redis\.io|mysql\.com|mongodb\.com|pgbouncer\.org|pgbackrest\.org|use-the-index-luke\.com)(\/|$)/;
+const REF_HOSTS = /^https:\/\/([a-z0-9-]+\.)*(kubernetes\.io|docker\.com|hashicorp\.com|terraform\.io|aws\.amazon\.com|microsoft\.com|azure\.com|prometheus\.io|sre\.google|python\.org|man7\.org|rfc-editor\.org|opentelemetry\.io|grafana\.com|helm\.sh|kernel\.org|gnu\.org|redhat\.com|ubuntu\.com|debian\.org|nginx\.org|openssh\.com|argoproj\.github\.io|cncf\.io|opencontainers\.org|github\.com|cloud\.google\.com|cloudflare\.com|iptables\.org|netfilter\.org|systemd\.io|freedesktop\.org|kubectl\.docs\.kubernetes\.io|kustomize\.io|pypa\.io|pytest\.org|readthedocs\.io|postgresql\.org|jenkins\.io|semver\.org|owasp\.org|nist\.gov|slsa\.dev|sigstore\.dev|open-policy-agent\.org|aquasec\.com|trivy\.dev|podman\.io|buildah\.io|etcd\.io|cni\.dev|istio\.io|envoyproxy\.io|linuxfoundation\.org|cisecurity\.org|google\.com|w3\.org|ietf\.org|letsencrypt\.org|github\.io|gitlab\.com|hashicorp\.github\.io|opengroup\.org|jq\.dev|jqlang\.github\.io|curl\.se|openssl\.org|lvm2\.sourceware\.org|sourceware\.org|kernel\.dk|brendangregg\.com|netflix\.github\.io|principlesofchaos\.org|litmuschaos\.io|chaos-mesh\.org|pagerduty\.com|atlassian\.com|dora\.dev|12factor\.net|martinfowler\.com|apache\.org|elastic\.co|fluentbit\.io|fluentd\.org|vector\.dev|jaegertracing\.io|loki\.io|thanos\.io|victoriametrics\.com|containerd\.io|continuousdelivery\.com|keepachangelog\.com|fluxcd\.io|keda\.sh|karpenter\.sh|cilium\.io|openfeature\.dev|selinuxproject\.org|shellcheck\.net|everything\.curl\.dev|jqlang\.org|amazonaws\.com|mozilla\.org|tcpdump\.org|wireshark\.org|wireguard\.com|nftables\.org|cisa\.gov|oauth\.net|openpolicyagent\.org|kyverno\.io|mitre\.org|opengroup\.org|sigstore\.dev|ansible\.com|redis\.io|mysql\.com|mongodb\.com|pgbouncer\.org|pgbackrest\.org|use-the-index-luke\.com|git-scm\.com|conventionalcommits\.org|trunkbaseddevelopment\.com)(\/|$)/;
 function checkExtras() {
   // official references on every lesson, module and sheet
   const checkRefs = (what, refs) => {
@@ -508,7 +508,7 @@ function checkExtras() {
       if (!r.t || !r.u) err('refs', `${what}: reference missing title or url`);
       else if (!/^https:\/\//.test(r.u)) err('refs', `${what}: reference must be https: ${r.u}`);
       else if (!REF_HOSTS.test(r.u)) err('refs', `${what}: host not on the allow list: ${r.u}`);
-      if (/\bgit/i.test((r.t || '') + (r.u || '').replace(/github\.(com|io)/g, ''))) err('refs', `${what}: forbidden word in reference: ${r.t} ${r.u}`);
+      if (/\bgit(hub|lab|ops|leaks|ea)/i.test((r.t || '') + (r.u || '').replace(/github\.(com|io)/g, ''))) err('refs', `${what}: forbidden word in reference: ${r.t} ${r.u}`);
       if (seen.has(r.u)) err('refs', `${what}: duplicate reference ${r.u}`);
       seen.add(r.u); count('references');
     }
@@ -528,7 +528,7 @@ function checkExtras() {
     if ((x.text || '').split(/\s+/).length < 25) err('interview', `${x.id}: answer too short`);
     if (seen.has(x.id)) err('interview', `duplicate id ${x.id}`);
     seen.add(x.id); mods.add(x.module); count('interview questions');
-    if (/\bgit/i.test(x.q + ' ' + x.text)) err('interview', `${x.id}: forbidden word`);
+    if (/\bgit(hub|lab|ops|leaks|ea)/i.test(x.q + ' ' + x.text)) err('interview', `${x.id}: forbidden word`);
   }
   for (const m of modules) if (!mods.has(m.id)) err('interview', `module ${m.id} has no interview questions`);
   for (const lv of ['junior', 'mid', 'senior']) if (!IV.some((x) => x.level === lv)) err('interview', `no ${lv} questions`);
@@ -572,7 +572,7 @@ function checkExtras() {
 
 function checkPractice() {
   const mods = new Set(A.modules.map((m) => m.id));
-  const FORBID = /\bgit/i;
+  const FORBID = /\bgit(hub|lab|ops|leaks|ea)/i;
   const https = (u) => typeof u === 'string' && /^https:\/\/[a-z0-9.-]+\.[a-z]{2,}(\/|$)/i.test(u);
   // case studies
   if (!Array.isArray(A.cases) || A.cases.length < 50) err('cases', `need at least 50 case studies, found ${(A.cases || []).length}`);
@@ -738,7 +738,7 @@ function checkPractice() {
 
 function checkMore() {
   const mods = new Set(A.modules.map((m) => m.id));
-  const FORBID = /\bgit/i;
+  const FORBID = /\bgit(hub|lab|ops|leaks|ea)/i;
   // glossary
   if ((A.glossary || []).length < 100) err('glossary', `need at least 100 terms, found ${(A.glossary || []).length}`);
   const gids = new Set();
@@ -792,7 +792,7 @@ function checkMore() {
 }
 
 function checkTermLabs() {
-  const FORBID = /\bgit/i, EMOJI = /\p{Extended_Pictographic}/u, ARROW = /[←→⇒]/;
+  const FORBID = /\bgit(hub|lab|ops|leaks|ea)/i, EMOJI = /\p{Extended_Pictographic}/u, ARROW = /[←→⇒]/;
   const labs = A.termlabs || [];
   const parsed = require('./termlabs').load(path.join(SRC, 'termlabs'));
   parsed.forEach((l) => (l.errors || []).forEach((m) => err('termlabs', `${l.id || l.title}: ${m}`)));

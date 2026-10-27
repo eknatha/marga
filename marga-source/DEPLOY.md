@@ -143,3 +143,10 @@ If the number does not appear: open the browser console and look for the "visito
 - Lessons: 186 (28 new, 2 per module). Each has a worked example, quiz, flashcards, level texts and 2 official references.
 - Assumptions: +6 labs per stage and +2 lessons per module were chosen without asking.
 - Content was written from memory. Spot-check commands, figures and links before relying on them.
+
+## Round 14 additions
+- Git and version control: a new skill (`git`) with 10 lessons (first commits, undoing changes, branches and merging, rebase, remotes, team workflows, tags and versions, hooks and secrets in history, large repositories and worktrees, debugging with the reflog and bisect), a cheat sheet, 11 interview answers, 8 drills, 2 incident games, 10 glossary terms, 14 animated explainers, 6 reading items and module references. It has no prerequisites, so it can be started on its own, and it sits right after Linux in all four role paths. There is no Git terminal lab (the lab engine does not simulate Git).
+- Scan rule change: the build used to forbid the string "git" everywhere. It now forbids only the hosting and brand words (github, gitlab, gitops, gitleaks, gitea), because the Git skill needs the word. `tools/validate.js`, `tools/e2e.js` and the lesson generator use the same pattern. Reference links to `git-scm.com` are allowed.
+- Two ways to learn: the home page has two doors, "Learn by skill" and "Learn by path", and six goal starters. New pages: `#/skills` (every skill with time, prerequisites as advice, paths that use it), `#/build-path` and `#/build-path/<goal>` (pick skills, get the dependencies added and an ordered plan; the plan can be saved in the browser), and `#/testout/<skill>` (ten questions from across a skill; eight right marks every lesson passed). Locked skill pages now offer a test-out of the missing prerequisite. Source: `src/app/choose.js`.
+- Counts: 15 skills, 196 lessons, 40 games, 216 explainers, 72 terminal labs.
+- Content was written from memory. Spot-check commands and examples before relying on them.
