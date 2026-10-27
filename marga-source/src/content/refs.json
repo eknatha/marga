@@ -2229,6 +2229,286 @@
     "Replication slots",
     "https://www.postgresql.org/docs/current/warm-standby.html"
    ]
+  ],
+  "linux/time-ntp-and-timezones": [
+   [
+    "systemd-timesyncd manual",
+    "https://www.freedesktop.org/software/systemd/man/latest/systemd-timesyncd.service.html"
+   ],
+   [
+    "timedatectl manual",
+    "https://man7.org/linux/man-pages/man1/timedatectl.1.html"
+   ]
+  ],
+  "linux/systemd-overrides-targets-and-dependencies": [
+   [
+    "systemd.unit manual",
+    "https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html"
+   ],
+   [
+    "systemd.service manual",
+    "https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html"
+   ]
+  ],
+  "bash/temporary-files-and-atomic-writes": [
+   [
+    "GNU Bash reference manual: traps",
+    "https://www.gnu.org/software/bash/manual/bash.html#index-trap"
+   ],
+   [
+    "flock manual",
+    "https://man7.org/linux/man-pages/man1/flock.1.html"
+   ]
+  ],
+  "bash/portable-scripts-and-shellcheck": [
+   [
+    "ShellCheck",
+    "https://www.shellcheck.net/"
+   ],
+   [
+    "POSIX shell command language",
+    "https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html"
+   ]
+  ],
+  "python/logging-for-scripts-and-services": [
+   [
+    "Python logging HOWTO",
+    "https://docs.python.org/3/howto/logging.html"
+   ],
+   [
+    "Python logging cookbook",
+    "https://docs.python.org/3/howto/logging-cookbook.html"
+   ]
+  ],
+  "python/yaml-csv-and-config-files": [
+   [
+    "csv module documentation",
+    "https://docs.python.org/3/library/csv.html"
+   ],
+   [
+    "configparser documentation",
+    "https://docs.python.org/3/library/configparser.html"
+   ]
+  ],
+  "networking/network-segmentation-and-security-groups": [
+   [
+    "Amazon VPC security groups",
+    "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html"
+   ],
+   [
+    "NIST SP 800-41 Firewalls and firewall policy",
+    "https://csrc.nist.gov/pubs/sp/800/41/r1/final"
+   ]
+  ],
+  "networking/dhcp-arp-and-the-local-network": [
+   [
+    "RFC 2131: Dynamic Host Configuration Protocol",
+    "https://www.rfc-editor.org/rfc/rfc2131"
+   ],
+   [
+    "RFC 826: Address Resolution Protocol",
+    "https://www.rfc-editor.org/rfc/rfc826"
+   ]
+  ],
+  "docker/slim-images-and-faster-builds": [
+   [
+    "Dockerfile best practices",
+    "https://docs.docker.com/build/building/best-practices/"
+   ],
+   [
+    "Multi-stage builds",
+    "https://docs.docker.com/build/building/multi-stage/"
+   ]
+  ],
+  "docker/running-containers-in-production": [
+   [
+    "docker run reference",
+    "https://docs.docker.com/reference/cli/docker/container/run/"
+   ],
+   [
+    "Docker security",
+    "https://docs.docker.com/engine/security/"
+   ]
+  ],
+  "cicd/reusable-pipelines-and-templates": [
+   [
+    "Continuous Delivery by Jez Humble and Dave Farley",
+    "https://continuousdelivery.com/"
+   ],
+   [
+    "The DORA research programme",
+    "https://dora.dev/"
+   ]
+  ],
+  "cicd/environments-promotion-and-approvals": [
+   [
+    "Continuous Delivery",
+    "https://continuousdelivery.com/"
+   ],
+   [
+    "Twelve-Factor App: Config",
+    "https://12factor.net/config"
+   ]
+  ],
+  "kubernetes/network-policies-in-practice": [
+   [
+    "Kubernetes network policies",
+    "https://kubernetes.io/docs/concepts/services-networking/network-policies/"
+   ],
+   [
+    "Declare a network policy",
+    "https://kubernetes.io/docs/tasks/administer-cluster/declare-network-policy/"
+   ]
+  ],
+  "kubernetes/statefulsets-and-running-databases": [
+   [
+    "StatefulSets",
+    "https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/"
+   ],
+   [
+    "Run a replicated stateful application",
+    "https://kubernetes.io/docs/tasks/run-application/run-replicated-stateful-application/"
+   ]
+  ],
+  "terraform/import-refactor-and-moved-blocks": [
+   [
+    "Import resources",
+    "https://developer.hashicorp.com/terraform/language/import"
+   ],
+   [
+    "Refactoring with moved blocks",
+    "https://developer.hashicorp.com/terraform/language/modules/develop/refactoring"
+   ]
+  ],
+  "terraform/large-configurations-and-performance": [
+   [
+    "Terraform state",
+    "https://developer.hashicorp.com/terraform/language/state"
+   ],
+   [
+    "Terraform CLI: plan options",
+    "https://developer.hashicorp.com/terraform/cli/commands/plan"
+   ]
+  ],
+  "cloud/object-storage-and-data-lifecycle": [
+   [
+    "Amazon S3 lifecycle",
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html"
+   ],
+   [
+    "Blocking public access to S3",
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html"
+   ]
+  ],
+  "cloud/hybrid-connectivity-and-peering": [
+   [
+    "VPC peering",
+    "https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html"
+   ],
+   [
+    "AWS Site-to-Site VPN",
+    "https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html"
+   ]
+  ],
+  "observability/structured-logging-and-log-design": [
+   [
+    "OpenTelemetry logs",
+    "https://opentelemetry.io/docs/concepts/signals/logs/"
+   ],
+   [
+    "Twelve-Factor App: Logs",
+    "https://12factor.net/logs"
+   ]
+  ],
+  "observability/runbooks-and-dashboards-for-on-call": [
+   [
+    "Google SRE book: Being on-call",
+    "https://sre.google/sre-book/being-on-call/"
+   ],
+   [
+    "Grafana dashboard best practices",
+    "https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/best-practices/"
+   ]
+  ],
+  "sre/dependencies-and-third-party-risk": [
+   [
+    "Google SRE book: Embracing risk",
+    "https://sre.google/sre-book/embracing-risk/"
+   ],
+   [
+    "Google SRE workbook: Implementing SLOs",
+    "https://sre.google/workbook/implementing-slos/"
+   ]
+  ],
+  "sre/disaster-recovery-exercises": [
+   [
+    "Google SRE book: Data integrity",
+    "https://sre.google/sre-book/data-integrity/"
+   ],
+   [
+    "NIST SP 800-34 Contingency planning guide",
+    "https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final"
+   ]
+  ],
+  "security/supply-chain-sboms-and-provenance": [
+   [
+    "SLSA framework",
+    "https://slsa.dev/spec/v1.0/"
+   ],
+   [
+    "Sigstore: signing and verifying",
+    "https://docs.sigstore.dev/"
+   ]
+  ],
+  "security/cloud-incident-playbooks": [
+   [
+    "NIST SP 800-61 Incident handling guide",
+    "https://csrc.nist.gov/pubs/sp/800/61/r2/final"
+   ],
+   [
+    "AWS Security Incident Response Guide",
+    "https://docs.aws.amazon.com/whitepapers/latest/aws-security-incident-response-guide/welcome.html"
+   ]
+  ],
+  "ansible/dynamic-inventory-for-cloud": [
+   [
+    "Ansible: Working with dynamic inventory",
+    "https://docs.ansible.com/ansible/latest/inventory_guide/intro_dynamic_inventory.html"
+   ],
+   [
+    "Ansible: Inventory plugins",
+    "https://docs.ansible.com/ansible/latest/plugins/inventory.html"
+   ]
+  ],
+  "ansible/testing-and-linting-ansible": [
+   [
+    "ansible-lint documentation",
+    "https://ansible.readthedocs.io/projects/lint/"
+   ],
+   [
+    "Molecule documentation",
+    "https://ansible.readthedocs.io/projects/molecule/"
+   ]
+  ],
+  "databases/postgres-vacuum-bloat-and-maintenance": [
+   [
+    "PostgreSQL: Routine vacuuming",
+    "https://www.postgresql.org/docs/current/routine-vacuuming.html"
+   ],
+   [
+    "PostgreSQL: Monitoring database activity",
+    "https://www.postgresql.org/docs/current/monitoring-stats.html"
+   ]
+  ],
+  "databases/schema-design-for-operations": [
+   [
+    "PostgreSQL: Table partitioning",
+    "https://www.postgresql.org/docs/current/ddl-partitioning.html"
+   ],
+   [
+    "PostgreSQL: Constraints",
+    "https://www.postgresql.org/docs/current/ddl-constraints.html"
+   ]
   ]
  },
  "sheets": {
