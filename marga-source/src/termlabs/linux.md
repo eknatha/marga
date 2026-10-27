@@ -293,3 +293,505 @@ crontab -l
 cron-tick
 @@ explain
 Cron is not your shell: small PATH, no profile, no tty. Use absolute paths or set PATH in the crontab, make the script executable, and send output to a file so you can read what happened.
+
+## Find what is eating the disk
+id: lx-find-big
+module: linux
+level: Beginner
+minutes: 10
+lesson: linux/disks-and-filesystems
+engine: Simulated Linux shell
+summary: Use find with size tests to list large files, without deleting anything.
+@@ story
+The upload server is running low on space. Before anyone deletes anything, the team wants a list of every file larger than 100 MB under /srv/uploads, including sub-folders.
+@@ goals
+- Write the full paths of all files over 100 MB into ~/big.txt, one per line, sorted alphabetically.
+- Do not delete or change any file under /srv/uploads.
+@@ hints
+- `find /srv/uploads -type f` lists every file. Add `-size +100M` to keep only the large ones.
+- `sort` puts the lines in alphabetical order. Redirect with `>` into a file.
+- Check the result with `cat ~/big.txt`. Files of exactly 100 MB are not "over 100 MB".
+@@ world
+{}
+@@ file /srv/uploads/a.iso mode=644 owner=root size=700M
+iso
+@@ file /srv/uploads/b.log mode=644 owner=root size=120M
+log
+@@ file /srv/uploads/c.txt mode=644 owner=root
+small
+@@ file /srv/uploads/d.bin mode=644 owner=root size=300M
+bin
+@@ file /srv/uploads/e.tmp mode=644 owner=root size=5M
+tmp
+@@ file /srv/uploads/exact.img mode=644 owner=root size=100M
+img
+@@ file /srv/uploads/sub/f.mp4 mode=644 owner=root size=900M
+video
+@@ checks
+[
+ {"t": "equals", "path": "/home/user/big.txt", "text": "/srv/uploads/a.iso\n/srv/uploads/b.log\n/srv/uploads/d.bin\n/srv/uploads/sub/f.mp4", "label": "big.txt lists exactly the four files over 100 MB, sorted"},
+ {"t": "file", "path": "/srv/uploads/a.iso", "exists": true, "label": "a.iso is still there"},
+ {"t": "file", "path": "/srv/uploads/sub/f.mp4", "exists": true, "label": "f.mp4 is still there"}
+]
+@@ solution
+df -h
+find /srv/uploads -type f -size +100M | sort > ~/big.txt
+cat ~/big.txt
+@@ explain
+Find answers "which files" quickly and safely. Listing first and deleting later, after people have looked at the list, avoids the mistake of removing something that is still needed.
+
+## Fix SSH key permissions
+id: lx-ssh-perms
+module: linux
+level: Beginner
+minutes: 10
+lesson: linux/ssh-and-remote-access
+engine: Simulated Linux shell
+summary: SSH refuses keys whose files are readable by others. Set the permissions that sshd and ssh expect.
+@@ story
+Your SSH login fails with "Permissions are too open" for the private key, and the server ignores authorized_keys. The folder ~/.ssh and its files were copied from a backup with the wrong modes.
+@@ goals
+- ~/.ssh is mode 700.
+- The private key id_ed25519 and authorized_keys are mode 600.
+- The public key id_ed25519.pub stays readable (mode 644).
+@@ hints
+- `ls -la ~/.ssh` shows the current modes.
+- Private material must be readable only by its owner: `chmod 600 FILE`. The folder needs `chmod 700 ~/.ssh`.
+- The public key is meant to be shared, so 644 is fine.
+@@ world
+{}
+@@ file /home/user/.ssh/id_ed25519 mode=644 owner=user
+-----BEGIN KEY (lab placeholder, not a real key)-----
+@@ file /home/user/.ssh/id_ed25519.pub mode=666 owner=user
+ssh-ed25519 AAAA-lab-placeholder user@lab
+@@ file /home/user/.ssh/authorized_keys mode=666 owner=user
+ssh-ed25519 AAAA-lab-placeholder user@lab
+@@ checks
+[
+ {"t": "mode", "path": "/home/user/.ssh", "mode": "700", "label": "~/.ssh is 700"},
+ {"t": "mode", "path": "/home/user/.ssh/id_ed25519", "mode": "600", "label": "the private key is 600"},
+ {"t": "mode", "path": "/home/user/.ssh/authorized_keys", "mode": "600", "label": "authorized_keys is 600"},
+ {"t": "mode", "path": "/home/user/.ssh/id_ed25519.pub", "mode": "644", "label": "the public key is 644"}
+]
+@@ solution
+ls -la ~/.ssh
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/id_ed25519 ~/.ssh/authorized_keys
+chmod 644 ~/.ssh/id_ed25519.pub
+ls -la ~/.ssh
+@@ explain
+SSH checks permissions on purpose: a private key that others can read is no longer private. The rule of thumb is 700 for the folder, 600 for private files and authorized_keys, and 644 for public keys.
+
+## Restore a website with the right owner
+id: lx-restore-owner
+module: linux
+level: Intermediate
+minutes: 15
+lesson: linux/users-groups-permissions
+engine: Simulated Linux shell
+summary: A restore left everything owned by root. Fix ownership and modes, and keep a secret file private.
+@@ story
+A site was restored from backup as root. The web server runs as `www-data` and cannot write uploads or read its files. The config file holds a database password and must not be readable by everyone.
+@@ goals
+- Everything under /var/www/site belongs to www-data (user and group).
+- Directories are mode 755, ordinary files are 644, except uploads (775) and config.php (640).
+@@ hints
+- `ls -lR /var/www/site` shows the owners and modes.
+- `sudo chown -R www-data:www-data /var/www/site` fixes the owner in one step.
+- Set modes by type: `sudo find /var/www/site -type d -exec chmod 755 {} \;` and the same with `-type f` and 644. Then handle the two exceptions.
+@@ world
+{"users": {"www-data": {}}}
+@@ file /var/www/site/index.php mode=600 owner=root
+<?php echo "hello";
+@@ file /var/www/site/config.php mode=644 owner=root
+<?php $pw = "lab-secret";
+@@ file /var/www/site/assets/style.css mode=600 owner=root
+body{}
+@@ file /var/www/site/uploads/.keep mode=600 owner=root
+
+@@ checks
+[
+ {"t": "owner", "path": "/var/www/site/index.php", "owner": "www-data", "group": "www-data", "label": "index.php belongs to www-data"},
+ {"t": "owner", "path": "/var/www/site/uploads", "owner": "www-data", "group": "www-data", "label": "uploads belongs to www-data"},
+ {"t": "mode", "path": "/var/www/site/index.php", "mode": "644", "label": "index.php is 644"},
+ {"t": "mode", "path": "/var/www/site/assets", "mode": "755", "label": "assets is 755"},
+ {"t": "mode", "path": "/var/www/site/uploads", "mode": "775", "label": "uploads is 775"},
+ {"t": "mode", "path": "/var/www/site/config.php", "mode": "640", "label": "config.php is 640 (not readable by others)"}
+]
+@@ solution
+ls -lR /var/www/site
+sudo chown -R www-data:www-data /var/www/site
+sudo find /var/www/site -type d -exec chmod 755 {} \;
+sudo find /var/www/site -type f -exec chmod 644 {} \;
+sudo chmod 775 /var/www/site/uploads
+sudo chmod 640 /var/www/site/config.php
+ls -lR /var/www/site
+@@ explain
+Ownership and modes are separate questions. First decide who owns the tree, then give directories and files the modes they need, then tighten the few secrets. Using find with -type keeps directories executable and files plain.
+
+## Who owns port 5000?
+id: lx-port-owner
+module: linux
+level: Beginner
+minutes: 10
+lesson: linux/processes-and-services
+engine: Simulated Linux shell
+summary: Find the process that listens on a port, record its pid, and stop only that process.
+@@ story
+A new service cannot start because port 5000 is already in use. Several processes run on this machine, and only one of them is the stray test server a colleague left behind.
+@@ goals
+- Write the pid of the process listening on port 5000 into ~/killed-pid.txt.
+- Stop that process, and no other.
+- The web server (nginx) and the database must keep running.
+@@ hints
+- `ss -ltnp` lists listening sockets with the program and pid. Filter with `grep :5000`.
+- `ps aux` shows the full command line, which tells you what it is.
+- `kill PID` asks it to stop. Check with `ss -ltnp` again.
+@@ world
+{"procs": [{"pid": 611, "user": "root", "cmd": "/usr/sbin/nginx -g daemon off;", "cpu": 0.5, "mem": 0.8, "ports": [80]}, {"pid": 702, "user": "postgres", "cmd": "/usr/lib/postgresql/16/bin/postgres -D /var/lib/postgresql/16/main", "cpu": 1.5, "mem": 4.0, "ports": [5432]}, {"pid": 2201, "user": "user", "cmd": "python3 -m http.server 5000", "cpu": 0.1, "mem": 0.4, "ports": [5000]}]}
+@@ checks
+[
+ {"t": "equals", "path": "/home/user/killed-pid.txt", "text": "2201", "label": "killed-pid.txt contains 2201"},
+ {"t": "proc", "cmd": "http\\.server", "present": false, "label": "the stray test server is stopped"},
+ {"t": "proc", "cmd": "nginx", "present": true, "label": "nginx is still running"},
+ {"t": "proc", "cmd": "postgres", "present": true, "label": "the database is still running"}
+]
+@@ solution
+ss -ltnp
+ss -ltnp | grep :5000
+echo 2201 > ~/killed-pid.txt
+kill 2201
+ss -ltnp
+@@ explain
+Always identify a process before you stop it. A port number leads to a pid, and the pid leads to a command line that tells you whether it is safe to stop. Recording the pid makes your action easy to review.
+
+## Find the attacker in auth.log
+id: lx-failed-logins
+module: linux
+level: Intermediate
+minutes: 15
+lesson: linux/logs-and-troubleshooting
+engine: Simulated Linux shell
+summary: Count failed SSH logins per address and list the addresses that tried three times or more.
+@@ story
+The security team asked which addresses repeatedly failed to log in over SSH today. The log has failed and successful logins and some noise. Produce a list they can paste into a blocklist.
+@@ goals
+- Write ~/offenders.txt with one line per address that has 3 or more failed password attempts, in the form `ADDRESS COUNT`, most failures first.
+- Do not change /var/log/auth.log.
+@@ hints
+- Failed attempts contain `Failed password`. The address follows the word `from`.
+- `grep -o "from [0-9.]*"` prints only that part; `awk "{print \$2}"` keeps the address.
+- `sort | uniq -c | sort -rn` counts and ranks. Then use `awk "\$1 >= 3 {print \$2, \$1}"` to filter and reorder the columns.
+@@ world
+{}
+@@ file /var/log/auth.log mode=644 owner=root
+Jan  5 10:01:01 web sshd[101]: Failed password for root from 203.0.113.7 port 40001 ssh2
+Jan  5 10:01:04 web sshd[101]: Failed password for root from 203.0.113.7 port 40002 ssh2
+Jan  5 10:01:09 web sshd[102]: Failed password for invalid user admin from 203.0.113.7 port 40003 ssh2
+Jan  5 10:02:01 web sshd[103]: Failed password for invalid user test from 198.51.100.9 port 51000 ssh2
+Jan  5 10:02:05 web sshd[103]: Failed password for root from 198.51.100.9 port 51001 ssh2
+Jan  5 10:02:07 web sshd[104]: Accepted password for alice from 192.0.2.20 port 52000 ssh2
+Jan  5 10:03:00 web sshd[105]: Failed password for root from 203.0.113.7 port 40004 ssh2
+Jan  5 10:03:03 web sshd[105]: Failed password for root from 203.0.113.7 port 40005 ssh2
+Jan  5 10:03:10 web sshd[106]: Failed password for bob from 192.0.2.77 port 53000 ssh2
+Jan  5 10:04:00 web sshd[107]: Failed password for root from 198.51.100.9 port 51002 ssh2
+Jan  5 10:04:30 web CRON[200]: pam_unix(cron:session): session opened for user root
+@@ checks
+[
+ {"t": "equals", "path": "/home/user/offenders.txt", "text": "203.0.113.7 5\n198.51.100.9 3", "label": "offenders.txt lists 203.0.113.7 (5) and 198.51.100.9 (3)"},
+ {"t": "unchanged", "path": "/var/log/auth.log", "label": "auth.log was not changed"}
+]
+@@ solution
+grep 'Failed password' /var/log/auth.log | grep -o 'from [0-9.]*' | awk '{print $2}' | sort | uniq -c | sort -rn | awk '$1 >= 3 {print $2, $1}' > ~/offenders.txt
+cat ~/offenders.txt
+@@ explain
+Log analysis is a small pipeline: select the lines, extract the field, count, rank, filter. Build it one stage at a time and look at the output after each step.
+
+## Onboard a teammate
+id: lx-new-teammate
+module: linux
+level: Intermediate
+minutes: 15
+lesson: linux/users-groups-permissions
+engine: Simulated Linux shell
+summary: Create an account with a home folder, a shell and the right group, and give the group access to a shared folder.
+@@ story
+A new engineer, `dana`, starts today. She needs an account with a home folder and the bash shell, membership in the group `devs`, and write access to /srv/app through that group. She must not get administrator rights.
+@@ goals
+- User `dana` exists with home /home/dana and shell /bin/bash.
+- `dana` is a member of `devs`, and is not in the group `sudo`.
+- /srv/app belongs to group `devs` with mode 2775 (group can write, new files keep the group).
+@@ hints
+- `sudo useradd -m -s /bin/bash -G devs dana` creates the user, the home folder, the shell and the group membership in one command.
+- Check with `id dana` and `getent passwd dana`.
+- `sudo chgrp devs /srv/app` and `sudo chmod 2775 /srv/app`. The leading 2 is the setgid bit.
+@@ world
+{"groups": ["devs"], "dirs": [{"p": "/srv/app", "m": "755", "o": "root", "g": "root"}]}
+@@ checks
+[
+ {"t": "cmd", "run": "getent passwd dana", "code": 0, "out": "/home/dana:/bin/bash", "label": "dana has the home /home/dana and the shell /bin/bash"},
+ {"t": "cmd", "run": "id dana", "code": 0, "out": "devs", "label": "dana is in devs"},
+ {"t": "cmd", "run": "id dana", "notOut": "sudo", "label": "dana is not in the sudo group"},
+ {"t": "owner", "path": "/srv/app", "group": "devs", "label": "/srv/app belongs to group devs"},
+ {"t": "mode", "path": "/srv/app", "mode": "2775", "label": "/srv/app has mode 2775"}
+]
+@@ solution
+sudo useradd -m -s /bin/bash -G devs dana
+id dana
+getent passwd dana
+sudo chgrp devs /srv/app
+sudo chmod 2775 /srv/app
+ls -ld /srv/app
+@@ explain
+Give people the least access that lets them work. Group membership is how permissions scale, and the setgid bit on a shared directory keeps new files in the team group so everyone can use them.
+
+## Write a log rotation rule
+id: lx-logrotate
+module: linux
+level: Intermediate
+minutes: 15
+lesson: linux/logs-and-troubleshooting
+engine: Simulated Linux shell
+summary: Create a logrotate rule so an application log cannot grow without limit.
+@@ story
+The app writes /var/log/shop/app.log and nobody rotates it, so it grew to several gigabytes last month. Create a rotation rule in /etc/logrotate.d/shop. The file must name the log, rotate weekly, keep 4 old copies, compress them, and not fail when the log is missing.
+@@ goals
+- /etc/logrotate.d/shop exists and is readable by everyone (mode 644).
+- It rotates /var/log/shop/app.log weekly, keeps 4 copies, compresses, and uses missingok.
+@@ hints
+- Look at an existing rule for the format: `cat /etc/logrotate.d/nginx`.
+- The shape is: the log path, then a block in braces with one setting per line.
+- Settings you need: `weekly`, `rotate 4`, `compress`, `missingok`. Write the file with `sudo tee`.
+@@ world
+{}
+@@ file /etc/logrotate.d/nginx mode=644 owner=root
+/var/log/nginx/*.log {
+    daily
+    rotate 14
+    compress
+    missingok
+    notifempty
+}
+@@ file /var/log/shop/app.log mode=644 owner=root
+2025-01-05 started
+@@ checks
+[
+ {"t": "mode", "path": "/etc/logrotate.d/shop", "mode": "644", "label": "the rule file is mode 644"},
+ {"t": "contains", "path": "/etc/logrotate.d/shop", "re": "/var/log/shop/app\\.log", "label": "it names the application log"},
+ {"t": "contains", "path": "/etc/logrotate.d/shop", "re": "^\\s*weekly$", "label": "it rotates weekly"},
+ {"t": "contains", "path": "/etc/logrotate.d/shop", "re": "^\\s*rotate 4$", "label": "it keeps 4 copies"},
+ {"t": "contains", "path": "/etc/logrotate.d/shop", "re": "^\\s*compress$", "label": "it compresses old copies"},
+ {"t": "contains", "path": "/etc/logrotate.d/shop", "re": "^\\s*missingok$", "label": "it tolerates a missing log"}
+]
+@@ solution
+cat /etc/logrotate.d/nginx
+sudo tee /etc/logrotate.d/shop > /dev/null <<'EOF'
+/var/log/shop/app.log {
+    weekly
+    rotate 4
+    compress
+    missingok
+    notifempty
+}
+EOF
+sudo chmod 644 /etc/logrotate.d/shop
+cat /etc/logrotate.d/shop
+@@ explain
+Rotation turns an unbounded file into a bounded set of files. Always set a count, because old logs that are never removed fill the disk just as the single big file did.
+
+## Let one user restart one service
+id: lx-sudoers-drop
+module: linux
+level: Advanced
+minutes: 20
+lesson: linux/users-groups-permissions
+engine: Simulated Linux shell
+summary: Grant a narrow sudo rule in a drop-in file instead of giving full administrator rights.
+@@ story
+The user `deploy` must be able to restart the `shop` service without a password, and nothing else. Do not edit /etc/sudoers itself. Add a drop-in file named /etc/sudoers.d/deploy.
+@@ goals
+- /etc/sudoers.d/deploy exists with mode 440 and owner root.
+- It lets `deploy` run /usr/bin/systemctl restart shop without a password, and does not contain ALL=(ALL) ALL.
+@@ hints
+- Drop-in files in /etc/sudoers.d are read after the main file. Sudo ignores files with unsafe modes, so use 440.
+- A rule has the form: `USER HOST=(RUNAS) NOPASSWD: /full/path/to/command args`.
+- Write it as: `deploy ALL=(root) NOPASSWD: /usr/bin/systemctl restart shop`.
+@@ world
+{"dirs": [{"p": "/etc/sudoers.d", "m": "755", "o": "root", "g": "root"}]}
+@@ file /etc/sudoers mode=440 owner=root
+Defaults env_reset
+root ALL=(ALL:ALL) ALL
+%sudo ALL=(ALL:ALL) ALL
+@includedir /etc/sudoers.d
+@@ checks
+[
+ {"t": "mode", "path": "/etc/sudoers.d/deploy", "mode": "440", "label": "the drop-in file is mode 440"},
+ {"t": "owner", "path": "/etc/sudoers.d/deploy", "owner": "root", "label": "it is owned by root"},
+ {"t": "contains", "path": "/etc/sudoers.d/deploy", "re": "^deploy\\s+ALL=\\(root\\)\\s+NOPASSWD:\\s+/usr/bin/systemctl restart shop$", "label": "it allows exactly that one command without a password"},
+ {"t": "contains", "path": "/etc/sudoers.d/deploy", "re": "ALL=\\(ALL\\)\\s+ALL", "not": true, "label": "it does not grant full rights"},
+ {"t": "unchanged", "path": "/etc/sudoers", "label": "/etc/sudoers itself was not changed"}
+]
+@@ solution
+echo 'deploy ALL=(root) NOPASSWD: /usr/bin/systemctl restart shop' | sudo tee /etc/sudoers.d/deploy
+sudo chown root:root /etc/sudoers.d/deploy
+sudo chmod 440 /etc/sudoers.d/deploy
+ls -l /etc/sudoers.d/deploy
+cat /etc/sudoers.d/deploy
+@@ explain
+Least privilege applies to sudo as well. A drop-in file is easy to review and remove, and naming the exact command and arguments means a stolen deploy account cannot become full root. In real life you check the file with visudo -c before leaving it in place, because a syntax error can lock out sudo.
+
+## Switch a release with a symlink
+id: lx-release-switch
+module: linux
+level: Intermediate
+minutes: 15
+lesson: linux/filesystem-and-navigation
+engine: Simulated Linux shell
+summary: Point the current symlink at a new release and understand why this makes rollback instant.
+@@ story
+The app runs from /srv/app/current, which is a symbolic link to a release folder. Release 2 is ready in /srv/app/releases/2. Switch to it. Do not copy or move any files.
+@@ goals
+- /srv/app/current points to /srv/app/releases/2.
+- Both release folders still exist, so you could roll back by pointing the link at 1.
+@@ hints
+- `ls -l /srv/app` shows where `current` points today.
+- `ln -sfn /srv/app/releases/2 /srv/app/current` replaces the link. The -n stops it from creating a link inside the old target.
+- Check with `readlink /srv/app/current`.
+@@ world
+{"links": [{"path": "/srv/app/current", "to": "/srv/app/releases/1"}]}
+@@ file /srv/app/releases/1/version.txt mode=644 owner=root
+1
+@@ file /srv/app/releases/2/version.txt mode=644 owner=root
+2
+@@ checks
+[
+ {"t": "cmd", "run": "readlink /srv/app/current", "code": 0, "out": "^/srv/app/releases/2$", "label": "current points at release 2"},
+ {"t": "file", "path": "/srv/app/releases/1/version.txt", "exists": true, "label": "release 1 is still there for rollback"},
+ {"t": "cmd", "run": "cat /srv/app/current/version.txt", "code": 0, "out": "^2$", "label": "the app sees the new version"}
+]
+@@ solution
+ls -l /srv/app
+readlink /srv/app/current
+sudo ln -sfn /srv/app/releases/2 /srv/app/current
+readlink /srv/app/current
+cat /srv/app/current/version.txt
+@@ explain
+Deploying into a new folder and switching a link makes the change one quick step, and rolling back is the same step in reverse. The -n flag matters: without it, ln follows the old link and puts the new one inside the old release.
+
+## Count errors for one service
+id: lx-journal-errors
+module: linux
+level: Beginner
+minutes: 10
+lesson: linux/logs-and-troubleshooting
+engine: Simulated Linux shell
+summary: Read the journal for one unit, filter errors and save the count and the last message.
+@@ story
+The `shop` service restarted several times today. Find how many error lines it logged and what the last one said, so the on-call engineer can read it without opening the journal.
+@@ goals
+- ~/errors.txt has two lines: the number of lines from the shop journal that contain `error` (any case), then the text of the last such line.
+- Only the shop unit counts; ignore other services.
+@@ hints
+- `journalctl -u shop --no-pager` prints the unit log.
+- `grep -i error` keeps the error lines. `wc -l` counts, `tail -1` keeps the last.
+- Build the file in two steps: `... | wc -l > ~/errors.txt` then `... | tail -1 >> ~/errors.txt`.
+@@ world
+{"services": {"shop": {"unit": "/etc/systemd/system/shop.service", "state": "active", "enabled": true, "desc": "Shop", "port": 8080, "http": {"/": {"status": 200, "body": "ok\n"}}}}, "journal": {"shop": ["Jan 05 10:00:01 host shop[1]: Starting Shop...", "Jan 05 10:00:02 host shop[1]: ERROR cannot open /var/lib/shop/data.db: permission denied", "Jan 05 10:00:03 host shop[1]: Started Shop.", "Jan 05 11:15:09 host shop[1]: warning: slow query 2.1s", "Jan 05 12:30:40 host shop[1]: error: upstream payments timed out", "Jan 05 13:05:12 host shop[1]: Error: connection pool exhausted", "Jan 05 13:05:13 host shop[1]: Restarting Shop..."]}}
+@@ checks
+[
+ {"t": "equals", "path": "/home/user/errors.txt", "text": "3\nJan 05 13:05:12 host shop[1]: Error: connection pool exhausted", "label": "errors.txt has the count 3 and the last error line"}
+]
+@@ solution
+journalctl -u shop --no-pager | grep -i error | wc -l > ~/errors.txt
+journalctl -u shop --no-pager | grep -i error | tail -1 >> ~/errors.txt
+cat ~/errors.txt
+@@ explain
+Writing the answer into a file turns a one-off investigation into something others can use. The case-insensitive match matters because applications spell errors in different ways.
+
+## List the login users
+id: lx-passwd-users
+module: linux
+level: Beginner
+minutes: 10
+lesson: linux/users-groups-permissions
+engine: Simulated Linux shell
+summary: Read /etc/passwd with awk to find real people who can log in.
+@@ story
+An audit asks: which accounts are real people with a login shell? In /etc/passwd these have a user id of 1000 or more and a shell that is not /usr/sbin/nologin or /bin/false. Produce the list.
+@@ goals
+- Write ~/people.txt with one user name per line, sorted alphabetically.
+- /etc/passwd must not be changed.
+@@ hints
+- Fields in /etc/passwd are separated by colons: name:x:uid:gid:comment:home:shell.
+- `awk -F: '$3 >= 1000 && $7 !~ /nologin|false/ {print $1}' /etc/passwd` selects them.
+- Add `| sort > ~/people.txt`.
+@@ world
+{}
+@@ file /etc/passwd mode=644 owner=root
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+user:x:1000:1000:Lab User:/home/user:/bin/bash
+nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
+maya:x:1001:1001:Maya:/home/maya:/bin/bash
+svc-backup:x:1002:1002:Backup:/var/backups:/bin/false
+alex:x:1003:1003:Alex:/home/alex:/bin/zsh
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+@@ checks
+[
+ {"t": "equals", "path": "/home/user/people.txt", "text": "alex\nmaya\nuser", "label": "people.txt lists alex, maya and user"},
+ {"t": "unchanged", "path": "/etc/passwd", "label": "/etc/passwd was not changed"}
+]
+@@ solution
+awk -F: '$3 >= 1000 && $7 !~ /nologin|false/ {print $1}' /etc/passwd | sort > ~/people.txt
+cat ~/people.txt
+@@ explain
+System accounts exist so services can own files without a person behind them. Separating them by user id and shell is the standard way to answer who can really log in, and it is also the first step of an access review.
+
+## Stop a service from starting at boot
+id: lx-disable-service
+module: linux
+level: Beginner
+minutes: 10
+lesson: linux/processes-and-services
+engine: Simulated Linux shell
+summary: Stop and disable an unused service, and confirm it stays off.
+@@ story
+The security scan found `telnet-legacy` listening on port 2323. Nobody uses it any more. Stop it now and make sure it does not start again after a reboot. The shop service must keep running.
+@@ goals
+- telnet-legacy is stopped and disabled.
+- The shop service is still active.
+@@ hints
+- `systemctl status telnet-legacy` shows state and whether it is enabled.
+- `sudo systemctl disable --now telnet-legacy` stops it and removes it from boot in one step.
+- Confirm with `systemctl is-enabled telnet-legacy` and `ss -ltn`.
+@@ world
+{"services": {"telnet-legacy": {"unit": "/etc/systemd/system/telnet-legacy.service", "state": "active", "enabled": true, "desc": "Legacy telnet", "port": 2323}, "shop": {"unit": "/etc/systemd/system/shop.service", "state": "active", "enabled": true, "desc": "Shop", "port": 8080}}}
+@@ file /etc/systemd/system/telnet-legacy.service mode=644 owner=root
+[Unit]
+Description=Legacy telnet
+[Service]
+ExecStart=/usr/sbin/telnet-legacy
+[Install]
+WantedBy=multi-user.target
+@@ file /etc/systemd/system/shop.service mode=644 owner=root
+[Unit]
+Description=Shop
+[Service]
+ExecStart=/usr/bin/shop
+[Install]
+WantedBy=multi-user.target
+@@ checks
+[
+ {"t": "service", "name": "telnet-legacy", "state": "inactive", "label": "telnet-legacy is stopped"},
+ {"t": "service", "name": "telnet-legacy", "enabled": false, "label": "telnet-legacy is disabled"},
+ {"t": "service", "name": "shop", "state": "active", "label": "shop is still running"}
+]
+@@ solution
+systemctl status telnet-legacy
+sudo systemctl disable --now telnet-legacy
+systemctl is-enabled telnet-legacy
+ss -ltn
+systemctl status shop
+@@ explain
+Stopping and disabling are different. A stopped but enabled service comes back at the next reboot, which is how forgotten services reappear. Removing what you do not use is the cheapest security control.
