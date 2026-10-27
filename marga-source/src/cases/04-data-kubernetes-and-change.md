@@ -101,7 +101,7 @@ lesson: Service account credentials need strict storage rules, support uploads s
 company: Uber
 year: 2014
 area: Cloud security
-modules: security, cloud, cicd
+modules: security, cloud, cicd, git
 source: US Federal Trade Commission analysis | https://www.ftc.gov/system/files/documents/cases/1523054_uber_technologies_analysis.pdf
 what: In May 2014 an intruder opened an Amazon S3 data store of Uber and read a file with details of drivers, including licence numbers. Uber found out in September 2014.
 cause: An access key with full administrative rights had been posted publicly in a code-sharing site by an engineer. The FTC alleged that Uber used one shared key, did not limit access by job role, did not require multifactor authentication and stored sensitive data unencrypted.

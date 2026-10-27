@@ -79,7 +79,7 @@ lesson: Cache or vendor dependencies, pin versions, and do not assume a registry
 company: xz project
 year: 2024
 area: Supply chain
-modules: linux, cicd, networking, security
+modules: linux, cicd, networking, security, git
 source: Openwall security announcement | https://www.openwall.com/lists/oss-security/2024/03/29/4
 what: In March 2024 a backdoor was found in the xz compression library. It was designed to let an attacker log in to SSH servers on some Linux distributions.
 cause: Someone gained trust as a maintainer over two years and then added hidden code to release tarballs. A developer noticed that SSH logins were about half a second slower than expected and investigated.

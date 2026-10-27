@@ -160,7 +160,7 @@ function renderChrome() {
     '<header class="topbar"><div class="wrap topbar-in">' +
     '<a class="brand" href="#/"><img src="icon.svg" alt="" width="26" height="26"><span><b>MARGA</b></span></a>' +
     '<nav class="topnav" id="topnav" aria-label="Main">' +
-    '<a href="#/paths" data-nav="paths">Skill trees</a><a href="#/cheatsheets" data-nav="cheatsheets">Cheat sheets</a>' +
+    '<a href="#/skills" data-nav="skills">Skills</a><a href="#/paths" data-nav="paths">Skill trees</a><a href="#/cheatsheets" data-nav="cheatsheets">Cheat sheets</a>' +
     '<a href="#/cases" data-nav="cases">Case studies</a><a href="#/practice" data-nav="practice">Practice</a><a href="#/progress" data-nav="progress">Progress</a><a href="#/interview" data-nav="interview">InterviewHub</a><a href="#/about" data-nav="about">About</a></nav>' +
     '<div class="tools">' +
     '<button class="btn btn-quiet search-btn" type="button" data-act="search" aria-label="Search lessons and cheat sheets">' + ICON.search + '<span>Search</span><kbd>/</kbd></button>' +
@@ -306,6 +306,7 @@ function homeView() {
     heroDemoHtml() + '</div></section>' +
 
     '<section class="stats" aria-label="What is on MARGA"><div class="wrap">' + stats + '</div></section>' +
+    (api.doorsHtml ? api.doorsHtml() : '') +
 
     '<section class="band"><div class="wrap"><div class="band-head"><h2>Pick a skill tree. Pass each check to unlock the next skill.</h2><p>Each role is a tree of skills. A skill unlocks when the skills that lead into it are mastered.</p></div>' +
     '<div class="pipe-panel"><div class="pipe-head"><div role="tablist" aria-label="Role paths" class="tabs">' + tabs + '</div>' +
@@ -475,7 +476,7 @@ function moduleView(id) {
   view.title = m.title + ' | MARGA by EknathaLabs'; view.nav = 'paths';
   var lock = '';
   if (s === 'lock') {
-    lock = '<div class="gate"><strong>This stage is locked.</strong> Pass ' + missingReqs(m).map(function (r) { return '<a href="#/module/' + r.id + '">' + e(r.title) + '</a>'; }).join(' and ') + ' to open it.</div>';
+    lock = '<div class="gate"><strong>This stage is locked.</strong> Pass ' + missingReqs(m).map(function (r) { return '<a href="#/module/' + r.id + '">' + e(r.title) + '</a>'; }).join(' and ') + ' to open it. Know it already? ' + missingReqs(m).map(function (r) { return '<a href="#/testout/' + r.id + '">Test out of ' + e(r.title) + '</a>'; }).join(' or ') + '.</div>';
   }
   view.html = '<section class="page-head wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="#/paths">Paths</a></nav><h1>' + e(m.title) + '</h1>' +
     '<p class="lede">' + e(m.summary) + '</p>' +
@@ -484,7 +485,7 @@ function moduleView(id) {
     '<p class="small">Practice this stage: <a href="#/drills/' + m.id + '">troubleshooting drills</a>, <a href="#/cases/' + m.id + '">case studies</a>, <a href="#/flashcards">flashcards</a>.</p>' +
     (sheets.length ? '<p class="small">Cheat sheet: ' + sheets.map(function (k) { return '<a href="#/cheatsheet/' + k + '">' + e(SHEETS[k].title) + '</a>'; }).join(', ') + '</p>' : '') +
     '<div class="actions">' + printBar() + '</div>' + voiceSlot() +
-    '</section><div class="wrap"><ol class="jobs">' + m.lessons.map(function (lid, i) { return jobHtml(lid, i); }).join('') + '</ol>' + refsHtml(m.refs, 'Official documentation for this stage') + (window.MargaFeatures && MargaFeatures.moduleExtras ? MargaFeatures.moduleExtras(m.id) : '') + '</div>';
+    '</section><div class="wrap"><ol class="jobs">' + m.lessons.map(function (lid, i) { return jobHtml(lid, i); }).join('') + '</ol>' + refsHtml(m.refs, 'Official documentation for this stage') + (window.MargaFeatures && MargaFeatures.moduleExtras ? MargaFeatures.moduleExtras(m.id) : '') + (api.chooseModule ? api.chooseModule(m.id) : '') + '</div>';
   view.voice = '#main'; view.voiceLabel = m.title;
   view.after = null;
 }
@@ -1084,6 +1085,7 @@ if (typeof window.MargaLabs === 'function') window.MargaLabs(api);
 if (typeof window.MargaTermLabs === 'function') window.MargaTermLabs(api);
 if (typeof window.MargaFeatures === 'function') window.MargaFeatures(api);
 if (typeof window.MargaBadges === 'function') window.MargaBadges(api);
+if (typeof window.MargaChoose === 'function') window.MargaChoose(api);
 
 /* ---------- accessibility panel ---------- */
 (function () {
