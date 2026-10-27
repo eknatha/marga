@@ -1088,3 +1088,49 @@ p code, li code, td code { overflow-wrap: anywhere; }
 .hd-pause { font: 600 12.5px var(--sans); color: var(--code-text); background: transparent; border: 1px solid #4a5f8f; border-radius: 6px; padding: 4px 10px; min-height: 28px; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) { .hd-stage .tl-l:not(.pend) { animation: none; } }
 @media (max-width: 520px) { .hd-tab { padding: 8px 8px; font-size: 12.5px; } .hd-flow b { min-width: 5.5em; } .hd-stage { min-height: 330px; } }
+
+/* two ways to learn: skills page, doors, plan builder, test-out */
+.doors-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 8px; }
+.door { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px; }
+.door h3 { margin: 0; font: 700 1.35rem var(--sans); color: var(--ink); }
+.door p { margin: 0; }
+.door .chips { margin-top: 2px; }
+.door .actions { margin-top: auto; padding-top: 6px; }
+.door-paths { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.door-paths a { display: grid; gap: 4px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; color: var(--text); text-decoration: none; background: var(--paper); }
+.door-paths a:hover { border-color: var(--accent); }
+.door-paths strong { color: var(--ink); }
+.door-paths span { color: var(--muted); font-size: .9rem; }
+.door-bar { display: block; height: 5px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.door-bar i { display: block; height: 100%; background: var(--pass); }
+.goals { margin-top: 12px; margin-bottom: 8px; }
+.skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; margin: 4px 0 32px; }
+.skill { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; }
+.skill p { margin: 0; }
+.skill-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.skill h3 { margin: 0; font: 700 1.15rem var(--sans); }
+.skill h3 a { color: var(--ink); text-decoration: none; }
+.skill h3 a:hover { color: var(--accent); }
+.skill.s-pass { border-color: var(--pass); }
+.skill .actions { margin-top: auto; padding-top: 6px; display: flex; flex-wrap: wrap; gap: 8px; }
+.two-col { display: grid; grid-template-columns: minmax(260px, 340px) minmax(0, 1fr); gap: 32px; align-items: start; }
+.plan-pick fieldset { border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; background: var(--surface); }
+.plan-pick legend { font-weight: 700; color: var(--ink); padding: 0 6px; }
+.picks { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.pick { display: flex; gap: 10px; align-items: flex-start; padding: 8px 6px; border-radius: 8px; cursor: pointer; }
+.pick:hover { background: var(--paper); }
+.pick input { margin-top: 4px; width: 18px; height: 18px; flex: none; }
+.pick span { display: grid; gap: 2px; }
+.pick small { color: var(--muted); }
+.plan-meta { margin: 0 0 12px; }
+.plan-steps { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 10px; }
+.plan-steps .step { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.plan-steps .n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: var(--accent-soft); color: var(--accent); }
+.plan-steps .step.s-pass .n { background: var(--pass-soft); color: var(--pass); }
+.plan-steps .step div { display: grid; gap: 4px; }
+.plan-steps a { color: var(--ink); }
+.choose-note { margin-top: 28px; }
+@media (max-width: 860px) {
+  .doors-grid, .two-col { grid-template-columns: minmax(0, 1fr); }
+  .skills-grid { grid-template-columns: minmax(0, 1fr); }
+}

@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Git cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="Everyday commands for commits, branches, remotes, undoing mistakes, tags and recovery.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/git.html">
+<meta property="og:title" content="Git cheat sheet">
+<meta property="og:description" content="Everyday commands for commits, branches, remotes, undoing mistakes, tags and recovery.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/git.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=5c9ca8f9">
+<script src="../assets/a11y.js?v=5c9ca8f9"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="../#/interview">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>Git cheat sheet</h1>
+    <p class="lede">Everyday commands for commits, branches, remotes, undoing mistakes, tags and recovery.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="set-up-and-first-commits">Set up and first commits</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="git config --global user.name &quot;Your Name&quot;
+git config --global user.email &quot;you@example.com&quot;
+git config --global init.defaultBranch main
+git config --global pull.ff only          # safe pull default
+git init                                  # new repository here
+git clone URL                             # copy a repository
+git status                                # what is changed, staged, untracked
+git add FILE                              # stage a file
+git add -p                                # stage pieces of files
+git commit -m &quot;Fix retry loop in backup.sh&quot;
+git commit --amend --no-edit              # add staged changes to the last commit (unpushed)" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">git config --global user.name <span class="hljs-string">&quot;Your Name&quot;</span>
+git config --global user.email <span class="hljs-string">&quot;you@example.com&quot;</span>
+git config --global init.defaultBranch main
+git config --global pull.ff only          <span class="hljs-comment"># safe pull default</span>
+git init                                  <span class="hljs-comment"># new repository here</span>
+git <span class="hljs-built_in">clone</span> URL                             <span class="hljs-comment"># copy a repository</span>
+git status                                <span class="hljs-comment"># what is changed, staged, untracked</span>
+git add FILE                              <span class="hljs-comment"># stage a file</span>
+git add -p                                <span class="hljs-comment"># stage pieces of files</span>
+git commit -m <span class="hljs-string">&quot;Fix retry loop in backup.sh&quot;</span>
+git commit --amend --no-edit              <span class="hljs-comment"># add staged changes to the last commit (unpushed)</span></code></pre></div>
+<div class="table-wrap"><table><thead><tr>
+<th>Area</th>
+<th>Meaning</th>
+</tr>
+</thead><tbody><tr>
+<td>Working tree</td>
+<td>The files you edit</td>
+</tr>
+<tr>
+<td>Staging area (index)</td>
+<td>What goes into the next commit</td>
+</tr>
+<tr>
+<td>Repository</td>
+<td>The saved history in <code>.git</code></td>
+</tr>
+</tbody></table></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>git restore FILE</code> and <code>git reset --hard</code> throw away uncommitted edits for good. Run <code>git status</code> first, and stash if you are unsure.</p>
+</aside>
+<h2 id="look-at-history">Look at history</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="git log --oneline --graph --decorate -15
+git log -p -- FILE                        # changes to one file
+git log -S&quot;text&quot;                          # commits that added or removed text
+git log A..B                              # commits in B not in A
+git show HASH                             # one commit in full
+git diff                                  # working tree vs staging
+git diff --staged                         # staging vs last commit
+git diff main...feature                   # what the branch adds
+git blame -L 40,60 FILE                   # who last changed each line" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">git <span class="hljs-built_in">log</span> --oneline --graph --decorate -15
+git <span class="hljs-built_in">log</span> -p -- FILE                        <span class="hljs-comment"># changes to one file</span>
+git <span class="hljs-built_in">log</span> -S<span class="hljs-string">&quot;text&quot;</span>                          <span class="hljs-comment"># commits that added or removed text</span>
+git <span class="hljs-built_in">log</span> A..B                              <span class="hljs-comment"># commits in B not in A</span>
+git show HASH                             <span class="hljs-comment"># one commit in full</span>
+git diff                                  <span class="hljs-comment"># working tree vs staging</span>
+git diff --staged                         <span class="hljs-comment"># staging vs last commit</span>
+git diff main...feature                   <span class="hljs-comment"># what the branch adds</span>
+git blame -L 40,60 FILE                   <span class="hljs-comment"># who last changed each line</span></code></pre></div>
+<h2 id="branches-and-merging">Branches and merging</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="git branch                                # list branches
+git switch -c feature/retry               # create and switch
+git switch main
+git merge feature/retry                   # merge into current branch
+git merge --no-ff feature/retry           # always create a merge commit
+git merge --abort                         # give up a merge
+git rebase origin/main                    # replay my commits on the latest main
+git rebase -i HEAD~4                      # tidy the last four commits
+git rebase --abort
+git branch -d feature/retry               # delete a merged branch
+git cherry-pick HASH                      # copy one commit here" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">git branch                                <span class="hljs-comment"># list branches</span>
+git switch -c feature/retry               <span class="hljs-comment"># create and switch</span>
+git switch main
+git merge feature/retry                   <span class="hljs-comment"># merge into current branch</span>
+git merge --no-ff feature/retry           <span class="hljs-comment"># always create a merge commit</span>
+git merge --abort                         <span class="hljs-comment"># give up a merge</span>
+git rebase origin/main                    <span class="hljs-comment"># replay my commits on the latest main</span>
+git rebase -i HEAD~4                      <span class="hljs-comment"># tidy the last four commits</span>
+git rebase --abort
+git branch -d feature/retry               <span class="hljs-comment"># delete a merged branch</span>
+git cherry-pick HASH                      <span class="hljs-comment"># copy one commit here</span></code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Never rebase or amend commits that others have already pulled. It creates new commits, and their copies no longer match.</p>
+</aside>
+<h2 id="remotes">Remotes</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="git remote -v
+git fetch origin                          # download, change nothing local
+git pull --ff-only                        # fetch and fast-forward only
+git pull --rebase                         # fetch and replay my commits
+git push -u origin feature/retry          # first push, set upstream
+git push --force-with-lease               # safer forced update (own branches only)
+git branch -vv                            # ahead or behind" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">git remote -v
+git fetch origin                          <span class="hljs-comment"># download, change nothing local</span>
+git pull --ff-only                        <span class="hljs-comment"># fetch and fast-forward only</span>
+git pull --rebase                         <span class="hljs-comment"># fetch and replay my commits</span>
+git push -u origin feature/retry          <span class="hljs-comment"># first push, set upstream</span>
+git push --force-with-lease               <span class="hljs-comment"># safer forced update (own branches only)</span>
+git branch -vv                            <span class="hljs-comment"># ahead or behind</span></code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Plain <code>git push --force</code> can erase a colleague&#39;s commits. Use <code>--force-with-lease</code> on your own branch, and block force pushes on shared branches.</p>
+</aside>
+<h2 id="undo">Undo</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Goal</th>
+<th>Command</th>
+</tr>
+</thead><tbody><tr>
+<td>Discard edits to a file</td>
+<td><code>git restore FILE</code></td>
+</tr>
+<tr>
+<td>Unstage a file</td>
+<td><code>git restore --staged FILE</code></td>
+</tr>
+<tr>
+<td>Fix last commit message</td>
+<td><code>git commit --amend</code></td>
+</tr>
+<tr>
+<td>Reverse a shared commit</td>
+<td><code>git revert HASH</code></td>
+</tr>
+<tr>
+<td>Undo commit, keep changes staged</td>
+<td><code>git reset --soft HEAD~1</code></td>
+</tr>
+<tr>
+<td>Match the remote exactly (loses local work)</td>
+<td><code>git reset --hard origin/main</code></td>
+</tr>
+<tr>
+<td>Park work</td>
+<td><code>git stash push -m &quot;note&quot;</code> then <code>git stash pop</code></td>
+</tr>
+<tr>
+<td>Preview deleting untracked files</td>
+<td><code>git clean -n</code></td>
+</tr>
+</tbody></table></div>
+<h2 id="tags-and-releases">Tags and releases</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="git tag -a v1.4.0 -m &quot;Release 1.4.0&quot;      # annotated tag
+git push origin v1.4.0
+git describe --tags                       # v1.4.0-12-g3f9c2ab
+git log v1.3.0..v1.4.0 --oneline          # what is in the release
+git tag --contains HASH                   # which releases hold this fix" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">git tag -a v1.4.0 -m <span class="hljs-string">&quot;Release 1.4.0&quot;</span>      <span class="hljs-comment"># annotated tag</span>
+git push origin v1.4.0
+git describe --tags                       <span class="hljs-comment"># v1.4.0-12-g3f9c2ab</span>
+git <span class="hljs-built_in">log</span> v1.3.0..v1.4.0 --oneline          <span class="hljs-comment"># what is in the release</span>
+git tag --contains HASH                   <span class="hljs-comment"># which releases hold this fix</span></code></pre></div>
+<p>Semantic versioning: <code>MAJOR.MINOR.PATCH</code>. Breaking change raises MAJOR, new compatible feature raises MINOR, bug fix raises PATCH.</p>
+<h2 id="recover-and-investigate">Recover and investigate</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="git reflog                                # where HEAD has been
+git branch rescue HASH                    # name a lost commit
+git bisect start; git bisect bad; git bisect good v1.3.0
+git bisect run ./test.sh                  # automatic search for the first bad commit
+git fsck --lost-found                     # unreachable objects
+git rm --cached FILE                      # stop tracking, keep the file" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">git reflog                                <span class="hljs-comment"># where HEAD has been</span>
+git branch rescue HASH                    <span class="hljs-comment"># name a lost commit</span>
+git bisect start; git bisect bad; git bisect good v1.3.0
+git bisect run ./test.sh                  <span class="hljs-comment"># automatic search for the first bad commit</span>
+git fsck --lost-found                     <span class="hljs-comment"># unreachable objects</span>
+git <span class="hljs-built_in">rm</span> --cached FILE                      <span class="hljs-comment"># stop tracking, keep the file</span></code></pre></div>
+<h2 id="big-repositories">Big repositories</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="git clone --depth 1 URL                   # latest commit only
+git clone --filter=blob:none URL          # fetch file contents on demand
+git sparse-checkout set DIR1 DIR2         # check out only these folders
+git worktree add ../hotfix hotfix/1.4     # second working folder
+git submodule update --init --recursive
+git count-objects -vH" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">git <span class="hljs-built_in">clone</span> --depth 1 URL                   <span class="hljs-comment"># latest commit only</span>
+git <span class="hljs-built_in">clone</span> --filter=blob:none URL          <span class="hljs-comment"># fetch file contents on demand</span>
+git sparse-checkout <span class="hljs-built_in">set</span> DIR1 DIR2         <span class="hljs-comment"># check out only these folders</span>
+git worktree add ../hotfix hotfix/1.4     <span class="hljs-comment"># second working folder</span>
+git submodule update --init --recursive
+git count-objects -vH</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>A secret that was committed is compromised, even after you delete it. Revoke it first, then clean history, because old clones keep a copy.</p>
+</aside>
+<h2 id="safe-habits">Safe habits</h2>
+<ul>
+<li>Run <code>git status</code> before every commit, reset or checkout.</li>
+<li>Keep commits small, with a message that says why.</li>
+<li>Never rewrite commits that others have pulled.</li>
+<li>Never commit secrets. If one is committed, revoke it first.</li>
+<li>Protect <code>main</code>: pull requests, review, required checks, no force push.</li>
+</ul>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://git-scm.com/docs" target="_blank" rel="noopener">Git reference documentation</a><span class="host">git-scm.com</span></li><li><a href="https://git-scm.com/book/en/v2" target="_blank" rel="noopener">Pro Git book</a><span class="host">git-scm.com</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=5c9ca8f9"></script>
+<script src="../assets/counter.js?v=5c9ca8f9"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>
