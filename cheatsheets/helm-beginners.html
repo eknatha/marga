@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Helm for beginners cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="Install, configure, upgrade and roll back releases, write templates, package charts and debug failed deployments.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/helm-beginners.html">
+<meta property="og:title" content="Helm for beginners cheat sheet">
+<meta property="og:description" content="Install, configure, upgrade and roll back releases, write templates, package charts and debug failed deployments.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/helm-beginners.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=82e79988">
+<script src="../assets/a11y.js?v=82e79988"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="../#/interview">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>Helm for beginners cheat sheet</h1>
+    <p class="lede">Install, configure, upgrade and roll back releases, write templates, package charts and debug failed deployments.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="find-and-inspect-charts">Find and inspect charts</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="helm repo add acme https://charts.example.com
+helm repo update
+helm search repo acme --versions | head
+helm show values acme/web --version 2.4.1 &gt; defaults.yaml
+helm show readme acme/web --version 2.4.1" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">helm repo add acme https://charts.example.com
+helm repo update
+helm search repo acme --versions | <span class="hljs-built_in">head</span>
+helm show values acme/web --version 2.4.1 &gt; defaults.yaml
+helm show readme acme/web --version 2.4.1</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Always pin <code>--version</code>. A repository update can otherwise change what you install.</p>
+</aside>
+<h2 id="install-and-override-values">Install and override values</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="helm install shop-web acme/web -n shop --create-namespace \
+  --version 2.4.1 -f values.yaml -f values-prod.yaml
+helm install shop-web acme/web -n shop --set image.tag=1.8.3
+helm list -n shop
+helm status shop-web -n shop" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">helm install shop-web acme/web -n shop --create-namespace \
+  --version 2.4.1 -f values.yaml -f values-prod.yaml
+helm install shop-web acme/web -n shop --<span class="hljs-built_in">set</span> image.tag=1.8.3
+helm list -n shop
+helm status shop-web -n shop</code></pre></div>
+<p>Later <code>-f</code> files win, and <code>--set</code> wins over files. Lists are replaced, not merged.</p>
+<h2 id="preview-before-applying">Preview before applying</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="helm lint ./chart -f values-prod.yaml
+helm template shop-web ./chart -f values-prod.yaml &gt; rendered.yaml
+helm upgrade shop-web ./chart -f values-prod.yaml --dry-run --debug
+kubectl apply --dry-run=server -f rendered.yaml" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">helm lint ./chart -f values-prod.yaml
+helm template shop-web ./chart -f values-prod.yaml &gt; rendered.yaml
+helm upgrade shop-web ./chart -f values-prod.yaml --dry-run --debug
+kubectl apply --dry-run=server -f rendered.yaml</code></pre></div>
+<h2 id="upgrade-history-and-rollback">Upgrade, history and rollback</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="helm upgrade --install shop-web acme/web -n shop -f values-prod.yaml \
+  --atomic --wait --timeout 5m
+helm history shop-web -n shop
+helm rollback shop-web 2 -n shop --wait
+helm uninstall shop-web -n shop --keep-history" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">helm upgrade --install shop-web acme/web -n shop -f values-prod.yaml \
+  --atomic --<span class="hljs-built_in">wait</span> --<span class="hljs-built_in">timeout</span> 5m
+helm <span class="hljs-built_in">history</span> shop-web -n shop
+helm rollback shop-web 2 -n shop --<span class="hljs-built_in">wait</span>
+helm uninstall shop-web -n shop --keep-history</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Without <code>--wait</code> or <code>--atomic</code>, a release can report success while pods crash. A rollback restores objects, not data or database schema.</p>
+</aside>
+<h2 id="what-is-deployed">What is deployed</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="helm get values shop-web -n shop -a
+helm get manifest shop-web -n shop
+helm get manifest shop-web -n shop --revision 2
+helm get notes shop-web -n shop" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">helm get values shop-web -n shop -a
+helm get manifest shop-web -n shop
+helm get manifest shop-web -n shop --revision 2
+helm get notes shop-web -n shop</code></pre></div>
+<h2 id="chart-layout">Chart layout</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="mychart/
+  Chart.yaml
+  values.yaml
+  values.schema.json
+  charts/
+  templates/
+    deployment.yaml
+    _helpers.tpl
+    NOTES.txt" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">mychart/
+  Chart.yaml
+  values.yaml
+  values.schema.json
+  charts/
+  templates/
+    deployment.yaml
+    _helpers.tpl
+    NOTES.txt</code></pre></div>
+<div class="code" data-lang="yaml"><button class="copy" type="button" data-copy="apiVersion: v2
+name: shop-web
+version: 0.3.1
+appVersion: &quot;1.8.2&quot;" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v2</span>
+<span class="hljs-attr">name:</span> <span class="hljs-string">shop-web</span>
+<span class="hljs-attr">version:</span> <span class="hljs-number">0.3</span><span class="hljs-number">.1</span>
+<span class="hljs-attr">appVersion:</span> <span class="hljs-string">&quot;1.8.2&quot;</span></code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Raise <code>version</code> whenever the chart changes. Published chart versions are meant to be immutable.</p>
+</aside>
+<h2 id="template-patterns">Template patterns</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="replicas: {{ .Values.replicaCount }}
+image: &quot;{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}&quot;
+{{- if .Values.ingress.enabled }}
+{{- end }}
+{{- range .Values.hosts }}
+- host: {{ . | quote }}
+{{- end }}
+labels:
+  {{- include &quot;web.labels&quot; . | nindent 4 }}
+resources:
+  {{- toYaml .Values.resources | nindent 12 }}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">replicas: {{ .Values.replicaCount }}
+image: &quot;{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}&quot;
+{{- if .Values.ingress.enabled }}
+{{- end }}
+{{- range .Values.hosts }}
+- host: {{ . | quote }}
+{{- end }}
+labels:
+  {{- include &quot;web.labels&quot; . | nindent 4 }}
+resources:
+  {{- toYaml .Values.resources | nindent 12 }}</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>nindent</code> must equal the column of the destination key, or the YAML breaks. Render with several values files, including all optional features off.</p>
+</aside>
+<h2 id="dependencies-and-registries">Dependencies and registries</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="helm dependency update ./chart
+helm dependency build ./chart
+helm package ./chart
+helm registry login registry.example.com
+helm push chart-0.3.1.tgz oci://registry.example.com/charts
+helm install web oci://registry.example.com/charts/chart --version 0.3.1" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">helm dependency update ./chart
+helm dependency build ./chart
+helm package ./chart
+helm registry login registry.example.com
+helm push chart-0.3.1.tgz oci://registry.example.com/charts
+helm install web oci://registry.example.com/charts/chart --version 0.3.1</code></pre></div>
+<p>Commit <code>Chart.lock</code>. Mirror important external charts in your own registry.</p>
+<h2 id="secrets">Secrets</h2>
+<div class="code" data-lang="yaml"><button class="copy" type="button" data-copy="# chart takes a reference, never the value
+auth:
+  existingSecret: shop-db" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-comment"># chart takes a reference, never the value</span>
+<span class="hljs-attr">auth:</span>
+  <span class="hljs-attr">existingSecret:</span> <span class="hljs-string">shop-db</span></code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Values are stored in the release Secret and shown by <code>helm get values</code>. Never put passwords in values files or <code>--set</code> arguments.</p>
+</aside>
+<h2 id="debug-a-failed-release">Debug a failed release</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="helm template rel ./chart --debug | less
+helm history rel -n shop
+helm rollback rel 7 -n shop
+kubectl get events -n shop --sort-by=.lastTimestamp | tail
+kubectl describe pod POD -n shop
+helm test rel -n shop" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">helm template rel ./chart --debug | less
+helm <span class="hljs-built_in">history</span> rel -n shop
+helm rollback rel 7 -n shop
+kubectl get events -n shop --sort-by=.lastTimestamp | <span class="hljs-built_in">tail</span>
+kubectl describe pod POD -n shop
+helm <span class="hljs-built_in">test</span> rel -n shop</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>For <code>another operation is in progress</code>, check history and roll back first. Delete a release Secret only as a last resort, and never delete the running workload to fix it.</p>
+</aside>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://helm.sh/docs/" target="_blank" rel="noopener">Helm documentation</a><span class="host">helm.sh</span></li><li><a href="https://helm.sh/docs/chart_best_practices/" target="_blank" rel="noopener">Helm chart best practices</a><span class="host">helm.sh</span></li><li><a href="https://kubernetes.io/docs/home/" target="_blank" rel="noopener">Kubernetes documentation</a><span class="host">kubernetes.io</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=82e79988"></script>
+<script src="../assets/counter.js?v=82e79988"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

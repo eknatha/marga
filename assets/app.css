@@ -1134,3 +1134,8 @@ p code, li code, td code { overflow-wrap: anywhere; }
   .doors-grid, .two-col { grid-template-columns: minmax(0, 1fr); }
   .skills-grid { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Certifications icon link in the top navigation */
+.topnav a.nav-certs { display: inline-flex; align-items: center; gap: 6px; padding: 8px 9px; }
+.topnav a.nav-certs svg { display: block; }
+@media (max-width: 900px) { .topnav a.nav-certs::after { content: "Certifications"; } .topnav a.nav-certs .sr { display: none; } }
