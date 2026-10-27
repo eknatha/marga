@@ -863,3 +863,53 @@ def: A failure where two nodes both accept writes as primary, producing conflict
 module: databases
 plain: Everyone rebuilds the same expired answer at once.
 def: Many requests miss on an expired hot key simultaneously and overload the source of truth.
+
+## Commit
+module: git
+plain: A saved snapshot of your project with a message.
+def: An object in Git that records the state of all tracked files at one moment, plus an author, a timestamp, a message and a pointer to its parent commit.
+
+## Git branch
+module: git
+plain: A movable label on a line of work.
+def: A lightweight pointer to a commit that moves forward as you commit, used to develop changes in parallel and merge them later.
+
+## Staging area
+module: git
+plain: The draft of your next commit.
+def: Also called the index. It holds the changes selected with git add that will be included in the next commit.
+
+## Merge
+module: git
+plain: Combining the work of two branches.
+def: An operation that joins the histories of two branches, either by moving the pointer forward (fast-forward) or by creating a merge commit with two parents.
+
+## Rebase
+module: git
+plain: Replaying your commits on top of newer work.
+def: An operation that moves a branch to a new base commit and recreates its commits there, producing new commit hashes and a linear history.
+
+## Remote
+module: git
+plain: A named link to another copy of the repository.
+def: A reference to a repository elsewhere, such as origin, used with fetch, pull and push to share commits.
+
+## Pull request
+module: git
+plain: A request to merge your branch, with review.
+def: A feature of hosting platforms where one branch is proposed for merging into another, with discussion, review and automated checks (also called a merge request).
+
+## Reflog
+module: git
+plain: Git's private journal of where your branches pointed.
+def: A local log of every movement of HEAD and branch tips, used to recover commits after resets, rebases and deleted branches.
+
+## Tag
+module: git
+plain: A permanent name for one commit.
+def: A fixed reference to a commit, usually a release such as v1.4.0. Annotated tags also record a tagger, date and message and can be signed.
+
+## HEAD
+module: git
+plain: Where you are now in the history.
+def: A reference to the currently checked out commit, normally through a branch name. When it points directly to a commit it is called a detached HEAD.
