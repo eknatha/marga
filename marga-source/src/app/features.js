@@ -82,7 +82,7 @@ window.MargaFeatures = function (A) {
       '<p><strong>Eknatha Reddy Puli</strong> is a Senior Platform Engineer and SRE with over 14 years of experience managing enterprise infrastructure, Linux environments, and critical virtualization layers. <a href="https://www.linkedin.com/in/eknathareddypuli/" target="_blank" rel="noopener noreferrer">Connect on LinkedIn</a>.</p>' +
       '<p>MARGA, part of the EknathaLabs ecosystem, was born out of a simple mission: to make world-class DevOps and SRE education free and accessible to everyone globally. Every lesson, playground task, and troubleshooting drill on this platform is forged from real-world production incidents and complex data migrations, not vendor slides.</p>' +
       '<h2>Our Commitment: A Pure Global Public Good</h2>' +
-      '<p class="about-pledge"><strong>Free forever · No login · No ads · No cookies</strong></p>' +
+      '<p class="about-pledge"><strong>Free · No login · No ads · No cookies</strong></p>' +
       '<p>Most ed-tech platforms lock real troubleshooting tools behind paywalls, leaving self-directed learners in emerging markets at a massive disadvantage. MARGA changes that.</p>' +
       '<p>We do not collect your data, we do not track your habits, and we do not sell ads. The platform is designed from the ground up to be an open, serverless engineering laboratory that scales effortlessly to millions of students worldwide. We believe the tech industry thrives when knowledge is shared transparently, not gatekept.</p>' +
       '<h2>Privacy-First, Offline-Resilient Progress</h2>' +
@@ -344,7 +344,7 @@ window.MargaFeatures = function (A) {
       '<li>Linked websites, documents, standards and company incident reports belong to their owners. Case studies give a short summary in our own words and link to the original source.</li>' +
       '<li>Fonts and third-party libraries keep their own licenses.</li></ul>' +
       '<h2>No warranty</h2><p>The material is provided as it is, without any warranty. It was written to teach, not as advice for your particular systems. Test commands in a safe environment before using them in production, and check facts against the official documentation linked from each lesson.</p>' +
-      '<p class="about-pledge"><strong>Free forever &middot; No login &middot; No ads &middot; No cookies</strong></p>' +
+      '<p class="about-pledge"><strong>Free &middot; No login &middot; No ads &middot; No cookies</strong></p>' +
       '</div>';
     view.after = null;
   });
@@ -370,7 +370,7 @@ window.MargaFeatures = function (A) {
   }
   window.MargaFeatures.moduleExtras = function (mid) {
     var g = gamesForModule(mid), r = readingHtml(mid);
-    return (window.MargaBadges && MargaBadges.moduleLine ? MargaBadges.moduleLine(mid) : '') + (g ? '<h2 class="sub-h">Incident game</h2><p class="lede-s">Make the calls during a realistic outage and see what each choice leads to.</p>' + g : '') +
+    return (window.MargaBadges && MargaBadges.moduleLine ? MargaBadges.moduleLine(mid) : '') + (window.MargaTermLabs && MargaTermLabs.moduleLine ? MargaTermLabs.moduleLine(mid) : '') + (g ? '<h2 class="sub-h">Incident game</h2><p class="lede-s">Make the calls during a realistic outage and see what each choice leads to.</p>' + g : '') +
       (r ? '<h2 class="sub-h">Reading list</h2>' + r + '<p class="small"><a href="#/reading">See the reading lists for every stage</a></p>' : '');
   };
   A.addRoute(/^\/games$/, function () {
@@ -394,12 +394,16 @@ window.MargaFeatures = function (A) {
       '<div class="wrap narrow"><div id="gm-root" aria-live="polite"></div></div>';
     view.after = function () { gmPaint(); };
   });
+  function gmFbHtml(t) {
+    var i = t.indexOf(' Example: ');
+    return i < 0 ? esc(t) : esc(t.slice(0, i)) + '</p><p class="gm-ex"><strong>Example.</strong> ' + esc(t.slice(i + 10));
+  }
   function gmPaint(fb) {
     var root = $('#gm-root'); if (!root || !GM) return;
     var g = GM.g, sc = g.scenes[GM.at], html = '';
     if (GM.at === g.start && !GM.log.length && !fb) html += '<p class="gm-intro">' + esc(g.intro) + '</p>';
     if (fb) {
-      html += '<div class="gm-fb gm-' + fb.pts + '" role="status"><p><strong>' + (fb.pts === 2 ? 'Good call.' : fb.pts === 1 ? 'Acceptable, but not the best.' : 'That made things worse or wasted time.') + '</strong> ' + esc(fb.fb) + '</p><div class="actions"><button type="button" class="btn btn-primary" data-act="gm-next" data-to="' + esc(fb.to) + '">Continue</button></div></div>';
+      html += '<div class="gm-fb gm-' + fb.pts + '" role="status"><p><strong>' + (fb.pts === 2 ? 'Good call.' : fb.pts === 1 ? 'Acceptable, but not the best.' : 'That made things worse or wasted time.') + '</strong> ' + gmFbHtml(fb.fb) + '</p><div class="actions"><button type="button" class="btn btn-primary" data-act="gm-next" data-to="' + esc(fb.to) + '">Continue</button></div></div>';
       root.innerHTML = html; var b = $('[data-act=gm-next]', root); if (b) b.focus(); return;
     }
     if (sc.end) {
@@ -409,7 +413,7 @@ window.MargaFeatures = function (A) {
       A.markActive(); A.save(); A.renderChrome();
       html += '<div class="gm-end gm-end-' + sc.end + '"><h2>' + OUTLABEL[sc.end] + '</h2><p>' + esc(sc.text) + '</p><p><strong>What to take away.</strong> ' + esc(sc.takeaway) + '</p>' +
         '<p class="small">Good decisions: ' + GM.pts + ' of ' + GM.max + ' points.</p></div>' +
-        '<h3 class="sub-h">Your decisions</h3><ol class="gm-log">' + GM.log.map(function (x) { return '<li><span class="small">' + esc(x.scene) + '</span><br>' + esc(x.choice) + ' <span class="chip' + (x.pts === 2 ? ' pass' : '') + '">' + (x.pts === 2 ? 'Best' : x.pts === 1 ? 'Acceptable' : 'Poor') + '</span></li>'; }).join('') + '</ol>' +
+        '<h3 class="sub-h">Your decisions</h3><ol class="gm-log">' + GM.log.map(function (x) { return '<li><span class="small">' + esc(x.scene) + '</span><br>' + esc(x.choice) + ' <span class="chip' + (x.pts === 2 ? ' pass' : '') + '">' + (x.pts === 2 ? 'Best' : x.pts === 1 ? 'Acceptable' : 'Poor') + '</span><p class="gm-why">' + gmFbHtml(x.fb) + '</p>' + (x.pts < 2 && x.best ? '<p class="gm-why"><strong>A better move:</strong> ' + esc(x.best.t) + '. ' + gmFbHtml(x.best.fb) + '</p>' : '') + '</li>'; }).join('') + '</ol>' +
         '<div class="actions"><button type="button" class="btn btn-primary" data-act="gm-again">Play again and try other choices</button> <a class="btn btn-quiet" href="#/games">More games</a></div>';
       root.innerHTML = html; return;
     }
@@ -420,7 +424,7 @@ window.MargaFeatures = function (A) {
   A.onAct('gm-pick', function (b) {
     if (!GM) return;
     var sc = GM.g.scenes[GM.at], c = sc.choices[Number(b.getAttribute('data-i'))]; if (!c) return;
-    GM.pts += c.pts; GM.max += 2; GM.log.push({ scene: sc.text.length > 90 ? sc.text.slice(0, 90) + '...' : sc.text, choice: c.t, pts: c.pts });
+    GM.pts += c.pts; GM.max += 2; GM.log.push({ scene: sc.text.length > 90 ? sc.text.slice(0, 90) + '...' : sc.text, choice: c.t, pts: c.pts, fb: c.fb, best: sc.choices.filter(function (z) { return z.pts === 2; })[0] || null });
     GM.at = c.to; gmPaint({ pts: c.pts, fb: c.fb, to: c.to });
   });
   A.onAct('gm-next', function () { gmPaint(); var h = $('#gm-root'); if (h) h.scrollIntoView({ block: 'start' }); });

@@ -519,6 +519,8 @@ var PY_EX = [
 ];
 PY_EX = PY_EX.concat((D.labs && D.labs.python) || []);
 window.MARGA_PY_EX = PY_EX;
+window.MARGA_PYLOAD = function () { return pyLoad(); };
+window.MARGA_PY_READY = function () { return !!PY.py; };
 function pyLoad() {
   if (PY.py) return Promise.resolve(PY.py);
   if (PY.promise) return PY.promise;

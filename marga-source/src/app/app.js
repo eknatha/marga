@@ -155,7 +155,7 @@ function theme() { return document.documentElement.getAttribute('data-theme') ||
 function renderChrome() {
   var st = streaks();
   $('#chrome').innerHTML =
-    '<div class="utilbar"><div class="wrap utilbar-in"><span class="util-promise">Free forever \u00b7 No login \u00b7 No ads \u00b7 No cookies</span>' +
+    '<div class="utilbar"><div class="wrap utilbar-in"><span class="util-promise">Free \u00b7 No login \u00b7 No ads \u00b7 No cookies</span>' +
     (D.counter ? '<span class="visitors" id="visitors" role="status" aria-label="Visitor count" hidden></span>' : '') + '</div></div>' +
     '<header class="topbar"><div class="wrap topbar-in">' +
     '<a class="brand" href="#/"><img src="icon.svg" alt="" width="26" height="26"><span><b>MARGA</b></span></a>' +
@@ -172,9 +172,9 @@ function renderChrome() {
   $('#footer').innerHTML =
     '<footer class="foot"><div class="wrap foot-in">' +
     '<span>MARGA by EknathaLabs</span>' +
-    '<a href="cheatsheets/">Printable cheat sheets</a><a href="#/interview">InterviewHub</a><a href="#/practice">Practice</a><a href="#/glossary">Glossary</a><a href="#/labs">Labs (planned)</a><a href="#/badges">Badges</a><a href="#/license">Open content license</a>' +
+    '<a href="cheatsheets/">Printable cheat sheets</a><a href="#/interview">InterviewHub</a><a href="#/practice">Practice</a><a href="#/glossary">Glossary</a><a href="#/terminal-labs">Terminal labs</a><a href="#/badges">Badges</a><a href="#/license">Open content license</a>' +
     '<span class="foot-note">Progress is saved in this browser only.</span>' +
-    '<p class="foot-promise">Free forever \u00b7 No login \u00b7 No ads \u00b7 No cookies</p><p class="small foot-ver">Version ' + siteVer() + '</p></div></footer>';
+    '<p class="foot-promise">Free \u00b7 No login \u00b7 No ads \u00b7 No cookies</p><p class="small foot-ver">Version ' + siteVer() + '</p></div></footer>';
   if (window.MargaCounter && D.counter) MargaCounter.rebind('#visitors');
 }
 
@@ -296,22 +296,14 @@ function homeView() {
   view.html =
     '<section class="hero hero2"><div class="wrap hero-grid2">' +
     '<div class="hero-copy"><h1>Learn to fix production before production breaks.</h1>' +
+    '<p class="hero-free"><strong>Free. No login. No payment. Just practice and learn.</strong></p>' +
     '<p class="lede">Practical DevOps, cloud and SRE training from someone who runs production. Real incidents, real commands, no login, no ads.</p>' +
     '<div class="roles" role="radiogroup" aria-label="Choose your role">' + roles + '</div>' +
     '<div class="actions">' + cta + '<a class="btn btn-quiet" href="#/placement">Take the 10-question placement check</a></div>' +
-    '<p class="small">Free forever. Progress stays in your browser.</p>' +
+    '<p class="small">No account needed. Start now. Progress stays in your browser on this device; export it to move it.</p>' +
     '<dl class="today"><div><dt>Day streak</dt><dd>' + st.cur + '</dd></div><div><dt>Lessons passed</dt><dd>' + t.done + '<small> of ' + t.total + '</small></dd></div>' +
     '<div><dt>Best streak</dt><dd>' + st.best + '</dd></div></dl></div>' +
-    '<div class="term" id="term" aria-label="Example terminal session"><div class="tbar"><i></i><i></i><i></i><span>prod-cluster: a pod will not start</span></div><div class="tb" tabindex="0" role="region" aria-label="Terminal output">' +
-    '<p class="tl-l"><span class="pr">$</span> kubectl get pods -n shop</p>' +
-    '<p class="tl-l dim">NAME                  READY  STATUS             RESTARTS</p>' +
-    '<p class="tl-l">api-7d9f8c6b5-x2k4p   0/1    <span class="bad">CrashLoopBackOff</span>  6</p>' +
-    '<p class="tl-l">web-5c4d7f9b8-m8q2z   1/1    <span class="ok">Running</span>           0</p>' +
-    '<p class="tl-l"><span class="pr">$</span> kubectl logs api-7d9f8c6b5-x2k4p --previous</p>' +
-    '<p class="tl-l warn">Error: DATABASE_URL is not set</p>' +
-    '<p class="tl-l"><span class="pr">$</span> kubectl set env deploy/api DATABASE_URL=<span class="cur"></span></p>' +
-    '<div class="tl-l term-hint"><b>Your turn.</b> The pod crashes on start. What did the log just tell you? Pick the fix in the drill, then read what a real incident looked like.</div></div>' +
-    '<div class="tcap"><span>Troubleshooting drill, Kubernetes</span><a href="#/drills/kubernetes">Try it</a></div></div></div></section>' +
+    heroDemoHtml() + '</div></section>' +
 
     '<section class="stats" aria-label="What is on MARGA"><div class="wrap">' + stats + '</div></section>' +
 
@@ -342,22 +334,88 @@ function homeView() {
     '<div class="note-panel"><h3>Listen while you learn</h3><p>Every lesson, cheat sheet and interview answer can be read aloud. Pick any voice installed on your device from the Voice dropdown.</p></div></div></section>' +
 
     '<section class="band"><div class="wrap two"><div><h2>How a lesson works</h2><ol class="steps"><li><strong>Read.</strong> Each lesson explains why, then shows commands with their output.</li><li><strong>Check.</strong> Answer a short quiz. Pass it to mark the lesson done and unlock the next.</li><li><strong>Remember.</strong> Flip the flashcards now, and review them again later from the Review cards page.</li></ol></div>' +
-    '<div class="note-panel"><h3>Hands-on labs are planned</h3><p>Browser-based practice with automatic checking is in development. Until then, every lesson includes a written incident walkthrough with sample output so you can follow the reasoning.</p><p><a href="#/labs">What is planned</a></p></div></div></section>';
+    '<div class="note-panel"><h3>Terminal labs</h3><p>Break-and-fix practice for Linux, Shell, Networking and Python, in a simulated terminal in your browser, with automatic checks. It is a simulation, not a real server. Labs for Kubernetes, Docker and Terraform are still planned.</p><p><a href="#/terminal-labs">Open the terminal labs</a> | <a href="#/labs">What is planned</a></p></div></div></section>';
   view.after = function () { armTree(); armTerm(); };
 }
 
+var HD = [
+  { tab: 'Terminal lab', title: 'lab: SSH refuses the key', cap: 'Terminal lab: fix SSH key permissions', href: '#/terminal-lab/lx-ssh-perms', go: 'Try this lab', items: [
+    ['cmd', 'ls -l ~/.ssh/id_ed25519'], ['out bad', '-rw-r--r-- 1 user user 411 Jan  5 id_ed25519'], ['out warn', "Permissions 0644 for 'id_ed25519' are too open."],
+    ['cmd', 'chmod 600 ~/.ssh/id_ed25519'], ['cmd', 'ls -l ~/.ssh/id_ed25519'], ['out ok', '-rw------- 1 user user 411 Jan  5 id_ed25519'],
+    ['note', '<b>Check passed.</b> A private key must be readable only by its owner. Labs like this run in your browser.']] },
+  { tab: 'Incident game', title: 'game: Healthy Pods, no traffic', cap: 'Incident game: choose, then see why', href: '#/game/healthy-pods-no-traffic', go: 'Play this game', items: [
+    ['out dim', 'The shop returns 503 after a rollout.'], ['out', 'All 3 new Pods are Running, but READY shows 0/1.'], ['out warn', 'What do you do first?'],
+    ['choice', 'Delete the Pods so they are recreated'], ['choice pick', 'Describe a Pod and read the readiness events'], ['choice', 'Scale the Deployment to ten replicas'],
+    ['note', '<b>Why:</b> describe shows why a Pod is not Ready. <b>Example:</b> "Readiness probe failed: connection refused on port 8080" while the app listens on 9090.']] },
+  { tab: 'Explainer', title: 'explainer: How a DNS lookup works', cap: 'Animated explainer: step through a DNS lookup', href: '#/explainers/dns-lookup', go: 'Watch it', items: [
+    ['flow', 'Browser', 'Where is app.example.com?', 'Resolver'], ['flow', 'Resolver', 'Who handles .com?', 'Root server'], ['flow', 'Root server', 'Ask the .com servers', 'Resolver'],
+    ['flow', 'Resolver', 'Who handles example.com?', 'TLD server'], ['flow', 'Resolver', 'What is app.example.com?', 'Authoritative'], ['flow', 'Authoritative', 'It is 203.0.113.10', 'Resolver'],
+    ['note', '<b>Cached.</b> The resolver keeps the answer for its TTL, so the next lookup is instant. Explainers cover every skill.']] },
+  { tab: 'Architecture', title: 'walkthrough: Online payments service', cap: 'Architecture walkthrough: find where it breaks', href: '#/walkthrough/online-payments-service', go: 'Read the design', items: [
+    ['node', 'Client'], ['node', 'API gateway'], ['node', 'Payment service'], ['node', 'Queue'], ['node bad', 'Card network'],
+    ['out warn', 'Where it breaks: the card network is slow.'], ['note', '<b>Effect:</b> the queue grows and clients retry. <b>Fix:</b> make every payment request safe to repeat, with an idempotency key. Every design lists where it breaks.']] }
+];
+function heroDemoHtml() {
+  var tabs = HD.map(function (x, n) { return '<button type="button" role="tab" class="hd-tab' + (n ? '' : ' on') + '" id="hd-t' + n + '" aria-selected="' + (n === 0) + '" aria-controls="hd-stage" data-n="' + n + '">' + e(x.tab) + '</button>'; }).join('');
+  var sr = HD.map(function (x) { return x.cap; }).join('. ');
+  return '<div class="term hd" id="term" aria-label="Short demos of MARGA">' +
+    '<div class="hd-tabs" role="tablist" aria-label="Demos">' + tabs + '</div>' +
+    '<div class="tbar"><i></i><i></i><i></i><span id="hd-title">' + e(HD[0].title) + '</span></div>' +
+    '<div class="tb hd-stage" id="hd-stage" role="tabpanel" tabindex="0" aria-labelledby="hd-t0">' + hdItems(HD[0], true) + '</div>' +
+    '<p class="hd-sr">Four short demos that play in turn: ' + e(sr) + '.</p>' +
+    '<div class="tcap"><span id="hd-cap">' + e(HD[0].cap) + '</span><span class="hd-ctl"><button type="button" class="hd-pause" id="hd-pause" aria-pressed="false">Pause</button><a id="hd-link" href="' + HD[0].href + '">' + e(HD[0].go) + '</a></span></div></div>';
+}
+function hdItems(sc, shown) {
+  return sc.items.map(function (it) {
+    var k = it[0].split(' '), kind = k[0], cls = k.slice(1).join(' '), h;
+    if (kind === 'cmd') h = '<p class="tl-l' + (shown ? '' : ' pend') + '"><span class="pr">$</span> <span class="hd-cmd" data-t="' + e(it[1]) + '">' + (shown ? e(it[1]) : '') + '</span></p>';
+    else if (kind === 'out') h = '<p class="tl-l ' + cls + (shown ? '' : ' pend') + '">' + e(it[1]) + '</p>';
+    else if (kind === 'note') h = '<div class="tl-l term-hint' + (shown ? '' : ' pend') + '">' + it[1] + '</div>';
+    else if (kind === 'choice') h = '<p class="tl-l hd-ch ' + cls + (shown ? '' : ' pend') + '"><i aria-hidden="true"></i>' + e(it[1]) + '</p>';
+    else if (kind === 'flow') h = '<p class="tl-l hd-flow' + (shown ? '' : ' pend') + '"><b>' + e(it[1]) + '</b><span>' + e(it[2]) + '</span><b>' + e(it[3]) + '</b></p>';
+    else h = '<p class="tl-l hd-node ' + cls + (shown ? '' : ' pend') + '"><b>' + e(it[1]) + '</b></p>';
+    return h;
+  }).join('');
+}
 function armTerm() {
-  var t = $('#term'); if (!t) return;
+  var root = $('#term'); if (!root || !root.classList.contains('hd')) return;
   var reduce = (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) || document.documentElement.getAttribute('data-a-motion') === 'reduce';
-  if (reduce) return;
-  var ls = $$('.tl-l', t), i = 0;
-  ls.forEach(function (x) { x.classList.add('pend'); });
-  (function step() {
-    if (!document.body.contains(t)) return;
-    if (i >= ls.length) return;
-    ls[i].classList.remove('pend'); i++;
-    setTimeout(step, i === 5 ? 900 : 520);
-  })();
+  var stage = $('#hd-stage'), cur = 0, gen = 0, paused = false, timer = null, pauseBtn = $('#hd-pause');
+  function alive() { return document.body.contains(root); }
+  function show(n, play) {
+    gen++; clearTimeout(timer); cur = n;
+    $$('.hd-tab', root).forEach(function (b, i) { b.classList.toggle('on', i === n); b.setAttribute('aria-selected', String(i === n)); });
+    stage.setAttribute('aria-labelledby', 'hd-t' + n);
+    $('#hd-title').textContent = HD[n].title; $('#hd-cap').textContent = HD[n].cap;
+    var l = $('#hd-link'); l.setAttribute('href', HD[n].href); l.textContent = HD[n].go;
+    stage.innerHTML = hdItems(HD[n], !play);
+    if (play) run(n, gen);
+  }
+  function run(n, g) {
+    var ls = $$('.tl-l', stage), i = 0;
+    (function step() {
+      if (g !== gen || !alive() || paused) return;
+      if (i >= ls.length) { timer = setTimeout(function () { if (g === gen && alive() && !paused) show((n + 1) % HD.length, true); }, 3200); return; }
+      var el = ls[i++]; el.classList.remove('pend');
+      var c = $('.hd-cmd', el);
+      if (c) { var t = c.getAttribute('data-t'), k = 0; (function type() { if (g !== gen || !alive()) return; c.textContent = t.slice(0, ++k); if (k < t.length) setTimeout(type, 26); else timer = setTimeout(step, 420); })(); }
+      else timer = setTimeout(step, el.classList.contains('term-hint') ? 600 : 560);
+    })();
+    run.resume = function () { if (g === gen) { step0(); } };
+    function step0() { /* resume from the first hidden line */ var rest = $$('.tl-l.pend', stage); if (!rest.length) { timer = setTimeout(function () { if (g === gen && alive() && !paused) show((n + 1) % HD.length, true); }, 1500); return; } ls = rest; i = 0; step(); }
+  }
+  $$('.hd-tab', root).forEach(function (b) { b.addEventListener('click', function () { show(parseInt(b.getAttribute('data-n'), 10), !reduce && !paused); }); });
+  root.querySelector('.hd-tabs').addEventListener('keydown', function (ev) {
+    var d = ev.key === 'ArrowRight' ? 1 : ev.key === 'ArrowLeft' ? -1 : 0; if (!d) return;
+    ev.preventDefault(); var n = (cur + d + HD.length) % HD.length; show(n, !reduce && !paused); $('#hd-t' + n).focus();
+  });
+  if (reduce) { pauseBtn.hidden = true; return; }
+  pauseBtn.addEventListener('click', function () {
+    paused = !paused; pauseBtn.textContent = paused ? 'Play' : 'Pause'; pauseBtn.setAttribute('aria-pressed', String(paused));
+    if (paused) { clearTimeout(timer); } else if (run.resume) run.resume();
+  });
+  document.addEventListener('visibilitychange', function () { if (document.hidden) { clearTimeout(timer); } else if (!paused && alive() && run.resume) run.resume(); });
+  show(0, true);
 }
 
 function pathRow(p) {
@@ -752,13 +810,12 @@ function ivToggle(card, open) {
 /* ----- labs ----- */
 function labsView() {
   view.title = 'Labs | MARGA by EknathaLabs'; view.nav = 'labs';
-  view.html = '<section class="page-head wrap"><h1>Hands-on labs</h1><p class="lede">Planned. Labs are not available yet, and nothing on this site depends on them.</p></section>' +
-    '<div class="wrap narrow prose"><h2>What is planned</h2><ul>' +
-    '<li><strong>Terminal practice in the browser</strong> for Linux and Bash, with each task checked automatically.</li>' +
-    '<li><strong>Break and fix scenarios</strong> where a service is failing and you find the cause, based on real incidents.</li>' +
+  view.html = '<section class="page-head wrap"><h1>Hands-on labs</h1><p class="lede">Terminal labs for Linux, Shell, Networking and Python are available. The labs listed under planned are not available yet, and nothing on this site depends on them.</p></section>' +
+    '<div class="wrap narrow prose"><h2>Available now</h2><p><strong>Terminal labs</strong> are break-and-fix exercises in a simulated terminal in your browser. They are checked automatically. They are a simulation, not a real server.</p><p><a class="btn btn-primary" href="#/terminal-labs">Open the terminal labs</a></p><h2>What is planned</h2><ul>' +
+    '<li><strong>More break-and-fix scenarios</strong> based on real incidents, beyond the four stages that have terminal labs.</li>' +
     '<li><strong>Kubernetes and Docker exercises</strong> that match the lesson you just passed, including CKA and CKS style tasks.</li>' +
     '<li><strong>Infrastructure as code exercises</strong> for Terraform plans and state problems.</li></ul>' +
-    '<h2>What you can do today</h2><p>Each lesson contains a written incident walkthrough with sample output, a lesson check and flashcards. Cheat sheets cover the commands you will use when labs arrive.</p>' +
+    '<h2>What you can do today</h2><p>Each lesson contains a written incident walkthrough with sample output, a lesson check and flashcards. Cheat sheets cover the commands you will use in the labs.</p>' +
     '<p><a class="btn btn-primary" href="#/paths">Choose a learning path</a></p></div>';
   view.after = null;
 }
@@ -796,7 +853,7 @@ function progressView() {
           var o = JSON.parse(r.result);
           if (!o || o.v !== 1 || typeof o.lessons !== 'object' || !Array.isArray(o.days)) throw new Error('bad');
           S = { v: 1, lessons: o.lessons || {}, cards: o.cards || {}, days: o.days, path: o.path || 'devops', iv: (o.iv && typeof o.iv === 'object') ? o.iv : {} };
-          ['cs', 'dr', 'fc', 'dc', 'py', 'lab', 'wk', 'cap', 'gm', 'bd'].forEach(function (k) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) S[k] = o[k]; });
+          ['cs', 'dr', 'fc', 'dc', 'py', 'lab', 'wk', 'cap', 'gm', 'bd', 'tl'].forEach(function (k) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) S[k] = o[k]; });
           if (Array.isArray(o.mock)) S.mock = o.mock.slice(-20);
           save(); renderChrome(); toast('Progress imported.'); route();
         } catch (x) { toast('That file is not a MARGA progress export.'); }
@@ -1024,6 +1081,7 @@ window.MargaApp = api;
 if (typeof window.MargaExtras === 'function') window.MargaExtras(api);
 if (typeof window.MargaMore === 'function') window.MargaMore(api);
 if (typeof window.MargaLabs === 'function') window.MargaLabs(api);
+if (typeof window.MargaTermLabs === 'function') window.MargaTermLabs(api);
 if (typeof window.MargaFeatures === 'function') window.MargaFeatures(api);
 if (typeof window.MargaBadges === 'function') window.MargaBadges(api);
 

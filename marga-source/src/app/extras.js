@@ -58,7 +58,7 @@ function practiceView() {
     ['#/mix', 'Mixed practice', 'Twelve questions and drills from different stages in a shuffled order. Interleaving helps long-term memory.', 'Uses the lessons you passed'],
     ['#/weak', 'Weak-spot review', 'Questions, drills and flashcards you missed come back here until you get them right.', (window.MargaFeatures && MargaFeatures.weakCount ? MargaFeatures.weakCount() : 0) + ' to review'],
     ['#/review', 'Review due cards', 'Spaced repetition for the lessons you have passed.', 'Cards come back when due'],
-    ['#/labs', 'Hands-on labs', 'Planned. Not available yet.', 'Planned']
+    ['#/terminal-labs', 'Terminal labs', 'Fix broken systems in a simulated terminal for Linux, Shell, Networking and Python. Each lab checks your work and gives hints.', (window.MargaTermLabs && MargaTermLabs.count ? MargaTermLabs.count() : 'Simulated terminal')]
   ];
   view.html = head('Practice', 'Learning sticks when you use it. Everything here is open: no lesson needs to be passed first.') +
     '<div class="wrap"><ul class="prac">' + items.map(function (x) {
