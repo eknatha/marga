@@ -128,6 +128,8 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const text = await page.evaluate(() => document.body.innerText);
     ok(!/\bgit/i.test(text), 'visible text mentions git');
     ok(/Labs/.test(text) && /planned/i.test(text), 'home should mention planned labs');
+    ok(text.includes('Free. No login. No payment. Just practice and learn.') && text.includes('No account needed. Start now.'), 'home free/no login lines');
+    ok(!/Free forever/.test(text), 'no Free forever wording');
     eq(await page.locator('.tree .node').count() >= 8, true, 'skill tree nodes rendered');
     eq(await page.getAttribute('html', 'lang'), 'en', 'html lang');
     const canon = await page.getAttribute('link[rel=canonical]', 'href');
@@ -141,7 +143,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await page.goto(BASE + '/');
     await page.waitForSelector('#main h1');
     eq((await page.textContent('.brand')).trim(), 'MARGA', 'header brand is just MARGA');
-    ok(await page.evaluate(() => { const r = document.querySelector('#visitors').getBoundingClientRect(), w = document.querySelector('.utilbar .wrap').getBoundingClientRect(); return r.right > w.right - 24 && r.top < 40; }), 'visitor count sits at the top right');
+    ok(await page.evaluate(() => { const r = document.querySelector('#visitors').getBoundingClientRect(), w = document.querySelector('.utilbar .wrap').getBoundingClientRect(); return r.right > w.right - 64 && r.top < 40; }), 'visitor count sits at the top right');
     ok(!/Academy/i.test(await page.evaluate(() => document.title + document.body.innerText)), 'no leftover "Academy" wording');
     await page.waitForFunction(() => /^\d[\d ]* visitors?$/.test(document.querySelector('#visitors').textContent.trim()));
     eq((await page.textContent('#visitors')).trim(), '1 234 visitors', 'visitor text');
@@ -758,7 +760,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const { ctx, page, issues } = await open();
     await go(page, '/');
     const foot = await page.locator('#footer').innerText();
-    ok(foot.includes('Free forever · No login · No ads · No cookies'), 'promise: ' + foot);
+    ok(foot.includes('Free · No login · No ads · No cookies'), 'promise: ' + foot);
     for (const r of ['/', '/paths', '/labs', '/progress', '/interview', '/cheatsheets', '/path/sre']) {
       await nav(page, r); await page.waitForTimeout(100);
       const t = await page.evaluate(() => document.body.innerText);
@@ -766,7 +768,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     }
     for (const f of ['cheatsheets/index.html', 'cheatsheets/kubernetes.html']) {
       await page.goto(`${BASE}/${f}`);
-      ok((await page.locator('footer').innerText()).includes('Free forever'), `${f} promise`);
+      ok((await page.locator('footer').innerText()).includes('Free'), `${f} promise`);
     }
     eq(issues.length, 0, issues.join(' | '));
     await ctx.close();
@@ -1496,7 +1498,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const EXPL = await page.evaluate(() => null); 
     await go(page, '/explainers');
     const ids = await page.locator('.prac a').evaluateAll((as) => as.map((a) => a.getAttribute('href').replace('#/explainers/', '')));
-    ok(ids.length >= 44, 'explainers listed: ' + ids.length);
+    ok(ids.length >= 200, 'explainers listed: ' + ids.length);
     for (const id of ids) {
       await go(page, '/explainers/' + id);
       await page.waitForSelector('.ex-svg');
@@ -1648,6 +1650,25 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await ctx.close();
   });
 
+  await test('hero demo: rotates by itself through four demos, can be paused, and every link target exists', async () => {
+    const { ctx, page } = await open({ motion: true }); await go(page, '/');
+    await page.waitForSelector('#term.hd');
+    const first = await page.textContent('#hd-title');
+    await page.waitForFunction((t) => document.querySelector('#hd-title').textContent !== t, first, { timeout: 30000 });
+    await page.click('#hd-pause'); eq(await page.getAttribute('#hd-pause', 'aria-pressed'), 'true', 'paused');
+    const frozen = await page.textContent('#hd-title'); await page.waitForTimeout(6000);
+    eq(await page.textContent('#hd-title'), frozen, 'a paused demo does not rotate');
+    const data = await A(page);
+    for (let n = 0; n < 4; n++) {
+      await page.click('#hd-t' + n);
+      const h = await page.getAttribute('#hd-link', 'href');
+      if (/^#\/game\//.test(h)) ok(data.games.some((g) => '#/game/' + g.id === h), 'game exists: ' + h);
+      if (/^#\/terminal-lab\//.test(h)) ok(data.termlabs.some((g) => '#/terminal-lab/' + g.id === h), 'lab exists: ' + h);
+      if (/^#\/walkthrough\//.test(h)) ok(data.walkthroughs.some((g) => '#/walkthrough/' + g.id === h), 'walkthrough exists: ' + h);
+    }
+    await ctx.close();
+  });
+
   await test('landing page: hero, roles, stats, terminal, incident teaser, tools, placement link', async () => {
     const { ctx, page } = await open(); await go(page, '/');
     ok(/Learn to fix production/.test(await page.textContent('.hero h1')), 'headline');
@@ -1658,7 +1679,10 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     eq(await page.locator('.stats b').count(), 5, 'five stats');
     const nums = await page.locator('.stats b').allTextContents(); ok(nums.every((n) => +n > 0), 'stats from data: ' + nums);
     eq(await page.locator('.tl-l.pend').count(), 0, 'terminal shows its finished state with reduced motion');
-    ok(await page.locator('#term a[href="#/drills/kubernetes"]').count() === 1, 'terminal links to the drill');
+    ok(await page.locator('#term a[href="#/terminal-lab/lx-ssh-perms"]').count() === 1, 'demo links to a lab');
+    eq(await page.locator('.hd-tab').count(), 4, 'four demo tabs');
+    await page.click('#hd-t2'); eq(await page.locator('#hd-link').getAttribute('href'), '#/explainers/dns-lookup', 'explainer tab switches the link');
+    ok(await page.locator('.hero .hero-copy .hero-free').count() === 1, 'free line sits in the hero');
     eq(await page.locator('#today-band .prac li').count(), 3, 'today strip');
     eq(await page.locator('.tl-card li').count(), 5, 'incident timeline');
     ok(await page.locator('a[href="#/architecture/aws-s3-us-east-1-2017"]').count() >= 1, 'post-mortem link');
@@ -2000,7 +2024,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     eq(links[links.indexOf('InterviewHub') + 1], 'About', 'About sits right after InterviewHub: ' + links.join(','));
     await page.click('#topnav a[data-nav=about]'); await page.waitForSelector('.about');
     const txt = await page.textContent('.about');
-    ok(/Pure Global Public Good/.test(txt) && /Free forever · No login · No ads · No cookies/.test(txt) && /localStorage/.test(txt) && /14 years/.test(txt), 'text');
+    ok(/Pure Global Public Good/.test(txt) && /Free · No login · No ads · No cookies/.test(txt) && /localStorage/.test(txt) && /14 years/.test(txt), 'text');
     eq(await page.getAttribute('.about a[href*=linkedin]', 'href'), 'https://www.linkedin.com/in/eknathareddypuli/', 'linkedin');
     await ctx.close();
   });
@@ -2101,10 +2125,10 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
 
   await test('incident games: one per stage, a choice shows feedback, a game reaches an ending and is remembered', async () => {
     const { ctx, page } = await open(); await go(page, '/');
-    eq(data.games.length, 14, 'fourteen games');
+    eq(data.games.length, 38, '38 games');
     for (const m of data.modules) ok(data.games.some((g) => g.module === m.id), m.id + ' has a game');
     await nav(page, '/practice'); ok(await page.locator('.prac a[href="#/games"]').count() === 1, 'hub card');
-    await nav(page, '/games'); await page.waitForSelector('.game-card'); eq(await page.locator('.game-card').count(), 14, 'all games listed');
+    await nav(page, '/games'); await page.waitForSelector('.game-card'); eq(await page.locator('.game-card').count(), 38, 'all games listed');
     const g = data.games[0];
     await nav(page, '/game/' + g.id); await page.waitForSelector('.gm-choice');
     ok((await page.textContent('.gm-intro')).length > 60, 'intro shown');
@@ -2122,6 +2146,30 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await page.waitForSelector('.gm-end'); ok(/Resolved well/.test(await page.textContent('.gm-end')), 'best path wins');
     eq((await progress(page)).gm[g.id].best, 'win', 'remembered');
     await page.click('[data-act=gm-again]'); await page.waitForSelector('.gm-choice');
+    await ctx.close();
+  });
+
+  await test('incident games: every game explains every choice with an example, and the summary shows a better move', async () => {
+    const { ctx, page } = await open(); await go(page, '/');
+    const fresh = data.games.filter((g) => Object.values(g.scenes).some((s) => s.choices.some((c) => /Example: /.test(c.fb))));
+    eq(fresh.length, 38, 'games with worked examples');
+    for (const g of fresh) for (const sc of Object.values(g.scenes)) for (const c of sc.choices) ok(/ Example: /.test(c.fb) && c.fb.length > 30, g.id + ': ' + c.t);
+    const g = fresh[0];
+    await nav(page, '/game/' + g.id); await page.waitForSelector('.gm-choice');
+    for (let i = 0; i < 20; i++) {
+      if (await page.locator('.gm-end').count()) break;
+      await page.waitForSelector('.gm-choice');
+      const text = await page.textContent('.gm-scene');
+      const scene = Object.values(g.scenes).find((x) => x.text === text.trim());
+      const pick = i === 0 ? scene.choices.findIndex((c) => c.pts === 1) : scene.choices.findIndex((c) => c.pts === 2);
+      await page.locator('.gm-choice').nth(pick).click();
+      await page.waitForSelector('.gm-fb .gm-ex');
+      ok(/Example\./.test(await page.textContent('.gm-fb')), 'example shown after a choice');
+      await page.click('[data-act=gm-next]');
+    }
+    await page.waitForSelector('.gm-end');
+    ok(/A better move:/.test(await page.textContent('#gm-root')), 'summary names the better move');
+    ok(await page.locator('.gm-log .gm-ex').count() >= 5, 'every decision is explained in the summary');
     await ctx.close();
   });
 
@@ -2413,7 +2461,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
   await test('architecture walkthroughs: six designs list, open with a diagram, flows and failure points, link to lessons and work on a phone', async () => {
     const { ctx, page, issues } = await open();
     await go(page, '/walkthroughs');
-    eq(await page.locator('.cap-card').count(), 6, 'six walkthroughs');
+    eq(await page.locator('.cap-card').count(), 16, 'sixteen walkthroughs');
     ok(/not the internal designs of any real company/.test(await page.textContent('#main')), 'honest note on the list');
     for (const w of data.walkthroughs) {
       await nav(page, `/walkthrough/${w.id}`); await page.waitForSelector('#wt-body .dg-node');
@@ -2445,17 +2493,17 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
   };
   const openLab = async (page, id) => { await go(page, '/terminal-lab/' + id); await page.waitForFunction(() => /Simulated terminal/.test(document.querySelector('#tl-out').textContent), null, { timeout: 30000 }); };
 
-  await test('terminal labs: index shows 24 labs in four stages with the honest warning; hub, footer and stage pages link to it', async () => {
+  await test('terminal labs: index shows 72 labs in four stages with the honest warning; hub, footer and stage pages link to it', async () => {
     const { ctx, page, issues } = await open();
     await go(page, '/terminal-labs');
     const data = await A(page);
-    eq(data.termlabs.length, 24, 'labs in data');
-    eq(await page.locator('.tl-item').count(), 24, 'labs listed');
+    eq(data.termlabs.length, 72, 'labs in data');
+    eq(await page.locator('.tl-item').count(), 72, 'labs listed');
     const t = await page.textContent('#main');
     ok(/This is a simulation/.test(t) && /not a real kernel/.test(t), 'simulation warning');
     ok(/What is not here/.test(t) && /real Linux machine/.test(t), 'says what is not included');
     await page.click('.tl-filter a[href="#/terminal-labs/networking"]');
-    await page.waitForFunction(() => document.querySelectorAll('.tl-item').length === 6);
+    await page.waitForFunction(() => document.querySelectorAll('.tl-item').length === 18);
     await nav(page, '/practice');
     eq(await page.locator('.prac li').count(), 25, 'hub cards');
     ok(await page.locator('.prac a[href="#/terminal-labs"]').count() === 1, 'hub link');
@@ -2472,7 +2520,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await go(page, '/');
     const data = await A(page);
     const labs = data.termlabs.filter((l) => l.module !== 'python');
-    eq(labs.length, 18, 'non-python labs');
+    eq(labs.length, 54, 'non-python labs');
     for (const lab of labs) {
       await openLab(page, lab.id);
       await page.click('[data-act=tl-check]'); await page.waitForSelector('#tl-res .drill-res');
@@ -2485,7 +2533,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       ok(/What this lab showed/.test(await page.textContent('#tl-res')), lab.id + ': explanation');
     }
     const p = await progress(page);
-    eq(Object.keys(p.tl).length, 18, 'eighteen done');
+    eq(Object.keys(p.tl).length, 54, "all non-python done");
     eq(issues.filter((x) => !/goatcounter/.test(x)).length, 0, issues.join(' | '));
     await ctx.close();
   });
@@ -2496,7 +2544,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await go(page, '/');
     const data = await A(page);
     const labs = data.termlabs.filter((l) => l.module === 'python');
-    eq(labs.length, 6, 'python labs');
+    eq(labs.length, 18, 'python labs');
     for (const lab of labs) {
       await openLab(page, lab.id);
       await typeLine(page, 'python3 -m unittest -q 2>&1 | tail -3');
@@ -2566,7 +2614,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const p = emptyProgress(); p.tl = { 'lx-cron': { d: '2026-01-05', h: 1, s: 0 } };
     await setProgress(page, p);
     await nav(page, '/terminal-labs');
-    ok(/1 of 24 labs done/.test(await page.textContent('.tl-count')), 'count: ' + await page.textContent('.tl-count'));
+    ok(/1 of 72 labs done/.test(await page.textContent('.tl-count')), 'count: ' + await page.textContent('.tl-count'));
     ok(/Done/.test(await page.textContent('.tl-item a[href="#/terminal-lab/lx-cron"] >> xpath=ancestor::li')), 'lab marked done');
     const exported = await page.evaluate(() => JSON.parse(localStorage.getItem('ea.progress.v1')));
     ok(exported.tl['lx-cron'], 'kept in storage');

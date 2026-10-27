@@ -124,5 +124,22 @@ If the number does not appear: open the browser console and look for the "visito
 - Limits, stated on every lab page: a simulation, not a real kernel, network or Docker; output of real tools can differ in the details. Known gaps: pipeline stages run one after another, not at the same time; awk `for (k in a)` order is not real awk order; no sed N or D; no jq reduce or foreach; `ip` and `ss` print simplified output; group changes apply at once; sorting follows the C locale; an endless Python loop freezes the tab (reload to recover). The commands `from MACHINE curl ...` and `cron-tick` exist only in the simulator.
 - A real Linux in the browser (for example a WebAssembly virtual machine) was NOT built. It needs a download of tens of megabytes, a third-party engine with its own licence and CDN terms, and could not be verified in the build sandbox. It can be added later.
 - The engine files load only when a lab is opened (not on other pages) and are in the offline cache list. `tools/build.js` has them in the ENGINE list.
-- Verification tools: `node tools/terminal-verify.js` proves for all 24 labs that the starting state does not pass every check and that the written solution passes all of them (Python labs use the local python3). `node tools/term-diff.js` compares the simulated shell with real bash on 341 commands (needs bash and python3 on the build machine; awk is mawk or gawk). The e2e suite types every solution into the real terminal in a browser, including the Python labs on real Pyodide, and checks a phone viewport and accessibility.
+- Verification tools: `node tools/terminal-verify.js` proves for all 72 labs that the starting state does not pass every check and that the written solution passes all of them (Python labs use the local python3). `node tools/term-diff.js` compares the simulated shell with real bash on 341 commands (needs bash and python3 on the build machine; awk is mawk or gawk). The e2e suite types every solution into the real terminal in a browser, including the Python labs on real Pyodide, and checks a phone viewport and accessibility.
 - Reminder: the labs and the simulator were written from memory and tested against the checks above, not by a domain reviewer. Real servers behave in more ways than the simulation does. Spot-check the lab explanations. The Pyodide download, external links, the live counter and the Go Playground are not machine-verified from the build sandbox.
+
+## Round 12 additions
+- Home page: the line "Free. No login. No payment. Just practice and learn." under the headline, and "No account needed. Start now." under the main button. The footer promise reads "Free · No login · No ads · No cookies".
+- Architecture walkthroughs: 16 (10 new, `src/walkthroughs/07` to `16`).
+- Incident games: 38. The 24 new games explain every choice and give a worked example (feedback written as "explanation. Example: ..."). The 14 older games now have worked examples too (all 38 games, every choice).
+- Terminal labs: 72 (18 per stage, 6 more added in Round 13). Two small engine fixes came with them: `read` now keeps the rest of the line for the last variable, and `ufw allow|delete PORT/proto` parses a bare port. `node tools/term-diff.js` still matches real bash on 341 commands.
+- Animated explainers: 202, with at least 12 per module (Ansible and Databases were the thinnest and received the most).
+- Validator minimums raised: 16 walkthroughs, 12 labs per stage, 200 explainers and 12 per module.
+- Content was written from memory. Spot-check commands, figures and examples before relying on them.
+
+## Round 13 additions
+- Home page: the hero demo rotates by itself through four scenes (terminal lab, incident game, animated explainer, architecture walkthrough). Tabs, arrow keys and a Pause/Play button control it; it stays still with reduced motion. The line "Free. No login. No payment. ..." sits under the headline in the left column, with the demo in the right column. On a wide desktop it is beside the demo, not strictly above it; on mobile it is above.
+- The 14 older incident games now give a worked example on every choice.
+- Terminal labs: 72 (18 per stage). Engine fixes: `ln -f/-n`, separate `readlink` and `realpath`, `"${!arr[@]}"` splitting, `systemctl enable|disable --now`, `read` rest-of-line, `ufw` bare port.
+- Lessons: 186 (28 new, 2 per module). Each has a worked example, quiz, flashcards, level texts and 2 official references.
+- Assumptions: +6 labs per stage and +2 lessons per module were chosen without asking.
+- Content was written from memory. Spot-check commands, figures and links before relying on them.

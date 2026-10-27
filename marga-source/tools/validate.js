@@ -546,7 +546,7 @@ function checkExtras() {
   for (const id of Object.keys(lessons)) if (!covered.has(id)) err('paths', `lesson ${id} is not on any live path`);
 
   // footer promise, no blog or newsletter, voice and print wiring
-  const PROMISE = 'Free forever · No login · No ads · No cookies';
+  const PROMISE = 'Free · No login · No ads · No cookies';
   const appJs = read(path.join(DIST, 'assets/app.js'));
   if (!appJs.includes(PROMISE) && !appJs.includes(PROMISE.replace(/·/g, '\\u00b7'))) err('footer', 'app.js is missing the footer promise');
   for (const f of ['cheatsheets/index.html', ...Object.keys(sheets).map((k) => `cheatsheets/${k}.html`)]) {
@@ -623,7 +623,7 @@ function checkPractice() {
         if (!seen.has(i)) err('games', `${w}: scene ${i} is unreachable`);
         if (!sc.text || sc.text.length < 40) err('games', `${w}: scene ${i} has short text`);
         if (sc.end) { if (sc.choices.length) err('games', `${w}: ending ${i} has choices`); if (!sc.takeaway || sc.takeaway.length < 30) err('games', `${w}: ending ${i} needs a takeaway`); }
-        else { if (sc.choices.length < 2) err('games', `${w}: scene ${i} needs at least 2 choices`); for (const c of sc.choices) if (c.fb.length < 20) err('games', `${w}: scene ${i} has a short feedback`); }
+        else { if (sc.choices.length < 2) err('games', `${w}: scene ${i} needs at least 2 choices`); for (const c of sc.choices) { if (c.fb.length < 20) err("games", `${w}: scene ${i} has a short feedback`); if (!/ Example: /.test(c.fb)) err("games", `${w}: scene ${i} choice has no worked example`); } }
       }
       if (FORBID.test(JSON.stringify(g)) || /TODO|FIXME|lorem ipsum/i.test(JSON.stringify(g))) err('games', `${w}: forbidden or placeholder text`);
       count('incident games');
@@ -666,7 +666,7 @@ function checkPractice() {
   // architecture walkthroughs
   {
     const ws = A.walkthroughs || [];
-    if (ws.length < 6) err('walkthroughs', `need at least 6 walkthroughs, found ${ws.length}`);
+    if (ws.length < 16) err('walkthroughs', `need at least 16 walkthroughs, found ${ws.length}`);
     const wids = new Set();
     for (const w of ws) {
       const t = `walkthrough ${w.id}`;
@@ -754,8 +754,8 @@ function checkMore() {
   for (const m of A.modules) if ((A.glossary || []).filter((g) => g.module === m.id).length < 4) err('glossary', `module ${m.id} has fewer than 4 terms`);
   // explainers
   const ex = (() => { const w = { window: {} }; vm.runInNewContext(read(path.join(DIST, 'assets', 'explainers.js')), w); return w.window.MARGA_EXPLAINERS || []; })();
-  if (ex.length < 100) err("explainers", `need at least 100, found ${ex.length}`);
-  for (const m of mods) if (ex.filter((x) => x.module === m).length < 5) err("explainers", `module ${m} needs at least 5 explainers`);
+  if (ex.length < 200) err("explainers", `need at least 200, found ${ex.length}`);
+  for (const m of mods) if (ex.filter((x) => x.module === m).length < 12) err("explainers", `module ${m} needs at least 12 explainers`);
   for (const x of ex) {
     if (!mods.has(x.module)) err('explainers', `${x.id}: unknown module`);
     if (x.steps.length < 6) err('explainers', `${x.id}: fewer than 6 steps`);
@@ -800,7 +800,7 @@ function checkTermLabs() {
   const KNOWN = new Set(['file', 'contains', 'equals', 'mode', 'owner', 'unchanged', 'service', 'proc', 'disk', 'cron', 'ran', 'group', 'cmd']);
   const MODS = ['linux', 'bash', 'networking', 'python'], LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
   const ids = new Set();
-  for (const m of MODS) if (labs.filter((l) => l.module === m).length < 6) err('termlabs', `${m}: need at least 6 labs`);
+  for (const m of MODS) if (labs.filter((l) => l.module === m).length < 18) err("termlabs", `${m}: need at least 18 labs`);
   for (const l of labs) {
     const w = l.id || l.title;
     if (!/^[a-z0-9-]+$/.test(l.id || '')) err('termlabs', `${w}: bad id`);
