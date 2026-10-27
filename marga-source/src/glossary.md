@@ -913,3 +913,53 @@ def: A fixed reference to a commit, usually a release such as v1.4.0. Annotated 
 module: git
 plain: Where you are now in the history.
 def: A reference to the currently checked out commit, normally through a branch name. When it points directly to a commit it is called a detached HEAD.
+
+## Goroutine
+module: go
+plain: A very light thread run by Go itself.
+def: A function running concurrently, scheduled by the Go runtime. Goroutines are cheap, but one that never stops is a leak.
+
+## Channel
+module: go
+plain: A pipe that goroutines use to pass values.
+def: A typed conduit for sending and receiving values between goroutines. Unbuffered channels synchronise sender and receiver.
+
+## Context
+module: go
+plain: A signal that says stop or time is up.
+def: A value passed through calls that carries cancellation, deadlines and request data. It is the standard way to stop work in Go.
+
+## Interface
+module: go
+plain: A list of methods a type must have.
+def: A set of method signatures. Any type with those methods satisfies it implicitly, without declaring so.
+
+## Defer
+module: go
+plain: Run this when the function finishes.
+def: A statement that schedules a call to run when the surrounding function returns, commonly used to close files and unlock mutexes.
+
+## Chart
+module: helm
+plain: A package of Kubernetes templates.
+def: A directory or archive with Chart.yaml, default values and templates that Helm renders into Kubernetes manifests.
+
+## Release
+module: helm
+plain: One installed copy of a chart.
+def: A named installation of a chart in a cluster, with its own values and numbered revision history.
+
+## Values
+module: helm
+plain: The settings that fill in a chart.
+def: Configuration passed to templates, from the chart defaults, values files and command line overrides.
+
+## Subchart
+module: helm
+plain: A chart that another chart depends on.
+def: A dependency installed as part of the parent chart release, configured through values under its name.
+
+## Helm rollback
+module: helm
+plain: Go back to an earlier release revision.
+def: A command that creates a new revision applying an earlier manifest. It restores objects but not data.
