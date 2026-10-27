@@ -323,7 +323,7 @@ def('ufw', function (a, io) {
     if (sub === 'insert') { args = args.slice(1); act = args[0]; args = args.slice(1); }
     var from = 'any', port = null, proto = 'tcp';
     var fi = args.indexOf('from'); if (fi >= 0) from = args[fi + 1];
-    var pi = args.indexOf('port'); if (pi >= 0) port = args[pi + 1]; else { var first = args.filter(function (x, i) { return i !== fi && i !== fi + 1; })[0]; if (first && /^\d+(\/\w+)?$/.test(first)) port = first; }
+    var pi = args.indexOf('port'); if (pi >= 0) port = args[pi + 1]; else { var first = args.filter(function (x, i) { return fi < 0 || (i !== fi && i !== fi + 1); })[0]; if (first && /^\d+(\/\w+)?$/.test(first)) port = first; }
     if (port && port.indexOf('/') >= 0) { var pp = port.split('/'); port = pp[0]; proto = pp[1]; }
     if (args.indexOf('proto') >= 0) proto = args[args.indexOf('proto') + 1];
     if (!port) { io.e('ERROR: Bad source address\n'); return 1; }

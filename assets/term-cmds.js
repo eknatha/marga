@@ -144,7 +144,7 @@ def('read', function (a, io) {
   var ifs = this.getVar('IFS'); var re = ifs === undefined ? /[ \t]+/ : new RegExp('[' + ifs.replace(/[\]\\^-]/g, '\\$&') + ']+');
   var parts = line.replace(/^[ \t]+/, '').split(re);
   for (i = 0; i < names.length; i++) {
-    if (i === names.length - 1 && names.length > 0) { var rest = line.replace(/^[ \t]+/, ''); for (var k = 0; k < i; k++) rest = rest.replace(re, '@@SPLIT@@').split('@@SPLIT@@').slice(1).join(' '); this.setVar(names[i], names.length === 1 ? (names[0] === 'REPLY' ? line : line.trim()) : (i < parts.length ? parts.slice(i).join(' ') : '')); }
+    if (i === names.length - 1 && names.length > 0) { var rest = line.replace(/^[ \t]+/, ''); for (var k = 0; k < i; k++) { var mm = re.exec(rest); rest = mm ? rest.slice(mm.index + mm[0].length) : ''; } this.setVar(names[i], names.length === 1 ? (names[0] === 'REPLY' ? line : rest.replace(/[ \t]+$/, '')) : rest.replace(/[ \t]+$/, '')); }
     else this.setVar(names[i], i < parts.length ? parts[i] : '');
   }
   return 0;
@@ -301,7 +301,9 @@ def('ln', function (a, io) {
   if (o.rest.length < 2) { io.e('ln: missing file operand\n'); return 1; }
   try {
     var tgt = self.abs(o.rest[1]), par = self.walk(T.dirname(tgt), true);
-    try { var ex = self.stat(o.rest[1]); if (ex.t === 'd') { tgt = tgt + '/' + T.basename(o.rest[0]); par = ex; } else throw new T.FsErr('EEXIST', tgt); } catch (e) { if (e.code === 'EEXIST') throw e; }
+    var direct = par.c && par.c[T.basename(tgt)];
+    if (direct && direct.t === 'l' && o.f.n) { if (!o.f.f) throw new T.FsErr('EEXIST', tgt); delete par.c[T.basename(tgt)]; }
+    else try { var ex = self.stat(o.rest[1]); if (ex.t === 'd') { tgt = tgt + '/' + T.basename(o.rest[0]); par = ex; if (o.f.f && par.c[T.basename(tgt)] && par.c[T.basename(tgt)].t !== 'd') delete par.c[T.basename(tgt)]; } else if (o.f.f) delete par.c[T.basename(tgt)]; else throw new T.FsErr('EEXIST', tgt); } catch (e) { if (e.code === 'EEXIST') throw e; }
     if (!self.can(par, 2)) throw new T.FsErr('EACCES', tgt);
     if (o.f.s) par.c[T.basename(tgt)] = { t: 'l', m: 511, o: self.eu, g: self.users[self.eu].group, d: o.rest[0], mt: self.clock };
     else { var src = self.stat(o.rest[0]); par.c[T.basename(tgt)] = src; }
@@ -374,7 +376,17 @@ def('stat', function (a, io) {
 });
 def('basename', function (a, io) { var p = (a[0] || '').replace(/\/+$/, ''); var b = p.slice(p.lastIndexOf('/') + 1) || (p ? '/' : ''); if (a[1] && b.slice(-a[1].length) === a[1] && b !== a[1]) b = b.slice(0, -a[1].length); io.o(b + '\n'); return 0; });
 def('dirname', function (a, io) { (a.length ? a : ['']).forEach(function (p) { p = p.replace(/\/+$/, ''); var i = p.lastIndexOf('/'); io.o((i < 0 ? '.' : i === 0 ? '/' : p.slice(0, i)) + '\n'); }); return 0; });
-def('realpath readlink', function (a, io) { var self = this, rc = 0; opts(a).rest.forEach(function (p) { try { io.o(self.abs(p) + '\n'); } catch (e) { rc = 1; } }); return rc; });
+def('realpath', function (a, io) { var self = this, rc = 0; opts(a).rest.forEach(function (p) { try { io.o(self.abs(p) + '\n'); } catch (e) { rc = 1; } }); return rc; });
+def('readlink', function (a, io) {
+  var self = this, rc = 0, o = opts(a);
+  o.rest.forEach(function (p) {
+    try {
+      if (o.f.f || o.f.e || o.f.m) { io.o(self.abs(p) + '\n'); return; }
+      var n = self.stat(p, false); if (n.t === 'l') io.o(n.d + '\n'); else rc = 1;
+    } catch (e) { rc = 1; }
+  });
+  return rc;
+});
 def('truncate', function (a, io) {
   var o = opts(a, ['s']), self = this, rc = 0, sz = parseInt(o.f.s || '0', 10);
   o.rest.forEach(function (p) { try { var cur = self.exists(p) ? self.readFile(p) : ''; self.writeFile(p, sz === 0 ? '' : cur.slice(0, sz), false); } catch (e) { if (e instanceof T.FsErr) { io.e('truncate: cannot open \'' + p + '\' for writing: ' + e.msg + '\n'); rc = 1; } else throw e; } });

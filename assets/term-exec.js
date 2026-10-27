@@ -166,7 +166,7 @@ P.paramValue = async function (n) { /* returns {list:[...]|null, text} */
 };
 P.expandParam = async function (n, quoted) {
   var pv = await this.paramValue(n), op = n.op, list = pv.list, v = pv.text;
-  if (n.keys) return { list: list, join: true };
+  if (n.keys) return { list: list, join: !(n.idx && n.idx.length === 1 && n.idx[0].s === '@'), at: true };
   if (n.len) { if (list) return { str: String(list.length) }; return { str: String(v === undefined ? 0 : v.length) }; }
   if (list && !op) return { list: list, at: n.name === '@' || n.idx && n.idx.length === 1 && n.idx[0].s === '@' };
   if (list) { v = list.join(' '); }

@@ -1708,5 +1708,405 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Run and release", n: "When the transaction ends, the server connection returns to the pool for another client." },
     { f: 2, t: 3, l: "Stable resources", n: "The database sees a steady, small number of sessions and keeps memory for queries." },
     { f: 3, t: 1, l: "Watch the queue", n: "Monitoring shows clients waiting for a connection, which tells you when to tune or scale." }
+  ] },
+  { id: "x-ans-inventory", module: "ansible", title: "How Ansible finds the hosts to change", summary: "From an inventory file and a group name to a list of machines.",
+  actors: ["Engineer", "Control node", "Inventory", "Target hosts"],
+  steps: [
+    { f: 0, t: 1, l: "Run a play against a group", n: "The engineer runs a playbook that says hosts: web. Ansible must now work out which machines belong to web." },
+    { f: 1, t: 2, l: "Read the inventory", n: "The control node reads the inventory file or script, where machines are listed and put into groups." },
+    { f: 2, t: 1, l: "Expand the group", n: "The inventory returns every host in web, including hosts that are in child groups of web." },
+    { f: 1, t: 2, l: "Merge variables", n: "Group variables and host variables are collected, and the more specific host value wins over the group value." },
+    { f: 1, t: 3, l: "Connect to each host", n: "The control node opens an SSH connection to every host in the list, a few at a time (the forks setting)." },
+    { f: 3, t: 1, l: "Report results", n: "Each host returns ok, changed, failed or unreachable, and the run summary counts them per host." }
+  ] },
+  { id: "x-ans-idempotent", module: "ansible", title: "Why running a playbook twice is safe", summary: "A module checks the current state before it changes anything.",
+  actors: ["Playbook", "Module", "Target host", "Run summary"],
+  steps: [
+    { f: 0, t: 1, l: "Task asks for a state", n: "The task says a package must be present or a line must exist in a file. It describes the end state, not the steps." },
+    { f: 1, t: 2, l: "Inspect the host", n: "The module looks at the host: is the package installed, does the line already exist?" },
+    { f: 2, t: 1, l: "State already matches", n: "On the second run the host already looks as requested, so there is nothing to do." },
+    { f: 1, t: 3, l: "Report ok", n: "The module reports ok and changes nothing, so the summary shows changed=0 for that task." },
+    { f: 1, t: 2, l: "State differs on a new host", n: "On a different host the package is missing, so the module installs it." },
+    { f: 1, t: 3, l: "Report changed", n: "That host is reported as changed. Counting changed tasks tells you whether a second run found drift." }
+  ] },
+  { id: "x-ans-precedence", module: "ansible", title: "Which variable value wins", summary: "Several places define the same variable, and Ansible has a fixed order.",
+  actors: ["Role defaults", "Group variables", "Host variables", "Command line", "Task using the variable"],
+  steps: [
+    { f: 0, t: 4, l: "Start with role defaults", n: "A role ships a default value, designed to be the easiest thing to override. It has very low priority." },
+    { f: 1, t: 4, l: "Group variables override defaults", n: "A value set for the group in the inventory replaces the role default for all hosts in that group." },
+    { f: 2, t: 4, l: "Host variables override groups", n: "A value set for one host is more specific, so it replaces the group value on that machine only." },
+    { f: 3, t: 4, l: "Extra variables win", n: "A value passed with -e on the command line beats everything else, which makes it handy and risky." },
+    { f: 4, t: 4, l: "Use the final value", n: "The task sees one value. When it is not the one you expected, run with -vvv or use the debug module." },
+    { f: 4, t: 2, l: "Keep it simple", n: "Define each variable in as few places as you can, so the answer to which value wins is obvious." }
+  ] },
+  { id: "x-ans-template", module: "ansible", title: "Turning a template into a config file", summary: "Facts and variables are merged into a Jinja2 template on the control node.",
+  actors: ["Template file", "Variables and facts", "Control node", "Target host"],
+  steps: [
+    { f: 2, t: 3, l: "Gather facts", n: "The control node collects facts such as the host name, addresses and memory from the target." },
+    { f: 2, t: 1, l: "Combine with variables", n: "Facts are joined with inventory and role variables to build the data that the template can use." },
+    { f: 2, t: 0, l: "Read the template", n: "The template is a normal file with placeholders such as a listen port and a loop over backend servers." },
+    { f: 2, t: 2, l: "Render the text", n: "Jinja2 replaces the placeholders and runs the loops, producing the final text on the control node." },
+    { f: 2, t: 3, l: "Copy the result", n: "The template module compares the rendered text with the file on the host and writes it only if different." },
+    { f: 3, t: 3, l: "Notify a handler", n: "When the file changed, the task notifies a handler so the service reloads once at the end." }
+  ] },
+  { id: "x-ans-role", module: "ansible", title: "What happens when a role is applied", summary: "A role bundles tasks, defaults, templates and handlers behind one name.",
+  actors: ["Playbook", "Role", "Task list", "Target host"],
+  steps: [
+    { f: 0, t: 1, l: "Name the role", n: "The playbook lists roles: [nginx]. Ansible looks for the role folder in the roles path or a collection." },
+    { f: 1, t: 1, l: "Load defaults", n: "The role defaults load first as low priority variables, so users of the role can change them." },
+    { f: 1, t: 2, l: "Queue the tasks", n: "The tasks in tasks/main.yml are added to the play in order, with the role variables available." },
+    { f: 2, t: 3, l: "Run the tasks", n: "Each task runs on the target host. Templates and files come from the role's own folders." },
+    { f: 2, t: 1, l: "Collect handler notifications", n: "Tasks that changed something notify handlers. Handlers run after the tasks of the play." },
+    { f: 1, t: 3, l: "Restart or reload once", n: "The handler runs one time, even if five tasks notified it, and the service picks up the new config." }
+  ] },
+  { id: "x-ans-check-mode", module: "ansible", title: "Previewing a change with check mode", summary: "Check mode and diff show what would change without changing it.",
+  actors: ["Engineer", "Ansible", "Target host", "Review"],
+  steps: [
+    { f: 0, t: 1, l: "Run with --check --diff", n: "The engineer adds the two flags to the normal command. Nothing will be written to the hosts." },
+    { f: 1, t: 2, l: "Ask each module what it would do", n: "Modules that support check mode compare the desired state with the real state and only report." },
+    { f: 2, t: 1, l: "Return would-change results", n: "The host answers with changed or ok, and for files the diff of old and new content." },
+    { f: 1, t: 0, l: "Show the diff", n: "The engineer reads exactly which lines would be added or removed on which hosts." },
+    { f: 0, t: 3, l: "Review the preview", n: "A colleague checks the diff. Surprises here are cheap, because nothing has been changed yet." },
+    { f: 0, t: 1, l: "Run for real", n: "After approval the same command runs without --check. Tasks that cannot preview, such as shell commands, still need care." }
+  ] },
+  { id: "x-ans-debug", module: "ansible", title: "Debugging a failed run step by step", summary: "From a vague error to the line that explains it.",
+  actors: ["Engineer", "Ansible output", "Target host", "Playbook"],
+  steps: [
+    { f: 0, t: 1, l: "Read the failing task", n: "The output names the task, the host and the error message. Start with the first failure, not the last." },
+    { f: 0, t: 1, l: "Add verbosity", n: "Running again with -vvv shows the exact arguments and the connection details used for the task." },
+    { f: 1, t: 2, l: "Check the connection", n: "If the host is unreachable, test SSH by hand with the same user and key to separate network from Ansible." },
+    { f: 0, t: 3, l: "Print the variables", n: "A debug task prints the variable the module receives, which often exposes a wrong or empty value." },
+    { f: 0, t: 3, l: "Narrow with limit and tags", n: "Use --limit for one host and --start-at-task to repeat only the failing part of the run." },
+    { f: 0, t: 3, l: "Fix and run again", n: "After the fix, run the whole play again. Because tasks are idempotent, the earlier steps report ok." }
+  ] },
+  { id: "x-ans-collection", module: "ansible", title: "Installing and using a collection", summary: "How modules from a collection reach your playbook.",
+  actors: ["requirements.yml", "Control node", "Collection source", "Playbook"],
+  steps: [
+    { f: 0, t: 1, l: "List the collections", n: "The requirements file names each collection and a version range, so every engineer gets the same set." },
+    { f: 1, t: 2, l: "Download", n: "ansible-galaxy collection install fetches the packages from the configured source." },
+    { f: 2, t: 1, l: "Store locally", n: "The collections are unpacked into a folder that Ansible searches for modules, roles and plugins." },
+    { f: 3, t: 1, l: "Use the full name", n: "The playbook calls a module by its full name, such as community.general.ufw, so there is no doubt where it comes from." },
+    { f: 1, t: 3, l: "Run the module", n: "Ansible loads the module code from the collection and runs it like any built-in module." },
+    { f: 0, t: 0, l: "Pin and review versions", n: "Pinning versions in the requirements file means an update is a reviewed change, not a surprise." }
+  ] },
+  { id: "x-db-index", module: "databases", title: "How an index speeds up a query", summary: "A lookup that walks a tree instead of reading every row.",
+  actors: ["Application", "Query planner", "Index", "Table"],
+  steps: [
+    { f: 0, t: 1, l: "Send a query", n: "The application asks for the orders of customer 42. The planner decides how to find them." },
+    { f: 1, t: 3, l: "Option one: scan the table", n: "Without an index the database would read every row and test each one, which is slow on a large table." },
+    { f: 1, t: 2, l: "Option two: use the index", n: "An index on customer_id is a sorted structure, so the planner picks it when few rows match." },
+    { f: 2, t: 2, l: "Walk the tree", n: "The database descends a few levels of the tree to find the entries for customer 42." },
+    { f: 2, t: 3, l: "Fetch the matching rows", n: "The index entries point to the rows, and only those rows are read from the table." },
+    { f: 3, t: 0, l: "Return the result", n: "The answer comes back in milliseconds. The cost is that every insert and update must also maintain the index." }
+  ] },
+  { id: "x-db-explain", module: "databases", title: "Reading a query plan", summary: "What EXPLAIN tells you before you change anything.",
+  actors: ["Engineer", "Database", "Planner", "Plan output"],
+  steps: [
+    { f: 0, t: 1, l: "Prefix the query with EXPLAIN", n: "The engineer asks the database how it would run the query, without necessarily running it." },
+    { f: 1, t: 2, l: "Estimate costs", n: "The planner uses table statistics to estimate rows and cost for each possible way of running the query." },
+    { f: 2, t: 3, l: "Choose the cheapest plan", n: "The plan lists steps such as a sequential scan, an index scan and a join method, with row estimates." },
+    { f: 3, t: 0, l: "Read from the inside out", n: "The most nested step runs first. Look for a scan on a big table that returns few rows." },
+    { f: 0, t: 1, l: "Compare estimate and reality", n: "EXPLAIN ANALYZE runs the query and shows actual rows. A big gap suggests stale statistics." },
+    { f: 0, t: 1, l: "Change one thing", n: "Add an index or rewrite the query, then explain again. Keep the change only if the plan really improved." }
+  ] },
+  { id: "x-db-mvcc", module: "databases", title: "Readers and writers without waiting", summary: "Multi-version concurrency lets a reader see a steady snapshot.",
+  actors: ["Reader", "Writer", "Row versions", "Commit log"],
+  steps: [
+    { f: 0, t: 2, l: "Reader starts a transaction", n: "The reader gets a snapshot, which means it sees only data committed before it started." },
+    { f: 1, t: 2, l: "Writer updates a row", n: "The writer does not overwrite the row. It creates a new version and marks the old one as replaced." },
+    { f: 0, t: 2, l: "Reader still sees the old version", n: "The reader keeps reading the old version, so it is not blocked and sees consistent data." },
+    { f: 1, t: 3, l: "Writer commits", n: "The commit is recorded. New transactions will now see the new version of the row." },
+    { f: 0, t: 3, l: "Reader finishes", n: "When the reader ends, old versions that nobody needs any more can be removed." },
+    { f: 2, t: 2, l: "Clean up dead versions", n: "A background process (vacuum in some databases) removes them. Very long transactions delay this cleanup." }
+  ] },
+  { id: "x-db-deadlock", module: "databases", title: "How a deadlock happens and resolves", summary: "Two transactions wait for each other until one is cancelled.",
+  actors: ["Transaction A", "Transaction B", "Row 1", "Row 2", "Lock manager"],
+  steps: [
+    { f: 0, t: 2, l: "A locks row 1", n: "Transaction A updates row 1 and holds a lock on it until it commits." },
+    { f: 1, t: 3, l: "B locks row 2", n: "Transaction B updates row 2 and holds that lock." },
+    { f: 0, t: 3, l: "A wants row 2", n: "A now needs row 2, which B holds, so A waits." },
+    { f: 1, t: 2, l: "B wants row 1", n: "B needs row 1, which A holds. Both are now waiting for each other and neither can continue." },
+    { f: 4, t: 4, l: "Detect the cycle", n: "The lock manager notices the circular wait after a short timeout." },
+    { f: 4, t: 1, l: "Cancel one transaction", n: "One transaction is rolled back with a deadlock error, and the other can finish. The application should retry the cancelled one." }
+  ] },
+  { id: "x-db-replica-lag", module: "databases", title: "Why a replica can show old data", summary: "Replication copies changes after the primary has committed them.",
+  actors: ["Application", "Primary", "Replication stream", "Replica"],
+  steps: [
+    { f: 0, t: 1, l: "Write to the primary", n: "The application saves an order. The primary commits it and returns success." },
+    { f: 1, t: 2, l: "Send the change", n: "The change is written to a log and streamed to replicas. This takes some time." },
+    { f: 0, t: 3, l: "Read from the replica at once", n: "The application immediately reads the order from a replica to spread the load." },
+    { f: 3, t: 0, l: "Old answer", n: "The replica has not applied the change yet, so the order seems missing. This is replica lag." },
+    { f: 2, t: 3, l: "Replica catches up", n: "The change arrives and is applied. A moment later the same read would succeed." },
+    { f: 0, t: 1, l: "Read your own writes", n: "Send reads that must see a fresh write to the primary, or wait until the replica reports the matching position." }
+  ] },
+  { id: "x-db-expand-contract", module: "databases", title: "Changing a column without downtime", summary: "The expand and contract pattern in small safe releases.",
+  actors: ["Engineer", "Old application", "Database", "New application"],
+  steps: [
+    { f: 0, t: 2, l: "Expand: add the new column", n: "The engineer adds a nullable column. The old application ignores it, so nothing breaks." },
+    { f: 0, t: 3, l: "Deploy code that writes both", n: "The new release writes to the old and the new column, and still reads from the old one." },
+    { f: 0, t: 2, l: "Backfill in batches", n: "A script copies old values into the new column in small batches, avoiding long locks." },
+    { f: 3, t: 2, l: "Switch reads", n: "The next release reads from the new column. If something is wrong, you can go back." },
+    { f: 0, t: 2, l: "Contract: stop writing the old one", n: "After a safe period the code stops writing the old column." },
+    { f: 0, t: 2, l: "Drop the old column", n: "Only now is the old column removed. Each step could be rolled back until this one." }
+  ] },
+  { id: "x-db-cache-aside", module: "databases", title: "The cache-aside pattern", summary: "Check the cache first, fall back to the database, and fill the cache.",
+  actors: ["Application", "Cache", "Database", "Next request"],
+  steps: [
+    { f: 0, t: 1, l: "Look in the cache", n: "The application asks the cache for the product with a key such as product:42." },
+    { f: 1, t: 0, l: "Miss", n: "The cache does not have it, because it expired or was never loaded." },
+    { f: 0, t: 2, l: "Query the database", n: "The application reads the product from the database, the source of truth." },
+    { f: 2, t: 0, l: "Return the row", n: "The database answers, which costs far more time than a cache read." },
+    { f: 0, t: 1, l: "Store with an expiry", n: "The application writes the value into the cache with a time to live, so stale data cannot stay forever." },
+    { f: 3, t: 1, l: "Hit next time", n: "The next request finds the value in the cache and never touches the database. After an update, delete the cache key." }
+  ] },
+  { id: "x-db-restore-test", module: "databases", title: "Proving a backup can be restored", summary: "A backup is only real once a restore has worked.",
+  actors: ["Scheduler", "Backup storage", "Test server", "Checker"],
+  steps: [
+    { f: 0, t: 1, l: "Take the backup", n: "The scheduler creates a base backup and keeps the log files, on storage separate from the database server." },
+    { f: 0, t: 3, l: "Record the result", n: "The job records size, duration and a checksum so that a sudden change gets noticed." },
+    { f: 1, t: 2, l: "Restore to a clean server", n: "On a schedule, a test server restores the latest backup and replays logs up to a chosen time." },
+    { f: 2, t: 3, l: "Run checks", n: "The checker counts rows in key tables, runs a few known queries and compares them with expected values." },
+    { f: 3, t: 0, l: "Report the outcome", n: "A failed restore raises an alert the same day, not on the day of the real disaster." },
+    { f: 2, t: 0, l: "Measure the time", n: "The restore time becomes a real number for your recovery objective, instead of a guess." }
+  ] },
+  { id: "x-linux-journal", module: "linux", title: "How a service log reaches journalctl", summary: "From a program writing a line to you reading it.",
+  actors: ["Service", "systemd-journald", "Disk", "Engineer"],
+  steps: [
+    { f: 0, t: 1, l: "Write to standard output", n: "The service just prints a line. Under systemd, standard output and error are connected to the journal." },
+    { f: 1, t: 1, l: "Add metadata", n: "The journal attaches the unit name, process id, time and priority to the line." },
+    { f: 1, t: 2, l: "Store it", n: "Entries are stored in a binary log, in memory only or on disk depending on the configuration." },
+    { f: 3, t: 1, l: "Ask with journalctl -u", n: "The engineer asks for one unit. Filters such as --since and -p err narrow the answer." },
+    { f: 1, t: 3, l: "Return the entries", n: "Matching entries come back in time order, and -f keeps following new ones." },
+    { f: 1, t: 2, l: "Rotate and limit", n: "Size and age limits remove old entries, so a noisy service cannot fill the disk." }
+  ] },
+  { id: "x-linux-sudo", module: "linux", title: "What happens when you run sudo", summary: "A rule lookup, a password check and a logged command.",
+  actors: ["User", "sudo", "Sudoers rules", "Command", "Auth log"],
+  steps: [
+    { f: 0, t: 1, l: "Run sudo systemctl restart nginx", n: "The user prefixes the command with sudo. The sudo program is installed with the setuid bit, so it starts as root." },
+    { f: 1, t: 2, l: "Look up the rules", n: "sudo reads /etc/sudoers and its include files to see whether this user may run this command as root." },
+    { f: 2, t: 1, l: "Allowed or denied", n: "A matching rule allows it, perhaps without a password. No rule means the attempt is refused." },
+    { f: 1, t: 0, l: "Ask for the user's password", n: "If a password is needed, sudo asks for the caller's own password, not the root password." },
+    { f: 1, t: 3, l: "Run the command as root", n: "With permission granted, sudo starts the command with root rights for that one command." },
+    { f: 1, t: 4, l: "Log the event", n: "Every use is written to the auth log with the user, the command and the result, which makes review possible." }
+  ] },
+  { id: "x-bash-redirect", module: "bash", title: "Where output goes: stdout, stderr and redirects", summary: "Two streams, and how the shell wires them to files.",
+  actors: ["Script", "Standard output", "Standard error", "Terminal", "Log file"],
+  steps: [
+    { f: 0, t: 1, l: "Normal results", n: "A command writes its results to standard output, file descriptor 1." },
+    { f: 0, t: 2, l: "Errors", n: "The same command writes errors to standard error, file descriptor 2, even though both usually appear on screen." },
+    { f: 1, t: 3, l: "No redirect", n: "By default both streams are connected to the terminal, so you see them mixed." },
+    { f: 1, t: 4, l: "Redirect with >", n: "Writing 'cmd > out.log' sends only standard output to the file. Errors still appear on the terminal." },
+    { f: 2, t: 4, l: "Join the streams", n: "Writing 'cmd > out.log 2>&1' sends errors to the same place as standard output. The order matters." },
+    { f: 2, t: 3, l: "Keep errors visible", n: "Sending only results to a file and keeping errors on the terminal is often the most useful setup for scripts." }
+  ] },
+  { id: "x-bash-loop-read", module: "bash", title: "Reading a file line by line", summary: "How while read processes input one record at a time.",
+  actors: ["File", "Shell loop", "Variables", "Command in the loop"],
+  steps: [
+    { f: 0, t: 1, l: "Redirect the file into the loop", n: "'done < file' attaches the file to the loop's standard input." },
+    { f: 1, t: 1, l: "Read one line", n: "The read builtin takes a line from standard input and returns success while lines remain." },
+    { f: 1, t: 2, l: "Split into variables", n: "With IFS set, the line is split into the named variables. The last variable gets the rest of the line." },
+    { f: 1, t: 3, l: "Run the body", n: "The body uses the variables, for example to call a command for each user name in the file." },
+    { f: 3, t: 1, l: "Next iteration", n: "When the body finishes, the loop reads the next line." },
+    { f: 1, t: 1, l: "Stop at the end", n: "At end of file, read returns failure and the loop ends. A last line without a newline needs extra care." }
+  ] },
+  { id: "x-python-venv-install", module: "python", title: "What pip does inside a virtual environment", summary: "Packages are installed next to the project, not into the system.",
+  actors: ["Engineer", "venv", "pip", "Package index", "Project folder"],
+  steps: [
+    { f: 0, t: 1, l: "Create the environment", n: "python3 -m venv .venv makes a private folder with its own interpreter and site-packages." },
+    { f: 0, t: 1, l: "Activate it", n: "Activation puts the venv bin folder first in PATH, so python and pip refer to the private copies." },
+    { f: 0, t: 2, l: "Install a requirement", n: "pip install -r requirements.txt reads the list of packages and versions." },
+    { f: 2, t: 3, l: "Resolve and download", n: "pip finds versions that satisfy all requirements and downloads wheels from the index." },
+    { f: 2, t: 1, l: "Install into the venv", n: "The packages go into the venv, so the system Python stays clean and other projects are unaffected." },
+    { f: 1, t: 4, l: "Run the project", n: "The project imports what it needs from the venv. Delete the folder and rebuild when things get confusing." }
+  ] },
+  { id: "x-python-exceptions", module: "python", title: "How an exception travels up the call stack", summary: "Raise, propagate, catch and clean up.",
+  actors: ["main()", "load_config()", "open()", "except block"],
+  steps: [
+    { f: 0, t: 1, l: "Call the function", n: "main calls load_config, which is a normal function call that adds a frame to the stack." },
+    { f: 1, t: 2, l: "Open the file", n: "load_config calls open on a path that does not exist." },
+    { f: 2, t: 1, l: "Raise FileNotFoundError", n: "The error is raised. The current function stops running at that line." },
+    { f: 1, t: 0, l: "Propagate upwards", n: "load_config has no handler, so the exception moves to its caller, main. Frames are removed as it goes." },
+    { f: 0, t: 3, l: "Catch it", n: "main has try/except FileNotFoundError and the handler runs, where it can print a clear message." },
+    { f: 3, t: 0, l: "Exit with a status", n: "The handler logs the cause and exits with a non-zero code. A finally block would run on every path." }
+  ] },
+  { id: "x-net-arp", module: "networking", title: "How a machine finds a neighbour's hardware address", summary: "ARP maps an IP address to a MAC address on the local network.",
+  actors: ["Host A", "Switch", "Host B", "ARP cache"],
+  steps: [
+    { f: 0, t: 0, l: "Decide the next hop", n: "Host A wants to reach 10.0.0.20 on the same network, so it must send the frame straight to that machine." },
+    { f: 0, t: 3, l: "Look in the ARP cache", n: "A checks its cache for a recent mapping of that address. If it exists, the lookup ends here." },
+    { f: 0, t: 1, l: "Broadcast a request", n: "Who has 10.0.0.20? is sent to every device on the local network." },
+    { f: 1, t: 2, l: "Deliver to all ports", n: "The switch floods the broadcast, and every host sees it but only the owner of the address answers." },
+    { f: 2, t: 0, l: "Reply with the MAC", n: "Host B answers directly to A with its hardware address." },
+    { f: 0, t: 3, l: "Cache and send", n: "A stores the mapping for a short time and sends the data frame to B's MAC." }
+  ] },
+  { id: "x-net-nat", module: "networking", title: "How NAT lets a private host reach the internet", summary: "Source address rewriting and the translation table.",
+  actors: ["Private host", "NAT router", "Translation table", "Internet server"],
+  steps: [
+    { f: 0, t: 1, l: "Send a packet out", n: "A host at 192.168.1.10 sends a packet to a public server. Its source address is private and not routable." },
+    { f: 1, t: 2, l: "Create a table entry", n: "The router records the private address and port against a new public port." },
+    { f: 1, t: 3, l: "Rewrite and forward", n: "The packet leaves with the router's public address as the source." },
+    { f: 3, t: 1, l: "Reply to the public address", n: "The server answers to the router's public address and the chosen port." },
+    { f: 1, t: 2, l: "Look up the entry", n: "The router finds which private host and port belong to that public port." },
+    { f: 1, t: 0, l: "Rewrite and deliver", n: "The destination is changed back and the reply reaches the host. Unrequested inbound traffic has no entry and is dropped." }
+  ] },
+  { id: "x-docker-layers", module: "docker", title: "How image layers and the container layer work", summary: "Shared read-only layers plus one thin writable layer.",
+  actors: ["Image layers", "Container", "Writable layer", "Another container"],
+  steps: [
+    { f: 0, t: 0, l: "Build creates layers", n: "Each instruction in the build adds a read-only layer. Unchanged layers are reused from the cache." },
+    { f: 0, t: 1, l: "Start a container", n: "The container uses all image layers together as one read-only filesystem." },
+    { f: 1, t: 2, l: "Add a writable layer", n: "A thin layer is placed on top for anything the container changes." },
+    { f: 1, t: 2, l: "Copy on write", n: "Changing an existing file copies it into the writable layer first. The image layer stays untouched." },
+    { f: 0, t: 3, l: "Share the layers", n: "A second container from the same image reuses the same layers, so it starts quickly and uses little disk." },
+    { f: 2, t: 2, l: "Remove the container", n: "Removing the container deletes its writable layer. Data that must stay belongs in a volume." }
+  ] },
+  { id: "x-docker-registry-push", module: "docker", title: "Pushing an image to a registry", summary: "Tags, digests and which layers are uploaded.",
+  actors: ["Developer", "Docker engine", "Registry", "Cluster node"],
+  steps: [
+    { f: 0, t: 1, l: "Tag the image", n: "docker tag adds a name that includes the registry address, the repository and a version tag." },
+    { f: 0, t: 1, l: "Run docker push", n: "The engine starts uploading the image to that address after logging in." },
+    { f: 1, t: 2, l: "Ask which layers exist", n: "For each layer the engine checks if the registry already has it, and skips those that do." },
+    { f: 1, t: 2, l: "Upload missing layers", n: "Only new layers travel over the network, which makes repeated pushes fast." },
+    { f: 2, t: 1, l: "Store the manifest", n: "The registry stores the manifest and returns a digest, a hash that identifies exactly this image." },
+    { f: 3, t: 2, l: "Pull by digest", n: "A node pulls using the digest. Tags can move, but a digest always points to the same content." }
+  ] },
+  { id: "x-cicd-artifact", module: "cicd", title: "Building once and promoting the same artifact", summary: "Why staging and production run the identical build.",
+  actors: ["Pipeline", "Artifact store", "Staging", "Production"],
+  steps: [
+    { f: 0, t: 0, l: "Build one artifact", n: "The pipeline compiles the code and packages it exactly once for this commit." },
+    { f: 0, t: 1, l: "Store it with a version", n: "The package is saved with a version and a checksum, so it can be found and verified later." },
+    { f: 1, t: 2, l: "Deploy to staging", n: "Staging pulls that same artifact and runs integration tests against it." },
+    { f: 2, t: 0, l: "Tests pass", n: "Results are recorded against the artifact version, not against a branch that might have moved." },
+    { f: 1, t: 3, l: "Promote to production", n: "After approval production pulls the identical artifact. Nothing is rebuilt." },
+    { f: 3, t: 0, l: "Know what runs", n: "The running version maps back to one commit and one test record, which makes rollback and audit simple." }
+  ] },
+  { id: "x-cicd-approval", module: "cicd", title: "A deploy gate with approval", summary: "Automatic checks first, then a person for risky changes.",
+  actors: ["Pipeline", "Policy checks", "Approver", "Production"],
+  steps: [
+    { f: 0, t: 1, l: "Run automatic checks", n: "Tests, security scans and policy rules run first. Failing any of them stops the pipeline." },
+    { f: 1, t: 0, l: "Report the result", n: "All checks are green, and the result is attached to the release." },
+    { f: 0, t: 2, l: "Ask for approval", n: "A production deploy waits for an approver. The request shows the change, the test results and the risk." },
+    { f: 2, t: 0, l: "Approve or reject", n: "The approver should be someone other than the author, who decides after reading the evidence." },
+    { f: 0, t: 3, l: "Deploy gradually", n: "The pipeline deploys with the rollout strategy defined for the service, such as canary then full." },
+    { f: 3, t: 0, l: "Verify and record", n: "Health checks decide whether the release is kept. The approval, the time and the version are stored for audit." }
+  ] },
+  { id: "x-k8s-ingress-tls", module: "kubernetes", title: "How an ingress terminates TLS", summary: "From a browser request to a pod, with the certificate handled at the edge.",
+  actors: ["Browser", "Load balancer", "Ingress controller", "Service", "Pod"],
+  steps: [
+    { f: 0, t: 1, l: "Connect to the public address", n: "The browser opens a connection to the cloud load balancer that fronts the cluster." },
+    { f: 1, t: 2, l: "Pass traffic to the controller", n: "The load balancer forwards the connection to ingress controller pods inside the cluster." },
+    { f: 2, t: 2, l: "Present the certificate", n: "The controller picks the certificate from a secret that matches the host name and completes the TLS handshake." },
+    { f: 2, t: 2, l: "Match the rule", n: "It decrypts the request and checks host and path against the ingress rules." },
+    { f: 2, t: 3, l: "Forward to the service", n: "The request goes to the service named in the matching rule." },
+    { f: 3, t: 4, l: "Choose a ready pod", n: "The service sends it to one of the ready pods, which answers over plain HTTP inside the cluster." }
+  ] },
+  { id: "x-k8s-job", module: "kubernetes", title: "How a Job and a CronJob run to completion", summary: "Unlike a Deployment, a Job is meant to finish.",
+  actors: ["CronJob", "Job controller", "Pod", "Cluster events"],
+  steps: [
+    { f: 0, t: 1, l: "Schedule fires", n: "At the scheduled time the CronJob creates a Job object, unless the previous run is still going and the policy forbids it." },
+    { f: 1, t: 2, l: "Create the pod", n: "The Job controller creates a pod that runs the task once." },
+    { f: 2, t: 2, l: "Run to the end", n: "The container runs its command and exits with a status code." },
+    { f: 2, t: 1, l: "Report success or failure", n: "Exit status 0 marks the pod succeeded. Any other status marks it failed." },
+    { f: 1, t: 2, l: "Retry on failure", n: "On failure the controller creates a new pod, up to the backoff limit, with growing delays." },
+    { f: 1, t: 3, l: "Finish and clean up", n: "When the required number of pods succeed, the Job completes. Old Jobs are removed by the history limits." }
+  ] },
+  { id: "x-tf-count-foreach", module: "terraform", title: "Why for_each is safer than count", summary: "Removing an item from the middle of a list.",
+  actors: ["Configuration", "Plan", "State", "Real servers"],
+  steps: [
+    { f: 0, t: 2, l: "Start with count over a list", n: "Three servers are created with count and a list of names. State addresses them as [0], [1] and [2]." },
+    { f: 0, t: 1, l: "Remove the middle name", n: "The list shrinks to two names, so the item that was at index 2 moves to index 1." },
+    { f: 1, t: 2, l: "Plan compares by position", n: "Terraform sees that [1] now has a different name and [2] is gone." },
+    { f: 1, t: 3, l: "Unexpected replacement", n: "It plans to change or destroy servers that nobody meant to touch, only because positions shifted." },
+    { f: 0, t: 2, l: "Use for_each with a set or map", n: "Each server is addressed by its key, such as web-b, so the address is stable." },
+    { f: 1, t: 3, l: "Only the removed one is destroyed", n: "The plan now destroys exactly the removed key and leaves the others alone." }
+  ] },
+  { id: "x-tf-workspace-env", module: "terraform", title: "Separate environments with separate state", summary: "Why dev and prod must not share a state file.",
+  actors: ["Engineer", "Dev state", "Prod state", "Cloud accounts"],
+  steps: [
+    { f: 0, t: 1, l: "Plan in dev", n: "The engineer runs plan with the dev settings. It reads the dev state and the dev account only." },
+    { f: 1, t: 3, l: "Apply in dev", n: "Changes go to the dev account, and only the dev state is updated." },
+    { f: 0, t: 0, l: "Review the difference", n: "The same code runs with different variable files, so the shape matches and only the sizes differ." },
+    { f: 0, t: 2, l: "Plan in prod", n: "The same code is planned against the prod state and the prod account, usually by a pipeline with an approval step." },
+    { f: 2, t: 3, l: "Apply in prod", n: "Prod changes happen only after the change was proven in dev. A mistake in dev cannot reach the prod state." },
+    { f: 0, t: 2, l: "Limit access", n: "Separate credentials and state locations mean most people can change dev but not prod." }
+  ] },
+  { id: "x-cloud-load-balancer-health", module: "cloud", title: "How a cloud load balancer removes a broken server", summary: "Health checks and draining.",
+  actors: ["Client", "Load balancer", "Server A", "Server B"],
+  steps: [
+    { f: 1, t: 2, l: "Probe each server", n: "The load balancer sends a health request to every target every few seconds." },
+    { f: 1, t: 3, l: "Probe the second server", n: "Both targets answer with success, so both receive traffic." },
+    { f: 0, t: 1, l: "Send user traffic", n: "Clients send requests and the balancer spreads them across healthy targets." },
+    { f: 2, t: 2, l: "Server A starts failing", n: "A deploy breaks the health endpoint on server A, which now returns errors." },
+    { f: 1, t: 2, l: "Mark unhealthy after a threshold", n: "After a few failed probes in a row the balancer stops sending new requests to A." },
+    { f: 1, t: 3, l: "All traffic goes to B", n: "Server B carries the load. Capacity and alerts matter here, because one server is now doing the work of two." }
+  ] },
+  { id: "x-cloud-secrets-manager", module: "cloud", title: "Fetching a secret at run time", summary: "The application asks for the secret with its own identity.",
+  actors: ["Application", "Instance identity", "Secrets service", "Audit log"],
+  steps: [
+    { f: 0, t: 1, l: "Start with an attached role", n: "The workload runs with an identity assigned by the platform, so no password is stored in its image." },
+    { f: 0, t: 2, l: "Request the secret by name", n: "The application asks the secrets service for db/password." },
+    { f: 2, t: 1, l: "Check the identity", n: "The service checks that this role is allowed to read exactly this secret." },
+    { f: 2, t: 0, l: "Return the value", n: "The secret is returned over an encrypted connection and kept in memory." },
+    { f: 2, t: 3, l: "Record the access", n: "Who read which secret and when is written to the audit log." },
+    { f: 2, t: 0, l: "Rotate on a schedule", n: "The service creates a new value on a schedule. Applications that fetch at start-up or refresh periodically pick it up." }
+  ] },
+  { id: "x-obs-alert-routing", module: "observability", title: "How an alert reaches the right person", summary: "Rules, grouping, routing and silence.",
+  actors: ["Metrics store", "Alert rule", "Alert manager", "Chat channel", "On-call person"],
+  steps: [
+    { f: 0, t: 1, l: "Evaluate the rule", n: "The rule runs every minute against the metrics, for example error ratio above 5 percent for 10 minutes." },
+    { f: 1, t: 2, l: "Fire the alert", n: "When the condition holds long enough, the alert is sent with labels such as service and severity." },
+    { f: 2, t: 2, l: "Group and de-duplicate", n: "Alerts with the same labels are grouped, so one outage does not create fifty messages." },
+    { f: 2, t: 3, l: "Route by severity", n: "Low severity goes to a channel for working hours." },
+    { f: 2, t: 4, l: "Page for high severity", n: "High severity pages the person on call, using the schedule, with a link to the dashboard and runbook." },
+    { f: 2, t: 2, l: "Resolve or silence", n: "When the condition clears a resolved message is sent. A silence mutes planned work." }
+  ] },
+  { id: "x-obs-slo-dashboard", module: "observability", title: "From request logs to an SLO number", summary: "How raw events become one reliability figure.",
+  actors: ["Service", "Metrics pipeline", "SLI query", "SLO report"],
+  steps: [
+    { f: 0, t: 1, l: "Emit counters", n: "Each request increments a counter labelled with its status code and route." },
+    { f: 1, t: 2, l: "Define the SLI", n: "The SLI is the share of good requests: non-5xx responses divided by all valid requests." },
+    { f: 2, t: 2, l: "Calculate over a window", n: "The query computes this ratio over 30 days and also over short windows for alerting." },
+    { f: 2, t: 3, l: "Compare with the target", n: "The result is compared with the SLO, for example 99.9 percent." },
+    { f: 3, t: 3, l: "Show the error budget", n: "The remaining budget is the allowed bad fraction minus the actual bad fraction, shown as minutes or requests." },
+    { f: 3, t: 0, l: "Decide what to do", n: "With budget left the team ships. With it nearly spent, the team focuses on reliability work." }
+  ] },
+  { id: "x-sre-blameless-review", module: "sre", title: "Running a blameless review", summary: "Learning from an incident without pointing fingers.",
+  actors: ["Facilitator", "Responders", "Timeline", "Action items"],
+  steps: [
+    { f: 0, t: 1, l: "Invite everyone involved", n: "The facilitator brings in responders, owners of affected systems and anyone who made a decision." },
+    { f: 1, t: 2, l: "Build the timeline", n: "Using chat logs and graphs, the group writes what happened and when, with facts only." },
+    { f: 0, t: 1, l: "Ask how, not who", n: "Questions focus on what made the action seem reasonable at that moment and what information was missing." },
+    { f: 1, t: 2, l: "Find contributing factors", n: "The group lists conditions such as missing alerts, unclear runbooks or risky defaults. There is rarely one root cause." },
+    { f: 1, t: 3, l: "Agree on actions", n: "Each action has an owner, a date and a measurable outcome. Fewer, stronger actions beat a long list." },
+    { f: 3, t: 0, l: "Share and follow up", n: "The review is shared widely and the actions are tracked until done, which is how trust in the process is earned." }
+  ] },
+  { id: "x-sre-capacity", module: "sre", title: "Planning capacity before it runs out", summary: "Forecasting from growth and headroom.",
+  actors: ["Metrics", "Forecast", "Capacity plan", "Procurement or autoscaling"],
+  steps: [
+    { f: 0, t: 1, l: "Collect usage trends", n: "Weeks of data on traffic, CPU, memory and storage show the growth rate and the daily peaks." },
+    { f: 1, t: 1, l: "Project forward", n: "The forecast extends the trend, adds known events such as a launch, and shows when the limit is reached." },
+    { f: 1, t: 2, l: "Define headroom", n: "The plan keeps a safety margin, so the loss of a zone or a traffic spike does not cause an outage." },
+    { f: 2, t: 3, l: "Choose how to add capacity", n: "Autoscaling handles fast changes. Slow resources such as storage or quota increases need lead time." },
+    { f: 3, t: 0, l: "Verify with load tests", n: "A load test shows if the system really scales as predicted, and where the next bottleneck is." },
+    { f: 0, t: 1, l: "Review on a schedule", n: "Forecasts are compared with reality each quarter, and the model is corrected where it was wrong." }
+  ] },
+  { id: "x-sec-threat-model", module: "security", title: "A quick threat model session", summary: "Four questions applied to one feature.",
+  actors: ["Team", "Diagram", "Threat list", "Backlog"],
+  steps: [
+    { f: 0, t: 1, l: "Draw the data flow", n: "The team draws users, services, data stores and the lines between them, marking trust boundaries." },
+    { f: 0, t: 1, l: "Ask what can go wrong", n: "For each boundary crossing the team asks how it could be spoofed, tampered with, read or overloaded." },
+    { f: 1, t: 2, l: "Write the threats down", n: "Each realistic threat gets a short sentence, such as a user changing an id in the URL to read another account." },
+    { f: 2, t: 2, l: "Rank by impact and likelihood", n: "A simple high, medium or low ranking decides what to deal with first." },
+    { f: 2, t: 3, l: "Choose a response for each", n: "Fix, reduce, accept or transfer. Every accepted risk has a named owner." },
+    { f: 3, t: 0, l: "Revisit when the design changes", n: "New features and integrations change the diagram, so the model is updated rather than filed away." }
+  ] },
+  { id: "x-sec-dependency-scan", module: "security", title: "Handling a vulnerable dependency", summary: "From a scanner finding to a safe release.",
+  actors: ["Scanner", "Engineer", "Package registry", "Pipeline"],
+  steps: [
+    { f: 0, t: 1, l: "Report a finding", n: "The scanner reports that a library version has a known vulnerability, with a severity score." },
+    { f: 1, t: 1, l: "Check if it matters", n: "The engineer checks if the vulnerable code is actually used and reachable. Severity alone is not the whole story." },
+    { f: 1, t: 2, l: "Find a fixed version", n: "The registry shows a patched version, and the release notes say if the update is compatible." },
+    { f: 1, t: 3, l: "Update and test", n: "The version is raised in the lock file, and the test suite runs to catch breaking changes." },
+    { f: 3, t: 0, l: "Scan again", n: "The pipeline repeats the scan on the new build and confirms the finding is gone." },
+    { f: 3, t: 1, l: "Ship within the agreed time", n: "The fix is released within the time the policy sets for that severity, and an exception is recorded if it cannot be." }
   ] }
 ];
