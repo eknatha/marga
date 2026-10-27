@@ -630,5 +630,117 @@
  "databases/debugging-database-problems": {
   "s": "When the database has trouble, look carefully before touching anything. Many quick fixes can lose data.",
   "i": "Triage by symptom: slow, hanging, full or unreachable. Look at sessions, locks, disk, WAL and slots, take the safest reversible action first, never delete data directory files, and confirm recovery."
+ },
+ "linux/time-ntp-and-timezones": {
+  "s": "A computer keeps time with a clock that slowly drifts, so it checks with trusted time servers now and then. If it forgets, its time gets wrong and logins and certificates can fail.",
+  "i": "I check timedatectl and chronyc tracking, keep servers on UTC, use the provider time source, allow UDP 123, and alert on clock offset so drift never reaches tokens, certificates or logs."
+ },
+ "linux/systemd-overrides-targets-and-dependencies": {
+  "s": "A service has a settings file from the package and you can add your own small file on top. Your file wins and survives updates, so your changes are not lost.",
+  "i": "I use drop-in overrides in /etc, pair After with Wants, check boot time with systemd-analyze, and set restart policy, start limits and resource limits in the unit so failures are visible and contained."
+ },
+ "bash/temporary-files-and-atomic-writes": {
+  "s": "When a script saves a file, it should write a new copy first and then swap it in, so nobody ever sees a half-finished file.",
+  "i": "I use mktemp for unique files, a trap for cleanup, rename for atomic replacement, and flock to prevent overlapping runs."
+ },
+ "bash/portable-scripts-and-shellcheck": {
+  "s": "Different computers use different shells. Write down which one your script needs, and let a checker read your script for mistakes before anyone runs it.",
+  "i": "I pick the shebang on purpose, avoid Bash-only features under sh, run ShellCheck in the editor and pipeline, and write usage text and functions so scripts are easy to maintain."
+ },
+ "python/logging-for-scripts-and-services": {
+  "s": "Logging is a diary your program keeps. It writes what it does at different levels of importance, so you can read the story when something goes wrong.",
+  "i": "I configure logging once, choose levels carefully, log exceptions with context and no secrets, and use rotation or JSON lines so logs are small, searchable and trusted."
+ },
+ "python/yaml-csv-and-config-files": {
+  "s": "Data files look simple, but each format has its own rules. Use the tools made for each format and check the data before you use it.",
+  "i": "I use safe_load, the csv module and configparser, quote values that must stay text, and validate keys and types with clear errors before the data reaches real systems."
+ },
+ "networking/network-segmentation-and-security-groups": {
+  "s": "A network can be cut into rooms with locked doors. Each room only opens to the one room that needs it, so a thief in one room cannot walk everywhere.",
+  "i": "I split networks into zones, write least-privilege security group rules that reference groups, describe every rule, test blocked paths, and review rules and flow logs regularly."
+ },
+ "networking/dhcp-arp-and-the-local-network": {
+  "s": "When a computer joins a network it asks, who can give me an address. Then it asks its neighbours who owns each address, so that it can deliver messages in the right room.",
+  "i": "I understand the DHCP exchange, treat 169.254 as a DHCP failure, keep static and dynamic ranges apart, and use ip neigh and arping to find duplicates and stale neighbour entries."
+ },
+ "docker/slim-images-and-faster-builds": {
+  "s": "An image is a packed suitcase. Pack only what you need for the trip, and leave the tools you used to pack at home.",
+  "i": "I choose a slim or distroless base, use multi-stage builds, clean up in the same layer, keep the context small with .dockerignore, and measure with docker history and scans."
+ },
+ "docker/running-containers-in-production": {
+  "s": "A container in production should be polite: it uses little power, stops when asked, tells people when it is ill, and keeps its important things outside.",
+  "i": "I run containers as non-root with a read-only filesystem and dropped capabilities, handle SIGTERM, set limits, health checks and restart policy, log to stdout, and keep data in volumes."
+ },
+ "cicd/reusable-pipelines-and-templates": {
+  "s": "Instead of every team writing its own recipe, write a good recipe once and let teams use it with a few choices, with version numbers so a change never surprises them.",
+  "i": "I share pipeline steps as versioned templates with few typed inputs, enforce the essential guard rails centrally, roll out breaking changes with canaries, and measure adoption."
+ },
+ "cicd/environments-promotion-and-approvals": {
+  "s": "Make one cake and carry that same cake from the kitchen to the tasting table to the party. Never bake a new cake at each stop.",
+  "i": "I build once and promote by digest, keep environments close, use automatic gates where possible and evidence-backed approvals where needed, and record what runs where."
+ },
+ "kubernetes/network-policies-in-practice": {
+  "s": "In a cluster everyone can visit everyone unless you lock the doors. Network policies lock all doors first, then open only the ones that should be open.",
+  "i": "I start with default deny, write allow rules by label and port, remember DNS, check the plugin enforces policies, and test both allowed and blocked paths."
+ },
+ "kubernetes/statefulsets-and-running-databases": {
+  "s": "A StatefulSet gives each pod a name tag and its own locker that stay with it. It does not teach the pods how to run a database well; an operator or a managed service does that.",
+  "i": "I use StatefulSets for stable identity and per-pod storage, headless services for peer DNS, PodDisruptionBudgets for safe drains, and an operator or managed service for backups and failover, with restore drills."
+ },
+ "terraform/import-refactor-and-moved-blocks": {
+  "s": "Terraform keeps a list of names for the things it built. If you rename something, tell Terraform it is the same thing, or it may knock the old one down and build a new one.",
+  "i": "I adopt resources with import blocks, rename and move with moved blocks, stop management with removed blocks, protect critical resources, and prove each refactor with a plan that has no destroys."
+ },
+ "terraform/large-configurations-and-performance": {
+  "s": "One giant box of building blocks is slow to search and everyone fights over it. Several smaller boxes, one per team and topic, are quicker and safer.",
+  "i": "I split Terraform into stacks by lifecycle and ownership, share outputs through data sources, keep states small for fast plans and small blast radius, and avoid -target as a habit."
+ },
+ "cloud/object-storage-and-data-lifecycle": {
+  "s": "Object storage is a huge warehouse. Put old boxes in cheaper aisles, throw away what you no longer need, and keep the doors locked.",
+  "i": "I use lifecycle rules for cost, versioning and object lock for protection, block public access with roles and signed URLs, and monitor bucket growth and policy changes."
+ },
+ "cloud/hybrid-connectivity-and-peering": {
+  "s": "To join two towns by road, they must not have the same street numbers, and each needs a signpost pointing to the other.",
+  "i": "I plan unique address ranges, choose peering, transit hubs, VPN or dedicated links by need, use private endpoints, and check routes, rules and DNS on both sides."
+ },
+ "observability/structured-logging-and-log-design": {
+  "s": "If every diary uses different words for the same thing, you cannot search across them. Agree on the words and write them in labelled boxes.",
+  "i": "I log structured events with stable field names and a request ID, use levels as a contract, avoid secrets, and control volume and retention."
+ },
+ "observability/runbooks-and-dashboards-for-on-call": {
+  "s": "On-call material is a map for a tired traveller. It should be small, current, and start where the traveller is standing.",
+  "i": "I build layered dashboards that answer the first five minutes of questions, link each alert to a service dashboard and a concrete runbook, and keep both owned and reviewed."
+ },
+ "sre/dependencies-and-third-party-risk": {
+  "s": "If your dinner needs five shops to be open at once, it is only as reliable as all five together. Find a way to cook without some of them.",
+  "i": "I map hard and soft dependencies, calculate honest targets, design fallbacks, queues and breakers, test them, and measure vendors myself with an exit plan for critical ones."
+ },
+ "sre/disaster-recovery-exercises": {
+  "s": "A fire drill shows where the exits are blocked before there is a fire. Disaster recovery drills do the same for your systems.",
+  "i": "I set RTO and RPO with the business, run exercises from tabletop to failover with success criteria and stop rules, record timings, and fix and repeat until the objectives are met."
+ },
+ "security/supply-chain-sboms-and-provenance": {
+  "s": "Food has an ingredients list and a sealed lid. SBOMs list the ingredients in software, and signatures show the lid was not opened.",
+  "i": "I generate and index SBOMs, sign and verify artifacts by digest, require provenance from our pipeline, and pull dependencies through a controlled mirror."
+ },
+ "security/cloud-incident-playbooks": {
+  "s": "A fire plan on the wall says who calls, which door to use, and what to switch off. Cloud playbooks do the same for security incidents.",
+  "i": "I keep short playbooks for leaked keys, exposed storage and compromised workloads, contain without destroying evidence, remove persistence, rotate secrets and fix the cause."
+ },
+ "ansible/dynamic-inventory-for-cloud": {
+  "s": "A guest list written last week misses today's guests. A dynamic inventory checks the door every time.",
+  "i": "I use inventory plugins with tags, keyed groups, merged static sources and serial batches, and inspect the result before running."
+ },
+ "ansible/testing-and-linting-ansible": {
+  "s": "Proofread a letter, practise the speech in front of a mirror, then deliver it. That is lint, Molecule and the real run.",
+  "i": "I lint, syntax check, preview with check and diff, test roles with Molecule on disposable instances, and require idempotence."
+ },
+ "databases/postgres-vacuum-bloat-and-maintenance": {
+  "s": "When you change a page in a ledger, the old line is crossed out, not erased. Vacuum is the clerk who finally tidies the crossed-out lines.",
+  "i": "I understand MVCC and vacuum, tune autovacuum per table, find blockers with pg_stat_activity, avoid VACUUM FULL in production, and monitor dead tuples and transaction age."
+ },
+ "databases/schema-design-for-operations": {
+  "s": "A well-labelled warehouse with shelves per month is easy to tidy. A single huge pile with no labels is not.",
+  "i": "I choose stable keys and proper types, add constraints from the start, partition growing tables, and design changes that can be made safely."
  }
 }
