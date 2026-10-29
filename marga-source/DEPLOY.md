@@ -183,3 +183,8 @@ The Practice page keeps favourites and collapsed groups in local storage under t
 ## Round 18
 
 No deployment change. Explainer links and the failure filter are static data and need no server.
+
+
+Round 19: nav panel, route dots on path cards, nav reorder. No new files or settings.
+
+Round 20: skill tree redesign. No new files or settings.

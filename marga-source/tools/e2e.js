@@ -1265,7 +1265,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const { ctx, page } = await open();
     await go(page, '/');
     const links = await page.locator('#topnav a').allInnerTexts();
-    eq(links.join('|'), 'Skills|Skill trees|Certifications|Cheat sheets|Case studies|Practice|Progress|InterviewHub|About', 'nav order');
+    eq(links.join('|'), 'Skills|Skill trees|Cheat sheets|Case studies|Practice|Certifications|Progress|InterviewHub|About', 'nav order');
     await nav(page, '/practice');
     eq(await page.locator('.prac li').count(), 25, 'hub cards');
     for (const href of ['#/drills', '#/interview/mock', '#/flashcards', '#/cases', '#/architecture', '#/calculators', '#/review', '#/terminal-labs']) ok(await page.locator(`.prac a[href="${href}"]`).count() === 1, 'hub links to ' + href);
@@ -1565,6 +1565,115 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     ok(/Watched/.test(await page.textContent('#watch-it')), 'watched is shown on the lesson');
     ok(issues.filter((m) => !/goatcounter|ERR_/.test(m)).length === 0, 'no console issues: ' + issues.join('|'));
     await ctx.close();
+  });
+
+  await test('skill tree: default selection is the next skill, click shows details and highlights links, hover previews, locked skill points to its first prerequisite', async () => {
+    const { ctx, page } = await open();
+    await go(page, '/paths'); await page.waitForSelector('.tree .node');
+    eq(await page.locator('.node.next').count(), 1, 'one next-up skill');
+    eq(await page.locator('.tree').getAttribute('data-sel'), 'linux', 'linux selected at the start');
+    ok(/Linux/.test(await page.textContent('.tree-detail h3')), 'panel shows linux');
+    await page.waitForFunction(() => document.querySelectorAll('.tree-lines path').length >= 9);
+    await page.click('.node[data-id="kubernetes"] a');
+    eq(page.url().includes('/module/'), false, 'click selects instead of navigating');
+    eq(await page.locator('.tree').getAttribute('data-sel'), 'kubernetes', 'selection moved');
+    ok(/Kubernetes/.test(await page.textContent('.tree-detail h3')), 'panel updated');
+    ok(/Docker and containers/.test(await page.textContent('.tree-detail')), 'panel lists prerequisites');
+    ok(await page.locator('.tree-lines .ln.hl').count() >= 4, 'links to and from the selected skill are highlighted');
+    ok(await page.locator('.node.rel').count() >= 4, 'related skills are marked');
+    const first = page.locator('.tree-detail .td-cta a').first();
+    ok(/First: /.test(await first.textContent()), 'locked skill points to the first prerequisite');
+    await page.hover('.node[data-id="linux"] a');
+    ok(await page.locator('.node[data-id="linux"].sel').count() === 1, 'hover previews');
+    await page.mouse.move(2, 2);
+    eq(await page.locator('.node[data-id="kubernetes"].sel').count(), 1, 'selection returns after hover');
+    await page.focus('.node[data-id="linux"] a'); await page.keyboard.press('Enter');
+    eq(await page.locator('.tree').getAttribute('data-sel'), 'linux', 'keyboard selects');
+    ok(!/undefined|NaN|\[object Object\]/.test(await page.textContent('.tree-wrap')), 'clean text');
+    for (const i of [1, 2, 3, 4]) { await page.locator('.tab').nth(i).click(); await page.waitForSelector('.tree .node'); ok(await page.locator('.tree-detail h3').count() === 1, 'panel on tab ' + i); }
+    await ctx.close();
+  });
+
+  await test('skill tree on mobile: nodes in a list, tap opens a bottom sheet, close button hides it, no sideways scroll', async () => {
+    const { ctx, page } = await open({ viewport: { width: 390, height: 844 } });
+    await go(page, '/paths'); await page.waitForSelector('.tree .node');
+    eq(await page.locator('.tree-detail').isHidden(), true, 'sheet hidden at first');
+    await page.click('.node[data-id="kubernetes"] a');
+    await page.waitForSelector('.tree-detail', { state: 'visible' });
+    ok(await page.locator('.td-close').isVisible(), 'close button');
+    eq(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, 'no sideways scroll');
+    await page.click('.td-close');
+    eq(await page.locator('.tree-detail').isHidden(), true, 'sheet closes');
+    await ctx.close();
+  });
+
+  await test('skill trees panel: hover and keyboard open all five paths, links work, Escape closes, Certifications sits beside Practice, no author line', async () => {
+    const { ctx, page } = await open();
+    await go(page, '/');
+    eq(await page.locator('#pmega').isHidden(), true, 'closed at rest');
+    const names = await page.locator('#topnav > a').allInnerTexts();
+    eq(names.indexOf('Certifications'), names.indexOf('Practice') + 1, 'certifications right after Practice');
+    await page.hover('#topnav a[data-nav="paths"]');
+    await page.waitForSelector('#pmega:not([hidden]) .pm-col');
+    eq(await page.locator('#pmega .pm-col').count(), 5, 'five path columns');
+    const skills = await page.locator('#pmega .pm-col').first().locator('.pm-list li').count();
+    ok(skills >= 15, 'first path lists its skills: ' + skills);
+    const bad = /undefined|NaN|\[object Object\]/.test(await page.textContent('#pmega')); eq(bad, false, 'panel text clean');
+    const box = await page.locator('#pmega').boundingBox(); ok(box.width >= 1200 && box.y < 120, 'panel under the header, full width');
+    await page.click('#pmega .pm-list a >> nth=0'); await page.waitForFunction(() => /#\/module\//.test(location.hash));
+    await page.mouse.move(5, 500); await page.waitForSelector('#pmega', { state: 'hidden' });
+    eq(await page.locator('#pmega').isHidden(), true, 'closes after choosing a skill');
+    await page.focus('#topnav a[data-nav="paths"]');
+    await page.waitForSelector('#pmega:not([hidden])');
+    await page.keyboard.press('Tab'); await page.keyboard.press('Tab');
+    eq(await page.locator('#pmega').isVisible(), true, 'stays open while tabbing inside');
+    await page.keyboard.press('Escape');
+    eq(await page.locator('#pmega').isHidden(), true, 'Escape closes');
+    await go(page, '/');
+    ok(!/Built by Eknatha|Senior Platform Engineer at IBM/.test(await page.textContent('#main')), 'no author line on the landing page');
+    await ctx.close();
+  });
+
+  await test('skill trees panel on mobile: tap expands inside the menu', async () => {
+    const { ctx, page } = await open({ viewport: { width: 390, height: 844 } });
+    await go(page, '/');
+    await page.click('.menu-btn');
+    eq(await page.locator('#pmega').isHidden(), true, 'collapsed in the menu');
+    await page.click('.pm-toggle');
+    await page.waitForSelector('#pmega:not([hidden]) .pm-col');
+    eq(await page.locator('.pm-toggle').getAttribute('aria-expanded'), 'true', 'expanded flag');
+    eq(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), true, 'no sideways scroll');
+    await page.click('.pm-toggle');
+    eq(await page.locator('#pmega').isHidden(), true, 'collapses again');
+    await ctx.close();
+  });
+
+  await test('path cards: route dots show every skill, tooltip name, tap-to-expand names, dots link to skills', async () => {
+    const { ctx, page } = await open();
+    await go(page, '/');
+    const rows = page.locator('.rows .row');
+    eq(await rows.count(), 5, 'five path cards');
+    for (let i = 0; i < 5; i++) {
+      const r = rows.nth(i);
+      eq(await r.locator('.rp-d').count(), await r.locator('.row-mods li').count(), 'dots match skills in card ' + i);
+    }
+    const d = rows.first().locator('.rp-d').first();
+    ok((await d.getAttribute('data-tip')).length > 2, 'dot has a name');
+    ok(/passed|in progress|ready|locked/.test(await d.getAttribute('aria-label')), 'dot status in label');
+    eq(await rows.first().locator('.row-mods').isHidden(), true, 'names collapsed');
+    await rows.first().locator('.rp-more').click();
+    eq(await rows.first().locator('.row-mods').isVisible(), true, 'names expanded');
+    eq(await rows.first().locator('.rp-more').getAttribute('aria-expanded'), 'true', 'expanded flag');
+    await rows.first().locator('.rp-more').click();
+    eq(await rows.first().locator('.row-mods').isHidden(), true, 'collapsed again');
+    await d.click(); await page.waitForFunction(() => /#\/module\//.test(location.hash));
+    await ctx.close();
+    const m = await open({ viewport: { width: 390, height: 844 } });
+    await go(m.page, '/');
+    await m.page.locator('.rows .row').first().locator('.rp-more').tap().catch(async () => { await m.page.locator('.rows .row').first().locator('.rp-more').click(); });
+    eq(await m.page.locator('.rows .row').first().locator('.row-mods').isVisible(), true, 'mobile expand');
+    eq(await m.page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), true, 'mobile no sideways scroll');
+    await m.ctx.close();
   });
 
   await test('new skills: cloud security and IAM, Kubernetes administration and operations, Argo CD have eight lessons each, ending in debugging', async () => {

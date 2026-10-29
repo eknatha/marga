@@ -52,3 +52,14 @@ See DEPLOY.md for hosting, DNS and the visitor counter.
 - Lesson links for the 394 older explainers were matched automatically by keywords and then corrected by hand where the match was clearly off. A few may still be the second-best lesson in the skill. 63 lessons have no tied explainer; their "Watch it" section shows two from the same skill and says so.
 - Three older explainers shared an id with another one. They were renamed so every id is unique.
 - The Practice page layout from Round 17 is unchanged.
+
+
+## Round 19
+
+- Skill trees panel in the main nav: hover or focus opens all five paths with every skill and progress; on mobile a chevron expands it inside the menu.
+- Path cards show a route of dots (one per skill, coloured by status, name on hover) with a Show all skills toggle.
+- Certifications link now sits beside Practice.
+
+## Round 20
+
+- Skill tree view rebuilt: compact nodes in stage lanes, elbow connectors, a detail panel (needs, unlocks, lessons, next action), highlight of the selected skill links, hover preview, Next up tag, and a bottom sheet on phones.
