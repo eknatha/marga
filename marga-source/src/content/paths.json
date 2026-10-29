@@ -139,6 +139,32 @@
         "Lead the first hour of a security incident while preserving evidence.",
         "Protect automation secrets with Vault and keep database backups, access and migrations safe."
       ]
+    },
+    {
+      "id": "ai",
+      "title": "AI Engineer",
+      "summary": "Build with large language models: how they work, prompting and structured output, Claude Skills, and tool use with the Model Context Protocol, on top of Linux, Git, Python and networking.",
+      "audience": "Developers and DevOps engineers who want to build, package and operate AI features safely.",
+      "modules": [
+        "linux",
+        "git",
+        "python",
+        "networking",
+        "llm",
+        "prompting",
+        "claude-skills",
+        "mcp"
+      ],
+      "outcomes": [
+        "Explain tokens, context windows, sampling and why models make mistakes.",
+        "Call a model API with sensible limits, retries, streaming and cost control.",
+        "Write prompts with clear roles, examples and constraints, and test them like code.",
+        "Get structured JSON from a model and validate, repair or reject it.",
+        "Package repeatable expertise as a Claude Skill with a description that triggers reliably.",
+        "Test, version and review skills before sharing them with a team.",
+        "Define tools with schemas and run the tool-use loop correctly.",
+        "Build a small MCP server and defend it against prompt injection and over-broad permissions."
+      ]
     }
   ],
   "planned": [
