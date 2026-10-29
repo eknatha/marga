@@ -160,8 +160,10 @@ function renderChrome() {
     '<header class="topbar"><div class="wrap topbar-in">' +
     '<a class="brand" href="#/"><img src="icon.svg" alt="" width="26" height="26"><span><b>MARGA</b></span></a>' +
     '<nav class="topnav" id="topnav" aria-label="Main">' +
-    '<a href="#/skills" data-nav="skills">Skills</a><a href="#/paths" data-nav="paths">Skill trees</a><a class="nav-certs" href="https://certs.eknathalabs.com" target="_blank" rel="noopener" title="Certifications (opens in a new tab)">Certifications</a><a href="#/cheatsheets" data-nav="cheatsheets">Cheat sheets</a>' +
-    '<a href="#/cases" data-nav="cases">Case studies</a><a href="#/practice" data-nav="practice">Practice</a><a href="#/progress" data-nav="progress">Progress</a><a href="#/interview" data-nav="interview">InterviewHub</a><a href="#/about" data-nav="about">About</a></nav>' +
+    '<a href="#/skills" data-nav="skills">Skills</a><a href="#/paths" data-nav="paths" aria-controls="pmega" aria-expanded="false">Skill trees</a>' +
+    '<button class="pm-toggle" type="button" data-act="pm-toggle" aria-controls="pmega" aria-expanded="false" aria-label="Show the skills in each path"></button><div class="pmega" id="pmega" hidden></div>' +
+    '<a href="#/cheatsheets" data-nav="cheatsheets">Cheat sheets</a><a href="#/cases" data-nav="cases">Case studies</a><a href="#/practice" data-nav="practice">Practice</a>' +
+    '<a class="nav-certs" href="https://certs.eknathalabs.com" target="_blank" rel="noopener" title="Certifications (opens in a new tab)">Certifications</a><a href="#/progress" data-nav="progress">Progress</a><a href="#/interview" data-nav="interview">InterviewHub</a><a href="#/about" data-nav="about">About</a></nav>' +
     '<div class="tools">' +
     '<button class="btn btn-quiet search-btn" type="button" data-act="search" aria-label="Search lessons and cheat sheets">' + ICON.search + '<span>Search</span><kbd>/</kbd></button>' +
     '<a class="streak' + (st.cur ? ' on' : '') + '" href="#/progress" title="Current streak ' + plural(st.cur, 'day') + ', best ' + plural(st.best, 'day') + '" aria-label="Current streak ' + plural(st.cur, 'day') + '">' + ICON.flame + '<b>' + st.cur + '</b></a>' +
@@ -177,6 +179,42 @@ function renderChrome() {
     '<p class="foot-promise">Free \u00b7 No login \u00b7 No ads \u00b7 No cookies</p><p class="small foot-ver">Version ' + siteVer() + '</p></div></footer>';
   if (window.MargaCounter && D.counter) MargaCounter.rebind('#visitors');
 }
+
+/* ---------- Skill trees panel in the nav: every path and its skills ---------- */
+var pmTimer = 0, pmSkip = false;
+function pmWide() { return !window.matchMedia || window.matchMedia('(min-width: 901px)').matches; }
+function pmHtml() {
+  return '<div class="wrap pm-in">' + LIVE.map(function (p) {
+    var pp = pathProgress(p), pct = pp.total ? Math.round(pp.done / pp.total * 100) : 0;
+    return '<section class="pm-col" aria-label="' + e(p.title) + '"><h3><a href="#/path/' + p.id + '">' + e(p.title) + '</a></h3>' +
+      '<p class="pm-meta">' + plural(p.modules.length, 'skill') + ', about ' + hours(pp.minutes) + '</p>' +
+      '<div class="pm-bar" role="img" aria-label="' + pct + ' percent complete"><i style="width:' + pct + '%"></i></div>' +
+      '<ol class="pm-list">' + p.modules.map(function (id) {
+        var m = MOD[id], st = modStatus(m);
+        return '<li class="m-' + st + '"><a href="#/module/' + id + '" title="' + e(m.title) + '"><i class="pm-dot" aria-hidden="true"></i><span>' + e(m.title) + '</span><em class="sr">' + ({ pass: ', passed', run: ', in progress', ready: ', ready', lock: ', locked' }[st]) + '</em></a></li>';
+      }).join('') + '</ol></section>';
+  }).join('') + '</div><div class="wrap pm-foot"><a href="#/paths">Open the skill tree view</a></div>';
+}
+function pmOpen(on) {
+  var m = $('#pmega'); if (!m) return;
+  clearTimeout(pmTimer);
+  if (on && m.hidden) m.innerHTML = pmHtml();
+  m.hidden = !on;
+  var lk = $('#topnav a[data-nav="paths"]'), bt = $('.pm-toggle');
+  if (lk) lk.setAttribute('aria-expanded', String(on));
+  if (bt) bt.setAttribute('aria-expanded', String(on));
+  $('#topnav').classList.toggle('pm-on', on);
+}
+function inPm(t) { return !!(t && t.closest && (t.closest('#pmega') || t.closest('#topnav a[data-nav="paths"]'))); }
+document.addEventListener('mouseover', function (ev) { if (pmWide() && inPm(ev.target)) pmOpen(true); });
+document.addEventListener('mouseout', function (ev) {
+  if (pmWide() && inPm(ev.target) && !inPm(ev.relatedTarget)) { clearTimeout(pmTimer); pmTimer = setTimeout(function () { pmOpen(false); }, 180); }
+});
+document.addEventListener('focusin', function (ev) {
+  var m = $('#pmega'); if (!m || pmSkip) return;
+  if (pmWide() && inPm(ev.target)) pmOpen(true);
+  else if (pmWide() && !m.hidden) pmOpen(false);
+});
 
 /* ---------- visitor count: see counter.js ---------- */
 function siteVer() { try { var m = /[?&]v=([0-9a-f]+)/.exec(document.querySelector('script[src*="app.js"]').getAttribute('src')); return m ? m[1] : 'dev'; } catch (x) { return 'dev'; } }
@@ -201,42 +239,112 @@ function treeTiers(p) {
   p.modules.forEach(function (id) { (tiers[depth[id]] = tiers[depth[id]] || []).push(id); });
   return tiers.filter(Boolean);
 }
-function nodeHtml(m, pid) {
+var treeSel = '';
+var PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>';
+function nodeHtml(m, pid, nextId) {
   var s = modStatus(m), n = modCount(m), tot = m.lessons.length, pct = Math.round(n / tot * 100);
   var label = { pass: 'Mastered', run: 'In progress', ready: 'Ready to unlock skills', lock: 'Locked' }[s];
-  var badge = s === 'pass' ? ICON.check : s === 'lock' ? ICON.lock : '<span>' + n + '</span>';
+  var badge = s === 'pass' ? ICON.check : s === 'lock' ? ICON.lock : s === 'ready' ? PLAY : '<span>' + pct + '%</span>';
   var need = s === 'lock' ? m.requires.map(function (r) { return MOD[r].title; }).join(' and ') : '';
-  return '<li class="node s-' + s + '" data-id="' + m.id + '" data-req="' + e(m.requires.join(' ')) + '" style="--p:' + pct + '">' +
-    '<a href="#/module/' + m.id + '" aria-label="' + e(m.title) + ', ' + label + ', ' + n + ' of ' + tot + ' lessons passed' + (need ? '. Needs ' + e(need) : '') + '">' +
+  var nx = m.id === nextId;
+  return '<li class="node s-' + s + (nx ? ' next' : '') + '" data-id="' + m.id + '" data-req="' + e(m.requires.join(' ')) + '" style="--p:' + pct + '">' +
+    '<a href="#/module/' + m.id + '" aria-label="' + e(m.title) + ', ' + label + ', ' + n + ' of ' + tot + ' lessons passed' + (need ? '. Needs ' + e(need) : '') + (nx ? '. Next up' : '') + '. Select to see details">' +
+    (nx ? '<span class="nexttag">Next up</span>' : '') +
     '<span class="ring"><span class="badge">' + badge + '</span></span>' +
     '<span class="name">' + e(m.title) + '</span><span class="sub">' + (s === 'lock' ? 'Needs ' + e(need) : 'Level ' + n + ' of ' + tot) + '</span></a></li>';
 }
-function treeHtml(p) {
-  var tiers = treeTiers(p), pp = pathProgress(p);
-  var xp = pp.done * 100, rank = pp.done === 0 ? 'Newcomer' : pp.done < pp.total * .25 ? 'Apprentice' : pp.done < pp.total * .6 ? 'Practitioner' : pp.done < pp.total ? 'Senior' : 'Master';
-  return '<div class="tree-wrap"><p class="tree-meta"><span><b>' + xp + '</b> skill points</span><span>Rank: <b>' + rank + '</b></span><span>' + pp.done + ' of ' + pp.total + ' lessons passed</span></p>' +
-    '<div class="tree" data-path="' + p.id + '" role="group" aria-label="' + e(p.title) + ' skill tree"><svg class="tree-lines" aria-hidden="true" focusable="false"></svg>' +
-    tiers.map(function (t, i) { return '<div class="tier"><p class="tier-name">' + (TIER_NAMES[i] || 'Tier ' + (i + 1)) + '</p><ol class="tier-nodes">' + t.map(function (id) { return nodeHtml(MOD[id], p.id); }).join('') + '</ol></div>'; }).join('') +
-    '</div><p class="tree-legend small">Pass every lesson check in a skill to master it. Locked skills open when the skills that lead into them are mastered.</p></div>';
+function treeNextMod(p) { var nx = nextInPath(p); return nx ? LES[nx].module : ''; }
+function treeDefaultSel(p) { return treeNextMod(p) || p.modules[0]; }
+function treeDetail(p, id) {
+  var m = MOD[id]; if (!m) return '';
+  var s = modStatus(m), n = modCount(m), tot = m.lessons.length;
+  var word = { pass: 'Mastered', run: 'In progress', ready: 'Ready', lock: 'Locked' }[s];
+  var unlocks = p.modules.filter(function (x) { return MOD[x].requires.indexOf(id) >= 0; });
+  var rw = { pass: 'Mastered', run: 'In progress', ready: 'Ready', lock: 'Locked' };
+  var needs = m.requires.length ? '<h4>Needs first</h4><ul class="td-list">' + m.requires.map(function (r) {
+    var rs = modStatus(MOD[r]);
+    return '<li class="m-' + rs + '"><i class="td-dot" aria-hidden="true"></i><a href="#/module/' + r + '">' + e(MOD[r].title) + '</a><span>' + rw[rs] + '</span></li>';
+  }).join('') + '</ul>' : '<p class="td-note">No prerequisites. A good place to start.</p>';
+  var unl = unlocks.length ? '<h4>Unlocks</h4><ul class="td-list">' + unlocks.map(function (x) {
+    return '<li class="m-' + modStatus(MOD[x]) + '"><i class="td-dot" aria-hidden="true"></i><a href="#/module/' + x + '">' + e(MOD[x].title) + '</a></li>';
+  }).join('') + '</ul>' : '';
+  var cta;
+  if (s === 'lock') { var mr = missingReqs(m)[0]; cta = '<a class="btn btn-primary" href="#/module/' + mr.id + '">First: ' + e(mr.title) + '</a>'; }
+  else {
+    var nl = m.lessons.filter(function (l) { return !isDone(l); })[0];
+    cta = nl ? '<a class="btn btn-primary" href="' + hrefLesson(nl) + '">' + (n ? 'Continue: ' : 'Start: ') + e(LES[nl].title) + '</a>' : '<span class="chip pass">All lessons passed</span>';
+  }
+  return '<button class="td-close" type="button" data-act="tree-close" aria-label="Close details">' + '&times;' + '</button>' +
+    '<p class="td-state s-' + s + '">' + word + '</p><h3>' + e(m.title) + '</h3><p class="td-sum">' + e(m.summary) + '</p>' +
+    '<dl class="td-stats"><div><dt>Lessons</dt><dd>' + tot + '</dd></div><div><dt>Study time</dt><dd>' + hours(m.minutes) + '</dd></div><div><dt>Passed</dt><dd>' + n + '/' + tot + '</dd></div></dl>' +
+    needs + unl + '<div class="td-cta">' + cta + '<a class="btn btn-quiet" href="#/module/' + m.id + '">Open the ' + e(m.title) + ' page</a></div>' +
+    '<h4>Lessons</h4><ol class="td-lessons">' + m.lessons.slice(0, 8).map(function (l) { return '<li class="' + (isDone(l) ? 'done' : '') + '"><a href="' + hrefLesson(l) + '">' + e(LES[l].title) + '</a></li>'; }).join('') + '</ol>' + (m.lessons.length > 8 ? '<p class="td-note"><a href="#/module/' + m.id + '">All ' + m.lessons.length + ' lessons</a></p>' : '');
 }
+function treeHtml(p) {
+  var tiers = treeTiers(p), pp = pathProgress(p), nextId = treeNextMod(p);
+  var sel = treeSel && p.modules.indexOf(treeSel) >= 0 ? treeSel : treeDefaultSel(p);
+  var xp = pp.done * 100, rank = pp.done === 0 ? 'Newcomer' : pp.done < pp.total * .25 ? 'Apprentice' : pp.done < pp.total * .6 ? 'Practitioner' : pp.done < pp.total ? 'Senior' : 'Master';
+  var mastered = p.modules.filter(function (id) { return modDone(MOD[id]); }).length;
+  return '<div class="tree-wrap"><p class="tree-meta"><span><b>' + xp + '</b> skill points</span><span>Rank: <b>' + rank + '</b></span><span>' + pp.done + ' of ' + pp.total + ' lessons passed</span><span>' + mastered + ' of ' + p.modules.length + ' skills mastered</span></p>' +
+    '<div class="tree-layout"><div class="tree" data-path="' + p.id + '" data-sel="' + e(sel) + '" role="group" aria-label="' + e(p.title) + ' skill tree"><svg class="tree-lines" aria-hidden="true" focusable="false"></svg>' +
+    tiers.map(function (t, i) { return '<div class="tier"><p class="tier-name">' + (TIER_NAMES[i] || 'Tier ' + (i + 1)) + '</p><ol class="tier-nodes">' + t.map(function (id) { return nodeHtml(MOD[id], p.id, nextId); }).join('') + '</ol></div>'; }).join('') +
+    '</div><aside class="tree-detail" aria-live="polite" aria-label="Skill details">' + treeDetail(p, sel) + '</aside></div>' +
+    '<ul class="tree-key" aria-label="Key"><li class="k-pass">Mastered</li><li class="k-run">In progress</li><li class="k-ready">Ready</li><li class="k-lock">Locked</li><li class="k-line">Needs or unlocks the selected skill</li></ul>' +
+    '<p class="tree-legend small">Select a skill to see what it needs and unlocks. Pass every lesson check in a skill to master it. Locked skills open when the skills that lead into them are mastered.</p></div>';
+}
+function treeApply(tr, id) {
+  if (!tr) return;
+  var sel = id || tr.getAttribute('data-sel'), rel = {};
+  var ns = $$('.node', tr);
+  ns.forEach(function (n) {
+    var nid = n.getAttribute('data-id'), req = ' ' + (n.getAttribute('data-req') || '') + ' ';
+    if (nid === sel) { (n.getAttribute('data-req') || '').split(' ').forEach(function (r) { if (r) rel[r] = 1; }); }
+    else if (req.indexOf(' ' + sel + ' ') >= 0) rel[nid] = 1;
+  });
+  ns.forEach(function (n) { var nid = n.getAttribute('data-id'); n.classList.toggle('sel', nid === sel); n.classList.toggle('rel', !!rel[nid] && nid !== sel); var a = $('a', n); if (a) { if (nid === tr.getAttribute('data-sel')) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); } });
+  $$('.tree-lines .ln', tr).forEach(function (l) { l.classList.toggle('hl', l.getAttribute('data-f') === sel || l.getAttribute('data-t') === sel); });
+  tr.classList.toggle('has-sel', !!sel);
+}
+function treeSelect(tr, id, sheet) {
+  var p = PATH[tr.getAttribute('data-path')]; if (!p || !MOD[id]) return;
+  treeSel = id; tr.setAttribute('data-sel', id);
+  var wrap = tr.closest('.tree-wrap'), det = $('.tree-detail', wrap);
+  if (det) det.innerHTML = treeDetail(p, id);
+  if (sheet) wrap.classList.add('tsheet');
+  treeApply(tr);
+}
+document.addEventListener('click', function (ev) {
+  var a = ev.target.closest && ev.target.closest('.tree .node a'); if (!a) return;
+  ev.preventDefault(); var n = a.closest('.node'), tr = n.closest('.tree'); treeSelect(tr, n.getAttribute('data-id'), true);
+});
+document.addEventListener('mouseover', function (ev) { var n = ev.target.closest && ev.target.closest('.tree .node'); if (n) treeApply(n.closest('.tree'), n.getAttribute('data-id')); });
+document.addEventListener('mouseout', function (ev) { var n = ev.target.closest && ev.target.closest('.tree .node'); if (n && !(ev.relatedTarget && ev.relatedTarget.closest && ev.relatedTarget.closest('.tree .node'))) treeApply(n.closest('.tree')); });
+document.addEventListener('focusin', function (ev) { var n = ev.target.closest && ev.target.closest('.tree .node'); if (n) treeApply(n.closest('.tree'), n.getAttribute('data-id')); });
+document.addEventListener('focusout', function (ev) { var n = ev.target.closest && ev.target.closest('.tree .node'); if (n) treeApply(n.closest('.tree')); });
 function drawTree() {
   $$('.tree').forEach(function (tr) {
     var svg = $('.tree-lines', tr); if (!svg) return;
     var box = tr.getBoundingClientRect(), w = tr.offsetWidth, h = tr.offsetHeight, k = box.width ? w / box.width : 1;
     svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
     var nodes = {}; $$('.node', tr).forEach(function (n) { nodes[n.getAttribute('data-id')] = n; });
-    var out = '';
+    var out = '<defs><marker id="tl-ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>';
     Object.keys(nodes).forEach(function (id) {
       (nodes[id].getAttribute('data-req') || '').split(' ').forEach(function (r) {
         if (!r || !nodes[r]) return;
-        var a = nodes[r].querySelector('.ring').getBoundingClientRect(), b = nodes[id].querySelector('.ring').getBoundingClientRect();
-        var x1 = (a.left + a.width / 2 - box.left) * k, y1 = (a.top + a.height - box.top) * k, x2 = (b.left + b.width / 2 - box.left) * k, y2 = (b.top - box.top) * k;
-        var my = (y1 + y2) / 2, done = nodes[r].classList.contains('s-pass'), cs = nodes[id].classList;
+        var pn = nodes[r], cn = nodes[id];
+        var pr = $('.ring', pn).getBoundingClientRect(), nm = $('.name', pn).getBoundingClientRect(), cr = $('.ring', cn).getBoundingClientRect(), pt = pn.closest('.tier').getBoundingClientRect();
+        var x1 = (pr.left + pr.width / 2 - box.left) * k, y1 = (nm.bottom - box.top) * k + 5, x2 = (cr.left + cr.width / 2 - box.left) * k, y2 = (cr.top - box.top) * k - 3;
+        var ym = (pt.bottom - box.top) * k + 18, rr = 10, dx = x2 - x1, sg = dx > 0 ? 1 : -1, d;
+        if (Math.abs(dx) < 1) d = 'M' + x1 + ' ' + y1 + ' V' + y2;
+        else if (Math.abs(dx) < 2 * rr) d = 'M' + x1 + ' ' + y1 + ' V' + ym + ' H' + x2 + ' V' + y2;
+        else d = 'M' + x1 + ' ' + y1 + ' V' + (ym - rr) + ' Q' + x1 + ' ' + ym + ' ' + (x1 + sg * rr) + ' ' + ym + ' H' + (x2 - sg * rr) + ' Q' + x2 + ' ' + ym + ' ' + x2 + ' ' + (ym + rr) + ' V' + y2;
+        var done = pn.classList.contains('s-pass'), cs = cn.classList;
         var cls = done && cs.contains('s-pass') ? 'ln done' : done && cs.contains('s-run') ? 'ln active run' : done && cs.contains('s-ready') ? 'ln active' : 'ln';
-        out += '<path d="M' + x1 + ' ' + y1 + ' C' + x1 + ' ' + my + ' ' + x2 + ' ' + my + ' ' + x2 + ' ' + y2 + '" class="' + cls + '"/>';
+        out += '<path d="' + d + '" class="' + cls + '" data-f="' + r + '" data-t="' + id + '"/>';
       });
     });
     svg.innerHTML = out;
+    treeApply(tr);
   });
 }
 var treeRO = null;
@@ -421,8 +529,14 @@ function armTerm() {
 
 function pathRow(p) {
   var pp = pathProgress(p), pct = pp.total ? Math.round(pp.done / pp.total * 100) : 0;
+  var word = { pass: 'passed', run: 'in progress', ready: 'ready', lock: 'locked' }, lab = 'Show all ' + p.modules.length + ' skills';
   return '<article class="row"><div class="row-main"><h3><a href="#/path/' + p.id + '">' + e(p.title) + '</a></h3><p>' + e(p.summary) + '</p></div>' +
-    '<ul class="row-mods">' + p.modules.map(function (id) { return '<li class="m-' + modStatus(MOD[id]) + '">' + e(MOD[id].title) + '</li>'; }).join('') + '</ul>' +
+    '<div class="row-route"><div class="rp" role="group" aria-label="Skill route for ' + e(p.title) + '">' + p.modules.map(function (id) {
+      var m = MOD[id], st = modStatus(m);
+      return '<a class="rp-d m-' + st + '" href="#/module/' + id + '" data-tip="' + e(m.title) + '" aria-label="' + e(m.title) + ', ' + word[st] + '"></a>';
+    }).join('') + '</div>' +
+    '<button class="rp-more" type="button" data-act="rp-toggle" data-label="' + lab + '" aria-expanded="false">' + lab + '</button>' +
+    '<ul class="row-mods" hidden>' + p.modules.map(function (id) { return '<li class="m-' + modStatus(MOD[id]) + '">' + e(MOD[id].title) + '</li>'; }).join('') + '</ul></div>' +
     '<div class="row-stat"><b>' + hours(pp.minutes) + '</b><span>' + plural(pp.total, 'lesson') + '</span>' +
     '<div class="bar" role="img" aria-label="' + pct + ' percent complete"><i style="width:' + pct + '%"></i></div></div></article>';
 }
@@ -1051,6 +1165,13 @@ document.addEventListener('click', function (ev) {
   } else if (a === 'menu') {
     var nav = $('#topnav'), open = !nav.classList.contains('open');
     nav.classList.toggle('open', open); act.setAttribute('aria-expanded', String(open));
+  } else if (a === 'tree-close') {
+    var tw = act.closest('.tree-wrap'); if (tw) tw.classList.remove('tsheet');
+  } else if (a === 'pm-toggle') {
+    var pmx = $('#pmega'); pmOpen(!!(pmx && pmx.hidden));
+  } else if (a === 'rp-toggle') {
+    var rl = act.parentNode.querySelector('.row-mods'), ro = rl.hidden;
+    rl.hidden = !ro; act.setAttribute('aria-expanded', String(ro)); act.textContent = ro ? 'Hide skill names' : act.getAttribute('data-label');
   } else if (a === 'pick-path') {
     S.path = act.getAttribute('data-id'); save();
     if (act.getAttribute('data-go') === 'home') { location.hash = '/'; toast('Home path set to ' + PATH[S.path].title + '.'); } else route();
@@ -1068,10 +1189,10 @@ document.addEventListener('click', function (ev) {
 document.addEventListener('keydown', function (ev) {
   var tag = (document.activeElement && document.activeElement.tagName) || '';
   var typing = /INPUT|TEXTAREA|SELECT/.test(tag);
-  if (ev.key === 'Escape') { if ($('#smodal')) closeSearch(); var nv = $('#topnav'); if (nv) nv.classList.remove('open'); return; }
+  if (ev.key === 'Escape') { var pm = $('#pmega'); if (pm && !pm.hidden) { pmOpen(false); var pl = $('#topnav a[data-nav="paths"]'); if (pl && pm.contains(document.activeElement)) { pmSkip = true; pl.focus(); pmSkip = false; } } if ($('#smodal')) closeSearch(); var nv = $('#topnav'); if (nv) nv.classList.remove('open'); return; }
   if ((ev.key === 'k' && (ev.metaKey || ev.ctrlKey)) || (ev.key === '/' && !typing)) { ev.preventDefault(); if (!$('#smodal')) openSearch(); }
 });
-window.addEventListener('hashchange', function () { var nv = $('#topnav'); if (nv) nv.classList.remove('open'); route(); });
+window.addEventListener('hashchange', function () { pmOpen(false); var nv = $('#topnav'); if (nv) nv.classList.remove('open'); route(); });
 
 /* ---------- extension API (extras.js registers more views through this) ---------- */
 var actions = {};
