@@ -1,0 +1,1095 @@
+{
+ "linux": [
+  {
+   "t": "The Linux man-pages project",
+   "by": "Michael Kerrisk and contributors",
+   "u": "https://man7.org/linux/man-pages/",
+   "kind": "Reference",
+   "why": "The authoritative manual for system calls, files and commands; learn to read it before searching forums."
+  },
+  {
+   "t": "Linux Performance",
+   "by": "Brendan Gregg",
+   "u": "https://www.brendangregg.com/linuxperf.html",
+   "kind": "Articles and talks",
+   "why": "Diagrams of which tool shows which part of the system; the best map for slow-server problems."
+  },
+  {
+   "t": "The Linux kernel documentation: admin guide",
+   "by": "Kernel developers",
+   "u": "https://www.kernel.org/doc/html/latest/admin-guide/",
+   "kind": "Reference",
+   "why": "Explains kernel parameters, cgroups and boot options at the source."
+  },
+  {
+   "t": "systemd manual pages",
+   "by": "systemd project",
+   "u": "https://www.freedesktop.org/software/systemd/man/latest/",
+   "kind": "Reference",
+   "why": "Units, timers and journald are described precisely here, including every option."
+  },
+  {
+   "t": "GNU Coreutils manual",
+   "by": "GNU project",
+   "u": "https://www.gnu.org/software/coreutils/manual/",
+   "kind": "Reference",
+   "why": "The exact behaviour of ls, cp, sort, cut and the other tools you use every day."
+  },
+  {
+   "t": "Red Hat Enterprise Linux documentation",
+   "by": "Red Hat",
+   "u": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/",
+   "kind": "Guides",
+   "why": "Practical administration guides for storage, SELinux, networking and security on enterprise Linux."
+  }
+ ],
+ "bash": [
+  {
+   "t": "GNU Bash reference manual",
+   "by": "GNU project",
+   "u": "https://www.gnu.org/software/bash/manual/bash.html",
+   "kind": "Reference",
+   "why": "The definitive description of quoting, expansion and builtins."
+  },
+  {
+   "t": "ShellCheck",
+   "by": "Vidar Holen",
+   "u": "https://www.shellcheck.net/",
+   "kind": "Tool",
+   "why": "Paste a script and learn why each warning matters; the fastest way to stop writing fragile shell."
+  },
+  {
+   "t": "Debian Reference: Programming (shell scripts)",
+   "by": "Osamu Aoki and Debian contributors",
+   "u": "https://www.debian.org/doc/manuals/debian-reference/ch12.en.html",
+   "kind": "Guide",
+   "why": "Shows shell scripting next to other tools and the pitfalls of portable scripts."
+  },
+  {
+   "t": "jq manual",
+   "by": "jq project",
+   "u": "https://jqlang.org/manual/",
+   "kind": "Reference",
+   "why": "Everything you need to process JSON from APIs and cloud command-line tools."
+  },
+  {
+   "t": "curl: Everything curl",
+   "by": "Daniel Stenberg",
+   "u": "https://everything.curl.dev/",
+   "kind": "Book",
+   "why": "A free book on the tool you use in nearly every API script."
+  },
+  {
+   "t": "POSIX shell command language",
+   "by": "The Open Group",
+   "u": "https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html",
+   "kind": "Specification",
+   "why": "Know which features are portable to /bin/sh and which are Bash only."
+  }
+ ],
+ "python": [
+  {
+   "t": "The Python tutorial",
+   "by": "Python Software Foundation",
+   "u": "https://docs.python.org/3/tutorial/",
+   "kind": "Tutorial",
+   "why": "The official, always current introduction to the language."
+  },
+  {
+   "t": "PEP 8: Style Guide for Python Code",
+   "by": "Python Software Foundation",
+   "u": "https://peps.python.org/pep-0008/",
+   "kind": "Guide",
+   "why": "Shared style makes team scripts easy to read and review."
+  },
+  {
+   "t": "Python Packaging User Guide",
+   "by": "Python Packaging Authority",
+   "u": "https://packaging.python.org/en/latest/",
+   "kind": "Guide",
+   "why": "How to structure, build and install Python projects and command-line tools."
+  },
+  {
+   "t": "pytest documentation",
+   "by": "pytest project",
+   "u": "https://docs.pytest.org/en/stable/",
+   "kind": "Reference",
+   "why": "Fixtures, parametrised tests and plugins for testing automation code."
+  },
+  {
+   "t": "Requests: HTTP for Humans",
+   "by": "Requests project",
+   "u": "https://requests.readthedocs.io/en/latest/",
+   "kind": "Reference",
+   "why": "Sessions, timeouts and error handling for API scripts."
+  },
+  {
+   "t": "Boto3 documentation",
+   "by": "Amazon Web Services",
+   "u": "https://boto3.amazonaws.com/v1/documentation/api/latest/index.html",
+   "kind": "Reference",
+   "why": "The Python SDK for AWS, with paginators, waiters and error handling."
+  }
+ ],
+ "networking": [
+  {
+   "t": "RFC 1918: Address allocation for private internets",
+   "by": "IETF",
+   "u": "https://www.rfc-editor.org/rfc/rfc1918",
+   "kind": "Specification",
+   "why": "The short document behind 10.0.0.0/8, 172.16.0.0/12 and 192.168.0.0/16."
+  },
+  {
+   "t": "RFC 1035: Domain names, implementation and specification",
+   "by": "IETF",
+   "u": "https://www.rfc-editor.org/rfc/rfc1035",
+   "kind": "Specification",
+   "why": "How DNS messages and records really work."
+  },
+  {
+   "t": "RFC 9293: Transmission Control Protocol",
+   "by": "IETF",
+   "u": "https://www.rfc-editor.org/rfc/rfc9293",
+   "kind": "Specification",
+   "why": "The current TCP specification, including states you see in ss and netstat."
+  },
+  {
+   "t": "RFC 8446: TLS 1.3",
+   "by": "IETF",
+   "u": "https://www.rfc-editor.org/rfc/rfc8446",
+   "kind": "Specification",
+   "why": "The handshake and security design of modern HTTPS."
+  },
+  {
+   "t": "Cloudflare Learning Center",
+   "by": "Cloudflare",
+   "u": "https://www.cloudflare.com/learning/",
+   "kind": "Articles",
+   "why": "Clear explanations of DNS, DDoS, CDN, TLS and networking concepts."
+  },
+  {
+   "t": "Wireshark User's Guide",
+   "by": "Wireshark project",
+   "u": "https://www.wireshark.org/docs/wsug_html_chunked/",
+   "kind": "Guide",
+   "why": "Learn to read packet captures, the last resort when other tools disagree."
+  }
+ ],
+ "docker": [
+  {
+   "t": "Docker: Get started",
+   "by": "Docker",
+   "u": "https://docs.docker.com/get-started/",
+   "kind": "Tutorial",
+   "why": "The official introduction to images, containers and Compose."
+  },
+  {
+   "t": "Docker: Building best practices",
+   "by": "Docker",
+   "u": "https://docs.docker.com/build/building/best-practices/",
+   "kind": "Guide",
+   "why": "Layer ordering, multi-stage builds and small, safe images."
+  },
+  {
+   "t": "Docker: Engine security",
+   "by": "Docker",
+   "u": "https://docs.docker.com/engine/security/",
+   "kind": "Guide",
+   "why": "Namespaces, capabilities, seccomp and how to reduce risk."
+  },
+  {
+   "t": "Open Container Initiative specifications",
+   "by": "Open Container Initiative",
+   "u": "https://opencontainers.org/",
+   "kind": "Specification",
+   "why": "The image and runtime standards that all container tools share."
+  },
+  {
+   "t": "Podman documentation",
+   "by": "Podman project",
+   "u": "https://podman.io/docs",
+   "kind": "Reference",
+   "why": "Daemonless, rootless containers and how they differ from Docker."
+  },
+  {
+   "t": "CIS Docker Benchmark",
+   "by": "Center for Internet Security",
+   "u": "https://www.cisecurity.org/benchmark/docker",
+   "kind": "Benchmark",
+   "why": "A checklist of hardening settings used in audits."
+  }
+ ],
+ "cicd": [
+  {
+   "t": "Continuous Delivery",
+   "by": "Jez Humble and Dave Farley",
+   "u": "https://continuousdelivery.com/",
+   "kind": "Site and book summary",
+   "why": "The principles of deployment pipelines, small batches and fast feedback."
+  },
+  {
+   "t": "Continuous Integration",
+   "by": "Martin Fowler",
+   "u": "https://martinfowler.com/articles/continuousIntegration.html",
+   "kind": "Article",
+   "why": "Why integrating often matters and what practices make it work."
+  },
+  {
+   "t": "DORA research and the Four Keys",
+   "by": "DORA",
+   "u": "https://dora.dev/",
+   "kind": "Research",
+   "why": "Evidence on which delivery metrics predict performance."
+  },
+  {
+   "t": "The Twelve-Factor App",
+   "by": "Adam Wiggins",
+   "u": "https://12factor.net/",
+   "kind": "Guide",
+   "why": "Build, config and release practices for apps that deploy cleanly."
+  },
+  {
+   "t": "Argo CD documentation",
+   "by": "Argo project",
+   "u": "https://argo-cd.readthedocs.io/en/stable/",
+   "kind": "Reference",
+   "why": "Declarative delivery to Kubernetes, sync policies and rollbacks."
+  },
+  {
+   "t": "SLSA specification",
+   "by": "OpenSSF",
+   "u": "https://slsa.dev/spec/",
+   "kind": "Specification",
+   "why": "Levels of build integrity and provenance for the software supply chain."
+  }
+ ],
+ "kubernetes": [
+  {
+   "t": "Kubernetes concepts",
+   "by": "Kubernetes project",
+   "u": "https://kubernetes.io/docs/concepts/",
+   "kind": "Reference",
+   "why": "The official explanation of every object, from Pods to Ingress."
+  },
+  {
+   "t": "Kubernetes tasks",
+   "by": "Kubernetes project",
+   "u": "https://kubernetes.io/docs/tasks/",
+   "kind": "Guides",
+   "why": "Step-by-step recipes, including the debugging pages."
+  },
+  {
+   "t": "kubectl quick reference",
+   "by": "Kubernetes project",
+   "u": "https://kubernetes.io/docs/reference/kubectl/quick-reference/",
+   "kind": "Cheat sheet",
+   "why": "Commands you will use daily, and the ones for exams."
+  },
+  {
+   "t": "Kubernetes security concepts",
+   "by": "Kubernetes project",
+   "u": "https://kubernetes.io/docs/concepts/security/",
+   "kind": "Guide",
+   "why": "Pod security, RBAC, network policy and secrets handling."
+  },
+  {
+   "t": "Helm documentation",
+   "by": "Helm project",
+   "u": "https://helm.sh/docs/",
+   "kind": "Reference",
+   "why": "Charts, values and releases for packaging applications."
+  },
+  {
+   "t": "etcd documentation",
+   "by": "etcd project",
+   "u": "https://etcd.io/docs/",
+   "kind": "Reference",
+   "why": "How the cluster's data store works, and how to back it up and restore it."
+  }
+ ],
+ "terraform": [
+  {
+   "t": "Terraform language documentation",
+   "by": "HashiCorp",
+   "u": "https://developer.hashicorp.com/terraform/language",
+   "kind": "Reference",
+   "why": "Resources, expressions, modules and state described in full."
+  },
+  {
+   "t": "Terraform tutorials",
+   "by": "HashiCorp",
+   "u": "https://developer.hashicorp.com/terraform/tutorials",
+   "kind": "Tutorials",
+   "why": "Hands-on exercises from first apply to production workflows."
+  },
+  {
+   "t": "Terraform style conventions",
+   "by": "HashiCorp",
+   "u": "https://developer.hashicorp.com/terraform/language/style",
+   "kind": "Guide",
+   "why": "Naming, formatting and file layout that teams agree on."
+  },
+  {
+   "t": "Terraform Registry",
+   "by": "HashiCorp",
+   "u": "https://registry.terraform.io/",
+   "kind": "Catalogue",
+   "why": "Providers and modules with documentation for every resource."
+  },
+  {
+   "t": "HashiCorp Well-Architected Framework",
+   "by": "HashiCorp",
+   "u": "https://developer.hashicorp.com/well-architected-framework",
+   "kind": "Guide",
+   "why": "Operational practices for infrastructure automation at scale."
+  },
+  {
+   "t": "Terraform testing",
+   "by": "HashiCorp",
+   "u": "https://developer.hashicorp.com/terraform/language/tests",
+   "kind": "Reference",
+   "why": "How to write tests for modules and run them in a pipeline."
+  }
+ ],
+ "cloud": [
+  {
+   "t": "AWS Well-Architected Framework",
+   "by": "Amazon Web Services",
+   "u": "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html",
+   "kind": "Framework",
+   "why": "Six pillars for judging a design: security, reliability, cost and more."
+  },
+  {
+   "t": "Azure Well-Architected Framework",
+   "by": "Microsoft",
+   "u": "https://learn.microsoft.com/en-us/azure/well-architected/",
+   "kind": "Framework",
+   "why": "The same ideas for Azure, with design checklists."
+  },
+  {
+   "t": "Google Cloud Architecture Framework",
+   "by": "Google Cloud",
+   "u": "https://cloud.google.com/architecture/framework",
+   "kind": "Framework",
+   "why": "Principles and recommendations for building on Google Cloud."
+  },
+  {
+   "t": "AWS shared responsibility model",
+   "by": "Amazon Web Services",
+   "u": "https://aws.amazon.com/compliance/shared-responsibility-model/",
+   "kind": "Article",
+   "why": "What the provider secures and what remains your job."
+  },
+  {
+   "t": "IAM best practices",
+   "by": "Amazon Web Services",
+   "u": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html",
+   "kind": "Guide",
+   "why": "Least privilege, temporary credentials and organisation-wide controls."
+  },
+  {
+   "t": "Cloud Adoption Framework",
+   "by": "Microsoft",
+   "u": "https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/",
+   "kind": "Guide",
+   "why": "Landing zones, governance and migration planning."
+  }
+ ],
+ "observability": [
+  {
+   "t": "Prometheus overview",
+   "by": "Prometheus project",
+   "u": "https://prometheus.io/docs/introduction/overview/",
+   "kind": "Reference",
+   "why": "The data model, PromQL and alerting concepts."
+  },
+  {
+   "t": "OpenTelemetry documentation",
+   "by": "OpenTelemetry project",
+   "u": "https://opentelemetry.io/docs/",
+   "kind": "Reference",
+   "why": "Instrumentation, collectors and the shared telemetry standard."
+  },
+  {
+   "t": "Monitoring Distributed Systems",
+   "by": "Google SRE book",
+   "u": "https://sre.google/sre-book/monitoring-distributed-systems/",
+   "kind": "Book chapter",
+   "why": "The four golden signals and how to alert on symptoms."
+  },
+  {
+   "t": "Prometheus naming and instrumentation practices",
+   "by": "Prometheus project",
+   "u": "https://prometheus.io/docs/practices/naming/",
+   "kind": "Guide",
+   "why": "Metric and label rules that keep systems queryable and affordable."
+  },
+  {
+   "t": "The USE Method",
+   "by": "Brendan Gregg",
+   "u": "https://www.brendangregg.com/usemethod.html",
+   "kind": "Article",
+   "why": "A checklist approach to finding resource bottlenecks."
+  },
+  {
+   "t": "Grafana documentation",
+   "by": "Grafana Labs",
+   "u": "https://grafana.com/docs/",
+   "kind": "Reference",
+   "why": "Dashboards, alert rules and data source setup."
+  }
+ ],
+ "sre": [
+  {
+   "t": "Site Reliability Engineering",
+   "by": "Google",
+   "u": "https://sre.google/sre-book/table-of-contents/",
+   "kind": "Book",
+   "why": "The foundational text: SLOs, toil, incidents and postmortems."
+  },
+  {
+   "t": "The Site Reliability Workbook",
+   "by": "Google",
+   "u": "https://sre.google/workbook/table-of-contents/",
+   "kind": "Book",
+   "why": "Worked examples of applying the principles."
+  },
+  {
+   "t": "Service Level Objectives",
+   "by": "Google SRE book",
+   "u": "https://sre.google/sre-book/service-level-objectives/",
+   "kind": "Book chapter",
+   "why": "How to choose indicators and targets."
+  },
+  {
+   "t": "Postmortem culture",
+   "by": "Google SRE book",
+   "u": "https://sre.google/sre-book/postmortem-culture/",
+   "kind": "Book chapter",
+   "why": "How to learn from failure without blame."
+  },
+  {
+   "t": "PagerDuty incident response documentation",
+   "by": "PagerDuty",
+   "u": "https://response.pagerduty.com/",
+   "kind": "Guide",
+   "why": "A practical, open playbook for roles, severity and communication."
+  },
+  {
+   "t": "Principles of Chaos Engineering",
+   "by": "Chaos community",
+   "u": "https://principlesofchaos.org/",
+   "kind": "Manifesto",
+   "why": "A short statement of how to run safe experiments in production."
+  }
+ ],
+ "security": [
+  {
+   "t": "OWASP Top 10",
+   "by": "OWASP",
+   "u": "https://owasp.org/www-project-top-ten/",
+   "kind": "Reference",
+   "why": "The most common web application risks, with examples."
+  },
+  {
+   "t": "OWASP Cheat Sheet Series",
+   "by": "OWASP",
+   "u": "https://cheatsheetseries.owasp.org/",
+   "kind": "Guides",
+   "why": "Concise, practical advice for secrets, logging, cryptography and more."
+  },
+  {
+   "t": "NIST Cybersecurity Framework",
+   "by": "NIST",
+   "u": "https://www.nist.gov/cyberframework",
+   "kind": "Framework",
+   "why": "A common structure for identify, protect, detect, respond and recover."
+  },
+  {
+   "t": "MITRE ATT&CK",
+   "by": "MITRE",
+   "u": "https://attack.mitre.org/",
+   "kind": "Knowledge base",
+   "why": "Attacker techniques by stage, used to plan detections."
+  },
+  {
+   "t": "CISA StopRansomware",
+   "by": "CISA",
+   "u": "https://www.cisa.gov/stopransomware",
+   "kind": "Guide",
+   "why": "Government guidance on preventing and recovering from ransomware."
+  },
+  {
+   "t": "Sigstore documentation",
+   "by": "Sigstore project",
+   "u": "https://docs.sigstore.dev/",
+   "kind": "Reference",
+   "why": "Signing and verifying software artifacts without managing keys."
+  }
+ ],
+ "ansible": [
+  {
+   "t": "Ansible user guide",
+   "by": "Red Hat and the Ansible community",
+   "u": "https://docs.ansible.com/ansible/latest/user_guide/index.html",
+   "kind": "Reference",
+   "why": "The official guide to inventories, playbooks, roles and collections."
+  },
+  {
+   "t": "Ansible getting started",
+   "by": "Red Hat and the Ansible community",
+   "u": "https://docs.ansible.com/ansible/latest/getting_started/index.html",
+   "kind": "Tutorial",
+   "why": "A first inventory and first playbook, step by step."
+  },
+  {
+   "t": "Best practices and tips",
+   "by": "Red Hat and the Ansible community",
+   "u": "https://docs.ansible.com/ansible/latest/tips_tricks/index.html",
+   "kind": "Guide",
+   "why": "Directory layout, naming and inventory habits that scale."
+  },
+  {
+   "t": "Ansible Lint documentation",
+   "by": "Ansible community",
+   "u": "https://ansible.readthedocs.io/projects/lint/",
+   "kind": "Reference",
+   "why": "Rules that catch common playbook mistakes before they run."
+  },
+  {
+   "t": "Molecule documentation",
+   "by": "Ansible community",
+   "u": "https://ansible.readthedocs.io/projects/molecule/",
+   "kind": "Reference",
+   "why": "How to test roles in disposable instances, including idempotence checks."
+  },
+  {
+   "t": "Ansible Vault guide",
+   "by": "Red Hat and the Ansible community",
+   "u": "https://docs.ansible.com/ansible/latest/vault_guide/index.html",
+   "kind": "Reference",
+   "why": "Encrypting secrets and managing vault IDs."
+  }
+ ],
+ "databases": [
+  {
+   "t": "PostgreSQL documentation",
+   "by": "PostgreSQL Global Development Group",
+   "u": "https://www.postgresql.org/docs/current/",
+   "kind": "Reference",
+   "why": "The authoritative, readable manual for the most-used open source relational database."
+  },
+  {
+   "t": "Use The Index, Luke",
+   "by": "Markus Winand",
+   "u": "https://use-the-index-luke.com/",
+   "kind": "Guide",
+   "why": "A free guide to how indexes work and how to write queries that use them."
+  },
+  {
+   "t": "Continuous archiving and point-in-time recovery",
+   "by": "PostgreSQL Global Development Group",
+   "u": "https://www.postgresql.org/docs/current/continuous-archiving.html",
+   "kind": "Reference",
+   "why": "The full procedure for base backups, archived logs and recovery targets."
+  },
+  {
+   "t": "Using EXPLAIN",
+   "by": "PostgreSQL Global Development Group",
+   "u": "https://www.postgresql.org/docs/current/using-explain.html",
+   "kind": "Guide",
+   "why": "How to read a query plan, with worked examples."
+  },
+  {
+   "t": "Redis administration",
+   "by": "Redis",
+   "u": "https://redis.io/docs/latest/operate/oss_and_stack/management/admin/",
+   "kind": "Guide",
+   "why": "Memory, persistence and safe operation of a Redis server."
+  },
+  {
+   "t": "MySQL InnoDB online DDL",
+   "by": "Oracle",
+   "u": "https://dev.mysql.com/doc/refman/8.0/en/innodb-online-ddl.html",
+   "kind": "Reference",
+   "why": "Which schema changes run online and which block, with the options to control them."
+  }
+ ],
+ "git": [
+  {
+   "t": "Pro Git",
+   "by": "Scott Chacon and Ben Straub",
+   "u": "https://git-scm.com/book/en/v2",
+   "kind": "Book",
+   "why": "The free, official book. Chapters 2 and 3 cover everything in the first half of this stage."
+  },
+  {
+   "t": "Git reference manual",
+   "by": "The Git project",
+   "u": "https://git-scm.com/docs",
+   "kind": "Reference",
+   "why": "Every command and option, with examples. Use it to check exact behaviour of a flag."
+  },
+  {
+   "t": "Atlassian Git tutorials",
+   "by": "Atlassian",
+   "u": "https://www.atlassian.com/git/tutorials",
+   "kind": "Tutorial",
+   "why": "Clear diagrams of branching, merging and rebasing, and a comparison of team workflows."
+  },
+  {
+   "t": "Patterns for Managing Source Code Branches",
+   "by": "Martin Fowler",
+   "u": "https://martinfowler.com/articles/branching-patterns.html",
+   "kind": "Article",
+   "why": "Explains the trade-offs between trunk-based development, feature branches and release branches."
+  },
+  {
+   "t": "Semantic Versioning 2.0.0",
+   "by": "Tom Preston-Werner",
+   "u": "https://semver.org/",
+   "kind": "Specification",
+   "why": "The short specification behind MAJOR.MINOR.PATCH, useful when you tag releases."
+  },
+  {
+   "t": "Keep a Changelog",
+   "by": "Olivier Lacan",
+   "u": "https://keepachangelog.com/",
+   "kind": "Guide",
+   "why": "A simple format for release notes that people can read, to pair with your tags."
+  }
+ ],
+ "go": [
+  {
+   "t": "A Tour of Go",
+   "by": "The Go team",
+   "u": "https://go.dev/tour/",
+   "kind": "Tutorial",
+   "why": "Interactive lessons in the browser; the fastest way to see every core feature once."
+  },
+  {
+   "t": "Effective Go",
+   "by": "The Go team",
+   "u": "https://go.dev/doc/effective_go",
+   "kind": "Guide",
+   "why": "How idiomatic Go code is written, from naming to concurrency."
+  },
+  {
+   "t": "The Go Blog",
+   "by": "The Go team",
+   "u": "https://go.dev/blog/",
+   "kind": "Articles",
+   "why": "Release notes and deep dives straight from the team, including concurrency, modules and tooling."
+  },
+  {
+   "t": "Go standard library reference",
+   "by": "The Go team",
+   "u": "https://pkg.go.dev/std",
+   "kind": "Reference",
+   "why": "net/http, context, encoding/json and testing are documented with runnable examples."
+  },
+  {
+   "t": "Go blog: Go Concurrency Patterns",
+   "by": "The Go team",
+   "u": "https://go.dev/blog/pipelines",
+   "kind": "Articles",
+   "why": "Pipelines and cancellation explained with the patterns you will meet in services."
+  },
+  {
+   "t": "Go Wiki: Code Review Comments",
+   "by": "The Go team",
+   "u": "https://go.dev/wiki/CodeReviewComments",
+   "kind": "Reference",
+   "why": "A checklist of common review remarks; explains the style choices behind Go code."
+  }
+ ],
+ "helm": [
+  {
+   "t": "Helm documentation",
+   "by": "Helm project",
+   "u": "https://helm.sh/docs/",
+   "kind": "Reference",
+   "why": "The official guide to charts, releases, values and the command line."
+  },
+  {
+   "t": "Chart Template Guide",
+   "by": "Helm project",
+   "u": "https://helm.sh/docs/chart_template_guide/",
+   "kind": "Guide",
+   "why": "Walks through templating from values to named templates and debugging."
+  },
+  {
+   "t": "Chart Best Practices",
+   "by": "Helm project",
+   "u": "https://helm.sh/docs/chart_best_practices/",
+   "kind": "Guide",
+   "why": "Conventions for values, labels, templates and dependencies that keep charts maintainable."
+  },
+  {
+   "t": "Helm command reference",
+   "by": "Helm project",
+   "u": "https://helm.sh/docs/helm/",
+   "kind": "Reference",
+   "why": "Every command and flag, including upgrade, rollback and template."
+  },
+  {
+   "t": "Kubernetes documentation: Concepts",
+   "by": "Kubernetes project",
+   "u": "https://kubernetes.io/docs/concepts/",
+   "kind": "Reference",
+   "why": "The objects that Helm templates produce; read it to understand what a chart creates."
+  },
+  {
+   "t": "Chart hooks",
+   "by": "Helm project",
+   "u": "https://helm.sh/docs/topics/charts_hooks/",
+   "kind": "Reference",
+   "why": "Explains lifecycle hooks, weights and delete policies used for migrations and tests."
+  }
+ ],
+ "llm": [
+  {
+   "t": "Build with Claude",
+   "by": "Anthropic",
+   "u": "https://docs.anthropic.com/en/docs/build-with-claude/overview",
+   "kind": "Documentation",
+   "why": "Official guide to calling the API, context windows, caching, batching and more."
+  },
+  {
+   "t": "Models overview",
+   "by": "Anthropic",
+   "u": "https://docs.anthropic.com/en/docs/about-claude/models/overview",
+   "kind": "Reference",
+   "why": "Current model names, context sizes and capabilities; check it before choosing a model."
+  },
+  {
+   "t": "API reference",
+   "by": "Anthropic",
+   "u": "https://docs.anthropic.com/en/api/overview",
+   "kind": "Reference",
+   "why": "Every request and response field, with error codes and rate-limit behaviour."
+  },
+  {
+   "t": "Context windows",
+   "by": "Anthropic",
+   "u": "https://docs.anthropic.com/en/docs/build-with-claude/context-windows",
+   "kind": "Documentation",
+   "why": "Explains how input and output share the window and how limits work."
+  },
+  {
+   "t": "Prompt caching",
+   "by": "Anthropic",
+   "u": "https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching",
+   "kind": "Documentation",
+   "why": "How to cut cost and delay for repeated prefixes, with pricing rules."
+  },
+  {
+   "t": "Define success criteria",
+   "by": "Anthropic",
+   "u": "https://docs.anthropic.com/en/docs/test-and-evaluate/define-success",
+   "kind": "Guide",
+   "why": "A practical start for evaluation: what to measure before you choose a model."
+  }
+ ],
+ "prompting": [
+  {
+   "t": "Prompt engineering overview",
+   "by": "Anthropic",
+   "u": "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview",
+   "kind": "Guide",
+   "why": "The main techniques in one place, with a list of what to try first."
+  },
+  {
+   "t": "Use XML tags",
+   "by": "Anthropic",
+   "u": "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/use-xml-tags",
+   "kind": "Guide",
+   "why": "How tags separate instructions from material and make prompts easier to maintain."
+  },
+  {
+   "t": "Multishot prompting",
+   "by": "Anthropic",
+   "u": "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/multishot-prompting",
+   "kind": "Guide",
+   "why": "How to choose and format examples that raise reliability."
+  },
+  {
+   "t": "Extended thinking",
+   "by": "Anthropic",
+   "u": "https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking",
+   "kind": "Documentation",
+   "why": "How the thinking budget works and when it is worth the cost."
+  },
+  {
+   "t": "Understanding JSON Schema",
+   "by": "JSON Schema project",
+   "u": "https://json-schema.org/understanding-json-schema/",
+   "kind": "Reference",
+   "why": "The schema language used for structured output and tool inputs."
+  },
+  {
+   "t": "Increase output consistency",
+   "by": "Anthropic",
+   "u": "https://docs.anthropic.com/en/docs/test-and-evaluate/strengthen-guardrails/increase-consistency",
+   "kind": "Guide",
+   "why": "Techniques for format and style consistency, with examples."
+  }
+ ],
+ "claude-skills": [
+  {
+   "t": "Agent Skills overview",
+   "by": "Anthropic",
+   "u": "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview",
+   "kind": "Documentation",
+   "why": "What skills are, how they load, and where they are supported."
+  },
+  {
+   "t": "Skill authoring best practices",
+   "by": "Anthropic",
+   "u": "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/best-practices",
+   "kind": "Guide",
+   "why": "Guidance on descriptions, structure, scripts and testing from the product team."
+  },
+  {
+   "t": "Skills in Claude Code",
+   "by": "Anthropic",
+   "u": "https://docs.claude.com/en/docs/claude-code/skills",
+   "kind": "Documentation",
+   "why": "Where Claude Code looks for skills and how project and personal skills differ."
+  },
+  {
+   "t": "Prompt engineering overview",
+   "by": "Anthropic",
+   "u": "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview",
+   "kind": "Guide",
+   "why": "The techniques behind good skill instructions."
+  },
+  {
+   "t": "OWASP Top 10 for LLM Applications",
+   "by": "OWASP",
+   "u": "https://owasp.org/www-project-top-10-for-large-language-model-applications/",
+   "kind": "Security",
+   "why": "Risks to consider before you share or install skills and scripts."
+  },
+  {
+   "t": "Develop test cases",
+   "by": "Anthropic",
+   "u": "https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests",
+   "kind": "Guide",
+   "why": "How to build the task sets used to test a skill."
+  }
+ ],
+ "mcp": [
+  {
+   "t": "Model Context Protocol introduction",
+   "by": "MCP project",
+   "u": "https://modelcontextprotocol.io/introduction",
+   "kind": "Documentation",
+   "why": "The purpose, roles and concepts of the protocol."
+  },
+  {
+   "t": "MCP specification",
+   "by": "MCP project",
+   "u": "https://modelcontextprotocol.io/specification",
+   "kind": "Specification",
+   "why": "The authoritative description of messages, lifecycle and security guidance."
+  },
+  {
+   "t": "Build a server",
+   "by": "MCP project",
+   "u": "https://modelcontextprotocol.io/docs/develop/build-server",
+   "kind": "Tutorial",
+   "why": "A step-by-step server in Python or TypeScript."
+  },
+  {
+   "t": "Tool use overview",
+   "by": "Anthropic",
+   "u": "https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview",
+   "kind": "Documentation",
+   "why": "How function calling works in the Messages API, with the loop explained."
+  },
+  {
+   "t": "How to implement tool use",
+   "by": "Anthropic",
+   "u": "https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/implement-tool-use",
+   "kind": "Guide",
+   "why": "Details on tool results, errors, parallel calls and choice settings."
+  },
+  {
+   "t": "OWASP Top 10 for LLM Applications",
+   "by": "OWASP",
+   "u": "https://owasp.org/www-project-top-10-for-large-language-model-applications/",
+   "kind": "Security",
+   "why": "Prompt injection, excessive agency and other risks of tool-using systems."
+  }
+ ],
+ "cloud-iam": [
+  {
+   "t": "AWS IAM user guide",
+   "by": "Amazon Web Services",
+   "u": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html",
+   "kind": "Documentation",
+   "why": "The reference for users, roles, policies and how access is evaluated."
+  },
+  {
+   "t": "IAM policy evaluation logic",
+   "by": "Amazon Web Services",
+   "u": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html",
+   "kind": "Reference",
+   "why": "Exactly how allow, deny and boundaries combine, which explains most access surprises."
+  },
+  {
+   "t": "Azure role-based access control overview",
+   "by": "Microsoft",
+   "u": "https://learn.microsoft.com/en-us/azure/role-based-access-control/overview",
+   "kind": "Documentation",
+   "why": "Scopes, roles and assignments in Azure."
+  },
+  {
+   "t": "What are managed identities for Azure resources",
+   "by": "Microsoft",
+   "u": "https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/overview",
+   "kind": "Documentation",
+   "why": "Credential-free identities for workloads."
+  },
+  {
+   "t": "AWS Well-Architected: Security pillar",
+   "by": "Amazon Web Services",
+   "u": "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html",
+   "kind": "Guide",
+   "why": "Identity, detection and data protection practices in one framework."
+  },
+  {
+   "t": "Zero trust architecture (SP 800-207)",
+   "by": "NIST",
+   "u": "https://csrc.nist.gov/pubs/sp/800/207/final",
+   "kind": "Specification",
+   "why": "The principles behind identity-centred security."
+  }
+ ],
+ "k8s-ops": [
+  {
+   "t": "Administer a cluster",
+   "by": "Kubernetes project",
+   "u": "https://kubernetes.io/docs/tasks/administer-cluster/",
+   "kind": "Documentation",
+   "why": "Official tasks for upgrades, certificates, quotas and maintenance."
+  },
+  {
+   "t": "Operating etcd clusters for Kubernetes",
+   "by": "Kubernetes project",
+   "u": "https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/",
+   "kind": "Documentation",
+   "why": "Backup, restore and health of the cluster datastore."
+  },
+  {
+   "t": "Using RBAC authorization",
+   "by": "Kubernetes project",
+   "u": "https://kubernetes.io/docs/reference/access-authn-authz/rbac/",
+   "kind": "Reference",
+   "why": "Roles, bindings and service accounts explained precisely."
+  },
+  {
+   "t": "Safely drain a node",
+   "by": "Kubernetes project",
+   "u": "https://kubernetes.io/docs/tasks/administer-cluster/safely-drain-node/",
+   "kind": "Documentation",
+   "why": "How to do maintenance without breaking availability."
+  },
+  {
+   "t": "Pod Security Standards",
+   "by": "Kubernetes project",
+   "u": "https://kubernetes.io/docs/concepts/security/pod-security-standards/",
+   "kind": "Reference",
+   "why": "The three profiles and what each restricts."
+  },
+  {
+   "t": "Troubleshooting clusters",
+   "by": "Kubernetes project",
+   "u": "https://kubernetes.io/docs/tasks/debug/debug-cluster/",
+   "kind": "Guide",
+   "why": "Official steps for finding control plane and node faults."
+  }
+ ],
+ "argocd": [
+  {
+   "t": "Argo CD documentation",
+   "by": "Argo project",
+   "u": "https://argo-cd.readthedocs.io/en/stable/",
+   "kind": "Documentation",
+   "why": "The official reference for applications, sync and operations."
+  },
+  {
+   "t": "Argo CD core concepts",
+   "by": "Argo project",
+   "u": "https://argo-cd.readthedocs.io/en/stable/core_concepts/",
+   "kind": "Documentation",
+   "why": "Application, target state, live state, sync and health defined."
+  },
+  {
+   "t": "Automated sync policy",
+   "by": "Argo project",
+   "u": "https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/",
+   "kind": "Documentation",
+   "why": "Prune, self-heal and their risks."
+  },
+  {
+   "t": "ApplicationSet controller",
+   "by": "Argo project",
+   "u": "https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/",
+   "kind": "Documentation",
+   "why": "Generating many applications from one template."
+  },
+  {
+   "t": "Argo CD security",
+   "by": "Argo project",
+   "u": "https://argo-cd.readthedocs.io/en/stable/operator-manual/security/",
+   "kind": "Documentation",
+   "why": "Authentication, RBAC and hardening for the controller."
+  },
+  {
+   "t": "Argo CD project page",
+   "by": "CNCF",
+   "u": "https://www.cncf.io/projects/argo/",
+   "kind": "Reference",
+   "why": "Project status and context within the CNCF."
+  }
+ ],
+ "system-design": [
+  {
+   "t": "Site Reliability Engineering",
+   "by": "Google",
+   "u": "https://sre.google/sre-book/table-of-contents/",
+   "kind": "Book",
+   "why": "Cascading failures, overload, critical state and postmortems."
+  },
+  {
+   "t": "Amazon Builders' Library",
+   "by": "Amazon",
+   "u": "https://aws.amazon.com/builders-library/",
+   "kind": "Articles",
+   "why": "Practical write-ups on shuffle sharding, static stability, retries and safe deployment."
+  },
+  {
+   "t": "Cloud design patterns",
+   "by": "Microsoft",
+   "u": "https://learn.microsoft.com/en-us/azure/architecture/patterns/",
+   "kind": "Documentation",
+   "why": "Circuit breaker, bulkhead, cache-aside, deployment stamp and more."
+  },
+  {
+   "t": "The Site Reliability Workbook",
+   "by": "Google",
+   "u": "https://sre.google/workbook/table-of-contents/",
+   "kind": "Book",
+   "why": "Worked examples of SLOs, canarying and postmortems."
+  },
+  {
+   "t": "AWS Well-Architected: Reliability pillar",
+   "by": "Amazon",
+   "u": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html",
+   "kind": "Documentation",
+   "why": "Failure management, change management and recovery design questions."
+  }
+ ]
+}
