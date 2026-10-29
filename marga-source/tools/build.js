@@ -18,7 +18,7 @@ const SRC = path.join(ROOT, 'src');
 const DIST = path.join(ROOT, 'dist');
 const DOMAIN = 'marga.eknathalabs.com';
 // GoatCounter site code for the visitor count (https://CODE.goatcounter.com). Empty string disables it.
-const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js', 'choose.js'];
+const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js', 'choose.js', 'skilllab.js'];
 // terminal lab engine: loaded only when a terminal lab is opened, but cached for offline use
 const ENGINE = ['term-fs.js', 'term-parse.js', 'term-exec.js', 'term-cmds.js', 'term-text.js', 'term-awk.js', 'term-jq.js', 'term-sys.js', 'term-net.js', 'term-labs.js'];
 const COUNTER = process.env.MARGA_COUNTER !== undefined ? process.env.MARGA_COUNTER : 'marga-eknathalabs';

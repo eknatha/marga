@@ -455,7 +455,7 @@ function checkLinks() {
       if ((mm = h.match(/^#\/lesson\/([^/]+)\/([^/]+)$/))) ok = !!lessons[`${mm[1]}/${mm[2]}`];
       else if ((mm = h.match(/^#\/module\/([^/]+)$/))) ok = !!modById[mm[1]];
       else if ((mm = h.match(/^#\/cheatsheet\/([^/]+)$/))) ok = !!sheets[mm[1]];
-      else if (/^#\/(paths|cheatsheets|review|labs|progress)$/.test(h)) ok = true;
+      else if (/^#\/(paths|cheatsheets|review|labs|progress|skill-lab)$/.test(h)) ok = true;
       if (!ok) err('links', `lesson ${id}: broken app link ${h}`);
       allowedHash.push(h);
     }
@@ -498,7 +498,7 @@ function checkBudgets() {
 
 
 // ---------------------------------------------------------------- 8. references, interview, promise, voice, print
-const REF_HOSTS = /^https:\/\/([a-z0-9-]+\.)*(kubernetes\.io|docker\.com|hashicorp\.com|terraform\.io|aws\.amazon\.com|microsoft\.com|azure\.com|prometheus\.io|sre\.google|python\.org|man7\.org|rfc-editor\.org|opentelemetry\.io|grafana\.com|helm\.sh|kernel\.org|gnu\.org|redhat\.com|ubuntu\.com|debian\.org|nginx\.org|openssh\.com|argoproj\.github\.io|cncf\.io|opencontainers\.org|github\.com|cloud\.google\.com|cloudflare\.com|iptables\.org|netfilter\.org|systemd\.io|freedesktop\.org|kubectl\.docs\.kubernetes\.io|kustomize\.io|pypa\.io|pytest\.org|readthedocs\.io|postgresql\.org|jenkins\.io|semver\.org|owasp\.org|nist\.gov|slsa\.dev|sigstore\.dev|open-policy-agent\.org|aquasec\.com|trivy\.dev|podman\.io|buildah\.io|etcd\.io|cni\.dev|istio\.io|envoyproxy\.io|linuxfoundation\.org|cisecurity\.org|google\.com|w3\.org|ietf\.org|letsencrypt\.org|github\.io|gitlab\.com|hashicorp\.github\.io|opengroup\.org|jq\.dev|jqlang\.github\.io|curl\.se|openssl\.org|lvm2\.sourceware\.org|sourceware\.org|kernel\.dk|brendangregg\.com|netflix\.github\.io|principlesofchaos\.org|litmuschaos\.io|chaos-mesh\.org|pagerduty\.com|atlassian\.com|dora\.dev|12factor\.net|martinfowler\.com|apache\.org|elastic\.co|fluentbit\.io|fluentd\.org|vector\.dev|jaegertracing\.io|loki\.io|thanos\.io|victoriametrics\.com|containerd\.io|continuousdelivery\.com|keepachangelog\.com|fluxcd\.io|keda\.sh|karpenter\.sh|cilium\.io|openfeature\.dev|selinuxproject\.org|shellcheck\.net|everything\.curl\.dev|jqlang\.org|amazonaws\.com|mozilla\.org|tcpdump\.org|wireshark\.org|wireguard\.com|nftables\.org|cisa\.gov|oauth\.net|openpolicyagent\.org|kyverno\.io|mitre\.org|opengroup\.org|sigstore\.dev|ansible\.com|redis\.io|mysql\.com|mongodb\.com|pgbouncer\.org|pgbackrest\.org|use-the-index-luke\.com|git-scm\.com|go\.dev|golang\.org|conventionalcommits\.org|trunkbaseddevelopment\.com)(\/|$)/;
+const REF_HOSTS = /^https:\/\/([a-z0-9-]+\.)*(kubernetes\.io|docker\.com|hashicorp\.com|terraform\.io|aws\.amazon\.com|microsoft\.com|azure\.com|prometheus\.io|sre\.google|python\.org|man7\.org|rfc-editor\.org|opentelemetry\.io|grafana\.com|helm\.sh|kernel\.org|gnu\.org|redhat\.com|ubuntu\.com|debian\.org|nginx\.org|openssh\.com|argoproj\.github\.io|cncf\.io|opencontainers\.org|github\.com|cloud\.google\.com|cloudflare\.com|iptables\.org|netfilter\.org|systemd\.io|freedesktop\.org|kubectl\.docs\.kubernetes\.io|kustomize\.io|pypa\.io|pytest\.org|readthedocs\.io|postgresql\.org|jenkins\.io|semver\.org|owasp\.org|nist\.gov|slsa\.dev|sigstore\.dev|open-policy-agent\.org|aquasec\.com|trivy\.dev|podman\.io|buildah\.io|etcd\.io|cni\.dev|istio\.io|envoyproxy\.io|linuxfoundation\.org|cisecurity\.org|google\.com|w3\.org|ietf\.org|letsencrypt\.org|github\.io|gitlab\.com|hashicorp\.github\.io|opengroup\.org|jq\.dev|jqlang\.github\.io|curl\.se|openssl\.org|lvm2\.sourceware\.org|sourceware\.org|kernel\.dk|brendangregg\.com|netflix\.github\.io|principlesofchaos\.org|litmuschaos\.io|chaos-mesh\.org|pagerduty\.com|atlassian\.com|dora\.dev|12factor\.net|martinfowler\.com|apache\.org|elastic\.co|fluentbit\.io|fluentd\.org|vector\.dev|jaegertracing\.io|loki\.io|thanos\.io|victoriametrics\.com|containerd\.io|continuousdelivery\.com|keepachangelog\.com|fluxcd\.io|keda\.sh|karpenter\.sh|cilium\.io|openfeature\.dev|selinuxproject\.org|shellcheck\.net|everything\.curl\.dev|jqlang\.org|amazonaws\.com|mozilla\.org|tcpdump\.org|wireshark\.org|wireguard\.com|nftables\.org|cisa\.gov|oauth\.net|openpolicyagent\.org|kyverno\.io|mitre\.org|opengroup\.org|sigstore\.dev|ansible\.com|redis\.io|mysql\.com|mongodb\.com|pgbouncer\.org|pgbackrest\.org|use-the-index-luke\.com|git-scm\.com|go\.dev|golang\.org|conventionalcommits\.org|trunkbaseddevelopment\.com|anthropic\.com|claude\.com|modelcontextprotocol\.io|json-schema\.org)(\/|$)/;
 function checkExtras() {
   // official references on every lesson, module and sheet
   const checkRefs = (what, refs) => {
@@ -656,8 +656,8 @@ function checkPractice() {
     const symBlock = (src.match(/var SYM = \{([\s\S]*?)\n\};/) || [])[1] || '';
     const hueBlock = (src.match(/var HUES = \{([^}]*)\}/) || [])[1] || '';
     for (const id of [...A.modules.map((m) => m.id), ...A.paths.live.map((p) => p.id)]) {
-      if (!new RegExp(`\\b${id}:`).test(symBlock)) err('badges', `no badge symbol for ${id}`);
-      if (!new RegExp(`\\b${id}:`).test(hueBlock)) err('badges', `no badge colour for ${id}`);
+      if (!new RegExp(`["']?\\b${id}["']?:`).test(symBlock)) err('badges', `no badge symbol for ${id}`);
+      if (!new RegExp(`["']?\\b${id}["']?:`).test(hueBlock)) err('badges', `no badge colour for ${id}`);
     }
     if (/\bfetch\s*\(|XMLHttpRequest|sendBeacon|WebSocket/.test(src)) err('badges', 'badges.js must not use the network');
     if (/certified/i.test(src.replace(/Not a certification/g, ''))) err('badges', 'badges.js must not claim certification');
