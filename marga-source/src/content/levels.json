@@ -874,5 +874,133 @@
  "linux/networking-in-the-kernel-sockets-and-conntrack": {
   "s": "A listening socket is a restaurant host with a waiting list. If the kitchen is slow the list overflows and diners walk away, and conntrack is the reservation book that has run out of pages.",
   "i": "I read ss output and TCP states, diagnose accept queue overflow, CLOSE_WAIT and port exhaustion, and recognise conntrack table exhaustion."
+ },
+ "llm/what-an-llm-is-and-how-it-predicts-tokens": {
+  "s": "An LLM is a very well read autocomplete. It continues your text the way an expert writer would, but it has no way to check the facts unless you give it a tool.",
+  "i": "I describe an LLM as a next-token predictor, know its strengths and weak spots, and treat its output as untrusted until checked."
+ },
+ "llm/tokens-context-windows-and-limits": {
+  "s": "The context window is a desk of fixed size. Everything you need must fit on it at the same time, including the space for the model to write its answer.",
+  "i": "I count tokens, understand what fills the context window, check stop reasons, and design for limits with trimming, summaries and caching."
+ },
+ "llm/sampling-temperature-and-determinism": {
+  "s": "Sampling is rolling a weighted die. Low temperature loads the die so the favourite side nearly always lands. High temperature makes the sides more equal.",
+  "i": "I explain sampling, set temperature appropriately, know the limits of determinism, and test model features by properties and pass rates."
+ },
+ "llm/training-fine-tuning-and-where-knowledge-comes-from": {
+  "s": "The model is a well read colleague who has been on a long trip with no news. It knows a lot up to the day it left, so you must hand it today's papers.",
+  "i": "I explain training stages, the knowledge cutoff and hallucinations, and choose between prompting, retrieval, tools and fine-tuning."
+ },
+ "llm/calling-an-llm-api": {
+  "s": "Calling a model is like calling any paid web service: authenticate, set timeouts, expect throttling, retry only what is safe to retry, and never leave the key on the table.",
+  "i": "I make API calls with proper limits, stream replies, handle errors and rate limits, and keep keys and logs safe."
+ },
+ "llm/cost-latency-and-caching": {
+  "s": "Think of tokens as taxi metres. A short trip in a small car is cheap. A long trip in a big car, repeated a million times, is a budget problem.",
+  "i": "I estimate cost from tokens, reduce cost and latency with model choice, caching and batching, and set budgets and alerts."
+ },
+ "llm/choosing-and-evaluating-models": {
+  "s": "An evaluation set is a driving test you give each candidate. Public benchmarks are the brochure.",
+  "i": "I build a small evaluation set, score outputs several ways, compare models and prompts, and re-run tests on every change."
+ },
+ "llm/debugging-llm-applications": {
+  "s": "Debugging an LLM feature is a funnel: what did it see, what did it say, and where did the system around it go wrong. Keep the evidence, then test the fix.",
+  "i": "I capture full traces, separate retrieval, prompt, model and parsing problems, fix one change at a time, and add regression tests."
+ },
+ "prompting/anatomy-of-a-good-prompt": {
+  "s": "Write the prompt as a brief for a capable new colleague who has never seen your project: purpose, material, limits, and the shape of the answer you expect.",
+  "i": "I write prompts with task, context, material, constraints and format, separate data from instructions, and test on varied inputs."
+ },
+ "prompting/examples-and-few-shot-prompting": {
+  "s": "Examples are worked answers in the margin. A student will copy their shape, so pick ones you would be happy to see repeated.",
+  "i": "I use few-shot examples well: varied, consistent, realistic and separate from my test set."
+ },
+ "prompting/reasoning-and-step-by-step-prompts": {
+  "s": "Reasoning prompts give the model scrap paper. Useful for hard sums, wasteful for simple ones, and the scrap paper should never be handed to the customer.",
+  "i": "I use step-by-step prompting where it pays off, separate reasoning from the final answer, and verify rather than trust explanations."
+ },
+ "prompting/system-prompts-roles-and-context-layout": {
+  "s": "The system prompt is the house rules pinned to the wall, in view of every visitor. Do not pin the safe combination next to them.",
+  "i": "I structure prompts with system messages and tags, place long documents well, and treat untrusted text as data, not instructions."
+ },
+ "prompting/structured-output-json-and-schemas": {
+  "s": "A schema is a form with tick boxes. The fewer free-text boxes you leave, the fewer surprises when the forms arrive at the next desk.",
+  "i": "I define schemas, choose a structured output method, parse strictly, and design shapes that are easy for models to fill in."
+ },
+ "prompting/validating-repairing-and-retrying-outputs": {
+  "s": "Treat model output like input from a stranger: check the envelope, check the contents, and keep a procedure for letters that do not make sense.",
+  "i": "I validate in layers, retry with feedback within limits, repair only safe things, and design fallbacks and review paths."
+ },
+ "prompting/prompt-versioning-and-testing": {
+  "s": "A prompt with no version history is a script edited live on the server. It works until it does not, and then nobody knows what changed.",
+  "i": "I version prompts as files, review them, run evaluations in CI, and roll out and back with traceable versions."
+ },
+ "prompting/debugging-bad-prompts": {
+  "s": "Debugging a prompt is like debugging a flaky test: capture the failure, shrink it, change one variable, and keep the test.",
+  "i": "I reproduce failures, isolate causes, apply targeted fixes, measure on the whole set, and keep regression tests."
+ },
+ "claude-skills/what-a-claude-skill-is": {
+  "s": "A skill is a binder on the shelf with a clear label on the spine. Claude reads the labels all the time, and takes down a binder only when the job calls for it.",
+  "i": "I explain what a skill is, how it differs from prompts and tools, and choose when a skill is worth writing."
+ },
+ "claude-skills/anatomy-of-a-skill-folder": {
+  "s": "Treat the folder like a small project README plus tools: one clear entry point, linked chapters, and nothing a reviewer cannot find in minutes.",
+  "i": "I lay out a skill with a proper header, a focused body, and supporting files, and keep it reviewable."
+ },
+ "claude-skills/writing-descriptions-that-trigger": {
+  "s": "The description is the spine label on the binder. If it says \"Stuff\", nobody takes it down. If it says \"Everything\", people take down the wrong binder.",
+  "i": "I write descriptions that say what and when, balance breadth, and test triggering with near-miss requests."
+ },
+ "claude-skills/progressive-disclosure-and-structure": {
+  "s": "Like a good manual: a one-page quick start, then chapters you open only when you need them, not a thousand pages pushed across the desk.",
+  "i": "I structure skills in layers, move rare detail to linked files, keep links shallow, and measure size against value."
+ },
+ "claude-skills/scripts-and-deterministic-steps": {
+  "s": "The model is the editor and the script is the calculator. Do not ask the editor to add up the column by eye.",
+  "i": "I put exact work in tested scripts with clear output, keep them safe, and let the model handle judgement."
+ },
+ "claude-skills/testing-and-evaluating-a-skill": {
+  "s": "Testing a skill is a driving test with and without the instructor. If the learner passes without, the instructor was not needed.",
+  "i": "I test triggering, quality and cost, compare with a baseline, iterate one change at a time, and keep records."
+ },
+ "claude-skills/sharing-versioning-and-skill-security": {
+  "s": "Installing a skill is hiring a helper who will follow written instructions with your keys in the room. Check the references first.",
+  "i": "I share skills through version control, version and own them, and review skills for security before use."
+ },
+ "claude-skills/debugging-skills-that-do-not-trigger-or-misbehave": {
+  "s": "Walk the path the way Claude does: can it find the binder, does the label make it pick it up, does it follow the pages, and do the tools in the binder work?",
+  "i": "I debug skills in order: discovery, choosing, following and scripts, and lock fixes in with tests."
+ },
+ "mcp/why-tools-and-what-mcp-is": {
+  "s": "MCP is a universal plug for AI tools. It makes connecting easy; it does not check what is behind the socket.",
+  "i": "I explain why models need tools, what MCP standardises, its three roles, and what it does not guarantee."
+ },
+ "mcp/function-calling-and-tool-schemas": {
+  "s": "A tool definition is the manual you tape to a machine for a user who reads very fast and never asks questions. Be precise.",
+  "i": "I write clear tool definitions with schemas, validate arguments in code, and keep the toolset small and focused."
+ },
+ "mcp/the-tool-use-loop": {
+  "s": "Think of a relay race: the model hands the baton to your code, your code runs and hands it back with the result. Put a timer on the race.",
+  "i": "I implement the tool-use loop with correct results, error handling, limits and logging."
+ },
+ "mcp/mcp-architecture-hosts-clients-servers-transports": {
+  "s": "MCP is a polite conversation: introduce yourselves and say what you can do, then ask and answer in a fixed format. Keep side chatter off the main line.",
+  "i": "I explain the MCP lifecycle, messages and transports, and avoid common protocol mistakes such as polluting stdout."
+ },
+ "mcp/building-an-mcp-server-in-python": {
+  "s": "Building a server is writing a tiny API for a reader who only sees your docstrings. Test it with a human-friendly tool before connecting any model.",
+  "i": "I build a small MCP server in Python, test it with the inspector, and register it with a host."
+ },
+ "mcp/resources-prompts-and-other-primitives": {
+  "s": "Tools are the machines in the workshop, resources are the reference books you can put on the bench, and prompts are the recipe cards you choose to start from.",
+  "i": "I choose between tools, resources and prompts, and use each primitive for what it is good at."
+ },
+ "mcp/permissions-auth-and-prompt-injection-defence": {
+  "s": "Assume the assistant can be talked into things. Give it a small toolbox, a supervisor for risky jobs, and keep the vault, the stranger's letters and the front door out of the same room.",
+  "i": "I apply least privilege, require approval for risky actions, authenticate remote servers properly, and design against prompt injection."
+ },
+ "mcp/debugging-tool-use-and-mcp": {
+  "s": "Debug from the bottom of the stack up: the tool, the wire, the menu, the diner who orders, and the waiter who carries the plates.",
+  "i": "I debug tool use layer by layer, use the inspector and traces, and add tests for tool lists, definitions and loops."
  }
 }

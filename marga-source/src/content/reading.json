@@ -746,5 +746,181 @@
       "kind": "Reference",
       "why": "Explains lifecycle hooks, weights and delete policies used for migrations and tests."
     }
+  ],
+  "llm": [
+    {
+      "t": "Build with Claude",
+      "by": "Anthropic",
+      "u": "https://docs.anthropic.com/en/docs/build-with-claude/overview",
+      "kind": "Documentation",
+      "why": "Official guide to calling the API, context windows, caching, batching and more."
+    },
+    {
+      "t": "Models overview",
+      "by": "Anthropic",
+      "u": "https://docs.anthropic.com/en/docs/about-claude/models/overview",
+      "kind": "Reference",
+      "why": "Current model names, context sizes and capabilities; check it before choosing a model."
+    },
+    {
+      "t": "API reference",
+      "by": "Anthropic",
+      "u": "https://docs.anthropic.com/en/api/overview",
+      "kind": "Reference",
+      "why": "Every request and response field, with error codes and rate-limit behaviour."
+    },
+    {
+      "t": "Context windows",
+      "by": "Anthropic",
+      "u": "https://docs.anthropic.com/en/docs/build-with-claude/context-windows",
+      "kind": "Documentation",
+      "why": "Explains how input and output share the window and how limits work."
+    },
+    {
+      "t": "Prompt caching",
+      "by": "Anthropic",
+      "u": "https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching",
+      "kind": "Documentation",
+      "why": "How to cut cost and delay for repeated prefixes, with pricing rules."
+    },
+    {
+      "t": "Define success criteria",
+      "by": "Anthropic",
+      "u": "https://docs.anthropic.com/en/docs/test-and-evaluate/define-success",
+      "kind": "Guide",
+      "why": "A practical start for evaluation: what to measure before you choose a model."
+    }
+  ],
+  "prompting": [
+    {
+      "t": "Prompt engineering overview",
+      "by": "Anthropic",
+      "u": "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview",
+      "kind": "Guide",
+      "why": "The main techniques in one place, with a list of what to try first."
+    },
+    {
+      "t": "Use XML tags",
+      "by": "Anthropic",
+      "u": "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/use-xml-tags",
+      "kind": "Guide",
+      "why": "How tags separate instructions from material and make prompts easier to maintain."
+    },
+    {
+      "t": "Multishot prompting",
+      "by": "Anthropic",
+      "u": "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/multishot-prompting",
+      "kind": "Guide",
+      "why": "How to choose and format examples that raise reliability."
+    },
+    {
+      "t": "Extended thinking",
+      "by": "Anthropic",
+      "u": "https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking",
+      "kind": "Documentation",
+      "why": "How the thinking budget works and when it is worth the cost."
+    },
+    {
+      "t": "Understanding JSON Schema",
+      "by": "JSON Schema project",
+      "u": "https://json-schema.org/understanding-json-schema/",
+      "kind": "Reference",
+      "why": "The schema language used for structured output and tool inputs."
+    },
+    {
+      "t": "Increase output consistency",
+      "by": "Anthropic",
+      "u": "https://docs.anthropic.com/en/docs/test-and-evaluate/strengthen-guardrails/increase-consistency",
+      "kind": "Guide",
+      "why": "Techniques for format and style consistency, with examples."
+    }
+  ],
+  "claude-skills": [
+    {
+      "t": "Agent Skills overview",
+      "by": "Anthropic",
+      "u": "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview",
+      "kind": "Documentation",
+      "why": "What skills are, how they load, and where they are supported."
+    },
+    {
+      "t": "Skill authoring best practices",
+      "by": "Anthropic",
+      "u": "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/best-practices",
+      "kind": "Guide",
+      "why": "Guidance on descriptions, structure, scripts and testing from the product team."
+    },
+    {
+      "t": "Skills in Claude Code",
+      "by": "Anthropic",
+      "u": "https://docs.claude.com/en/docs/claude-code/skills",
+      "kind": "Documentation",
+      "why": "Where Claude Code looks for skills and how project and personal skills differ."
+    },
+    {
+      "t": "Prompt engineering overview",
+      "by": "Anthropic",
+      "u": "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview",
+      "kind": "Guide",
+      "why": "The techniques behind good skill instructions."
+    },
+    {
+      "t": "OWASP Top 10 for LLM Applications",
+      "by": "OWASP",
+      "u": "https://owasp.org/www-project-top-10-for-large-language-model-applications/",
+      "kind": "Security",
+      "why": "Risks to consider before you share or install skills and scripts."
+    },
+    {
+      "t": "Develop test cases",
+      "by": "Anthropic",
+      "u": "https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests",
+      "kind": "Guide",
+      "why": "How to build the task sets used to test a skill."
+    }
+  ],
+  "mcp": [
+    {
+      "t": "Model Context Protocol introduction",
+      "by": "MCP project",
+      "u": "https://modelcontextprotocol.io/introduction",
+      "kind": "Documentation",
+      "why": "The purpose, roles and concepts of the protocol."
+    },
+    {
+      "t": "MCP specification",
+      "by": "MCP project",
+      "u": "https://modelcontextprotocol.io/specification",
+      "kind": "Specification",
+      "why": "The authoritative description of messages, lifecycle and security guidance."
+    },
+    {
+      "t": "Build a server",
+      "by": "MCP project",
+      "u": "https://modelcontextprotocol.io/docs/develop/build-server",
+      "kind": "Tutorial",
+      "why": "A step-by-step server in Python or TypeScript."
+    },
+    {
+      "t": "Tool use overview",
+      "by": "Anthropic",
+      "u": "https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview",
+      "kind": "Documentation",
+      "why": "How function calling works in the Messages API, with the loop explained."
+    },
+    {
+      "t": "How to implement tool use",
+      "by": "Anthropic",
+      "u": "https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/implement-tool-use",
+      "kind": "Guide",
+      "why": "Details on tool results, errors, parallel calls and choice settings."
+    },
+    {
+      "t": "OWASP Top 10 for LLM Applications",
+      "by": "OWASP",
+      "u": "https://owasp.org/www-project-top-10-for-large-language-model-applications/",
+      "kind": "Security",
+      "why": "Prompt injection, excessive agency and other risks of tool-using systems."
+    }
   ]
 }

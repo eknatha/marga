@@ -147,5 +147,42 @@
     "requires": [
       "kubernetes"
     ]
+  },
+  {
+    "id": "llm",
+    "title": "LLM fundamentals",
+    "summary": "Understand how large language models work in practice: tokens, context windows, sampling, training, API calls, cost, latency, evaluation and debugging.",
+    "level": "Intermediate",
+    "requires": [
+      "python"
+    ]
+  },
+  {
+    "id": "prompting",
+    "title": "Prompting and structured output",
+    "summary": "Write reliable prompts, give examples, ask for step-by-step reasoning, get validated JSON back, and version and test your prompts.",
+    "level": "Intermediate",
+    "requires": [
+      "llm"
+    ]
+  },
+  {
+    "id": "claude-skills",
+    "title": "Claude Skills",
+    "summary": "Package expertise as skills Claude loads on demand: SKILL.md, descriptions that trigger, progressive disclosure, scripts, testing, sharing and security.",
+    "level": "Intermediate",
+    "requires": [
+      "prompting"
+    ]
+  },
+  {
+    "id": "mcp",
+    "title": "Tool use and MCP",
+    "summary": "Let models call tools safely: function calling, the tool-use loop, the Model Context Protocol, building a server, permissions and prompt injection.",
+    "level": "Intermediate",
+    "requires": [
+      "prompting",
+      "networking"
+    ]
   }
 ]
