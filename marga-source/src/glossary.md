@@ -1139,3 +1139,43 @@ def: Evicting the pods from a node, respecting disruption budgets, so they are r
 module: k8s-ops
 plain: A check that runs before an object is saved.
 def: A stage in the API server that can validate or change a request after authorisation and before storage.
+
+## Failure domain
+module: system-design
+plain: Everything one cause can take down together.
+def: A set of components that share a fate, such as a host, zone, region, shared configuration or deployment pipeline.
+
+## Cell
+module: system-design
+plain: A small full copy of the service for some of the users.
+def: An independent deployment of the whole service serving a slice of customers, so a fault stays inside that slice.
+
+## Shuffle sharding
+module: system-design
+plain: Give each customer a random few workers.
+def: Assigning each customer a small random subset of workers so one customer's fault overlaps few others.
+
+## Quorum
+module: system-design
+plain: More than half the group agreeing.
+def: A majority of members required to commit a write or elect a leader in a consensus system.
+
+## Fencing token
+module: system-design
+plain: A number that proves who the newest leader is.
+def: A monotonically increasing value issued with each leadership, which a resource uses to reject writes from stale leaders.
+
+## Idempotency key
+module: system-design
+plain: A label that stops a repeat from doing the work twice.
+def: A unique client-supplied token stored with the result so a retried request returns the stored result instead of acting again.
+
+## RPO and RTO
+module: system-design
+plain: How much data you can lose and how long you can be down.
+def: Recovery point objective is the maximum acceptable data loss measured in time; recovery time objective is the maximum acceptable downtime.
+
+## Load shedding
+module: system-design
+plain: Turning some work away to keep the rest healthy.
+def: Deliberately rejecting low priority or late requests when over capacity so useful work still completes.
