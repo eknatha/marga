@@ -3072,6 +3072,43 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await ctx.close();
   });
 
+  await test('case files: nine sections, labelled diagrams and evidence, quiz feedback, card link, no overflow, axe clean', async () => {
+    const ids = (data.casefiles || []).map((f) => f.id);
+    ok(ids.length === (data.cases || []).length && ids.length >= 81, 'a case file for every case card, got ' + ids.length + ' of ' + (data.cases || []).length);
+    const { ctx, page, issues } = await open();
+    for (const id of ids) {
+      await go(page, '/case-file/' + id);
+      const h = await page.locator('#main h2').allTextContents();
+      ok(h.length >= 9 && /Incident overview/.test(h[0]) && /Lessons learned/.test(h[8]), id + ' sections ' + h.length);
+      ok(await page.locator('.cf-badge.ver, .cf-badge.con').count() >= 2, id + ' diagram labels');
+      ok(await page.locator('.cf-badge.sim').count() >= 1, id + ' simulated label');
+      ok(await page.locator('.cfd, svg').count() >= 2, id + ' diagrams');
+      const txt = await page.locator('#main').innerText();
+      ok(!/undefined|NaN|\[object Object\]/.test(txt), id + ' clean text');
+    }
+    await go(page, '/case-file/' + ids[0]);
+    const q = page.locator('.cf-q').first(); const ans = await q.getAttribute('data-answer');
+    await q.locator('.cf-opt').nth(Number(ans)).click();
+    ok(await q.locator('.cf-why').isVisible(), 'explanation shown after answering');
+    await page.click('.cf-jump >> nth=5');
+    await go(page, '/cases/' + ids[0]);
+    ok(/Open the full case file/.test(await page.locator('#main').innerText()), 'card links to the file');
+    ok(issues.length === 0, 'page errors ' + issues.join('|'));
+    await ctx.close();
+    for (const dark of [false, true]) {
+      const m = await open({ viewport: { width: 390, height: 844 }, dark });
+      const sample = dark ? ids.filter((_, i) => i % 8 === 0) : ids;
+      for (const id of sample) {
+        await go(m.page, '/case-file/' + id);
+        ok(await m.page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 2), id + ' no sideways scroll' + (dark ? ' (dark)' : ''));
+        await m.page.addScriptTag({ content: AXE });
+        const res = await m.page.evaluate(async () => (await axe.run('#main', { runOnly: ['wcag2a', 'wcag2aa'] })).violations.map((v) => v.id + ': ' + v.nodes.map((n) => n.target).join(',')));
+        eq(res.length, 0, id + ' axe: ' + res.join(' | '));
+      }
+      await m.ctx.close();
+    }
+  });
+
   await browser.close();
   srv.close();
 

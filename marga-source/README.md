@@ -63,3 +63,11 @@ See DEPLOY.md for hosting, DNS and the visitor counter.
 ## Round 20
 
 - Skill tree view rebuilt: compact nodes in stage lanes, elbow connectors, a detail panel (needs, unlocks, lessons, next action), highlight of the selected skill links, hover preview, Next up tag, and a bottom sheet on phones.
+
+## Round 21
+
+- Case files: all 81 case cards have a full case file page at `#/case-file/<case-id>` with nine sections: overview, architecture, timeline, root cause, evidence, fix, before and after, learning activities, lessons.
+- Data lives in `src/casefiles/<case-id>.json`; the build checks the JSON and that a case card with the same id exists; `tools/validate.js` checks the schema, labels, sources and wording.
+- Diagrams are inline SVG drawn by `src/app/casefile.js`, each labelled Verified architecture or Conceptual diagram, with a text version. Evidence is labelled Quoted or Simulated; timeline times come only from the sources.
+- Source depth varies. Each file has a verification note saying what was read. Some files rest on news reports or secondary summaries because the primary page could not be read (for example Facebook 2021 via Cloudflare, Equifax, Optus, Rogers, Tay, Gemini, Terraform 2026, Tesla), and a few describe a mechanism rather than one dated incident (Docker Hub rate limits, Let's Encrypt root expiry, ingress-nginx). Read the note before relying on a detail.
+- The end-to-end test checks every case file for the nine sections, labels, sideways scroll on a phone width and accessibility.

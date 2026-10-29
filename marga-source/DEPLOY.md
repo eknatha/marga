@@ -188,3 +188,5 @@ No deployment change. Explainer links and the failure filter are static data and
 Round 19: nav panel, route dots on path cards, nav reorder. No new files or settings.
 
 Round 20: skill tree redesign. No new files or settings.
+
+Round 21: case files for all 81 cases. New data folder `src/casefiles`, new script `assets/casefile.js`. No new settings.

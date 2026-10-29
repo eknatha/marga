@@ -18,7 +18,7 @@ const SRC = path.join(ROOT, 'src');
 const DIST = path.join(ROOT, 'dist');
 const DOMAIN = 'marga.eknathalabs.com';
 // GoatCounter site code for the visitor count (https://CODE.goatcounter.com). Empty string disables it.
-const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js', 'choose.js', 'skilllab.js'];
+const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js', 'choose.js', 'skilllab.js', 'casefile.js'];
 // terminal lab engine: loaded only when a terminal lab is opened, but cached for offline use
 const ENGINE = ['term-fs.js', 'term-parse.js', 'term-exec.js', 'term-cmds.js', 'term-text.js', 'term-awk.js', 'term-jq.js', 'term-sys.js', 'term-net.js', 'term-labs.js'];
 const COUNTER = process.env.MARGA_COUNTER !== undefined ? process.env.MARGA_COUNTER : 'marga-eknathalabs';
@@ -439,7 +439,18 @@ function loadContent() {
   }
   const labs = require('./labs').load(path.join(SRC, 'labs'));
   const termlabs = require('./termlabs').load(path.join(SRC, 'termlabs')).map((l) => { const o = { ...l }; delete o.errors; delete o.file; return o; });
-  return { modules, paths, lessons, sheets, interview, cases, capstones, walkthroughs, reading, games, arch, drills, glossary, labs, termlabs, predicts: PREDICTS };
+  // Case files: src/casefiles/<case-id>.json, the full source-checked write-up behind a case card
+  const casefiles = [];
+  const cfdir = path.join(SRC, 'casefiles');
+  if (fs.existsSync(cfdir)) {
+    for (const f of fs.readdirSync(cfdir).filter((x) => x.endsWith('.json')).sort()) {
+      let j; try { j = JSON.parse(fs.readFileSync(path.join(cfdir, f), 'utf8')); } catch (x) { throw new Error(`casefiles/${f}: invalid JSON (${x.message})`); }
+      if (j.id + '.json' !== f) throw new Error(`casefiles/${f}: id must match the file name`);
+      if (!cases.some((c) => c.id === j.id)) throw new Error(`casefiles/${f}: no case card with id ${j.id}`);
+      casefiles.push(j);
+    }
+  }
+  return { modules, paths, lessons, sheets, interview, cases, casefiles, capstones, walkthroughs, reading, games, arch, drills, glossary, labs, termlabs, predicts: PREDICTS };
 
 }
 

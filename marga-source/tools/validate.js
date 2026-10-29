@@ -850,6 +850,49 @@ function checkTermLabs() {
 }
 
 // ---------------------------------------------------------------- run
+function checkCaseFiles() {
+  const dir = path.join(SRC, 'casefiles');
+  if (!fs.existsSync(dir)) return;
+  const cases = new Set(); const arch = new Set();
+  for (const f of fs.readdirSync(path.join(SRC, 'cases'))) for (const m of read(path.join(SRC, 'cases', f)).matchAll(/^## (.+)$/gm)) cases.add(m[1].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''));
+  for (const f of fs.readdirSync(path.join(SRC, 'architecture'))) arch.add(f.replace(/^\d+-/, '').replace(/\.md$/, ''));
+  const bad = /\bgit(hub|lab|ops|leaks|ea)/i; const glyph = /[←-⇿☀-➿\u{1F300}-\u{1FAFF}]/u; const junk = /\bundefined\b|\bNaN\b|\[object Object\]|\bTODO\b|\bFIXME\b|lorem ipsum/;
+  let n = 0;
+  for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.json'))) {
+    n++; const w = (m) => err('casefile', f + ': ' + m);
+    const raw = read(path.join(dir, f)); let d; try { d = JSON.parse(raw); } catch (e) { w('bad JSON'); continue; }
+    if (!cases.has(d.id)) w('no case card with id ' + d.id);
+    for (const k of ['summary', 'overview', 'diagrams', 'timeline', 'rootCause', 'evidence', 'fix', 'activities', 'lessons', 'sources', 'verification']) if (!d[k]) w('missing ' + k);
+    if (junk.test(raw)) w('contains undefined, NaN, TODO or similar text');
+    if (glyph.test(raw)) w('emoji or arrow glyph');
+    if (bad.test(raw.replace(/https?:\/\/[^"\s]*/g, ''))) w('banned word');
+    for (const u of (d.sources || [])) if (!/^https:\/\//.test(u.url) || bad.test(u.url)) w('bad source url ' + u.url);
+    const ds = d.diagrams || [];
+    if (!ds.some((x) => x.section === 'arch')) w('no arch diagram');
+    if (!ds.some((x) => x.section === 'after')) w('no after diagram');
+    for (const g of ds) {
+      if (!['verified', 'conceptual'].includes(g.kind)) w('diagram kind ' + g.id);
+      const ids = new Set(g.nodes.map((x) => x.id)); if (ids.size !== g.nodes.length) w('duplicate node id in ' + g.id);
+      for (const e of g.edges) if (!ids.has(e.f) || !ids.has(e.t)) w('edge to missing node in ' + g.id);
+    }
+    const tl = d.timeline || [];
+    if (tl.length < 6) w('timeline under 6 entries');
+    for (const ph of ['trigger', 'recover']) if (!tl.some((x) => x.phase === ph)) w('timeline lacks ' + ph);
+    if ((d.evidence || []).length < 2 || (d.evidence || []).some((x) => !['quoted', 'simulated'].includes(x.kind))) w('evidence needs 2+ entries labelled quoted or simulated');
+    const fx = d.fix || {};
+    for (const k of ['diagnose', 'correct', 'verify', 'prevent']) if (!(fx[k] || []).length) w('fix lacks ' + k);
+    if (!fx.safety) w('fix lacks safety');
+    const a = d.activities || {};
+    for (const k of ['troubleshoot', 'rootcause', 'remediation', 'design']) if (!a[k]) w('activities lack ' + k);
+    const qs = (a.checks || []).concat(a.rootcause ? [a.rootcause] : []);
+    if ((a.checks || []).length < 4) w('under 4 knowledge checks');
+    for (const q of qs) if (!(q.answer >= 0 && q.answer < q.options.length) || !q.why) w('quiz answer or explanation invalid');
+    if (d.postmortem && !arch.has(d.postmortem)) w('postmortem not found ' + d.postmortem);
+  }
+  stats['case files'] = n;
+  if (!n) err('casefile', 'no case files');
+}
+
 const steps = [
   ['content schema', checkSchema],
   ['role paths', checkPaths],
@@ -861,7 +904,8 @@ const steps = [
   ['references, interview, footer, voice, print', checkExtras],
   ['case studies, architecture, drills, accessibility, counter', checkPractice],
   ['glossary, explainers, search, subnet, playgrounds', checkMore],
-  ['terminal labs', checkTermLabs]
+  ['terminal labs', checkTermLabs],
+  ['case files', checkCaseFiles]
 ];
 for (const [name, fn] of steps) {
   const before = errors.length;
