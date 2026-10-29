@@ -1267,7 +1267,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const links = await page.locator('#topnav a').allInnerTexts();
     eq(links.join('|'), 'Skills|Skill trees|Cheat sheets|Case studies|Practice|Certifications|Progress|InterviewHub|About', 'nav order');
     await nav(page, '/practice');
-    eq(await page.locator('.prac li').count(), 25, 'hub cards');
+    eq(await page.locator('.prac li').count(), 26, 'hub cards');
     for (const href of ['#/drills', '#/interview/mock', '#/flashcards', '#/cases', '#/architecture', '#/calculators', '#/review', '#/terminal-labs']) ok(await page.locator(`.prac a[href="${href}"]`).count() === 1, 'hub links to ' + href);
     await nav(page, '/module/kubernetes');
     ok(await page.locator('a[href="#/drills/kubernetes"]').count() === 1 && await page.locator('a[href="#/cases/kubernetes"]').count() === 1, 'module page links to practice');
@@ -1389,6 +1389,31 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     eq(n.summarize(['10.0.0.0/24', '10.0.1.0/24', '10.0.2.0/24', '10.0.3.0/24', '10.0.5.0/24']).join(' '), '10.0.0.0/22 10.0.5.0/24', 'merge');
     eq(n.summarize(['10.0.0.0/25', '10.0.0.128/25']).join(' '), '10.0.0.0/24', 'halves merge'); eq(n.summarize(['10.0.0.0/24', '10.0.0.0/25']).join(' '), '10.0.0.0/24', 'covered block absorbed');
     eq(n.summarize(['10.0.1.0/24', '10.0.2.0/24']).join(' '), '10.0.1.0/24 10.0.2.0/24', 'unaligned neighbours stay separate'); eq(n.summarize(['x']), null, 'bad input');
+  });
+
+  await test('system design lab: estimator, break-it simulator with fix toggle, case challenges, phone width, axe in both themes', async () => {
+    const SD = await (async () => { const { ctx, page } = await open(); await go(page, '/system-design-lab'); await page.waitForSelector('#es-out .calc-row'); const r = await page.evaluate(() => { const e = window.MargaSD.estimate({ users: 20000000, perUser: 15, readPct: 70, respKb: 5, writeKb: 1, peak: 3, copies: 3, cap: 500, slo: 99.9 }); return { avg: Math.round(e.avg), peak: Math.round(e.peak), budget: e.budget, bad: window.MargaSD.estimate({ users: -1, perUser: 1, readPct: 1, respKb: 1, writeKb: 1, peak: 1, copies: 1, cap: 1, slo: 99 }).error }; }); await ctx.close(); return r; })();
+    eq(SD.avg, 3472, 'average rps'); eq(SD.peak, 10417, 'peak rps'); ok(Math.abs(SD.budget - 43.2) < 0.01, 'budget minutes'); ok(/zero or more/.test(SD.bad), 'rejects negative input');
+    for (const dark of [false, true]) {
+      const { ctx, page, issues } = await open({ dark });
+      await go(page, '/system-design-lab'); await page.waitForSelector('#sm-dia svg');
+      ok(!/NaN|undefined|Infinity/.test(await page.textContent('#main')), 'no bad numbers');
+      await page.fill('#es-u', '1000'); ok(/Peak requests per second/.test(await page.textContent('#es-out')), 'estimator updates'); await page.fill('#es-u', '-5'); ok(await page.locator('#es-out .calc-err').isVisible(), 'estimator error shows');
+      await page.selectOption('#sm-d', 'config-push'); await page.click('[data-comp="cp"]');
+      ok(/more than the whole month/.test(await page.textContent('#sm-out')), 'unfixed config push blows the budget');
+      await page.check('#sm-fix'); ok(/5 percent/.test(await page.textContent('#sm-out')), 'fix reduces users affected');
+      await page.focus('[data-comp="gen"]'); await page.keyboard.press('Enter'); ok(/file/.test(await page.textContent('#sm-out')), 'keyboard selects a component');
+      await page.click('.sd-ch[data-ch="0"] .cf-opt[data-j="2"]'); ok(/Not quite/.test(await page.textContent('.sd-ch[data-ch="0"] .sd-fb')), 'wrong answer explained'); ok(/What the organisation changed/.test(await page.textContent('.sd-ch[data-ch="0"] .sd-fb')), 'after changes shown');
+      ok(await page.locator('.sd-ch[data-ch="0"] a[href^="#/case-file/"]').count() === 1, 'case file link');
+      eq(await page.locator('.sd-ch').count(), 8, 'eight challenges');
+      await page.addScriptTag({ content: AXE });
+      const res = await page.evaluate(async () => (await window.axe.run(document, { resultTypes: ['violations'] })).violations.filter((v) => v.impact === 'serious' || v.impact === 'critical').map((v) => v.id + ': ' + v.nodes[0].target.join(' ')));
+      eq(res.length, 0, 'axe ' + (dark ? 'dark' : 'light') + ' ' + res.join(' | '));
+      await page.setViewportSize({ width: 390, height: 800 }); await page.waitForTimeout(150);
+      ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'no sideways scroll at 390px');
+      eq(issues.length, 0, 'console: ' + issues.join(' | '));
+      await ctx.close();
+    }
   });
 
   await test('subnet playground: live results, errors, VLSM table, cloud reserve, summary', async () => {
@@ -1534,12 +1559,12 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await ctx.close();
   });
 
-  await test('failure and recovery explainers: one filter, 48 stories, every skill has two, each linked to a lesson and its paths', async () => {
+  await test('failure and recovery explainers: one filter, 50 stories, every skill has two, each linked to a lesson and its paths', async () => {
     const { ctx, page, issues } = await open();
     await go(page, '/explainers?kind=failure'); await page.waitForSelector('.exf-chip');
-    eq(await page.locator('#exf-list li:not([hidden])').count(), 48, 'failure stories shown');
+    eq(await page.locator('#exf-list li:not([hidden])').count(), 50, 'failure stories shown');
     eq(await page.isChecked('#exf-fail'), true, 'filter checked from the URL');
-    eq(await page.locator('#exf-list .exf-g:not([hidden])').count(), 24, 'every skill has failure stories');
+    eq(await page.locator('#exf-list .exf-g:not([hidden])').count(), 25, 'every skill has failure stories');
     for (const g of await page.locator('#exf-list .exf-g:not([hidden])').all()) ok((await g.locator('li:not([hidden])').count()) >= 2, 'two or more per skill');
     ok(/Failure and recovery/.test(await page.textContent('#exf-list li:not([hidden]) em')), 'tagged in the list');
     await page.uncheck('#exf-fail');
@@ -1931,7 +1956,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const { ctx, page, issues } = await open(); await go(page, '/practice'); await page.waitForSelector('.pr-cmd');
     eq(await page.locator('.pr-feat .prac a').count(), 3, 'three featured tools');
     for (const h of ['#/explainers', '#/architecture', '#/drills']) eq(await page.locator(`.prac a[href="${h}"]`).count(), 1, h + ' appears once');
-    eq(await page.locator('.pr-li').count(), 25, '25 tools');
+    eq(await page.locator('.pr-li').count(), 26, '26 tools');
     eq(await page.locator('.pr-node').count(), 5, 'five groups');
     eq(await page.locator('.pr-week li').count(), 7, 'week strip');
     const t1 = await page.textContent('.pr-cmd h2');
@@ -1940,13 +1965,13 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     ok((await page.textContent('.pr-cmd h2')) !== t1, 'skip shows another suggestion');
     await page.click('[data-act="pr-why"]'); eq(await page.locator('#pr-whyt').isVisible(), true, 'why text');
     await page.click('[data-flag="labs"]');
-    eq(await page.locator('.pr-li:not([hidden])').count(), 10, 'labs flag shows 7 labs and 3 featured');
+    eq(await page.locator('.pr-li:not([hidden])').count(), 11, 'labs flag shows 8 labs and 3 featured');
     eq(await page.getAttribute('[data-flag="labs"]', 'aria-pressed'), 'true', 'flag pressed');
     await page.click('[data-flag="all"]');
     await page.fill('#pr-q', 'terraform');
     ok((await page.locator('.pr-li:not([hidden])').count()) >= 1 && (await page.locator('.pr-li:not([hidden])').count()) < 6, 'search narrows');
     await page.fill('#pr-q', 'zzzqqq'); eq(await page.locator('#pr-empty').isVisible(), true, 'empty state');
-    await page.click('#pr-empty [data-act="pr-clear"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 25, 'clear shows all');
+    await page.click('#pr-empty [data-act="pr-clear"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 26, 'clear shows all');
     await page.click('[data-flag="starred"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 0, 'no favourites yet');
     await page.click('[data-flag="all"]');
     await page.click('.pr-li[data-id="yaml"] .pr-star'); eq(await page.getAttribute('.pr-li[data-id="yaml"] .pr-star', 'aria-pressed'), 'true', 'starred');
@@ -2460,12 +2485,12 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
   }
   const bytesOf = (file) => fs.readFileSync(file);
 
-  await test('badges: the wall lists 24 stage and 5 path badges, locked ones show progress, and the hub links to it', async () => {
+  await test('badges: the wall lists 25 stage and 5 path badges, locked ones show progress, and the hub links to it', async () => {
     const { ctx, page, issues } = await open();
     await go(page, '/badges');
     eq(await page.locator('.bd-card').count(), data.modules.length + data.paths.live.length, 'badge cards');
     eq(await page.locator('.bd-card.on').count(), 0, 'none earned at first');
-    ok(/You have earned 0 of 29/.test(await page.textContent('#main')), 'count text');
+    ok(/You have earned 0 of 30/.test(await page.textContent('#main')), 'count text');
     const t = await page.textContent('.bd-caution');
     ok(/Not a certification/.test(t), 'caution on wall');
     await nav(page, '/badge/stage-ansible');
@@ -2604,12 +2629,12 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await ctx.close();
   });
 
-  await test('badges: finishing every stage earns all 24 stage badges and 5 path badges; shapes differ and the light and dark variants both draw', async () => {
+  await test('badges: finishing every stage earns all 25 stage badges and 5 path badges; shapes differ and the light and dark variants both draw', async () => {
     const { ctx, page } = await open();
     await go(page, '/'); await setProgress(page, allDone());
     await nav(page, '/badges'); await page.waitForSelector('.bd-card');
-    eq(await page.locator(".bd-card.on").count(), 29, 'all earned');
-    ok(/You have earned 29 of 29/.test(await page.textContent('#main')), 'count');
+    eq(await page.locator(".bd-card.on").count(), 30, 'all earned');
+    ok(/You have earned 30 of 30/.test(await page.textContent('#main')), 'count');
     ok(!/certified/i.test(await page.textContent('#main')), 'never says certified');
     await nav(page, '/badge/path-devops'); await page.waitForSelector('#bd-show svg');
     ok(await page.locator('#bd-show svg polygon').count() >= 2, 'path badge is a hexagon');
@@ -2747,7 +2772,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await page.click('.tl-filter a[href="#/terminal-labs/networking"]');
     await page.waitForFunction(() => document.querySelectorAll('.tl-item').length === 18);
     await nav(page, '/practice');
-    eq(await page.locator('.prac li').count(), 25, 'hub cards');
+    eq(await page.locator('.prac li').count(), 26, 'hub cards');
     ok(await page.locator('.prac a[href="#/terminal-labs"]').count() === 1, 'hub link');
     ok(await page.locator('footer a[href="#/terminal-labs"]').count() === 1, 'footer link');
     for (const m of ['linux', 'bash', 'networking', 'python']) { await nav(page, '/module/' + m); ok(await page.locator(`a[href="#/terminal-labs/${m}"]`).count() >= 1, 'stage page links to labs: ' + m); }

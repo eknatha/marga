@@ -190,3 +190,6 @@ Round 19: nav panel, route dots on path cards, nav reorder. No new files or sett
 Round 20: skill tree redesign. No new files or settings.
 
 Round 21: case files for all 81 cases. New data folder `src/casefiles`, new script `assets/casefile.js`. No new settings.
+
+Round 22: new module system-design (lessons, cheat sheet, interview, drills, game, glossary, explainers) added to the SRE path. No new settings or scripts.
+Round 22b: System design lab page (src/app/sdlab.js, loaded from shell.html and listed in build.js EXTRA). No new settings.

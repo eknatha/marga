@@ -455,7 +455,7 @@ function checkLinks() {
       if ((mm = h.match(/^#\/lesson\/([^/]+)\/([^/]+)$/))) ok = !!lessons[`${mm[1]}/${mm[2]}`];
       else if ((mm = h.match(/^#\/module\/([^/]+)$/))) ok = !!modById[mm[1]];
       else if ((mm = h.match(/^#\/cheatsheet\/([^/]+)$/))) ok = !!sheets[mm[1]];
-      else if (/^#\/(paths|cheatsheets|review|labs|progress|skill-lab)$/.test(h)) ok = true;
+      else if (/^#\/(paths|cheatsheets|review|labs|progress|skill-lab|system-design-lab)$/.test(h)) ok = true;
       if (!ok) err('links', `lesson ${id}: broken app link ${h}`);
       allowedHash.push(h);
     }

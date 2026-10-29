@@ -47,7 +47,7 @@ See DEPLOY.md for hosting, DNS and the visitor counter.
 
 ## Round 18
 
-- 48 failure-and-recovery explainers, two for each of the 24 skills. Each one runs from a healthy start, through the change and the failure, to the symptom, the diagnosis, the fix and the check that proves recovery. They carry `kind: "failure"` in `src/app/explainers.js` and a title that starts with "Failure and recovery:". A "Failure and recovery only" checkbox on the explainers page filters them (`#/explainers?kind=failure`).
+- 50 failure-and-recovery explainers, two for each of the 25 skills. Each one runs from a healthy start, through the change and the failure, to the symptom, the diagnosis, the fix and the check that proves recovery. They carry `kind: "failure"` in `src/app/explainers.js` and a title that starts with "Failure and recovery:". A "Failure and recovery only" checkbox on the explainers page filters them (`#/explainers?kind=failure`).
 - Every explainer now has a `lesson` field (`module/slug`). It is shown as "Related lesson" on the explainer page, together with the learning paths that include the skill. Lesson pages get a "Watch it" section, skill pages list their explainers and failure stories, and path pages have a "Watch along this path" row. The validator checks that every link resolves to a lesson in the same skill, that ids are unique and that each skill has at least two failure explainers.
 - Lesson links for the 394 older explainers were matched automatically by keywords and then corrected by hand where the match was clearly off. A few may still be the second-best lesson in the skill. 63 lessons have no tied explainer; their "Watch it" section shows two from the same skill and says so.
 - Three older explainers shared an id with another one. They were renamed so every id is unique.
@@ -71,3 +71,21 @@ See DEPLOY.md for hosting, DNS and the visitor counter.
 - Diagrams are inline SVG drawn by `src/app/casefile.js`, each labelled Verified architecture or Conceptual diagram, with a text version. Evidence is labelled Quoted or Simulated; timeline times come only from the sources.
 - Source depth varies. Each file has a verification note saying what was read. Some files rest on news reports or secondary summaries because the primary page could not be read (for example Facebook 2021 via Cloudflare, Equifax, Optus, Rogers, Tay, Gemini, Terraform 2026, Tesla), and a few describe a mechanism rather than one dated incident (Docker Hub rate limits, Let's Encrypt root expiry, ingress-nginx). Read the note before relying on a detail.
 - The end-to-end test checks every case file for the nine sections, labels, sideways scroll on a phone width and accessibility.
+
+## Round 22
+
+New skill: **System design for platform and SRE** (`system-design`, Advanced, requires `sre`, `networking`, `databases`), placed at the end of the SRE path.
+
+- 15 lessons in `src/content/system-design`: the design method and estimation; caching without stampedes; queues, retries and idempotency; consistency and availability; quorums, leaders and split brain; clocks and ordering; failure domains, cells and bulkheads; blast radius and shuffle sharding; graceful degradation and circuit breakers; rate limiting and load shedding; multi-region and global traffic; configuration and control plane change safety; hidden dependencies and single points of failure; and two worked designs (a global API at 99.99 percent, and a status page that survives the outage with an outage design review method).
+- Each lesson has a "how it fails" section, an incident block tied to a case study (console output is labelled as a simulated illustration where it is not a quotation), an interview question, a quiz and flashcards.
+- Also added: cheat sheet, 9 interview questions, 6 drills, 1 incident game, 8 glossary terms, 12 explainers (2 failure and recovery), reading list, references, badge hue and icon, and the `system-design` module on 22 cloud outage case cards.
+- Not included in this release: terminal labs, and the planned Stage 1 and 2 link lessons beyond the design method, caching and queues (OS limits, load balancing, databases and containers are linked to the existing modules rather than re-taught).
+- Reference links were chosen from well known stable pages but could not be fetched from the build sandbox; check them once online.
+
+### System design lab (Round 22)
+
+`#/system-design-lab`, script `src/app/sdlab.js`, listed in the Practice hub under Labs. No backend, no accounts, nothing is sent anywhere.
+
+- **Estimator:** users, requests, read share, response size, peak factor, copies, per-instance capacity and an availability target give requests per second, peak writes, egress, storage growth, instance count and the monthly error budget, with rule-based notes on which number crosses a limit.
+- **Break it:** six fixed designs (one region, two regions, configuration push, status page, retry chain, queue pipeline). Select a component to fail it; a "fix" switch shows the same fault with the design improved. Cost is the share of users affected times minutes to recover, compared with the monthly budget. It is a labelled model: the numbers are written in `DESIGNS` in `sdlab.js` as teaching assumptions, not measurements.
+- **Case challenges:** eight multiple-choice challenges from real case files; the reveal shows what the organisation changed (`afterChanges`) and links to the case file and a lesson.
