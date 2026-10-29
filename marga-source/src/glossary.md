@@ -1064,3 +1064,78 @@ def: A message block that returns the output or error of a tool call, matched to
 module: mcp
 plain: Giving an AI more power than it needs.
 def: A risk where a model-driven system has broader permissions or tools than its task requires, so mistakes or injected instructions can cause harm.
+
+## Principal
+module: cloud-iam
+plain: The person or workload making a request.
+def: The identity that asks to perform an action, such as a user, a role session or a service.
+
+## Role
+module: cloud-iam
+plain: An identity you assume for a short time.
+def: An identity with permissions and a trust policy that trusted principals can assume to receive temporary credentials.
+
+## Managed identity
+module: cloud-iam
+plain: An Azure identity managed for a resource.
+def: An identity that Azure creates and manages for a resource so it can obtain tokens without stored secrets.
+
+## KMS
+module: cloud-iam
+plain: A service that makes and guards encryption keys.
+def: Key Management Service: creates and uses encryption keys without exposing key material, with policies controlling use.
+
+## Audit trail
+module: cloud-iam
+plain: The record of who did what in the cloud.
+def: Logs of management actions, such as CloudTrail or the Azure Activity Log, used for detection and investigation.
+
+## PodDisruptionBudget
+module: k8s-ops
+plain: A promise about how many pods stay up during maintenance.
+def: An object that limits voluntary disruption of an application's pods, honoured by node drains.
+
+## ResourceQuota
+module: k8s-ops
+plain: A cap on what a namespace can use.
+def: An object that limits total resource requests, limits or object counts in a namespace.
+
+## Application
+module: argocd
+plain: What Argo CD delivers.
+def: A custom resource that names a source in a repository and a destination cluster and namespace.
+
+## Sync
+module: argocd
+plain: Making the cluster match the repository.
+def: The act of applying the desired state from the source to the destination cluster.
+
+## Self-heal
+module: argocd
+plain: Automatically undoing manual changes.
+def: A sync policy that reverts live changes made outside the repository.
+
+## ApplicationSet
+module: argocd
+plain: A template that creates many applications.
+def: A controller resource that generates Applications from a template and generators.
+
+## AppProject
+module: argocd
+plain: A boundary for a team's applications.
+def: A resource that limits which repositories, destinations and resource kinds applications may use.
+
+## Cordon
+module: k8s-ops
+plain: Stop new pods landing on a node.
+def: Marking a node unschedulable so no new pods are placed on it while existing pods keep running.
+
+## Drain
+module: k8s-ops
+plain: Move pods off a node safely.
+def: Evicting the pods from a node, respecting disruption budgets, so they are recreated elsewhere before maintenance.
+
+## Admission controller
+module: k8s-ops
+plain: A check that runs before an object is saved.
+def: A stage in the API server that can validate or change a request after authorisation and before storage.
