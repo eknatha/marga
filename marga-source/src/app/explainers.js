@@ -2742,5 +2742,495 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "Resolve conflicts if any", n: "If the surrounding code differs, the developer edits and continues." },
     { f: 2, t: 3, l: "Open a pull request", n: "The release change is reviewed like any other." },
     { f: 3, t: 2, l: "Merge and tag", n: "After checks pass, the fix is merged and a patch release is tagged." }
+  ] },
+{ id: "x-llm-tokenization", module: "llm", title: "How text becomes tokens", summary: "What the model reads and what you are billed for.",
+  actors: ["Your app", "Tokenizer", "Model", "Billing"],
+  steps: [
+    { f: 0, t: 1, l: "Send text", n: "Your application sends the prompt as ordinary text." },
+    { f: 1, t: 1, l: "Split into tokens", n: "The tokenizer cuts the text into small pieces, roughly four characters of English each." },
+    { f: 1, t: 2, l: "Map to numbers", n: "Each token becomes an ID number that the model can process." },
+    { f: 2, t: 2, l: "Process the sequence", n: "The model reads all token IDs together and builds context from them." },
+    { f: 2, t: 3, l: "Count usage", n: "Input and output tokens are counted for the request." },
+    { f: 3, t: 0, l: "Report usage", n: "The response includes token counts, which you log to track cost and limits." }
+  ] },
+{ id: "x-llm-next-token-loop", module: "llm", title: "The next-token loop", summary: "How one answer is produced one token at a time.",
+  actors: ["Prompt", "Model", "Sampler", "Output"],
+  steps: [
+    { f: 0, t: 1, l: "Read the prompt", n: "The model receives all prompt tokens as its starting context." },
+    { f: 1, t: 1, l: "Score every token", n: "It computes a probability for every possible next token." },
+    { f: 1, t: 2, l: "Pick one", n: "The sampler chooses a token based on the probabilities and the temperature setting." },
+    { f: 2, t: 3, l: "Append the token", n: "The chosen token is added to the output." },
+    { f: 3, t: 1, l: "Feed it back", n: "The new token becomes part of the context for the next step." },
+    { f: 2, t: 3, l: "Stop", n: "The loop ends at an end token or the length limit, and the stop reason is reported." }
+  ] },
+{ id: "x-llm-context-window", module: "llm", title: "Filling the context window", summary: "Why long chats and big documents run into a limit.",
+  actors: ["System prompt", "Chat history", "Documents", "Model"],
+  steps: [
+    { f: 0, t: 3, l: "Fixed instructions", n: "The system prompt is sent first on every request and always uses space." },
+    { f: 1, t: 3, l: "History grows", n: "Each turn adds the question and the answer, so the history gets longer." },
+    { f: 2, t: 3, l: "Add documents", n: "Retrieved text or files are added and may take thousands of tokens." },
+    { f: 3, t: 3, l: "Reserve output space", n: "Room for the answer must remain, because input and output share the window." },
+    { f: 3, t: 1, l: "Limit reached", n: "If the total is too large the request fails or older parts must be removed." },
+    { f: 1, t: 1, l: "Trim or summarise", n: "Your application removes or summarises old turns so the important parts still fit." }
+  ] },
+{ id: "x-llm-temperature", module: "llm", title: "What temperature changes", summary: "How the same prompt can give different answers.",
+  actors: ["Model scores", "Low temperature", "High temperature", "Your test"],
+  steps: [
+    { f: 0, t: 0, l: "Probabilities", n: "The model gives each candidate token a probability, such as 60, 25 and 15 percent." },
+    { f: 0, t: 1, l: "Sharpen", n: "A low temperature makes the likely token even more likely." },
+    { f: 1, t: 3, l: "Stable results", n: "Answers are nearly the same each run, which suits extraction and classification." },
+    { f: 0, t: 2, l: "Flatten", n: "A high temperature gives unlikely tokens a better chance." },
+    { f: 2, t: 3, l: "Varied results", n: "Answers differ between runs, which suits brainstorming but is harder to test." },
+    { f: 3, t: 3, l: "Test the property", n: "Even at low temperature you check required properties over several runs, not exact text." }
+  ] },
+{ id: "x-llm-stateless-chat", module: "llm", title: "Why the API forgets", summary: "How a chat works when the API is stateless.",
+  actors: ["User", "Your app", "Model API", "Database"],
+  steps: [
+    { f: 0, t: 1, l: "Ask question one", n: "The user sends the first message." },
+    { f: 1, t: 2, l: "Call with message one", n: "Your application sends the system prompt and message one." },
+    { f: 2, t: 1, l: "Return answer one", n: "The model replies and keeps nothing about the exchange." },
+    { f: 1, t: 3, l: "Store the turn", n: "Your application saves both messages in its database." },
+    { f: 0, t: 1, l: "Ask question two", n: "The user sends a follow-up that depends on the first answer." },
+    { f: 1, t: 2, l: "Resend all history", n: "Your application sends the earlier messages plus the new one, which is why the model seems to remember." }
+  ] },
+{ id: "x-llm-streaming", module: "llm", title: "Streaming a response", summary: "How tokens reach the screen before the answer is finished.",
+  actors: ["Browser", "Your server", "Model API", "Parser"],
+  steps: [
+    { f: 0, t: 1, l: "Open request", n: "The browser asks for an answer and keeps the connection open." },
+    { f: 1, t: 2, l: "Request a stream", n: "The server calls the API with streaming turned on." },
+    { f: 2, t: 1, l: "Send small events", n: "The API sends text pieces as soon as they are produced." },
+    { f: 1, t: 0, l: "Forward pieces", n: "The server passes each piece to the browser, which shows it at once." },
+    { f: 2, t: 3, l: "Final event", n: "A last event carries the stop reason and the usage counts." },
+    { f: 3, t: 3, l: "Parse after completion", n: "Structured data is parsed only when the full reply has arrived and the stop reason is normal." }
+  ] },
+{ id: "x-llm-prompt-caching", module: "llm", title: "Prompt caching", summary: "How a repeated prefix becomes cheaper and faster.",
+  actors: ["Request one", "Cache", "Request two", "Billing"],
+  steps: [
+    { f: 0, t: 1, l: "Mark a stable prefix", n: "The first request puts a long, unchanging manual at the start of the prompt." },
+    { f: 1, t: 1, l: "Store the prefix", n: "The provider stores the processed prefix for a short time." },
+    { f: 0, t: 3, l: "Pay full price once", n: "The first request is billed at the normal input rate plus a small write cost." },
+    { f: 2, t: 1, l: "Send the same prefix", n: "The second request begins with exactly the same text." },
+    { f: 1, t: 2, l: "Reuse", n: "The stored work is reused, so the answer starts sooner." },
+    { f: 2, t: 3, l: "Pay less", n: "The reused tokens are billed at a lower rate, and the usage report shows cache reads." }
+  ] },
+{ id: "x-llm-rate-limit-backoff", module: "llm", title: "Handling a rate limit", summary: "Why retrying at once makes things worse.",
+  actors: ["Worker", "Model API", "Backoff timer", "Alert"],
+  steps: [
+    { f: 0, t: 1, l: "Send a burst", n: "A batch job sends many requests at once." },
+    { f: 1, t: 0, l: "Return 429", n: "The API answers with a rate limit error and may include a retry-after time." },
+    { f: 0, t: 2, l: "Wait", n: "The worker waits for the longer of the retry-after time and a growing delay." },
+    { f: 2, t: 0, l: "Add jitter", n: "A small random amount is added so workers do not all retry together." },
+    { f: 0, t: 1, l: "Retry", n: "The worker tries again with lower concurrency." },
+    { f: 0, t: 3, l: "Alert on persistent errors", n: "If failures continue, an alert warns the team instead of looping forever." }
+  ] },
+{ id: "x-llm-grounded-answer", module: "llm", title: "A grounded answer with retrieval", summary: "How supplying facts reduces invented answers.",
+  actors: ["Question", "Search index", "Prompt builder", "Model"],
+  steps: [
+    { f: 0, t: 1, l: "Question arrives", n: "A customer asks about the returns policy." },
+    { f: 1, t: 2, l: "Retrieve passages", n: "The index returns the few most relevant policy passages." },
+    { f: 2, t: 3, l: "Build the prompt", n: "The passages are placed in tags with the question and a rule to answer only from them." },
+    { f: 3, t: 3, l: "Answer with quotes", n: "The model answers and quotes the sentence it used." },
+    { f: 2, t: 0, l: "Show sources", n: "The reply links to the source passages so the customer can check." },
+    { f: 1, t: 1, l: "Monitor retrieval", n: "Known test questions confirm that the right passage is still found after each update." }
+  ] },
+{ id: "x-llm-truncated-reply", module: "llm", title: "A reply cut off by the limit", summary: "Why JSON sometimes fails to parse.",
+  actors: ["Request", "Model", "Stop reason", "Parser"],
+  steps: [
+    { f: 0, t: 1, l: "Ask for a long report", n: "The request asks for a large JSON document with a small output limit." },
+    { f: 1, t: 1, l: "Generate tokens", n: "The model writes tokens until the limit is reached." },
+    { f: 1, t: 2, l: "Stop early", n: "The reply ends in the middle of a string and the stop reason says max_tokens." },
+    { f: 2, t: 3, l: "Skip the check", n: "A careless pipeline sends the text straight to the parser." },
+    { f: 3, t: 3, l: "Parse error", n: "The parser fails because the JSON is unfinished." },
+    { f: 2, t: 0, l: "Check first", n: "A good pipeline reads the stop reason, raises the limit or shortens the task, and tries again." }
+  ] },
+{ id: "x-llm-choose-technique", module: "llm", title: "Prompt, retrieve or fine-tune", summary: "How to choose how to give a model what it needs.",
+  actors: ["Problem", "Prompt", "Retrieval", "Fine-tuning"],
+  steps: [
+    { f: 0, t: 1, l: "Start with the prompt", n: "Clear instructions and examples solve many problems cheaply." },
+    { f: 1, t: 0, l: "Measure", n: "An evaluation set shows whether the prompt is good enough." },
+    { f: 0, t: 2, l: "Add retrieval for facts", n: "If the answer needs private or changing facts, retrieve them at request time." },
+    { f: 2, t: 0, l: "Measure again", n: "Check that answers are correct and cite the retrieved text." },
+    { f: 0, t: 3, l: "Fine-tune for behaviour", n: "Training helps with a stable style or format that prompting cannot achieve." },
+    { f: 3, t: 0, l: "Compare cost and risk", n: "Compare quality gain with data work and maintenance, and keep the evaluation as the judge." }
+  ] },
+{ id: "x-llm-eval-in-ci", module: "llm", title: "Evaluation in CI", summary: "How a model or prompt change is checked before release.",
+  actors: ["Developer", "CI pipeline", "Evaluation set", "Model API"],
+  steps: [
+    { f: 0, t: 1, l: "Open a pull request", n: "A change to a prompt or model version is proposed." },
+    { f: 1, t: 2, l: "Load the cases", n: "The pipeline loads saved realistic inputs with expected properties." },
+    { f: 1, t: 3, l: "Run each case", n: "Each case is sent to the model, several times where variation matters." },
+    { f: 3, t: 2, l: "Score results", n: "Checks in code score format, required facts and forbidden content." },
+    { f: 2, t: 1, l: "Compare to threshold", n: "The pass rate is compared with the last release and a minimum." },
+    { f: 1, t: 0, l: "Block or allow", n: "The pull request fails with the failing cases listed if the rate drops." }
+  ] },
+{ id: "x-llm-incident-trace", module: "llm", title: "Investigating a bad answer", summary: "How stored traces explain a wrong answer.",
+  actors: ["User report", "Trace store", "Engineer", "Evaluation set"],
+  steps: [
+    { f: 0, t: 2, l: "Report a wrong answer", n: "A user shares the time and the question that went wrong." },
+    { f: 2, t: 1, l: "Find the trace", n: "The engineer finds the stored prompt, retrieved text, parameters and model version." },
+    { f: 1, t: 2, l: "Read what the model saw", n: "The needed fact is missing from the retrieved text." },
+    { f: 2, t: 2, l: "Form a hypothesis", n: "The index was not updated after the document changed." },
+    { f: 2, t: 3, l: "Add the case", n: "The question is added to the evaluation set with the expected fact." },
+    { f: 2, t: 1, l: "Fix and monitor", n: "The index job is repaired and an alert watches for stale documents." }
+  ] },
+{ id: "x-prompting-anatomy", module: "prompting", title: "Parts of a good prompt", summary: "What each piece of a prompt is for.",
+  actors: ["Author", "Prompt", "Model", "Reviewer"],
+  steps: [
+    { f: 0, t: 1, l: "State the task", n: "One clear sentence says what the model must produce." },
+    { f: 0, t: 1, l: "Add the audience", n: "Saying who reads the result sets tone and detail." },
+    { f: 0, t: 1, l: "Supply the material", n: "The text to work on is wrapped in tags so it is not mixed with instructions." },
+    { f: 0, t: 1, l: "Set constraints", n: "Limits such as length and what to avoid are written as measurable rules." },
+    { f: 1, t: 2, l: "Specify the format", n: "The exact output shape is described, with an example if needed." },
+    { f: 2, t: 3, l: "Review on real inputs", n: "The reviewer checks answers on varied real examples, not one sample." }
+  ] },
+{ id: "x-prompting-few-shot", module: "prompting", title: "How examples steer output", summary: "Why a few good examples beat a long description.",
+  actors: ["Author", "Examples", "Model", "Evaluation set"],
+  steps: [
+    { f: 0, t: 1, l: "Pick varied cases", n: "Choose three to five realistic inputs that cover normal, borderline and unknown cases." },
+    { f: 0, t: 1, l: "Write ideal outputs", n: "Each example shows the exact output format and wording wanted." },
+    { f: 1, t: 2, l: "Place in the prompt", n: "The examples are added in a consistent layout before the real input." },
+    { f: 2, t: 2, l: "Imitate the pattern", n: "The model copies the format and the decision style from the examples." },
+    { f: 2, t: 3, l: "Test on unseen inputs", n: "Cases that are not in the prompt measure whether the pattern generalises." },
+    { f: 3, t: 0, l: "Rebalance", n: "If one label is over-predicted, examples are rebalanced and definitions added." }
+  ] },
+{ id: "x-prompting-reasoning", module: "prompting", title: "Reasoning before answering", summary: "When step-by-step thinking helps and when it costs.",
+  actors: ["Task", "Direct prompt", "Reasoning prompt", "Evaluation set"],
+  steps: [
+    { f: 0, t: 1, l: "Try a direct answer", n: "The model answers a multi-step question in one go." },
+    { f: 1, t: 3, l: "Measure accuracy", n: "The evaluation set shows many mistakes on steps in the middle." },
+    { f: 0, t: 2, l: "Ask for steps first", n: "The prompt asks the model to work through the steps before the final answer." },
+    { f: 2, t: 3, l: "Measure again", n: "Accuracy rises, but tokens and delay also rise." },
+    { f: 2, t: 2, l: "Separate the answer", n: "The final answer is placed in its own tag so code can extract it." },
+    { f: 3, t: 0, l: "Choose by data", n: "Simple lookups stay direct, and hard tasks keep the reasoning step." }
+  ] },
+{ id: "x-prompting-system-layout", module: "prompting", title: "Layout of a system prompt", summary: "Where rules, data and user text belong.",
+  actors: ["System message", "Context block", "User message", "Model"],
+  steps: [
+    { f: 0, t: 3, l: "Role and rules", n: "Stable instructions about role, boundaries and style go first." },
+    { f: 0, t: 3, l: "Output contract", n: "The required output format and error behaviour are stated clearly." },
+    { f: 1, t: 3, l: "Reference data", n: "Documents are added in tags and marked as data, not instructions." },
+    { f: 2, t: 3, l: "User request", n: "The actual question comes last, close to where the answer begins." },
+    { f: 3, t: 2, l: "Answer within rules", n: "The model uses the rules, the data and the question together." },
+    { f: 0, t: 1, l: "No secrets", n: "Secrets and permission checks stay in code, because prompt text can often be revealed." }
+  ] },
+{ id: "x-prompting-structured-output", module: "prompting", title: "Getting reliable JSON", summary: "From schema to validated data.",
+  actors: ["Schema", "Model", "Validator", "Your code"],
+  steps: [
+    { f: 0, t: 1, l: "Define the schema", n: "Types, required fields and allowed values are written as JSON Schema." },
+    { f: 1, t: 1, l: "Constrain the reply", n: "The model is asked through forced tool use or schema output to match the schema." },
+    { f: 1, t: 2, l: "Return JSON", n: "The reply arrives as text and the stop reason is checked." },
+    { f: 2, t: 2, l: "Validate", n: "A validator checks types, required fields and enum values." },
+    { f: 2, t: 1, l: "Retry with the error", n: "On failure, the error message is sent back once for a corrected answer." },
+    { f: 2, t: 3, l: "Use or review", n: "Valid data goes on, and repeated failures go to a visible review queue." }
+  ] },
+{ id: "x-prompting-repair-loop", module: "prompting", title: "The repair and retry loop", summary: "Handling output that does not validate.",
+  actors: ["Model", "Parser", "Retry logic", "Review queue"],
+  steps: [
+    { f: 0, t: 1, l: "Reply arrives", n: "The model returns text that should be JSON." },
+    { f: 1, t: 1, l: "Parse fails", n: "The parser reports the exact position of the problem." },
+    { f: 1, t: 2, l: "Decide", n: "The logic checks the stop reason and whether retries remain." },
+    { f: 2, t: 0, l: "Retry with feedback", n: "The error and the original request are sent again, with a small retry limit." },
+    { f: 0, t: 1, l: "Second reply", n: "The next reply parses and validates." },
+    { f: 2, t: 3, l: "Send failures onward", n: "After the limit, the item goes to a review queue and a counter metric increases." }
+  ] },
+{ id: "x-prompting-version-test", module: "prompting", title: "Versioning and testing prompts", summary: "How a prompt change reaches production safely.",
+  actors: ["Author", "Repository", "CI", "Production"],
+  steps: [
+    { f: 0, t: 1, l: "Edit the prompt file", n: "The prompt lives in version control with a changelog." },
+    { f: 1, t: 2, l: "Open a review", n: "A teammate reviews the change like any code change." },
+    { f: 2, t: 2, l: "Run the evaluation", n: "CI runs the saved cases and computes a pass rate." },
+    { f: 2, t: 0, l: "Block regressions", n: "A drop below the threshold fails the check and lists the cases." },
+    { f: 2, t: 3, l: "Release gradually", n: "A passing change goes to a small share of traffic first." },
+    { f: 3, t: 1, l: "Roll back by config", n: "A bad result is reverted by switching the version, not by editing text under pressure." }
+  ] },
+{ id: "x-prompting-injection", module: "prompting", title: "Prompt injection path", summary: "How untrusted text becomes an action.",
+  actors: ["Attacker", "Document", "Assistant", "Email tool"],
+  steps: [
+    { f: 0, t: 1, l: "Plant instructions", n: "The attacker writes instructions inside a document or ticket." },
+    { f: 1, t: 2, l: "Assistant reads it", n: "The assistant retrieves the document as part of normal work." },
+    { f: 2, t: 2, l: "Text looks like orders", n: "The model may treat the planted text as a request." },
+    { f: 2, t: 3, l: "Calls a tool", n: "With a powerful tool available, the assistant tries to send data out." },
+    { f: 3, t: 0, l: "Data leaves", n: "Without limits the data reaches the attacker." },
+    { f: 2, t: 3, l: "Defence in depth", n: "Least privilege, approvals and allowed recipients stop the action even if the model is fooled." }
+  ] },
+{ id: "x-prompting-injection-defence", module: "prompting", title: "Layers of defence", summary: "How to limit damage from injected text.",
+  actors: ["Untrusted text", "Prompt", "Policy layer", "Human approver"],
+  steps: [
+    { f: 0, t: 1, l: "Mark as data", n: "Untrusted content is wrapped in tags and described as data." },
+    { f: 1, t: 2, l: "Request an action", n: "The model asks to use a tool with specific arguments." },
+    { f: 2, t: 2, l: "Check the policy", n: "Code checks the tool, the arguments and the recipient against an allowed list." },
+    { f: 2, t: 3, l: "Ask for approval", n: "Risky actions show the exact arguments to a person." },
+    { f: 3, t: 2, l: "Approve or deny", n: "The decision and the exact arguments are recorded." },
+    { f: 2, t: 0, l: "Log everything", n: "Every request and decision is logged to review attempts later." }
+  ] },
+{ id: "x-prompting-regression", module: "prompting", title: "A silent prompt regression", summary: "How a small edit breaks a case no one tested.",
+  actors: ["Edit", "Production", "Users", "Evaluation set"],
+  steps: [
+    { f: 0, t: 1, l: "Shorten the prompt", n: "Examples are removed to save tokens." },
+    { f: 1, t: 2, l: "Output changes", n: "Date handling quietly gets worse for one region format." },
+    { f: 2, t: 1, l: "Wrong data", n: "Invoices carry wrong due dates for two days." },
+    { f: 2, t: 3, l: "Complaints arrive", n: "Users report problems, but there is no baseline to compare." },
+    { f: 3, t: 0, l: "Build the set", n: "The failing invoices are added to an evaluation set." },
+    { f: 3, t: 1, l: "Prevent", n: "CI now runs the set on every prompt change and blocks drops." }
+  ] },
+{ id: "x-prompting-guardrail-check", module: "prompting", title: "Checking output in code", summary: "Why exact checks beat polite reminders.",
+  actors: ["Model", "Output check", "Rules", "User"],
+  steps: [
+    { f: 0, t: 1, l: "Produce a reply", n: "The model writes a customer message." },
+    { f: 1, t: 2, l: "Load rules", n: "The checker loads rules such as no email addresses or prices." },
+    { f: 1, t: 1, l: "Scan", n: "Code scans the reply with patterns and arithmetic checks." },
+    { f: 1, t: 0, l: "Fail the reply", n: "A violating reply is blocked or regenerated with the error." },
+    { f: 1, t: 3, l: "Pass clean replies", n: "Only checked replies reach the user." },
+    { f: 2, t: 2, l: "Update rules", n: "New incidents become new checks, so the same problem cannot return silently." }
+  ] },
+{ id: "x-prompting-prompt-debug", module: "prompting", title: "Debugging a bad prompt", summary: "A methodical way to find which part fails.",
+  actors: ["Failing case", "Minimal prompt", "Change log", "Evaluation set"],
+  steps: [
+    { f: 0, t: 1, l: "Collect failures", n: "Gather the real inputs where the prompt fails and find what they share." },
+    { f: 1, t: 1, l: "Reduce", n: "Remove parts of the prompt until the smallest version that still fails remains." },
+    { f: 1, t: 2, l: "Change one thing", n: "Alter one instruction or example and write down the change." },
+    { f: 1, t: 3, l: "Measure on the full set", n: "Run all cases several times and compare pass rates." },
+    { f: 3, t: 2, l: "Keep or revert", n: "Only changes that improve the whole set are kept." },
+    { f: 2, t: 3, l: "Add the failures", n: "The original failing inputs join the set permanently." }
+  ] },
+{ id: "x-skills-loading", module: "claude-skills", title: "How a skill loads", summary: "Why skills cost little context until needed.",
+  actors: ["User request", "Skill list", "Claude", "Skill folder"],
+  steps: [
+    { f: 1, t: 2, l: "Descriptions only", n: "At start Claude sees only each skill name and description." },
+    { f: 0, t: 2, l: "Request arrives", n: "The user asks for a task such as reviewing a contract." },
+    { f: 2, t: 1, l: "Match", n: "Claude compares the request with the descriptions." },
+    { f: 2, t: 3, l: "Load SKILL.md", n: "The matching skill body is read into context." },
+    { f: 2, t: 3, l: "Open linked files", n: "Reference files or scripts are opened only if the task needs them." },
+    { f: 2, t: 0, l: "Answer using the skill", n: "The answer follows the skill workflow and any script results." }
+  ] },
+{ id: "x-skills-anatomy", module: "claude-skills", title: "Inside a skill folder", summary: "What belongs where.",
+  actors: ["SKILL.md", "references", "scripts", "assets"],
+  steps: [
+    { f: 0, t: 0, l: "Header", n: "The top of SKILL.md has a name and a description." },
+    { f: 0, t: 0, l: "Workflow", n: "The body lists the steps Claude should follow, in short sentences." },
+    { f: 0, t: 1, l: "Link detail", n: "Long tables and rarely needed rules live in separate reference files." },
+    { f: 0, t: 2, l: "Call scripts", n: "Exact work such as validation is done by a script that SKILL.md names." },
+    { f: 0, t: 3, l: "Templates", n: "Output templates or sample files are stored as assets." },
+    { f: 0, t: 0, l: "Keep it small", n: "The main file stays short so it is cheap to load and easy to review." }
+  ] },
+{ id: "x-skills-description-writing", module: "claude-skills", title: "Writing a description that triggers", summary: "From vague to specific.",
+  actors: ["Draft", "Trigger tests", "Neighbour skills", "Final"],
+  steps: [
+    { f: 0, t: 0, l: "Vague draft", n: "A description such as Helps with documents will fire rarely or everywhere." },
+    { f: 0, t: 1, l: "List real requests", n: "Write ten requests that should trigger and ten that should not." },
+    { f: 0, t: 0, l: "Use the user's words", n: "Add the nouns, verbs and file types people actually say." },
+    { f: 0, t: 2, l: "Exclude neighbours", n: "Say what the skill is not for, so similar skills do not collide." },
+    { f: 1, t: 3, l: "Re-test", n: "Run the requests again and count misses and false triggers." },
+    { f: 3, t: 3, l: "Save the tests", n: "The request list is stored with the skill for future edits." }
+  ] },
+{ id: "x-skills-progressive-disclosure", module: "claude-skills", title: "Progressive disclosure", summary: "Three layers of information.",
+  actors: ["Metadata", "Body", "Linked files", "Context"],
+  steps: [
+    { f: 0, t: 3, l: "Layer one", n: "The name and description are always in context and cost only a few tokens." },
+    { f: 1, t: 3, l: "Layer two", n: "The body is loaded when the skill triggers." },
+    { f: 2, t: 3, l: "Layer three", n: "Linked files are loaded only when a step needs them." },
+    { f: 1, t: 2, l: "Link one level", n: "Links from the body point straight to the files, not through other files." },
+    { f: 2, t: 2, l: "Table of contents", n: "A long file starts with a short list of its sections." },
+    { f: 3, t: 3, l: "Result", n: "The context stays small, so more room remains for the user's task." }
+  ] },
+{ id: "x-skills-script-step", module: "claude-skills", title: "A script inside a skill", summary: "Letting code do exact work.",
+  actors: ["Claude", "SKILL.md", "Script", "Report"],
+  steps: [
+    { f: 0, t: 1, l: "Read the workflow", n: "The skill says to run the checker on the uploaded file." },
+    { f: 0, t: 2, l: "Run the script", n: "Claude runs the script with the file path as an argument." },
+    { f: 2, t: 2, l: "Check precisely", n: "The script validates every row and counts totals exactly." },
+    { f: 2, t: 0, l: "Return short output", n: "It prints a few clear lines and an exit code." },
+    { f: 0, t: 3, l: "Use the result", n: "Claude copies the numbers from the output into the report." },
+    { f: 3, t: 0, l: "Explain", n: "Claude adds judgement and wording, not arithmetic." }
+  ] },
+{ id: "x-skills-testing-loop", module: "claude-skills", title: "Testing a skill", summary: "A loop that measures the real benefit.",
+  actors: ["Task set", "Without skill", "With skill", "Scores"],
+  steps: [
+    { f: 0, t: 0, l: "Write tasks", n: "Collect 10 to 20 realistic tasks with a checklist of expected results." },
+    { f: 0, t: 1, l: "Run the baseline", n: "Run the tasks without the skill and record the results." },
+    { f: 0, t: 2, l: "Run with the skill", n: "Run the same tasks with the skill installed." },
+    { f: 1, t: 3, l: "Score", n: "Compare quality, tokens and time for both runs." },
+    { f: 2, t: 3, l: "Find failures", n: "Look at tasks where the skill did not help." },
+    { f: 3, t: 0, l: "Change one thing", n: "Edit one part of the skill and run the set again." }
+  ] },
+{ id: "x-skills-not-triggering", module: "claude-skills", title: "A skill that does not trigger", summary: "Debugging in the right order.",
+  actors: ["Folder", "Header", "Description", "Test"],
+  steps: [
+    { f: 0, t: 0, l: "Check location", n: "The folder is in a place the product reads skills from." },
+    { f: 0, t: 1, l: "Check the file name", n: "The file must be named SKILL.md with exact capitals." },
+    { f: 1, t: 1, l: "Check the header", n: "The name and description fields must be valid and not empty." },
+    { f: 3, t: 2, l: "Ask by name", n: "Naming the skill shows whether the body works when loaded." },
+    { f: 2, t: 2, l: "Improve the description", n: "Add trigger phrases and tasks in the user's words." },
+    { f: 2, t: 3, l: "Measure again", n: "Run should-trigger and should-not-trigger requests." }
+  ] },
+{ id: "x-skills-security-review", module: "claude-skills", title: "Reviewing an outside skill", summary: "Treat a skill like code you did not write.",
+  actors: ["Outside skill", "Reviewer", "Sandbox", "Approved list"],
+  steps: [
+    { f: 0, t: 1, l: "Download", n: "The skill is fetched without installing it." },
+    { f: 1, t: 1, l: "Read every file", n: "The reviewer reads instructions and scripts, looking for network calls and downloads." },
+    { f: 1, t: 2, l: "Run in a sandbox", n: "The skill runs with test data and no network access." },
+    { f: 2, t: 1, l: "Observe", n: "Files touched and commands run are compared with what the skill claims." },
+    { f: 1, t: 3, l: "Pin a version", n: "A reviewed commit is added to the approved list with an owner." },
+    { f: 3, t: 1, l: "Re-review updates", n: "Each update is reviewed before it replaces the pinned version." }
+  ] },
+{ id: "x-skills-team-workflow", module: "claude-skills", title: "Skills as a team asset", summary: "From idea to shared, versioned skill.",
+  actors: ["Author", "Repository", "Reviewer", "Team"],
+  steps: [
+    { f: 0, t: 1, l: "Write the skill", n: "The author drafts the skill and a set of test tasks." },
+    { f: 1, t: 2, l: "Pull request", n: "The reviewer checks the description, the instructions and the scripts." },
+    { f: 2, t: 1, l: "Merge with a version", n: "The skill gets a version number and a changelog entry." },
+    { f: 1, t: 3, l: "Distribute", n: "The team installs it from a known location." },
+    { f: 3, t: 0, l: "Feedback", n: "Users report misses with the request that failed." },
+    { f: 0, t: 1, l: "Improve", n: "New requests become test tasks and the next version is released." }
+  ] },
+{ id: "x-skills-vs-prompt-tool", module: "claude-skills", title: "Skill, prompt or tool", summary: "Choosing the right building block.",
+  actors: ["Need", "Prompt", "Skill", "Tool"],
+  steps: [
+    { f: 0, t: 1, l: "One-off request", n: "A single conversation need is solved with a prompt." },
+    { f: 0, t: 2, l: "Repeated know-how", n: "A workflow used again and again becomes a skill." },
+    { f: 0, t: 3, l: "Action or live data", n: "Reaching a system or fetching current data needs a tool." },
+    { f: 2, t: 3, l: "Combine", n: "A skill can explain how and when to use a tool." },
+    { f: 2, t: 2, l: "Bundle scripts", n: "A skill can also carry scripts for exact, repeatable steps." },
+    { f: 0, t: 2, l: "Review and share", n: "Skills are files, so they can be reviewed and versioned like code." }
+  ] },
+{ id: "x-skills-structure-split", module: "claude-skills", title: "Splitting a long skill", summary: "From one giant file to a lean skill.",
+  actors: ["Giant file", "Workflow", "References", "Scripts"],
+  steps: [
+    { f: 0, t: 0, l: "Spot the problem", n: "A 1,400-line SKILL.md is slow to load and hard to review." },
+    { f: 0, t: 1, l: "Extract the workflow", n: "The main steps move into a short body." },
+    { f: 0, t: 2, l: "Move reference tables", n: "Long lists and rules go to separate files with clear names." },
+    { f: 0, t: 3, l: "Move exact logic", n: "Calculations and validations become scripts." },
+    { f: 1, t: 2, l: "Link from the body", n: "Each step links to the file it needs, one level deep." },
+    { f: 1, t: 1, l: "Re-test", n: "The task set confirms that quality did not drop after the split." }
+  ] },
+{ id: "x-mcp-tool-loop", module: "mcp", title: "The tool-use loop", summary: "How a model uses your code to get facts.",
+  actors: ["User", "App", "Model", "Tool"],
+  steps: [
+    { f: 0, t: 1, l: "Ask a question", n: "The user asks for the status of ticket TCK-1042." },
+    { f: 1, t: 2, l: "Send tools and question", n: "The app sends the question and the tool definitions to the model." },
+    { f: 2, t: 1, l: "Request a tool call", n: "The model replies that it wants get_ticket with a ticket ID." },
+    { f: 1, t: 3, l: "Validate and run", n: "The app validates the arguments and runs the tool." },
+    { f: 3, t: 1, l: "Return the result", n: "The tool output is sent back as a tool result tied to the call ID." },
+    { f: 2, t: 0, l: "Final answer", n: "The model uses the result to answer, and the loop ends." }
+  ] },
+{ id: "x-mcp-schema-validation", module: "mcp", title: "Validating tool arguments", summary: "Never trust arguments the model produced.",
+  actors: ["Model", "Schema check", "Business rules", "Tool"],
+  steps: [
+    { f: 0, t: 1, l: "Propose arguments", n: "The model returns a tool name and JSON arguments." },
+    { f: 1, t: 1, l: "Check the schema", n: "Types, required fields and enum values are validated." },
+    { f: 1, t: 2, l: "Check the rules", n: "Code confirms the user may access that record." },
+    { f: 2, t: 3, l: "Run the tool", n: "Only valid and allowed calls are executed." },
+    { f: 3, t: 0, l: "Return a clear error", n: "On failure the tool result explains the problem so the model can correct it." },
+    { f: 2, t: 2, l: "Log the call", n: "The request ID, arguments and result are logged for later review." }
+  ] },
+{ id: "x-mcp-architecture", module: "mcp", title: "Host, client and server", summary: "Who talks to whom in MCP.",
+  actors: ["Host app", "MCP client", "MCP server", "Backend"],
+  steps: [
+    { f: 0, t: 1, l: "Create a client", n: "The host application creates one client per connected server." },
+    { f: 1, t: 2, l: "Initialize", n: "The client and server exchange versions and capabilities." },
+    { f: 1, t: 2, l: "List tools", n: "The client asks the server which tools it offers." },
+    { f: 0, t: 0, l: "Give tools to the model", n: "The host passes the tool list to the model." },
+    { f: 1, t: 2, l: "Call a tool", n: "When the model asks, the host has its client send tools/call." },
+    { f: 2, t: 3, l: "Use the backend", n: "The server calls the real system and returns a result." }
+  ] },
+{ id: "x-mcp-stdio-transport", module: "mcp", title: "The stdio transport", summary: "A local server as a child process.",
+  actors: ["Host", "Child process", "Standard input", "Standard error"],
+  steps: [
+    { f: 0, t: 1, l: "Start the process", n: "The host launches the server command from its configuration." },
+    { f: 0, t: 2, l: "Write requests", n: "JSON-RPC messages are written to the server's standard input." },
+    { f: 1, t: 0, l: "Write responses", n: "Responses are written to standard output, one message per line." },
+    { f: 1, t: 3, l: "Log to stderr", n: "Logs and banners must go to standard error so the stream stays clean." },
+    { f: 1, t: 0, l: "Banner breaks parsing", n: "A text banner on standard output corrupts the JSON stream and the host fails." },
+    { f: 0, t: 1, l: "Stop", n: "The host closes the pipes and ends the process." }
+  ] },
+{ id: "x-mcp-http-transport", module: "mcp", title: "A remote MCP server", summary: "Streamable HTTP with authentication.",
+  actors: ["Client", "Authorization server", "MCP server over HTTP", "Backend API"],
+  steps: [
+    { f: 0, t: 2, l: "Request without a token", n: "The client calls the server and receives a request to authenticate." },
+    { f: 0, t: 1, l: "Sign in", n: "The user signs in through the authorization server and approves scopes." },
+    { f: 1, t: 0, l: "Receive a token", n: "The client gets a token meant for this MCP server." },
+    { f: 0, t: 2, l: "Call with the token", n: "Each request carries the token over TLS." },
+    { f: 2, t: 2, l: "Check audience and scope", n: "The server verifies that the token was issued for it and allows the action." },
+    { f: 2, t: 3, l: "Use separate credentials", n: "The server calls the backend with its own scoped credentials, never passing the user token on." }
+  ] },
+{ id: "x-mcp-primitives", module: "mcp", title: "Tools, resources and prompts", summary: "Three kinds of capability.",
+  actors: ["Model", "User", "Host", "Server"],
+  steps: [
+    { f: 3, t: 2, l: "Expose a tool", n: "A tool is an action the model can request, such as create_ticket." },
+    { f: 3, t: 2, l: "Expose a resource", n: "A resource is data with a URI, such as a runbook, that the app or user attaches." },
+    { f: 3, t: 2, l: "Expose a prompt", n: "A prompt is a template the user picks, such as review this incident." },
+    { f: 2, t: 0, l: "Model calls tools", n: "Only tools are chosen by the model during its work." },
+    { f: 2, t: 1, l: "User picks the rest", n: "Resources and prompts are selected by the application or the person." },
+    { f: 2, t: 2, l: "Check support", n: "Hosts differ in what they support, so test in the host you use." }
+  ] },
+{ id: "x-mcp-injection-via-tool-result", module: "mcp", title: "Injection through a tool result", summary: "How a ticket can steer an agent.",
+  actors: ["Attacker", "Ticket system", "Agent", "Email tool"],
+  steps: [
+    { f: 0, t: 1, l: "Write a ticket", n: "The attacker files a ticket containing instructions for an AI assistant." },
+    { f: 2, t: 1, l: "Agent reads tickets", n: "The agent fetches tickets through a read tool." },
+    { f: 1, t: 2, l: "Result contains orders", n: "The ticket text comes back as a tool result." },
+    { f: 2, t: 2, l: "Model is influenced", n: "The model may treat the text as a request from the user." },
+    { f: 2, t: 3, l: "Email tool is available", n: "With broad email access the agent could send data out." },
+    { f: 3, t: 0, l: "Allowlist stops it", n: "A recipient allowlist and an approval step block the external address." }
+  ] },
+{ id: "x-mcp-approval-flow", module: "mcp", title: "Human approval for risky tools", summary: "Showing the exact action before it runs.",
+  actors: ["Model", "Host policy", "Person", "Tool"],
+  steps: [
+    { f: 0, t: 1, l: "Request delete_file", n: "The model asks to delete a file with a path argument." },
+    { f: 1, t: 1, l: "Classify", n: "The policy marks delete as destructive and requires approval." },
+    { f: 1, t: 2, l: "Show the exact path", n: "The person sees the tool name and the full arguments." },
+    { f: 2, t: 1, l: "Approve or deny", n: "The person decides, and the choice is recorded." },
+    { f: 1, t: 3, l: "Run in a safe area", n: "An approved call runs with least privilege and moves to a trash folder." },
+    { f: 3, t: 0, l: "Return the result", n: "The model receives either the result or the reason for denial." }
+  ] },
+{ id: "x-mcp-server-debugging", module: "mcp", title: "Debugging an MCP server", summary: "Working from the bottom up.",
+  actors: ["Inspector", "Server", "Host", "Model"],
+  steps: [
+    { f: 0, t: 1, l: "Call the server directly", n: "Use an inspector to connect without the host." },
+    { f: 0, t: 1, l: "List tools", n: "tools/list shows exactly what the server exposes." },
+    { f: 0, t: 1, l: "Call a tool", n: "Run the tool with sample arguments and read the result." },
+    { f: 2, t: 1, l: "Check host start", n: "Confirm the host starts the same command with the right interpreter and paths." },
+    { f: 2, t: 3, l: "Check the tool list", n: "Confirm that the host refreshed its list and passed the tool to the model." },
+    { f: 3, t: 2, l: "Read traces", n: "Traces show whether the model considered and chose the tool." }
+  ] },
+{ id: "x-mcp-tool-description", module: "mcp", title: "Why descriptions decide choices", summary: "How the model picks between tools.",
+  actors: ["Model", "search_logs", "get_request_trace", "Result"],
+  steps: [
+    { f: 0, t: 0, l: "Read definitions", n: "The model sees only names, descriptions and schemas." },
+    { f: 0, t: 1, l: "Vague text", n: "A description that says Search logs does not say what is returned." },
+    { f: 0, t: 2, l: "Specific text", n: "One that says returns the full trace for a request ID fits an ID question." },
+    { f: 0, t: 2, l: "Choose", n: "The model picks the tool whose description matches the request." },
+    { f: 2, t: 3, l: "Get the right data", n: "The right tool returns the data needed for the answer." },
+    { f: 0, t: 3, l: "Test choices", n: "A conversation test confirms the right tool is chosen for typical requests." }
+  ] },
+{ id: "x-mcp-agent-limits", module: "mcp", title: "Limits for an agent loop", summary: "Stopping runaway tool use.",
+  actors: ["Agent loop", "Step counter", "Budget guard", "Repeat detector"],
+  steps: [
+    { f: 0, t: 1, l: "Count steps", n: "Each model call and tool call increases a counter." },
+    { f: 1, t: 1, l: "Stop at the cap", n: "A maximum step count ends the loop with a clear message." },
+    { f: 0, t: 2, l: "Track tokens and cost", n: "A running total is compared with the budget." },
+    { f: 0, t: 3, l: "Detect repeats", n: "The same call with the same arguments many times is a sign of a loop." },
+    { f: 3, t: 0, l: "Break the loop", n: "The agent is told the tool returns nothing new and must change approach or stop." },
+    { f: 2, t: 0, l: "Report", n: "The final answer states what was done and what is incomplete." }
+  ] },
+{ id: "x-mcp-confused-deputy", module: "mcp", title: "The confused deputy", summary: "Why a server must not pass tokens through.",
+  actors: ["User", "MCP server", "Internal service", "Attacker"],
+  steps: [
+    { f: 0, t: 1, l: "Connect with a token", n: "The user connects with a broad token for several services." },
+    { f: 1, t: 2, l: "Forward the token", n: "A careless server passes the same token to an internal service." },
+    { f: 3, t: 1, l: "Craft a request", n: "An attacker tricks the assistant into asking for a harmful action." },
+    { f: 1, t: 2, l: "Action succeeds", n: "The internal service accepts the action because the token is valid." },
+    { f: 1, t: 1, l: "Validate audience", n: "A safe server accepts only tokens issued for itself." },
+    { f: 1, t: 2, l: "Use its own credentials", n: "It calls the internal service with a narrow credential and checks the user's rights itself." }
+  ] },
+{ id: "x-skills-script-safety", module: "claude-skills", title: "A safe script in a skill", summary: "What a trustworthy bundled script looks like.",
+  actors: ["Author", "Script", "Sandbox", "Reviewer"],
+  steps: [
+    { f: 0, t: 1, l: "Keep it read-only", n: "The script reads inputs and prints results, and writes only to a named output file." },
+    { f: 0, t: 1, l: "No secrets inside", n: "Credentials are never stored in the skill and are passed by the environment if needed." },
+    { f: 0, t: 1, l: "No hidden network", n: "The script makes no downloads or outgoing requests that the skill does not explain." },
+    { f: 1, t: 2, l: "Test with sample data", n: "The script runs on sample files in a restricted environment." },
+    { f: 2, t: 3, l: "Review the output", n: "The reviewer compares behaviour with the description and checks exit codes." },
+    { f: 3, t: 0, l: "Fix and re-test", n: "Findings are fixed and the script tests are run again before release." }
   ] }
 ];
