@@ -1054,5 +1054,42 @@
    "kind": "Reference",
    "why": "Project status and context within the CNCF."
   }
+ ],
+ "system-design": [
+  {
+   "t": "Site Reliability Engineering",
+   "by": "Google",
+   "u": "https://sre.google/sre-book/table-of-contents/",
+   "kind": "Book",
+   "why": "Cascading failures, overload, critical state and postmortems."
+  },
+  {
+   "t": "Amazon Builders' Library",
+   "by": "Amazon",
+   "u": "https://aws.amazon.com/builders-library/",
+   "kind": "Articles",
+   "why": "Practical write-ups on shuffle sharding, static stability, retries and safe deployment."
+  },
+  {
+   "t": "Cloud design patterns",
+   "by": "Microsoft",
+   "u": "https://learn.microsoft.com/en-us/azure/architecture/patterns/",
+   "kind": "Documentation",
+   "why": "Circuit breaker, bulkhead, cache-aside, deployment stamp and more."
+  },
+  {
+   "t": "The Site Reliability Workbook",
+   "by": "Google",
+   "u": "https://sre.google/workbook/table-of-contents/",
+   "kind": "Book",
+   "why": "Worked examples of SLOs, canarying and postmortems."
+  },
+  {
+   "t": "AWS Well-Architected: Reliability pillar",
+   "by": "Amazon",
+   "u": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html",
+   "kind": "Documentation",
+   "why": "Failure management, change management and recovery design questions."
+  }
  ]
 }

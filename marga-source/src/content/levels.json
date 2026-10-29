@@ -1098,5 +1098,65 @@
  "argocd/debugging-argo-cd": {
   "s": "Walk the pipeline in order: can it fetch, can it render, can it apply, is it healthy? The first \"no\" is your problem.",
   "i": "I debug Argo CD by stage, reproduce renders locally and fix OutOfSync loops."
+ },
+ "system-design/the-design-method-and-estimation": {
+  "s": "Designing is like planning a bridge: you ask how many cars, then how strong, then what if a pier fails, before you pour any concrete.",
+  "i": "I follow a fixed design method and size a system with round-number estimates."
+ },
+ "system-design/caching-without-stampedes": {
+  "s": "A cache is a shelf of photocopies; when the shelf empties, everyone rushes the original library at once.",
+  "i": "I choose cache patterns, set TTLs with jitter and prevent stampedes and cold-start overload."
+ },
+ "system-design/queues-retries-and-idempotency": {
+  "s": "A retry is knocking again on a door; idempotency makes sure a second knock does not order a second pizza.",
+  "i": "I set timeouts, retries and backoff safely and make repeated operations harmless with idempotency keys."
+ },
+ "system-design/consistency-and-availability-in-practice": {
+  "s": "When two copies of a notebook disagree, you either wait to compare them or answer from the one you hold; each choice has a price.",
+  "i": "I choose a consistency level per feature and handle replication lag and failover trade-offs."
+ },
+ "system-design/quorum-leaders-and-split-brain": {
+  "s": "A vote needs more than half the room, or two rooms could each elect a different chair.",
+  "i": "I explain quorum, leader election, split brain and fencing, and I can operate a consensus store."
+ },
+ "system-design/clocks-time-and-ordering": {
+  "s": "Two watches never agree exactly, so you order events by who told whom, not by the time on the wall.",
+  "i": "I avoid wall-clock ordering, use monotonic time for durations and plan for leap seconds and clock jumps."
+ },
+ "system-design/failure-domains-cells-and-bulkheads": {
+  "s": "A ship is divided into watertight compartments so one hole does not sink the whole vessel.",
+  "i": "I identify failure domains and use cells and bulkheads so one fault reaches only a bounded share."
+ },
+ "system-design/blast-radius-and-shuffle-sharding": {
+  "s": "Give each customer a random few lanes of a motorway; one crash blocks only the lanes it sits in.",
+  "i": "I measure blast radius and use staged rollout, quotas and shuffle sharding to contain faults."
+ },
+ "system-design/graceful-degradation-and-circuit-breakers": {
+  "s": "A tripped fuse stops the fire spreading; the house keeps its lights even if the toaster circuit is off.",
+  "i": "I plan fallbacks, set circuit breakers and keep health checks about the instance itself."
+ },
+ "system-design/rate-limiting-and-load-shedding": {
+  "s": "A restaurant that seats everyone serves nobody; a host who turns some away keeps every served table happy.",
+  "i": "I limit, shed and admit load by priority and tell clients how to back off."
+ },
+ "system-design/multi-region-and-global-traffic": {
+  "s": "A second office only helps if the staff can really work there and the road to it is not the road that is closed.",
+  "i": "I map RTO and RPO to a multi-region pattern and steer traffic without a single point of failure."
+ },
+ "system-design/config-and-control-plane-change-safety": {
+  "s": "Changing a setting everywhere at once is like repainting every road sign overnight; stage it, and keep the old signs.",
+  "i": "I treat configuration as code with validation, staging, fail-static loading and rollback."
+ },
+ "system-design/hidden-dependencies-and-single-points": {
+  "s": "The map shows the roads you use to drive; it forgets the road you use to reach the garage.",
+  "i": "I map serving, build, operate and recover dependencies and keep recovery tools independent."
+ },
+ "system-design/worked-design-global-api-at-four-nines": {
+  "s": "Four nines is a budget of minutes; every design choice either spends it or protects it.",
+  "i": "I compose cells, regions, limits and staged rollout into a design that fits a four-nines budget."
+ },
+ "system-design/worked-design-the-status-page-that-survives": {
+  "s": "The fire alarm must not run on the same wire as the fire.",
+  "i": "I design an independent communication path and run a before and after design review of an outage."
  }
 }
