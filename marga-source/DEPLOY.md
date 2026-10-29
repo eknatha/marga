@@ -177,3 +177,9 @@ Deploy as before: upload the contents of the zip to the site root, keep CNAME, .
 ## Round 17
 
 No deployment change. Build with `node tools/build.js`, upload the dist contents, keep CNAME and .nojekyll. The explainer filter state is kept in the URL hash and local storage only.
+
+The Practice page keeps favourites and collapsed groups in local storage under the existing progress object. No new files, routes or network requests.
+
+## Round 18
+
+No deployment change. Explainer links and the failure filter are static data and need no server.

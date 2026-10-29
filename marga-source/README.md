@@ -39,6 +39,16 @@ See DEPLOY.md for hosting, DNS and the visitor counter.
 ## Round 17
 
 - Three new skills: Cloud security and IAM, Kubernetes administration and operations, and Continuous delivery with Argo CD (8 lessons each, each ending in a debugging lesson), with cheat sheets, interview answers, drills, incident games, glossary terms, case studies and architecture studies mapped to them. They sit in the DevOps, Cloud, SRE and DevSecOps paths.
-- 82 more animated explainers (about 394 in total), covering the new skills and every existing skill.
+- 82 more animated explainers (442 in total after Round 18), covering the new skills and every existing skill.
 - Core filters on the Animated explainers page: skill chips with counts (multi-select), search across titles, summaries and step text, a Hide watched toggle, per-skill "N of M watched", a live result count, an empty state, a URL that keeps the filter (`#/explainers?skill=a,b&q=text&unwatched=1`) and a remembered last filter. An explainer counts as watched when its final step is reached.
 - Caveats: the new skills have no terminal labs yet. Argo CD wording avoids the banned word list, and product behaviour is described as of writing.
+- Practice page redesign: tools grouped into Featured (Animated explainers, Architecture post-mortems, Troubleshooting drills), Every day, Hands-on labs, Scenarios and Interview and study. A next-step panel suggests one action from your own progress (missed items, today's practice, then something new) with Run it, Skip and Why this. Filters are flag buttons (`--labs`, `--starred` and so on) plus a search box. Each tool shows a status (Ready, Running, Completed), progress, time and level tags and the skills it practises. Tools can be starred, groups collapse, and a week strip shows the days practised. Favourites, collapsed groups and the week strip come from this browser only. Skill pages now link to that skill's animated explainers and architecture post-mortems.
+- Caveats: the time and level tags are fixed estimates, not measured. Every group starts open so every tool stays one click away.
+
+## Round 18
+
+- 48 failure-and-recovery explainers, two for each of the 24 skills. Each one runs from a healthy start, through the change and the failure, to the symptom, the diagnosis, the fix and the check that proves recovery. They carry `kind: "failure"` in `src/app/explainers.js` and a title that starts with "Failure and recovery:". A "Failure and recovery only" checkbox on the explainers page filters them (`#/explainers?kind=failure`).
+- Every explainer now has a `lesson` field (`module/slug`). It is shown as "Related lesson" on the explainer page, together with the learning paths that include the skill. Lesson pages get a "Watch it" section, skill pages list their explainers and failure stories, and path pages have a "Watch along this path" row. The validator checks that every link resolves to a lesson in the same skill, that ids are unique and that each skill has at least two failure explainers.
+- Lesson links for the 394 older explainers were matched automatically by keywords and then corrected by hand where the match was clearly off. A few may still be the second-best lesson in the skill. 63 lessons have no tied explainer; their "Watch it" section shows two from the same skill and says so.
+- Three older explainers shared an id with another one. They were renamed so every id is unique.
+- The Practice page layout from Round 17 is unchanged.
