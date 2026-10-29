@@ -607,15 +607,67 @@ var EXP = window.MARGA_EXPLAINERS || [];
 var EX = null, exTimer = null;
 function exStop() { if (exTimer) { clearInterval(exTimer); exTimer = null; } if (EX) EX.playing = false; var b = $('#ex-play'); if (b) b.textContent = 'Play'; if (b) b.setAttribute('aria-pressed', 'false'); }
 window.addEventListener('hashchange', function () { exStop(); });
-function explainersView() {
-  view.title = 'Animated explainers | MARGA by EknathaLabs'; view.nav = 'practice';
-  view.html = head('Animated explainers', 'Watch how common systems work, one message at a time. Step through yourself or press Play. Each step has a plain explanation.') +
-    '<div class="wrap">' + MODS.filter(function (m) { return EXP.some(function (x) { return x.module === m.id; }); }).map(function (m) {
-      return '<h2 class="sub-h">' + e(m.title) + '</h2><ul class="prac">' + EXP.filter(function (x) { return x.module === m.id; }).map(function (x) {
-        return '<li><a href="#/explainers/' + e(x.id) + '"><strong>' + e(x.title) + '</strong><span>' + e(x.summary) + '</span><em>' + plural(x.steps.length, 'step') + '</em></a></li>'; }).join('') + '</ul>'; }).join('') + '</div>';
-  view.after = null;
+/* ---- explainer list with filters: skill chips with counts, multi-select, search, watched, URL and remembered choice ---- */
+var EXF = null, EXP_BY = {}, EXP_IDX = {};
+EXP.forEach(function (x) { EXP_BY[x.id] = x; EXP_IDX[x.id] = (x.title + ' ' + x.summary + ' ' + modTitle(x.module) + ' ' + x.steps.map(function (st) { return st.l + ' ' + st.n; }).join(' ')).toLowerCase(); });
+function exBag(name) { var st = A.state(); if (!st[name] || typeof st[name] !== 'object' || Array.isArray(st[name])) st[name] = {}; return st[name]; }
+function exQuery(qs) {
+  var o = {}; String(qs || '').split('&').forEach(function (kv) { if (!kv) return; var i = kv.indexOf('='), k = i < 0 ? kv : kv.slice(0, i), v = i < 0 ? '' : kv.slice(i + 1); try { o[k] = decodeURIComponent(v.replace(/\+/g, ' ')); } catch (x) { o[k] = v; } });
+  return o;
 }
-A.addRoute(/^\/explainers$/, explainersView);
+function exSkills() { return MODS.filter(function (m) { return EXP.some(function (x) { return x.module === m.id; }); }); }
+function exCount(id) { return EXP.filter(function (x) { return x.module === id; }).length; }
+function explainersView(qs) {
+  view.title = 'Animated explainers | MARGA by EknathaLabs'; view.nav = 'practice';
+  var skills = exSkills(), valid = {}; skills.forEach(function (m) { valid[m.id] = 1; });
+  var P = exQuery(qs), bag = exBag('exf'), has = !!(qs && qs.length);
+  EXF = has ? { skills: (P.skill || '').split(',').filter(function (id) { return valid[id]; }), q: P.q || '', unw: P.unwatched === '1' }
+            : { skills: (Array.isArray(bag.skills) ? bag.skills : []).filter(function (id) { return valid[id]; }), q: '', unw: !!bag.unw };
+  var W = exBag('exw');
+  view.html = head('Animated explainers', 'Watch how common systems work, one message at a time. Step through yourself or press Play. Each step has a plain explanation. Choose one or more skills below, or search, to see fewer.') +
+    '<div class="wrap exf" id="exf">' +
+    '<label class="field exf-search"><span>Search explainers</span><input type="search" id="exf-q" value="' + e(EXF.q) + '" autocomplete="off" placeholder="For example: DNS, rollback, quota"></label>' +
+    '<div class="exf-chips" role="group" aria-label="Filter by skill"><button type="button" class="exf-chip" data-act="exf-all" aria-pressed="false">All skills <span class="exf-n">' + EXP.length + '</span></button>' +
+    skills.map(function (m) { return '<button type="button" class="exf-chip" data-act="exf-skill" data-mod="' + e(m.id) + '" aria-pressed="false">' + e(m.title) + ' <span class="exf-n">' + exCount(m.id) + '</span></button>'; }).join('') + '</div>' +
+    '<div class="exf-bar"><label class="opt-r"><input type="checkbox" id="exf-unw"' + (EXF.unw ? ' checked' : '') + '> <span>Hide explainers I have watched</span></label>' +
+    '<button type="button" class="btn btn-quiet" data-act="exf-clear">Clear filters</button><span class="small" id="exf-count" role="status" aria-live="polite"></span></div>' +
+    '<div id="exf-list">' + skills.map(function (m) {
+      var items = EXP.filter(function (x) { return x.module === m.id; }), seen = items.filter(function (x) { return W[x.id]; }).length;
+      return '<section class="exf-g" data-mod="' + e(m.id) + '"><h2 class="sub-h">' + e(m.title) + ' <span class="small exf-prog">' + seen + ' of ' + items.length + ' watched</span></h2><ul class="prac">' + items.map(function (x) {
+        return '<li data-id="' + e(x.id) + '"><a href="#/explainers/' + e(x.id) + '"><strong>' + e(x.title) + '</strong><span>' + e(x.summary) + '</span><em>' + plural(x.steps.length, 'step') + (W[x.id] ? ' | Watched' : '') + '</em></a></li>'; }).join('') + '</ul></section>'; }).join('') + '</div>' +
+    '<div class="empty" id="exf-empty" hidden><h3>No explainers match</h3><p>Try fewer skills or a shorter search.</p><p><button type="button" class="btn btn-primary" data-act="exf-clear">Clear filters</button></p></div></div>';
+  view.after = function () {
+    exfApply(false);
+    var q = $('#exf-q'); if (q) q.addEventListener('input', function () { EXF.q = q.value; exfApply(true); });
+    var u = $('#exf-unw'); if (u) u.addEventListener('change', function () { EXF.unw = u.checked; exfApply(true); });
+  };
+}
+function exfApply(write) {
+  if (!EXF || !$('#exf')) return;
+  var words = EXF.q.trim().toLowerCase().split(/\s+/).filter(Boolean), W = exBag('exw'), shown = 0;
+  $$('#exf-list li').forEach(function (li) {
+    var id = li.getAttribute('data-id'), x = EXP_BY[id];
+    var okS = !EXF.skills.length || EXF.skills.indexOf(x.module) >= 0, okW = !EXF.unw || !W[id], okQ = words.every(function (w) { return EXP_IDX[id].indexOf(w) >= 0; });
+    li.hidden = !(okS && okW && okQ); if (!li.hidden) shown++;
+  });
+  $$('#exf-list .exf-g').forEach(function (sec) { sec.hidden = !sec.querySelector('li:not([hidden])'); });
+  $$('.exf-chip').forEach(function (b) { var m = b.getAttribute('data-mod'); b.setAttribute('aria-pressed', String(m ? EXF.skills.indexOf(m) >= 0 : !EXF.skills.length)); });
+  $('#exf-count').textContent = shown + ' of ' + EXP.length + ' explainers shown';
+  $('#exf-empty').hidden = shown > 0;
+  if (write) {
+    var bag = exBag('exf'); bag.skills = EXF.skills.slice(); bag.unw = EXF.unw; A.save();
+    var parts = []; if (EXF.skills.length) parts.push('skill=' + EXF.skills.join(',')); if (EXF.q.trim()) parts.push('q=' + encodeURIComponent(EXF.q.trim())); if (EXF.unw) parts.push('unwatched=1');
+    try { history.replaceState(null, '', '#/explainers' + (parts.length ? '?' + parts.join('&') : '')); } catch (x) {}
+  }
+}
+A.onAct('exf-skill', function (b) {
+  if (!EXF) return; var m = b.getAttribute('data-mod'), i = EXF.skills.indexOf(m);
+  if (i >= 0) EXF.skills.splice(i, 1); else EXF.skills.push(m);
+  exfApply(true);
+});
+A.onAct('exf-all', function () { if (!EXF) return; EXF.skills = []; exfApply(true); });
+A.onAct('exf-clear', function () { if (!EXF) return; EXF.skills = []; EXF.q = ''; EXF.unw = false; var q = $('#exf-q'); if (q) q.value = ''; var u = $('#exf-unw'); if (u) u.checked = false; exfApply(true); });
+A.addRoute(/^\/explainers(?:\?(.*))?$/, explainersView);
 function exSvg(x) {
   var n = x.actors.length, W = Math.max(640, n * 150), cw = W / n, top = 56, rowH = 58, H = top + x.steps.length * rowH + 20;
   function cx(i) { return cw * i + cw / 2; }
@@ -646,6 +698,7 @@ function exPaint(animate) {
     else pkt.setAttribute('cx', x1);
     pkt.classList.toggle('self', st.f === st.t);
   }
+  if (i === x.steps.length - 1) { var wb = exBag('exw'); if (!wb[x.id]) { wb[x.id] = 1; A.save(); } }
   $('#ex-step').textContent = 'Step ' + (i + 1) + ' of ' + x.steps.length;
   $('#ex-label').textContent = st.l; $('#ex-note').textContent = st.n;
   $('#ex-prev').disabled = i === 0; $('#ex-next').disabled = i === x.steps.length - 1;
@@ -665,7 +718,7 @@ function explainerView(id) {
   view.title = x.title + ' | MARGA by EknathaLabs'; view.nav = 'practice';
   EX = { x: x, i: 0, playing: false, speed: 4200 };
   var others = EXP.filter(function (q) { return q.id !== id; }).sort(function (p, q) { return (q.module === x.module) - (p.module === x.module); });
-  view.html = head(x.title, e(x.summary), '<p class="small"><a class="chip" href="#/module/' + e(x.module) + '">' + e(modTitle(x.module)) + '</a> <a href="#/explainers">All explainers</a></p>') +
+  view.html = head(x.title, e(x.summary), '<p class="small"><a class="chip" href="#/module/' + e(x.module) + '">' + e(modTitle(x.module)) + '</a> <a href="#/explainers?skill=' + e(x.module) + '">More from this skill</a> <a href="#/explainers">All explainers</a></p>') +
     '<div class="wrap"><div class="ex" id="ex"><div class="ex-ctl" role="group" aria-label="Playback controls"><button type="button" class="btn btn-quiet" id="ex-first" data-act="ex-first">Restart</button><button type="button" class="btn btn-quiet" id="ex-prev" data-act="ex-prev">Back</button>' +
     '<button type="button" class="btn btn-primary" id="ex-play" data-act="ex-play" aria-pressed="false">Play</button><button type="button" class="btn btn-quiet" id="ex-next" data-act="ex-next">Next</button>' +
     sel('ex-speed', 'Speed', [['6500', 'Slow'], ['4200', 'Normal'], ['2400', 'Fast']], '4200') +

@@ -3232,5 +3232,825 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Test with sample data", n: "The script runs on sample files in a restricted environment." },
     { f: 2, t: 3, l: "Review the output", n: "The reviewer compares behaviour with the description and checks exit codes." },
     { f: 3, t: 0, l: "Fix and re-test", n: "Findings are fixed and the script tests are run again before release." }
+  ] },
+{ id: "x-cloud-iam-authn-authz", module: "cloud-iam", title: "Authentication then authorization", summary: "One request, two separate checks.",
+  actors: ["User", "Identity provider", "Cloud API", "Policy engine"],
+  steps: [
+    { f: 0, t: 1, l: "Sign in", n: "The user proves who they are, ideally with single sign-on and a second factor." },
+    { f: 1, t: 0, l: "Receive a token", n: "The identity provider returns a short-lived token that represents the user." },
+    { f: 0, t: 2, l: "Send a request", n: "The user asks the cloud API to read an object, presenting the token." },
+    { f: 2, t: 2, l: "Verify the token", n: "The API checks the signature, expiry and audience before trusting any claim in it." },
+    { f: 2, t: 3, l: "Ask for a decision", n: "The request is compared with policies for that principal, action, resource and conditions." },
+    { f: 3, t: 2, l: "Allow or deny", n: "With no matching allow the answer is no, and an explicit deny beats every allow." }
+  ] },
+{ id: "x-cloud-iam-assume-role", module: "cloud-iam", title: "Assuming a role", summary: "How a workload gets temporary credentials.",
+  actors: ["Application", "Token service", "Role", "Storage"],
+  steps: [
+    { f: 0, t: 1, l: "Ask to assume", n: "The application calls the token service and names the role it needs." },
+    { f: 1, t: 2, l: "Check the trust policy", n: "The service reads the role's trust policy to see whether this caller is allowed to assume it." },
+    { f: 2, t: 1, l: "Role approved", n: "The trust policy names the caller, so the request passes this check." },
+    { f: 1, t: 0, l: "Return temporary keys", n: "The application receives credentials that expire in an hour or less." },
+    { f: 0, t: 3, l: "Call storage", n: "The request is signed with the temporary credentials and carries the session identity." },
+    { f: 3, t: 0, l: "Check permissions", n: "Storage allows only what the role's permission policy grants, then the session expires on its own." }
+  ] },
+{ id: "x-cloud-iam-policy-evaluation", module: "cloud-iam", title: "How a policy decision is made", summary: "Default deny, allows and explicit denies.",
+  actors: ["Request", "Organization guardrail", "Identity policy", "Resource policy"],
+  steps: [
+    { f: 0, t: 1, l: "Request arrives", n: "A principal asks for an action on a resource with some context such as network and MFA." },
+    { f: 1, t: 1, l: "Guardrails first", n: "Organisation-level policies cap what the account may do, whatever the roles inside it allow." },
+    { f: 1, t: 2, l: "Identity policy", n: "The identity's own policies are searched for an allow that matches action, resource and conditions." },
+    { f: 2, t: 3, l: "Resource policy", n: "The resource may add an allow, for example for another account, or a deny." },
+    { f: 3, t: 0, l: "Explicit deny wins", n: "Any matching deny ends the evaluation with a refusal." },
+    { f: 3, t: 0, l: "No allow means no", n: "If nothing allows the request, the default answer is deny." }
+  ] },
+{ id: "x-cloud-iam-least-privilege-loop", module: "cloud-iam", title: "Shrinking permissions with usage data", summary: "From broad to narrow without breaking things.",
+  actors: ["Owner", "Access analysis", "Policy", "Audit log"],
+  steps: [
+    { f: 0, t: 2, l: "Start with a broad role", n: "A team holds a role with hundreds of allowed actions, granted to get going quickly." },
+    { f: 1, t: 3, l: "Collect usage", n: "Last-accessed data and audit logs show which actions were used in the last 90 days." },
+    { f: 1, t: 0, l: "Report to the owner", n: "The owner sees twelve used actions and the rest unused." },
+    { f: 0, t: 2, l: "Replace the policy", n: "A new policy lists only the used actions on the real resources." },
+    { f: 2, t: 3, l: "Watch for denials", n: "Audit logs show any denied call so a missing permission is added quickly." },
+    { f: 0, t: 1, l: "Schedule a review", n: "The same check is repeated every quarter and recorded." }
+  ] },
+{ id: "x-cloud-iam-azure-rbac", module: "cloud-iam", title: "Azure role assignment and scope", summary: "Principal, role and scope.",
+  actors: ["Principal", "Role definition", "Scope", "Resource"],
+  steps: [
+    { f: 0, t: 1, l: "Pick a role", n: "A built-in role such as Reader lists the actions it allows." },
+    { f: 1, t: 2, l: "Choose a scope", n: "The assignment is created on a resource group, not the whole subscription." },
+    { f: 0, t: 2, l: "Create the assignment", n: "The principal, role and scope are bound together as an assignment." },
+    { f: 2, t: 3, l: "Inheritance", n: "Everything inside the resource group inherits the assignment." },
+    { f: 0, t: 3, l: "Request a resource", n: "The principal reads a resource in the group and is allowed." },
+    { f: 0, t: 3, l: "Outside the scope", n: "A resource in another group is refused because no assignment covers it." }
+  ] },
+{ id: "x-cloud-iam-managed-identity", module: "cloud-iam", title: "A managed identity gets a token", summary: "No secret stored in the application.",
+  actors: ["App service", "Local token endpoint", "Entra ID", "Key vault"],
+  steps: [
+    { f: 0, t: 0, l: "Enable the identity", n: "The platform creates an identity for the app service and manages its credentials." },
+    { f: 0, t: 1, l: "Ask for a token", n: "At run time the app calls a local endpoint that only the platform exposes to it." },
+    { f: 1, t: 2, l: "Request from the directory", n: "The platform asks the directory for a token for this identity and the vault as audience." },
+    { f: 2, t: 0, l: "Receive the token", n: "The app gets a short-lived token with no secret in its configuration." },
+    { f: 0, t: 3, l: "Call the vault", n: "The app presents the token to read one secret." },
+    { f: 3, t: 0, l: "Check the role", n: "The vault allows the read only because the identity holds a narrow role on it." }
+  ] },
+{ id: "x-cloud-iam-secret-fetch", module: "cloud-iam", title: "Fetching a secret at run time", summary: "Keep passwords out of images and code.",
+  actors: ["Service", "Secrets manager", "Audit log", "Database"],
+  steps: [
+    { f: 0, t: 1, l: "Start up", n: "The service starts with only its identity, not a password." },
+    { f: 0, t: 1, l: "Request the secret", n: "It asks the secrets manager for the database password by name." },
+    { f: 1, t: 1, l: "Authorise", n: "The manager checks the caller's role allows this one secret." },
+    { f: 1, t: 2, l: "Log the read", n: "The audit log records who read which secret and when." },
+    { f: 1, t: 0, l: "Return the value", n: "The service keeps the value in memory and never writes it to disk or logs." },
+    { f: 0, t: 3, l: "Connect", n: "The service connects to the database with the fetched password." }
+  ] },
+{ id: "x-cloud-iam-envelope-encryption", module: "cloud-iam", title: "Envelope encryption", summary: "A data key under a master key.",
+  actors: ["Application", "Key service", "Data key", "Storage"],
+  steps: [
+    { f: 0, t: 1, l: "Ask for a data key", n: "The application requests a new key from the key management service." },
+    { f: 1, t: 0, l: "Receive two copies", n: "It gets the data key in plain form and the same key encrypted under the master key." },
+    { f: 0, t: 2, l: "Encrypt the data", n: "The application encrypts the data locally with the plain data key." },
+    { f: 0, t: 2, l: "Discard the plain key", n: "The plain key is erased from memory after use." },
+    { f: 0, t: 3, l: "Store both", n: "The ciphertext and the encrypted data key are stored together." },
+    { f: 0, t: 1, l: "Decrypt later", n: "To read, the encrypted data key is sent to the key service, which allows it only if policy permits." }
+  ] },
+{ id: "x-cloud-iam-private-endpoint", module: "cloud-iam", title: "Reaching storage through a private endpoint", summary: "Keep traffic off the internet.",
+  actors: ["Application", "Private network", "Private endpoint", "Storage service"],
+  steps: [
+    { f: 0, t: 1, l: "Resolve the name", n: "Private DNS resolves the storage name to a private address inside the network." },
+    { f: 1, t: 2, l: "Send to the private address", n: "The request travels over the private network to the endpoint, not to the internet." },
+    { f: 2, t: 3, l: "Forward to the service", n: "The endpoint passes the request to the storage service." },
+    { f: 3, t: 3, l: "Check the policy", n: "The storage policy allows requests only from this private path and denies the public one." },
+    { f: 3, t: 0, l: "Respond", n: "The data returns over the same private path." },
+    { f: 0, t: 3, l: "Public path fails", n: "A request from outside the network is refused by the policy." }
+  ] },
+{ id: "x-cloud-iam-audit-detection", module: "cloud-iam", title: "From audit log to alert", summary: "Spotting a risky action.",
+  actors: ["Principal", "Control plane", "Audit log", "Alert"],
+  steps: [
+    { f: 0, t: 1, l: "An action happens", n: "A principal tries to stop audit logging at night." },
+    { f: 1, t: 2, l: "Event recorded", n: "The control plane writes the event with who, what, where and when." },
+    { f: 2, t: 2, l: "Copy to a protected account", n: "Logs flow to a separate account that few people can change." },
+    { f: 2, t: 3, l: "Rule matches", n: "A detection rule flags a change to logging as high risk." },
+    { f: 3, t: 0, l: "Page the responder", n: "The on-call engineer gets the alert with the principal and source address." },
+    { f: 0, t: 2, l: "Review and respond", n: "They restore logging, review recent actions and disable the identity if it is not legitimate." }
+  ] },
+{ id: "x-cloud-iam-leaked-key", module: "cloud-iam", title: "Responding to a leaked key", summary: "Contain, assess, remove, recover.",
+  actors: ["Scanner", "Responder", "Audit log", "Platform"],
+  steps: [
+    { f: 0, t: 1, l: "Alert", n: "A scanner reports a live key in a public repository." },
+    { f: 1, t: 3, l: "Contain", n: "The responder deactivates the key without deleting it, to keep evidence." },
+    { f: 1, t: 2, l: "Assess", n: "The audit log shows what the key did and from which addresses." },
+    { f: 1, t: 3, l: "Remove", n: "Attacker-created users, keys and servers are deleted." },
+    { f: 1, t: 3, l: "Replace", n: "The pipeline moves to a role with short-lived credentials." },
+    { f: 1, t: 0, l: "Learn", n: "Secret scanning and guardrails are added so the same path cannot recur." }
+  ] },
+{ id: "x-cloud-iam-conditional-access", module: "cloud-iam", title: "A sign-in with conditional access", summary: "Rules decide how strong the proof must be.",
+  actors: ["User", "Sign-in service", "Policy", "Application"],
+  steps: [
+    { f: 0, t: 1, l: "Start sign-in", n: "The user opens the application and is sent to the sign-in service." },
+    { f: 1, t: 2, l: "Evaluate context", n: "The policy looks at the user, device, location and risk of this attempt." },
+    { f: 2, t: 1, l: "Require more proof", n: "An unfamiliar location triggers a second factor requirement." },
+    { f: 0, t: 1, l: "Complete the second factor", n: "The user approves on their device." },
+    { f: 1, t: 0, l: "Issue a token", n: "A short-lived token is issued with the claims the application needs." },
+    { f: 0, t: 3, l: "Use the application", n: "The application trusts the token and applies its own authorization." }
+  ] },
+{ id: "x-k8s-ops-request-flow", module: "k8s-ops", title: "A request through the API server", summary: "Authenticate, authorise, admit, store.",
+  actors: ["Client", "API server", "Admission", "etcd"],
+  steps: [
+    { f: 0, t: 1, l: "Send a request", n: "kubectl sends a create request over TLS with a credential." },
+    { f: 1, t: 1, l: "Authenticate", n: "The API server identifies the caller from a certificate, token or sign-in." },
+    { f: 1, t: 1, l: "Authorise", n: "RBAC checks whether this subject may create this kind in this namespace." },
+    { f: 1, t: 2, l: "Admission", n: "Controllers may change the object or reject it, for example by policy." },
+    { f: 1, t: 3, l: "Persist", n: "The validated object is written to etcd, the only place state is stored." },
+    { f: 1, t: 0, l: "Respond", n: "The caller receives the stored object, and controllers begin to act on it." }
+  ] },
+{ id: "x-k8s-ops-etcd-quorum", module: "k8s-ops", title: "etcd and quorum", summary: "Why a majority of members is needed.",
+  actors: ["Leader", "Follower A", "Follower B", "API server"],
+  steps: [
+    { f: 3, t: 0, l: "Write request", n: "The API server sends a write to the etcd leader." },
+    { f: 0, t: 1, l: "Replicate", n: "The leader sends the entry to the followers." },
+    { f: 0, t: 2, l: "Replicate", n: "The same entry goes to the other follower." },
+    { f: 1, t: 0, l: "Acknowledge", n: "One follower confirms, which together with the leader is a majority of three." },
+    { f: 0, t: 3, l: "Commit", n: "With a majority the leader commits and tells the API server the write succeeded." },
+    { f: 2, t: 2, l: "A member is lost", n: "The cluster keeps working with two of three, but losing a second member stops writes." }
+  ] },
+{ id: "x-k8s-ops-etcd-restore", module: "k8s-ops", title: "Restoring etcd from a snapshot", summary: "Bring the cluster state back.",
+  actors: ["Operator", "API servers", "etcd members", "Snapshot file"],
+  steps: [
+    { f: 0, t: 1, l: "Stop the API servers", n: "Nothing should write while state is being replaced." },
+    { f: 0, t: 3, l: "Verify the snapshot", n: "The status command confirms the file is readable and shows its key count." },
+    { f: 0, t: 2, l: "Restore each member", n: "Every member gets a new data directory built from the same snapshot." },
+    { f: 0, t: 2, l: "Start the members together", n: "The members form a new cluster with the new membership settings." },
+    { f: 0, t: 1, l: "Start the API servers", n: "The API servers connect and serve the restored state." },
+    { f: 0, t: 1, l: "Reconcile", n: "Objects created after the snapshot are re-applied from the repository, and the team checks volumes separately." }
+  ] },
+{ id: "x-k8s-ops-upgrade-flow", module: "k8s-ops", title: "Upgrading a cluster one minor version", summary: "Order of an upgrade.",
+  actors: ["Operator", "Control plane", "Worker node", "Workloads"],
+  steps: [
+    { f: 0, t: 0, l: "Prepare", n: "Read release notes, scan for removed APIs and take an etcd snapshot." },
+    { f: 0, t: 1, l: "Upgrade control plane", n: "The first control plane node is upgraded, then the others." },
+    { f: 0, t: 2, l: "Cordon and drain", n: "A worker node is made unschedulable and its pods are evicted." },
+    { f: 0, t: 2, l: "Upgrade the node", n: "The kubelet and packages are updated and restarted." },
+    { f: 0, t: 2, l: "Uncordon", n: "The node is schedulable again and pods return." },
+    { f: 0, t: 3, l: "Check workloads", n: "Smoke tests and dashboards confirm the services are healthy before the next node." }
+  ] },
+{ id: "x-k8s-ops-node-drain", module: "k8s-ops", title: "A node drain step by step", summary: "Respecting disruption budgets.",
+  actors: ["Operator", "Node", "Eviction API", "Scheduler"],
+  steps: [
+    { f: 0, t: 1, l: "Cordon", n: "The node is marked unschedulable so nothing new lands on it." },
+    { f: 0, t: 2, l: "Start the drain", n: "The drain asks the eviction API to remove each pod." },
+    { f: 2, t: 2, l: "Check the budget", n: "An eviction is refused if it would break the disruption budget." },
+    { f: 2, t: 1, l: "Evict a pod", n: "When allowed, the pod is terminated gracefully." },
+    { f: 1, t: 3, l: "Recreate elsewhere", n: "The owning controller makes a new pod and the scheduler places it on another node." },
+    { f: 0, t: 1, l: "Maintain and uncordon", n: "After the work the node is opened for scheduling again." }
+  ] },
+{ id: "x-k8s-ops-rbac-decision", module: "k8s-ops", title: "An RBAC decision", summary: "Subject, verb and resource.",
+  actors: ["Subject", "API server", "Binding", "Role"],
+  steps: [
+    { f: 0, t: 1, l: "Request", n: "A service account asks to list secrets in the shop namespace." },
+    { f: 1, t: 2, l: "Find bindings", n: "The API server finds role bindings that mention this subject in that namespace." },
+    { f: 2, t: 3, l: "Read the role", n: "The bound role lists the verbs and resources it allows." },
+    { f: 3, t: 1, l: "No match", n: "The role allows pods but not secrets, so nothing allows the request." },
+    { f: 1, t: 0, l: "Forbidden", n: "The caller receives an error naming the subject, verb and resource." },
+    { f: 0, t: 2, l: "Fix narrowly", n: "A new rule allows only list on secrets in that namespace." }
+  ] },
+{ id: "x-k8s-ops-quota-admission", module: "k8s-ops", title: "A quota stops a deployment", summary: "Namespace limits in action.",
+  actors: ["Team", "Deployment controller", "Quota check", "Namespace"],
+  steps: [
+    { f: 0, t: 1, l: "Scale up", n: "The team raises replicas from 10 to 14." },
+    { f: 1, t: 2, l: "Create pods", n: "The controller asks the API server to create four more pods." },
+    { f: 2, t: 3, l: "Check the quota", n: "Admission adds the new requests to the namespace usage and compares with the hard limit." },
+    { f: 2, t: 1, l: "Reject", n: "The creation fails with an exceeded quota message." },
+    { f: 1, t: 0, l: "See the event", n: "The team reads the event on the ReplicaSet." },
+    { f: 0, t: 3, l: "Right-size or request more", n: "They reduce oversized requests or ask for a higher quota through review." }
+  ] },
+{ id: "x-k8s-ops-autoscaler-nodes", module: "k8s-ops", title: "Node autoscaling", summary: "Pending pods add nodes.",
+  actors: ["HPA", "Scheduler", "Node autoscaler", "Cloud"],
+  steps: [
+    { f: 0, t: 1, l: "Add replicas", n: "Load rises and the HPA increases the replica count." },
+    { f: 1, t: 1, l: "Pods stay Pending", n: "No node has enough free requests for the new pods." },
+    { f: 1, t: 2, l: "Autoscaler notices", n: "The autoscaler sees unschedulable pods and calculates a node size that fits them." },
+    { f: 2, t: 3, l: "Create a node", n: "It asks the cloud to add a node to the pool." },
+    { f: 3, t: 1, l: "Node joins", n: "The node registers and the scheduler places the pending pods." },
+    { f: 2, t: 3, l: "Scale down later", n: "Under-used nodes are drained and removed when pods can move safely." }
+  ] },
+{ id: "x-k8s-ops-network-policy", module: "k8s-ops", title: "A network policy decision", summary: "Allow lists for pod traffic.",
+  actors: ["Web pod", "Network plugin", "API pod", "Database pod"],
+  steps: [
+    { f: 0, t: 1, l: "Web calls API", n: "A packet leaves the web pod for the API pod." },
+    { f: 1, t: 1, l: "Check egress", n: "The plugin checks that egress from the web pod to the API on this port is allowed." },
+    { f: 1, t: 2, l: "Check ingress", n: "It checks the API pod's ingress allows traffic from web pods." },
+    { f: 2, t: 0, l: "Allowed", n: "Both lists allow it, so the request is delivered and answered." },
+    { f: 0, t: 3, l: "Web calls database", n: "A direct call from the web pod to the database is attempted." },
+    { f: 1, t: 3, l: "Dropped", n: "No policy allows it, so the packet is dropped and nothing reaches the database." }
+  ] },
+{ id: "x-k8s-ops-pod-security", module: "k8s-ops", title: "Pod security admission", summary: "A privileged pod is refused.",
+  actors: ["Developer", "API server", "Pod Security", "Namespace"],
+  steps: [
+    { f: 0, t: 1, l: "Apply a pod", n: "A manifest asks for privileged mode and host networking." },
+    { f: 1, t: 2, l: "Admission check", n: "Pod Security admission reads the namespace's profile label." },
+    { f: 2, t: 3, l: "Compare", n: "The pod spec is checked against the baseline rules." },
+    { f: 2, t: 1, l: "Reject", n: "Privileged mode violates the baseline, so the request is refused with a clear message." },
+    { f: 0, t: 0, l: "Fix the manifest", n: "The developer removes the extra powers and sets a non-root security context." },
+    { f: 0, t: 1, l: "Apply again", n: "The hardened pod passes admission and starts." }
+  ] },
+{ id: "x-k8s-ops-node-notready", module: "k8s-ops", title: "Why a node goes NotReady", summary: "From missed heartbeats to rescheduling.",
+  actors: ["Kubelet", "Node controller", "API server", "Scheduler"],
+  steps: [
+    { f: 0, t: 2, l: "Heartbeats", n: "The kubelet sends regular heartbeats that update the node lease." },
+    { f: 0, t: 0, l: "Fault", n: "The disk fills and the kubelet stops reporting." },
+    { f: 1, t: 2, l: "Missed updates", n: "The node controller sees no update within the grace period." },
+    { f: 1, t: 2, l: "Mark NotReady", n: "The node condition is set and taints are added." },
+    { f: 2, t: 3, l: "Evict after timeout", n: "After the toleration period, pods on the node are marked for removal." },
+    { f: 3, t: 2, l: "Reschedule", n: "Controllers create replacements and the scheduler places them on healthy nodes." }
+  ] },
+{ id: "x-k8s-ops-cert-expiry", module: "k8s-ops", title: "Certificate expiry in a cluster", summary: "A silent clock.",
+  actors: ["Certificates", "Monitor", "Operator", "API server"],
+  steps: [
+    { f: 0, t: 0, l: "Issued", n: "Cluster certificates are created with a one year lifetime." },
+    { f: 1, t: 0, l: "Watch the date", n: "A monitor tracks the days left on each certificate." },
+    { f: 1, t: 2, l: "Alert early", n: "At 30 days an alert reaches the operator." },
+    { f: 2, t: 0, l: "Renew", n: "The operator renews the certificates with the cluster tools." },
+    { f: 2, t: 3, l: "Restart components", n: "The control plane components are restarted to load the new files." },
+    { f: 0, t: 3, l: "Without monitoring", n: "An unnoticed expiry breaks every client connection to the API server." }
+  ] },
+{ id: "x-argocd-push-vs-pull", module: "argocd", title: "Push and pull delivery", summary: "Where the credentials live.",
+  actors: ["CI", "Registry", "Repository", "Controller"],
+  steps: [
+    { f: 0, t: 1, l: "Build and push the image", n: "CI builds the image and publishes it to the registry." },
+    { f: 0, t: 2, l: "Commit the new tag", n: "CI changes the image tag in the configuration repository and stops there." },
+    { f: 3, t: 2, l: "Watch the repository", n: "The controller in the cluster detects the new commit." },
+    { f: 3, t: 3, l: "Render and compare", n: "It renders the manifests and compares them with live state." },
+    { f: 3, t: 3, l: "Apply the change", n: "The controller applies the difference from inside the cluster." },
+    { f: 3, t: 2, l: "Report status", n: "The result shows as Synced and Healthy; CI never held cluster credentials." }
+  ] },
+{ id: "x-argocd-reconcile-loop", module: "argocd", title: "The reconcile loop", summary: "Desired against live state.",
+  actors: ["Repository", "Repo server", "Controller", "Cluster"],
+  steps: [
+    { f: 0, t: 1, l: "Fetch", n: "The repo server clones the repository at the target revision." },
+    { f: 1, t: 1, l: "Render", n: "Helm, Kustomize or plain YAML is turned into manifests." },
+    { f: 2, t: 3, l: "Read live state", n: "The controller reads the matching objects from the cluster." },
+    { f: 2, t: 2, l: "Compare", n: "Differences between desired and live state are calculated." },
+    { f: 2, t: 3, l: "Sync if allowed", n: "With automation on, the controller applies the difference." },
+    { f: 2, t: 2, l: "Repeat", n: "The loop runs again on new commits or when live state changes." }
+  ] },
+{ id: "x-argocd-install-first-app", module: "argocd", title: "Creating the first Application", summary: "From install to a running service.",
+  actors: ["Engineer", "Argo CD", "Repository", "Cluster"],
+  steps: [
+    { f: 0, t: 1, l: "Install Argo CD", n: "The components start in their own namespace." },
+    { f: 0, t: 1, l: "Register the repository", n: "A read-only credential is added for the configuration repository." },
+    { f: 0, t: 1, l: "Create the Application", n: "The manifest names the source path and the destination namespace." },
+    { f: 1, t: 2, l: "Fetch and render", n: "Argo CD reads the folder and renders the manifests." },
+    { f: 1, t: 1, l: "Show OutOfSync", n: "Nothing is deployed yet, so the application is OutOfSync." },
+    { f: 0, t: 3, l: "Sync", n: "The engineer presses sync and the objects appear and become Healthy." }
+  ] },
+{ id: "x-argocd-drift-selfheal", module: "argocd", title: "Drift and self-heal", summary: "A manual edit is reverted.",
+  actors: ["Engineer", "Cluster", "Controller", "Repository"],
+  steps: [
+    { f: 0, t: 1, l: "Edit by hand", n: "An engineer changes the replica count directly in the cluster." },
+    { f: 2, t: 1, l: "Notice the difference", n: "The controller sees live state no longer matches the repository." },
+    { f: 2, t: 3, l: "Mark OutOfSync", n: "The application is shown as OutOfSync with a diff." },
+    { f: 2, t: 1, l: "Self-heal", n: "With self-heal on, the controller applies the repository value again." },
+    { f: 1, t: 1, l: "Back to desired", n: "The replica count returns to the committed number." },
+    { f: 0, t: 3, l: "Change by commit", n: "The engineer makes the change in the repository so it lasts." }
+  ] },
+{ id: "x-argocd-sync-and-health", module: "argocd", title: "Sync status and health", summary: "Two different questions.",
+  actors: ["Manifests", "Argo CD", "Pods", "Dashboard"],
+  steps: [
+    { f: 0, t: 1, l: "Apply manifests", n: "Argo CD applies the rendered manifests." },
+    { f: 1, t: 1, l: "Compare", n: "Live state matches desired state, so the sync status is Synced." },
+    { f: 2, t: 2, l: "Pods fail", n: "The image tag is wrong and pods go into CrashLoopBackOff." },
+    { f: 1, t: 2, l: "Assess health", n: "Argo CD evaluates the Deployment and finds it not available." },
+    { f: 1, t: 3, l: "Show both", n: "The dashboard shows Synced and Degraded together." },
+    { f: 3, t: 2, l: "Debug the workload", n: "The team looks at events and logs, not at the manifest diff." }
+  ] },
+{ id: "x-argocd-prune", module: "argocd", title: "What prune does", summary: "Removing what left the repository.",
+  actors: ["Repository", "Controller", "Cluster", "Protection"],
+  steps: [
+    { f: 0, t: 0, l: "Delete a file", n: "A manifest for an old service is removed from the repository." },
+    { f: 1, t: 2, l: "Compare", n: "The controller sees an object in the cluster that is no longer in the source." },
+    { f: 1, t: 3, l: "Check protection", n: "The object has no Prune=false annotation, so it may be deleted." },
+    { f: 1, t: 2, l: "Prune", n: "With prune on, the controller deletes the object." },
+    { f: 0, t: 3, l: "Mark stateful data", n: "Databases and volumes carry the annotation so they survive a mistake." },
+    { f: 1, t: 0, l: "Review first", n: "A render check in the pull request shows what would be removed." }
+  ] },
+{ id: "x-argocd-helm-values", module: "argocd", title: "Helm values from the repository", summary: "Rendering without a release.",
+  actors: ["Chart", "Values file", "Repo server", "Cluster"],
+  steps: [
+    { f: 0, t: 2, l: "Pin the chart", n: "The Application names an exact chart version." },
+    { f: 1, t: 2, l: "Choose the values file", n: "The environment's values file in the repository is selected." },
+    { f: 2, t: 2, l: "Template", n: "The repo server runs the equivalent of helm template with those values." },
+    { f: 2, t: 3, l: "Apply the output", n: "The rendered manifests are applied as plain objects." },
+    { f: 2, t: 3, l: "No release record", n: "Helm itself keeps no release, because Argo CD tracks the resources." },
+    { f: 1, t: 0, l: "Review the diff", n: "A change to a value shows up as a reviewed difference." }
+  ] },
+{ id: "x-argocd-app-of-apps", module: "argocd", title: "App-of-apps bootstrap", summary: "One parent creates many applications.",
+  actors: ["Engineer", "Parent app", "Child apps", "Cluster"],
+  steps: [
+    { f: 0, t: 1, l: "Create the parent", n: "One Application points at a folder of Application manifests." },
+    { f: 1, t: 2, l: "Sync the parent", n: "Syncing creates each child Application." },
+    { f: 2, t: 3, l: "Children sync", n: "Each child delivers its own service to the cluster." },
+    { f: 0, t: 1, l: "Add a file", n: "A new Application manifest is committed to the folder." },
+    { f: 1, t: 2, l: "Detect the new child", n: "The parent creates the new Application automatically." },
+    { f: 2, t: 3, l: "New service appears", n: "The new service is delivered with no extra clicks." }
+  ] },
+{ id: "x-argocd-applicationset", module: "argocd", title: "An ApplicationSet generating applications", summary: "One template, many targets.",
+  actors: ["Generator", "ApplicationSet", "Applications", "Clusters"],
+  steps: [
+    { f: 0, t: 1, l: "List the targets", n: "A generator lists staging and production, or every registered cluster." },
+    { f: 1, t: 1, l: "Fill the template", n: "The template inserts each target's name and path." },
+    { f: 1, t: 2, l: "Create applications", n: "One Application is created per target." },
+    { f: 2, t: 3, l: "Deliver", n: "Each application syncs to its own cluster and namespace." },
+    { f: 0, t: 1, l: "A target is added", n: "A new cluster is registered and the generator sees it." },
+    { f: 1, t: 2, l: "New application appears", n: "A new Application is created and delivers the same service." }
+  ] },
+{ id: "x-argocd-promotion", module: "argocd", title: "Promoting a version", summary: "Staging first, then production.",
+  actors: ["Developer", "Staging overlay", "Production overlay", "Reviewer"],
+  steps: [
+    { f: 0, t: 1, l: "Commit the new tag", n: "The new image tag is committed to the staging overlay." },
+    { f: 1, t: 1, l: "Sync and test", n: "Staging delivers the version and tests run." },
+    { f: 0, t: 2, l: "Open a promotion request", n: "The same tag is proposed for the production overlay in a pull request." },
+    { f: 3, t: 2, l: "Review", n: "A reviewer checks the diff, test results and timing." },
+    { f: 3, t: 2, l: "Merge", n: "The merge is the approval and leaves an audit record." },
+    { f: 2, t: 2, l: "Production syncs", n: "Production delivers the same version that was tested in staging." }
+  ] },
+{ id: "x-argocd-hooks-waves", module: "argocd", title: "Waves and hooks in a sync", summary: "Running things in order.",
+  actors: ["Controller", "Wave minus one", "Hooks", "Wave zero"],
+  steps: [
+    { f: 0, t: 1, l: "Start the sync", n: "The controller sorts resources by sync wave." },
+    { f: 1, t: 1, l: "Wave minus one", n: "Namespaces and CRDs are applied first and must become healthy." },
+    { f: 0, t: 2, l: "PreSync hook", n: "A migration Job runs before the application changes." },
+    { f: 2, t: 0, l: "Job completes", n: "The controller waits for the Job to finish successfully." },
+    { f: 0, t: 3, l: "Wave zero", n: "The Deployment and Service are applied." },
+    { f: 0, t: 2, l: "PostSync hook", n: "A smoke test runs and the hook is cleaned up when it succeeds." }
+  ] },
+{ id: "x-argocd-rollout-canary", module: "argocd", title: "A canary rollout with analysis", summary: "Gradual traffic with a safety net.",
+  actors: ["Rollout", "Canary pods", "Metrics", "Stable pods"],
+  steps: [
+    { f: 0, t: 1, l: "Start the canary", n: "A small number of pods run the new version." },
+    { f: 0, t: 1, l: "Send five percent", n: "A traffic rule sends five percent of requests to the canary." },
+    { f: 2, t: 2, l: "Analyse", n: "Analysis queries the error rate for the canary." },
+    { f: 2, t: 0, l: "Pass", n: "The error rate is under the threshold, so the rollout advances to 25 percent." },
+    { f: 0, t: 3, l: "Fail", n: "If the threshold is crossed, traffic returns to the stable pods automatically." },
+    { f: 0, t: 1, l: "Finish", n: "After the last step the canary becomes the stable version." }
+  ] },
+{ id: "x-argocd-project-boundary", module: "argocd", title: "A project blocks a deployment", summary: "Teams stay inside their boundary.",
+  actors: ["Team A application", "AppProject", "Argo CD", "Team B namespace"],
+  steps: [
+    { f: 0, t: 1, l: "Application created", n: "Team A defines an application that targets team B's namespace." },
+    { f: 1, t: 2, l: "Check the project", n: "The project's allowed destinations list only team A namespaces." },
+    { f: 2, t: 0, l: "Reject", n: "Sync is refused with a message that the destination is not permitted." },
+    { f: 0, t: 3, l: "Change to its own namespace", n: "Team A points the application at its own namespace." },
+    { f: 1, t: 2, l: "Pass", n: "The destination is allowed, so the sync proceeds." },
+    { f: 2, t: 3, l: "Resources limited", n: "The project also blocks cluster-level kinds that the team has no need for." }
+  ] },
+{ id: "x-argocd-secrets-external", module: "argocd", title: "Secrets without storing them in the repository", summary: "A reference instead of a value.",
+  actors: ["Repository", "Argo CD", "External Secrets Operator", "Secrets manager"],
+  steps: [
+    { f: 0, t: 1, l: "Commit a reference", n: "The repository holds a resource that names a secret, not its value." },
+    { f: 1, t: 2, l: "Sync the reference", n: "Argo CD applies the reference object to the cluster." },
+    { f: 2, t: 3, l: "Fetch the value", n: "The operator reads the real value from the cloud secrets manager with its own identity." },
+    { f: 2, t: 1, l: "Create the Kubernetes Secret", n: "A Secret is created in the namespace for the pods to use." },
+    { f: 1, t: 1, l: "Hide the value", n: "Argo CD ignores the generated Secret contents so they never appear in diffs." },
+    { f: 3, t: 2, l: "Rotate", n: "A new value in the manager is picked up automatically on the next refresh." }
+  ] },
+{ id: "x-argocd-multi-cluster", module: "argocd", title: "Delivering to a second cluster", summary: "A hub and its targets.",
+  actors: ["Hub Argo CD", "Cluster credential", "Target cluster", "Application"],
+  steps: [
+    { f: 0, t: 2, l: "Register the target", n: "A command adds the remote cluster and creates a service account there." },
+    { f: 0, t: 1, l: "Store the credential", n: "The token is saved in the hub as a secret, so the hub namespace must be protected." },
+    { f: 3, t: 0, l: "Point an application at it", n: "The application's destination uses the remote cluster's address." },
+    { f: 0, t: 2, l: "Sync", n: "The hub applies the rendered manifests to the remote cluster." },
+    { f: 2, t: 0, l: "Report health", n: "The remote resources' health is reported back to the hub." },
+    { f: 0, t: 2, l: "Limit the role", n: "The service account in the target has only the rights the applications need." }
+  ] },
+{ id: "x-argocd-debug-stages", module: "argocd", title: "Debugging by stage", summary: "Fetch, render, apply, health.",
+  actors: ["Engineer", "Repo server", "API server", "Workload"],
+  steps: [
+    { f: 0, t: 1, l: "Read the condition", n: "argocd app get shows which stage failed first." },
+    { f: 1, t: 1, l: "Fetch", n: "A bad credential or path fails here with a clear message." },
+    { f: 1, t: 1, l: "Render", n: "The same helm template or kustomize build is run locally to reproduce errors." },
+    { f: 1, t: 2, l: "Apply", n: "A forbidden or not permitted message points to RBAC or project rules." },
+    { f: 2, t: 3, l: "Health", n: "If everything applied, the pods are debugged with events and logs." },
+    { f: 0, t: 0, l: "Record the cause", n: "The fix and a prevention are written down." }
+  ] },
+{ id: "x-linux-signal-delivery", module: "linux", title: "How a signal reaches a process", summary: "From kill to exit.",
+  actors: ["Shell", "Kernel", "Process", "Handler"],
+  steps: [
+    { f: 0, t: 1, l: "Send SIGTERM", n: "The kill command asks the kernel to deliver SIGTERM to the process ID." },
+    { f: 1, t: 2, l: "Mark the signal pending", n: "The kernel records the signal for the target process." },
+    { f: 2, t: 3, l: "Run the handler", n: "If the program installed a handler, it runs and begins an orderly shutdown." },
+    { f: 3, t: 2, l: "Close connections", n: "The handler finishes requests, flushes buffers and releases locks." },
+    { f: 0, t: 1, l: "Escalate if stuck", n: "If the process ignores SIGTERM, a later SIGKILL is sent." },
+    { f: 1, t: 2, l: "Kill without a handler", n: "SIGKILL cannot be caught, so the kernel removes the process at once." }
+  ] },
+{ id: "x-linux-file-write-path", module: "linux", title: "How a file write reaches the disk", summary: "Page cache and fsync.",
+  actors: ["Program", "Page cache", "Filesystem", "Disk"],
+  steps: [
+    { f: 0, t: 1, l: "write() call", n: "The program writes bytes, which go to memory in the page cache." },
+    { f: 1, t: 0, l: "Return quickly", n: "The call returns before the data is on disk." },
+    { f: 1, t: 2, l: "Dirty pages", n: "The cache marks pages dirty and the kernel flushes them in the background." },
+    { f: 0, t: 1, l: "fsync() call", n: "A program that needs durability asks for the data to be flushed." },
+    { f: 2, t: 3, l: "Write blocks", n: "The filesystem writes data and its journal to the disk." },
+    { f: 3, t: 0, l: "Confirm", n: "Only after the disk reports completion does fsync return, so a crash no longer loses the data." }
+  ] },
+{ id: "x-git-squash-merge", module: "git", title: "A squash merge", summary: "Many commits become one.",
+  actors: ["Feature branch", "Pull request", "main", "History"],
+  steps: [
+    { f: 0, t: 1, l: "Open the pull request", n: "The feature branch has twelve small commits, including fixes." },
+    { f: 1, t: 1, l: "Review and approve", n: "Reviewers approve the combined change." },
+    { f: 1, t: 2, l: "Squash and merge", n: "Git combines the twelve commits into one new commit on main." },
+    { f: 2, t: 3, l: "Clean history", n: "The history shows one commit with a clear message and a link to the review." },
+    { f: 0, t: 0, l: "Branch left behind", n: "The old branch still has the twelve commits and is deleted." },
+    { f: 2, t: 3, l: "Revert is easy", n: "If it causes trouble, one revert undoes the whole feature." }
+  ] },
+{ id: "x-git-reflog-rescue", module: "git", title: "Rescuing work with the reflog", summary: "Undoing a bad reset.",
+  actors: ["Developer", "Branch", "Reflog", "Recovered branch"],
+  steps: [
+    { f: 0, t: 1, l: "Reset by mistake", n: "A hard reset moves the branch back and the last three commits vanish from view." },
+    { f: 1, t: 2, l: "Reflog keeps moves", n: "Git recorded every previous position of the branch tip." },
+    { f: 0, t: 2, l: "Read the reflog", n: "The developer runs git reflog and finds the commit before the reset." },
+    { f: 0, t: 3, l: "Create a branch", n: "A new branch is created at that commit." },
+    { f: 3, t: 1, l: "Commits return", n: "All three commits are reachable again." },
+    { f: 0, t: 1, l: "Move on", n: "The developer merges or cherry-picks the work back where it belongs." }
+  ] },
+{ id: "x-bash-read-lines", module: "bash", title: "Reading a file line by line safely", summary: "Why while read needs care.",
+  actors: ["Script", "File", "Loop", "Command"],
+  steps: [
+    { f: 0, t: 1, l: "Open the file", n: "The script redirects the file into a while loop." },
+    { f: 1, t: 2, l: "Read one line", n: "The read command takes a line, with IFS= and -r so spaces and backslashes survive." },
+    { f: 2, t: 3, l: "Run a command", n: "The loop passes the line to a command inside quotes." },
+    { f: 3, t: 2, l: "Do not consume input", n: "A command that reads standard input would swallow the rest of the file." },
+    { f: 2, t: 1, l: "Repeat", n: "The loop continues until read returns end of file." },
+    { f: 0, t: 3, l: "Check the exit code", n: "The script checks the status and stops on failure." }
+  ] },
+{ id: "x-bash-lock-file", module: "bash", title: "A script that refuses to run twice", summary: "Locking with flock.",
+  actors: ["Cron", "Script", "Lock file", "Second run"],
+  steps: [
+    { f: 0, t: 1, l: "Start the job", n: "Cron starts the script on schedule." },
+    { f: 1, t: 2, l: "Take the lock", n: "The script uses flock to take an exclusive lock on a lock file." },
+    { f: 1, t: 1, l: "Do the work", n: "The long task runs while holding the lock." },
+    { f: 0, t: 3, l: "A second run starts", n: "A late job starts while the first is still running." },
+    { f: 3, t: 2, l: "Lock is busy", n: "The second run cannot get the lock and exits quietly." },
+    { f: 1, t: 2, l: "Release", n: "When the first run ends, the lock is released automatically." }
+  ] },
+{ id: "x-python-package-publish", module: "python", title: "Publishing a Python package", summary: "From source to installable.",
+  actors: ["Developer", "Build tool", "Index", "User"],
+  steps: [
+    { f: 0, t: 1, l: "Set the version", n: "The developer updates the version in the project metadata." },
+    { f: 1, t: 1, l: "Build", n: "The build tool creates a source archive and a wheel." },
+    { f: 0, t: 2, l: "Upload", n: "The files are uploaded to a package index with a scoped token." },
+    { f: 2, t: 3, l: "Index serves", n: "The index stores the files and lists the new version." },
+    { f: 3, t: 2, l: "Install", n: "A user installs the package, preferably with a pinned version." },
+    { f: 3, t: 0, l: "Verify", n: "Hashes and a lock file ensure the same files are used each time." }
+  ] },
+{ id: "x-python-exit-codes", module: "python", title: "A Python tool exits with the right code", summary: "So automation can react.",
+  actors: ["Script", "Exception handler", "Shell", "Pipeline"],
+  steps: [
+    { f: 0, t: 1, l: "Run the work", n: "The script calls an API and the call fails." },
+    { f: 1, t: 1, l: "Catch the error", n: "The handler catches the specific exception and logs a clear message." },
+    { f: 1, t: 0, l: "Choose the code", n: "It exits with a non-zero code instead of returning normally." },
+    { f: 0, t: 2, l: "Shell sees failure", n: "The shell stores the exit status for the caller." },
+    { f: 2, t: 3, l: "Pipeline stops", n: "The pipeline step fails and the team is notified." },
+    { f: 0, t: 3, l: "Success path", n: "On success the script exits with zero and later steps continue." }
+  ] },
+{ id: "x-go-interface-satisfaction", module: "go", title: "How a Go type satisfies an interface", summary: "No implements keyword.",
+  actors: ["Interface", "Type", "Compiler", "Caller"],
+  steps: [
+    { f: 0, t: 2, l: "Define the interface", n: "The interface lists the methods a caller needs." },
+    { f: 1, t: 1, l: "Write the type", n: "A type defines methods with matching names and signatures." },
+    { f: 2, t: 1, l: "Check at compile time", n: "The compiler checks the type has every method, with no declaration needed." },
+    { f: 3, t: 0, l: "Accept the interface", n: "The caller's function takes the interface, so it accepts any matching type." },
+    { f: 3, t: 1, l: "Swap in a fake", n: "A test passes a small fake type that has the same methods." },
+    { f: 2, t: 3, l: "Mismatch fails early", n: "A missing method is reported as a compile error." }
+  ] },
+{ id: "x-go-cli-exit", module: "go", title: "A Go command-line tool", summary: "Flags, work and exit codes.",
+  actors: ["User", "flag package", "main", "os.Exit"],
+  steps: [
+    { f: 0, t: 1, l: "Pass flags", n: "The user runs the tool with flags such as a timeout and a path." },
+    { f: 1, t: 2, l: "Parse", n: "The flag package parses values and prints usage for mistakes." },
+    { f: 2, t: 2, l: "Run the work", n: "main calls a function that returns an error instead of exiting inside it." },
+    { f: 2, t: 3, l: "Choose an exit code", n: "main maps errors to exit codes in one place." },
+    { f: 3, t: 0, l: "Exit", n: "The process ends with a status that scripts can test." },
+    { f: 2, t: 0, l: "Print errors to stderr", n: "Messages go to standard error so output stays clean." }
+  ] },
+{ id: "x-net-arp-lookup", module: "networking", title: "How ARP finds a MAC address", summary: "Local delivery on a subnet.",
+  actors: ["Host A", "Switch", "Host B", "ARP cache"],
+  steps: [
+    { f: 0, t: 3, l: "Check the cache", n: "Host A looks for host B's MAC address in its ARP cache." },
+    { f: 0, t: 1, l: "Broadcast a question", n: "Nothing is cached, so A broadcasts who has this IP address." },
+    { f: 1, t: 2, l: "Switch floods", n: "The switch sends the broadcast to every port in the subnet." },
+    { f: 2, t: 0, l: "Host B replies", n: "Host B answers directly with its MAC address." },
+    { f: 0, t: 3, l: "Cache the answer", n: "Host A stores the mapping for a short time." },
+    { f: 0, t: 2, l: "Send the frame", n: "The frame goes to host B's MAC address through the switch." }
+  ] },
+{ id: "x-net-nat-translation", module: "networking", title: "How NAT rewrites a connection", summary: "Private addresses reaching the internet.",
+  actors: ["Private host", "NAT gateway", "Translation table", "Server"],
+  steps: [
+    { f: 0, t: 1, l: "Send a packet", n: "A private host sends a packet to a public server." },
+    { f: 1, t: 2, l: "Create a mapping", n: "The gateway records the private address and port against a public port." },
+    { f: 1, t: 3, l: "Rewrite and forward", n: "The source address is changed to the gateway's public address." },
+    { f: 3, t: 1, l: "Reply returns", n: "The server answers to the gateway's public address and port." },
+    { f: 1, t: 2, l: "Look up the mapping", n: "The gateway finds which private host owns that port." },
+    { f: 1, t: 0, l: "Rewrite back", n: "The destination is changed to the private host and the packet is delivered." }
+  ] },
+{ id: "x-docker-bind-vs-volume", module: "docker", title: "Bind mount and volume", summary: "Where container data lives.",
+  actors: ["Container", "Bind mount", "Volume", "Host"],
+  steps: [
+    { f: 0, t: 1, l: "Mount a host folder", n: "A bind mount maps an existing host path into the container." },
+    { f: 1, t: 3, l: "Edits are shared", n: "Changes inside and outside the container appear in both places." },
+    { f: 0, t: 2, l: "Mount a volume", n: "A named volume is managed by Docker and mounted at a path." },
+    { f: 2, t: 3, l: "Stored by Docker", n: "Data lives in Docker's own area, independent of the container." },
+    { f: 0, t: 2, l: "Remove the container", n: "The volume remains with its data until it is removed explicitly." },
+    { f: 1, t: 3, l: "Beware permissions", n: "Host paths bring host ownership and permissions into the container." }
+  ] },
+{ id: "x-docker-image-scan", module: "docker", title: "Scanning an image before it ships", summary: "Catch known flaws early.",
+  actors: ["Build", "Scanner", "Registry", "Policy"],
+  steps: [
+    { f: 0, t: 1, l: "Build the image", n: "The pipeline builds the image from the Dockerfile." },
+    { f: 1, t: 1, l: "Scan", n: "The scanner compares installed packages with a database of known vulnerabilities." },
+    { f: 1, t: 3, l: "Apply a policy", n: "The policy fails the build for critical flaws with an available fix." },
+    { f: 3, t: 0, l: "Fix", n: "The team updates the base image or package and rebuilds." },
+    { f: 0, t: 2, l: "Push", n: "The clean image is pushed to the registry." },
+    { f: 2, t: 3, l: "Rescan regularly", n: "New flaws are published daily, so stored images are scanned again." }
+  ] },
+{ id: "x-cicd-manual-approval", module: "cicd", title: "A pipeline with approval", summary: "A gate before production.",
+  actors: ["Pipeline", "Staging", "Approver", "Production"],
+  steps: [
+    { f: 0, t: 1, l: "Deploy to staging", n: "The pipeline deploys the build and runs tests automatically." },
+    { f: 1, t: 0, l: "Tests pass", n: "Results are attached to the run." },
+    { f: 0, t: 2, l: "Request approval", n: "The pipeline pauses and notifies the approver with the change and test results." },
+    { f: 2, t: 0, l: "Approve", n: "The approver reviews and approves, and the decision is recorded." },
+    { f: 0, t: 3, l: "Deploy to production", n: "The same artifact that was tested is deployed." },
+    { f: 3, t: 0, l: "Verify", n: "A health check confirms the release, and the pipeline reports success." }
+  ] },
+{ id: "x-cicd-rollback-artifact", module: "cicd", title: "Rolling back by redeploying an artifact", summary: "Previous version, same process.",
+  actors: ["Pipeline", "Artifact store", "Production", "Monitor"],
+  steps: [
+    { f: 0, t: 2, l: "Release v42", n: "The pipeline deploys build 42 to production." },
+    { f: 3, t: 2, l: "Spot errors", n: "The monitor shows error rates rising after the release." },
+    { f: 3, t: 0, l: "Trigger rollback", n: "The on-call engineer starts the rollback job with the previous version number." },
+    { f: 0, t: 1, l: "Fetch v41", n: "The pipeline retrieves the stored v41 artifact, not a rebuild." },
+    { f: 0, t: 2, l: "Redeploy", n: "v41 is deployed with the same process as any release." },
+    { f: 3, t: 0, l: "Recover", n: "Error rates return to normal and the team investigates v42 calmly." }
+  ] },
+{ id: "x-k8s-statefulset-order", module: "kubernetes", title: "How a StatefulSet starts pods", summary: "Stable names and order.",
+  actors: ["StatefulSet controller", "Pod 0", "Pod 1", "Volume"],
+  steps: [
+    { f: 0, t: 1, l: "Create pod 0", n: "The controller creates pod 0 first with a stable name." },
+    { f: 1, t: 3, l: "Attach storage", n: "Pod 0 gets its own volume claim that persists." },
+    { f: 1, t: 0, l: "Wait until ready", n: "The controller waits for pod 0 to be Running and Ready." },
+    { f: 0, t: 2, l: "Create pod 1", n: "Only after pod 0 is ready is pod 1 created." },
+    { f: 2, t: 3, l: "Own volume", n: "Pod 1 receives a separate volume claim." },
+    { f: 0, t: 3, l: "Replace in place", n: "A failed pod returns with the same name and the same volume." }
+  ] },
+{ id: "x-k8s-node-failure", module: "kubernetes", title: "A node fails", summary: "Rescheduling workloads.",
+  actors: ["Node", "Node controller", "Deployment controller", "Scheduler"],
+  steps: [
+    { f: 0, t: 0, l: "Node stops responding", n: "Power loss stops the kubelet heartbeats." },
+    { f: 1, t: 1, l: "Mark unreachable", n: "After the grace period the node is marked NotReady and tainted." },
+    { f: 1, t: 2, l: "Evict after the timeout", n: "Pods on the node are removed from the API after their toleration expires." },
+    { f: 2, t: 2, l: "Create replacements", n: "The Deployment's ReplicaSet creates new pods to restore the count." },
+    { f: 2, t: 3, l: "Place them", n: "The scheduler assigns the new pods to healthy nodes." },
+    { f: 3, t: 0, l: "Service recovers", n: "Traffic goes to the new pods once they are ready." }
+  ] },
+{ id: "x-helm-diff-before-upgrade", module: "helm", title: "Checking a change with helm diff", summary: "See before you apply.",
+  actors: ["Engineer", "helm diff", "Cluster", "Release"],
+  steps: [
+    { f: 0, t: 1, l: "Prepare the change", n: "The engineer updates values or the chart version." },
+    { f: 1, t: 2, l: "Read the live release", n: "The diff plugin reads the manifest of the current release." },
+    { f: 1, t: 1, l: "Render the new manifest", n: "The new chart and values are rendered locally." },
+    { f: 1, t: 0, l: "Show the differences", n: "Lines are shown for each changed object." },
+    { f: 0, t: 0, l: "Review", n: "The engineer checks image tags, replicas and resources." },
+    { f: 0, t: 3, l: "Upgrade", n: "Only then does helm upgrade run, with the diff attached to the review." }
+  ] },
+{ id: "x-helm-repo-version", module: "helm", title: "Choosing a chart version", summary: "From repository index to release.",
+  actors: ["Engineer", "Repository index", "Chart", "Cluster"],
+  steps: [
+    { f: 0, t: 1, l: "Update the index", n: "helm repo update downloads the list of available chart versions." },
+    { f: 0, t: 1, l: "Search versions", n: "helm search shows several versions of the chart." },
+    { f: 0, t: 2, l: "Pin one", n: "The engineer chooses an exact version, not the latest." },
+    { f: 2, t: 0, l: "Pull and inspect", n: "The chart is pulled and its values and templates reviewed." },
+    { f: 0, t: 3, l: "Install", n: "The release is installed with the pinned version and recorded." },
+    { f: 0, t: 1, l: "Upgrade deliberately", n: "New versions are adopted by a reviewed change." }
+  ] },
+{ id: "x-terraform-workspaces", module: "terraform", title: "Workspaces and separate state", summary: "Two ways to separate environments.",
+  actors: ["Engineer", "Workspace", "State file", "Environment"],
+  steps: [
+    { f: 0, t: 1, l: "Select a workspace", n: "The engineer chooses a workspace named staging." },
+    { f: 1, t: 2, l: "Use its state", n: "Each workspace has its own state in the same backend." },
+    { f: 0, t: 3, l: "Apply", n: "Resources for staging are created from the same code." },
+    { f: 0, t: 1, l: "Switch to production", n: "A second workspace uses another state, easy to confuse with the first." },
+    { f: 0, t: 2, l: "Prefer separate directories", n: "Many teams use separate configurations and backends for clearer boundaries and permissions." },
+    { f: 0, t: 3, l: "Check before apply", n: "The plan header shows which environment is targeted." }
+  ] },
+{ id: "x-terraform-failed-apply", module: "terraform", title: "Recovering from a failed apply", summary: "Half-created infrastructure.",
+  actors: ["Terraform", "Cloud API", "State", "Engineer"],
+  steps: [
+    { f: 0, t: 1, l: "Apply", n: "Terraform creates resources one by one." },
+    { f: 1, t: 0, l: "One call fails", n: "The cloud rejects a request, for example due to a quota." },
+    { f: 0, t: 2, l: "Save progress", n: "The state records the resources created before the error." },
+    { f: 0, t: 3, l: "Read the error", n: "The engineer reads the message and fixes the cause, such as raising the quota." },
+    { f: 3, t: 0, l: "Run apply again", n: "The next apply continues from the saved state." },
+    { f: 0, t: 2, l: "Check the plan", n: "The plan shows only the remaining work and no duplicates." }
+  ] },
+{ id: "x-ansible-handlers", module: "ansible", title: "Handlers and notifications", summary: "Restart only when something changed.",
+  actors: ["Playbook", "Task", "Handler", "Service"],
+  steps: [
+    { f: 0, t: 1, l: "Run the task", n: "A task updates the configuration file." },
+    { f: 1, t: 1, l: "Detect a change", n: "The file differs, so the task reports changed." },
+    { f: 1, t: 2, l: "Notify", n: "The task notifies the restart handler." },
+    { f: 0, t: 2, l: "Run other tasks", n: "The play continues with later tasks." },
+    { f: 2, t: 3, l: "Run handlers at the end", n: "The restart runs once, after the tasks that needed it." },
+    { f: 0, t: 3, l: "No change, no restart", n: "On a second run nothing changes and the service is not touched." }
+  ] },
+{ id: "x-ansible-dynamic-inventory", module: "ansible", title: "Dynamic inventory from the cloud", summary: "Hosts found at run time.",
+  actors: ["Playbook", "Inventory plugin", "Cloud API", "Hosts"],
+  steps: [
+    { f: 0, t: 1, l: "Ask for inventory", n: "The playbook run starts with an inventory plugin." },
+    { f: 1, t: 2, l: "Query the cloud", n: "The plugin lists servers with their tags." },
+    { f: 2, t: 1, l: "Return the list", n: "The cloud returns servers and metadata." },
+    { f: 1, t: 0, l: "Build groups", n: "Hosts are grouped by tag such as web or db." },
+    { f: 0, t: 3, l: "Run on the group", n: "The play targets the web group and connects to those hosts." },
+    { f: 0, t: 3, l: "Always current", n: "New servers are included next run and deleted servers disappear." }
+  ] },
+{ id: "x-cloud-health-check", module: "cloud", title: "A load balancer health check", summary: "Only healthy targets get traffic.",
+  actors: ["Load balancer", "Target A", "Target B", "Users"],
+  steps: [
+    { f: 0, t: 1, l: "Probe", n: "The load balancer requests the health path from each target." },
+    { f: 1, t: 0, l: "Healthy", n: "Target A returns 200 and stays in rotation." },
+    { f: 0, t: 2, l: "Probe B", n: "Target B is probed in the same way on the same path." },
+    { f: 2, t: 0, l: "Unhealthy", n: "Target B returns errors repeatedly." },
+    { f: 0, t: 2, l: "Remove", n: "After the threshold, target B receives no new traffic." },
+    { f: 3, t: 0, l: "Users unaffected", n: "Requests go to target A while B is repaired and re-added." }
+  ] },
+{ id: "x-cloud-budget-alert", module: "cloud", title: "A cost budget alert", summary: "Catch a bill spike early.",
+  actors: ["Billing data", "Budget", "Alert", "Team"],
+  steps: [
+    { f: 0, t: 1, l: "Collect costs", n: "Usage and cost data is collected daily by tag." },
+    { f: 1, t: 1, l: "Compare with budget", n: "The service compares spend with the monthly budget." },
+    { f: 1, t: 2, l: "Cross a threshold", n: "Forecast spend passes 80 percent of the budget." },
+    { f: 2, t: 3, l: "Notify", n: "The team receives an alert naming the service and the tag." },
+    { f: 3, t: 0, l: "Investigate", n: "They find idle large servers left running." },
+    { f: 3, t: 1, l: "Fix and prevent", n: "They remove the servers and add scheduled shutdown for test environments." }
+  ] },
+{ id: "x-obs-slo-dashboard", module: "observability", title: "How an SLO is computed", summary: "From events to a budget.",
+  actors: ["Requests", "Metrics", "Query", "Dashboard"],
+  steps: [
+    { f: 0, t: 1, l: "Count requests", n: "Every request increments total and error counters." },
+    { f: 1, t: 2, l: "Query a window", n: "A query computes the good request ratio over 30 days." },
+    { f: 2, t: 3, l: "Compare with the target", n: "The ratio is compared with the 99.9 percent objective." },
+    { f: 3, t: 3, l: "Show the budget", n: "The dashboard displays the error budget remaining." },
+    { f: 3, t: 0, l: "Show the burn rate", n: "A second panel shows how fast the budget is being used." },
+    { f: 3, t: 0, l: "Decide", n: "The team slows releases if the budget is nearly spent." }
+  ] },
+{ id: "x-obs-trace-id-logs", module: "observability", title: "Linking logs and traces", summary: "One ID across tools.",
+  actors: ["Gateway", "Service", "Log search", "Trace view"],
+  steps: [
+    { f: 0, t: 1, l: "Create a trace ID", n: "The gateway creates an ID and passes it in a header." },
+    { f: 1, t: 1, l: "Log with the ID", n: "The service writes the ID in every log line." },
+    { f: 1, t: 3, l: "Send spans", n: "The service also sends spans with the same ID to the tracing backend." },
+    { f: 2, t: 2, l: "Search logs", n: "An engineer searches logs for the ID." },
+    { f: 3, t: 2, l: "Open the trace", n: "The trace view shows the same request and where it was slow." },
+    { f: 2, t: 3, l: "Fix with evidence", n: "Logs show the error and the trace shows the slow call that caused it." }
+  ] },
+{ id: "x-sre-capacity-planning", module: "sre", title: "Capacity planning from a trend", summary: "Plan before you run out.",
+  actors: ["Metrics", "Forecast", "Plan", "Review"],
+  steps: [
+    { f: 0, t: 1, l: "Collect usage", n: "Weekly peaks for CPU, memory and storage are collected." },
+    { f: 1, t: 1, l: "Fit a trend", n: "A forecast projects when usage will reach 80 percent." },
+    { f: 1, t: 2, l: "Add headroom", n: "The plan adds a margin for failures and launches." },
+    { f: 2, t: 2, l: "Schedule the work", n: "The purchase or scale-up is scheduled before the date, with lead time." },
+    { f: 3, t: 0, l: "Review monthly", n: "The forecast is compared with actual growth." },
+    { f: 3, t: 2, l: "Adjust", n: "Differences change the plan, not only the numbers." }
+  ] },
+{ id: "x-sre-oncall-handoff", module: "sre", title: "An on-call handoff", summary: "Passing context safely.",
+  actors: ["Outgoing engineer", "Notes", "Incoming engineer", "Alerts"],
+  steps: [
+    { f: 0, t: 1, l: "Write the notes", n: "The outgoing engineer lists open issues, recent changes and risky tasks." },
+    { f: 1, t: 2, l: "Share", n: "The notes are shared in the handoff meeting or channel." },
+    { f: 2, t: 1, l: "Ask questions", n: "The incoming engineer asks about anything unclear." },
+    { f: 3, t: 2, l: "Review alerts", n: "Together they check open alerts and silences." },
+    { f: 2, t: 3, l: "Confirm", n: "The incoming engineer confirms ownership and the pager is switched." },
+    { f: 0, t: 2, l: "Stay reachable", n: "The outgoing engineer remains available for a short overlap." }
+  ] },
+{ id: "x-security-dependency-scan", module: "security", title: "Scanning dependencies", summary: "Known flaws in libraries.",
+  actors: ["Developer", "Pipeline", "Scanner", "Advisory data"],
+  steps: [
+    { f: 0, t: 1, l: "Open a pull request", n: "The change updates dependencies." },
+    { f: 1, t: 2, l: "Run the scanner", n: "The pipeline lists direct and indirect dependencies." },
+    { f: 2, t: 3, l: "Compare", n: "Versions are matched against known vulnerability data." },
+    { f: 2, t: 1, l: "Report findings", n: "A critical flaw with a fixed version is found." },
+    { f: 0, t: 0, l: "Update", n: "The developer upgrades to the fixed version." },
+    { f: 1, t: 1, l: "Pass", n: "The scan is clean and the pull request can merge." }
+  ] },
+{ id: "x-security-rotate-credential", module: "security", title: "Rotating a credential", summary: "Replace without an outage.",
+  actors: ["Secret store", "Service A", "Database", "Operator"],
+  steps: [
+    { f: 0, t: 0, l: "Create the new secret", n: "The operator creates version 2 while version 1 remains valid." },
+    { f: 0, t: 3, l: "Add the new password", n: "The database accepts both passwords for now." },
+    { f: 1, t: 0, l: "Read the new version", n: "Service A reloads the secret and starts using version 2." },
+    { f: 0, t: 1, l: "Verify", n: "Logs show all instances connected with the new password." },
+    { f: 0, t: 3, l: "Retire the old", n: "Version 1 is removed from the database." },
+    { f: 0, t: 0, l: "Record", n: "The date and owner are recorded for the next rotation." }
+  ] },
+{ id: "x-db-write-ahead-log", module: "databases", title: "Write-ahead logging", summary: "Durability before the data file.",
+  actors: ["Client", "Database", "Log", "Data files"],
+  steps: [
+    { f: 0, t: 1, l: "Commit", n: "The client commits a transaction." },
+    { f: 1, t: 2, l: "Write the log", n: "The change is appended to the write-ahead log and flushed." },
+    { f: 1, t: 0, l: "Acknowledge", n: "Only after the log is safe is the commit confirmed." },
+    { f: 1, t: 3, l: "Update data later", n: "The data files are updated in the background." },
+    { f: 1, t: 1, l: "Crash", n: "The server loses power before data files are written." },
+    { f: 2, t: 3, l: "Replay", n: "On restart the log is replayed so committed changes are restored." }
+  ] },
+{ id: "x-db-connection-exhaustion", module: "databases", title: "Running out of connections", summary: "Why a pool and a limit matter.",
+  actors: ["Application", "Pool", "Database", "Alert"],
+  steps: [
+    { f: 0, t: 1, l: "Traffic grows", n: "More application instances start, each opening its own connections." },
+    { f: 1, t: 2, l: "Reach the limit", n: "The database hits its maximum number of connections." },
+    { f: 2, t: 0, l: "Refuse new connections", n: "New requests fail with too many connections." },
+    { f: 3, t: 0, l: "Alert", n: "An alert fires on connection use above 80 percent." },
+    { f: 1, t: 2, l: "Add a pooler", n: "A pooler shares a small number of server connections among many clients." },
+    { f: 0, t: 1, l: "Set pool sizes", n: "Each application gets a limit so the total stays under the cap." }
+  ] },
+{ id: "x-llm-cheaper-model", module: "llm", title: "Choosing a cheaper model for simple steps", summary: "Match model to task.",
+  actors: ["Router", "Small model", "Large model", "Evaluation"],
+  steps: [
+    { f: 0, t: 3, l: "Collect examples", n: "Real requests are labelled by difficulty." },
+    { f: 0, t: 1, l: "Try the small model", n: "Simple classification is run on the cheaper model." },
+    { f: 3, t: 1, l: "Measure", n: "The evaluation set shows the pass rate matches the larger model on this step." },
+    { f: 0, t: 2, l: "Keep the large model", n: "Hard reasoning steps stay on the more capable model." },
+    { f: 0, t: 0, l: "Route", n: "The router sends each step to the cheapest model that passes." },
+    { f: 3, t: 0, l: "Recheck", n: "The evaluation runs again on every model or prompt change." }
+  ] },
+{ id: "x-llm-batch-processing", module: "llm", title: "Batch processing", summary: "Non-urgent work at lower cost.",
+  actors: ["Job", "Batch API", "Model", "Results"],
+  steps: [
+    { f: 0, t: 1, l: "Collect requests", n: "A nightly job gathers ten thousand summaries to produce." },
+    { f: 1, t: 1, l: "Submit as a batch", n: "The requests are sent as one batch with IDs." },
+    { f: 1, t: 2, l: "Process later", n: "The provider processes them within a time window at a lower price." },
+    { f: 1, t: 0, l: "Poll for status", n: "The job checks the batch status periodically." },
+    { f: 2, t: 3, l: "Download results", n: "Results are returned with the same IDs." },
+    { f: 3, t: 0, l: "Match and validate", n: "Each result is matched to its request and validated, and failures are retried." }
+  ] },
+{ id: "x-prompting-tags-data", module: "prompting", title: "Separating data from instructions", summary: "Tags keep roles clear.",
+  actors: ["Instructions", "Document", "Prompt", "Model"],
+  steps: [
+    { f: 0, t: 2, l: "Write the task", n: "The instructions say what to do with the document." },
+    { f: 1, t: 2, l: "Wrap the data", n: "The document is placed inside tags marked as data." },
+    { f: 2, t: 3, l: "Send", n: "The prompt contains instructions first, then the tagged document." },
+    { f: 3, t: 3, l: "Treat tags as data", n: "The model summarises the content and does not follow orders written inside it." },
+    { f: 2, t: 3, l: "Not a guarantee", n: "Tags help but do not replace limiting what the system can do." },
+    { f: 3, t: 0, l: "Validate", n: "The output is validated in code before anything uses it." }
+  ] },
+{ id: "x-prompting-ab-compare", module: "prompting", title: "Comparing two prompt versions", summary: "Decide with data.",
+  actors: ["Version A", "Version B", "Evaluation set", "Decision"],
+  steps: [
+    { f: 0, t: 2, l: "Run version A", n: "The saved cases are run through version A several times." },
+    { f: 1, t: 2, l: "Run version B", n: "The same cases are run through version B." },
+    { f: 2, t: 3, l: "Score", n: "Checks in code score format, facts and forbidden content." },
+    { f: 3, t: 3, l: "Compare", n: "Pass rates, cost and latency are compared per case type." },
+    { f: 3, t: 0, l: "Choose", n: "The better version is released gradually." },
+    { f: 3, t: 2, l: "Keep the cases", n: "Failures become new cases for the future." }
+  ] },
+{ id: "x-skills-reference-on-demand", module: "claude-skills", title: "Loading a reference file on demand", summary: "Only when a step needs it.",
+  actors: ["Request", "SKILL.md", "Reference file", "Claude"],
+  steps: [
+    { f: 0, t: 3, l: "Skill triggers", n: "The request matches the skill and the body loads." },
+    { f: 1, t: 3, l: "Follow the workflow", n: "The steps run; most requests never need the long reference." },
+    { f: 1, t: 2, l: "A step needs detail", n: "A step says to read the rules file for invoices over a limit." },
+    { f: 3, t: 2, l: "Open the file", n: "Claude reads the single file named by the step." },
+    { f: 2, t: 3, l: "Use the detail", n: "The rules are applied to the task." },
+    { f: 3, t: 0, l: "Stay lean", n: "Other requests never pay for the reference in context." }
+  ] },
+{ id: "x-skills-version-update", module: "claude-skills", title: "Updating a skill", summary: "Change with tests.",
+  actors: ["Author", "Test tasks", "Repository", "Team"],
+  steps: [
+    { f: 0, t: 1, l: "Edit the skill", n: "The author improves a description or step." },
+    { f: 1, t: 1, l: "Run the tasks", n: "The saved tasks are run before and after." },
+    { f: 1, t: 0, l: "Compare", n: "Results show better quality and no new false triggers." },
+    { f: 0, t: 2, l: "Bump the version", n: "The change is merged with a changelog entry and a new version." },
+    { f: 2, t: 3, l: "Roll out", n: "The team installs the new version from the repository." },
+    { f: 3, t: 0, l: "Report problems", n: "A missed request is added to the test tasks for next time." }
+  ] },
+{ id: "x-mcp-resource-template", module: "mcp", title: "Reading a resource by URI", summary: "Data the application attaches.",
+  actors: ["User", "Host", "MCP server", "Backend"],
+  steps: [
+    { f: 0, t: 1, l: "Pick a document", n: "The user selects a runbook in the host's attachment menu." },
+    { f: 1, t: 2, l: "Read the resource", n: "The host asks the server to read the resource by its URI." },
+    { f: 2, t: 3, l: "Fetch", n: "The server loads the runbook from the backend." },
+    { f: 3, t: 2, l: "Return content", n: "The text is returned as the resource contents." },
+    { f: 2, t: 1, l: "Attach", n: "The host adds it to the model's context for the conversation." },
+    { f: 1, t: 0, l: "Respect size", n: "Large documents are summarised or limited to save context." }
+  ] },
+{ id: "x-mcp-tracing-calls", module: "mcp", title: "Tracing tool calls", summary: "Make agent runs debuggable.",
+  actors: ["Agent", "Tool", "Trace store", "Engineer"],
+  steps: [
+    { f: 0, t: 1, l: "Create a run ID", n: "Each conversation gets a run ID and each call a step number." },
+    { f: 0, t: 1, l: "Call a tool", n: "The agent calls a tool with arguments." },
+    { f: 1, t: 2, l: "Log the step", n: "The call, duration, result size and errors are stored with the run ID." },
+    { f: 0, t: 1, l: "Repeat", n: "Later steps are logged in order." },
+    { f: 3, t: 2, l: "Investigate", n: "An engineer opens the trace for a wrong answer." },
+    { f: 3, t: 2, l: "Find the cause", n: "They see the tool returned an empty result and the agent gave up." }
   ] }
 ];

@@ -1145,3 +1145,13 @@ p code, li code, td code { overflow-wrap: anywhere; }
 
 /* nav fits at laptop widths now that Certifications is a text link */
 @media (min-width: 900px) and (max-width: 1360px) { .topnav a { padding: 8px 6px; font-size: .94rem; } .topnav { gap: 0; } }
+
+/* explainer filters */
+.exf-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.exf-chip { font: 600 14px/1.2 var(--sans); padding: 8px 12px; border-radius: 99px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--text); cursor: pointer; }
+.exf-chip:hover { background: var(--accent-soft); }
+.exf-chip[aria-pressed="true"] { background: var(--accent-soft); color: var(--ink); border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.exf-n { margin-left: 4px; padding: 0 7px; border-radius: 99px; font-size: 12px; background: var(--line); }
+.exf-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 8px 0 16px; }
+.exf-prog { font-weight: 500; margin-left: 8px; }
+.exf-search input { width: 100%; max-width: 420px; }
