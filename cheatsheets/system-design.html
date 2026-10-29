@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>System design for platform and SRE cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="The design order, estimation numbers, building-block rules and failure-containment patterns on one page.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/system-design.html">
+<meta property="og:title" content="System design for platform and SRE cheat sheet">
+<meta property="og:description" content="The design order, estimation numbers, building-block rules and failure-containment patterns on one page.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/system-design.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=44dd1e9e">
+<script src="../assets/a11y.js?v=44dd1e9e"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="../#/interview">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>System design for platform and SRE cheat sheet</h1>
+    <p class="lede">The design order, estimation numbers, building-block rules and failure-containment patterns on one page.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="the-order">The order</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="1. Clarify    - users, what must never be wrong, SLO
+2. Estimate   - requests per second, storage, bandwidth, peak
+3. Sketch     - smallest design that meets the numbers
+4. Deep-dive  - the risky part: data store, queue, rollout
+5. Failures   - slow, down, wrong, overloaded, for every box
+6. Trade-offs - say what you gave up" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">1. Clarify    - users, what must never be wrong, SLO
+2. Estimate   - requests per second, storage, bandwidth, peak
+3. Sketch     - smallest design that meets the numbers
+4. Deep-dive  - the risky part: data store, queue, rollout
+5. Failures   - slow, down, wrong, overloaded, for every box
+6. Trade-offs - say what you gave up</code></pre></div>
+<h2 id="numbers-to-remember">Numbers to remember</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="seconds per day     ~ 100,000 (86,400)
+1M requests/day     ~ 10 per second
+100M requests/day   ~ 1,000 per second
+peak versus average ~ 3x unless known
+memory read ~100 ns | SSD read ~100 us | same-region RTT ~1 ms | cross-continent RTT 100-200 ms
+99.9% = 43 min/month | 99.99% = 4.3 min/month | 99.999% = 26 s/month" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">seconds per day     ~ 100,000 (86,400)
+1M requests/day     ~ 10 per second
+100M requests/day   ~ 1,000 per second
+peak versus average ~ 3x unless known
+memory read ~100 ns | SSD read ~100 us | same-region RTT ~1 ms | cross-continent RTT 100-200 ms
+99.9% = 43 min/month | 99.99% = 4.3 min/month | 99.999% = 26 s/month</code></pre></div>
+<h2 id="building-blocks-in-one-line-each">Building blocks in one line each</h2>
+<ul>
+<li><strong>Cache:</strong> jitter TTLs, coalesce refills, serve stale, warm before cutover, size the store for the cold case.</li>
+<li><strong>Queue:</strong> assume at-least-once, make consumers idempotent, bound the queue, watch age not length.</li>
+<li><strong>Retry:</strong> timeout shorter than the caller, exponential backoff with jitter, retry at one layer, use a budget.</li>
+<li><strong>Idempotency:</strong> client key, stored with the result in one transaction.</li>
+<li><strong>Consistency:</strong> pick per feature; fix stale reads with read-your-writes; alert on replication lag.</li>
+<li><strong>Quorum:</strong> majority of an odd number; 3 tolerates 1, 5 tolerates 2; spread across zones.</li>
+<li><strong>Fencing:</strong> the resource rejects a lower token; a lease alone is not enough.</li>
+<li><strong>Time:</strong> monotonic for durations; never order by wall-clock across machines; handle negative differences.</li>
+</ul>
+<h2 id="containing-failure">Containing failure</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="failure domain   what one cause takes down together (process, host, zone, region, change)
+cell             full independent copy for a slice of users, thin router, hard size limit
+bulkhead         separate pools per dependency
+shuffle shard    random worker subset per customer
+canary           smallest stage with a stop signal and bake time
+fail static      keep last known good on bad input
+fail open/closed decide per check, write it down, test it" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">failure domain   what one cause takes down together (process, host, zone, region, change)
+cell             full independent copy for a slice of users, thin router, hard size limit
+bulkhead         separate pools per dependency
+shuffle shard    random worker subset per customer
+canary           smallest stage with a stop signal and bake time
+fail static      keep last known good on bad input
+fail open/closed decide per check, write it down, test it</code></pre></div>
+<h2 id="overload">Overload</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="token bucket         steady refill, bounded burst
+concurrency limit    cap in-flight work (protects slow paths)
+shed by priority     batch first, critical last
+signals              429 or 503 with Retry-After; clients back off with jitter
+autoscaling          slow; limits hold the line meanwhile" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">token bucket         steady refill, bounded burst
+concurrency limit    cap in-flight work (protects slow paths)
+shed by priority     batch first, critical last
+signals              429 or 503 with Retry-After; clients back off with jitter
+autoscaling          slow; limits hold the line meanwhile</code></pre></div>
+<h2 id="multi-region">Multi-region</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="RTO = time down       RPO = data lost, in time
+backup/restore &lt; pilot light &lt; warm standby &lt; active-active
+survivors must carry the lost share (N regions need headroom)
+two DNS providers; drill the failover; recovery tools off the failing system" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">RTO = time down       RPO = data lost, in time
+backup/restore &lt; pilot light &lt; warm standby &lt; active-active
+survivors must carry the lost share (N regions need headroom)
+two DNS providers; drill the failover; recovery tools off the failing system</code></pre></div>
+<h2 id="retry-arithmetic">Retry arithmetic</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="layers retrying  3 x 3 x 3  =  27 calls per user request at the bottom
+fix: retry at one layer, jittered backoff, budget of ~10% of traffic" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">layers retrying  3 x 3 x 3  =  27 calls per user request at the bottom
+fix: retry at one layer, jittered backoff, budget of ~10% of traffic</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Retries without jitter arrive in waves and keep a recovering service down.</p>
+</aside>
+<h2 id="failover-checks">Failover checks</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="# who is writable? exactly one should answer false for recovery
+psql -h NODE -Atc &quot;select pg_is_in_recovery()&quot;
+# replication lag in seconds on a replica
+psql -Atc &quot;select extract(epoch from now()-pg_last_xact_replay_timestamp())&quot;" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-comment"># who is writable? exactly one should answer false for recovery</span>
+psql -h NODE -Atc <span class="hljs-string">&quot;select pg_is_in_recovery()&quot;</span>
+<span class="hljs-comment"># replication lag in seconds on a replica</span>
+psql -Atc <span class="hljs-string">&quot;select extract(epoch from now()-pg_last_xact_replay_timestamp())&quot;</span></code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Never promote a node without fencing the old primary first, or two writers will diverge.</p>
+</aside>
+<h2 id="change-safety-checklist">Change safety checklist</h2>
+<ol>
+<li>Can it be previewed on real data?</li>
+<li>Smallest first stage and stop signal?</li>
+<li>Previous good state and rollback time?</li>
+<li>What does the consumer do with garbage?</li>
+<li>Does the fixer depend on the broken thing?</li>
+</ol>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>A second zone does not protect against a change pushed to every zone at once. Count shared things, not copies.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>A status page, runbook or monitoring tool hosted on the failing platform will fail with it. Host them independently.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Automated quotas and limits need a floor. A limit that can reach zero is an outage waiting for a bad input.</p>
+</aside>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://aws.amazon.com/builders-library/" target="_blank" rel="noopener">Amazon Builders' Library</a><span class="host">aws.amazon.com</span></li><li><a href="https://sre.google/sre-book/addressing-cascading-failures/" target="_blank" rel="noopener">SRE book: Addressing cascading failures</a><span class="host">sre.google</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=44dd1e9e"></script>
+<script src="../assets/counter.js?v=44dd1e9e"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>
