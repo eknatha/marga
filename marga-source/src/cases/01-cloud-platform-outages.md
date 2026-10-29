@@ -222,7 +222,7 @@ lesson: Treat internally generated files like untrusted input. Validate their si
 company: Cloudflare
 year: 2017
 area: Time and dates
-modules: linux, python, networking
+modules: go, linux, networking
 source: Cloudflare blog | https://blog.cloudflare.com/how-and-why-the-leap-second-affected-cloudflare-dns/
 what: When the leap second was added at the end of 2016, some Cloudflare DNS resolvers returned errors for a short time and a fraction of requests failed.
 cause: The software measured elapsed time by subtracting two readings of the wall clock. At the leap second the clock stepped back, producing a negative duration that the code did not expect, and it panicked.

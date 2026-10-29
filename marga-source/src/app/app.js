@@ -1217,6 +1217,7 @@ if (typeof window.MargaFeatures === 'function') window.MargaFeatures(api);
 if (typeof window.MargaBadges === 'function') window.MargaBadges(api);
 if (typeof window.MargaChoose === 'function') window.MargaChoose(api);
 if (typeof window.MargaSkillLabPage === 'function') window.MargaSkillLabPage(api);
+if (typeof window.MargaCaseFile === 'function') window.MargaCaseFile(api);
 
 /* ---------- accessibility panel ---------- */
 (function () {
