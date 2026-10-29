@@ -1002,5 +1002,101 @@
  "mcp/debugging-tool-use-and-mcp": {
   "s": "Debug from the bottom of the stack up: the tool, the wire, the menu, the diner who orders, and the waiter who carries the plates.",
   "i": "I debug tool use layer by layer, use the inspector and traces, and add tests for tool lists, definitions and loops."
+ },
+ "cloud-iam/identities-principals-and-permissions": {
+  "s": "A cloud request is a door with a guard: the guard checks your badge, your name on the list, and the rule for that room.",
+  "i": "I separate authentication from authorization, name the parts of a decision, and prefer workload identities to stored keys."
+ },
+ "cloud-iam/aws-iam-policies-roles-and-assume-role": {
+  "s": "A role is a hotel key card that works for a few hours and only opens the rooms listed on it.",
+  "i": "I read IAM policies, use roles for workloads and cross-account access, and use boundaries as guardrails."
+ },
+ "cloud-iam/azure-entra-id-rbac-and-managed-identities": {
+  "s": "Entra ID is the passport office; Azure RBAC is the list of doors each passport opens.",
+  "i": "I assign roles at the right scope, prefer managed identities, and protect privileged access."
+ },
+ "cloud-iam/least-privilege-and-access-reviews": {
+  "s": "Least privilege is a gardener pruning: access grows back unless you cut it on a schedule.",
+  "i": "I narrow permissions with usage data, design roles for jobs, and review access regularly."
+ },
+ "cloud-iam/secrets-and-encryption-with-kms-and-key-vaults": {
+  "s": "A secrets manager is a bank vault with a logbook: you ask at the counter, every opening is written down.",
+  "i": "I keep secrets in a managed store, use KMS and envelope encryption, and rotate with overlap."
+ },
+ "cloud-iam/network-boundaries-and-private-access": {
+  "s": "The network is the fence and identity is the lock. A fence without a lock, or a lock on an open field, is only half a plan.",
+  "i": "I keep resources private, narrow security rules, use private endpoints and block public storage access."
+ },
+ "cloud-iam/logging-detection-and-audit-trails": {
+  "s": "Audit logs are the security camera footage of your cloud. Footage that is switched off or stored in the thief's pocket helps nobody.",
+  "i": "I enable audit logging everywhere, protect it, and alert on high-risk actions."
+ },
+ "cloud-iam/debugging-access-denied-and-cloud-security-incidents": {
+  "s": "Debug access like a locksmith: find which lock refused, which key you used, and why, before you cut any new doors.",
+  "i": "I debug access-denied errors in order, fix them narrowly, and respond to leaked credentials by containing first."
+ },
+ "k8s-ops/the-control-plane-in-depth": {
+  "s": "The API server is the front desk, etcd is the filing cabinet, controllers are the clerks who keep the files true.",
+  "i": "I can trace a request through the control plane and predict what each failure means."
+ },
+ "k8s-ops/etcd-backup-and-restore": {
+  "s": "An etcd backup is a spare key. It only counts once you have tried it in the lock.",
+  "i": "I take verified etcd snapshots, store them safely and rehearse restores."
+ },
+ "k8s-ops/upgrading-clusters-safely": {
+  "s": "An upgrade is a staircase: one step at a time, handrail first, and you check the next step before you put weight on it.",
+  "i": "I plan upgrades one minor version at a time, scan for deprecated APIs and keep a rollback."
+ },
+ "k8s-ops/rbac-and-service-accounts": {
+  "s": "RBAC is a set of sticky notes: each says who may do which verb on which thing. There is no note that says no.",
+  "i": "I write narrow Roles and bindings, give workloads their own service accounts and audit with can-i."
+ },
+ "k8s-ops/nodes-draining-taints-and-capacity": {
+  "s": "Draining a node is evicting tenants politely: tell them where to go, check the building rules (budgets), then lock the door.",
+  "i": "I drain nodes safely, use PDBs, taints and spread rules, and keep spare capacity."
+ },
+ "k8s-ops/resource-quotas-limits-and-autoscaling": {
+  "s": "Requests are your table reservation, limits are the rule about how much you can eat, and quotas are how many tables your team may book.",
+  "i": "I set requests and limits, apply quotas and defaults, and use autoscaling with correct inputs."
+ },
+ "k8s-ops/network-policies-and-pod-security": {
+  "s": "A flat cluster network is an open-plan office: anyone can wander into the finance room. Policies add doors and badges.",
+  "i": "I apply default-deny network policies, Pod Security Standards and hardened security contexts."
+ },
+ "k8s-ops/debugging-cluster-and-node-problems": {
+  "s": "Debugging a cluster is peeling an onion from the outside: pod, then node, then control plane, and checking each layer before moving in.",
+  "i": "I triage cluster faults in order, read node conditions, and check the control plane and certificates."
+ },
+ "argocd/pull-based-delivery-and-the-repository-as-source-of-truth": {
+  "s": "Push delivery is a courier who comes to your door. Pull delivery is a thermostat that keeps checking the target and adjusts.",
+  "i": "I explain pull-based delivery, drift and why the repository is the source of truth."
+ },
+ "argocd/installing-argo-cd-and-the-application-resource": {
+  "s": "The Application resource is a delivery order: pick up from this address (repository), drop at that address (namespace).",
+  "i": "I install Argo CD, understand its components, and write an Application."
+ },
+ "argocd/sync-health-and-drift": {
+  "s": "Sync status asks \"is it what we wrote?\" Health asks \"does it work?\" You need both answers before you act.",
+  "i": "I read sync and health separately, use prune and self-heal carefully, and ignore expected differences."
+ },
+ "argocd/helm-and-kustomize-with-argo-cd": {
+  "s": "Argo CD uses Helm like a printing press: it prints the pages and puts them on the wall, it does not keep Helm's own notebook.",
+  "i": "I deliver Helm and Kustomize sources, keep values in the repository and pin versions."
+ },
+ "argocd/environments-app-of-apps-and-applicationsets": {
+  "s": "App-of-apps is a table of contents. An ApplicationSet is a stamp: one design, many copies.",
+  "i": "I organise environments with overlays, app-of-apps and ApplicationSets and promote by commit."
+ },
+ "argocd/hooks-sync-waves-and-progressive-delivery": {
+  "s": "Waves are the order of courses at dinner, hooks are the chef tasting before and after, and a canary is the first small plate sent to one table.",
+  "i": "I order syncs with waves and hooks and understand canary and blue-green rollouts."
+ },
+ "argocd/access-projects-secrets-and-multi-cluster": {
+  "s": "Argo CD holds the keys to many clusters. Treat it as production infrastructure, not a developer toy.",
+  "i": "I scope teams with projects and RBAC, keep secrets out of the repository and secure multi-cluster setups."
+ },
+ "argocd/debugging-argo-cd": {
+  "s": "Walk the pipeline in order: can it fetch, can it render, can it apply, is it healthy? The first \"no\" is your problem.",
+  "i": "I debug Argo CD by stage, reproduce renders locally and fix OutOfSync loops."
  }
 }
