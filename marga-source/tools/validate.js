@@ -756,7 +756,14 @@ function checkMore() {
   const ex = (() => { const w = { window: {} }; vm.runInNewContext(read(path.join(DIST, 'assets', 'explainers.js')), w); return w.window.MARGA_EXPLAINERS || []; })();
   if (ex.length < 200) err("explainers", `need at least 200, found ${ex.length}`);
   for (const m of mods) if (ex.filter((x) => x.module === m).length < 12) err("explainers", `module ${m} needs at least 12 explainers`);
+  { const seenIds = new Set(); for (const x of ex) { if (seenIds.has(x.id)) err('explainers', `${x.id}: duplicate id`); seenIds.add(x.id); } }
+  for (const m of mods) if (ex.filter((x) => x.module === m && x.kind === 'failure').length < 2) err('explainers', `module ${m} needs at least 2 failure and recovery explainers`);
   for (const x of ex) {
+    if (!x.lesson || !lessons[x.lesson]) err('explainers', `${x.id}: lesson link "${x.lesson}" does not exist`);
+    else if (lessons[x.lesson].module !== x.module) err('explainers', `${x.id}: lesson ${x.lesson} belongs to another module`);
+    if (x.kind && x.kind !== 'failure') err('explainers', `${x.id}: unknown kind ${x.kind}`);
+    if (x.kind === 'failure' && x.steps.length < 7) err('explainers', `${x.id}: a failure and recovery explainer needs at least 7 steps`);
+    if (x.kind === 'failure' && !/^Failure and recovery:/.test(x.title)) err('explainers', `${x.id}: failure titles start with "Failure and recovery:"`);
     if (!mods.has(x.module)) err('explainers', `${x.id}: unknown module`);
     if (x.steps.length < 6) err('explainers', `${x.id}: fewer than 6 steps`);
     x.steps.forEach((s, i) => {

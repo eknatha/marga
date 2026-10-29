@@ -1534,6 +1534,39 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await ctx.close();
   });
 
+  await test('failure and recovery explainers: one filter, 48 stories, every skill has two, each linked to a lesson and its paths', async () => {
+    const { ctx, page, issues } = await open();
+    await go(page, '/explainers?kind=failure'); await page.waitForSelector('.exf-chip');
+    eq(await page.locator('#exf-list li:not([hidden])').count(), 48, 'failure stories shown');
+    eq(await page.isChecked('#exf-fail'), true, 'filter checked from the URL');
+    eq(await page.locator('#exf-list .exf-g:not([hidden])').count(), 24, 'every skill has failure stories');
+    for (const g of await page.locator('#exf-list .exf-g:not([hidden])').all()) ok((await g.locator('li:not([hidden])').count()) >= 2, 'two or more per skill');
+    ok(/Failure and recovery/.test(await page.textContent('#exf-list li:not([hidden]) em')), 'tagged in the list');
+    await page.uncheck('#exf-fail');
+    ok((await page.locator('#exf-list li:not([hidden])').count()) >= 440, 'unchecking shows everything');
+    ok(!/kind=failure/.test(await page.evaluate(() => location.hash)), 'URL drops the filter');
+    await go(page, '/explainers/f-linux-disk-full'); await page.waitForSelector('.ex-svg');
+    ok(/Failure and recovery/.test(await page.textContent('#main .page-head')), 'failure tag on the page');
+    eq(await page.locator('#main .page-head a[href="#/lesson/linux/disks-and-filesystems"]').count(), 1, 'related lesson link');
+    ok((await page.locator('#main .page-head a[href^="#/path/"]').count()) >= 3, 'path links');
+    const prog = emptyProgress(); prog.lessons = doneMap(MODS.linux.lessons); await setProgress(page, prog);
+    await go(page, '/lesson/linux/disks-and-filesystems'); await page.waitForSelector('#watch-it');
+    ok(/full disk/.test(await page.textContent('#watch-it')), 'Watch it lists the tied explainer');
+    await go(page, '/lesson/linux/filesystem-and-navigation'); await page.waitForSelector('#watch-it');
+    ok(/same skill|for this lesson/.test(await page.textContent('#watch-it')), 'Watch it always has something');
+    await go(page, '/module/linux');
+    ok(/failure and recovery stor/.test(await page.textContent('#main')), 'skill page links failure stories');
+    await go(page, '/path/sre');
+    ok(/Watch along this path/.test(await page.textContent('#main')), 'path page watch row');
+    eq(await page.locator('#main a[href*="kind=failure"]').count(), 1, 'path failure link');
+    await go(page, '/explainers/f-linux-disk-full'); await page.waitForSelector('.ex-svg');
+    for (let i = 0; i < 12 && await page.locator('#ex-next').isEnabled(); i++) await page.click('#ex-next');
+    await go(page, '/lesson/linux/disks-and-filesystems'); await page.waitForSelector('#watch-it');
+    ok(/Watched/.test(await page.textContent('#watch-it')), 'watched is shown on the lesson');
+    ok(issues.filter((m) => !/goatcounter|ERR_/.test(m)).length === 0, 'no console issues: ' + issues.join('|'));
+    await ctx.close();
+  });
+
   await test('new skills: cloud security and IAM, Kubernetes administration and operations, Argo CD have eight lessons each, ending in debugging', async () => {
     const { ctx, page } = await open();
     const data = await page.evaluate(async () => { const r = await fetch('data/modules.json'); return r.ok ? r.json() : null; }).catch(() => null);
@@ -1778,6 +1811,52 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       const ov = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       ok(ov <= 2, 'overflow ' + ov);
       await page.evaluate(() => { MargaA11y.set('fs', '100'); });
+      await page.addScriptTag({ content: AXE });
+      const res = await page.evaluate(async () => (await axe.run('#main', { runOnly: ['wcag2a', 'wcag2aa'] })).violations.map((v) => v.id + ': ' + v.nodes.map((n) => n.target).join(' ')));
+      eq(res.length, 0, 'axe: ' + res.join(' | '));
+      await ctx.close();
+    }
+  });
+
+  await test('practice hub: featured tools, grouped tools, next-step panel, flags, search, favourites, collapse, week strip', async () => {
+    const { ctx, page, issues } = await open(); await go(page, '/practice'); await page.waitForSelector('.pr-cmd');
+    eq(await page.locator('.pr-feat .prac a').count(), 3, 'three featured tools');
+    for (const h of ['#/explainers', '#/architecture', '#/drills']) eq(await page.locator(`.prac a[href="${h}"]`).count(), 1, h + ' appears once');
+    eq(await page.locator('.pr-li').count(), 25, '25 tools');
+    eq(await page.locator('.pr-node').count(), 5, 'five groups');
+    eq(await page.locator('.pr-week li').count(), 7, 'week strip');
+    const t1 = await page.textContent('.pr-cmd h2');
+    ok(t1.length > 8 && !/undefined|NaN|\[object/.test(t1), 'recommendation: ' + t1);
+    await page.click('[data-act="pr-skip"]'); await page.waitForSelector('.pr-cmd h2');
+    ok((await page.textContent('.pr-cmd h2')) !== t1, 'skip shows another suggestion');
+    await page.click('[data-act="pr-why"]'); eq(await page.locator('#pr-whyt').isVisible(), true, 'why text');
+    await page.click('[data-flag="labs"]');
+    eq(await page.locator('.pr-li:not([hidden])').count(), 10, 'labs flag shows 7 labs and 3 featured');
+    eq(await page.getAttribute('[data-flag="labs"]', 'aria-pressed'), 'true', 'flag pressed');
+    await page.click('[data-flag="all"]');
+    await page.fill('#pr-q', 'terraform');
+    ok((await page.locator('.pr-li:not([hidden])').count()) >= 1 && (await page.locator('.pr-li:not([hidden])').count()) < 6, 'search narrows');
+    await page.fill('#pr-q', 'zzzqqq'); eq(await page.locator('#pr-empty').isVisible(), true, 'empty state');
+    await page.click('#pr-empty [data-act="pr-clear"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 25, 'clear shows all');
+    await page.click('[data-flag="starred"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 0, 'no favourites yet');
+    await page.click('[data-flag="all"]');
+    await page.click('.pr-li[data-id="yaml"] .pr-star'); eq(await page.getAttribute('.pr-li[data-id="yaml"] .pr-star', 'aria-pressed'), 'true', 'starred');
+    await page.click('[data-flag="starred"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 1, 'one favourite');
+    await go(page, '/practice'); await page.waitForSelector('.pr-cmd');
+    eq(await page.getAttribute('.pr-li[data-id="yaml"] .pr-star', 'aria-pressed'), 'true', 'favourite is remembered');
+    await page.click('.pr-node[data-g="labs"] > summary'); eq(await page.locator('.pr-node[data-g="labs"]').getAttribute('open'), null, 'collapsed');
+    await go(page, '/practice'); await page.waitForSelector('.pr-cmd');
+    eq(await page.locator('.pr-node[data-g="labs"]').getAttribute('open'), null, 'collapse is remembered');
+    ok(!/undefined|NaN|\[object Object\]/.test(await page.textContent('#main')), 'no placeholder text');
+    eq(issues.length, 0, 'no console issues: ' + issues.join('|'));
+    await ctx.close();
+  });
+
+  await test('practice hub: no overflow on a phone, axe clean in both themes', async () => {
+    for (const dark of [false, true]) {
+      const { ctx, page } = await open({ viewport: { width: 390, height: 844 }, dark }); await go(page, '/practice'); await page.waitForSelector('.pr-cmd');
+      const ov = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      ok(ov <= 2, 'overflow ' + ov);
       await page.addScriptTag({ content: AXE });
       const res = await page.evaluate(async () => (await axe.run('#main', { runOnly: ['wcag2a', 'wcag2aa'] })).violations.map((v) => v.id + ': ' + v.nodes.map((n) => n.target).join(' ')));
       eq(res.length, 0, 'axe: ' + res.join(' | '));
@@ -2030,7 +2109,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     ok(/5 cleared/.test(await page.textContent('#weak-root')), await page.textContent('#weak-root'));
     wk = (await progress(page)).wk || {}; eq(Object.keys(wk).length, 0, 'list empty after clearing');
     await nav(page, '/practice'); await nav(page, '/weak'); await page.waitForSelector('#weak-root .empty');
-    await go(page, '/practice'); ok(/Weak-spot review/.test(await page.textContent('.prac')), 'hub card');
+    await go(page, '/practice'); ok(/Weak-spot review/.test(await page.textContent('#pr')), 'hub card');
     await ctx.close();
   });
 
