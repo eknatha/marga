@@ -35,3 +35,10 @@ See DEPLOY.md for hosting, DNS and the visitor counter.
 - A Certifications link in the top navigation points to https://certs.eknathalabs.com (new tab).
 - Rule change: the ban on the word "git" was narrowed to hosting and brand words (`/\bgit(hub|lab|ops|leaks|ea)/i`), so the Git skill can name the tool.
 - Go and Helm have no terminal labs (Go has the existing playground exercises).
+
+## Round 17
+
+- Three new skills: Cloud security and IAM, Kubernetes administration and operations, and Continuous delivery with Argo CD (8 lessons each, each ending in a debugging lesson), with cheat sheets, interview answers, drills, incident games, glossary terms, case studies and architecture studies mapped to them. They sit in the DevOps, Cloud, SRE and DevSecOps paths.
+- 82 more animated explainers (about 394 in total), covering the new skills and every existing skill.
+- Core filters on the Animated explainers page: skill chips with counts (multi-select), search across titles, summaries and step text, a Hide watched toggle, per-skill "N of M watched", a live result count, an empty state, a URL that keeps the filter (`#/explainers?skill=a,b&q=text&unwatched=1`) and a remembered last filter. An explainer counts as watched when its final step is reached.
+- Caveats: the new skills have no terminal labs yet. Argo CD wording avoids the banned word list, and product behaviour is described as of writing.

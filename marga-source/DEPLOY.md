@@ -173,3 +173,7 @@ If the number does not appear: open the browser console and look for the "visito
 - Honest limits: the AI lessons describe product behaviour as it was when written; products, limits and model names change, so each lesson tells the learner to check the current documentation. The AI skills have no terminal labs.
 
 Deploy as before: upload the contents of the zip to the site root, keep CNAME, .nojekyll and LICENSE.md, and do not add a `.github` folder. A new script, `assets/skilllab.js`, is part of the build output.
+
+## Round 17
+
+No deployment change. Build with `node tools/build.js`, upload the dist contents, keep CNAME and .nojekyll. The explainer filter state is kept in the URL hash and local storage only.
