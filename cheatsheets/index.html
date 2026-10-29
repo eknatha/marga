@@ -13,8 +13,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=5ba7eef6">
-<script src="../assets/a11y.js?v=5ba7eef6"></script>
+<link rel="stylesheet" href="../assets/app.css?v=b20f9617">
+<script src="../assets/a11y.js?v=b20f9617"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -28,17 +28,20 @@
   </header>
   <ul class="sheet-list">
 <li><a href="ansible.html"><strong>Ansible</strong><span>Inventory, ad-hoc commands, playbook structure, variables, handlers, roles, Vault and safe rollout flags.</span></a></li>
+<li><a href="argocd.html"><strong>Continuous delivery with Argo CD</strong><span>Applications, sync policies, hooks, projects, ApplicationSets and a debugging checklist.</span></a></li>
 <li><a href="aws.html"><strong>AWS</strong><span>Identity, networking, compute, storage, cost and incident-response commands for AWS.</span></a></li>
 <li><a href="azure.html"><strong>Azure</strong><span>Identity, networking, compute, storage, cost and diagnostics commands for Azure.</span></a></li>
 <li><a href="bash.html"><strong>Bash scripting</strong><span>Safe script headers, variables, conditionals, loops, functions and text-processing one-liners.</span></a></li>
 <li><a href="cicd.html"><strong>CI/CD</strong><span>Pipeline stages, a Jenkinsfile skeleton, deployment strategies, and declarative delivery commands.</span></a></li>
 <li><a href="claude-skills.html"><strong>Claude Skills</strong><span>Skill folder layout, SKILL.md header, descriptions that trigger, structure, scripts, tests and a security review checklist.</span></a></li>
+<li><a href="cloud-iam.html"><strong>Cloud security and IAM</strong><span>Policies, roles, scopes, keys, private access, audit logs and an incident checklist for AWS and Azure.</span></a></li>
 <li><a href="databases.html"><strong>Databases (PostgreSQL)</strong><span>SQL basics, operator queries, indexes and plans, locks, backups, replication, pooling and safe migrations.</span></a></li>
 <li><a href="docker.html"><strong>Docker and Compose</strong><span>Run, build, inspect, clean up and harden containers, plus everyday Compose commands.</span></a></li>
 <li><a href="git.html"><strong>Git</strong><span>Everyday commands for commits, branches, remotes, undoing mistakes, tags and recovery.</span></a></li>
 <li><a href="go.html"><strong>Go</strong><span>Toolchain commands, types, errors, interfaces, goroutines, context, HTTP, testing and build flags for services and CLIs.</span></a></li>
 <li><a href="helm-beginners.html"><strong>Helm for beginners</strong><span>Install, configure, upgrade and roll back releases, write templates, package charts and debug failed deployments.</span></a></li>
 <li><a href="helm.html"><strong>Helm and Kustomize</strong><span>Charts, releases, values, upgrade and rollback commands, template functions and Kustomize overlays.</span></a></li>
+<li><a href="k8s-ops.html"><strong>Kubernetes administration and operations</strong><span>etcd backup, upgrades, node maintenance, RBAC, quotas, policies and a cluster debugging checklist.</span></a></li>
 <li><a href="kubernetes.html"><strong>Kubernetes</strong><span>kubectl essentials, manifests, troubleshooting order, RBAC and exam-speed tricks.</span></a></li>
 <li><a href="linux.html"><strong>Linux</strong><span>Files, permissions, processes, disks, logs and performance commands you reach for daily.</span></a></li>
 <li><a href="llm.html"><strong>LLM fundamentals</strong><span>Tokens, context limits, API calls, sampling, cost, caching, evaluation and a debugging checklist for LLM features.</span></a></li>
@@ -54,7 +57,7 @@
   </ul>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/counter.js?v=5ba7eef6"></script>
+<script src="../assets/counter.js?v=b20f9617"></script>
 <script>if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit('/cheatsheets/',document.title);}</script>
 </body>
 </html>

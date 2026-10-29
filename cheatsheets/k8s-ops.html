@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kubernetes administration and operations cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="etcd backup, upgrades, node maintenance, RBAC, quotas, policies and a cluster debugging checklist.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/k8s-ops.html">
+<meta property="og:title" content="Kubernetes administration and operations cheat sheet">
+<meta property="og:description" content="etcd backup, upgrades, node maintenance, RBAC, quotas, policies and a cluster debugging checklist.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/k8s-ops.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=b20f9617">
+<script src="../assets/a11y.js?v=b20f9617"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="../#/interview">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>Kubernetes administration and operations cheat sheet</h1>
+    <p class="lede">etcd backup, upgrades, node maintenance, RBAC, quotas, policies and a cluster debugging checklist.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="etcd-snapshot">etcd snapshot</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="ETCDCTL_API=3 etcdctl snapshot save /backup/etcd.db \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key
+etcdutl snapshot status /backup/etcd.db -w table" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">ETCDCTL_API=3 etcdctl snapshot save /backup/etcd.db \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key
+etcdutl snapshot status /backup/etcd.db -w table</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Snapshots contain Secrets. Encrypt them, copy them off the node and test a restore on a schedule.</p>
+</aside>
+<h2 id="upgrade-with-kubeadm">Upgrade with kubeadm</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubeadm upgrade plan
+kubeadm upgrade apply v1.NN.X
+kubeadm upgrade node
+kubeadm certs check-expiration" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubeadm upgrade plan
+kubeadm upgrade apply v1.NN.X
+kubeadm upgrade node
+kubeadm certs check-expiration</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Upgrade one minor version at a time, control plane first, and scan for removed APIs before you begin.</p>
+</aside>
+<h2 id="node-maintenance">Node maintenance</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl cordon node-1
+kubectl drain node-1 --ignore-daemonsets --delete-emptydir-data
+kubectl uncordon node-1
+kubectl taint nodes gpu-1 gpu=true:NoSchedule" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubectl cordon node-1
+kubectl drain node-1 --ignore-daemonsets --delete-emptydir-data
+kubectl uncordon node-1
+kubectl taint nodes gpu-1 gpu=<span class="hljs-literal">true</span>:NoSchedule</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>A PodDisruptionBudget that allows zero disruptions makes drain hang. Check budgets before maintenance.</p>
+</aside>
+<h2 id="rbac">RBAC</h2>
+<div class="code" data-lang="yaml"><button class="copy" type="button" data-copy="apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: shop
+subjects:
+  - kind: Group
+    name: shop-developers
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">rbac.authorization.k8s.io/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">RoleBinding</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">read-pods</span>
+  <span class="hljs-attr">namespace:</span> <span class="hljs-string">shop</span>
+<span class="hljs-attr">subjects:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">kind:</span> <span class="hljs-string">Group</span>
+    <span class="hljs-attr">name:</span> <span class="hljs-string">shop-developers</span>
+    <span class="hljs-attr">apiGroup:</span> <span class="hljs-string">rbac.authorization.k8s.io</span>
+<span class="hljs-attr">roleRef:</span>
+  <span class="hljs-attr">kind:</span> <span class="hljs-string">Role</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">pod-reader</span>
+  <span class="hljs-attr">apiGroup:</span> <span class="hljs-string">rbac.authorization.k8s.io</span></code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not bind cluster-admin to fix a permission error. Read the Forbidden message and grant the one verb on the one resource.</p>
+</aside>
+<h2 id="check-permissions">Check permissions</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl auth can-i delete pods -n shop --as=jane
+kubectl auth can-i --list -n shop --as=system:serviceaccount:shop:web" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubectl auth can-i delete pods -n shop --as=jane
+kubectl auth can-i --list -n shop --as=system:serviceaccount:shop:web</code></pre></div>
+<h2 id="quotas-and-autoscaling">Quotas and autoscaling</h2>
+<div class="code" data-lang="yaml"><button class="copy" type="button" data-copy="apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: team-a
+  namespace: team-a
+spec:
+  hard:
+    requests.cpu: &quot;20&quot;
+    requests.memory: 64Gi
+    pods: &quot;100&quot;" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">ResourceQuota</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">team-a</span>
+  <span class="hljs-attr">namespace:</span> <span class="hljs-string">team-a</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">hard:</span>
+    <span class="hljs-attr">requests.cpu:</span> <span class="hljs-string">&quot;20&quot;</span>
+    <span class="hljs-attr">requests.memory:</span> <span class="hljs-string">64Gi</span>
+    <span class="hljs-attr">pods:</span> <span class="hljs-string">&quot;100&quot;</span></code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>The scheduler uses requests, not usage. Without realistic requests, autoscalers and quotas mislead you.</p>
+</aside>
+<h2 id="default-deny-network-policy">Default deny network policy</h2>
+<div class="code" data-lang="yaml"><button class="copy" type="button" data-copy="apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: shop
+spec:
+  podSelector: {}
+  policyTypes: [&quot;Ingress&quot;, &quot;Egress&quot;]" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">networking.k8s.io/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">NetworkPolicy</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">default-deny</span>
+  <span class="hljs-attr">namespace:</span> <span class="hljs-string">shop</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">podSelector:</span> {}
+  <span class="hljs-attr">policyTypes:</span> [<span class="hljs-string">&quot;Ingress&quot;</span>, <span class="hljs-string">&quot;Egress&quot;</span>]</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>After default deny, allow DNS egress and the specific flows you need, and confirm your network plugin enforces policies.</p>
+</aside>
+<h2 id="debugging-order">Debugging order</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl describe pod NAME
+kubectl get nodes
+kubectl describe node NODE
+journalctl -u kubelet -n 100
+kubectl get --raw=/readyz?verbose" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubectl describe pod NAME
+kubectl get nodes
+kubectl describe node NODE
+journalctl -u kubelet -n 100
+kubectl get --raw=/readyz?verbose</code></pre></div>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://kubernetes.io/docs/tasks/administer-cluster/" target="_blank" rel="noopener">Administer a cluster</a><span class="host">kubernetes.io</span></li><li><a href="https://kubernetes.io/docs/reference/access-authn-authz/rbac/" target="_blank" rel="noopener">Using RBAC authorization</a><span class="host">kubernetes.io</span></li><li><a href="https://kubernetes.io/docs/concepts/security/pod-security-standards/" target="_blank" rel="noopener">Pod Security Standards</a><span class="host">kubernetes.io</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=b20f9617"></script>
+<script src="../assets/counter.js?v=b20f9617"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

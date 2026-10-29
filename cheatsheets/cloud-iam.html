@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cloud security and IAM cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="Policies, roles, scopes, keys, private access, audit logs and an incident checklist for AWS and Azure.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/cloud-iam.html">
+<meta property="og:title" content="Cloud security and IAM cheat sheet">
+<meta property="og:description" content="Policies, roles, scopes, keys, private access, audit logs and an incident checklist for AWS and Azure.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/cloud-iam.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=b20f9617">
+<script src="../assets/a11y.js?v=b20f9617"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="../#/interview">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>Cloud security and IAM cheat sheet</h1>
+    <p class="lede">Policies, roles, scopes, keys, private access, audit logs and an incident checklist for AWS and Azure.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="read-an-aws-policy">Read an AWS policy</h2>
+<div class="code" data-lang="json"><button class="copy" type="button" data-copy="{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [{
+    &quot;Effect&quot;: &quot;Allow&quot;,
+    &quot;Action&quot;: [&quot;s3:GetObject&quot;],
+    &quot;Resource&quot;: &quot;arn:aws:s3:::reports-prod/summaries/*&quot;
+  }]
+}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;Version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2012-10-17&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;Statement&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;Effect&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Allow&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;Action&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;s3:GetObject&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;Resource&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;arn:aws:s3:::reports-prod/summaries/*&quot;</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span></code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Action &quot;<em>&quot; on Resource &quot;</em>&quot; is administrator access. Never use it to make an error go away.</p>
+</aside>
+<h2 id="who-am-i-and-what-can-i-do">Who am I and what can I do</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="aws sts get-caller-identity
+aws iam list-attached-role-policies --role-name build
+aws iam simulate-principal-policy --policy-source-arn ARN --action-names s3:PutObject --resource-arns ARN
+aws iam generate-service-last-accessed-details --arn ARN" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">aws sts get-caller-identity
+aws iam list-attached-role-policies --role-name build
+aws iam simulate-principal-policy --policy-source-arn ARN --action-names s3:PutObject --resource-arns ARN
+aws iam generate-service-last-accessed-details --arn ARN</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Check which identity you are running as before changing any policy. Many denials come from the wrong role.</p>
+</aside>
+<h2 id="azure-access">Azure access</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="az account show
+az role assignment list --assignee USER --all -o table
+az role assignment create --assignee USER --role &quot;Reader&quot; --scope /subscriptions/SUB/resourceGroups/RG
+az identity create --name app-identity --resource-group RG" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">az account show
+az role assignment list --assignee USER --all -o table
+az role assignment create --assignee USER --role <span class="hljs-string">&quot;Reader&quot;</span> --scope /subscriptions/SUB/resourceGroups/RG
+az identity create --name app-identity --resource-group RG</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Assign roles at the lowest scope that works. A subscription-level Contributor can change everything below it.</p>
+</aside>
+<h2 id="secrets-and-keys">Secrets and keys</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="aws secretsmanager get-secret-value --secret-id prod/db --query SecretString --output text
+aws kms describe-key --key-id alias/app-data
+az keyvault secret show --vault-name kv-prod --name db-password --query value -o tsv" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">aws secretsmanager get-secret-value --secret-id prod/db --query SecretString --output text
+aws kms describe-key --key-id <span class="hljs-built_in">alias</span>/app-data
+az keyvault secret show --vault-name kv-prod --name db-password --query value -o tsv</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not print secrets in logs or CI output. Fetch at run time, hold in memory, rotate with an overlap.</p>
+</aside>
+<h2 id="network-exposure-checks">Network exposure checks</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="aws s3api get-public-access-block --bucket NAME
+aws ec2 describe-security-groups --filters Name=ip-permission.cidr,Values=0.0.0.0/0
+az network nsg rule list --nsg-name NSG --resource-group RG -o table" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">aws s3api get-public-access-block --bucket NAME
+aws ec2 describe-security-groups --filters Name=ip-permission.cidr,Values=0.0.0.0/0
+az network nsg rule list --nsg-name NSG --resource-group RG -o table</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>0.0.0.0/0 on SSH, RDP or a database port is an incident waiting to happen. Use session-based access instead.</p>
+</aside>
+<h2 id="audit-trail-lookups">Audit trail lookups</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=DeleteTrail --max-results 5
+aws cloudtrail get-trail-status --name org-trail
+az monitor activity-log list --offset 1d -o table" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=DeleteTrail --max-results 5
+aws cloudtrail get-trail-status --name org-trail
+az monitor activity-log list --offset 1d -o table</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Alert on audit logging being stopped, root account use, new admin grants and public resources. Keep logs in a separate protected account.</p>
+</aside>
+<h2 id="leaked-credential-order">Leaked credential order</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="1. Contain  - deactivate the key or revoke the session (do not delete yet)
+2. Assess   - audit log: what did this credential do, from where
+3. Remove   - attacker-created users, keys, servers, policies
+4. Rotate   - related secrets; replace with a role
+5. Learn    - how it leaked; add detection" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">1. Contain  - deactivate the key or revoke the session (do not delete yet)
+2. Assess   - audit log: what did this credential do, from where
+3. Remove   - attacker-created users, keys, servers, policies
+4. Rotate   - related secrets; replace with a role
+5. Learn    - how it leaked; add detection</code></pre></div>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html" target="_blank" rel="noopener">AWS IAM user guide</a><span class="host">docs.aws.amazon.com</span></li><li><a href="https://learn.microsoft.com/en-us/azure/role-based-access-control/overview" target="_blank" rel="noopener">Azure role-based access control overview</a><span class="host">learn.microsoft.com</span></li><li><a href="https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html" target="_blank" rel="noopener">AWS Well-Architected: Security pillar</a><span class="host">docs.aws.amazon.com</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=b20f9617"></script>
+<script src="../assets/counter.js?v=b20f9617"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>
