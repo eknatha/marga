@@ -58,6 +58,7 @@ function prTools() {
   add('labs', 'go', '#/playground/go', 'Go playground', 'Fifty Go exercises for operations work.', labDone('go') + ' of ' + labN('go') + ' solved', '15 min', 'mid', 'Go', labN('go') ? labDone('go') / labN('go') : 0);
   add('labs', 'hcl', '#/playground/hcl', 'Terraform (HCL) playground', 'Write configuration and get it checked.', labDone('hcl') + ' of ' + labN('hcl') + ' solved', '15 min', 'mid', 'Terraform, Cloud', labN('hcl') ? labDone('hcl') / labN('hcl') : 0);
   add('labs', 'sql', '#/playground/sql', 'SQL for SREs', 'Query deploys, incidents and SLO data in a real database.', labDone('sql') + ' of ' + labN('sql') + ' solved', '15 min', 'mid', 'Databases, SRE', labN('sql') ? labDone('sql') / labN('sql') : 0);
+  add('labs', 'sdlab', '#/system-design-lab', 'System design lab', 'Size a system, break a design against an error budget, and fix real outages.', 'Runs in your browser', '15 min', 'mid', 'System design, SRE', null);
   add('labs', 'subnet', '#/subnet', 'Subnet and CIDR playground', 'Inspect networks, split them and plan VLSM for a VPC.', 'Runs in your browser', '10 min', 'starter', 'Networking, Cloud', null);
   add('scenarios', 'games', '#/games', 'Incident games', 'Be on call for an outage. Choose, then see where it leads.', (F.gameCount ? F.gameCount() : '12 games'), '10 min', 'mid', 'Every skill', null);
   add('scenarios', 'capstones', '#/capstones', 'Capstone projects', 'Guided builds for each path, with a self-check.', (F.capCount ? F.capCount() : '16 projects'), '2 hours', 'advanced', 'Every path', null);

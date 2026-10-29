@@ -6,9 +6,10 @@
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 var CAUTION1 = 'Self-reported completion record from MARGA by EknathaLabs. Not a certification, degree or qualification.';
 var CAUTION2 = 'The verification code only checks that the name, badge and date match each other. It does not confirm identity.';
-var HUES = { 'cloud-iam': 200, 'k8s-ops': 250, argocd: 28, llm: 262, prompting: 292, 'claude-skills': 20, mcp: 168, ai: 262, linux: 28, git: 12, go: 190, helm: 222, bash: 150, python: 52, networking: 195, docker: 212, cicd: 120, kubernetes: 235, terraform: 268, ansible: 352, cloud: 176, databases: 305, observability: 18, sre: 78, security: 332, devops: 215, devsecops: 332 };
+var HUES = { 'system-design': 48, 'cloud-iam': 200, 'k8s-ops': 250, argocd: 28, llm: 262, prompting: 292, 'claude-skills': 20, mcp: 168, ai: 262, linux: 28, git: 12, go: 190, helm: 222, bash: 150, python: 52, networking: 195, docker: 212, cicd: 120, kubernetes: 235, terraform: 268, ansible: 352, cloud: 176, databases: 305, observability: 18, sre: 78, security: 332, devops: 215, devsecops: 332 };
 /* Each symbol is drawn on a 24 by 24 grid so the shape, not only the colour, tells badges apart. */
 var SYM = {
+  'system-design': '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="8.5" y="14" width="7" height="7" rx="1"/><path d="M6.5 10v2h11v-2M12 12v2"/>',
   'cloud-iam': '<path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z"/><circle cx="12" cy="11" r="2"/><path d="M12 13v4"/>',
   'k8s-ops': '<path d="M12 2l8 4.5v9L12 20l-8-4.5v-9z"/><path d="M12 8v4l3 2M12 12L9 14"/>',
   argocd: '<path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/>',
