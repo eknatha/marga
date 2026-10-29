@@ -343,6 +343,20 @@
     "Automated sync policy",
     "https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/"
    ]
+  ],
+  "system-design": [
+   [
+    "Site Reliability Engineering (SRE book)",
+    "https://sre.google/sre-book/table-of-contents/"
+   ],
+   [
+    "Amazon Builders' Library",
+    "https://aws.amazon.com/builders-library/"
+   ],
+   [
+    "Azure Architecture Center: cloud design patterns",
+    "https://learn.microsoft.com/en-us/azure/architecture/patterns/"
+   ]
   ]
  },
  "lessons": {
@@ -3539,6 +3553,156 @@
     "Automated sync policy",
     "https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/"
    ]
+  ],
+  "system-design/the-design-method-and-estimation": [
+   [
+    "Azure Well-Architected reliability",
+    "https://learn.microsoft.com/en-us/azure/well-architected/reliability/"
+   ],
+   [
+    "SRE book contents",
+    "https://sre.google/sre-book/table-of-contents/"
+   ]
+  ],
+  "system-design/caching-without-stampedes": [
+   [
+    "Caching challenges and strategies",
+    "https://aws.amazon.com/builders-library/caching-challenges-and-strategies/"
+   ],
+   [
+    "Cache-aside pattern",
+    "https://learn.microsoft.com/en-us/azure/architecture/patterns/cache-aside"
+   ]
+  ],
+  "system-design/queues-retries-and-idempotency": [
+   [
+    "Timeouts, retries and backoff with jitter",
+    "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/"
+   ],
+   [
+    "Making retries safe with idempotent APIs",
+    "https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/"
+   ]
+  ],
+  "system-design/consistency-and-availability-in-practice": [
+   [
+    "Consistency levels",
+    "https://learn.microsoft.com/en-us/azure/cosmos-db/consistency-levels"
+   ],
+   [
+    "Managing critical state",
+    "https://sre.google/sre-book/managing-critical-state/"
+   ]
+  ],
+  "system-design/quorum-leaders-and-split-brain": [
+   [
+    "Managing critical state",
+    "https://sre.google/sre-book/managing-critical-state/"
+   ],
+   [
+    "etcd documentation",
+    "https://etcd.io/docs/latest/"
+   ]
+  ],
+  "system-design/clocks-time-and-ordering": [
+   [
+    "How the leap second affected Cloudflare DNS",
+    "https://blog.cloudflare.com/how-and-why-the-leap-second-affected-cloudflare-dns/"
+   ],
+   [
+    "RFC 5905 Network Time Protocol v4",
+    "https://www.rfc-editor.org/rfc/rfc5905"
+   ]
+  ],
+  "system-design/failure-domains-cells-and-bulkheads": [
+   [
+    "Static stability using Availability Zones",
+    "https://aws.amazon.com/builders-library/static-stability-using-availability-zones/"
+   ],
+   [
+    "Bulkhead pattern",
+    "https://learn.microsoft.com/en-us/azure/architecture/patterns/bulkhead"
+   ]
+  ],
+  "system-design/blast-radius-and-shuffle-sharding": [
+   [
+    "Workload isolation using shuffle sharding",
+    "https://aws.amazon.com/builders-library/workload-isolation-using-shuffle-sharding/"
+   ],
+   [
+    "Canarying releases",
+    "https://sre.google/workbook/canarying-releases/"
+   ]
+  ],
+  "system-design/graceful-degradation-and-circuit-breakers": [
+   [
+    "Circuit breaker pattern",
+    "https://learn.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker"
+   ],
+   [
+    "Avoiding fallback in distributed systems",
+    "https://aws.amazon.com/builders-library/avoiding-fallback-in-distributed-systems/"
+   ]
+  ],
+  "system-design/rate-limiting-and-load-shedding": [
+   [
+    "Using load shedding to avoid overload",
+    "https://aws.amazon.com/builders-library/using-load-shedding-to-avoid-overload/"
+   ],
+   [
+    "Handling overload",
+    "https://sre.google/sre-book/handling-overload/"
+   ]
+  ],
+  "system-design/multi-region-and-global-traffic": [
+   [
+    "Disaster recovery options in the cloud",
+    "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html"
+   ],
+   [
+    "Geode pattern",
+    "https://learn.microsoft.com/en-us/azure/architecture/patterns/geode"
+   ]
+  ],
+  "system-design/config-and-control-plane-change-safety": [
+   [
+    "Automating safe, hands-off deployments",
+    "https://aws.amazon.com/builders-library/automating-safe-hands-off-deployments/"
+   ],
+   [
+    "Cloudflare outage on 18 November 2025",
+    "https://blog.cloudflare.com/cloudflare-outage-on-november-18-2025/"
+   ]
+  ],
+  "system-design/hidden-dependencies-and-single-points": [
+   [
+    "Addressing cascading failures",
+    "https://sre.google/sre-book/addressing-cascading-failures/"
+   ],
+   [
+    "Avoiding fallback in distributed systems",
+    "https://aws.amazon.com/builders-library/avoiding-fallback-in-distributed-systems/"
+   ]
+  ],
+  "system-design/worked-design-global-api-at-four-nines": [
+   [
+    "Implementing SLOs",
+    "https://sre.google/workbook/implementing-slos/"
+   ],
+   [
+    "Automating safe, hands-off deployments",
+    "https://aws.amazon.com/builders-library/automating-safe-hands-off-deployments/"
+   ]
+  ],
+  "system-design/worked-design-the-status-page-that-survives": [
+   [
+    "Postmortem culture (SRE book)",
+    "https://sre.google/sre-book/postmortem-culture/"
+   ],
+   [
+    "Postmortem culture (SRE workbook)",
+    "https://sre.google/workbook/postmortem-culture/"
+   ]
   ]
  },
  "sheets": {
@@ -3914,6 +4078,16 @@
    [
     "Automated sync policy",
     "https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/"
+   ]
+  ],
+  "system-design": [
+   [
+    "Amazon Builders' Library",
+    "https://aws.amazon.com/builders-library/"
+   ],
+   [
+    "SRE book: Addressing cascading failures",
+    "https://sre.google/sre-book/addressing-cascading-failures/"
    ]
   ]
  }
