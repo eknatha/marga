@@ -1,0 +1,367 @@
+{
+ "id": "microsoft-teams-expired-certificate",
+ "checked": "29 October 2026",
+ "summary": "On 3 February 2020 around 8:30 a.m. ET Microsoft Teams became unavailable. Microsoft said an authentication certificate had expired and that it was developing a fix to apply a new certificate.",
+ "overview": {
+  "background": "Teams depends on authentication certificates for its service. When one expires and is not renewed, services needing it fail.",
+  "systems": [
+   "Microsoft Teams service",
+   "An authentication certificate",
+   "Users signing in"
+  ],
+  "impact": "Users could not access Teams. The article gives no end time.",
+  "severity": "A public outage that lasted for hours (the card says several hours).",
+  "gaps": "This file uses a TechCrunch report. Microsoft's status history (the card source) could not be read."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "An unrenewed certificate stops sign-in",
+   "caption": "Per Microsoft's statement, an authentication certificate expired and users had issues using the service.",
+   "nodes": [
+    {
+     "id": "exp",
+     "label": "Authentication certificate expires",
+     "row": 0,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "auth",
+     "label": "Services needing it fail",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "usr",
+     "label": "Users cannot sign in or use Teams",
+     "row": 2,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "fix",
+     "label": "New certificate deployed",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "exp",
+     "t": "auth",
+     "state": "fail"
+    },
+    {
+     "f": "auth",
+     "t": "usr",
+     "state": "hit"
+    },
+    {
+     "f": "usr",
+     "t": "fix",
+     "label": "recovery"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Certificate inventory and expiry alerts (conceptual)",
+   "caption": "General controls: track every certificate, alert early and automate renewal.",
+   "nodes": [
+    {
+     "id": "inv",
+     "label": "Inventory of all certificates",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "al",
+     "label": "Alerts at 60, 30, 14 and 7 days",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "auto",
+     "label": "Automatic renewal",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "drill",
+     "label": "Expiry drills",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "inv",
+     "t": "al",
+     "state": "new"
+    },
+    {
+     "f": "inv",
+     "t": "auto",
+     "state": "new"
+    },
+    {
+     "f": "al",
+     "t": "drill",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "No certificate expires unseen.",
+  "Renewal is automated.",
+  "Expiry is rehearsed."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Before 3 Feb 2020",
+   "phase": "change",
+   "e": "An authentication certificate reaches its expiry without being renewed."
+  },
+  {
+   "t": "3 Feb 2020, ~8:30 a.m. ET",
+   "phase": "trigger",
+   "e": "Users report Teams is unavailable."
+  },
+  {
+   "t": "~10:00 a.m. ET",
+   "phase": "detect",
+   "e": "Microsoft says an authentication certificate has expired."
+  },
+  {
+   "t": "After the diagnosis",
+   "phase": "investigate",
+   "e": "Microsoft works on a fix."
+  },
+  {
+   "t": "During the morning",
+   "phase": "mitigate",
+   "e": "Microsoft develops and begins to deploy a new certificate."
+  },
+  {
+   "t": "After deployment",
+   "phase": "recover",
+   "e": "Some customers report service restored."
+  }
+ ],
+ "rootCause": {
+  "trigger": "An authentication certificate expired and had not been renewed.",
+  "underlying": "Services that needed the certificate failed.",
+  "contributing": [
+   "Missing renewal process",
+   "No alert in time"
+  ],
+  "propagation": [
+   "Certificate expires.",
+   "Authentication fails.",
+   "Teams unavailable."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Microsoft's statement",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "We've determined that an authentication certificate has expired causing, users to have issues using the service.",
+   "note": "From Microsoft as quoted by TechCrunch."
+  },
+  {
+   "label": "The fix",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "developing a fix to apply a new certificate to the service",
+   "note": "From the same statement."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Read the TLS or token errors.",
+    "why": "Certificate expiry."
+   },
+   {
+    "step": "Check expiry dates of auth certificates.",
+    "why": "One expired."
+   },
+   {
+    "step": "Check who owns renewal.",
+    "why": "Process gap."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Issue and deploy a new certificate.",
+    "why": "Microsoft's fix."
+   },
+   {
+    "step": "Restart or reload dependent services.",
+    "why": "General practice."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check sign-ins succeed.",
+    "why": "Test."
+   },
+   {
+    "step": "Check other certificates for upcoming expiry.",
+    "why": "Sweep."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Inventory certificates.",
+    "why": "General practice."
+   },
+   {
+    "step": "Automate renewal.",
+    "why": "General practice."
+   },
+   {
+    "step": "Alert on expiry.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Replace certificates in a controlled order. A bad replacement can cause a second outage."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Sign-ins fail and logs show an authentication certificate has expired.",
+   "clues": [
+    "Service depends on it",
+    "No automation",
+    "Users waiting"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "How do you restore quickly?",
+    "How do you check others?",
+    "How do you prevent a repeat?"
+   ],
+   "answer": "Issue and deploy a new certificate, sweep for others near expiry and automate renewal with alerts."
+  },
+  "rootcause": {
+   "q": "What expired?",
+   "options": [
+    "An authentication certificate",
+    "A domain",
+    "A licence",
+    "A contract"
+   ],
+   "answer": 0,
+   "why": "Per the statement."
+  },
+  "remediation": [
+   {
+    "task": "Build an expiry dashboard.",
+    "answer": "Days left per certificate."
+   },
+   {
+    "task": "Plan automated renewal.",
+    "answer": "ACME or managed service."
+   },
+   {
+    "task": "Plan expiry drills.",
+    "answer": "Expire a test certificate."
+   }
+  ],
+  "design": {
+   "prompt": "Design certificate management for a global service.",
+   "constraints": [
+    "Hundreds of certificates",
+    "Many teams",
+    "No downtime"
+   ],
+   "answer": "Central inventory, owner per certificate, automatic renewal, alerts and drills."
+  },
+  "checks": [
+   {
+    "q": "When did it happen?",
+    "options": [
+     "3 February 2020",
+     "1 May 2021",
+     "5 June 2019",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per TechCrunch."
+   },
+   {
+    "q": "About what time did it start?",
+    "options": [
+     "8:30 a.m. ET",
+     "Midnight",
+     "Noon",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per TechCrunch."
+   },
+   {
+    "q": "Did the article give an end time?",
+    "options": [
+     "No",
+     "Yes",
+     "Partly",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per TechCrunch."
+   },
+   {
+    "q": "What was Microsoft's fix?",
+    "options": [
+     "Apply a new certificate",
+     "Reboot",
+     "Change DNS",
+     "Nothing"
+    ],
+    "answer": 0,
+    "why": "Per TechCrunch."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Inventory",
+   "Automatic renewal"
+  ],
+  "monitoring": [
+   "Expiry alerts"
+  ],
+  "recovery": [
+   "New certificate"
+  ],
+  "practices": [
+   "Drills"
+  ]
+ },
+ "sources": [
+  {
+   "title": "TechCrunch: Microsoft Teams has been down this morning",
+   "url": "https://techcrunch.com/2020/02/03/microsoft-teams-has-been-down-this-morning/amp/",
+   "used": "date, time, cause, statement"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from TechCrunch's report. Duration is not given there; the card says several hours."
+}

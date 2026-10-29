@@ -1,0 +1,379 @@
+{
+ "id": "exchange-y2022-date-bug",
+ "checked": "29 October 2026",
+ "summary": "At the start of 2022, on-premises Exchange Server 2016 and 2019 stopped delivering mail because the malware-scan engine could not read a date-based version number. Messages piled up in transport queues until Microsoft published a workaround script.",
+ "overview": {
+  "background": "Exchange Server's malware scanning engine loads signature updates identified by a version string built from the date. On 1 January 2022 the version became 2201010001.",
+  "systems": [
+   "Exchange Server 2016 and 2019 on premises",
+   "FIP-FS malware scan engine",
+   "Transport queues",
+   "Engine update version string"
+  ],
+  "impact": "Mail stuck in transport queues for administrators running on-premises Exchange.",
+  "severity": "A widespread outage for on-premises Exchange customers at the new year. The report gives no severity level.",
+  "gaps": "This file uses a news report, not Microsoft's page. It gives no clock times or counts."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A date-shaped version breaks the scan engine",
+   "caption": "The engine failed to load on the new version string, so mail waited in queues.",
+   "nodes": [
+    {
+     "id": "ver",
+     "label": "Engine version 2201010001",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "eng",
+     "label": "FIP-FS scan engine fails to load",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "tq",
+     "label": "Transport queues hold mail",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "user",
+     "label": "Mail not delivered",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "ver",
+     "t": "eng",
+     "state": "fail"
+    },
+    {
+     "f": "eng",
+     "t": "tq",
+     "state": "fail"
+    },
+    {
+     "f": "tq",
+     "t": "user",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Date and version handling that survives rollover (conceptual)",
+   "caption": "General guards, not Microsoft's stated changes.",
+   "nodes": [
+    {
+     "id": "test",
+     "label": "Tests with future dates",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "val",
+     "label": "Version parsing validated",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "fail",
+     "label": "Scan failure does not block mail flow",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "mon",
+     "label": "Queue length alert",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "test",
+     "t": "val",
+     "state": "new"
+    },
+    {
+     "f": "test",
+     "t": "fail",
+     "state": "new"
+    },
+    {
+     "f": "fail",
+     "t": "mon",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Rollover dates are tested.",
+  "A scan failure degrades safely.",
+  "Queue growth pages someone."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "1 Jan 2022",
+   "phase": "trigger",
+   "e": "The new engine version number becomes 2201010001."
+  },
+  {
+   "t": "Following hours",
+   "phase": "impact",
+   "e": "The scan engine fails to load with the error Can't convert '2201010001' to long."
+  },
+  {
+   "t": "Following hours",
+   "phase": "impact",
+   "e": "Mail piles up in transport queues on Exchange 2016 and 2019."
+  },
+  {
+   "t": "Following hours",
+   "phase": "detect",
+   "e": "Administrators report the event log error and stuck queues."
+  },
+  {
+   "t": "Following days",
+   "phase": "mitigate",
+   "e": "Microsoft publishes Reset-ScanEngineVersion.ps1 which sets the engine version to 2112330001."
+  },
+  {
+   "t": "After the script runs",
+   "phase": "recover",
+   "e": "Services restart and queued mail is delivered."
+  }
+ ],
+ "rootCause": {
+  "trigger": "The malware engine could not convert a date-based version number to a number.",
+  "underlying": "The version string for a signature update was 2201010001, which the code could not convert.",
+  "contributing": [
+   "Version numbers encoded dates without rollover tests",
+   "A scan engine failure blocked mail flow"
+  ],
+  "propagation": [
+   "Version string changes.",
+   "Engine fails to load.",
+   "Queues fill."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Event log error",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Can't convert '2201010001' to long.",
+   "note": "From the news report of the Exchange error."
+  },
+  {
+   "label": "Engine load error",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "The FIP-FS 'Microsoft' Scan Engine failed to load. PID: 23092, Error Code: 0x80004005.",
+   "note": "From the same report."
+  },
+  {
+   "label": "Simulated queue check",
+   "kind": "simulated",
+   "lang": "powershell",
+   "body": "Get-Queue | Sort-Object MessageCount -Descending | Select-Object -First 5 Identity,MessageCount",
+   "note": "A command to view queue lengths. Output omitted."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check the event log for scan engine errors.",
+    "why": "The error named the version string."
+   },
+   {
+    "step": "Check transport queue lengths.",
+    "why": "Queues were growing."
+   },
+   {
+    "step": "Check recent engine updates.",
+    "why": "The update version rolled over."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Run Microsoft's reset script.",
+    "why": "It sets the engine version to 2112330001."
+   },
+   {
+    "step": "Restart transport services.",
+    "why": "Mail resumes."
+   },
+   {
+    "step": "Release queued messages.",
+    "why": "Delivers backlog."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check queues drain.",
+    "why": "Confirms mail flow."
+   },
+   {
+    "step": "Check the scan engine loads.",
+    "why": "Event log is clean."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Test date rollover in release testing.",
+    "why": "General practice."
+   },
+   {
+    "step": "Allow mail flow to continue if scanning fails, with alerting.",
+    "why": "A design choice to weigh against security."
+   },
+   {
+    "step": "Alert on queue length.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Disabling malware scanning removes protection. Prefer the supported script and restore scanning afterwards."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Mail is stuck in queues on 1 January. The event log shows a scan engine failed to load with a conversion error.",
+   "clues": [
+    "Version looks like a date",
+    "Queues growing",
+    "Only on-premises"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "What does the error tell you?",
+    "What is the safest fix?",
+    "How do you check?"
+   ],
+   "answer": "Apply the vendor's workaround for the engine version, restart services, release queues and check that scanning works."
+  },
+  "rootcause": {
+   "q": "What failed to convert?",
+   "options": [
+    "The version string 2201010001",
+    "A password",
+    "An address",
+    "A certificate"
+   ],
+   "answer": 0,
+   "why": "Per the report."
+  },
+  "remediation": [
+   {
+    "task": "List date risks.",
+    "answer": "Two-digit years, version strings with dates and 32-bit time values."
+   },
+   {
+    "task": "Write rollover tests.",
+    "answer": "Run with clock set to year ends."
+   },
+   {
+    "task": "Design a safe fail mode.",
+    "answer": "Queue, alert and fall back."
+   }
+  ],
+  "design": {
+   "prompt": "Design update packaging that cannot break on a date boundary.",
+   "constraints": [
+    "Signature updates daily",
+    "Mail gateway",
+    "Many customers"
+   ],
+   "answer": "Validate version parsing, canary rollout, test rollover and keep rollback."
+  },
+  "checks": [
+   {
+    "q": "Which servers were affected?",
+    "options": [
+     "Exchange 2016 and 2019 on premises",
+     "Exchange Online",
+     "All Windows",
+     "None"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "What did the script change?",
+    "options": [
+     "The engine version to 2112330001",
+     "The mailbox size",
+     "The password",
+     "The DNS"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "Where was mail stuck?",
+    "options": [
+     "Transport queues",
+     "Archives",
+     "Spam",
+     "Drafts"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "Does the report say the value was a 32-bit integer?",
+    "options": [
+     "No",
+     "Yes",
+     "Sometimes",
+     "Always"
+    ],
+    "answer": 0,
+    "why": "It only gives the conversion error."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Test date rollover",
+   "Safe failure of scanning"
+  ],
+  "monitoring": [
+   "Queue length alerts"
+  ],
+  "recovery": [
+   "Vendor workaround script",
+   "Release queues"
+  ],
+  "practices": [
+   "Include year-end tests"
+  ]
+ },
+ "sources": [
+  {
+   "title": "The Hacker News: Microsoft Exchange Y2K22 bug",
+   "url": "https://thehackernews.com/2022/01/microsoft-issues-fix-for-exchange-y2k22.html",
+   "used": "error text, effect, workaround"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from a news report. The report does not say the value was a 32-bit integer, so this file does not claim that. No clock times are given. The command is Simulated. The source URL is the report cited on the case card."
+}

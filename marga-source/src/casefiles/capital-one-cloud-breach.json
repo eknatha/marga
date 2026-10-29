@@ -1,0 +1,372 @@
+{
+ "id": "capital-one-cloud-breach",
+ "checked": "29 October 2026",
+ "summary": "In 2019 an attacker used a server-side request forgery (SSRF) against a misconfigured web application firewall to reach the cloud metadata service, obtained temporary credentials for an over-permissioned role and read data from storage buckets. The case is covered here through Brian Krebs's report of 2 August 2019.",
+ "overview": {
+  "background": "Capital One ran a ModSecurity web application firewall on Apache in AWS. The WAF's server role could list and read data buckets.",
+  "systems": [
+   "Web application firewall (ModSecurity, Apache) on AWS",
+   "Instance metadata service",
+   "An IAM role with broad permissions",
+   "S3 data buckets"
+  ],
+  "impact": "A former Amazon employee was charged with stealing more than 100 million consumer credit applications, per the report.",
+  "severity": "A major data breach reported in late July 2019.",
+  "gaps": "This file uses a journalist's report. Capital One's own statement could not be read, and Capital One declined to comment to the reporter."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "SSRF to credentials to data",
+   "caption": "Per the report, the attacker tricked the firewall into relaying requests to the metadata service, which gave temporary credentials for a role that could list and read buckets.",
+   "nodes": [
+    {
+     "id": "ssrf",
+     "label": "SSRF through the misconfigured WAF",
+     "row": 0,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "meta",
+     "label": "Instance metadata service returns role credentials",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "role",
+     "label": "Role can list and read data buckets",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "s3",
+     "label": "Data read from S3",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "ssrf",
+     "t": "meta",
+     "state": "fail"
+    },
+    {
+     "f": "meta",
+     "t": "role",
+     "state": "fail"
+    },
+    {
+     "f": "role",
+     "t": "s3",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Least privilege and metadata protection (conceptual)",
+   "caption": "Controls the report and Amazon pointed to, plus general guards.",
+   "nodes": [
+    {
+     "id": "lp",
+     "label": "Least-privilege role (Access Advisor)",
+     "row": 0,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "md",
+     "label": "Metadata access restricted",
+     "row": 0,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "mon",
+     "label": "Anomaly detection (GuardDuty)",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "cls",
+     "label": "Sensitive data classification (Macie)",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "lp",
+     "t": "mon",
+     "state": "new"
+    },
+    {
+     "f": "md",
+     "t": "cls",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "A web server role can only read what it needs.",
+  "Metadata credentials are hard to steal.",
+  "Odd data reads raise alerts."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Before the attack",
+   "phase": "change",
+   "e": "The WAF is deployed with a misconfiguration."
+  },
+  {
+   "t": "During the attack",
+   "phase": "trigger",
+   "e": "The attacker uses SSRF to reach the metadata service and obtain credentials."
+  },
+  {
+   "t": "During the attack",
+   "phase": "impact",
+   "e": "The attacker lists and reads data from storage buckets."
+  },
+  {
+   "t": "Late July 2019",
+   "phase": "detect",
+   "e": "The activity is discovered and a former Amazon employee is arrested the Monday before 2 August."
+  },
+  {
+   "t": "2 Aug 2019",
+   "phase": "change",
+   "e": "Krebs publishes his analysis of the case."
+  },
+  {
+   "t": "After the breach",
+   "phase": "recover",
+   "e": "Credentials are rotated and permissions reviewed (general response; the report does not detail it)."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A misconfigured WAF relayed attacker requests to the metadata service.",
+  "underlying": "The WAF's role had too many permissions and SSRF is not in the default rules of that WAF.",
+  "contributing": [
+   "Over-broad role",
+   "Metadata service reachable from the WAF host",
+   "Skills gap in cloud security (per the report)"
+  ],
+  "propagation": [
+   "SSRF.",
+   "Credentials.",
+   "Bucket listing.",
+   "Data read."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "On SSRF risk",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "SSRF has become the most serious vulnerability facing organizations that use public clouds.",
+   "note": "Evan Johnson of Cloudflare, as quoted in Krebs's report."
+  },
+  {
+   "label": "Amazon's view",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "a misconfiguration of a web application firewall",
+   "note": "Amazon's characterisation as reported by Krebs."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check what the web tier's role can access.",
+    "why": "It could read buckets."
+   },
+   {
+    "step": "Check metadata endpoint access.",
+    "why": "SSRF target."
+   },
+   {
+    "step": "Check bucket access logs.",
+    "why": "Unusual reads."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Restrict the role to needed resources.",
+    "why": "Access Advisor."
+   },
+   {
+    "step": "Require session tokens for metadata (IMDSv2).",
+    "why": "General practice."
+   },
+   {
+    "step": "Add WAF rules for SSRF.",
+    "why": "AWS WAF can detect SSRF per Amazon."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Re-test with an SSRF probe.",
+    "why": "Confirm blocked."
+   },
+   {
+    "step": "Check anomaly detection fires.",
+    "why": "Test."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Apply least privilege.",
+    "why": "Core lesson."
+   },
+   {
+    "step": "Detect unusual access.",
+    "why": "GuardDuty."
+   },
+   {
+    "step": "Classify sensitive data.",
+    "why": "Macie."
+   }
+  ],
+  "safety": "Test SSRF only on systems you own."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A public web app can be made to fetch internal URLs. It runs on a VM with a role that can read data buckets.",
+   "clues": [
+    "Metadata endpoint reachable",
+    "Role is broad",
+    "No anomaly alerts"
+   ],
+   "question": "How do you reduce the risk?",
+   "hints": [
+    "What do you restrict?",
+    "What do you block?",
+    "What do you watch?"
+   ],
+   "answer": "Block metadata access from the app, require session-based metadata, scope the role down and alert on unusual bucket reads."
+  },
+  "rootcause": {
+   "q": "What attack technique was used?",
+   "options": [
+    "Server-side request forgery",
+    "SQL injection",
+    "Phishing",
+    "DDoS"
+   ],
+   "answer": 0,
+   "why": "Per the report."
+  },
+  "remediation": [
+   {
+    "task": "Define role scope.",
+    "answer": "List the exact buckets and actions."
+   },
+   {
+    "task": "Plan IMDSv2 rollout.",
+    "answer": "Enable on all instances."
+   },
+   {
+    "task": "Plan anomaly alerts.",
+    "answer": "Alert on large reads from unusual roles."
+   }
+  ],
+  "design": {
+   "prompt": "Design a cloud web tier that resists SSRF.",
+   "constraints": [
+    "Public WAF",
+    "Sensitive data",
+    "AWS"
+   ],
+   "answer": "Least privilege, metadata hardening, egress controls, WAF rules and detection."
+  },
+  "checks": [
+   {
+    "q": "What did the metadata service hand out?",
+    "options": [
+     "Temporary credentials for the server's role",
+     "Passwords",
+     "Certificates",
+     "Logs"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "Who disputed that AWS services caused it?",
+    "options": [
+     "Amazon",
+     "Capital One",
+     "The attacker",
+     "A regulator"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "How many applications were stolen, per the charge?",
+    "options": [
+     "More than 100 million",
+     "10",
+     "1 million",
+     "None"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "Did Capital One comment on the record?",
+    "options": [
+     "No, it declined",
+     "Yes",
+     "Partly",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Least privilege",
+   "Metadata hardening",
+   "Egress controls"
+  ],
+  "monitoring": [
+   "Unusual data reads"
+  ],
+  "recovery": [
+   "Rotate credentials",
+   "Scope roles"
+  ],
+  "practices": [
+   "SSRF testing",
+   "Cloud security skills"
+  ]
+ },
+ "sources": [
+  {
+   "title": "KrebsOnSecurity: What We Can Learn from the Capital One Hack",
+   "url": "https://krebsonsecurity.com/2019/08/what-we-can-learn-from-the-capital-one-hack/",
+   "used": "mechanism, charges, lessons"
+  }
+ ],
+ "verification": "Facts were read from Krebs's report on 29 October 2026. Capital One's statement (the card source) was not read. The timeline has few dates because the report gives few; the last entry is a general response and is marked as such."
+}

@@ -1,0 +1,427 @@
+{
+ "id": "google-cloud-service-control-null-pointer",
+ "checked": "29 October 2026",
+ "summary": "On 12 June 2025 a policy change with blank fields reached Google's Service Control binaries, which had a new, unprotected feature. A null pointer put them into a crash loop worldwide and APIs returned 503 errors for hours.",
+ "overview": {
+  "background": "Service Control checks policy and quota for API requests across Google Cloud. Its policy data is stored in regional Spanner tables that replicate globally within seconds.",
+  "systems": [
+   "Service Control binaries",
+   "Regional Spanner policy tables",
+   "Google Cloud APIs and Google Workspace products",
+   "us-central1 Spanner table",
+   "Status and monitoring tools"
+  ],
+  "impact": "Google Cloud and Workspace products returned 503 errors in many regions from about 10:51 AM PDT. Most products recovered by about 1:45 PM, us-central1 later, and Vertex AI Online Prediction fully at 6:18 PM.",
+  "severity": "A global, multi-product outage of several hours. Google gives no formal severity.",
+  "gaps": "Some times in the page differ (incident end 13:49 in the mini report, 18:18 in the status header)."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A blank policy hits an unprotected new code path",
+   "caption": "A May 29 feature lacked error handling and a feature flag. Blank policy fields replicated worldwide and crashed Service Control in every region.",
+   "nodes": [
+    {
+     "id": "pol",
+     "label": "Policy change with blank fields",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "sp",
+     "label": "Regional Spanner tables replicate globally in seconds",
+     "row": 1,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "sc",
+     "label": "Service Control: null pointer, crash loop",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "api",
+     "label": "Cloud and Workspace APIs return 503",
+     "row": 3,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "big",
+     "label": "us-central1: restarts overload Spanner",
+     "row": 3,
+     "col": 2,
+     "state": "fail"
+    }
+   ],
+   "edges": [
+    {
+     "f": "pol",
+     "t": "sp",
+     "label": "within seconds"
+    },
+    {
+     "f": "sp",
+     "t": "sc",
+     "label": "global rollout",
+     "state": "fail"
+    },
+    {
+     "f": "sc",
+     "t": "api",
+     "state": "hit"
+    },
+    {
+     "f": "sc",
+     "t": "big",
+     "label": "no randomized backoff",
+     "state": "fail"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Fail-open and staged data (conceptual)",
+   "caption": "Google said it would modularize Service Control to fail open, audit globally replicated data, require feature flags and add randomized backoff. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "pol",
+     "label": "Policy data rolled out region by region",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "val",
+     "label": "Validation rejects blank fields",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "sc",
+     "label": "Service Control with feature flags and fail-open",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "bo",
+     "label": "Randomized exponential backoff on restarts",
+     "row": 3,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "api",
+     "label": "APIs keep serving",
+     "row": 3,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "pol",
+     "t": "val",
+     "state": "new"
+    },
+    {
+     "f": "val",
+     "t": "sc",
+     "state": "new"
+    },
+    {
+     "f": "sc",
+     "t": "bo",
+     "state": "new"
+    },
+    {
+     "f": "sc",
+     "t": "api",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Bad data is stopped before it is replicated.",
+  "A crash in one module does not stop request serving.",
+  "Restarts do not stampede the database."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "29 May",
+   "phase": "change",
+   "e": "A new Service Control feature for quota policy checks is released without a feature flag."
+  },
+  {
+   "t": "About 10:45 AM PDT, 12 Jun",
+   "phase": "trigger",
+   "e": "A policy change with blank fields is inserted into regional Spanner tables and replicates globally within seconds."
+  },
+  {
+   "t": "10:49 or 10:51",
+   "phase": "impact",
+   "e": "The incident starts: Service Control binaries crash on the blank fields."
+  },
+  {
+   "t": "11:46",
+   "phase": "detect",
+   "e": "First public post acknowledges issues with multiple Google Cloud products."
+  },
+  {
+   "t": "12:41",
+   "phase": "investigate",
+   "e": "The root cause is identified and mitigations are applied."
+  },
+  {
+   "t": "12:48",
+   "phase": "mitigate",
+   "e": "All regions except us-central1 are mitigated."
+  },
+  {
+   "t": "13:45",
+   "phase": "recover",
+   "e": "Most Google Cloud products are fully recovered."
+  },
+  {
+   "t": "14:00",
+   "phase": "mitigate",
+   "e": "Mitigation is applied in us-central1 and multi-region US."
+  },
+  {
+   "t": "18:18",
+   "phase": "recover",
+   "e": "Vertex AI Online Prediction is fully recovered."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A policy change containing blank fields was written to the regional Spanner tables.",
+  "underlying": "A new feature added on 29 May had no error handling and no feature flag, so the blank fields caused a null pointer and a crash loop in every region.",
+  "contributing": [
+   "Policy data replicates globally within seconds",
+   "The binary crashed instead of failing open",
+   "In large regions restarting tasks overloaded Spanner because there was no randomized exponential backoff",
+   "Customer monitoring and Google's status page were also affected"
+  ],
+  "propagation": [
+   "Blank fields replicate.",
+   "Binaries crash in a loop.",
+   "APIs return 503.",
+   "Restart stampede slows recovery."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "What was missing",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "The issue with this change was that it did not have appropriate error handling nor was it feature flag protected.",
+   "note": "From Google's report."
+  },
+  {
+   "label": "Why it spread",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "This occurred globally given each regional deployment.",
+   "note": "From Google's report."
+  },
+  {
+   "label": "A simulated guard",
+   "kind": "simulated",
+   "lang": "python",
+   "body": "def apply_policy(p):\n    if p is None or p.quota_rules is None:\n        log.error('blank policy, keeping last good')\n        return LAST_GOOD",
+   "note": "Shows fail-open handling with a last known good value. Not Google code."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Find the first change near the start time.",
+    "why": "A policy insertion at about 10:45 matched."
+   },
+   {
+    "step": "Check whether the binary crashes on specific data.",
+    "why": "The crash was in a null-pointer path."
+   },
+   {
+    "step": "Look at database load during restarts.",
+    "why": "us-central1 was slow because of the restart stampede."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Freeze changes and policy pushes.",
+    "why": "Google froze all Service Control changes."
+   },
+   {
+    "step": "Bypass the faulty check and throttle task creation.",
+    "why": "This helped us-central1 recover."
+   },
+   {
+    "step": "Route to multi-regional databases where needed.",
+    "why": "Google did so in us-central1."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Watch 503 rates fall by region.",
+    "why": "Recovery varied by region."
+   },
+   {
+    "step": "Check products that recovered late.",
+    "why": "Dataflow and Vertex AI took longer."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Gate every new code path behind a feature flag.",
+    "why": "Google's stated action."
+   },
+   {
+    "step": "Validate and stage globally replicated data.",
+    "why": "Google audits such systems."
+   },
+   {
+    "step": "Add randomized exponential backoff.",
+    "why": "Google's stated action."
+   }
+  ],
+  "safety": "Bypassing a quota check changes who can call what. Re-enable it as soon as the data is fixed."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A control-plane binary crashes on startup everywhere and APIs return 503. A policy table changed 5 minutes before.",
+   "clues": [
+    "Data replicates in seconds",
+    "A new feature shipped two weeks ago",
+    "Restarts overload the database"
+   ],
+   "question": "What are your first three actions?",
+   "hints": [
+    "Stop more change",
+    "Fail open or closed?",
+    "How to avoid a stampede?"
+   ],
+   "answer": "Freeze policy pushes, bypass the faulty check or roll back the data, throttle restarts with jitter, and route to healthy databases. Then fix the null handling."
+  },
+  "rootcause": {
+   "q": "What triggered the crash?",
+   "options": [
+    "Blank fields in policy data hitting an unprotected feature",
+    "A power failure",
+    "An expired certificate",
+    "A DDoS attack"
+   ],
+   "answer": 0,
+   "why": "Google names blank fields and a null pointer."
+  },
+  "remediation": [
+   {
+    "task": "Define a feature-flag rule.",
+    "answer": "No new code path on a critical binary ships without a flag that can disable it remotely."
+   },
+   {
+    "task": "Write validation.",
+    "answer": "Reject policy records with missing required fields before they replicate."
+   },
+   {
+    "task": "Design backoff.",
+    "answer": "Exponential backoff with full jitter on restarts and database retries."
+   }
+  ],
+  "design": {
+   "prompt": "Design a global policy system that cannot be crashed by a bad record.",
+   "constraints": [
+    "Replication in seconds",
+    "Many consumers",
+    "Critical APIs"
+   ],
+   "answer": "Validate at write, replicate in stages with bake time, make consumers fail open with last known good, and rate limit restarts."
+  },
+  "checks": [
+   {
+    "q": "When was the new feature released?",
+    "options": [
+     "29 May",
+     "12 June",
+     "1 January",
+     "Never"
+    ],
+    "answer": 0,
+    "why": "Google says May 29."
+   },
+   {
+    "q": "Which region needed extra work?",
+    "options": [
+     "us-central1",
+     "europe-west1 only",
+     "None",
+     "asia-southeast1 only"
+    ],
+    "answer": 0,
+    "why": "Restart load overloaded the Spanner table there."
+   },
+   {
+    "q": "What did Google freeze?",
+    "options": [
+     "Service Control changes and manual policy pushes",
+     "All services",
+     "Billing",
+     "Support"
+    ],
+    "answer": 0,
+    "why": "That was the first remediation."
+   },
+   {
+    "q": "What would have limited the blast radius?",
+    "options": [
+     "A feature flag",
+     "A longer timeout",
+     "More logs",
+     "Bigger servers"
+    ],
+    "answer": 0,
+    "why": "Google says the change lacked flag protection."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Feature flags on critical paths",
+   "Validate data before global replication",
+   "Randomized backoff"
+  ],
+  "monitoring": [
+   "503 rate by region",
+   "Crash loops"
+  ],
+  "recovery": [
+   "Freeze changes",
+   "Throttle restarts"
+  ],
+  "practices": [
+   "Fail open with last known good",
+   "Keep status tooling independent"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Google Cloud incident report, 12 June 2025 (Service Control)",
+   "url": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW",
+   "used": "timeline, cause, impact, remediation"
+  }
+ ],
+ "verification": "Facts were read from Google's incident page on 29 October 2026. Some times in the page conflict, which is noted. The code is Simulated."
+}

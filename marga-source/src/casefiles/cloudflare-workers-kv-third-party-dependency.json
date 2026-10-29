@@ -1,0 +1,411 @@
+{
+ "id": "cloudflare-workers-kv-third-party-dependency",
+ "checked": "29 October 2026",
+ "summary": "On 12 June 2025 a third-party cloud provider that backs part of Workers KV's storage had its own outage. Workers KV failed for cold reads and writes, and Access, WARP, Gateway, Stream, Workers AI and many more services went down for about two and a half hours.",
+ "overview": {
+  "background": "Workers KV is a key-value service that many Cloudflare products use for configuration, authentication and asset delivery. It relies on a central data store as the source of truth, part of it backed by a third-party cloud provider.",
+  "systems": [
+   "Workers KV and its central data store",
+   "Access, Gateway, WARP, Browser Isolation",
+   "Dashboard login (Turnstile, Google sign-in, SSO)",
+   "Stream, Images, Realtime, Workers AI, Pages, Queues, D1 and more"
+  ],
+  "impact": "About 90 percent of Workers KV requests failed when the value was not cached. Identity logins, WARP registrations, Stream playback, Workers AI inference and Pages builds were among the failures. Data stored was not lost.",
+  "severity": "A global incident of about 2 hours 28 to 36 minutes. Cloudflare says it was not an attack.",
+  "gaps": "The post states 2 hours 28 minutes but 17:52 to 20:28 is 2 hours 36 minutes. The last 5 KB of the page were not read."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A single store beneath many products",
+   "caption": "The failure of a third-party-backed central store broke cold reads and writes. Products that depended on KV for identity and config failed together.",
+   "nodes": [
+    {
+     "id": "tp",
+     "label": "Third-party cloud provider outage",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "store",
+     "label": "Workers KV central data store",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "kv",
+     "label": "Workers KV: about 90 percent cold requests fail",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "prod",
+     "label": "Access, Gateway, WARP, Stream, AI, Pages",
+     "row": 3,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "dash",
+     "label": "Dashboard login and Turnstile",
+     "row": 3,
+     "col": 2,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "tp",
+     "t": "store",
+     "state": "fail"
+    },
+    {
+     "f": "store",
+     "t": "kv",
+     "state": "fail"
+    },
+    {
+     "f": "kv",
+     "t": "prod",
+     "state": "hit"
+    },
+    {
+     "f": "kv",
+     "t": "dash",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Own the storage, bound the dependency (conceptual)",
+   "caption": "Cloudflare was moving KV to its own infrastructure including R2, adding redundancy and tooling to re-enable namespaces gradually. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "kv",
+     "label": "Workers KV on Cloudflare-run storage",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "red",
+     "label": "Redundant storage, no single provider",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "deg",
+     "label": "Products degrade gracefully without KV",
+     "row": 2,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "prog",
+     "label": "Progressive namespace re-enable tooling",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "kv",
+     "t": "red",
+     "state": "new"
+    },
+    {
+     "f": "red",
+     "t": "deg",
+     "state": "new"
+    },
+    {
+     "f": "red",
+     "t": "prog",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "A provider outage no longer stops KV.",
+  "Products work in a reduced mode.",
+  "Recovery does not overload infrastructure."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "17:52 UTC, 12 Jun",
+   "phase": "trigger",
+   "e": "The WARP team sees new device registrations failing and declares an incident."
+  },
+  {
+   "t": "18:05",
+   "phase": "detect",
+   "e": "The Access team is alerted to a rapid rise in error rates."
+  },
+  {
+   "t": "18:06",
+   "phase": "investigate",
+   "e": "Service incidents are combined. The shared cause is Workers KV unavailability. Priority P1."
+  },
+  {
+   "t": "18:21",
+   "phase": "investigate",
+   "e": "Priority is raised to P0."
+  },
+  {
+   "t": "19:09",
+   "phase": "mitigate",
+   "e": "Zero Trust Gateway removes Workers KV dependencies by degrading rules that need identity or device posture."
+  },
+  {
+   "t": "19:32",
+   "phase": "mitigate",
+   "e": "Access and Device Posture force-drop identity and posture requests to shed load."
+  },
+  {
+   "t": "20:23",
+   "phase": "recover",
+   "e": "Services begin recovering. Caches repopulate and rate limits are hit."
+  },
+  {
+   "t": "20:25",
+   "phase": "recover",
+   "e": "Access and Device Posture resume calling Workers KV."
+  },
+  {
+   "t": "20:28",
+   "phase": "recover",
+   "e": "Impact ends and SLOs return to pre-incident levels."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A failure in the third-party-backed storage underlying Workers KV.",
+  "underlying": "Workers KV's central store was a single source of truth, so its failure meant a complete outage of cold reads and writes. Cloudflare had gaps in resilience planning and was already moving KV to more resilient infrastructure.",
+  "contributing": [
+   "Many products depended on KV for configuration and authentication",
+   "Some kill switches enabled during the incident allowed Turnstile tokens to be redeemed more than once",
+   "Caches repopulating caused rate limits during recovery"
+  ],
+  "propagation": [
+   "Third-party store fails.",
+   "KV cold reads and writes fail.",
+   "Dependent products fail.",
+   "Logins and sessions break."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The failure",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "A failure of that store caused a complete outage for cold reads and writes",
+   "note": "From Cloudflare's post."
+  },
+  {
+   "label": "Responsibility",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "we are ultimately responsible for our chosen dependencies and how we choose to architect around them.",
+   "note": "From Cloudflare's post."
+  },
+  {
+   "label": "A simulated degrade rule",
+   "kind": "simulated",
+   "lang": "yaml",
+   "body": "rule: gateway-identity-policy\non_kv_unavailable: skip-identity-conditions\nlog: degraded=true",
+   "note": "Shows graceful degradation of a rule that needs identity. Invented."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Find the shared failing dependency across products.",
+    "why": "KV unavailability was common to many incidents."
+   },
+   {
+    "step": "Check the provider's status.",
+    "why": "The third party had its own outage."
+   },
+   {
+    "step": "Check which paths are cold versus cached.",
+    "why": "Cached values still worked."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Combine incidents under one cause and raise priority.",
+    "why": "Cloudflare did at 18:06 and 18:21."
+   },
+   {
+    "step": "Degrade or shed load for dependents.",
+    "why": "Gateway and Access did."
+   },
+   {
+    "step": "Cut over critical namespaces to your own storage.",
+    "why": "Cloudflare began this during the incident."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Watch error rates and SLOs.",
+    "why": "SLOs returned at 20:28."
+   },
+   {
+    "step": "Check dependent services separately.",
+    "why": "Each had a different impact."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Remove single-provider dependence.",
+    "why": "Cloudflare's action."
+   },
+   {
+    "step": "Reduce the blast radius per product.",
+    "why": "Cloudflare's action."
+   },
+   {
+    "step": "Build progressive re-enable tooling.",
+    "why": "Cloudflare's action."
+   }
+  ],
+  "safety": "Kill switches can have security side effects. Review them before you rely on them in an incident."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Many products fail at once. The shared dependency is a key-value service backed by a third-party store that is down.",
+   "clues": [
+    "Cached reads work",
+    "Logins fail",
+    "Provider status is red"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "Which products can degrade?",
+    "How do you shed load?",
+    "What is the permanent fix?"
+   ],
+   "answer": "Combine incidents, degrade dependent products where safe, shed load from the store, shift critical data to your own storage, and re-enable gradually."
+  },
+  "rootcause": {
+   "q": "What was the trigger?",
+   "options": [
+    "A third-party provider outage affecting KV storage",
+    "A DDoS attack",
+    "A bad deploy",
+    "A cut cable"
+   ],
+   "answer": 0,
+   "why": "Cloudflare states this."
+  },
+  "remediation": [
+   {
+    "task": "List dependencies per product.",
+    "answer": "Map each product to the stores it needs and the fallback."
+   },
+   {
+    "task": "Design a progressive re-enable.",
+    "answer": "Turn namespaces on in groups while watching load."
+   },
+   {
+    "task": "Review kill switches.",
+    "answer": "Document the security impact of each."
+   }
+  ],
+  "design": {
+   "prompt": "Design a key-value platform whose failure does not break logins.",
+   "constraints": [
+    "Many consumers",
+    "Third-party storage",
+    "Global"
+   ],
+   "answer": "Use multiple storage backends, caches that survive outages, graceful degradation, per-product isolation and tested fallbacks."
+  },
+  "checks": [
+   {
+    "q": "What share of uncached KV requests failed?",
+    "options": [
+     "About 90 percent",
+     "1 percent",
+     "10 percent",
+     "None"
+    ],
+    "answer": 0,
+    "why": "The post says about 90 percent."
+   },
+   {
+    "q": "Was stored data lost?",
+    "options": [
+     "No",
+     "Yes, all",
+     "Half",
+     "Only logs"
+    ],
+    "answer": 0,
+    "why": "Stored data was not affected."
+   },
+   {
+    "q": "What did the dashboard login rely on?",
+    "options": [
+     "Turnstile, KV and Access",
+     "Only DNS",
+     "Nothing",
+     "Only email"
+    ],
+    "answer": 0,
+    "why": "The post lists those failures."
+   },
+   {
+    "q": "What was Cloudflare moving KV toward?",
+    "options": [
+     "More resilient own infrastructure",
+     "A single provider",
+     "Less storage",
+     "No caches"
+    ],
+    "answer": 0,
+    "why": "The post says so."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Avoid single-provider dependence",
+   "Graceful degradation",
+   "Test fallbacks"
+  ],
+  "monitoring": [
+   "Cold read error rate",
+   "Dependency health"
+  ],
+  "recovery": [
+   "Combine incidents",
+   "Progressive re-enable"
+  ],
+  "practices": [
+   "Own your dependencies",
+   "Review kill switch effects"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Cloudflare: Cloudflare service outage June 12, 2025",
+   "url": "https://blog.cloudflare.com/cloudflare-service-outage-june-12-2025/",
+   "used": "timeline, cause, impact, remediation"
+  }
+ ],
+ "verification": "Facts were read from Cloudflare's post on 29 October 2026 (the last 5 KB were not read). The configuration is Simulated."
+}

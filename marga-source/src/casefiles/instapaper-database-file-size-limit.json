@@ -1,0 +1,400 @@
+{
+ "id": "instapaper-database-file-size-limit",
+ "checked": "29 October 2026",
+ "summary": "On 9 February 2017 Instapaper's MySQL database on Amazon RDS hit a 2 TB file size limit on its bookmarks table. The service was down for about 31 hours and had limited archive access for about five days.",
+ "overview": {
+  "background": "Instapaper ran MySQL on Amazon RDS. RDS instances created before April 2014 used an ext3 filesystem with a 2 TB file limit. Instapaper's database was a read replica of a June 2013 instance, so it inherited the limit.",
+  "systems": [
+   "MySQL database on Amazon RDS",
+   "The bookmarks table",
+   "Backups (filesystem snapshots)",
+   "A temporary instance, an Aurora replica and a new MySQL instance"
+  ],
+  "impact": "About 31 hours of total downtime. Archive access was limited for about five days. Instapaper says no data was lost.",
+  "severity": "A full outage and a long recovery. No formal severity level is given.",
+  "gaps": "Times in the post are Pacific and were converted to Eastern by the reader of the page."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "An invisible limit on an old filesystem",
+   "caption": "The bookmarks table passed 2 TB on an ext3-backed instance. Snapshots shared the same limit, so recovery needed a new database.",
+   "nodes": [
+    {
+     "id": "tbl",
+     "label": "bookmarks table passes 2 TB",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "rds",
+     "label": "RDS MySQL on ext3: hard 2 TB file limit",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "bak",
+     "label": "Snapshots inherit the limit",
+     "row": 2,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "app",
+     "label": "Instapaper down 31 hours",
+     "row": 2,
+     "col": 2,
+     "state": "hit"
+    },
+    {
+     "id": "new",
+     "label": "New ext4 database via rsync, replication, promotion",
+     "row": 3,
+     "col": 1
+    }
+   ],
+   "edges": [
+    {
+     "f": "tbl",
+     "t": "rds",
+     "state": "fail"
+    },
+    {
+     "f": "rds",
+     "t": "bak",
+     "state": "fail"
+    },
+    {
+     "f": "rds",
+     "t": "app",
+     "state": "hit"
+    },
+    {
+     "f": "rds",
+     "t": "new",
+     "label": "recovery path"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Limits known, backups tested (conceptual)",
+   "caption": "Instapaper said it would test backups monthly and escalate outages to SRE. This picture adds general guards.",
+   "nodes": [
+    {
+     "id": "lim",
+     "label": "Inventory of platform limits per database",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "alert",
+     "label": "Alerts on distance to limits",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "test",
+     "label": "Monthly restore tests",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "dr",
+     "label": "Disaster recovery plan for this failure",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "lim",
+     "t": "alert",
+     "state": "new"
+    },
+    {
+     "f": "lim",
+     "t": "test",
+     "state": "new"
+    },
+    {
+     "f": "test",
+     "t": "dr",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Limits are tracked.",
+  "Backups are proven to restore.",
+  "The plan exists before the incident."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Before the incident",
+   "phase": "change",
+   "e": "The bookmarks table grows toward 2 TB on an instance created from a June 2013 instance."
+  },
+  {
+   "t": "9 Feb 3:30 PM ET",
+   "phase": "trigger",
+   "e": "The outage begins when the table exceeds the limit."
+  },
+  {
+   "t": "During the first hours",
+   "phase": "investigate",
+   "e": "The team dumps the production database to a 5.5 TB RAID-0 disk. The first dump takes 24 hours, a parallel one 10 hours."
+  },
+  {
+   "t": "After 31 hours",
+   "phase": "mitigate",
+   "e": "A temporary instance launches with limited archive access."
+  },
+  {
+   "t": "10 Feb 10:30 PM ET",
+   "phase": "recover",
+   "e": "Service returns with limited archive access."
+  },
+  {
+   "t": "During the following days",
+   "phase": "mitigate",
+   "e": "An Amazon engineer mounts ext4 on the failed database and uses rsync to copy data. Binary-log replication syncs changes."
+  },
+  {
+   "t": "14 Feb",
+   "phase": "recover",
+   "e": "Full recovery is completed after the new database is promoted."
+  }
+ ],
+ "rootCause": {
+  "trigger": "The bookmarks table exceeded the 2 TB file size limit of RDS instances created before April 2014.",
+  "underlying": "Instapaper's instance inherited an ext3 filesystem from the June 2013 instance it was replicated from.",
+  "contributing": [
+   "No monitoring or alerts for the limit",
+   "No disaster recovery plan for this failure",
+   "Snapshots were also affected",
+   "The first dump estimate was too low because it was based on row counts"
+  ],
+  "propagation": [
+   "Table reaches limit.",
+   "Writes fail.",
+   "Backups share the limit.",
+   "Recovery needs a rebuilt database."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "What failed",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "The critical system that failed was our MySQL database",
+   "note": "From Instapaper's post."
+  },
+  {
+   "label": "Data outcome",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "We performed the restoration without losing any of our users’ older articles",
+   "note": "From Instapaper's post."
+  },
+  {
+   "label": "A simulated size check",
+   "kind": "simulated",
+   "lang": "sql",
+   "body": "SELECT table_name, ROUND((data_length + index_length) / POW(1024,4), 2) AS tb\nFROM information_schema.tables\nORDER BY tb DESC LIMIT 5;",
+   "note": "A query to see how close tables are to a limit. Output omitted."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Read the database error and check file size limits.",
+    "why": "A hard limit explains writes failing."
+   },
+   {
+    "step": "Check the filesystem type and instance creation date.",
+    "why": "Instances before April 2014 used ext3."
+   },
+   {
+    "step": "Check whether backups can restore.",
+    "why": "Snapshots shared the limit."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Dump data to a large disk and rebuild.",
+    "why": "The first dump took 24 hours, the parallel one 10."
+   },
+   {
+    "step": "Bring up a temporary service with limited access.",
+    "why": "It restored partial service after 31 hours."
+   },
+   {
+    "step": "Copy data to ext4 and sync changes by binary log.",
+    "why": "Final switch."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Compare row counts and recent data.",
+    "why": "Confirm no articles were lost."
+   },
+   {
+    "step": "Check the app runs against the new database.",
+    "why": "Deploy and test."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Know provider limits for each datastore.",
+    "why": "A lesson in the post."
+   },
+   {
+    "step": "Test backups monthly.",
+    "why": "Instapaper's change."
+   },
+   {
+    "step": "Escalate outages to SRE immediately.",
+    "why": "Instapaper's change."
+   }
+  ],
+  "safety": "Moving the production database during recovery risks losing writes made since the dump. Use replication to catch up before the cut-over."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Writes to your main table fail. The database is an old managed instance and the table is nearly 2 TB.",
+   "clues": [
+    "Snapshots are also at 2 TB",
+    "No alert fired",
+    "Dump takes a day"
+   ],
+   "question": "How do you plan the recovery?",
+   "hints": [
+    "What gives partial service sooner?",
+    "How do you copy safely?",
+    "How do you cut over?"
+   ],
+   "answer": "Start a parallel dump, stand up a temporary service with limited data, copy to a new larger filesystem, replicate binary logs and promote."
+  },
+  "rootcause": {
+   "q": "What limit was hit?",
+   "options": [
+    "A 2 TB file size limit on ext3-backed RDS",
+    "A memory limit",
+    "A CPU limit",
+    "A connection limit"
+   ],
+   "answer": 0,
+   "why": "Per the post."
+  },
+  "remediation": [
+   {
+    "task": "Write a limit inventory.",
+    "answer": "List filesystem, table, index, connection and size limits per datastore."
+   },
+   {
+    "task": "Plan a restore test.",
+    "answer": "Restore monthly to a fresh instance and time it."
+   },
+   {
+    "task": "Estimate dump time properly.",
+    "answer": "Base on bytes, not rows."
+   }
+  ],
+  "design": {
+   "prompt": "Design a database setup that avoids hidden size limits.",
+   "constraints": [
+    "Growing table",
+    "Managed service",
+    "Backups"
+   ],
+   "answer": "Pick current engine and filesystem, partition large tables, alert at 60 percent of limits, test restores and keep a rebuild plan."
+  },
+  "checks": [
+   {
+    "q": "How long was Instapaper down?",
+    "options": [
+     "About 31 hours",
+     "5 minutes",
+     "1 week",
+     "2 days"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   },
+   {
+    "q": "Why was the instance limited?",
+    "options": [
+     "It was created before April 2014 and used ext3",
+     "It was small",
+     "It was new",
+     "It used Aurora"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   },
+   {
+    "q": "How often will backup tests run now?",
+    "options": [
+     "Monthly",
+     "Yearly",
+     "Never",
+     "Daily"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   },
+   {
+    "q": "Was data lost?",
+    "options": [
+     "No older articles were lost",
+     "All lost",
+     "Half lost",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Track platform limits",
+   "Use current filesystems and engines",
+   "Partition large tables"
+  ],
+  "monitoring": [
+   "Alerts on size and limits"
+  ],
+  "recovery": [
+   "Parallel dump",
+   "Replication to cut over"
+  ],
+  "practices": [
+   "Test restores monthly",
+   "Escalate to SRE immediately"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Making Instapaper: Instapaper Outage Cause & Recovery",
+   "url": "https://medium.com/making-instapaper/3c32a7e9cc5f",
+   "used": "cause, timeline, recovery, lessons"
+  }
+ ],
+ "verification": "Facts were read from Instapaper's post on 29 October 2026. The SQL is Simulated."
+}

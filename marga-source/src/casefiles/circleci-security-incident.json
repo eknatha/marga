@@ -1,0 +1,380 @@
+{
+ "id": "circleci-security-incident",
+ "checked": "29 October 2026",
+ "summary": "In December 2022 malware on a CircleCI engineer's laptop stole a valid, 2FA-backed SSO session. The attacker used it to reach production and exfiltrate customer environment variables, tokens and keys. CircleCI told all customers to rotate their secrets on 4 January 2023.",
+ "overview": {
+  "background": "CircleCI runs customers' CI jobs, storing their secrets as environment variables, tokens and keys. An employee could generate production access tokens.",
+  "systems": [
+   "An engineer's laptop",
+   "SSO session cookie",
+   "Production databases and stores",
+   "Customer secrets and encryption keys"
+  ],
+  "impact": "Customer environment variables, tokens and keys were exfiltrated. Fewer than 5 customers had reported unauthorised access to third-party systems at publication.",
+  "severity": "Serious. CircleCI recommended rotating all secrets.",
+  "gaps": "The report includes indicators; this file does not copy them."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Stolen session, then production access",
+   "caption": "Per CircleCI, malware stole a 2FA-backed SSO session cookie, the attacker impersonated the employee remotely, and the employee's access to production tokens let them reach databases.",
+   "nodes": [
+    {
+     "id": "mal",
+     "label": "Malware on engineer's laptop",
+     "row": 0,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "ses",
+     "label": "Valid SSO session stolen",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "prod",
+     "label": "Production access via employee's token rights",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "sec",
+     "label": "Customer secrets and keys exfiltrated",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "mal",
+     "t": "ses",
+     "state": "fail"
+    },
+    {
+     "f": "ses",
+     "t": "prod",
+     "state": "fail"
+    },
+    {
+     "f": "prod",
+     "t": "sec",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Less standing access, shorter sessions (conceptual)",
+   "caption": "CircleCI planned limits on production access, step-up authentication and ephemeral permissions. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "dev",
+     "label": "Managed devices with malware detection",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "step",
+     "label": "Step-up authentication for production",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "eph",
+     "label": "Ephemeral permissions",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "mon",
+     "label": "Alerts on token generation",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "dev",
+     "t": "step",
+     "state": "new"
+    },
+    {
+     "f": "dev",
+     "t": "eph",
+     "state": "new"
+    },
+    {
+     "f": "step",
+     "t": "mon",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Few people have production access.",
+  "Sessions cannot be reused elsewhere.",
+  "Secrets rotate automatically."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "16 Dec 2022",
+   "phase": "trigger",
+   "e": "An engineer's laptop is infected with malware that antivirus did not detect."
+  },
+  {
+   "t": "19 Dec",
+   "phase": "impact",
+   "e": "Unauthorised third-party access and reconnaissance in production."
+  },
+  {
+   "t": "22 Dec",
+   "phase": "impact",
+   "e": "Data exfiltration; the last recorded unauthorised activity in production."
+  },
+  {
+   "t": "29 to 30 Dec",
+   "phase": "detect",
+   "e": "A customer reports suspicious OAuth activity and CircleCI learns a customer token was compromised."
+  },
+  {
+   "t": "4 Jan 2023, 16:35 UTC",
+   "phase": "mitigate",
+   "e": "The compromised employee's access is shut down; production access is cut for nearly all employees at 18:30."
+  },
+  {
+   "t": "5 Jan, 03:26",
+   "phase": "mitigate",
+   "e": "All Project API tokens are revoked."
+  },
+  {
+   "t": "7 Jan",
+   "phase": "recover",
+   "e": "OAuth token rotation is completed; notifications about potentially affected AWS tokens begin."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Malware stole a valid, 2FA-backed SSO session from an engineer's laptop.",
+  "underlying": "The employee could generate production access tokens, so the attacker reached databases and stores.",
+  "contributing": [
+   "Antivirus did not detect the malware",
+   "Secrets were encrypted at rest but keys could be taken from a running process",
+   "Broad production access for individuals"
+  ],
+  "propagation": [
+   "Malware.",
+   "Session theft.",
+   "Production access.",
+   "Secret exfiltration."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The principle",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "a security incident is a systems failure",
+   "note": "From CircleCI's report."
+  },
+  {
+   "label": "Safe window",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Anything entered into the system after January 5, 2023 can be considered secure.",
+   "note": "CircleCI's statement to customers."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check for odd token or OAuth use.",
+    "why": "A customer's report started it."
+   },
+   {
+    "step": "Trace sessions to devices.",
+    "why": "Laptop malware."
+   },
+   {
+    "step": "Check audit logs for odd commands.",
+    "why": "CircleCI listed some."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Rotate all customer secrets.",
+    "why": "OAuth, project tokens, SSH keys."
+   },
+   {
+    "step": "Revoke tokens and sessions.",
+    "why": "Done in sequence."
+   },
+   {
+    "step": "Cut production access to few people.",
+    "why": "CircleCI's step."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check audit logs from 16 Dec onwards.",
+    "why": "Look for unexpected actions."
+   },
+   {
+    "step": "Check no abnormal activity after rotation.",
+    "why": "Monitor."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Use managed devices with strong detection.",
+    "why": "CircleCI's plan."
+   },
+   {
+    "step": "Step-up auth for production.",
+    "why": "CircleCI's plan."
+   },
+   {
+    "step": "Automatic token rotation and OIDC.",
+    "why": "CircleCI's plan."
+   }
+  ],
+  "safety": "Rotate in dependency order and test builds. A mass rotation can break pipelines."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A vendor says your CI secrets may have been exposed. You have hundreds of pipelines.",
+   "clues": [
+    "Tokens, SSH keys, cloud keys",
+    "Production deploys",
+    "Audit logs available"
+   ],
+   "question": "What is your plan?",
+   "hints": [
+    "What do you rotate first?",
+    "What do you review?",
+    "How do you avoid long-lived secrets?"
+   ],
+   "answer": "Rotate cloud and deploy keys first, review audit logs for the exposure window, then move to short-lived OIDC credentials."
+  },
+  "rootcause": {
+   "q": "How did the attacker get in?",
+   "options": [
+    "A stolen 2FA-backed SSO session via malware",
+    "A password guess",
+    "A DDoS",
+    "A DNS hijack"
+   ],
+   "answer": 0,
+   "why": "Per CircleCI."
+  },
+  "remediation": [
+   {
+    "task": "Define an inventory of secrets.",
+    "answer": "Where each is used."
+   },
+   {
+    "task": "Write a rotation runbook.",
+    "answer": "Order and tests."
+   },
+   {
+    "task": "Plan OIDC adoption.",
+    "answer": "Replace stored cloud keys."
+   }
+  ],
+  "design": {
+   "prompt": "Design CI secrets handling that limits blast radius.",
+   "constraints": [
+    "Many customers",
+    "Cloud deploys",
+    "Stolen session risk"
+   ],
+   "answer": "Short-lived credentials, OIDC, scoped tokens, step-up access and session binding."
+  },
+  "checks": [
+   {
+    "q": "When did the malware infect the laptop?",
+    "options": [
+     "16 December 2022",
+     "4 January 2023",
+     "5 January",
+     "1 March"
+    ],
+    "answer": 0,
+    "why": "Per CircleCI."
+   },
+   {
+    "q": "When were all Project API tokens revoked?",
+    "options": [
+     "5 January 2023 at 03:26 UTC",
+     "1 December",
+     "7 January",
+     "Never"
+    ],
+    "answer": 0,
+    "why": "Per CircleCI."
+   },
+   {
+    "q": "Were secrets encrypted at rest?",
+    "options": [
+     "Yes, but keys were extracted from a running process",
+     "No",
+     "Partly",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per CircleCI."
+   },
+   {
+    "q": "What does CircleCI say a security incident is?",
+    "options": [
+     "A systems failure",
+     "A person's fault",
+     "Bad luck",
+     "Normal"
+    ],
+    "answer": 0,
+    "why": "Per CircleCI."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "OIDC and short-lived credentials",
+   "Step-up authentication"
+  ],
+  "monitoring": [
+   "Alerts on token generation"
+  ],
+  "recovery": [
+   "Mass secret rotation"
+  ],
+  "practices": [
+   "Managed devices",
+   "Ephemeral permissions"
+  ]
+ },
+ "sources": [
+  {
+   "title": "CircleCI: Incident report for January 4, 2023 security incident",
+   "url": "https://circleci.com/blog/jan-4-2023-incident-report",
+   "used": "timeline, mechanism, scope, response"
+  }
+ ],
+ "verification": "Facts were read from CircleCI's report on 29 October 2026. Indicator lists are in the report and not copied."
+}

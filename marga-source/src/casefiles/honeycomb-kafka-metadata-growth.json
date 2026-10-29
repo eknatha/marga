@@ -1,0 +1,362 @@
+{
+ "id": "honeycomb-kafka-metadata-growth",
+ "checked": "29 October 2026",
+ "summary": "In May 2024 Honeycomb engineers saw one Kafka broker reading far more from disk than its peers, peaking above the device's rated limit. The cause was tiered storage metadata that had grown for years because cleanup was not enabled. Enabling the cleaner cut metadata by over 99 percent and broker startup fell from over 20 minutes to under one minute.",
+ "overview": {
+  "background": "Honeycomb uses Kafka with Confluent tiered storage. Deleted segments leave metadata behind unless a cleaner is enabled.",
+  "systems": [
+   "Kafka brokers with Confluent Platform 7.6.0",
+   "Tiered storage metadata state files",
+   "SSD read IOPS limit (about 40,000)",
+   "Rolling upgrades"
+  ],
+  "impact": "No practical customer-facing effect in normal operation. Read load reached about 54,000 IOPS against a 40,000 rating, and brokers took over 20 minutes to start during rolling upgrades.",
+  "severity": "Low immediate impact, with a risk of a latency bottleneck.",
+  "gaps": "The blog does not give an incident date; the author says it appeared a few months after the February upgrade."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Metadata kept for six million deleted segments",
+   "caption": "Per the author, the largest partition held records for about 6 million deleted segments, some years old, and one broker's reads traced to these files.",
+   "nodes": [
+    {
+     "id": "up",
+     "label": "Upgrade converts metadata files",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "meta",
+     "label": "Metadata grows without cleanup",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "io",
+     "label": "One broker reads about 54,000 IOPS",
+     "row": 2,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "start",
+     "label": "Broker startup over 20 minutes",
+     "row": 2,
+     "col": 2,
+     "state": "fail"
+    }
+   ],
+   "edges": [
+    {
+     "f": "up",
+     "t": "meta",
+     "state": "fail"
+    },
+    {
+     "f": "meta",
+     "t": "io",
+     "state": "fail"
+    },
+    {
+     "f": "meta",
+     "t": "start",
+     "state": "fail"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "verified",
+   "title": "Cleaner enabled (as described by the author)",
+   "caption": "Honeycomb enabled the cleaner with a 30-day delay and a 24-hour cycle. Metadata fell by over 99 percent in every partition of the largest topic.",
+   "nodes": [
+    {
+     "id": "cln",
+     "label": "Metadata cleaner enabled",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "small",
+     "label": "Metadata files shrink by over 99 percent",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "fast",
+     "label": "Startup under one minute",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "cln",
+     "t": "small",
+     "state": "new"
+    },
+    {
+     "f": "cln",
+     "t": "fast",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Metadata is cleaned up.",
+  "Disk reads match expectations.",
+  "Upgrades are fast."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Feb 2024",
+   "phase": "trigger",
+   "e": "Honeycomb upgrades Confluent Platform from 7.0.10 to 7.6.0; metadata files are converted and startup slows."
+  },
+  {
+   "t": "May 2024",
+   "phase": "detect",
+   "e": "Engineers see one broker reading far more than the others."
+  },
+  {
+   "t": "May 2024",
+   "phase": "investigate",
+   "e": "They trace reads to metadata files using SystemTap."
+  },
+  {
+   "t": "May 2024",
+   "phase": "mitigate",
+   "e": "Confluent support identifies settings to clean tiered storage metadata."
+  },
+  {
+   "t": "After enabling",
+   "phase": "mitigate",
+   "e": "The cleaner runs with a 30-day delay every 24 hours."
+  },
+  {
+   "t": "After cleanup",
+   "phase": "recover",
+   "e": "Metadata shrinks by over 99 percent and the extra reads stop."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Tiered storage metadata grew without cleanup.",
+  "underlying": "The cleanup of metadata for segments deleted long ago was not enabled.",
+  "contributing": [
+   "Mature infrastructure was not revisited as it scaled",
+   "Normal metrics did not show which files were read",
+   "Upgrade migrations ran serially over large files"
+  ],
+  "propagation": [
+   "Metadata grows.",
+   "Reads rise.",
+   "Startup slows.",
+   "Cleaner fixes it."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Scale of the problem (restated)",
+   "kind": "simulated",
+   "lang": "text",
+   "body": "Largest partition: metadata for about 6 million deleted segments, some years old.",
+   "note": "A restatement of the post, not a verbatim quote."
+  },
+  {
+   "label": "A simulated cleaner setting",
+   "kind": "simulated",
+   "lang": "text",
+   "body": "tier.metadata.cleaner.enable=true\ntier.metadata.cleaner.delay=30d\ntier.metadata.cleaner.interval=24h",
+   "note": "Illustrative names only. Check Confluent's documentation for the real settings."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Compare per-broker disk reads.",
+    "why": "One broker stood out."
+   },
+   {
+    "step": "Trace which files are read.",
+    "why": "SystemTap showed metadata files."
+   },
+   {
+    "step": "Check file sizes.",
+    "why": "Hundreds of megabytes."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Enable metadata cleanup.",
+    "why": "With support's guidance."
+   },
+   {
+    "step": "Use a delay.",
+    "why": "30 days."
+   },
+   {
+    "step": "Run cleanup regularly.",
+    "why": "Every 24 hours."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check metadata size dropped.",
+    "why": "Over 99 percent."
+   },
+   {
+    "step": "Check startup time.",
+    "why": "Under a minute."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Revisit mature infrastructure as it scales.",
+    "why": "Author's lesson."
+   },
+   {
+    "step": "Watch metadata growth.",
+    "why": "Author's lesson."
+   },
+   {
+    "step": "Add observability for file reads.",
+    "why": "Author's lesson."
+   }
+  ],
+  "safety": "Enabling the cleaner makes all previously tombstoned data eligible after the delay. Understand this first."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "One Kafka broker reads eight times more from disk than the others, near its device limit. Customers are not affected yet.",
+   "clues": [
+    "Tiered storage",
+    "Recent upgrade",
+    "Metrics do not show the files"
+   ],
+   "question": "How do you investigate?",
+   "hints": [
+    "What tool shows which files are read?",
+    "What does support suggest?",
+    "What do you set?"
+   ],
+   "answer": "Trace file reads, find the large metadata files, enable the cleaner with a delay and watch IOPS and startup times."
+  },
+  "rootcause": {
+   "q": "What was the broker's read load versus its rating?",
+   "options": [
+    "About 54,000 IOPS against 40,000",
+    "1 IOPS",
+    "Equal",
+    "Unknown"
+   ],
+   "answer": 0,
+   "why": "Per the blog."
+  },
+  "remediation": [
+   {
+    "task": "Define a metadata size alert.",
+    "answer": "Alert when state files exceed a threshold."
+   },
+   {
+    "task": "Plan tracing.",
+    "answer": "Prepare SystemTap or eBPF."
+   },
+   {
+    "task": "Plan upgrade tests.",
+    "answer": "Time startup on production-size data."
+   }
+  ],
+  "design": {
+   "prompt": "Design Kafka operations that avoid slow starts.",
+   "constraints": [
+    "Tiered storage",
+    "Years of data",
+    "Rolling upgrades"
+   ],
+   "answer": "Metadata cleanup, size monitoring, tested upgrade timing and per-broker I/O dashboards."
+  },
+  "checks": [
+   {
+    "q": "Which tool found the files being read?",
+    "options": [
+     "SystemTap",
+     "A dashboard",
+     "A log",
+     "An alert"
+    ],
+    "answer": 0,
+    "why": "Per the blog."
+   },
+   {
+    "q": "What delay was set?",
+    "options": [
+     "30 days",
+     "30 seconds",
+     "30 months",
+     "None"
+    ],
+    "answer": 0,
+    "why": "Per the blog."
+   },
+   {
+    "q": "How far did startup fall?",
+    "options": [
+     "From over 20 minutes to under a minute",
+     "No change",
+     "Doubled",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the blog."
+   },
+   {
+    "q": "Was there customer impact?",
+    "options": [
+     "No practical customer-facing impact in normal operation",
+     "Total outage",
+     "Data loss",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the blog."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Metadata cleanup",
+   "Per-broker I/O dashboards"
+  ],
+  "monitoring": [
+   "Metadata size"
+  ],
+  "recovery": [
+   "Enable cleaner"
+  ],
+  "practices": [
+   "Revisit mature systems",
+   "Add tracing for file reads"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Honeycomb: Investigating Mysterious Kafka Broker I/O When Using Confluent Tiered Storage",
+   "url": "https://www.honeycomb.io/blog/bitten-by-a-kafka-bug-postmortem",
+   "used": "symptoms, cause, fix, results"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from the URL on the case card, which now serves a post with the title above (published 7 June 2024). The cleaner settings shown are illustrative and Simulated. The 6 million figure is restated, not quoted."
+}

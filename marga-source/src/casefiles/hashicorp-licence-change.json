@@ -1,0 +1,382 @@
+{
+ "id": "hashicorp-licence-change",
+ "checked": "29 October 2026",
+ "summary": "On 10 August 2023 HashiCorp announced that all future releases of its products would move from the Mozilla Public License 2.0 to the Business Source License 1.1. Vendors offering competing services could no longer use future releases. The community created the OpenTofu fork.",
+ "overview": {
+  "background": "Teams and vendors had built tooling and services on HashiCorp's open source products such as Terraform. A licence change affects who may use new releases and for what.",
+  "systems": [
+   "HashiCorp products licensed MPL 2.0",
+   "Business Source License 1.1",
+   "Third-party vendors with competing offerings",
+   "Teams building on Terraform"
+  ],
+  "impact": "Competing vendors could not incorporate future releases, bug fixes or security patches. End users could still copy, modify and redistribute the code except for competitive offerings. Enterprise and cloud customers saw no change.",
+  "severity": "A business and ecosystem risk, not an outage.",
+  "gaps": "The post does not list products or describe community reaction. The OpenTofu fork is in the card, not the post."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Licence, not code, changes who may use what",
+   "caption": "Per the post, future releases moved to BSL 1.1. APIs, SDKs and almost all libraries stay under MPL 2.0.",
+   "nodes": [
+    {
+     "id": "mpl",
+     "label": "MPL 2.0 licensed releases",
+     "row": 0,
+     "col": 0
+    },
+    {
+     "id": "bsl",
+     "label": "BSL 1.1 for future releases",
+     "row": 0,
+     "col": 2,
+     "state": "hit"
+    },
+    {
+     "id": "vend",
+     "label": "Competing vendors blocked from new releases",
+     "row": 1,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "user",
+     "label": "Other users continue within terms",
+     "row": 1,
+     "col": 2
+    },
+    {
+     "id": "fork",
+     "label": "Community fork (per the card)",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "mpl",
+     "t": "bsl",
+     "state": "hit"
+    },
+    {
+     "f": "bsl",
+     "t": "vend",
+     "state": "fail"
+    },
+    {
+     "f": "bsl",
+     "t": "user"
+    },
+    {
+     "f": "vend",
+     "t": "fork"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Managing licence and vendor risk (conceptual)",
+   "caption": "Controls for teams depending on a vendor's open source project.",
+   "nodes": [
+    {
+     "id": "inv",
+     "label": "Inventory of tools and licences",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "mon",
+     "label": "Watch vendor announcements",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "alt",
+     "label": "Evaluate alternatives and forks",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "pin",
+     "label": "Pin versions with an upgrade policy",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "inv",
+     "t": "mon",
+     "state": "new"
+    },
+    {
+     "f": "inv",
+     "t": "alt",
+     "state": "new"
+    },
+    {
+     "f": "mon",
+     "t": "pin",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "You know which licences you depend on.",
+  "You hear about changes early.",
+  "You have an exit option."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Before 10 Aug 2023",
+   "phase": "change",
+   "e": "HashiCorp products are under MPL 2.0."
+  },
+  {
+   "t": "10 Aug 2023",
+   "phase": "trigger",
+   "e": "HashiCorp announces BSL 1.1 for all future releases."
+  },
+  {
+   "t": "Following days",
+   "phase": "impact",
+   "e": "Vendors and users review the licence terms."
+  },
+  {
+   "t": "Following days",
+   "phase": "detect",
+   "e": "Teams discover their tooling depends on the changed products."
+  },
+  {
+   "t": "Following weeks",
+   "phase": "mitigate",
+   "e": "A community fork is started (per the card)."
+  },
+  {
+   "t": "Later",
+   "phase": "recover",
+   "e": "Teams choose to stay, pin versions, or move to alternatives."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A business decision about how others could use the code commercially.",
+  "underlying": "HashiCorp says some vendors used the open source work for commercial gain without material contributions back.",
+  "contributing": [
+   "Teams assumed the licence would not change",
+   "Competing services built on the products were affected",
+   "Tooling and workflows depended on one vendor's licence"
+  ],
+  "propagation": [
+   "Announcement.",
+   "Terms change.",
+   "Review.",
+   "Fork or stay."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Scope",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "all future releases of HashiCorp products",
+   "note": "From HashiCorp's post as read."
+  },
+  {
+   "label": "Enterprise customers",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Customers of enterprise and cloud-managed HashiCorp products will see no change.",
+   "note": "From the same post."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "List HashiCorp tools you use.",
+    "why": "Terraform and others."
+   },
+   {
+    "step": "Read the new licence terms.",
+    "why": "Competitive offering clause."
+   },
+   {
+    "step": "Check if you are a competing vendor.",
+    "why": "Matters for legal."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Decide to stay, pin or switch.",
+    "why": "Options."
+   },
+   {
+    "step": "Take legal advice if you resell services.",
+    "why": "General practice."
+   },
+   {
+    "step": "Track forks and governance.",
+    "why": "Community path."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Record the decision.",
+    "why": "Document."
+   },
+   {
+    "step": "Check upgrade path.",
+    "why": "Plan."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Inventory licences.",
+    "why": "General practice."
+   },
+   {
+    "step": "Prefer foundation-governed projects where possible.",
+    "why": "General practice."
+   },
+   {
+    "step": "Keep exit plans.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "A licence reading can have legal effect. Ask a lawyer before acting."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A tool your platform depends on changes its licence. You offer a managed service built on it.",
+   "clues": [
+    "Competitive clause",
+    "Customers rely on you",
+    "Fork exists"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "Who decides?",
+    "What are the options?",
+    "What is the timeline?"
+   ],
+   "answer": "Get legal advice, assess whether you are a competing offering, evaluate staying on the old version, switching to a fork or an alternative, and plan the change."
+  },
+  "rootcause": {
+   "q": "Which licence did the post move to?",
+   "options": [
+    "Business Source License 1.1",
+    "Apache 2.0",
+    "GPL",
+    "MIT"
+   ],
+   "answer": 0,
+   "why": "Per the post."
+  },
+  "remediation": [
+   {
+    "task": "Write a dependency licence list.",
+    "answer": "Tool, licence, owner."
+   },
+   {
+    "task": "Plan for forks.",
+    "answer": "Track governance and releases."
+   },
+   {
+    "task": "Plan upgrade pinning.",
+    "answer": "Pin and review."
+   }
+  ],
+  "design": {
+   "prompt": "Design a platform that is robust to licence changes.",
+   "constraints": [
+    "Many tools",
+    "Managed offering",
+    "Compliance"
+   ],
+   "answer": "Licence inventory, abstraction over tools, pinned versions and exit plans."
+  },
+  "checks": [
+   {
+    "q": "When was the announcement?",
+    "options": [
+     "10 August 2023",
+     "1 May 2020",
+     "5 June 2024",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   },
+   {
+    "q": "What stays under MPL 2.0?",
+    "options": [
+     "APIs, SDKs and almost all libraries",
+     "Everything",
+     "Nothing",
+     "Terraform only"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   },
+   {
+    "q": "Who wrote the post?",
+    "options": [
+     "Armon Dadgar",
+     "A journalist",
+     "A regulator",
+     "A user"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   },
+   {
+    "q": "What did HashiCorp say about enterprise customers?",
+    "options": [
+     "No change",
+     "Price rise",
+     "Shutdown",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Licence inventory",
+   "Exit plans"
+  ],
+  "monitoring": [
+   "Vendor announcements"
+  ],
+  "recovery": [
+   "Stay, pin or switch"
+  ],
+  "practices": [
+   "Foundation governance preference"
+  ]
+ },
+ "sources": [
+  {
+   "title": "HashiCorp: HashiCorp adopts Business Source License",
+   "url": "https://hashicorp.com/blog/hashicorp-adopts-business-source-license",
+   "used": "date, scope, terms, rationale"
+  }
+ ],
+ "verification": "Facts were read from HashiCorp's post on 29 October 2026. The post does not list products or describe community reaction. The OpenTofu fork comes from the case card."
+}

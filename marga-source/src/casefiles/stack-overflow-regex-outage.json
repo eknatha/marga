@@ -1,0 +1,395 @@
+{
+ "id": "stack-overflow-regex-outage",
+ "checked": "29 October 2026",
+ "summary": "On a Wednesday in July 2016 a malformed post with about 20,000 consecutive whitespace characters triggered catastrophic backtracking in a regular expression. It overloaded the web servers' CPUs, and load balancer health checks then removed servers from the pool, taking the site down for 34 minutes.",
+ "overview": {
+  "background": "Stack Overflow ran web servers behind a load balancer that checks the home page for health. A regex trimmed Unicode whitespace from the end of lines in posts.",
+  "systems": [
+   "Web servers rendering posts",
+   "A regex that trims whitespace from line ends",
+   "Load balancer health checks on the home page",
+   "Home page listing the malformed post"
+  ],
+  "impact": "The site was down for 34 minutes.",
+  "severity": "Full outage for about 34 minutes.",
+  "gaps": "This file is built from a news report of Stack Overflow's postmortem, because the postmortem page was not available to read."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A health check spreads the damage",
+   "caption": "The post sat on the home page, which was reprocessed again and again, and the home page was also the health check. Servers were taken out of the pool.",
+   "nodes": [
+    {
+     "id": "post",
+     "label": "Malformed post, about 20,000 whitespace characters",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "re",
+     "label": "Regex backtracking uses high CPU",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "web",
+     "label": "Web servers overloaded",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "lb",
+     "label": "Load balancer health check fails, removes servers",
+     "row": 3,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "site",
+     "label": "Site down",
+     "row": 4,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "post",
+     "t": "re",
+     "label": "on the home page"
+    },
+    {
+     "f": "re",
+     "t": "web",
+     "state": "fail"
+    },
+    {
+     "f": "web",
+     "t": "lb",
+     "state": "fail"
+    },
+    {
+     "f": "lb",
+     "t": "site",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Safe regex and bounded health checks (conceptual)",
+   "caption": "The regex was replaced with a substring function. This picture adds other general guards.",
+   "nodes": [
+    {
+     "id": "in",
+     "label": "Input length limit",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "sub",
+     "label": "Substring function instead of regex",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "to",
+     "label": "Regex timeouts where regex is needed",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "hc",
+     "label": "Health check separate from content",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "in",
+     "t": "sub",
+     "state": "new"
+    },
+    {
+     "f": "in",
+     "t": "to",
+     "state": "new"
+    },
+    {
+     "f": "sub",
+     "t": "hc",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Pathological input cannot burn CPU.",
+  "A bad post cannot fail the health check.",
+  "Servers stay in the pool."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Wednesday, July 2016",
+   "phase": "trigger",
+   "e": "A malformed post with about 20,000 whitespace characters is posted."
+  },
+  {
+   "t": "Following minutes",
+   "phase": "impact",
+   "e": "The trim regex consumes high CPU on the web servers as it backtracks."
+  },
+  {
+   "t": "Following minutes",
+   "phase": "impact",
+   "e": "The post appears on the home page, which is reprocessed repeatedly."
+  },
+  {
+   "t": "Following minutes",
+   "phase": "impact",
+   "e": "The load balancer health check fails and removes servers from the pool."
+  },
+  {
+   "t": "During the outage",
+   "phase": "investigate",
+   "e": "Engineers trace the load to the regex."
+  },
+  {
+   "t": "After 34 minutes",
+   "phase": "recover",
+   "e": "The regex is replaced with a substring function and the site is restored."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A malformed post with a long run of whitespace triggered a regex that trims Unicode spaces from line ends.",
+  "underlying": "The pattern backtracked heavily on that input and consumed high CPU on the web servers.",
+  "contributing": [
+   "The post was on the home page, so it was processed on every request",
+   "The home page was also used as the load balancer's health check",
+   "Servers failing the check were removed, concentrating load"
+  ],
+  "propagation": [
+   "Regex backtracks.",
+   "CPU rises.",
+   "Health check fails.",
+   "Servers leave the pool."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The direct cause",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "The direct cause was a malformed post that caused one of our regular expressions to consume high CPU on our Web servers.",
+   "note": "From Stack Overflow's postmortem as quoted in a news report."
+  },
+  {
+   "label": "The fix",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "This regular expression has been replaced with a substring function,",
+   "note": "From the same report."
+  },
+  {
+   "label": "A simulated backtracking test",
+   "kind": "simulated",
+   "lang": "python",
+   "body": "import re, time\nr = re.compile(r'^[\\s\\u200c]+$|[\\s]+$')\nfor n in (5000, 10000, 20000):\n    s = ' ' * n + 'x'\n    t = time.time(); r.search(s); print(n, round(time.time() - t, 2))",
+   "note": "A test you can run to see whether a trim pattern slows with long whitespace runs. The pattern is invented, not Stack Overflow's."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Look at CPU by process and request.",
+    "why": "High CPU on web servers pointed at request handling."
+   },
+   {
+    "step": "Find the request or content that is slow.",
+    "why": "A single post was the trigger."
+   },
+   {
+    "step": "Check why servers left the pool.",
+    "why": "The health check failed under load."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Remove or block the malformed post.",
+    "why": "Stops the load."
+   },
+   {
+    "step": "Replace the regex with a bounded operation.",
+    "why": "A substring function was used."
+   },
+   {
+    "step": "Bring servers back into the pool in steps.",
+    "why": "Prevents another overload."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check CPU and response times return to normal.",
+    "why": "Confirms the cause."
+   },
+   {
+    "step": "Check the health check passes without special content.",
+    "why": "Confirms the pool is stable."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Prefer string functions to regexes for trimming.",
+    "why": "Stack Overflow's change."
+   },
+   {
+    "step": "Limit input size and use timeouts for regexes.",
+    "why": "General practice."
+   },
+   {
+    "step": "Make health checks cheap and independent of content.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Removing a post from production is a content change. Log it and tell the author's support team."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "CPU is at 100 percent on every web server and the load balancer is dropping servers. One post is on the home page.",
+   "clues": [
+    "The page renders every request",
+    "A regex runs on post text",
+    "Health check hits the home page"
+   ],
+   "question": "How do you restore service?",
+   "hints": [
+    "What gets the load down?",
+    "How do you stop servers leaving?",
+    "How do you fix permanently?"
+   ],
+   "answer": "Remove the offending post, restore servers to the pool, then replace or bound the regex and make the health check independent of content."
+  },
+  "rootcause": {
+   "q": "How long was the site down?",
+   "options": [
+    "34 minutes",
+    "5 hours",
+    "1 day",
+    "1 minute"
+   ],
+   "answer": 0,
+   "why": "Per the report."
+  },
+  "remediation": [
+   {
+    "task": "Write a regex review rule.",
+    "answer": "Flag patterns with nested or overlapping quantifiers and test on long inputs."
+   },
+   {
+    "task": "Design a health check.",
+    "answer": "A static endpoint that checks the process, not page content."
+   },
+   {
+    "task": "Add input limits.",
+    "answer": "Reject whitespace runs over a set length."
+   }
+  ],
+  "design": {
+   "prompt": "Design post processing that cannot be DoS'd by one post.",
+   "constraints": [
+    "Millions of posts",
+    "Home page shows recent posts",
+    "Shared load balancer"
+   ],
+   "answer": "Bound processing time per item, cache rendered output, keep health checks independent and add input limits."
+  },
+  "checks": [
+   {
+    "q": "What replaced the regex?",
+    "options": [
+     "A substring function",
+     "A bigger regex",
+     "A database",
+     "A queue"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "What was unusual in the post?",
+    "options": [
+     "About 20,000 consecutive whitespace characters",
+     "A huge image",
+     "A long URL",
+     "A virus"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "Why did the health check matter?",
+    "options": [
+     "It removed servers and concentrated load",
+     "It saved data",
+     "It sent email",
+     "It cached pages"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "What kind of bug is this?",
+    "options": [
+     "Catastrophic regex backtracking",
+     "A memory leak",
+     "A race condition",
+     "A DNS bug"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Avoid regex for simple trimming",
+   "Input limits",
+   "Independent health checks"
+  ],
+  "monitoring": [
+   "CPU per request type"
+  ],
+  "recovery": [
+   "Remove the trigger",
+   "Rejoin servers in steps"
+  ],
+  "practices": [
+   "Review regexes for backtracking",
+   "Test with hostile input"
+  ]
+ },
+ "sources": [
+  {
+   "title": "ADTmag: Malformed Stack Overflow Post Chokes Regex, Crashes Site (report on Stack Overflow's postmortem)",
+   "url": "https://adtmag.com/Blogs/Dev-Watch/2016/07/stack-overflow-crash.aspx",
+   "used": "date, cause, impact, fix"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from a news report of Stack Overflow's postmortem. The postmortem page itself could not be read, and the report gives no clock times. The regex test is Simulated."
+}

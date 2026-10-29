@@ -1,0 +1,411 @@
+{
+ "id": "microsoft-azure-wan-router-command",
+ "checked": "29 October 2026",
+ "summary": "On 25 January 2023 an engineer ran a command on a WAN router in Madrid to purge the IGP database. The command forced every router joined to the IGP to recompute topology, and Microsoft 365 and Azure were unreachable for many users for hours.",
+ "overview": {
+  "background": "Microsoft's WAN connects its data centers and the internet. Routers share routes using an interior gateway protocol (IGP), and BGP routers validate internet prefixes.",
+  "systems": [
+   "Microsoft WAN routers (IGP and BGP)",
+   "Microsoft 365: Teams, SharePoint Online, OneDrive, Exchange Online",
+   "Microsoft Graph, Power BI, Intune, Defender",
+   "Azure connectivity and ExpressRoute"
+  ],
+  "impact": "Many users could not reach Microsoft 365 services from 7:08 AM to about 12:43 PM UTC. SharePoint and OneDrive requests dropped about 10 percent against the prior week between 7:08 and 9:50 AM UTC.",
+  "severity": "A multi-service, multi-region event, concentrated in Asia Pacific and EMEA during business hours.",
+  "gaps": "The document gives no user counts."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "One command recomputes the whole network",
+   "caption": "The command ran across all IGP-joined routers on that vendor's platform. BGP routers then re-validated internet prefixes, which took about 1 hour 40 minutes to restore fully.",
+   "nodes": [
+    {
+     "id": "eng",
+     "label": "Engineer adds WAN capacity in Madrid",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "cmd",
+     "label": "Command purges the IGP database",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "igp",
+     "label": "All IGP-joined routers recompute topology",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "bgp",
+     "label": "BGP routers re-validate internet prefixes",
+     "row": 3,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "svc",
+     "label": "Microsoft 365 and Azure unreachable",
+     "row": 4,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "eng",
+     "t": "cmd",
+     "label": "SOP changed, not re-tested"
+    },
+    {
+     "f": "cmd",
+     "t": "igp",
+     "label": "second router 33 minutes later",
+     "state": "fail"
+    },
+    {
+     "f": "igp",
+     "t": "bgp",
+     "state": "fail"
+    },
+    {
+     "f": "bgp",
+     "t": "svc",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Command blocking and qualified changes (conceptual)",
+   "caption": "Microsoft planned to block commands with widespread impact, give real-time visibility of device activity and require SOP review. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "sop",
+     "label": "SOP reviewed and re-tested",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "aaa",
+     "label": "Authorization blocks wide-impact commands",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "watch",
+     "label": "Real-time visibility of device activity",
+     "row": 2,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "alert",
+     "label": "Alert reaches the engineer making the change",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "sop",
+     "t": "aaa",
+     "state": "new"
+    },
+    {
+     "f": "aaa",
+     "t": "watch",
+     "state": "new"
+    },
+    {
+     "f": "aaa",
+     "t": "alert",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "A dangerous command cannot run on a device by mistake.",
+  "An alert reaches the person who made the change.",
+  "Procedures are tested before use."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "7:08 AM UTC, 25 Jan",
+   "phase": "trigger",
+   "e": "A planned WAN router change in Madrid triggers network-wide recomputation."
+  },
+  {
+   "t": "7:11",
+   "phase": "detect",
+   "e": "Monitoring alerts and DNS configurations are reviewed."
+  },
+  {
+   "t": "7:27",
+   "phase": "detect",
+   "e": "The incident is posted to the Service Health Dashboard."
+  },
+  {
+   "t": "7:40",
+   "phase": "investigate",
+   "e": "Monitoring confirms the issue is in the WAN, not DNS."
+  },
+  {
+   "t": "8:20",
+   "phase": "investigate",
+   "e": "The source is identified and automated recovery is already under way."
+  },
+  {
+   "t": "9:00",
+   "phase": "recover",
+   "e": "Most network devices have recovered."
+  },
+  {
+   "t": "9:35",
+   "phase": "recover",
+   "e": "The WAN self-recovers and downstream services begin recovering."
+  },
+  {
+   "t": "9:40",
+   "phase": "recover",
+   "e": "Teams is fully recovered."
+  },
+  {
+   "t": "12:43 PM",
+   "phase": "recover",
+   "e": "The majority of services have recovered and the incident window ends."
+  }
+ ],
+ "rootCause": {
+  "trigger": "An engineer added WAN capacity in Madrid and ran a command to purge the IGP database.",
+  "underlying": "On one vendor's platform the command executes across all IGP-joined routers and forces topology recomputation. It was not on the authorization block list.",
+  "contributing": [
+   "The SOP had been changed without re-testing or post-checks",
+   "Alerts fired within 5 minutes but the engineer was not told",
+   "The same operation ran on a second router 33 minutes later, creating a second wave"
+  ],
+  "propagation": [
+   "The command runs.",
+   "IGP recomputes everywhere.",
+   "BGP prefixes are re-validated.",
+   "Services lose connectivity."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The process failure",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Critically, our process was not followed as the change was not re-tested and did not include proper post-checks",
+   "note": "From Microsoft's post incident report."
+  },
+  {
+   "label": "The chain of events",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "This unqualified change led to a chain of events which culminated in the widespread impact of this incident.",
+   "note": "From the same report."
+  },
+  {
+   "label": "A simulated command guard",
+   "kind": "simulated",
+   "lang": "text",
+   "body": "deny  clear igp database  (scope: all-routers)\nrequire  change-ticket and second approver for  routing-protocol  commands",
+   "note": "Shows an authorization rule. Syntax is invented and not any vendor's."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check whether the fault is DNS, WAN or application.",
+    "why": "Microsoft ruled out DNS by 7:40 AM."
+   },
+   {
+    "step": "Look at recent network change activity.",
+    "why": "A Madrid router change matched the start."
+   },
+   {
+    "step": "Check routing protocol state across routers.",
+    "why": "A network-wide recompute is visible."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Let the network re-converge and watch recovery.",
+    "why": "Microsoft's devices self-recovered."
+   },
+   {
+    "step": "Stop a second run of the command.",
+    "why": "The same operation ran 33 minutes later."
+   },
+   {
+    "step": "Move traffic off the affected path where possible.",
+    "why": "Moving SPO and ODB off Front Door did not help here."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check services recover in order.",
+    "why": "Teams recovered at 9:40, SPO at 9:50."
+   },
+   {
+    "step": "Check regional residue.",
+    "why": "India packet loss was found later."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Block commands with widespread impact.",
+    "why": "Microsoft's action."
+   },
+   {
+    "step": "Test and re-approve procedures.",
+    "why": "Microsoft's action."
+   },
+   {
+    "step": "Make alerts reach the engineer.",
+    "why": "Microsoft noted the engineer was not informed."
+   }
+  ],
+  "safety": "Do not repeat a command on a second router until you have checked the first. A single mistake should not be run twice."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "An engineer ran a routine command on one router. Five minutes later alerts fire and many services are unreachable.",
+   "clues": [
+    "Procedure was edited recently",
+    "The command affects all routers",
+    "The same task is due on another router"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "Stop the second router",
+    "Rule out DNS and application",
+    "Who must be told?"
+   ],
+   "answer": "Pause the second run, confirm the fault is in the WAN, notify the engineer and incident manager, let recovery proceed and follow up with command blocking and tested procedures."
+  },
+  "rootcause": {
+   "q": "What did the command do?",
+   "options": [
+    "Purged the IGP database and forced recomputation on all joined routers",
+    "Shut down power",
+    "Deleted DNS",
+    "Changed passwords"
+   ],
+   "answer": 0,
+   "why": "Microsoft's report."
+  },
+  "remediation": [
+   {
+    "task": "Define a change gate.",
+    "answer": "Wide-impact commands need two approvals and a tested SOP."
+   },
+   {
+    "task": "Fix alert routing.",
+    "answer": "Alerts must page the change owner as well as on-call."
+   },
+   {
+    "task": "Plan a game day.",
+    "answer": "Practise recovery from IGP recompute in a lab."
+   }
+  ],
+  "design": {
+   "prompt": "Design network operations so one command cannot affect all routers.",
+   "constraints": [
+    "Many vendors",
+    "Break-glass access",
+    "Global WAN"
+   ],
+   "answer": "Block risky commands by policy, require approvals, test procedures, add real-time visibility, and segment IGP domains."
+  },
+  "checks": [
+   {
+    "q": "When did impact begin?",
+    "options": [
+     "7:08 AM UTC",
+     "Midnight",
+     "5 PM",
+     "9 AM"
+    ],
+    "answer": 0,
+    "why": "Microsoft gives 7:08 AM."
+   },
+   {
+    "q": "How long to restore prefixes fully?",
+    "options": [
+     "About 1 hour 40 minutes",
+     "5 seconds",
+     "2 days",
+     "A week"
+    ],
+    "answer": 0,
+    "why": "The report says so."
+   },
+   {
+    "q": "What was ruled out at 7:40?",
+    "options": [
+     "DNS",
+     "WAN",
+     "Power",
+     "Storage"
+    ],
+    "answer": 0,
+    "why": "Monitoring confirmed it was the WAN, not DNS."
+   },
+   {
+    "q": "What was missing from the process?",
+    "options": [
+     "Re-test and post-checks",
+     "More servers",
+     "A bigger room",
+     "A new brand"
+    ],
+    "answer": 0,
+    "why": "Microsoft's quote."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Block wide-impact commands",
+   "Test every SOP",
+   "Real-time visibility of change activity"
+  ],
+  "monitoring": [
+   "Alerts to the change owner"
+  ],
+  "recovery": [
+   "Stop repeated runs",
+   "Let routing converge"
+  ],
+  "practices": [
+   "Train and attest procedures",
+   "Review SOPs regularly"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Microsoft: Post incident report MO502273 (25 January 2023, as published copy)",
+   "url": "https://www.msxfaq.de/cloud/marketing/mo502273_postincidentreport.pdf",
+   "used": "timeline, cause, impact, corrective actions"
+  }
+ ],
+ "verification": "Facts were read from a published copy of Microsoft's post incident report on 29 October 2026 (hosted by a third party). The command guard is Simulated."
+}

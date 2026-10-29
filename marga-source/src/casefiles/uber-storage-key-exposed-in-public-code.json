@@ -1,0 +1,371 @@
+{
+ "id": "uber-storage-key-exposed-in-public-code",
+ "checked": "29 October 2026",
+ "summary": "In May 2014 an intruder used an Amazon access key that an Uber engineer had posted to a public code-sharing site to open Uber's S3 data store and read a file of driver data. Uber found out in September 2014. The FTC's proposed complaint, summarised here, alleged weak access control, no written security program and unencrypted data.",
+ "overview": {
+  "background": "Uber stored driver and rider data in Amazon S3. Engineers shared one AWS access key with full administrative privileges to all data in the store.",
+  "systems": [
+   "An AWS access key with full administrative privileges",
+   "Amazon S3 datastore",
+   "A file of driver information",
+   "A public code-sharing site"
+  ],
+  "impact": "The FTC says the intruder accessed one file containing over 100,000 unencrypted names and driver's licence numbers, 215 names with bank account and routing numbers and 84 names with Social Security numbers.",
+  "severity": "A serious breach with a regulatory settlement. The FTC allegations are unproven claims in a proposed complaint.",
+  "gaps": "The FTC document gives the breach as 12 May 2014; the 2016 timeframe in its text relates to a separate allegation about monitoring."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A powerful key in public code",
+   "caption": "Per the FTC analysis, the key granted full administrative privileges to all data in Uber's S3 datastore, and the intruder used it to access one file.",
+   "nodes": [
+    {
+     "id": "key",
+     "label": "Admin AWS key posted to a public code-sharing site",
+     "row": 0,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "s3",
+     "label": "Full access to the S3 datastore",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "file",
+     "label": "File with driver data read",
+     "row": 2,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "data",
+     "label": "Names, licence numbers, some bank and SSN data unencrypted",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "key",
+     "t": "s3",
+     "state": "fail"
+    },
+    {
+     "f": "s3",
+     "t": "file",
+     "state": "hit"
+    },
+    {
+     "f": "file",
+     "t": "data",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Scoped keys, MFA and encryption (conceptual)",
+   "caption": "The controls the FTC alleged were missing.",
+   "nodes": [
+    {
+     "id": "scope",
+     "label": "Keys scoped by job function",
+     "row": 0,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "mfa",
+     "label": "Multifactor authentication",
+     "row": 0,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "enc",
+     "label": "Encrypted sensitive data",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "scan",
+     "label": "Secret scanning on code",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "scope",
+     "t": "enc",
+     "state": "new"
+    },
+    {
+     "f": "mfa",
+     "t": "scan",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "A leaked key reaches little.",
+  "Secrets never reach public code.",
+  "Data is encrypted at rest."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "About 12 May 2014",
+   "phase": "trigger",
+   "e": "An intruder uses the exposed key to access the S3 datastore."
+  },
+  {
+   "t": "May 2014",
+   "phase": "impact",
+   "e": "The intruder reads one file with driver data."
+  },
+  {
+   "t": "Sep 2014",
+   "phase": "detect",
+   "e": "Uber discovers the breach."
+  },
+  {
+   "t": "Sep 2014",
+   "phase": "mitigate",
+   "e": "Uber stops sharing a single administrative key (per the FTC, until about September 2014)."
+  },
+  {
+   "t": "Mar 2015",
+   "phase": "mitigate",
+   "e": "Uber begins encrypting sensitive data (per the FTC, until about March 2015 it stored it in clear text)."
+  },
+  {
+   "t": "Later",
+   "phase": "recover",
+   "e": "The FTC issues its analysis of a proposed consent order."
+  }
+ ],
+ "rootCause": {
+  "trigger": "An engineer posted an access key with full administrative privileges to a public code-sharing site.",
+  "underlying": "Uber used one shared key with no job-based limits and no MFA, per the FTC allegations.",
+  "contributing": [
+   "No written information security program until about September 2014",
+   "Sensitive data stored unencrypted until about March 2015",
+   "Training and guidance gaps"
+  ],
+  "propagation": [
+   "Key posted.",
+   "Datastore opened.",
+   "File read.",
+   "Data exposed."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The key",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "an access key that one of Uber's engineers had posted to",
+   "note": "From the FTC analysis; the site's name is omitted here by the project's style rules."
+  },
+  {
+   "label": "The privilege",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "full administrative privileges to all data and documents stored within Uber's Amazon S3 Datastore",
+   "note": "From the FTC analysis."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Search code hosts for your keys.",
+    "why": "Secret scanning."
+   },
+   {
+    "step": "Check key permissions.",
+    "why": "Full admin."
+   },
+   {
+    "step": "Check access logs for the key.",
+    "why": "Intrusion."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Revoke the key and issue scoped ones.",
+    "why": "General practice."
+   },
+   {
+    "step": "Encrypt sensitive data.",
+    "why": "FTC allegation."
+   },
+   {
+    "step": "Add MFA.",
+    "why": "FTC allegation."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Scan repositories for secrets.",
+    "why": "Automate."
+   },
+   {
+    "step": "Review IAM policies.",
+    "why": "Least privilege."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Scope keys by role.",
+    "why": "FTC allegation."
+   },
+   {
+    "step": "Train engineers.",
+    "why": "FTC allegation."
+   },
+   {
+    "step": "Write a security programme.",
+    "why": "FTC allegation."
+   }
+  ],
+  "safety": "Rotating a key can break production. Create the new key and switch before revoking the old one."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A key with full admin rights to your storage appears in a public code listing.",
+   "clues": [
+    "Shared by several engineers",
+    "No MFA",
+    "Data unencrypted"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "What is the first action?",
+    "What do you check?",
+    "What do you change?"
+   ],
+   "answer": "Revoke and replace the key, review logs for use, notify as required, encrypt data and add scanning and scoped roles."
+  },
+  "rootcause": {
+   "q": "When did the breach occur, per the FTC?",
+   "options": [
+    "About 12 May 2014",
+    "2016",
+    "2020",
+    "2010"
+   ],
+   "answer": 0,
+   "why": "Per the FTC document."
+  },
+  "remediation": [
+   {
+    "task": "Define key scoping.",
+    "answer": "One role per function, least privilege."
+   },
+   {
+    "task": "Plan secret scanning.",
+    "answer": "Pre-commit and server-side."
+   },
+   {
+    "task": "Plan encryption.",
+    "answer": "Server-side encryption with key management."
+   }
+  ],
+  "design": {
+   "prompt": "Design access to a data store with sensitive driver data.",
+   "constraints": [
+    "Many engineers",
+    "Regulated data",
+    "Public code"
+   ],
+   "answer": "Role-based access, MFA, encryption, scanning and monitoring."
+  },
+  "checks": [
+   {
+    "q": "How many driver licence records were involved, at least?",
+    "options": [
+     "Over 100,000",
+     "10",
+     "1,000",
+     "None"
+    ],
+    "answer": 0,
+    "why": "Per the FTC document."
+   },
+   {
+    "q": "Are the FTC statements findings?",
+    "options": [
+     "No, they are allegations in a proposed complaint",
+     "Yes",
+     "Partly",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the FTC document."
+   },
+   {
+    "q": "When did Uber discover the breach?",
+    "options": [
+     "September 2014",
+     "May 2014",
+     "2016",
+     "Never"
+    ],
+    "answer": 0,
+    "why": "Per the FTC document."
+   },
+   {
+    "q": "What type of key was posted?",
+    "options": [
+     "AWS access key with full administrative privileges",
+     "SSH key",
+     "API token for maps",
+     "None"
+    ],
+    "answer": 0,
+    "why": "Per the FTC document."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Scoped keys",
+   "Secret scanning",
+   "Encryption"
+  ],
+  "monitoring": [
+   "Key usage logs"
+  ],
+  "recovery": [
+   "Revoke and replace key"
+  ],
+  "practices": [
+   "Security programme",
+   "Training"
+  ]
+ },
+ "sources": [
+  {
+   "title": "US FTC: Uber Technologies analysis of proposed consent order",
+   "url": "https://www.ftc.gov/system/files/documents/cases/1523054_uber_technologies_analysis.pdf",
+   "used": "date, mechanism, data, allegations"
+  }
+ ],
+ "verification": "Facts were read from the FTC's analysis on 29 October 2026. The statements are allegations, not findings. The case card says 2014, which matches. The FTC text names the code-sharing site; this file refers to it generically."
+}

@@ -1,0 +1,389 @@
+{
+ "id": "google-gemini-image-generation-pause",
+ "checked": "29 October 2026",
+ "summary": "In February 2024 Google paused Gemini's generation of images of people after it produced inaccurate and offensive results. Senior vice president Prabhakar Raghavan said tuning meant to show a range of people failed to account for cases where a range should not be shown, and the model became over-cautious.",
+ "overview": {
+  "background": "Gemini (formerly Bard) could generate images. Google tuned it to avoid biased results such as one ethnicity dominating.",
+  "systems": [
+   "Gemini image generation",
+   "Tuning for diversity",
+   "Prompt interpretation (sensitive vs anodyne)",
+   "The people-image feature"
+  ],
+  "impact": "Users saw historically inaccurate and offensive results, and some reasonable prompts were refused.",
+  "severity": "A product pause for the people-image feature.",
+  "gaps": "This file uses a news analysis, Maginative, of Raghavan's post (the card source was not read)."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Two tuning failures",
+   "caption": "Per Raghavan as reported: diversity tuning backfired on prompts for specific depictions, and the model became over-cautious, treating anodyne prompts as sensitive.",
+   "nodes": [
+    {
+     "id": "tune",
+     "label": "Tuning to avoid single-ethnicity results",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "f1",
+     "label": "Does not account for cases that should not show a range",
+     "row": 1,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "f2",
+     "label": "Over-cautious: refuses reasonable prompts",
+     "row": 1,
+     "col": 2,
+     "state": "fail"
+    },
+    {
+     "id": "out",
+     "label": "Inaccurate and offensive results",
+     "row": 2,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "pause",
+     "label": "People image generation paused",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "tune",
+     "t": "f1",
+     "state": "fail"
+    },
+    {
+     "f": "tune",
+     "t": "f2",
+     "state": "fail"
+    },
+    {
+     "f": "f1",
+     "t": "out",
+     "state": "hit"
+    },
+    {
+     "f": "f2",
+     "t": "out",
+     "state": "hit"
+    },
+    {
+     "f": "out",
+     "t": "pause"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Prompt-aware tuning and evaluation sets (conceptual)",
+   "caption": "General controls: test across prompt types before launch.",
+   "nodes": [
+    {
+     "id": "set",
+     "label": "Evaluation set with specific and open prompts",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "ctx",
+     "label": "Context-aware diversity rules",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "refuse",
+     "label": "Calibrated refusals",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "stage",
+     "label": "Staged rollout with feedback",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "set",
+     "t": "ctx",
+     "state": "new"
+    },
+    {
+     "f": "set",
+     "t": "refuse",
+     "state": "new"
+    },
+    {
+     "f": "ctx",
+     "t": "stage",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Prompts that name a specific subject get that subject.",
+  "Open prompts get variety.",
+  "Refusals are rare and justified."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Before launch",
+   "phase": "change",
+   "e": "Google tunes the image generator to avoid biased results."
+  },
+  {
+   "t": "Feb 2024",
+   "phase": "trigger",
+   "e": "Users post inaccurate and offensive images from Gemini."
+  },
+  {
+   "t": "Feb 2024",
+   "phase": "detect",
+   "e": "Google acknowledges the results are embarrassing and wrong."
+  },
+  {
+   "t": "Earlier in the week of 23 Feb",
+   "phase": "mitigate",
+   "e": "Google pauses people image generation."
+  },
+  {
+   "t": "23 Feb 2024",
+   "phase": "change",
+   "e": "Raghavan explains the two failures."
+  },
+  {
+   "t": "Later",
+   "phase": "recover",
+   "e": "Google commits to significant testing before re-enabling the feature."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Tuning aimed at showing diversity did not account for cases that should not show a range.",
+  "underlying": "The model became over-cautious and treated very anodyne prompts as sensitive.",
+  "contributing": [
+   "Insufficient testing across prompt types",
+   "Two interacting failures"
+  ],
+  "propagation": [
+   "Tuning.",
+   "Failure modes.",
+   "Public reports.",
+   "Pause."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Over-caution",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "wrongly interpret some very anodyne prompts as sensitive",
+   "note": "Raghavan's wording as quoted in the Maginative article."
+  },
+  {
+   "label": "A simulated test matrix",
+   "kind": "simulated",
+   "lang": "text",
+   "body": "prompt_type: specific_person_or_period | open_group | sensitive_topic\nexpect: faithful | varied | careful refusal",
+   "note": "An illustration of how to organise tests. Not Google's."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Collect failing prompts and group them.",
+    "why": "Specific vs open."
+   },
+   {
+    "step": "Check tuning effects per group.",
+    "why": "Backfire on specific."
+   },
+   {
+    "step": "Check refusal rates on anodyne prompts.",
+    "why": "Over-caution."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Pause the feature.",
+    "why": "Google did."
+   },
+   {
+    "step": "Retune with context.",
+    "why": "Plan."
+   },
+   {
+    "step": "Test extensively before re-enabling.",
+    "why": "Google's commitment."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Run a broad evaluation set.",
+    "why": "Verify."
+   },
+   {
+    "step": "Stage the relaunch.",
+    "why": "Collect feedback."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Test across prompt types.",
+    "why": "General practice."
+   },
+   {
+    "step": "Calibrate refusals.",
+    "why": "General practice."
+   },
+   {
+    "step": "Be honest about limits.",
+    "why": "Raghavan said he cannot promise perfection."
+   }
+  ],
+  "safety": "A pause is a safe fallback. Prefer pausing a feature to leaving it on while fixing."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Your image generator gives historically wrong results and refuses harmless prompts after a tuning change.",
+   "clues": [
+    "Public criticism",
+    "Two failure modes",
+    "Feature widely used"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "Do you pause?",
+    "What do you test?",
+    "What do you promise?"
+   ],
+   "answer": "Pause the affected feature, build an evaluation set covering both failure modes, retune and relaunch in stages without promising perfection."
+  },
+  "rootcause": {
+   "q": "What did Google pause?",
+   "options": [
+    "Image generation of people",
+    "All of Gemini",
+    "Search",
+    "Maps"
+   ],
+   "answer": 0,
+   "why": "Per the article."
+  },
+  "remediation": [
+   {
+    "task": "Build an eval set.",
+    "answer": "Cover specific, open and sensitive prompts."
+   },
+   {
+    "task": "Track refusal rate.",
+    "answer": "Alert on rises."
+   },
+   {
+    "task": "Plan staged rollout.",
+    "answer": "Small share first."
+   }
+  ],
+  "design": {
+   "prompt": "Design image generation guardrails that avoid both bias and distortion.",
+   "constraints": [
+    "Global users",
+    "Historical prompts",
+    "Public scrutiny"
+   ],
+   "answer": "Context-aware rules, evaluation across prompt types, human review and staged rollout."
+  },
+  "checks": [
+   {
+    "q": "Who explained the failures?",
+    "options": [
+     "Prabhakar Raghavan",
+     "A journalist",
+     "A regulator",
+     "A user"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   },
+   {
+    "q": "How many failures were named?",
+    "options": [
+     "Two",
+     "One",
+     "Five",
+     "None"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   },
+   {
+    "q": "What did Raghavan say he could not promise?",
+    "options": [
+     "That Gemini would never produce embarrassing results",
+     "A launch date",
+     "A price",
+     "Nothing"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   },
+   {
+    "q": "When was the article published?",
+    "options": [
+     "23 February 2024",
+     "1 June 2020",
+     "1 Jan 2025",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Eval sets across prompt types",
+   "Calibrated refusals"
+  ],
+  "monitoring": [
+   "Refusal rate"
+  ],
+  "recovery": [
+   "Pause"
+  ],
+  "practices": [
+   "Staged relaunch",
+   "Honest limits"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Maginative: Google Apologizes and Explains What Went Wrong with Gemini's Embarrassing Image Generation",
+   "url": "https://www.maginative.com/article/google-apologizes-and-explains-what-went-wrong-with-geminis-embarassing-image-generation/",
+   "used": "failures, pause, plan"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from a news article about Google's post. Google's own post (the card source) was not read. The test matrix is Simulated."
+}

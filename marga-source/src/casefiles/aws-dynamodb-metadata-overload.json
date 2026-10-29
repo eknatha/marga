@@ -1,0 +1,433 @@
+{
+ "id": "aws-dynamodb-metadata-overload",
+ "checked": "29 October 2026",
+ "summary": "On 20 September 2015 a brief network disruption made DynamoDB storage servers time out on membership requests. Their retries overloaded the metadata service and DynamoDB error rates reached about 55 percent for hours.",
+ "overview": {
+  "background": "DynamoDB storage servers hold table partitions and regularly ask a metadata service for their membership, meaning which partitions they serve. Many AWS services use DynamoDB for their own data.",
+  "systems": [
+   "DynamoDB storage servers",
+   "DynamoDB metadata service",
+   "SQS",
+   "EC2 Auto Scaling",
+   "CloudWatch metrics",
+   "AWS Management Console"
+  ],
+  "impact": "DynamoDB error rates reached about 55 percent from 2:37 AM PDT, a level AWS said was higher than any seen in the previous three years. SQS, Auto Scaling, CloudWatch and console logins were also affected.",
+  "severity": "A region-wide event in US-East. AWS gives no formal severity number.",
+  "gaps": "The page does not state the year, and gives no logs."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A slow metadata service and a retry storm",
+   "caption": "After a brief network disruption, some metadata replies took longer than storage servers allowed. Those servers removed themselves, and their retries slowed the metadata service for everyone.",
+   "nodes": [
+    {
+     "id": "net",
+     "label": "Brief network disruption",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "meta",
+     "label": "Metadata service: large membership lists, limited capacity",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "store",
+     "label": "Storage servers time out and remove themselves",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "ddb",
+     "label": "DynamoDB error rate about 55 percent",
+     "row": 3,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "dep",
+     "label": "SQS, Auto Scaling, CloudWatch, Console",
+     "row": 3,
+     "col": 2,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "net",
+     "t": "meta",
+     "label": "slow responses"
+    },
+    {
+     "f": "meta",
+     "t": "store",
+     "label": "renewals fail",
+     "state": "fail"
+    },
+    {
+     "f": "store",
+     "t": "meta",
+     "label": "retries add load",
+     "state": "fail"
+    },
+    {
+     "f": "store",
+     "t": "ddb",
+     "state": "hit"
+    },
+    {
+     "f": "ddb",
+     "t": "dep",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Split metadata and limits (conceptual)",
+   "caption": "AWS added metadata capacity, monitored membership size, slowed storage-server requests and planned to split the metadata service across several instances. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "m1",
+     "label": "Metadata instance A",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "m2",
+     "label": "Metadata instance B",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "s1",
+     "label": "Storage fleet part 1 with rate limits",
+     "row": 2,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "s2",
+     "label": "Storage fleet part 2",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "mon",
+     "label": "Alert on membership size",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "m1",
+     "t": "s1",
+     "state": "new"
+    },
+    {
+     "f": "m2",
+     "t": "s2",
+     "state": "new"
+    },
+    {
+     "f": "mon",
+     "t": "m1",
+     "state": "new"
+    },
+    {
+     "f": "mon",
+     "t": "m2",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "A problem in one metadata instance affects part of the fleet only.",
+  "Storage servers cannot flood metadata with requests.",
+  "Growth of the membership lists is watched."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "2:19 AM PDT",
+   "phase": "trigger",
+   "e": "A brief network disruption affects some DynamoDB storage servers."
+  },
+  {
+   "t": "2:35 AM",
+   "phase": "impact",
+   "e": "CloudWatch begins showing delayed and missing EC2 metrics."
+  },
+  {
+   "t": "2:37 AM",
+   "phase": "impact",
+   "e": "DynamoDB customer error rates reach about 55 percent."
+  },
+  {
+   "t": "5:06 AM",
+   "phase": "mitigate",
+   "e": "The team pauses requests to the metadata service to reduce the retry load."
+  },
+  {
+   "t": "5:45 AM",
+   "phase": "mitigate",
+   "e": "DynamoDB finishes disabling traffic and the console shows login latency."
+  },
+  {
+   "t": "7:10 AM",
+   "phase": "recover",
+   "e": "Error rates are low enough for most customers and dependent services."
+  },
+  {
+   "t": "7:29 AM",
+   "phase": "recover",
+   "e": "CloudWatch metrics are fully recovered."
+  },
+  {
+   "t": "10:52 AM",
+   "phase": "recover",
+   "e": "EC2 Auto Scaling clears its backlog."
+  },
+  {
+   "t": "Monday",
+   "phase": "recover",
+   "e": "A residual 0.15 to 0.25 percent error rate is traced to one metadata partition and fixed."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A brief network disruption slowed metadata responses past the timeout storage servers allowed.",
+  "underlying": "Rapid adoption of Global Secondary Indexes had grown the membership lists, making metadata replies slower, and the service lacked capacity and monitoring for that growth. Retries from unavailable servers made healthy servers fail renewals too.",
+  "contributing": [
+   "No monitoring of membership list size",
+   "Insufficient metadata capacity",
+   "Retries added load during the failure",
+   "Other services depended on DynamoDB"
+  ],
+  "propagation": [
+   "Replies slow down.",
+   "Servers drop out and retry.",
+   "More servers time out.",
+   "Dependent services fail."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The decision",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "we decided to pause requests to the metadata service",
+   "note": "From AWS's summary."
+  },
+  {
+   "label": "The principle",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "For us, availability is the most important feature of DynamoDB",
+   "note": "From AWS's summary."
+  },
+  {
+   "label": "A simulated timeout setting",
+   "kind": "simulated",
+   "lang": "yaml",
+   "body": "membership_refresh:\n  timeout_ms: 2000\n  retry:\n    backoff: exponential\n    jitter: full\n    max_inflight_per_node: 1",
+   "note": "Shows limits that stop a fleet flooding a metadata service. Invented."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Look at the metadata service latency and the size of its replies.",
+    "why": "Slow replies explain why healthy servers drop out."
+   },
+   {
+    "step": "Count storage servers removing themselves.",
+    "why": "A rising count shows a spiral."
+   },
+   {
+    "step": "Check what retries the failed servers are sending.",
+    "why": "Retry load can exceed normal load."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Pause or throttle requests to the metadata service.",
+    "why": "AWS paused them to let it recover."
+   },
+   {
+    "step": "Add metadata capacity.",
+    "why": "AWS increased it."
+   },
+   {
+    "step": "Bring traffic back in stages.",
+    "why": "Resume as error rates fall."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Watch error rates and dependent services separately.",
+    "why": "Auto Scaling and CloudWatch recovered later."
+   },
+   {
+    "step": "Look for residual partitions with low traffic.",
+    "why": "A hidden partition caused the small residual errors."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Alert on growth of membership lists.",
+    "why": "AWS added this monitoring."
+   },
+   {
+    "step": "Rate limit refresh requests and lengthen query time limits.",
+    "why": "Prevents a fleet-wide flood."
+   },
+   {
+    "step": "Split the metadata service into parts.",
+    "why": "Limits the blast radius."
+   }
+  ],
+  "safety": "Pausing requests deliberately makes the outage worse for a while. Do it only when retries are the cause and you can bring traffic back in steps."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Storage nodes keep dropping out after a short network blip. The membership service is slow and busier than usual.",
+   "clues": [
+    "Membership lists grew recently",
+    "Timeouts are short",
+    "Every dropped node retries at once"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "What is adding load?",
+    "Can you pause it?",
+    "What do you add?"
+   ],
+   "answer": "Pause or throttle membership requests so the metadata service recovers, add capacity, and bring nodes back in stages. Then add monitoring for list size and rate limits."
+  },
+  "rootcause": {
+   "q": "Why did healthy servers start to fail?",
+   "options": [
+    "Retries from unavailable servers loaded the metadata service",
+    "Their disks failed",
+    "A DNS error",
+    "A power cut"
+   ],
+   "answer": 0,
+   "why": "AWS says retries added load and caused renewals to fail."
+  },
+  "remediation": [
+   {
+    "task": "Write the alert.",
+    "answer": "Alert when membership list size or metadata p99 latency exceeds a threshold well below the storage-server timeout."
+   },
+   {
+    "task": "Define retry rules.",
+    "answer": "Exponential back-off with jitter and a cap on concurrent refreshes."
+   },
+   {
+    "task": "Plan the split.",
+    "answer": "Partition storage servers by range, with a metadata instance per partition group."
+   }
+  ],
+  "design": {
+   "prompt": "Design a metadata path that stays healthy when its clients all retry.",
+   "constraints": [
+    "Thousands of servers",
+    "Growing lists",
+    "Short outages"
+   ],
+   "answer": "Shard the metadata service, rate limit clients, cache membership, back off with jitter and monitor sizes and latencies."
+  },
+  "checks": [
+   {
+    "q": "What error rate did DynamoDB reach?",
+    "options": [
+     "About 55 percent",
+     "5 percent",
+     "100 percent",
+     "0.1 percent"
+    ],
+    "answer": 0,
+    "why": "AWS gives about 55 percent."
+   },
+   {
+    "q": "What feature growth slowed metadata?",
+    "options": [
+     "Global Secondary Indexes",
+     "Encryption",
+     "Backups",
+     "Streams"
+    ],
+    "answer": 0,
+    "why": "AWS says rapid adoption increased membership list sizes."
+   },
+   {
+    "q": "Which service had a backlog until 10:52 AM?",
+    "options": [
+     "EC2 Auto Scaling",
+     "S3",
+     "Route 53",
+     "IAM"
+    ],
+    "answer": 0,
+    "why": "AWS says Auto Scaling cleared its backlog then."
+   },
+   {
+    "q": "Why pause metadata requests?",
+    "options": [
+     "To cut retry load so it could recover",
+     "To save money",
+     "To test",
+     "To hide errors"
+    ],
+    "answer": 0,
+    "why": "That was AWS's mitigation."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Monitor membership list size",
+   "Rate limit refresh requests",
+   "Split metadata services"
+  ],
+  "monitoring": [
+   "Metadata p99 latency",
+   "Nodes dropping out"
+  ],
+  "recovery": [
+   "Pause retries to let the core recover",
+   "Restore in stages"
+  ],
+  "practices": [
+   "Treat dependent services as part of the blast radius",
+   "Plan for growth of metadata"
+  ]
+ },
+ "sources": [
+  {
+   "title": "AWS: Summary of the Amazon DynamoDB Service Disruption and Related Impacts in the US-East Region",
+   "url": "https://aws.amazon.com/message/5467D2",
+   "used": "timeline, cause, corrective actions"
+  }
+ ],
+ "verification": "Facts were read from AWS's summary on 29 October 2026. The page does not give the year; the 2015 date comes from the case card and press coverage. No logs are published, so the configuration is Simulated."
+}

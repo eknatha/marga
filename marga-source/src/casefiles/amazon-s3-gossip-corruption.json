@@ -1,0 +1,390 @@
+{
+ "id": "amazon-s3-gossip-corruption",
+ "checked": "29 October 2026",
+ "summary": "On Sunday 20 July 2008 Amazon S3 degraded for hours after a few server-to-server messages had a single flipped bit that stayed readable but carried wrong state, which spread through the gossip protocol. Amazon had to shut down all server-to-server communication and request processing, clear state and restart.",
+ "overview": {
+  "background": "S3 servers shared system state by gossip. Customer data was checked with MD5, but internal state messages had no equivalent check.",
+  "systems": [
+   "S3 servers and the gossip protocol",
+   "Internal state messages",
+   "Request processing in the US and EU",
+   "Monitoring and alarms"
+  ],
+  "impact": "S3 requests failed or were degraded for several hours (the card says several hours).",
+  "severity": "A long outage that needed a full shutdown and restart of the system.",
+  "gaps": "The AWS status page (the card source) could not be read. Facts come from Werner Vogels's post and Data Center Knowledge."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A bad message spreads and cannot be un-spread",
+   "caption": "Per the reports, a flipped bit in a few state messages spread through gossip, and with no check on internal state the corruption went unnoticed until the whole system had to be cleared.",
+   "nodes": [
+    {
+     "id": "bit",
+     "label": "A few messages with one flipped bit",
+     "row": 0,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "go",
+     "label": "Gossip spreads wrong state",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "no",
+     "label": "No checksum on internal state",
+     "row": 2,
+     "col": 0
+    },
+    {
+     "id": "srv",
+     "label": "Servers busy with bad state; requests fail",
+     "row": 2,
+     "col": 2,
+     "state": "hit"
+    },
+    {
+     "id": "rst",
+     "label": "Full shutdown, clear state, restart",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "bit",
+     "t": "go",
+     "state": "fail"
+    },
+    {
+     "f": "no",
+     "t": "go"
+    },
+    {
+     "f": "go",
+     "t": "srv",
+     "state": "hit"
+    },
+    {
+     "f": "srv",
+     "t": "rst",
+     "label": "recovery"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Checksums and faster restarts (conceptual)",
+   "caption": "Amazon said it added checksums and gossip monitoring and reduced restart time.",
+   "nodes": [
+    {
+     "id": "ck",
+     "label": "Checksums on internal state messages",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "al",
+     "label": "Monitoring and alarms on gossip",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "fast",
+     "label": "Faster system-wide restart",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "drill",
+     "label": "Restart drills",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "ck",
+     "t": "al",
+     "state": "new"
+    },
+    {
+     "f": "ck",
+     "t": "fast",
+     "state": "new"
+    },
+    {
+     "f": "al",
+     "t": "drill",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Corruption is caught at the message.",
+  "Gossip health is visible.",
+  "A full restart is fast."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Sun 20 Jul 2008, morning",
+   "phase": "trigger",
+   "e": "A few messages with a single flipped bit begin to spread through gossip."
+  },
+  {
+   "t": "Following hours",
+   "phase": "impact",
+   "e": "Servers have trouble communicating and requests fail or degrade."
+  },
+  {
+   "t": "10:32 a.m. PDT",
+   "phase": "investigate",
+   "e": "Engineers decide to shut down all server-to-server communication and request processing, clear system state and restart."
+  },
+  {
+   "t": "11:05 a.m. PDT",
+   "phase": "mitigate",
+   "e": "Communication and request processing are stopped and state is cleared."
+  },
+  {
+   "t": "2:20 p.m. PDT",
+   "phase": "recover",
+   "e": "Internal communication is restored and request processing restarts in the US and EU."
+  },
+  {
+   "t": "Following days",
+   "phase": "change",
+   "e": "Amazon adds checksums, gossip monitoring and faster restart."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Single-bit corruption of internal state messages distributed by gossip.",
+  "underlying": "Customer data was protected by MD5, but internal state messages had no equivalent check.",
+  "contributing": [
+   "No checksum on internal state",
+   "Gossip spread the error system-wide",
+   "Restart of the whole system takes long"
+  ],
+  "propagation": [
+   "Flipped bit.",
+   "Gossip spreads it.",
+   "System state unusable.",
+   "Full restart."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Werner Vogels on the root cause",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Root cause was single bit corruption of internal state messages that are distributed via Gossip techniques.",
+   "note": "From Vogels's 2008 post as read."
+  },
+  {
+   "label": "A simulated checksum",
+   "kind": "simulated",
+   "lang": "python",
+   "body": "import zlib\nmsg = b'node-17:state=up:epoch=42'\nframed = msg + zlib.crc32(msg).to_bytes(4, 'big')\nassert zlib.crc32(framed[:-4]).to_bytes(4, 'big') == framed[-4:]",
+   "note": "A way to frame a message with a checksum. Not Amazon's code."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Look at whether servers agree on state.",
+    "why": "They did not."
+   },
+   {
+    "step": "Check if any message integrity checks exist.",
+    "why": "None for internal state."
+   },
+   {
+    "step": "Decide if a full reset is the only option.",
+    "why": "It was."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Stop server-to-server communication.",
+    "why": "10:32 a.m. decision."
+   },
+   {
+    "step": "Clear system state.",
+    "why": "By 11:05 a.m."
+   },
+   {
+    "step": "Restart request processing.",
+    "why": "From 2:20 p.m."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Verify state is consistent.",
+    "why": "Compare across servers."
+   },
+   {
+    "step": "Verify customer data via MD5.",
+    "why": "Customer data was intact."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Checksum all messages.",
+    "why": "Amazon's change."
+   },
+   {
+    "step": "Alarm on gossip anomalies.",
+    "why": "Amazon's change."
+   },
+   {
+    "step": "Speed up full restart.",
+    "why": "Amazon's change."
+   }
+  ],
+  "safety": "Never restart with state that may be corrupt. Clear it first."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A gossip protocol carries a corrupt state message and all servers now hold wrong state. Customer data is intact.",
+   "clues": [
+    "No integrity check",
+    "State spreads",
+    "Requests failing"
+   ],
+   "question": "What is your plan?",
+   "hints": [
+    "Can you fix in place?",
+    "What do you clear?",
+    "What do you add afterwards?"
+   ],
+   "answer": "Stop communication, clear internal state, restart in stages, then add checksums and alarms."
+  },
+  "rootcause": {
+   "q": "What was the root cause?",
+   "options": [
+    "A single flipped bit in internal state messages",
+    "A DDoS",
+    "A fire",
+    "A bad deploy"
+   ],
+   "answer": 0,
+   "why": "Per Vogels."
+  },
+  "remediation": [
+   {
+    "task": "Design a message format.",
+    "answer": "Version, length and checksum."
+   },
+   {
+    "task": "Plan alarms.",
+    "answer": "Alert on state disagreement."
+   },
+   {
+    "task": "Plan restart drills.",
+    "answer": "Time a full restart quarterly."
+   }
+  ],
+  "design": {
+   "prompt": "Design a gossip protocol that tolerates corruption.",
+   "constraints": [
+    "Thousands of servers",
+    "Eventually consistent",
+    "Public API"
+   ],
+   "answer": "Checksums, authenticated messages, rate limits on state change and a rehearsed reset."
+  },
+  "checks": [
+   {
+    "q": "Which day was the event?",
+    "options": [
+     "Sunday 20 July 2008",
+     "Monday",
+     "Friday",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per Vogels."
+   },
+   {
+    "q": "What protected customer data?",
+    "options": [
+     "MD5 checks",
+     "Nothing",
+     "A firewall",
+     "A VPN"
+    ],
+    "answer": 0,
+    "why": "Per Data Center Knowledge."
+   },
+   {
+    "q": "What time did request processing start restarting?",
+    "options": [
+     "2:20 p.m. PDT",
+     "10:32 a.m.",
+     "11:05 a.m.",
+     "Midnight"
+    ],
+    "answer": 0,
+    "why": "Per Data Center Knowledge."
+   },
+   {
+    "q": "What was added afterwards?",
+    "options": [
+     "Checksums and gossip monitoring",
+     "More colours",
+     "A new logo",
+     "Nothing"
+    ],
+    "answer": 0,
+    "why": "Per Data Center Knowledge."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Checksummed messages",
+   "Gossip alarms"
+  ],
+  "monitoring": [
+   "Disagreement between servers"
+  ],
+  "recovery": [
+   "Clear state and restart"
+  ],
+  "practices": [
+   "Faster restart",
+   "Drills"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Werner Vogels: Root Cause",
+   "url": "https://www.allthingsdistributed.com/2008/07/root_cause.html",
+   "used": "root cause statement"
+  },
+  {
+   "title": "Data Center Knowledge: S3 Downtime: More Missing Bites",
+   "url": "https://www.datacenterknowledge.com/outages/s3-downtime-more-missing-bites",
+   "used": "timeline, gossip, MD5, changes"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from Vogels's short post and from Data Center Knowledge's report of Amazon's explanation. The AWS status page (the card source) was not read. The checksum example is Simulated."
+}

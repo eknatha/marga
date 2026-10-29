@@ -1,0 +1,392 @@
+{
+ "id": "anthropic-claude-quality-degradation",
+ "checked": "29 October 2026",
+ "summary": "Between August and early September 2025 three overlapping infrastructure bugs intermittently degraded Claude's responses: a context window routing error, output corruption on TPU servers, and an approximate top-k miscompilation. Anthropic's postmortem says quality was not reduced for demand, time of day or server load.",
+ "overview": {
+  "background": "Claude is served on several hardware platforms and clouds. Routing, compilers and sampling code sit between a request and a response.",
+  "systems": [
+   "Request routing to context-window server pools",
+   "Claude API TPU servers and runtime optimisations",
+   "XLA:TPU compiler and approximate top-k token selection",
+   "Evaluations and feedback channels"
+  ],
+  "impact": "Some requests got worse answers. At the worst hour (31 August) the routing bug affected 16 percent of Sonnet 4 requests, and about 30 percent of Claude Code users had at least one message misrouted.",
+  "severity": "Intermittent quality degradation over several weeks, with different symptoms per platform.",
+  "gaps": "The page does not state the percentage affected for bugs 2 and 3."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Three bugs, three layers",
+   "caption": "Per Anthropic: a routing error sent some Sonnet 4 requests to servers set for the 1M-token context; a TPU misconfiguration sometimes gave high probability to unexpected tokens; a compiler bug sometimes dropped the highest-probability token.",
+   "nodes": [
+    {
+     "id": "rt",
+     "label": "Routing error: short requests to long-context servers",
+     "row": 0,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "tpu",
+     "label": "TPU misconfiguration corrupts output tokens",
+     "row": 0,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "xla",
+     "label": "Approximate top-k miscompiled by XLA:TPU",
+     "row": 0,
+     "col": 2,
+     "state": "fail"
+    },
+    {
+     "id": "usr",
+     "label": "Users see degraded or odd responses",
+     "row": 1,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "ev",
+     "label": "Evaluations did not catch it",
+     "row": 2,
+     "col": 1
+    }
+   ],
+   "edges": [
+    {
+     "f": "rt",
+     "t": "usr",
+     "state": "fail"
+    },
+    {
+     "f": "tpu",
+     "t": "usr",
+     "state": "fail"
+    },
+    {
+     "f": "xla",
+     "t": "usr",
+     "state": "fail"
+    },
+    {
+     "f": "usr",
+     "t": "ev"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Continuous production quality checks (conceptual)",
+   "caption": "Anthropic lists more sensitive evaluations, continuous checks on production and faster debugging tools.",
+   "nodes": [
+    {
+     "id": "ev",
+     "label": "Sensitive evaluations",
+     "row": 0,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "prod",
+     "label": "Continuous quality checks on production",
+     "row": 0,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "fb",
+     "label": "Privacy-preserving feedback debugging",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "dep",
+     "label": "Detection tests in deployment",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "ev",
+     "t": "fb",
+     "state": "new"
+    },
+    {
+     "f": "prod",
+     "t": "dep",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Degradation is measured, not just reported.",
+  "Deploys check for odd outputs.",
+  "Feedback reaches engineers safely."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "5 Aug 2025",
+   "phase": "trigger",
+   "e": "The context window routing error is introduced."
+  },
+  {
+   "t": "25 Aug",
+   "phase": "trigger",
+   "e": "The TPU misconfiguration is deployed and a change triggers the compiler bug."
+  },
+  {
+   "t": "29 Aug",
+   "phase": "impact",
+   "e": "A load balancing change increases misrouted traffic."
+  },
+  {
+   "t": "31 Aug",
+   "phase": "impact",
+   "e": "The routing error peaks at 16 percent of Sonnet 4 requests in the worst hour."
+  },
+  {
+   "t": "2 Sep",
+   "phase": "mitigate",
+   "e": "The TPU misconfiguration is rolled back."
+  },
+  {
+   "t": "4 Sep",
+   "phase": "mitigate",
+   "e": "The routing fix is deployed and Haiku 3.5 is rolled back."
+  },
+  {
+   "t": "12 Sep",
+   "phase": "mitigate",
+   "e": "Opus 3 is rolled back for the compiler bug."
+  },
+  {
+   "t": "16 to 18 Sep",
+   "phase": "recover",
+   "e": "The routing fix reaches first-party and Vertex AI by 16 September and Bedrock by 18 September."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Three separate infrastructure bugs overlapped.",
+  "underlying": "A routing error, a TPU misconfiguration and a compiler bug each degraded responses in different ways.",
+  "contributing": [
+   "Routing was sticky, so follow-up requests hit the same wrong server",
+   "A December 2024 workaround had masked an underlying top-k problem",
+   "Evaluations missed what users saw because Claude often recovers from isolated mistakes",
+   "Privacy controls limited engineers' access to user interactions"
+  ],
+  "propagation": [
+   "Bugs introduced.",
+   "Symptoms differ by platform.",
+   "Reports look random.",
+   "Fixes roll out in stages."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Policy statement",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "We never reduce model quality due to demand, time of day, or server load.",
+   "note": "From Anthropic's postmortem."
+  },
+  {
+   "label": "A simulated output check",
+   "kind": "simulated",
+   "lang": "python",
+   "body": "def odd_chars(text, allowed=('en',)):\n    return [c for c in text if ord(c) > 0x2E80]  # CJK range in an English reply",
+   "note": "An illustration of a deployment check for unexpected characters. Not Anthropic's test."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Compare reports by platform, model and time.",
+    "why": "Symptoms differ."
+   },
+   {
+    "step": "Reproduce with controlled requests.",
+    "why": "Haiku 3.5 first."
+   },
+   {
+    "step": "Check recent routing, config and compiler changes.",
+    "why": "Three changes."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Roll back the bad configuration.",
+    "why": "2 September."
+   },
+   {
+    "step": "Fix routing logic.",
+    "why": "4 September."
+   },
+   {
+    "step": "Switch to exact top-k.",
+    "why": "With fp32 for some operations."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Run evaluations that separate working from broken.",
+    "why": "Anthropic's change."
+   },
+   {
+    "step": "Check platforms one by one.",
+    "why": "Bedrock and Vertex later."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Add detection tests for unexpected characters.",
+    "why": "Added to deployment."
+   },
+   {
+    "step": "Run continuous production evaluations.",
+    "why": "Anthropic's plan."
+   },
+   {
+    "step": "Collect feedback safely.",
+    "why": "Anthropic's plan."
+   }
+  ],
+  "safety": "Debugging with user data must respect privacy controls. Use feedback users submit."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Users say answers are worse. Your evaluations look fine. Three platforms show different symptoms.",
+   "clues": [
+    "Recent routing change",
+    "Compiler update",
+    "Config change"
+   ],
+   "question": "How do you investigate?",
+   "hints": [
+    "Which data do you trust?",
+    "How do you separate causes?",
+    "What do you change in evals?"
+   ],
+   "answer": "Reproduce per platform, line up changes with report spikes, roll back suspects one by one and add sensitive production evaluations."
+  },
+  "rootcause": {
+   "q": "What did the routing bug affect?",
+   "options": [
+    "Some Sonnet 4 requests sent to long-context servers",
+    "Only Opus",
+    "Billing",
+    "Logins"
+   ],
+   "answer": 0,
+   "why": "Per the postmortem."
+  },
+  "remediation": [
+   {
+    "task": "Define production evals.",
+    "answer": "Sample live traffic and score against a reference."
+   },
+   {
+    "task": "Define a deploy check.",
+    "answer": "Block on unexpected character output."
+   },
+   {
+    "task": "Plan staged rollouts per platform.",
+    "answer": "Canary first."
+   }
+  ],
+  "design": {
+   "prompt": "Design quality assurance for a multi-platform inference service.",
+   "constraints": [
+    "Several clouds",
+    "Compiler stack",
+    "Privacy limits"
+   ],
+   "answer": "Per-platform canaries, production evals, exact math fallbacks, rollbacks and feedback tooling."
+  },
+  "checks": [
+   {
+    "q": "On what date did the routing bug peak?",
+    "options": [
+     "31 August",
+     "5 August",
+     "16 September",
+     "2 September"
+    ],
+    "answer": 0,
+    "why": "Per the postmortem."
+   },
+   {
+    "q": "Which models did the compiler bug confirm affected?",
+    "options": [
+     "Haiku 3.5",
+     "Opus 4.1",
+     "Sonnet 5",
+     "None"
+    ],
+    "answer": 0,
+    "why": "Per the postmortem."
+   },
+   {
+    "q": "What fixed the top-k issue?",
+    "options": [
+     "Switching from approximate to exact top-k",
+     "More servers",
+     "A new tokenizer",
+     "Rate limits"
+    ],
+    "answer": 0,
+    "why": "Per the postmortem."
+   },
+   {
+    "q": "Were third-party platforms affected by the TPU corruption bug?",
+    "options": [
+     "No",
+     "Yes",
+     "Partly",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the postmortem."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Detection tests for odd outputs",
+   "Per-platform canaries"
+  ],
+  "monitoring": [
+   "Production quality evals"
+  ],
+  "recovery": [
+   "Rollback",
+   "Exact top-k"
+  ],
+  "practices": [
+   "Feedback tooling",
+   "Staged rollouts"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Anthropic: A postmortem of three recent issues",
+   "url": "https://www.anthropic.com/engineering/a-postmortem-of-three-recent-issues",
+   "used": "dates, bugs, impact, fixes, changes"
+  }
+ ],
+ "verification": "Facts were read from Anthropic's postmortem on 29 October 2026. The detection code is Simulated. Anthropic has a later postmortem (April 2026) that this card does not cover."
+}

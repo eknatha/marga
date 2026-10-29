@@ -1,0 +1,368 @@
+{
+ "id": "malicious-postmark-mcp-package",
+ "checked": "29 October 2026",
+ "summary": "In September 2025 a package named postmark-mcp on npm, copied from Postmark's genuine MCP server code, added a hidden BCC in version 1.0.16 so every email sent through it was also sent to the attacker. Koi Security found it. The Register reported about 1,500 downloads in a week.",
+ "overview": {
+  "background": "MCP servers let AI assistants use tools such as email. Postmark's official MCP server is not published on npm. An impostor built trust over 15 versions.",
+  "systems": [
+   "npm package postmark-mcp",
+   "AI assistants using the MCP server to send email",
+   "An attacker-controlled BCC address",
+   "Koi Security (discoverer)"
+  ],
+  "impact": "About 1,500 downloads in one week; Koi estimated about 20 percent in use at around 300 organisations. Postmark knew of only one customer using it and said its own systems were not breached.",
+  "severity": "Described by a researcher as a warning shot for the MCP ecosystem.",
+  "gaps": "Koi's estimates of stolen emails (3,000 to 15,000 per day) are Koi's, and Postmark disputes the scale."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Trust built over 15 versions, then a one-line BCC",
+   "caption": "Per The Register, the developer copied Postmark's code, added a line to BCC all emails to an attacker-controlled address and published it to npm.",
+   "nodes": [
+    {
+     "id": "up",
+     "label": "Impostor package copies genuine code",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "tr",
+     "label": "15 clean versions build trust",
+     "row": 1,
+     "col": 1
+    },
+    {
+     "id": "bd",
+     "label": "Version 1.0.16 adds hidden BCC",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "em",
+     "label": "Emails also sent to the attacker",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "up",
+     "t": "tr"
+    },
+    {
+     "f": "tr",
+     "t": "bd",
+     "state": "fail"
+    },
+    {
+     "f": "bd",
+     "t": "em",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Vetting MCP servers before use (conceptual)",
+   "caption": "General controls for AI tool servers.",
+   "nodes": [
+    {
+     "id": "src",
+     "label": "Use the vendor's official source",
+     "row": 0,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "pin",
+     "label": "Pin versions and review diffs",
+     "row": 0,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "sand",
+     "label": "Run servers with least privilege",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "log",
+     "label": "Audit outgoing email and recipients",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "src",
+     "t": "sand",
+     "state": "new"
+    },
+    {
+     "f": "pin",
+     "t": "log",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Tools come from the real vendor.",
+  "Updates are reviewed.",
+  "Outputs are audited."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Before Sep 2025",
+   "phase": "change",
+   "e": "The developer publishes postmark-mcp on npm across 15 versions."
+  },
+  {
+   "t": "Version 1.0.16",
+   "phase": "trigger",
+   "e": "A backdoor adds a BCC to all outgoing emails."
+  },
+  {
+   "t": "During the week",
+   "phase": "impact",
+   "e": "About 1,500 downloads; thousands of emails may be copied each day, per Koi."
+  },
+  {
+   "t": "Before 25 Sep 2025",
+   "phase": "detect",
+   "e": "Koi Security finds the package."
+  },
+  {
+   "t": "25 Sep 2025",
+   "phase": "mitigate",
+   "e": "Postmark states it had nothing to do with the package."
+  },
+  {
+   "t": "29 Sep 2025",
+   "phase": "recover",
+   "e": "The Register reports; the package is removed and users are told to rotate credentials sent by email."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A package impersonated a vendor's tool and added a hidden BCC.",
+  "underlying": "Users installed an unofficial npm package that looked like the vendor's.",
+  "contributing": [
+   "Trust built over many clean versions",
+   "Email often carries password resets and MFA codes",
+   "AI assistants run tools with the user's authority"
+  ],
+  "propagation": [
+   "Impostor.",
+   "Trust.",
+   "Backdoor.",
+   "Emails copied."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Postmark's statement",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "built trust over 15 versions, then added a backdoor in version 1.0.16",
+   "note": "Postmark, as quoted by The Register."
+  },
+  {
+   "label": "The researcher's view",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "a warning shot about the MCP ecosystem itself",
+   "note": "Idan Dardikman of Koi Security, as quoted."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "List installed MCP servers and sources.",
+    "why": "npm vs vendor."
+   },
+   {
+    "step": "Diff the package against the vendor's repository.",
+    "why": "Reveals the BCC."
+   },
+   {
+    "step": "Check email logs for unknown BCC recipients.",
+    "why": "Postmark's advice."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Remove the package.",
+    "why": "Postmark's advice."
+   },
+   {
+    "step": "Audit email logs.",
+    "why": "Postmark's advice."
+   },
+   {
+    "step": "Rotate credentials sent by email.",
+    "why": "Postmark's advice."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check no BCC to unknown addresses.",
+    "why": "Verify."
+   },
+   {
+    "step": "Check only official servers remain.",
+    "why": "Inventory."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Install only from the vendor's documented source.",
+    "why": "General practice."
+   },
+   {
+    "step": "Pin and review updates.",
+    "why": "General practice."
+   },
+   {
+    "step": "Restrict what tools can do.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Rotating credentials delivered by email is urgent. Do it first, then investigate."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Your AI assistant uses an MCP server for email you installed from npm. The vendor says it never published on npm.",
+   "clues": [
+    "Auto-updates enabled",
+    "Email carries resets",
+    "Used by several staff"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "What do you remove?",
+    "What do you check?",
+    "What do you rotate?"
+   ],
+   "answer": "Remove the package, check logs for unknown recipients, rotate credentials sent by email and use the vendor's official tool."
+  },
+  "rootcause": {
+   "q": "Which version added the backdoor?",
+   "options": [
+    "1.0.16",
+    "1.0.1",
+    "2.0",
+    "0.1"
+   ],
+   "answer": 0,
+   "why": "Per The Register."
+  },
+  "remediation": [
+   {
+    "task": "Write an MCP inventory.",
+    "answer": "Name, source, version, permissions."
+   },
+   {
+    "task": "Plan a review step.",
+    "answer": "Diff against the vendor's source."
+   },
+   {
+    "task": "Plan email controls.",
+    "answer": "Block unknown BCC."
+   }
+  ],
+  "design": {
+   "prompt": "Design a safe process for adding AI tool servers.",
+   "constraints": [
+    "Many teams",
+    "Sensitive email",
+    "Open ecosystem"
+   ],
+   "answer": "Allowlist, provenance checks, pinning, sandboxing and logging."
+  },
+  "checks": [
+   {
+    "q": "Who found the package?",
+    "options": [
+     "Koi Security",
+     "Postmark",
+     "npm",
+     "A user"
+    ],
+    "answer": 0,
+    "why": "Per The Register."
+   },
+   {
+    "q": "What did the BCC do?",
+    "options": [
+     "Sent a copy of each email to an attacker-controlled address",
+     "Deleted emails",
+     "Encrypted them",
+     "Nothing"
+    ],
+    "answer": 0,
+    "why": "Per The Register."
+   },
+   {
+    "q": "Did Postmark say its systems were breached?",
+    "options": [
+     "No",
+     "Yes",
+     "Partly",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per The Register."
+   },
+   {
+    "q": "About how many downloads in a week?",
+    "options": [
+     "1,500",
+     "15",
+     "150,000",
+     "0"
+    ],
+    "answer": 0,
+    "why": "Per The Register."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Official sources",
+   "Pinning and review"
+  ],
+  "monitoring": [
+   "Outgoing email recipients"
+  ],
+  "recovery": [
+   "Remove package",
+   "Rotate credentials"
+  ],
+  "practices": [
+   "Allowlists",
+   "Sandboxing"
+  ]
+ },
+ "sources": [
+  {
+   "title": "The Register: Postmark MCP server code hijacked",
+   "url": "https://www.theregister.com/2025/09/29/postmark_mcp_server_code_hijacked/",
+   "used": "version, scale, discovery, advice"
+  }
+ ],
+ "verification": "Facts were read from The Register on 29 October 2026. Scale estimates are Koi's and are not independently verified; Postmark knew of only one affected customer."
+}

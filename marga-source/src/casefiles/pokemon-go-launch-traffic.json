@@ -1,0 +1,390 @@
+{
+ "id": "pokemon-go-launch-traffic",
+ "checked": "29 October 2026",
+ "summary": "When Pokemon GO launched in 2016, player traffic reached 50 times Niantic's initial target and ten times its worst-case estimate within days. Google Cloud and Niantic scaled the Kubernetes backend with tens of thousands of cores.",
+ "overview": {
+  "background": "Niantic ran Pokemon GO on Google Cloud: Cloud Datastore as the main database, Google Container Engine (GKE) with Kubernetes for application logic, and Google's global network. The team planned for 1X traffic with a 5X worst case.",
+  "systems": [
+   "Cloud Datastore",
+   "GKE and Kubernetes",
+   "Network load balancer then HTTP/S load balancer",
+   "Google's global network and Cloud services"
+  ],
+  "impact": "Within 15 minutes of launching in Australia and New Zealand traffic was past Niantic's expectations. Traffic reached 50X the target.",
+  "severity": "A capacity incident rather than an outage. Google describes stability issues that were worked through in sequence.",
+  "gaps": "The post gives no error rates or exact downtime."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A launch far beyond the estimate",
+   "caption": "The game's logic ran on GKE with Datastore. Scaling meant a newer GKE version, a different load balancer and many more cores.",
+   "nodes": [
+    {
+     "id": "players",
+     "label": "Players: 50X the target",
+     "row": 0,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "lb",
+     "label": "Network Load Balancer, later HTTP/S Load Balancer",
+     "row": 1,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "gke",
+     "label": "GKE cluster: grows by a thousand nodes after upgrade",
+     "row": 2,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "ds",
+     "label": "Cloud Datastore",
+     "row": 3,
+     "col": 0
+    },
+    {
+     "id": "net",
+     "label": "Google's private network",
+     "row": 3,
+     "col": 2
+    }
+   ],
+   "edges": [
+    {
+     "f": "players",
+     "t": "lb"
+    },
+    {
+     "f": "lb",
+     "t": "gke"
+    },
+    {
+     "f": "gke",
+     "t": "ds"
+    },
+    {
+     "f": "gke",
+     "t": "net"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Capacity planning for an unknown launch (conceptual)",
+   "caption": "A picture of how to prepare for traffic far above estimates: headroom, staged launches, load balancers that fit the traffic and a watching team. It is not Niantic's design.",
+   "nodes": [
+    {
+     "id": "stage",
+     "label": "Staged regional launches",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "head",
+     "label": "Headroom well above worst case",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "lb",
+     "label": "Load balancer matched to the protocol",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "watch",
+     "label": "Capacity engineers watching growth",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "stage",
+     "t": "head",
+     "state": "new"
+    },
+    {
+     "f": "stage",
+     "t": "lb",
+     "state": "new"
+    },
+    {
+     "f": "head",
+     "t": "watch",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Launch in small regions first.",
+  "Plan for ten times the worst case.",
+  "Keep capacity engineers on call."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Launch day, Australia and New Zealand",
+   "phase": "trigger",
+   "e": "Pokemon GO launches in the first countries."
+  },
+  {
+   "t": "Within 15 minutes",
+   "phase": "detect",
+   "e": "Player traffic is well past Niantic's expectations."
+  },
+  {
+   "t": "Following days",
+   "phase": "impact",
+   "e": "Traffic reaches 50X the target, ten times the worst-case estimate."
+  },
+  {
+   "t": "During the surge",
+   "phase": "mitigate",
+   "e": "Google's customer reliability engineers provision extra capacity on Niantic's behalf."
+  },
+  {
+   "t": "Before the Japan launch",
+   "phase": "mitigate",
+   "e": "A newer GKE version allows more than a thousand extra nodes, and the Network Load Balancer is replaced by the HTTP/S Load Balancer."
+  },
+  {
+   "t": "Japan launch",
+   "phase": "recover",
+   "e": "Sign-ups triple the earlier US launch numbers and the launch goes smoothly."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Traffic far above the worst-case estimate after a successful launch.",
+  "underlying": "Capacity and load balancer design planned for 5X could not carry 50X without upgrades and extra provisioning.",
+  "contributing": [
+   "The cluster size limit of the earlier GKE version",
+   "The load balancer type was a poor fit for HTTPS traffic",
+   "Launch timing in several countries gave little time to react"
+  ],
+  "propagation": [
+   "Players arrive.",
+   "Load balancers and nodes saturate.",
+   "Errors and stability issues appear.",
+   "Capacity is added and design changed."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Surge size",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Pokémon GO's popularity quickly surged player traffic to 50X the initial target, ten times the worst-case estimate.",
+   "note": "From Google Cloud's post."
+  },
+  {
+   "label": "Early signal",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Within 15 minutes of launching in Australia and New Zealand, player traffic surged well past Niantic's expectations.",
+   "note": "From Google Cloud's post."
+  },
+  {
+   "label": "A simulated autoscaling policy",
+   "kind": "simulated",
+   "lang": "yaml",
+   "body": "autoscaling:\n  min_nodes: 500\n  max_nodes: 5000\n  target_cpu: 0.55\n  scale_up_step: 20%",
+   "note": "Shows headroom-based scaling settings. Invented values."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Compare real traffic with the plan.",
+    "why": "50X against 5X shows the scale of the miss."
+   },
+   {
+    "step": "Check cluster node limits and quotas.",
+    "why": "A newer GKE version raised the node count."
+   },
+   {
+    "step": "Check load balancer behaviour for your protocol.",
+    "why": "HTTP/S fits HTTPS traffic better."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Provision extra capacity ahead of growth.",
+    "why": "Google CRE did this."
+   },
+   {
+    "step": "Upgrade to a version with higher limits.",
+    "why": "More than a thousand extra nodes."
+   },
+   {
+    "step": "Replace the load balancer.",
+    "why": "HTTP/S load balancer."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Watch error rates and latency as capacity arrives.",
+    "why": "Stability issues were worked through in sequence."
+   },
+   {
+    "step": "Run the next launch as a test of the new capacity.",
+    "why": "Japan went smoothly."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Plan for ten times the worst case.",
+    "why": "The lesson of the numbers."
+   },
+   {
+    "step": "Launch in stages.",
+    "why": "Regional launches gave time to react."
+   },
+   {
+    "step": "Keep platform engineers close to the launch.",
+    "why": "Google CRE helped."
+   }
+  ],
+  "safety": "Upgrading a cluster version in the middle of a surge is risky. Rehearse the upgrade and keep a rollback path."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Your game is three days from a global launch. A small region launched and traffic is already 10 times the estimate.",
+   "clues": [
+    "Cluster node limit near",
+    "Network load balancer in use",
+    "Next launch in 24 hours"
+   ],
+   "question": "What do you do before the next launch?",
+   "hints": [
+    "What limits growth?",
+    "What changes for HTTPS?",
+    "Who helps?"
+   ],
+   "answer": "Upgrade to a version with higher node limits, switch to a fitting load balancer, provision extra capacity, engage the provider's reliability engineers, and launch the next region as a test."
+  },
+  "rootcause": {
+   "q": "What was the worst-case estimate relative to target?",
+   "options": [
+    "About 5X",
+    "50X",
+    "1X",
+    "100X"
+   ],
+   "answer": 0,
+   "why": "Teams planned for about 5X as worst case."
+  },
+  "remediation": [
+   {
+    "task": "Set capacity policy.",
+    "answer": "Provision for ten times the worst case with fast scale-up."
+   },
+   {
+    "task": "Choose the load balancer.",
+    "answer": "Use an HTTP/S balancer for HTTPS traffic."
+   },
+   {
+    "task": "Plan staged launches.",
+    "answer": "Smaller regions first, with a gap to learn."
+   }
+  ],
+  "design": {
+   "prompt": "Design a backend that tolerates a launch 50X above plan.",
+   "constraints": [
+    "Datastore",
+    "Kubernetes",
+    "Global users"
+   ],
+   "answer": "Use headroom, horizontal scale, a database that scales, staged launches, load shedding and a vendor on call."
+  },
+  "checks": [
+   {
+    "q": "Which database was primary?",
+    "options": [
+     "Cloud Datastore",
+     "Oracle",
+     "MySQL",
+     "Redis only"
+    ],
+    "answer": 0,
+    "why": "The post says Cloud Datastore."
+   },
+   {
+    "q": "What replaced the Network Load Balancer?",
+    "options": [
+     "The HTTP/S Load Balancer",
+     "A DNS record",
+     "A firewall",
+     "A CDN"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   },
+   {
+    "q": "How much did traffic exceed the worst case?",
+    "options": [
+     "Ten times",
+     "Twice",
+     "Equal",
+     "Half"
+    ],
+    "answer": 0,
+    "why": "The post says ten times."
+   },
+   {
+    "q": "What went smoothly?",
+    "options": [
+     "The Japan launch",
+     "The first launch",
+     "Nothing",
+     "The beta"
+    ],
+    "answer": 0,
+    "why": "The post says so."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Plan for ten times the worst case",
+   "Staged launches",
+   "Right load balancer"
+  ],
+  "monitoring": [
+   "Traffic against plan"
+  ],
+  "recovery": [
+   "Provision ahead of growth",
+   "Engage provider engineers"
+  ],
+  "practices": [
+   "Rehearse upgrades",
+   "Launch small regions first"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Google Cloud blog: Bringing Pokemon GO to life on Google Cloud",
+   "url": "https://cloud.google.com/blog/products/containers-kubernetes/bringing-pokemon-go-to-life-on-google-cloud",
+   "used": "traffic, scaling actions, architecture"
+  }
+ ],
+ "verification": "Facts were read from Google Cloud's post on 29 October 2026. The post gives no error rates, so this is a capacity case rather than a full outage record. The policy is Simulated."
+}

@@ -1,0 +1,435 @@
+{
+ "id": "google-cloud-network-control-plane-descheduled",
+ "checked": "29 October 2026",
+ "summary": "On 2 June 2019 a routine maintenance event, a rare misconfiguration and a bug in maintenance automation descheduled network control plane jobs in several locations at once. Network capacity collapsed for hours.",
+ "overview": {
+  "background": "Google's network control plane runs as jobs on cluster management instances. Maintenance automation normally deschedules jobs in one location at a time.",
+  "systems": [
+   "Network control plane jobs",
+   "Cluster management instances and maintenance automation",
+   "BGP routing between locations",
+   "Compute Engine, App Engine, Cloud VPN, Cloud Interconnect",
+   "Cloud Storage, Spanner, Pub/Sub, BigQuery, G Suite"
+  ],
+  "impact": "Compute Engine, App Engine and Cloud VPN were unavailable in us-east4, us-west2, northamerica-northeast1 and southamerica-east1. Cloud Storage error rates reached 96.2 percent in us-west2. Spanner was unavailable in three regions.",
+  "severity": "Google calls it a major outage in scope and duration. The page lists impact until about 15:40 to 16:10 US/Pacific.",
+  "gaps": "The page lists the incident end as 15:40 but says full service resumed at 16:10."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Several control planes descheduled at once",
+   "caption": "Three factors combined: control plane jobs stop during maintenance, their hosts were eligible for a rare maintenance event type, and a bug let the automation deschedule many clusters at once.",
+   "nodes": [
+    {
+     "id": "maint",
+     "label": "Maintenance event in one location",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "auto",
+     "label": "Automation bug: deschedules several clusters",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "cp",
+     "label": "Network control plane jobs stopped in many locations",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "bgp",
+     "label": "BGP routes withdrawn, capacity drops",
+     "row": 3,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "svc",
+     "label": "Compute, VPN, Storage, Spanner, Workspace",
+     "row": 4,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "maint",
+     "t": "auto",
+     "label": "rare event type"
+    },
+    {
+     "f": "auto",
+     "t": "cp",
+     "state": "fail"
+    },
+    {
+     "f": "cp",
+     "t": "bgp",
+     "state": "fail"
+    },
+    {
+     "f": "bgp",
+     "t": "svc",
+     "label": "congestion and packet loss",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Guards on maintenance and fail-static (conceptual)",
+   "caption": "Google halted the automation, made the cluster software reject such requests, made the control plane persist configuration and extended the fail static window. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "maint",
+     "label": "Maintenance request",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "guard",
+     "label": "Cluster software rejects requests that touch many clusters",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "cp",
+     "label": "Control plane persists configuration",
+     "row": 2,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "fs",
+     "label": "Longer fail-static window keeps routes",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "svc",
+     "label": "Services keep capacity",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "maint",
+     "t": "guard",
+     "state": "new"
+    },
+    {
+     "f": "guard",
+     "t": "cp",
+     "state": "new"
+    },
+    {
+     "f": "guard",
+     "t": "fs",
+     "state": "new"
+    },
+    {
+     "f": "cp",
+     "t": "svc",
+     "state": "new"
+    },
+    {
+     "f": "fs",
+     "t": "svc",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "One request cannot stop control planes in several places.",
+  "The network keeps its last routes while the control plane restarts.",
+  "Recovery is faster."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "11:45 US/Pacific, 2 Jun",
+   "phase": "trigger",
+   "e": "A maintenance event starts in one physical location."
+  },
+  {
+   "t": "11:47 to 11:49",
+   "phase": "impact",
+   "e": "End-user impact begins."
+  },
+  {
+   "t": "About 11:47",
+   "phase": "detect",
+   "e": "Engineers are alerted two minutes after the failure begins."
+  },
+  {
+   "t": "12:53",
+   "phase": "investigate",
+   "e": "A status post says Google is investigating a networking issue."
+  },
+  {
+   "t": "13:01",
+   "phase": "investigate",
+   "e": "The root cause is identified and the automation software is halted."
+  },
+  {
+   "t": "14:03",
+   "phase": "mitigate",
+   "e": "A new network configuration begins rolling out."
+  },
+  {
+   "t": "15:19",
+   "phase": "recover",
+   "e": "Network capacity recovery begins."
+  },
+  {
+   "t": "16:10",
+   "phase": "recover",
+   "e": "Full service resumes per the report."
+  },
+  {
+   "t": "4 Jun 11:30",
+   "phase": "recover",
+   "e": "Endpoints configuration pushes succeed again."
+  },
+  {
+   "t": "6 Jun 09:42",
+   "phase": "change",
+   "e": "The incident report is published."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A maintenance event started and the automation descheduled control plane jobs.",
+  "underlying": "Control plane jobs were configured to stop during maintenance, the cluster management instances were eligible for a rare event type, and a bug let the automation deschedule independent clusters in several locations at once.",
+  "contributing": [
+   "Two normally benign misconfigurations",
+   "A specific software bug in the automation",
+   "BGP routes were withdrawn when the control plane stopped",
+   "Tools for recovery and communication were also affected"
+  ],
+  "propagation": [
+   "Jobs are descheduled.",
+   "Routes are withdrawn.",
+   "Capacity falls.",
+   "Congestion spreads across regions."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The combination",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Two normally-benign misconfigurations, and a specific software bug, combined to initiate the outage",
+   "note": "From Google's report."
+  },
+  {
+   "label": "The scale",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "This was a major outage, both in its scope and duration.",
+   "note": "From Google's report."
+  },
+  {
+   "label": "A simulated automation guard",
+   "kind": "simulated",
+   "lang": "python",
+   "body": "if len({job.cluster for job in request.jobs}) > 1:\n    reject('maintenance may touch one cluster at a time')",
+   "note": "A teaching example of the missing rule. Not Google code."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Find what changed or ran in the first minutes.",
+    "why": "Maintenance automation was the trigger."
+   },
+   {
+    "step": "Check whether control plane jobs are running in each location.",
+    "why": "Descheduled jobs explain withdrawn routes."
+   },
+   {
+    "step": "Look at which regions lost capacity and which kept it.",
+    "why": "Impact followed the affected locations."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Halt the automation.",
+    "why": "Google did this once it knew the cause."
+   },
+   {
+    "step": "Roll out a new network configuration.",
+    "why": "It restored capacity from 14:03."
+   },
+   {
+    "step": "Bring services back region by region.",
+    "why": "Recovery was staged."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Watch capacity and packet loss in each region.",
+    "why": "Confirm the network is healthy."
+   },
+   {
+    "step": "Check late-recovering services.",
+    "why": "VPN and Endpoints recovered later."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Reject maintenance requests that affect many clusters.",
+    "why": "Google hardened the software."
+   },
+   {
+    "step": "Persist control plane configuration.",
+    "why": "Cuts recovery time."
+   },
+   {
+    "step": "Extend the fail-static window.",
+    "why": "Routes survive longer outages of the control plane."
+   }
+  ],
+  "safety": "Halting maintenance automation globally has its own costs, for example patches are delayed. Plan the restart of automation with safeguards in place."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Network capacity is dropping across several regions at once. A maintenance event began in one location a few minutes ago.",
+   "clues": [
+    "Control plane jobs are missing",
+    "Routes are withdrawn",
+    "Your tools run over the same network"
+   ],
+   "question": "How do you respond?",
+   "hints": [
+    "What stops the spread?",
+    "How do you restore capacity?",
+    "How do you talk to people if tools are down?"
+   ],
+   "answer": "Halt maintenance automation, restore the control plane, roll out the network configuration, and use an out-of-band channel for communication."
+  },
+  "rootcause": {
+   "q": "What combined to cause the outage?",
+   "options": [
+    "Two benign misconfigurations and an automation bug",
+    "A cable cut",
+    "A DDoS",
+    "A hardware fire"
+   ],
+   "answer": 0,
+   "why": "That is Google's own description."
+  },
+  "remediation": [
+   {
+    "task": "Write the guard.",
+    "answer": "Deny maintenance that targets more than one independent cluster or location at a time."
+   },
+   {
+    "task": "Explain fail-static.",
+    "answer": "A system keeps using its last known good state when its control plane is unavailable."
+   },
+   {
+    "task": "Plan communications.",
+    "answer": "Use a status channel that does not use the affected network."
+   }
+  ],
+  "design": {
+   "prompt": "Design maintenance automation that cannot touch several failure domains at once.",
+   "constraints": [
+    "Many clusters",
+    "Rare event types",
+    "Control planes with state"
+   ],
+   "answer": "Enforce one domain at a time, rate limit, require approval for rare event types, and test it with fault injection."
+  },
+  "checks": [
+   {
+    "q": "When did the incident begin?",
+    "options": [
+     "11:45 US/Pacific on 2 June 2019",
+     "Midnight",
+     "5 PM",
+     "4 June"
+    ],
+    "answer": 0,
+    "why": "The page lists 11:45."
+   },
+   {
+    "q": "What was withdrawn when the control plane stopped?",
+    "options": [
+     "BGP routes",
+     "Storage",
+     "Billing",
+     "Logs"
+    ],
+    "answer": 0,
+    "why": "Google says BGP routing was withdrawn."
+   },
+   {
+    "q": "What was Cloud Storage error rate in us-west2?",
+    "options": [
+     "96.2 percent",
+     "1 percent",
+     "10 percent",
+     "None"
+    ],
+    "answer": 0,
+    "why": "The page gives 96.2 percent."
+   },
+   {
+    "q": "What did Google extend?",
+    "options": [
+     "The network fail static window",
+     "Support hours",
+     "Price lists",
+     "Log retention"
+    ],
+    "answer": 0,
+    "why": "That is one remediation."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Limit automation to one failure domain",
+   "Fail static",
+   "Persist control plane configuration"
+  ],
+  "monitoring": [
+   "Control plane job counts",
+   "Capacity per region"
+  ],
+  "recovery": [
+   "Halt automation",
+   "Roll out configuration in stages"
+  ],
+  "practices": [
+   "Test emergency tooling",
+   "Have an out-of-band communication path"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Google Cloud incident report 19009, 2 June 2019 (networking)",
+   "url": "https://status.cloud.google.com/incident/cloud-networking/19009",
+   "used": "timeline, cause, impact, remediation"
+  }
+ ],
+ "verification": "Facts were read from Google's incident page on 29 October 2026. The page has a time conflict (15:40 or 16:10), noted. The code is Simulated."
+}

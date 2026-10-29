@@ -1,0 +1,372 @@
+{
+ "id": "akamai-edge-dns-configuration-bug",
+ "checked": "29 October 2026",
+ "summary": "On 22 July 2021 at 15:45 UTC a software configuration update triggered a bug in a DNS component of Akamai's Secure Edge CDN. Some customer websites were unavailable for up to about an hour, until Akamai rolled the change back.",
+ "overview": {
+  "background": "Akamai's Secure Edge CDN uses a DNS component to direct browsers to customer sites. Akamai first described it as a DNS service and corrected on 23 July that it was one DNS component of the Secure Edge CDN.",
+  "systems": [
+   "Secure Edge CDN DNS component",
+   "Software configuration update mechanism",
+   "Customer websites using the CDN"
+  ],
+  "impact": "Some customer websites were unavailable for up to about an hour.",
+  "severity": "A short but wide disruption. Akamai says it was not a cyberattack.",
+  "gaps": "Akamai's summary is short. It gives no deployment details."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A configuration update triggers a bug",
+   "caption": "Per Akamai, a software configuration update triggered a bug in the DNS component. Rolling it back restored service.",
+   "nodes": [
+    {
+     "id": "cfg",
+     "label": "Software configuration update",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "bug",
+     "label": "Bug in the DNS component",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "dns",
+     "label": "Browsers cannot be directed to sites",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "web",
+     "label": "Some customer websites unavailable",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "cfg",
+     "t": "bug",
+     "state": "fail"
+    },
+    {
+     "f": "bug",
+     "t": "dns",
+     "state": "fail"
+    },
+    {
+     "f": "dns",
+     "t": "web",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Staged configuration rollout (conceptual)",
+   "caption": "Akamai said it is reviewing its software update process. This picture shows a general staged approach.",
+   "nodes": [
+    {
+     "id": "cfg",
+     "label": "Configuration change",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "can",
+     "label": "Canary on a small share",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "auto",
+     "label": "Automatic rollback on error rate",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "full",
+     "label": "Gradual global rollout",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "cfg",
+     "t": "can",
+     "state": "new"
+    },
+    {
+     "f": "cfg",
+     "t": "auto",
+     "state": "new"
+    },
+    {
+     "f": "can",
+     "t": "full",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Changes reach few users first.",
+  "Bad changes roll back automatically.",
+  "Rollout is gradual."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "22 Jul 2021, 15:45 UTC",
+   "phase": "trigger",
+   "e": "A software configuration update triggers the bug."
+  },
+  {
+   "t": "Following minutes",
+   "phase": "impact",
+   "e": "Some customer websites become unavailable."
+  },
+  {
+   "t": "During the disruption",
+   "phase": "detect",
+   "e": "Akamai identifies the failing component."
+  },
+  {
+   "t": "During the disruption",
+   "phase": "investigate",
+   "e": "Akamai determines the cause is the configuration update."
+  },
+  {
+   "t": "Within about an hour",
+   "phase": "mitigate",
+   "e": "Akamai rolls back the configuration update."
+  },
+  {
+   "t": "After rollback",
+   "phase": "recover",
+   "e": "Services resume normal operations."
+  },
+  {
+   "t": "23 Jul 2021",
+   "phase": "change",
+   "e": "Akamai corrects that one DNS component, not the DNS service, was affected."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A software configuration update triggered a bug in a DNS component.",
+  "underlying": "The bug made some customer websites unreachable until the update was rolled back.",
+  "contributing": [
+   "The update reached the whole service quickly (the summary does not describe the rollout)"
+  ],
+  "propagation": [
+   "Config update.",
+   "Bug.",
+   "DNS component fails.",
+   "Sites unreachable."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Rollback",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Upon rolling back the software configuration update, the services resumed normal operations.",
+   "note": "From Akamai's summary as read."
+  },
+  {
+   "label": "Not an attack",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Akamai can confirm this was not a cyberattack against Akamai's platform.",
+   "note": "From the same summary."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check customer error rates by region.",
+    "why": "Some sites failed."
+   },
+   {
+    "step": "Find recent changes.",
+    "why": "A configuration update."
+   },
+   {
+    "step": "Check the component logs.",
+    "why": "The DNS component."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Roll back the update.",
+    "why": "Akamai's fix."
+   },
+   {
+    "step": "Confirm service resumes.",
+    "why": "Check customers."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check error rates return to normal.",
+    "why": "Confirmation."
+   },
+   {
+    "step": "Review the software update process.",
+    "why": "Akamai's follow-up."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Canary configuration changes.",
+    "why": "General practice."
+   },
+   {
+    "step": "Automate rollback.",
+    "why": "General practice."
+   },
+   {
+    "step": "Communicate corrections clearly.",
+    "why": "Akamai corrected its first description."
+   }
+  ],
+  "safety": "Do not roll back blindly if the change included data migrations. Check first."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Customers report sites down. The only recent change is a configuration push to your DNS component.",
+   "clues": [
+    "All regions",
+    "Config update 15 minutes ago",
+    "Not an attack"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "How fast can you undo?",
+    "What do you tell customers?",
+    "What do you review later?"
+   ],
+   "answer": "Roll back the configuration, confirm recovery, communicate, then fix the staging and canary process."
+  },
+  "rootcause": {
+   "q": "When did the disruption start?",
+   "options": [
+    "15:45 UTC on 22 July 2021",
+    "Midnight",
+    "3 July",
+    "Unknown"
+   ],
+   "answer": 0,
+   "why": "Per Akamai."
+  },
+  "remediation": [
+   {
+    "task": "Define a canary.",
+    "answer": "1 percent of traffic or one region first."
+   },
+   {
+    "task": "Define rollback triggers.",
+    "answer": "Error rate over a set limit."
+   },
+   {
+    "task": "Write the correction note.",
+    "answer": "State what was wrong in the first message."
+   }
+  ],
+  "design": {
+   "prompt": "Design safe configuration deployment for an edge network.",
+   "constraints": [
+    "Global edge",
+    "Frequent changes",
+    "DNS dependency"
+   ],
+   "answer": "Validation, canary, auto rollback, circuit breakers and a fast manual rollback."
+  },
+  "checks": [
+   {
+    "q": "What did Akamai say it was not?",
+    "options": [
+     "A cyberattack",
+     "A bug",
+     "A rollback",
+     "A DNS service"
+    ],
+    "answer": 0,
+    "why": "Per Akamai."
+   },
+   {
+    "q": "What restored service?",
+    "options": [
+     "Rolling back the configuration update",
+     "More servers",
+     "A new CDN",
+     "A fire drill"
+    ],
+    "answer": 0,
+    "why": "Per Akamai."
+   },
+   {
+    "q": "What did the 23 July correction say?",
+    "options": [
+     "Only one DNS component was affected",
+     "Everything was affected",
+     "The attack continued",
+     "Nothing"
+    ],
+    "answer": 0,
+    "why": "Per Akamai."
+   },
+   {
+    "q": "How long did the disruption last?",
+    "options": [
+     "Up to about an hour",
+     "A week",
+     "A minute",
+     "A year"
+    ],
+    "answer": 0,
+    "why": "Per Akamai."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Canary releases",
+   "Automatic rollback"
+  ],
+  "monitoring": [
+   "Error rate by region"
+  ],
+  "recovery": [
+   "Rollback"
+  ],
+  "practices": [
+   "Review update process",
+   "Precise communication"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Akamai: Akamai Summarizes Service Disruption (Resolved)",
+   "url": "https://www.akamai.com/blog/news/akamai-summarizes-service-disruption-resolved",
+   "used": "time, cause, resolution, follow-up"
+  }
+ ],
+ "verification": "Facts were read from Akamai's summary on 29 October 2026. It is short and gives no rollout details, so none are claimed."
+}

@@ -1,0 +1,390 @@
+{
+ "id": "xz-backdoor",
+ "checked": "29 October 2026",
+ "summary": "On 29 March 2024 Andres Freund reported a backdoor in the xz compression library's upstream tarballs 5.6.0 and 5.6.1, found after he noticed slow SSH logins and valgrind errors on Debian sid. It was CVE-2024-3094.",
+ "overview": {
+  "background": "xz-utils provides the liblzma library. OpenSSH does not link it directly, but Debian and other distributions patch OpenSSH to use libsystemd, which depends on liblzma.",
+  "systems": [
+   "xz-utils upstream release tarballs 5.6.0 and 5.6.1",
+   "liblzma",
+   "sshd on systems that link it through libsystemd",
+   "Debian sid and other pre-release distribution builds"
+  ],
+  "impact": "A backdoor that could allow some form of remote access was caught before it reached widely deployed stable releases.",
+  "severity": "Critical (CVE-2024-3094). Few systems had it, per the report.",
+  "gaps": "Freund's post says he had not yet analysed exactly what the injected code checks for."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A backdoor in the build chain reaches sshd",
+   "caption": "Per the report, an obfuscated script in the release tarball modifies the liblzma build, replaces ifunc resolvers and redirects RSA_public_decrypt in sshd.",
+   "nodes": [
+    {
+     "id": "tar",
+     "label": "Release tarball with obfuscated build script",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "lz",
+     "label": "liblzma built with malicious object",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "sd",
+     "label": "libsystemd links liblzma",
+     "row": 2,
+     "col": 0
+    },
+    {
+     "id": "ssh",
+     "label": "sshd loads liblzma",
+     "row": 2,
+     "col": 2,
+     "state": "fail"
+    },
+    {
+     "id": "hook",
+     "label": "RSA_public_decrypt redirected",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "tar",
+     "t": "lz",
+     "state": "fail"
+    },
+    {
+     "f": "lz",
+     "t": "sd"
+    },
+    {
+     "f": "sd",
+     "t": "ssh"
+    },
+    {
+     "f": "ssh",
+     "t": "hook",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Reproducible builds and release verification (conceptual)",
+   "caption": "Guards against release-only code. Not from the report.",
+   "nodes": [
+    {
+     "id": "src",
+     "label": "Source from the repository",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "rb",
+     "label": "Rebuild and compare tarball to repository",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "cap",
+     "label": "Limit what libraries sshd can load",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "mon",
+     "label": "Performance and behaviour monitoring",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "src",
+     "t": "rb",
+     "state": "new"
+    },
+    {
+     "f": "src",
+     "t": "cap",
+     "state": "new"
+    },
+    {
+     "f": "rb",
+     "t": "mon",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Release tarballs match the repository.",
+  "Daemons load only what they need.",
+  "Odd latency is investigated."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Several weeks before",
+   "phase": "change",
+   "e": "Malicious test files and build changes are committed upstream."
+  },
+  {
+   "t": "Before 29 Mar 2024",
+   "phase": "detect",
+   "e": "Freund notices SSH logins using a lot of CPU and valgrind errors."
+  },
+  {
+   "t": "Before 29 Mar 2024",
+   "phase": "investigate",
+   "e": "He uses perf and gdb to trace where execution diverges."
+  },
+  {
+   "t": "29 Mar 2024",
+   "phase": "trigger",
+   "e": "He posts the analysis to oss-security after a preliminary report to the Debian security team."
+  },
+  {
+   "t": "Following hours",
+   "phase": "mitigate",
+   "e": "Distributions revert or pin versions. Red Hat assigns CVE-2024-3094."
+  },
+  {
+   "t": "After reverts",
+   "phase": "recover",
+   "e": "Affected pre-release systems are downgraded and rebuilt."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Malicious code was added to xz upstream over several weeks.",
+  "underlying": "The release tarballs included an obfuscated script that was not in the repository's normal source, and test files held the payload.",
+  "contributing": [
+   "Single maintainer with limited review",
+   "Release artifacts not compared to the repository",
+   "sshd indirectly linking liblzma via libsystemd"
+  ],
+  "propagation": [
+   "Committed payload.",
+   "Build modifies liblzma.",
+   "sshd loads it.",
+   "Authentication path hooked."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The author's description of himself",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "not* a security researcher, nor a reverse engineer",
+   "note": "From the report; the asterisk is part of the original emphasis."
+  },
+  {
+   "label": "The author's advice",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "I'd upgrade any potentially vulnerable system ASAP",
+   "note": "From the report."
+  },
+  {
+   "label": "A simulated version check",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ xz --version\n$ dpkg -l | grep -E 'xz-utils|liblzma'",
+   "note": "How to see the xz version. Output omitted."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Measure unexpected CPU use in a daemon.",
+    "why": "Slow SSH logins were the clue."
+   },
+   {
+    "step": "Compare behaviour using perf and valgrind.",
+    "why": "Freund's approach."
+   },
+   {
+    "step": "Compare release tarballs with repository source.",
+    "why": "Differences revealed the script."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Downgrade xz to a version before 5.6.0.",
+    "why": "Distributions reverted."
+   },
+   {
+    "step": "Rebuild systems that built the bad version.",
+    "why": "Do not trust the binary."
+   },
+   {
+    "step": "Rotate credentials if exposure is possible.",
+    "why": "General practice."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check installed versions.",
+    "why": "Confirm none is 5.6.0 or 5.6.1."
+   },
+   {
+    "step": "Check sshd loads no unexpected libraries.",
+    "why": "Inspect with ldd."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Build from signed, reproducible sources.",
+    "why": "General practice."
+   },
+   {
+    "step": "Reduce libraries linked into network daemons.",
+    "why": "General practice."
+   },
+   {
+    "step": "Support open source maintainers.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Do not run the exploit or test on production hosts. Use isolated systems."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "SSH logins on your build host take 0.8 s instead of 0.3 s and valgrind reports errors. You use a rolling distribution.",
+   "clues": [
+    "xz updated recently",
+    "sshd links libsystemd",
+    "No other changes"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "What do you measure?",
+    "How do you compare artifacts?",
+    "Who do you tell?"
+   ],
+   "answer": "Profile sshd, compare libraries and versions, check upstream, pin or downgrade xz and report to your distribution security team."
+  },
+  "rootcause": {
+   "q": "Which xz versions were affected?",
+   "options": [
+    "5.6.0 and 5.6.1",
+    "5.2",
+    "4.9",
+    "All"
+   ],
+   "answer": 0,
+   "why": "Per the report."
+  },
+  "remediation": [
+   {
+    "task": "Write a library audit.",
+    "answer": "List libraries loaded by network daemons."
+   },
+   {
+    "task": "Plan reproducible builds.",
+    "answer": "Compare build outputs to source."
+   },
+   {
+    "task": "Plan a release check.",
+    "answer": "Verify tarball hash and signature against source."
+   }
+  ],
+  "design": {
+   "prompt": "Design supply-chain defence for a distribution.",
+   "constraints": [
+    "Thousands of packages",
+    "Volunteer maintainers",
+    "Release tarballs"
+   ],
+   "answer": "Reproducible builds, review of build scripts, binary analysis, canary builds and maintainer support."
+  },
+  "checks": [
+   {
+    "q": "Who reported it?",
+    "options": [
+     "Andres Freund",
+     "Neel Mehta",
+     "A vendor",
+     "A regulator"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "Which CVE was assigned?",
+    "options": [
+     "CVE-2024-3094",
+     "CVE-2014-0160",
+     "CVE-2021-44228",
+     "CVE-2017-5638"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "What symptom first showed?",
+    "options": [
+     "Slow SSH logins and valgrind errors",
+     "Disk full",
+     "DNS failures",
+     "Crashes"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "How does sshd load liblzma?",
+    "options": [
+     "Via libsystemd patched into OpenSSH on some distributions",
+     "Directly always",
+     "Never",
+     "Through a plugin store"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Reproducible builds",
+   "Fewer linked libraries"
+  ],
+  "monitoring": [
+   "Daemon latency"
+  ],
+  "recovery": [
+   "Downgrade",
+   "Rebuild"
+  ],
+  "practices": [
+   "Review build scripts",
+   "Support maintainers"
+  ]
+ },
+ "sources": [
+  {
+   "title": "oss-security: backdoor in upstream xz/liblzma leading to ssh server compromise",
+   "url": "https://openwall.com/lists/oss-security/2024/03/29/4",
+   "used": "discoverer, versions, mechanism, advice"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from Andres Freund's post. The post notes the analysis was incomplete, so this file states only what it says. The command is Simulated."
+}

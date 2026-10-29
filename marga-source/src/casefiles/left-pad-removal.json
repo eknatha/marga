@@ -1,0 +1,369 @@
+{
+ "id": "left-pad-removal",
+ "checked": "29 October 2026",
+ "summary": "On 22 March 2016 the author of left-pad and 272 other npm packages unpublished them after a naming dispute with Kik. Thousands of builds that depended on left-pad failed for about 2.5 hours until npm republished it.",
+ "overview": {
+  "background": "npm let authors unpublish packages without limits. left-pad was an 11-line string-padding function used widely through dependency chains.",
+  "systems": [
+   "npm registry",
+   "left-pad and 272 other unpublished packages",
+   "Dependency chains that required version 0.0.3",
+   "Build systems fetching dependencies"
+  ],
+  "impact": "Hundreds of failures per minute at around 2:30 PM Pacific, and thousands of projects broke.",
+  "severity": "A short but widespread build failure for about 2.5 hours.",
+  "gaps": "npm's account is from npm itself; the author's account is not covered."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Unpublish breaks builds that depend on it",
+   "caption": "Per npm, unrestricted unpublishing caused the disruption. npm republished left-pad 0.0.3 from a backup.",
+   "nodes": [
+    {
+     "id": "dis",
+     "label": "Dispute over the name kik",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "unp",
+     "label": "Author unpublishes kik and 272 packages",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "dep",
+     "label": "Dependency chains fail to install",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "bld",
+     "label": "Builds break",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "dis",
+     "t": "unp",
+     "state": "fail"
+    },
+    {
+     "f": "unp",
+     "t": "dep",
+     "state": "fail"
+    },
+    {
+     "f": "dep",
+     "t": "bld",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Safer unpublishing and local caches (conceptual)",
+   "caption": "npm said it would make it harder to unpublish versions that other packages depend on. Builds can also cache dependencies.",
+   "nodes": [
+    {
+     "id": "pol",
+     "label": "Unpublish blocked if dependents exist",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "cache",
+     "label": "Private mirror or cache",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "lock",
+     "label": "Lockfiles and vendoring",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "alert",
+     "label": "Build failure alerts",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "pol",
+     "t": "cache",
+     "state": "new"
+    },
+    {
+     "f": "pol",
+     "t": "lock",
+     "state": "new"
+    },
+    {
+     "f": "cache",
+     "t": "alert",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Registry policy protects dependents.",
+  "Builds survive registry changes.",
+  "Failures are visible."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Before 22 Mar 2016",
+   "phase": "change",
+   "e": "Kik asks npm for the kik package name and npm decides under its dispute policy."
+  },
+  {
+   "t": "Tue 22 Mar, ~2:30 PM PT",
+   "phase": "trigger",
+   "e": "The author unpublishes kik and 272 other packages including left-pad."
+  },
+  {
+   "t": "2:30 PM PT",
+   "phase": "impact",
+   "e": "npm sees hundreds of failures per minute."
+  },
+  {
+   "t": "Within ten minutes",
+   "phase": "mitigate",
+   "e": "A community member publishes a functionally identical left-pad 1.0.0."
+  },
+  {
+   "t": "4:05 PM PT",
+   "phase": "mitigate",
+   "e": "npm announces it will republish left-pad 0.0.3."
+  },
+  {
+   "t": "4:55 PM PT",
+   "phase": "recover",
+   "e": "The republishing is complete after about 2.5 hours."
+  }
+ ],
+ "rootCause": {
+  "trigger": "An author unpublished 273 packages after a naming dispute.",
+  "underlying": "npm allowed unrestricted unpublishing, even for packages with many dependents.",
+  "contributing": [
+   "Deep dependency chains pinned to 0.0.3",
+   "Builds fetched packages live from the registry"
+  ],
+  "propagation": [
+   "Unpublish.",
+   "Dependents cannot resolve.",
+   "Builds fail."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Policy statement",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "provide npm users with the package they expect",
+   "note": "From npm's dispute resolution policy goal as quoted in its post."
+  },
+  {
+   "label": "A simulated build error",
+   "kind": "simulated",
+   "lang": "text",
+   "body": "npm ERR! 404 'left-pad' is not in the npm registry.",
+   "note": "Typical shape of the error; not a captured log."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Read the failed install error.",
+    "why": "Package not found."
+   },
+   {
+    "step": "Check what depends on it.",
+    "why": "Dependency chains."
+   },
+   {
+    "step": "Check registry status.",
+    "why": "npm's response."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Republish or restore the package.",
+    "why": "npm republished 0.0.3."
+   },
+   {
+    "step": "Use a cached copy.",
+    "why": "Mirrors help."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Re-run builds.",
+    "why": "Confirm."
+   },
+   {
+    "step": "Check lockfiles.",
+    "why": "Pins."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Cache dependencies.",
+    "why": "General practice."
+   },
+   {
+    "step": "Vendor critical code.",
+    "why": "General practice."
+   },
+   {
+    "step": "Registry policy.",
+    "why": "npm's change."
+   }
+  ],
+  "safety": "Do not publish a different package under the same name without review. It may be malicious."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A package vanished from the registry and your builds fail. Many dependencies pin an old version.",
+   "clues": [
+    "404 errors",
+    "No cache",
+    "Release due today"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "How do you get builds running?",
+    "What do you tell the team?",
+    "What do you change?"
+   ],
+   "answer": "Use a mirror or cache, restore the version from backup, rerun builds and add a registry cache."
+  },
+  "rootcause": {
+   "q": "How many packages did the author unpublish?",
+   "options": [
+    "273 including kik",
+    "1",
+    "10",
+    "1000"
+   ],
+   "answer": 0,
+   "why": "Per npm."
+  },
+  "remediation": [
+   {
+    "task": "Design a cache.",
+    "answer": "Pull-through proxy registry."
+   },
+   {
+    "task": "Plan vendoring.",
+    "answer": "Copy tiny critical code."
+   },
+   {
+    "task": "Plan policy.",
+    "answer": "Block unpublish with dependents."
+   }
+  ],
+  "design": {
+   "prompt": "Design a registry that protects dependents.",
+   "constraints": [
+    "Public registry",
+    "Authors can unpublish",
+    "Dependents"
+   ],
+   "answer": "Immutable versions after a period, tombstones, dispute process and dependency alerts."
+  },
+  "checks": [
+   {
+    "q": "How long was the disruption?",
+    "options": [
+     "About 2.5 hours",
+     "A week",
+     "1 minute",
+     "A month"
+    ],
+    "answer": 0,
+    "why": "Per npm."
+   },
+   {
+    "q": "What did npm do to fix it?",
+    "options": [
+     "Republished left-pad 0.0.3",
+     "Closed",
+     "Banned users",
+     "Nothing"
+    ],
+    "answer": 0,
+    "why": "Per npm."
+   },
+   {
+    "q": "What did npm say caused the disruption?",
+    "options": [
+     "Unrestricted unpublishing",
+     "A hack",
+     "A DDoS",
+     "A bug"
+    ],
+    "answer": 0,
+    "why": "Per npm."
+   },
+   {
+    "q": "Who published a replacement within ten minutes?",
+    "options": [
+     "Cameron Westland",
+     "Azer Koçulu",
+     "Kik",
+     "npm"
+    ],
+    "answer": 0,
+    "why": "Per npm."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Immutable versions",
+   "Dispute process"
+  ],
+  "monitoring": [
+   "Install failure rates"
+  ],
+  "recovery": [
+   "Republish",
+   "Mirror"
+  ],
+  "practices": [
+   "Cache dependencies",
+   "Vendor tiny critical code"
+  ]
+ },
+ "sources": [
+  {
+   "title": "npm: kik, left-pad, and npm",
+   "url": "https://blog.npmjs.org/post/141577284765/kik-left-pad-and-npm",
+   "used": "timeline, dispute, actions"
+  }
+ ],
+ "verification": "Facts were read from npm's post on 29 October 2026. The build error is Simulated."
+}

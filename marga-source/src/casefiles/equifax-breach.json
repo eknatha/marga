@@ -1,0 +1,388 @@
+{
+ "id": "equifax-breach",
+ "checked": "29 October 2026",
+ "summary": "In 2017 attackers took personal data on about 145 million people from Equifax over 76 days. The US GAO found weaknesses in Equifax's patching, detection and network design. This file uses a trade-press summary of the GAO report because the GAO page itself could not be read.",
+ "overview": {
+  "background": "Equifax is a credit reporting company. The attack began with a flaw in the Apache Struts web framework in a web application.",
+  "systems": [
+   "An internet-facing web application using Apache Struts",
+   "51 databases",
+   "A dispute-resolution server with an outdated certificate",
+   "Network inspection tools"
+  ],
+  "impact": "Personal information of about 145 million people in the US, Canada and the UK was taken, according to the summary.",
+  "severity": "A major breach. The summary reports at least 9,000 queries to 51 databases over 76 days.",
+  "gaps": "The summary does not say whether Equifax had patched the flaw, and gives no dates. This file does not add any."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A weak first system and a long, quiet intrusion",
+   "caption": "Per the summary: attackers began scanning for the flaw within two days of public disclosure, queried 51 databases at least 9,000 times over 76 days, and encrypted traffic with an outdated certificate to avoid inspection.",
+   "nodes": [
+    {
+     "id": "web",
+     "label": "Web application with the Struts flaw",
+     "row": 0,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "db",
+     "label": "51 databases queried at least 9,000 times",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "enc",
+     "label": "Traffic hidden by an outdated certificate",
+     "row": 2,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "out",
+     "label": "Data removed in small pieces",
+     "row": 2,
+     "col": 2,
+     "state": "hit"
+    },
+    {
+     "id": "rec",
+     "label": "About 145 million people's data taken",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "web",
+     "t": "db",
+     "state": "fail"
+    },
+    {
+     "f": "db",
+     "t": "enc",
+     "state": "fail"
+    },
+    {
+     "f": "db",
+     "t": "out",
+     "state": "hit"
+    },
+    {
+     "f": "out",
+     "t": "rec",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Segmentation, query limits and certificate hygiene (conceptual)",
+   "caption": "General guards linked to the GAO's findings: network architecture, query limits and inspection.",
+   "nodes": [
+    {
+     "id": "seg",
+     "label": "Segmented network",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "lim",
+     "label": "Limits on queries per source",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "cert",
+     "label": "Certificate expiry tracked",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "det",
+     "label": "Detection of unusual data movement",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "seg",
+     "t": "lim",
+     "state": "new"
+    },
+    {
+     "f": "seg",
+     "t": "cert",
+     "state": "new"
+    },
+    {
+     "f": "lim",
+     "t": "det",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "A first foothold cannot reach every database.",
+  "Inspection tools work.",
+  "Unusual queries raise alerts."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Early on",
+   "phase": "change",
+   "e": "A flaw in Apache Struts is publicly disclosed."
+  },
+  {
+   "t": "Within two days",
+   "phase": "trigger",
+   "e": "Attackers begin scanning for the flaw, per the summary."
+  },
+  {
+   "t": "Over the next weeks",
+   "phase": "impact",
+   "e": "Attackers get in and run queries against many databases."
+  },
+  {
+   "t": "Over 76 days",
+   "phase": "impact",
+   "e": "They make at least 9,000 queries to 51 databases and remove data in small pieces."
+  },
+  {
+   "t": "After weeks",
+   "phase": "detect",
+   "e": "Equifax detects the intrusion after a delay, per the summary."
+  },
+  {
+   "t": "Later",
+   "phase": "recover",
+   "e": "Equifax says it has fixed the issues; the GAO has not independently verified the fixes."
+  }
+ ],
+ "rootCause": {
+  "trigger": "An attacker exploited a known web framework flaw.",
+  "underlying": "Equifax did not find the flaw or the intrusion quickly, per the summary.",
+  "contributing": [
+   "Poor network architecture",
+   "No limit on queries from a single address",
+   "An outdated certificate hid traffic from inspection"
+  ],
+  "propagation": [
+   "Exploit.",
+   "Pivot across databases.",
+   "Slow exfiltration.",
+   "Late detection."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Query limits",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "a failure to establish limits on the number of database queries possible from a single address",
+   "note": "As quoted in the Dark Reading summary of the GAO report."
+  },
+  {
+   "label": "Remediation status",
+   "kind": "simulated",
+   "lang": "text",
+   "body": "Equifax states it has fixed the issues; the GAO has not verified them.",
+   "note": "A restatement of the summary; not a quotation."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Inventory software and versions.",
+    "why": "Struts was not found."
+   },
+   {
+    "step": "Look for unusual query volume.",
+    "why": "9,000 queries over 76 days."
+   },
+   {
+    "step": "Check certificate expiry on inspection points.",
+    "why": "An outdated cert hid traffic."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Patch exposed software fast.",
+    "why": "General practice."
+   },
+   {
+    "step": "Segment networks.",
+    "why": "GAO weakness."
+   },
+   {
+    "step": "Limit queries per source.",
+    "why": "GAO weakness."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Rescan for the flaw.",
+    "why": "Confirms."
+   },
+   {
+    "step": "Test detection with a drill.",
+    "why": "Confirms alerts."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Keep an asset inventory.",
+    "why": "General practice."
+   },
+   {
+    "step": "Track certificate expiry.",
+    "why": "General practice."
+   },
+   {
+    "step": "Detect bulk data access.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Do not run scanning against systems you do not own."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A framework you use has a critical flaw announced today. You do not know every application that uses it.",
+   "clues": [
+    "Hundreds of apps",
+    "Mixed teams",
+    "Internet-facing"
+   ],
+   "question": "What is your first day plan?",
+   "hints": [
+    "How do you find use?",
+    "What do you patch first?",
+    "How do you check for abuse?"
+   ],
+   "answer": "Inventory, patch internet-facing apps first, look for exploitation, segment and review databases for unusual queries."
+  },
+  "rootcause": {
+   "q": "How many databases did attackers query?",
+   "options": [
+    "51",
+    "5",
+    "500",
+    "1"
+   ],
+   "answer": 0,
+   "why": "Per the summary."
+  },
+  "remediation": [
+   {
+    "task": "Define query limits.",
+    "answer": "Per source rate limits for bulk access."
+   },
+   {
+    "task": "Plan certificate tracking.",
+    "answer": "Inventory with expiry alerts."
+   },
+   {
+    "task": "Plan segmentation.",
+    "answer": "Separate web tier from data stores."
+   }
+  ],
+  "design": {
+   "prompt": "Design detection for slow data theft.",
+   "constraints": [
+    "Large databases",
+    "Encrypted traffic",
+    "Multi-month window"
+   ],
+   "answer": "Per-source query baselines, egress monitoring, working inspection and tested alerts."
+  },
+  "checks": [
+   {
+    "q": "How long did the intrusion last, per the summary?",
+    "options": [
+     "76 days",
+     "2 days",
+     "1 hour",
+     "1 year"
+    ],
+    "answer": 0,
+    "why": "Per the summary."
+   },
+   {
+    "q": "About how many people were affected?",
+    "options": [
+     "145 million",
+     "1 million",
+     "10 thousand",
+     "10 billion"
+    ],
+    "answer": 0,
+    "why": "Per the summary."
+   },
+   {
+    "q": "What hid traffic from inspection?",
+    "options": [
+     "An outdated certificate",
+     "A firewall",
+     "A VPN",
+     "Compression"
+    ],
+    "answer": 0,
+    "why": "Per the summary."
+   },
+   {
+    "q": "Does this file say whether Equifax had patched?",
+    "options": [
+     "No, the summary does not say",
+     "Yes",
+     "Partly",
+     "Always"
+    ],
+    "answer": 0,
+    "why": "See verification."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Asset inventory",
+   "Segmentation",
+   "Query limits"
+  ],
+  "monitoring": [
+   "Bulk query alerts"
+  ],
+  "recovery": [
+   "Patch exposed software first"
+  ],
+  "practices": [
+   "Certificate tracking",
+   "Detection drills"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Dark Reading: GAO Says Equifax Missed Flaws, Intrusion in Massive Breach",
+   "url": "https://www.darkreading.com/attacks-breaches/gao-says-equifax-missed-flaws-intrusion-in-massive-breach/d/d-id/1332776",
+   "used": "scale, evasion, weaknesses, remediation"
+  }
+ ],
+ "verification": "Facts come from Dark Reading's summary of the GAO report (read 29 October 2026). The GAO page (the card source) was not read, so details beyond the summary are not claimed. The second evidence item is a restatement and is labelled Simulated."
+}

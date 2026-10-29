@@ -1,0 +1,372 @@
+{
+ "id": "openai-chatgpt-chat-history-exposure",
+ "checked": "29 October 2026",
+ "summary": "On 20 March 2023 a bug in the redis-py library caused ChatGPT to show some users the titles of other users' chats, and exposed payment details for 1.2 percent of active ChatGPT Plus subscribers during a nine-hour window. OpenAI took ChatGPT offline and published its account.",
+ "overview": {
+  "background": "ChatGPT used Redis to cache user data, with the open-source redis-py client and its asyncio Redis Cluster client.",
+  "systems": [
+   "redis-py asyncio client for Redis Cluster",
+   "Shared connection pool",
+   "Chat history titles and subscription pages",
+   "Subscription confirmation emails"
+  ],
+  "impact": "Some users saw another active user's chat titles, and the first message of a new conversation may have been visible. 1.2 percent of active Plus subscribers had payment-related data exposed.",
+  "severity": "A privacy incident with an offline period, a nine-hour exposure window for payment data, and a few hours of chat history lost.",
+  "gaps": "OpenAI says the number of users whose data was actually revealed is extremely low."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Cancelled requests corrupt a shared connection",
+   "caption": "Per OpenAI, a spike in cancelled Redis requests left corrupted connections in a shared pool, so a later request could receive another user's cached data.",
+   "nodes": [
+    {
+     "id": "chg",
+     "label": "Server change at 1 a.m. PT causes request cancellations",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "pool",
+     "label": "Corrupted connections in shared pool",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "mix",
+     "label": "Responses delivered to the wrong user",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "exp",
+     "label": "Chat titles and payment data seen by others",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "chg",
+     "t": "pool",
+     "state": "fail"
+    },
+    {
+     "f": "pool",
+     "t": "mix",
+     "state": "fail"
+    },
+    {
+     "f": "mix",
+     "t": "exp",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Ownership checks on cached data (conceptual)",
+   "caption": "OpenAI added checks so cached data must match the requesting user. This shows where such a check sits.",
+   "nodes": [
+    {
+     "id": "req",
+     "label": "Request for user A",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "cache",
+     "label": "Cached response",
+     "row": 1,
+     "col": 1
+    },
+    {
+     "id": "chk",
+     "label": "Check: data belongs to user A",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "ok",
+     "label": "Delivered only if it matches",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "req",
+     "t": "cache"
+    },
+    {
+     "f": "cache",
+     "t": "chk",
+     "state": "new"
+    },
+    {
+     "f": "chk",
+     "t": "ok",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "A response always matches its requester.",
+  "Library bugs are caught by checks.",
+  "Logs show cross-user events."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "20 Mar 2023, 1 a.m. PT",
+   "phase": "trigger",
+   "e": "A server change causes a spike in Redis request cancellations."
+  },
+  {
+   "t": "1 a.m. to 10 a.m. PT",
+   "phase": "impact",
+   "e": "Payment-related data could have been exposed during this nine-hour window."
+  },
+  {
+   "t": "20 Mar",
+   "phase": "detect",
+   "e": "Users see other users' chat titles; OpenAI takes ChatGPT offline."
+  },
+  {
+   "t": "20 Mar",
+   "phase": "investigate",
+   "e": "OpenAI traces the problem to the redis-py asyncio client."
+  },
+  {
+   "t": "After the outage",
+   "phase": "mitigate",
+   "e": "OpenAI patches the bug, sends the patch to the Redis maintainers and adds ownership checks."
+  },
+  {
+   "t": "After the fix",
+   "phase": "recover",
+   "e": "ChatGPT and chat history are restored except for a few hours of history; affected users are notified."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A bug in the redis-py asyncio client for Redis Cluster.",
+  "underlying": "Cancelled requests left corrupted connections in a shared pool, so a later request could receive another user's data.",
+  "contributing": [
+   "Shared pools of connections across users",
+   "A server change that raised cancellations",
+   "No check that cached data matched the requester"
+  ],
+  "propagation": [
+   "Cancellation spike.",
+   "Corrupt connection.",
+   "Wrong data returned.",
+   "Exposure."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Scope of payment data",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Full credit card numbers were not exposed at any time.",
+   "note": "OpenAI's statement as read."
+  },
+  {
+   "label": "Scale",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "We believe the number of users whose data was actually revealed to someone else is extremely low.",
+   "note": "OpenAI's statement as read."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check for cross-user responses in logs.",
+    "why": "OpenAI audited logs."
+   },
+   {
+    "step": "Check cancellations and connection errors.",
+    "why": "The spike."
+   },
+   {
+    "step": "Check library issues upstream.",
+    "why": "redis-py bug."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Take the service offline.",
+    "why": "To stop exposure."
+   },
+   {
+    "step": "Patch the library and send upstream.",
+    "why": "Done."
+   },
+   {
+    "step": "Add ownership checks on cache reads.",
+    "why": "Done."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Audit logs for exposure.",
+    "why": "Done."
+   },
+   {
+    "step": "Test cancellation handling.",
+    "why": "Add tests."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Verify cached data matches the user.",
+    "why": "OpenAI's change."
+   },
+   {
+    "step": "Improve logging.",
+    "why": "OpenAI's change."
+   },
+   {
+    "step": "Make the Redis cluster more robust.",
+    "why": "OpenAI's change."
+   }
+  ],
+  "safety": "Do not restore a service that can leak data until a check proves isolation."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Users report seeing other people's data. A cache layer was changed overnight.",
+   "clues": [
+    "Cancellations spiked",
+    "Shared pool",
+    "Open-source client"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "How do you stop exposure?",
+    "How do you find who saw what?",
+    "How do you stop it recurring?"
+   ],
+   "answer": "Take the feature offline, patch the library, audit logs, notify affected users and add per-user checks on cache reads."
+  },
+  "rootcause": {
+   "q": "What share of active Plus subscribers had payment data exposed?",
+   "options": [
+    "1.2 percent",
+    "100 percent",
+    "0",
+    "50 percent"
+   ],
+   "answer": 0,
+   "why": "Per OpenAI."
+  },
+  "remediation": [
+   {
+    "task": "Write a cache isolation test.",
+    "answer": "Cancel requests under load and check no cross-user data."
+   },
+   {
+    "task": "Plan notifications.",
+    "answer": "Draft before you need it."
+   },
+   {
+    "task": "Plan upstream reporting.",
+    "answer": "Share a minimal reproduction."
+   }
+  ],
+  "design": {
+   "prompt": "Design caching that cannot cross users.",
+   "constraints": [
+    "Shared pool",
+    "Async client",
+    "Sensitive data"
+   ],
+   "answer": "Key by user, verify ownership on read, isolate pools, test cancellation and monitor mismatches."
+  },
+  "checks": [
+   {
+    "q": "Which library had the bug?",
+    "options": [
+     "redis-py",
+     "numpy",
+     "requests",
+     "openssl"
+    ],
+    "answer": 0,
+    "why": "Per OpenAI."
+   },
+   {
+    "q": "What was exposed besides payment data?",
+    "options": [
+     "Chat titles and possibly the first message of new chats",
+     "Passwords",
+     "Source code",
+     "Nothing"
+    ],
+    "answer": 0,
+    "why": "Per OpenAI."
+   },
+   {
+    "q": "How long was the payment data window?",
+    "options": [
+     "About nine hours",
+     "One minute",
+     "A week",
+     "A day"
+    ],
+    "answer": 0,
+    "why": "Per OpenAI."
+   },
+   {
+    "q": "Were full card numbers exposed?",
+    "options": [
+     "No",
+     "Yes",
+     "Partly",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per OpenAI."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Ownership checks",
+   "Isolated pools"
+  ],
+  "monitoring": [
+   "Cross-user mismatch logging"
+  ],
+  "recovery": [
+   "Take offline",
+   "Patch and notify"
+  ],
+  "practices": [
+   "Cancellation testing",
+   "Upstream fix"
+  ]
+ },
+ "sources": [
+  {
+   "title": "OpenAI: March 20 ChatGPT outage: Here's what happened",
+   "url": "https://openai.com/blog/march-20-chatgpt-outage",
+   "used": "timeline, cause, exposure, fixes"
+  }
+ ],
+ "verification": "Facts were read from OpenAI's post on 29 October 2026."
+}

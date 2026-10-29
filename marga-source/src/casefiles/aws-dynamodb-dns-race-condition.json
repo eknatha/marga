@@ -1,0 +1,453 @@
+{
+ "id": "aws-dynamodb-dns-race-condition",
+ "checked": "29 October 2026",
+ "summary": "On 19 and 20 October 2025 a race condition in DynamoDB's automated DNS management left the regional endpoint in us-east-1 with an empty DNS record. Many AWS services failed for about 15 hours.",
+ "overview": {
+  "background": "DynamoDB's DNS is managed by two components: a DNS Planner that creates plans and DNS Enactors that apply them through Route 53. Many other AWS services depend on DynamoDB.",
+  "systems": [
+   "DynamoDB regional endpoint in us-east-1",
+   "DNS Planner and three DNS Enactors",
+   "Route 53",
+   "EC2 DropletWorkflow Manager (DWFM)",
+   "Network Load Balancer",
+   "Lambda, ECS, EKS, Fargate, STS, Redshift and others"
+  ],
+  "impact": "DynamoDB was down from 11:48 PM PDT on 19 October until 2:40 AM on 20 October. Dependent services recovered later, with EC2 normal by 1:50 PM.",
+  "severity": "Region-wide. AWS describes a multi-service event and publishes corrective actions.",
+  "gaps": "AWS gives no logs or commands, and does not give request counts."
+ },
+ "archNote": "The Planner, Enactors and Route 53 roles are described in AWS's summary. Layout is ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A delayed Enactor overwrites a newer plan",
+   "caption": "One Enactor was delayed and later applied an old plan over a newer one. Cleanup then deleted the old plan, leaving an empty record.",
+   "nodes": [
+    {
+     "id": "plan",
+     "label": "DNS Planner creates plans",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "e1",
+     "label": "Enactor A: delayed, applies old plan",
+     "row": 1,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "e2",
+     "label": "Enactor B: applies newer plan, cleans up",
+     "row": 1,
+     "col": 2,
+     "state": "hit"
+    },
+    {
+     "id": "r53",
+     "label": "Route 53: empty record for the regional endpoint",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "ddb",
+     "label": "DynamoDB unreachable by name",
+     "row": 3,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "dep",
+     "label": "EC2 DWFM, NLB, Lambda, ECS, STS and more",
+     "row": 4,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "plan",
+     "t": "e1"
+    },
+    {
+     "f": "plan",
+     "t": "e2"
+    },
+    {
+     "f": "e1",
+     "t": "r53",
+     "label": "stale write",
+     "state": "fail"
+    },
+    {
+     "f": "e2",
+     "t": "r53",
+     "label": "deletes old plan",
+     "state": "hit"
+    },
+    {
+     "f": "r53",
+     "t": "ddb",
+     "state": "fail"
+    },
+    {
+     "f": "ddb",
+     "t": "dep",
+     "state": "fail"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Safer DNS automation (conceptual)",
+   "caption": "AWS said it disabled the Planner and Enactor automation worldwide until the race was fixed, and added a recovery test suite for DWFM, load balancer velocity control and propagation throttling. This picture shows guard rails.",
+   "nodes": [
+    {
+     "id": "plan",
+     "label": "Planner with plan versions",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "chk",
+     "label": "Enactor checks plan is newest before write",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "guard",
+     "label": "Refuse to publish an empty record",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "r53",
+     "label": "Route 53",
+     "row": 3,
+     "col": 1
+    },
+    {
+     "id": "man",
+     "label": "Manual recovery path rehearsed",
+     "row": 3,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "plan",
+     "t": "chk",
+     "state": "new"
+    },
+    {
+     "f": "chk",
+     "t": "guard",
+     "state": "new"
+    },
+    {
+     "f": "guard",
+     "t": "r53",
+     "state": "new"
+    },
+    {
+     "f": "guard",
+     "t": "man",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "An old plan can no longer replace a new one.",
+  "An empty answer is never published.",
+  "Recovery steps are practised, not improvised."
+ ],
+ "afterNote": "The guard rails shown are conceptual; AWS's actual steps are in its corrective actions list.",
+ "timelineNote": "Times are PDT as given in AWS's summary.",
+ "timeline": [
+  {
+   "t": "19 Oct 11:48 PM",
+   "phase": "trigger",
+   "e": "The event begins: the DynamoDB regional endpoint has an empty DNS record."
+  },
+  {
+   "t": "20 Oct 12:38 AM",
+   "phase": "investigate",
+   "e": "Engineers identify the DNS state as the issue."
+  },
+  {
+   "t": "1:15 AM",
+   "phase": "mitigate",
+   "e": "Temporary mitigations are applied."
+  },
+  {
+   "t": "2:25 AM",
+   "phase": "mitigate",
+   "e": "All DNS information is restored."
+  },
+  {
+   "t": "2:40 AM",
+   "phase": "recover",
+   "e": "DynamoDB recovers."
+  },
+  {
+   "t": "4:14 AM",
+   "phase": "mitigate",
+   "e": "Engineers throttle and restart DWFM hosts to clear lease problems."
+  },
+  {
+   "t": "5:28 AM",
+   "phase": "recover",
+   "e": "DWFM leases are re-established."
+  },
+  {
+   "t": "9:36 AM",
+   "phase": "mitigate",
+   "e": "Automatic health-check failover for Network Load Balancer is disabled."
+  },
+  {
+   "t": "10:36 AM",
+   "phase": "recover",
+   "e": "Network propagation is normal."
+  },
+  {
+   "t": "1:50 PM",
+   "phase": "recover",
+   "e": "All EC2 operations are normal."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A race between DNS Enactors: a delayed one wrote an old plan over a newer one.",
+  "underlying": "The cleanup process then deleted the old plan, and all IP addresses for the regional endpoint were removed. The system was left in a state that automation could not repair.",
+  "contributing": [
+   "The check that a plan was current was not safe against delay",
+   "Automation could not recover and required manual operator intervention",
+   "EC2 DWFM leases depended on DynamoDB and took time to recover",
+   "Network Load Balancer health checks caused connection errors during recovery"
+  ],
+  "propagation": [
+   "The endpoint resolves to nothing.",
+   "DynamoDB clients and internal AWS services cannot connect.",
+   "EC2 lease renewals fail.",
+   "Load balancers, Lambda, containers and other services degrade."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The effect of the race",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "all IP addresses for the regional endpoint were immediately removed",
+   "note": "From AWS's summary."
+  },
+  {
+   "label": "Simulated DNS check",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ dig +short dynamodb.us-east-1.amazonaws.com\n$ echo $?\n0",
+   "note": "An empty answer with status 0 is what a missing record looks like. Invented output; AWS gives no commands."
+  },
+  {
+   "label": "Simulated guard rail",
+   "kind": "simulated",
+   "lang": "python",
+   "body": "def safe_apply(plan, current_version, records):\n    if plan.version < current_version:\n        raise StaleWrite('older than applied plan')\n    if not records:\n        raise EmptyRecord('refusing to publish empty answer')",
+   "note": "A teaching sketch of the two checks; not AWS code."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check name resolution for the failing endpoint.",
+    "why": "Empty answers point to DNS, not capacity.",
+    "cmd": "dig +short dynamodb.us-east-1.amazonaws.com"
+   },
+   {
+    "step": "Compare with a healthy region.",
+    "why": "Isolates a local DNS fault."
+   },
+   {
+    "step": "Inspect the automation state and recent plans.",
+    "why": "AWS engineers identified the DNS state within about 50 minutes."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Restore the DNS record manually.",
+    "why": "Operators restored records at 2:25 AM."
+   },
+   {
+    "step": "Pause automation that could overwrite the fix.",
+    "why": "AWS disabled the Planner and Enactor automation worldwide."
+   },
+   {
+    "step": "Throttle and restart dependent systems in controlled steps.",
+    "why": "DWFM and load balancers needed slow recovery."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Resolve the endpoint and make a test request.",
+    "why": "Proves clients can connect.",
+    "cmd": "aws dynamodb list-tables --region us-east-1 --max-items 1"
+   },
+   {
+    "step": "Watch dependent services until they are normal.",
+    "why": "Recovery of the base service is not recovery of everything."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Version plans and reject stale writes.",
+    "why": "Stops a delayed worker from reverting state."
+   },
+   {
+    "step": "Never publish an empty answer for a live endpoint.",
+    "why": "An empty record is almost always a bug."
+   },
+   {
+    "step": "Rehearse recovery of dependent systems.",
+    "why": "AWS is adding a DWFM recovery test suite."
+   },
+   {
+    "step": "Add velocity control for load balancer failover and throttle propagation.",
+    "why": "Both are named in AWS's actions."
+   }
+  ],
+  "safety": "Do not re-enable automation until the race is fixed. Manual DNS edits bypass checks, so have a second person confirm the record and the change."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Clients cannot connect to a core database endpoint. Servers look healthy. The name returns no addresses.",
+   "clues": [
+    "Empty DNS answer",
+    "Two workers wrote DNS plans",
+    "One worker was delayed"
+   ],
+   "question": "Describe how you restore service and stop it from recurring.",
+   "hints": [
+    "Is it capacity or name resolution?",
+    "What should you pause?",
+    "Who can edit DNS manually?"
+   ],
+   "answer": "Confirm the empty record, restore the correct addresses manually, pause automation to avoid overwrite, verify with a real request, then add version checks and an empty-record guard before enabling automation."
+  },
+  "rootcause": {
+   "q": "What was the underlying cause?",
+   "options": [
+    "A cable cut",
+    "A race between DNS Enactors left an empty record",
+    "A DDoS attack",
+    "An expired certificate"
+   ],
+   "answer": 1,
+   "why": "AWS describes a race condition between Enactors."
+  },
+  "remediation": [
+   {
+    "task": "Define a stale-write guard.",
+    "answer": "Each plan has a version, and a worker may only apply a plan newer than the current one, checked atomically with the write."
+   },
+   {
+    "task": "Plan the dependency recovery.",
+    "answer": "Restore DNS first, then restart dependent systems in controlled batches, throttling to avoid overload."
+   },
+   {
+    "task": "Design an empty-record alarm.",
+    "answer": "Alert if a production endpoint has zero addresses and block the change."
+   }
+  ],
+  "design": {
+   "prompt": "Design DNS automation for a regional service so one slow worker cannot break it.",
+   "constraints": [
+    "Several workers",
+    "Eventual delivery",
+    "Manual override available"
+   ],
+   "answer": "Use monotonically increasing plan versions, compare-and-set updates, no deletion of the active plan, a rule against empty answers, a human approval step for large changes, and a rehearsed manual path."
+  },
+  "checks": [
+   {
+    "q": "When did the event begin?",
+    "options": [
+     "11:48 PM PDT on 19 October",
+     "1:50 PM",
+     "Midnight UTC",
+     "It is unknown"
+    ],
+    "answer": 0,
+    "why": "AWS gives 11:48 PM PDT."
+   },
+   {
+    "q": "What did cleanup delete?",
+    "options": [
+     "The old plan",
+     "The database",
+     "Route 53 itself",
+     "All logs"
+    ],
+    "answer": 0,
+    "why": "Cleanup removed the old plan, which removed the records."
+   },
+   {
+    "q": "What did AWS do with the automation?",
+    "options": [
+     "Disabled it worldwide until the race was fixed",
+     "Doubled it",
+     "Ignored it",
+     "Moved it to Lambda"
+    ],
+    "answer": 0,
+    "why": "That is a stated corrective action."
+   },
+   {
+    "q": "Why did EC2 recover later than DynamoDB?",
+    "options": [
+     "DWFM leases needed to be re-established",
+     "EC2 was not affected",
+     "Nobody checked",
+     "Billing"
+    ],
+    "answer": 0,
+    "why": "DWFM lease recovery went until 5:28 AM, with network propagation after."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Versioned plans",
+   "No empty production records",
+   "Recovery tests for dependent systems"
+  ],
+  "monitoring": [
+   "Alert on zero-address endpoints",
+   "Track plan age and enactor lag"
+  ],
+  "recovery": [
+   "Restore the base service first, then dependents in steps",
+   "Keep a manual path"
+  ],
+  "practices": [
+   "Review automation for races",
+   "Treat critical dependencies as a chain and test it end to end"
+  ]
+ },
+ "sources": [
+  {
+   "title": "AWS: Summary of the Amazon DynamoDB Service Disruption in the Northern Virginia (US-EAST-1) Region",
+   "url": "https://aws.amazon.com/message/101925/",
+   "used": "timeline, cause, corrective actions"
+  }
+ ],
+ "verification": "Facts were read from AWS's published summary on 29 October 2026. AWS gives no logs or commands, so commands and code are Simulated."
+}

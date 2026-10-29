@@ -1,0 +1,367 @@
+{
+ "id": "docker-hub-unauthorized-access",
+ "checked": "29 October 2026",
+ "summary": "Docker discovered on 25 April 2019 that an intruder had accessed a Docker Hub database holding data on nearly 190,000 users (under 5 percent of users), including usernames, some hashed passwords and tokens linking automated builds to source hosting. Docker revoked tokens and told users to change passwords.",
+ "overview": {
+  "background": "Docker Hub is a public container registry that offers automated builds from linked source repositories using stored tokens.",
+  "systems": [
+   "A Docker Hub database",
+   "Usernames and hashed passwords",
+   "Source-hosting tokens for automated builds (two providers)",
+   "Users of automated builds"
+  ],
+  "impact": "Nearly 190,000 users were affected. Docker described it as a subset of non-financial user data.",
+  "severity": "A security incident disclosed within days of discovery.",
+  "gaps": "The article does not say how the attackers got in or mention builds being disabled."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A database holds credentials that reach source code",
+   "caption": "Per The Hacker News, the database had usernames, some hashed passwords and tokens for linked repositories; Docker revoked tokens and access keys.",
+   "nodes": [
+    {
+     "id": "db",
+     "label": "Single Docker Hub database accessed",
+     "row": 0,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "data",
+     "label": "Usernames, hashed passwords, build tokens",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "tok",
+     "label": "Tokens could reach linked source repositories",
+     "row": 2,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "rev",
+     "label": "Docker revokes tokens and keys",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "db",
+     "t": "data",
+     "state": "fail"
+    },
+    {
+     "f": "data",
+     "t": "tok",
+     "state": "hit"
+    },
+    {
+     "f": "tok",
+     "t": "rev"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Limit what a stolen database yields (conceptual)",
+   "caption": "General controls: scoped tokens, strong hashing, monitoring of unusual access.",
+   "nodes": [
+    {
+     "id": "hash",
+     "label": "Strong password hashing",
+     "row": 0,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "scope",
+     "label": "Narrow, short-lived tokens",
+     "row": 0,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "mon",
+     "label": "Database access monitoring",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "rot",
+     "label": "Fast token revocation",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "hash",
+     "t": "mon",
+     "state": "new"
+    },
+    {
+     "f": "scope",
+     "t": "rot",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "A stolen database gives little.",
+  "Tokens are narrow.",
+  "Revocation is fast."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Before 25 Apr 2019",
+   "phase": "trigger",
+   "e": "An intruder accesses a single Docker Hub database."
+  },
+  {
+   "t": "Thu 25 Apr 2019",
+   "phase": "detect",
+   "e": "Docker discovers the unauthorized access."
+  },
+  {
+   "t": "25 to 27 Apr",
+   "phase": "mitigate",
+   "e": "Docker revokes tokens and access keys for users whose autobuilds may be affected."
+  },
+  {
+   "t": "27 Apr 2019",
+   "phase": "change",
+   "e": "Docker notifies users and The Hacker News reports nearly 190,000 accounts."
+  },
+  {
+   "t": "After notice",
+   "phase": "mitigate",
+   "e": "Users change passwords and reconnect autobuild repositories."
+  },
+  {
+   "t": "Following weeks",
+   "phase": "recover",
+   "e": "Docker reviews policies and strengthens security processes."
+  }
+ ],
+ "rootCause": {
+  "trigger": "An intruder accessed a single database.",
+  "underlying": "The article does not say how.",
+  "contributing": [
+   "Tokens linking builds to source hosting were stored in the database",
+   "Some hashed passwords were included"
+  ],
+  "propagation": [
+   "Unauthorized access.",
+   "Data exposed.",
+   "Tokens revoked."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Docker's description",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "a subset of non-financial user data",
+   "note": "From Docker's statement as quoted by The Hacker News."
+  },
+  {
+   "label": "Docker's action",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "acted quickly to intervene and secure the site",
+   "note": "From the same statement."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Identify the database and data fields.",
+    "why": "Usernames, hashes, tokens."
+   },
+   {
+    "step": "Check which accounts were affected.",
+    "why": "190,000."
+   },
+   {
+    "step": "Check linked source repositories for odd activity.",
+    "why": "Tokens."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Revoke tokens and keys.",
+    "why": "Docker did."
+   },
+   {
+    "step": "Force or advise password changes.",
+    "why": "Docker advised."
+   },
+   {
+    "step": "Reconnect builds with new tokens.",
+    "why": "Docker advised."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check security logs on linked accounts.",
+    "why": "Docker's advice."
+   },
+   {
+    "step": "Check no unexpected pushes.",
+    "why": "Verify."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Change reused passwords.",
+    "why": "Docker's advice."
+   },
+   {
+    "step": "Use narrow tokens.",
+    "why": "General practice."
+   },
+   {
+    "step": "Monitor for unexpected repository actions.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "If you use automated builds, check for unexpected commits before rebuilding images."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A registry you use reports a database breach that included build tokens for your source hosting.",
+   "clues": [
+    "Autobuilds enabled",
+    "Passwords reused",
+    "Public images"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "What do you rotate?",
+    "What do you check?",
+    "What do you tell users of your images?"
+   ],
+   "answer": "Change passwords, reconnect with new tokens, check repository logs and image digests, and tell users if images may have been affected."
+  },
+  "rootcause": {
+   "q": "About how many users were affected?",
+   "options": [
+    "Nearly 190,000",
+    "190",
+    "19 million",
+    "None"
+   ],
+   "answer": 0,
+   "why": "Per the article."
+  },
+  "remediation": [
+   {
+    "task": "Plan token scopes.",
+    "answer": "Read-only where possible."
+   },
+   {
+    "task": "Plan image verification.",
+    "answer": "Check digests and signatures."
+   },
+   {
+    "task": "Plan password hygiene.",
+    "answer": "No reuse; use a manager."
+   }
+  ],
+  "design": {
+   "prompt": "Design registry integrations that limit token risk.",
+   "constraints": [
+    "Autobuilds",
+    "Public users",
+    "Stored tokens"
+   ],
+   "answer": "Short-lived tokens, narrow scopes, encryption at rest, access monitoring and fast revocation."
+  },
+  "checks": [
+   {
+    "q": "When did Docker discover it?",
+    "options": [
+     "Thursday 25 April 2019",
+     "1 January",
+     "5 June 2020",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   },
+   {
+    "q": "Did the article say how attackers got in?",
+    "options": [
+     "No",
+     "Yes",
+     "Partly",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   },
+   {
+    "q": "What did Docker revoke?",
+    "options": [
+     "Tokens and access keys for affected autobuilds",
+     "All images",
+     "The website",
+     "Nothing"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   },
+   {
+    "q": "What share of users were affected?",
+    "options": [
+     "Under 5 percent",
+     "Over 50 percent",
+     "100 percent",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Narrow tokens",
+   "Strong hashing"
+  ],
+  "monitoring": [
+   "Database access monitoring"
+  ],
+  "recovery": [
+   "Revoke tokens"
+  ],
+  "practices": [
+   "Password hygiene",
+   "Policy review"
+  ]
+ },
+ "sources": [
+  {
+   "title": "The Hacker News: Docker Hub data breach",
+   "url": "https://thehackernews.com/2019/04/docker-hub-data-breach.html",
+   "used": "date, scope, data, actions, advice"
+  }
+ ],
+ "verification": "Facts were read from The Hacker News on 29 October 2026. It does not say how access occurred, so none is claimed."
+}

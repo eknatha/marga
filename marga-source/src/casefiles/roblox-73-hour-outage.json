@@ -1,0 +1,451 @@
+{
+ "id": "roblox-73-hour-outage",
+ "checked": "29 October 2026",
+ "summary": "In late October 2021 Roblox was down for 73 hours after a Consul cluster, under heavy load and with a new streaming feature enabled, hit a database performance problem. Monitoring that depended on the same cluster made it harder to see.",
+ "overview": {
+  "background": "Roblox ran many services that rely on HashiCorp Consul for service discovery, health checks and key-value storage. On 27 October a streaming feature was enabled on the Consul backend that handles traffic routing.",
+  "systems": [
+   "Consul cluster (five voters and five non-voters, upgraded from 1.9 to 1.10)",
+   "Traffic-routing backend",
+   "Telemetry and monitoring that used Consul",
+   "Vault",
+   "Caches and DNS steering"
+  ],
+  "impact": "Players were gradually admitted back, reaching 100 percent at 16:45 PST on Sunday 31 October, 73 hours after the start.",
+  "severity": "Total platform outage for three days. Roblox does not publish a formal level.",
+  "gaps": "The post does not give player counts, the exact first-failure minute on 28 October, or raw logs."
+ },
+ "archNote": "The Consul cluster, the telemetry dependency and the single shared cluster are described in Roblox's post. Layout is ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "One Consul cluster under many workloads",
+   "caption": "Many services shared one Consul cluster. Telemetry also depended on it, so the tools for diagnosing it were affected.",
+   "nodes": [
+    {
+     "id": "svc",
+     "label": "Roblox services",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "route",
+     "label": "Traffic routing with streaming enabled",
+     "row": 1,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "consul",
+     "label": "Single shared Consul cluster",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "bolt",
+     "label": "BoltDB storage under write load",
+     "row": 3,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "tel",
+     "label": "Telemetry that also needs Consul",
+     "row": 1,
+     "col": 2,
+     "state": "hit"
+    },
+    {
+     "id": "vault",
+     "label": "Vault",
+     "row": 3,
+     "col": 2,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "svc",
+     "t": "consul",
+     "label": "discovery, KV, health"
+    },
+    {
+     "f": "route",
+     "t": "consul",
+     "label": "streaming load",
+     "state": "fail"
+    },
+    {
+     "f": "consul",
+     "t": "bolt",
+     "state": "fail"
+    },
+    {
+     "f": "consul",
+     "t": "vault",
+     "state": "hit"
+    },
+    {
+     "f": "tel",
+     "t": "consul",
+     "label": "circular dependency",
+     "state": "fail"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Roblox's stated direction (conceptual)",
+   "caption": "Roblox said it removed the circular dependency, added Consul and BoltDB alerts, moved to a new multi-zone data center and planned dedicated clusters. This is our picture of that direction.",
+   "nodes": [
+    {
+     "id": "a",
+     "label": "Dedicated Consul cluster for routing",
+     "row": 0,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "b",
+     "label": "Dedicated Consul cluster for other workloads",
+     "row": 0,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "az",
+     "label": "Multi-zone deployment",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "tel",
+     "label": "Telemetry independent of Consul",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "al",
+     "label": "Alerts on Consul and BoltDB health",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "a",
+     "t": "az",
+     "state": "new"
+    },
+    {
+     "f": "b",
+     "t": "az",
+     "state": "new"
+    },
+    {
+     "f": "az",
+     "t": "tel",
+     "state": "new"
+    },
+    {
+     "f": "tel",
+     "t": "al",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "A problem in one workload no longer takes down others.",
+  "Monitoring survives the failure it must report.",
+  "Zone loss does not stop the control plane."
+ ],
+ "afterNote": "Separate failure domains and independent monitoring are the two big shifts.",
+ "timelineNote": "Times are PST as given in Roblox's post. Only times stated in the post are shown.",
+ "timeline": [
+  {
+   "t": "27 Oct 14:00",
+   "phase": "trigger",
+   "e": "Streaming is enabled on the traffic-routing backend and its node count grows by 50 percent."
+  },
+  {
+   "t": "28 Oct 13:37",
+   "phase": "detect",
+   "e": "A Vault performance degradation and a Consul server with high CPU are noticed."
+  },
+  {
+   "t": "28 Oct 16:35",
+   "phase": "impact",
+   "e": "Players are at 50 percent of normal."
+  },
+  {
+   "t": "28 Oct 19:00",
+   "phase": "mitigate",
+   "e": "Most of the cluster runs on new 128-core machines but is still unhealthy."
+  },
+  {
+   "t": "29 Oct 02:00 to 04:00",
+   "phase": "mitigate",
+   "e": "The cluster is reset from a snapshot and health-check frequency is lowered from 60 seconds to 10 minutes."
+  },
+  {
+   "t": "30 Oct 15:51",
+   "phase": "investigate",
+   "e": "Streaming is disabled everywhere. Median key-value write latency drops to 300 ms."
+  },
+  {
+   "t": "31 Oct 05:00",
+   "phase": "recover",
+   "e": "The cluster is healthy."
+  },
+  {
+   "t": "31 Oct 16:45",
+   "phase": "recover",
+   "e": "100 percent of players are readmitted, 73 hours after the start."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Streaming was enabled on Consul while the system carried unusually high read and write load.",
+  "underlying": "Roblox's load triggered a pathological performance issue in BoltDB, the storage used by Consul.",
+  "contributing": [
+   "One Consul cluster supported many workloads",
+   "Telemetry depended on Consul, a circular dependency",
+   "A recently upgraded Consul (1.9 to 1.10) was at an unusual load",
+   "Frequent health checks added work during the failure"
+  ],
+  "propagation": [
+   "Streaming and load degrade BoltDB.",
+   "Consul writes slow.",
+   "Services cannot discover each other.",
+   "Monitoring that needs Consul goes blind."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The streaming feature",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Enabling a relatively new streaming feature on Consul under unusually high read and write load",
+   "note": "From Roblox's post."
+  },
+  {
+   "label": "The storage problem",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "our particular load conditions triggered a pathological performance issue in BoltDB",
+   "note": "From Roblox's post."
+  },
+  {
+   "label": "Shared fate",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "A single Consul cluster supporting multiple workloads exacerbated the impact of these issues.",
+   "note": "From Roblox's post."
+  },
+  {
+   "label": "Simulated Consul checks",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ consul operator raft list-peers\nNode      State     Voter\nconsul-1  leader    true\nconsul-2  follower  true\n$ consul info | grep -E 'last_log|commit_index|applied_index'",
+   "note": "Commands one would use to inspect Raft health. Output is invented."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check cluster leadership and write latency.",
+    "why": "Slow or flapping leaders mean the control plane is unhealthy.",
+    "cmd": "consul operator raft list-peers"
+   },
+   {
+    "step": "Look at storage-level latency on the servers.",
+    "why": "Roblox traced the issue to BoltDB behaviour."
+   },
+   {
+    "step": "List recently enabled features.",
+    "why": "A feature enabled the day before was a main clue."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Disable the new feature across the system.",
+    "why": "Roblox disabled streaming everywhere before recovery."
+   },
+   {
+    "step": "Reset the cluster from a known good snapshot if needed.",
+    "why": "Roblox did this on 29 October."
+   },
+   {
+    "step": "Reduce non-essential load, such as health-check frequency.",
+    "why": "Lowering frequency from 60 seconds to 10 minutes eased pressure."
+   },
+   {
+    "step": "Readmit users in small steps.",
+    "why": "Roblox used about 10 percent increments with DNS steering to avoid a stampede."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Watch write latency and leader stability.",
+    "why": "Latency of 300 ms median was the sign streaming was no longer the problem."
+   },
+   {
+    "step": "Confirm caches are warm before opening to everyone.",
+    "why": "Cold caches can cause a second overload."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Give critical workloads dedicated clusters.",
+    "why": "Limits shared fate."
+   },
+   {
+    "step": "Remove monitoring dependencies on the system being monitored.",
+    "why": "You need to see in a crisis."
+   },
+   {
+    "step": "Alert on Consul and storage health.",
+    "why": "Roblox added these alerts afterwards."
+   },
+   {
+    "step": "Test new features under production-like load first.",
+    "why": "Roblox planned to reintroduce streaming only after testing."
+   }
+  ],
+  "safety": "Resetting a cluster from a snapshot can lose recent writes. Take a copy of current state first, and let people in gradually. Do not restart everything at once."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A key-value store that every service uses has slow writes and a high-CPU server. Dashboards that read from it are blank. A new feature was turned on yesterday.",
+   "clues": [
+    "Dashboards are blank",
+    "The feature was enabled recently",
+    "Health checks fire every 60 seconds"
+   ],
+   "question": "What do you do first, and how do you see what is happening?",
+   "hints": [
+    "What is the circular dependency?",
+    "What would you turn off?",
+    "How do you add capacity safely?"
+   ],
+   "answer": "Turn off the new feature, reduce background load such as health checks, use out-of-band tools to inspect the cluster, and avoid adding load by restarting everything. Plan a snapshot reset only if state is bad."
+  },
+  "rootcause": {
+   "q": "Which statement matches Roblox's account?",
+   "options": [
+    "A database was deleted",
+    "A new Consul streaming feature under heavy load triggered a BoltDB performance problem",
+    "A DNS provider failed",
+    "A cable was cut"
+   ],
+   "answer": 1,
+   "why": "That is the cause Roblox states."
+  },
+  "remediation": [
+   {
+    "task": "Break the circular dependency.",
+    "answer": "Move telemetry onto infrastructure that does not need the system it monitors, or give it a separate path."
+   },
+   {
+    "task": "Plan a staged readmission.",
+    "answer": "Use DNS steering to admit about 10 percent steps, watch metrics at each step, and hold if errors rise."
+   },
+   {
+    "task": "Write alerts for the control plane.",
+    "answer": "Alert on leader changes, write latency, commit lag and storage health, with thresholds tested under load."
+   }
+  ],
+  "design": {
+   "prompt": "Design a service-discovery layer that survives one workload overloading it.",
+   "constraints": [
+    "Many teams",
+    "Monitoring must survive",
+    "Multiple zones"
+   ],
+   "answer": "Use separate clusters per critical workload, deploy across zones, keep monitoring off the cluster, apply quotas on request rates, and test new features under load before use."
+  },
+  "checks": [
+   {
+    "q": "How long did the outage last?",
+    "options": [
+     "73 hours",
+     "7 hours",
+     "3 minutes",
+     "2 weeks"
+    ],
+    "answer": 0,
+    "why": "Roblox says 73 hours."
+   },
+   {
+    "q": "What was the circular dependency?",
+    "options": [
+     "Telemetry depending on Consul",
+     "Consul depending on DNS only",
+     "Vault depending on cache",
+     "Players depending on chat"
+    ],
+    "answer": 0,
+    "why": "The post says the telemetry system relied on Consul."
+   },
+   {
+    "q": "Why readmit players in steps?",
+    "options": [
+     "To save money",
+     "To avoid a second overload as caches warm",
+     "To test ads",
+     "To reset passwords"
+    ],
+    "answer": 1,
+    "why": "Roblox used DNS steering in about 10 percent increments."
+   },
+   {
+    "q": "Which change limits shared fate?",
+    "options": [
+     "Dedicated clusters",
+     "One bigger cluster",
+     "More dashboards",
+     "A longer timeout"
+    ],
+    "answer": 0,
+    "why": "Roblox moved toward dedicated clusters."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Dedicated clusters per workload",
+   "Test features at production load",
+   "No circular dependencies in monitoring"
+  ],
+  "monitoring": [
+   "Alert on Consul and BoltDB health",
+   "Watch write latency"
+  ],
+  "recovery": [
+   "Disable the new feature",
+   "Readmit users in steps",
+   "Reset from snapshot as a last step"
+  ],
+  "practices": [
+   "Run in multiple zones",
+   "Keep out-of-band tooling for crises"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Roblox: Roblox Return to Service 10/28-10/31 2021",
+   "url": "https://corp.roblox.com/newsroom/2021/10/roblox-return-to-service-10-28-10-31-2021",
+   "used": "timeline, causes, remediation (read at the about.roblox.com copy)"
+  }
+ ],
+ "verification": "Facts were read from Roblox's post on 29 October 2026. The post gives no logs, so command output is Simulated. The after diagram is Conceptual."
+}

@@ -1,0 +1,415 @@
+{
+ "id": "cloudflare-control-plane-power-failure",
+ "checked": "29 October 2026",
+ "summary": "On 2 November 2023 a power failure at a Flexential data center in Portland took down the primary site for Cloudflare's control plane and analytics. Customers could not change settings and logs were lost for about two days.",
+ "overview": {
+  "background": "Cloudflare ran its control plane (dashboard and APIs) and analytics from three core data centers, with a disaster recovery site in Europe. PDX-04 held critical services including Kafka and ClickHouse.",
+  "systems": [
+   "PDX-04 (Flexential) in Oregon",
+   "Control plane: dashboard and APIs",
+   "Analytics and logs: Kafka, ClickHouse",
+   "European disaster recovery site"
+  ],
+  "impact": "The dashboard, APIs and analytics were disrupted. Network and security traffic was not affected. Some logs were permanently lost, and unreplicated datasets have gaps.",
+  "severity": "Control-plane outage from 11:44 UTC on 2 November to 04:25 on 4 November.",
+  "gaps": "Parts of the post are labelled by Cloudflare as informed speculation about Flexential."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A single facility holds critical services",
+   "caption": "A ground fault shut down the facility's utility and generators. Services in PDX-04 were not fully covered by failover.",
+   "nodes": [
+    {
+     "id": "grid",
+     "label": "Utility feed failure then ground fault",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "pdx",
+     "label": "PDX-04 loses all power",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "svc",
+     "label": "Kafka, ClickHouse and control plane services",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "dr",
+     "label": "Disaster recovery site: partial failover",
+     "row": 3,
+     "col": 0
+    },
+    {
+     "id": "cust",
+     "label": "Dashboard, API and logs unavailable",
+     "row": 3,
+     "col": 2,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "grid",
+     "t": "pdx",
+     "state": "fail"
+    },
+    {
+     "f": "pdx",
+     "t": "svc",
+     "state": "fail"
+    },
+    {
+     "f": "svc",
+     "t": "dr",
+     "label": "rate-limited failover"
+    },
+    {
+     "f": "svc",
+     "t": "cust",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Control plane without core dependency (conceptual)",
+   "caption": "Cloudflare's Code Orange follow-ups include moving control plane dependencies off core data centers, requiring tested disaster recovery for products and chaos tests including full facility loss. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "net",
+     "label": "Distributed network runs the control plane",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "ha",
+     "label": "High-availability cluster for GA products",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "log",
+     "label": "Log pipeline with disaster recovery",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "chaos",
+     "label": "Chaos tests that remove a whole facility",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "net",
+     "t": "ha",
+     "state": "new"
+    },
+    {
+     "f": "net",
+     "t": "log",
+     "state": "new"
+    },
+    {
+     "f": "chaos",
+     "t": "net",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Losing a facility does not stop the control plane.",
+  "Logs are not dropped.",
+  "The failure is rehearsed."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "08:50 UTC, 2 Nov",
+   "phase": "change",
+   "e": "An unplanned PGE maintenance event shuts one power feed to PDX-04. Flexential keeps the other utility feed and starts generators."
+  },
+  {
+   "t": "About 11:40",
+   "phase": "trigger",
+   "e": "A ground fault on a PGE transformer shuts down the facility's generators and utility feeds."
+  },
+  {
+   "t": "11:44",
+   "phase": "detect",
+   "e": "Cloudflare's two routers at the facility go offline."
+  },
+  {
+   "t": "12:48",
+   "phase": "mitigate",
+   "e": "Generators restart and parts of the facility get power. Cloudflare's circuit breakers are faulty and need replacing."
+  },
+  {
+   "t": "13:40 to 13:43",
+   "phase": "mitigate",
+   "e": "Cloudflare fails over a small share of the control plane to its European DR sites."
+  },
+  {
+   "t": "17:57",
+   "phase": "recover",
+   "e": "Migrated services are stable and most customers are no longer directly affected."
+  },
+  {
+   "t": "22:48",
+   "phase": "recover",
+   "e": "Flexential restores both utility feeds and confirms clean power."
+  },
+  {
+   "t": "3 Nov",
+   "phase": "recover",
+   "e": "Cloudflare begins a full bootstrap of PDX-04 servers."
+  },
+  {
+   "t": "4 Nov 04:25",
+   "phase": "recover",
+   "e": "All services are fully restored."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A ground fault on a PGE transformer shut down both the facility's generators and utility feeds.",
+  "underlying": "UPS batteries ran out before power returned. Cloudflare's Kafka and ClickHouse services depended on the site and were not fully covered by failover, and a full facility loss had never been tested.",
+  "contributing": [
+   "Flexential did not tell Cloudflare it had failed over to generators",
+   "Some newer products were not on the disaster recovery site",
+   "A thundering herd of API calls had to be rate limited on recovery",
+   "Circuit breakers were faulty"
+  ],
+  "propagation": [
+   "Power is lost.",
+   "Services at the site stop.",
+   "Failover is partial.",
+   "Control plane and analytics degrade."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The provider",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Counter to best practices, Flexential did not inform Cloudflare that they had failed over to generator power.",
+   "note": "From Cloudflare's post."
+  },
+  {
+   "label": "The verdict",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "To start, this never should have happened.",
+   "note": "From Cloudflare's post."
+  },
+  {
+   "label": "A simulated failover test",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ chaos run --target dc=pdx-04 --action power-off --duration 30m\nexpected: dashboard p99 < 2s, no log loss\nresult: FAIL kafka-consumer-lag growing",
+   "note": "Shows a facility-loss test. Invented output."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check facility power and network reachability.",
+    "why": "Routers at the site went offline first."
+   },
+   {
+    "step": "Identify which services depend on the site.",
+    "why": "Kafka and ClickHouse did."
+   },
+   {
+    "step": "Check the DR site's coverage.",
+    "why": "Newer products were missing."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Fail over what is covered to the DR site.",
+    "why": "Cloudflare failed over a part of the control plane."
+   },
+   {
+    "step": "Rate limit recovery traffic.",
+    "why": "A thundering herd hit the APIs."
+   },
+   {
+    "step": "Rebuild the rest from the site once power is stable.",
+    "why": "Bootstrap took a day."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check dashboard, API and log pipelines separately.",
+    "why": "Each recovered on its own timeline."
+   },
+   {
+    "step": "Check datasets for gaps.",
+    "why": "Cloudflare reports permanent gaps."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Remove control plane dependencies on core data centers.",
+    "why": "Cloudflare's Code Orange."
+   },
+   {
+    "step": "Require tested DR for GA products.",
+    "why": "Cloudflare's action."
+   },
+   {
+    "step": "Test full facility loss.",
+    "why": "Cloudflare's action."
+   },
+   {
+    "step": "Create a DR plan for logs.",
+    "why": "Cloudflare's action."
+   }
+  ],
+  "safety": "Bootstrapping a facility after power loss can overload shared services. Rate limit and stage it."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Your primary facility lost all power and your control plane is partly down. Logs are dropping.",
+   "clues": [
+    "Failover covers some services",
+    "Provider did not alert you",
+    "Newer products lack DR"
+   ],
+   "question": "What do you do and in what order?",
+   "hints": [
+    "What can fail over now?",
+    "How do you stop a thundering herd?",
+    "What do you test afterwards?"
+   ],
+   "answer": "Fail over covered services, rate limit recovery, communicate, rebuild the site once power is stable, then test full facility loss and extend DR to all products."
+  },
+  "rootcause": {
+   "q": "What broke first?",
+   "options": [
+    "Power at PDX-04",
+    "DNS",
+    "A certificate",
+    "A software release"
+   ],
+   "answer": 0,
+   "why": "Cloudflare's timeline."
+  },
+  "remediation": [
+   {
+    "task": "Define DR requirements.",
+    "answer": "Every GA product must run on the HA cluster with a tested failover."
+   },
+   {
+    "task": "Plan a provider alert contract.",
+    "answer": "Require notice of generator failover."
+   },
+   {
+    "task": "Plan log DR.",
+    "answer": "Replicate logs to a second site before processing."
+   }
+  ],
+  "design": {
+   "prompt": "Design a control plane that survives the loss of its main facility.",
+   "constraints": [
+    "Three core sites",
+    "Kafka and ClickHouse",
+    "Fast recovery"
+   ],
+   "answer": "Distribute the control plane, replicate stateful systems, test removal of each site and rate limit recovery."
+  },
+  "checks": [
+   {
+    "q": "How long did UPS batteries last compared with expectation?",
+    "options": [
+     "About 4 minutes against about 10",
+     "An hour",
+     "A day",
+     "Not at all"
+    ],
+    "answer": 0,
+    "why": "Cloudflare observed them failing after about 4 minutes."
+   },
+   {
+    "q": "Was network traffic affected?",
+    "options": [
+     "No, the control plane and analytics were",
+     "Yes, all",
+     "Only DNS",
+     "Only WAF"
+    ],
+    "answer": 0,
+    "why": "Network and security traffic was not affected."
+   },
+   {
+    "q": "What did Cloudflare call its follow-up effort?",
+    "options": [
+     "Code Orange",
+     "Code Blue",
+     "Project Red",
+     "Operation Green"
+    ],
+    "answer": 0,
+    "why": "The post lists the follow-ups under Code Orange."
+   },
+   {
+    "q": "What was missing in testing?",
+    "options": [
+     "Full facility loss",
+     "Unit tests",
+     "Login",
+     "Billing"
+    ],
+    "answer": 0,
+    "why": "It had never been tested."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Remove dependencies on core data centers",
+   "Tested DR for every product",
+   "Chaos tests that remove a facility"
+  ],
+  "monitoring": [
+   "Facility power status",
+   "Log pipeline lag"
+  ],
+  "recovery": [
+   "Failover, then rebuild",
+   "Rate limit recovery"
+  ],
+  "practices": [
+   "Require provider alerts",
+   "Plan for log DR"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Cloudflare: Post mortem on the Cloudflare Control Plane and Analytics Outage",
+   "url": "https://blog.cloudflare.com/post-mortem-on-cloudflare-control-plane-and-analytics-outage",
+   "used": "timeline, cause, impact, follow-ups"
+  }
+ ],
+ "verification": "Facts were read from Cloudflare's post on 29 October 2026. Some account of the provider is labelled speculation by Cloudflare. The chaos run output is Simulated."
+}

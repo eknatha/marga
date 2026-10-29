@@ -1,0 +1,389 @@
+{
+ "id": "tesla-cloud-account-used-for-cryptomining",
+ "checked": "29 October 2026",
+ "summary": "In 2017, reported in February 2018, attackers ran Monero mining software in a Tesla cloud account after reaching a Kubernetes administration console that had no password. In a pod they found AWS credentials. RedLock found it and Tesla secured the console within hours.",
+ "overview": {
+  "background": "Tesla ran Kubernetes on cloud infrastructure. A pod in the console stored credentials for an AWS account.",
+  "systems": [
+   "Kubernetes administration console exposed to the internet",
+   "A pod holding AWS credentials",
+   "S3 buckets with telemetry",
+   "A private mining pool behind a reverse proxy"
+  ],
+  "impact": "Attackers used Tesla's AWS computing resources to mine cryptocurrency. Tesla said the data was from internal engineering test cars only and found no evidence of data theft.",
+  "severity": "A cryptojacking compromise limited by quick response.",
+  "gaps": "The reports are secondary (iTnews and BleepingComputer). Trend Micro's page (the card source) could not be read."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "No password on the console, secrets in a pod",
+   "caption": "Per the reports, RedLock found the console exposed with no password, a pod holding AWS credentials, and a miner that was throttled and hidden.",
+   "nodes": [
+    {
+     "id": "con",
+     "label": "Kubernetes console exposed without password",
+     "row": 0,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "pod",
+     "label": "Pod stores AWS credentials",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "aws",
+     "label": "Cloud compute used for mining",
+     "row": 2,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "s3",
+     "label": "S3 bucket with telemetry reachable",
+     "row": 2,
+     "col": 2,
+     "state": "hit"
+    },
+    {
+     "id": "hide",
+     "label": "Miner throttled, pool hidden behind CDN, odd port",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "con",
+     "t": "pod",
+     "state": "fail"
+    },
+    {
+     "f": "pod",
+     "t": "aws",
+     "state": "hit"
+    },
+    {
+     "f": "pod",
+     "t": "s3",
+     "state": "hit"
+    },
+    {
+     "f": "aws",
+     "t": "hide",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Authenticated consoles and secret management (conceptual)",
+   "caption": "General controls for cluster administration.",
+   "nodes": [
+    {
+     "id": "auth",
+     "label": "Console requires authentication and is private",
+     "row": 0,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "sec",
+     "label": "Secrets in a vault, not in pods",
+     "row": 0,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "egr",
+     "label": "Egress filtering and mining pool blocks",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "cost",
+     "label": "Cost and CPU anomaly alerts",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "auth",
+     "t": "egr",
+     "state": "new"
+    },
+    {
+     "f": "sec",
+     "t": "cost",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Admin consoles are not public.",
+  "Credentials are not stored in pods.",
+  "Odd CPU and cost raise alerts."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "2017",
+   "phase": "trigger",
+   "e": "Attackers reach Tesla's unprotected Kubernetes console."
+  },
+  {
+   "t": "2017",
+   "phase": "impact",
+   "e": "They find AWS credentials in a pod and install mining software."
+  },
+  {
+   "t": "2017",
+   "phase": "impact",
+   "e": "They throttle CPU and hide the mining pool to avoid detection."
+  },
+  {
+   "t": "Before Feb 2018",
+   "phase": "detect",
+   "e": "RedLock finds the compromised server and similar open consoles at other companies."
+  },
+  {
+   "t": "Within hours of notice",
+   "phase": "mitigate",
+   "e": "Tesla secures the server."
+  },
+  {
+   "t": "20 Feb 2018",
+   "phase": "recover",
+   "e": "BleepingComputer reports Tesla's response."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Tesla engineers did not secure the Kubernetes console with a password.",
+  "underlying": "Credentials for a cloud account were reachable inside a pod.",
+  "contributing": [
+   "Console reachable from the internet",
+   "Credentials stored in a pod",
+   "Miner designed to be quiet",
+   "No detection inside Tesla before RedLock"
+  ],
+  "propagation": [
+   "Open console.",
+   "Credentials found.",
+   "Miner installed.",
+   "Hidden usage."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Root cause",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "forgot to secure the Kubernetes console with an access password",
+   "note": "RedLock's assessment, as quoted by BleepingComputer."
+  },
+  {
+   "label": "Tesla's response",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "addressed this vulnerability within hours of learning about it",
+   "note": "Tesla, as quoted by BleepingComputer."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check which consoles are reachable from the internet.",
+    "why": "One was open."
+   },
+   {
+    "step": "Check pods for stored credentials.",
+    "why": "Found one."
+   },
+   {
+    "step": "Check CPU and cloud cost.",
+    "why": "Mining usage."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Secure and restrict the console.",
+    "why": "Tesla did within hours."
+   },
+   {
+    "step": "Rotate exposed credentials.",
+    "why": "General practice."
+   },
+   {
+    "step": "Remove miner workloads.",
+    "why": "General practice."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Scan for open consoles.",
+    "why": "RedLock-style scan."
+   },
+   {
+    "step": "Review cloud bills.",
+    "why": "Check."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Do not expose admin consoles.",
+    "why": "Core lesson."
+   },
+   {
+    "step": "Use a secret store.",
+    "why": "General practice."
+   },
+   {
+    "step": "Monitor compute use.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Revoke credentials before deleting workloads so the attacker cannot respawn them."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Cloud costs jump and CPU is high across a cluster. The Kubernetes console is reachable from the internet.",
+   "clues": [
+    "No password",
+    "Credentials in a pod",
+    "Unknown workloads"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "What do you close first?",
+    "What do you rotate?",
+    "How do you find miners?"
+   ],
+   "answer": "Restrict the console, rotate credentials, remove unknown workloads and add cost and CPU alerts."
+  },
+  "rootcause": {
+   "q": "What cryptocurrency was mined?",
+   "options": [
+    "Monero",
+    "Bitcoin only",
+    "Ether only",
+    "None"
+   ],
+   "answer": 0,
+   "why": "Per iTnews."
+  },
+  "remediation": [
+   {
+    "task": "Define console access.",
+    "answer": "Private network plus SSO."
+   },
+   {
+    "task": "Plan a secret store.",
+    "answer": "Vault with pod identity."
+   },
+   {
+    "task": "Plan anomaly alerts.",
+    "answer": "CPU and cost thresholds."
+   }
+  ],
+  "design": {
+   "prompt": "Design cluster administration safe from internet exposure.",
+   "constraints": [
+    "Cloud cluster",
+    "Many engineers",
+    "Secrets"
+   ],
+   "answer": "Private endpoints, SSO, RBAC, secrets management and egress control."
+  },
+  "checks": [
+   {
+    "q": "Who found the problem?",
+    "options": [
+     "RedLock",
+     "Tesla",
+     "A regulator",
+     "A customer"
+    ],
+    "answer": 0,
+    "why": "Per both reports."
+   },
+   {
+    "q": "What data did Tesla say the buckets held?",
+    "options": [
+     "Telemetry from internal engineering test cars",
+     "Customer data",
+     "Nothing",
+     "Passwords"
+    ],
+    "answer": 0,
+    "why": "Per BleepingComputer."
+   },
+   {
+    "q": "How did the attackers avoid detection?",
+    "options": [
+     "Throttled CPU and hid the mining pool",
+     "Used a VPN only",
+     "Deleted logs only",
+     "Did nothing"
+    ],
+    "answer": 0,
+    "why": "Per both reports."
+   },
+   {
+    "q": "How fast did Tesla fix it?",
+    "options": [
+     "Within hours",
+     "A year",
+     "A month",
+     "Never"
+    ],
+    "answer": 0,
+    "why": "Per BleepingComputer."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Private consoles",
+   "Secret store"
+  ],
+  "monitoring": [
+   "CPU and cost alerts"
+  ],
+  "recovery": [
+   "Close console",
+   "Rotate credentials"
+  ],
+  "practices": [
+   "Console scanning",
+   "Egress control"
+  ]
+ },
+ "sources": [
+  {
+   "title": "iTnews: Tesla left its cloud servers open to cryptomining hackers",
+   "url": "https://www.itnews.com.au/news/tesla-left-its-cloud-servers-open-to-cryptomining-hackers-485563",
+   "used": "mechanism, miner, evasion"
+  },
+  {
+   "title": "BleepingComputer: Tesla internal servers infected with cryptocurrency miner",
+   "url": "https://www.bleepingcomputer.com/news/security/tesla-internal-servers-infected-with-cryptocurrency-miner/",
+   "used": "timeline, data, Tesla response"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from iTnews and BleepingComputer, both secondary. Trend Micro's page (the card source) could not be read. Timeline entries have no exact dates because the reports give none."
+}

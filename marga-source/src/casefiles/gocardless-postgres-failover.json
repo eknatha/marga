@@ -1,0 +1,369 @@
+{
+ "id": "gocardless-postgres-failover",
+ "checked": "29 October 2026",
+ "summary": "On 10 October 2017 a disk array failure on GoCardless's Postgres primary should have caused an automatic promotion of the synchronous replica. Pacemaker did not promote it, and the API and dashboard were down for about 1 hour 50 minutes until engineers promoted it by hand.",
+ "overview": {
+  "background": "GoCardless ran a Postgres cluster managed by Pacemaker, with a synchronous replica to take over on failure.",
+  "systems": [
+   "Postgres primary and synchronous replica",
+   "Pacemaker cluster manager",
+   "A virtual IP (Backup VIP)",
+   "API and dashboard"
+  ],
+  "impact": "All requests failed for about 1 hour 50 minutes.",
+  "severity": "A full outage of the API and dashboard.",
+  "gaps": "Times are British Summer Time (UTC+1)."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A cluster rule prevents promotion",
+   "caption": "Per GoCardless, three conditions together stopped Pacemaker promoting the replica: a non-zero resource stickiness, a Backup VIP colocated against the primary running on the replica, and near-simultaneous Postgres crashes.",
+   "nodes": [
+    {
+     "id": "disk",
+     "label": "Primary disk array fails",
+     "row": 0,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "pm",
+     "label": "Pacemaker refuses to promote the replica",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "app",
+     "label": "API and dashboard down",
+     "row": 2,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "man",
+     "label": "Engineers promote the replica by hand",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "disk",
+     "t": "pm",
+     "state": "fail"
+    },
+    {
+     "f": "pm",
+     "t": "app",
+     "state": "hit"
+    },
+    {
+     "f": "pm",
+     "t": "man",
+     "label": "recovery path"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "verified",
+   "title": "Rule reversed and new cluster (as described by GoCardless)",
+   "caption": "GoCardless reversed the colocation rule so the Backup VIP prefers a replica, tested the failure, and moved to a new cluster with a PgBouncer switchover.",
+   "nodes": [
+    {
+     "id": "rule",
+     "label": "Colocation rule reversed",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "test",
+     "label": "Failure tested and promotes correctly",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "new",
+     "label": "New Postgres cluster via PgBouncer switchover",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "rule",
+     "t": "test",
+     "state": "new"
+    },
+    {
+     "f": "rule",
+     "t": "new",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Failure promotes the replica automatically.",
+  "Failure paths are tested.",
+  "Engineers can promote by hand quickly."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "15:09 BST, 10 Oct 2017",
+   "phase": "detect",
+   "e": "Monitoring detects the total outage."
+  },
+  {
+   "t": "15:11",
+   "phase": "investigate",
+   "e": "Evidence of a disk array failure on the primary."
+  },
+  {
+   "t": "15:17",
+   "phase": "mitigate",
+   "e": "The broken primary is powered off."
+  },
+  {
+   "t": "15:18",
+   "phase": "trigger",
+   "e": "Clearing Pacemaker error counts has no effect; the cluster will not promote the replica."
+  },
+  {
+   "t": "16:18",
+   "phase": "mitigate",
+   "e": "Engineers manually promote the replica and point applications at its address."
+  },
+  {
+   "t": "16:46",
+   "phase": "mitigate",
+   "e": "The promoted primary is working and configuration changes roll out."
+  },
+  {
+   "t": "16:59",
+   "phase": "recover",
+   "e": "Monitoring confirms the API and dashboard are back."
+  }
+ ],
+ "rootCause": {
+  "trigger": "The primary's RAID controller lost three disks at once.",
+  "underlying": "A Pacemaker rule configuration stopped the promotion of the synchronous replica.",
+  "contributing": [
+   "Non-zero default-resource-stickiness",
+   "Backup VIP colocated against the primary on the replica",
+   "Two Postgres processes crashing together",
+   "Manual recovery skills had eroded with automation"
+  ],
+  "propagation": [
+   "Disk failure.",
+   "Promotion blocked.",
+   "Outage.",
+   "Manual promotion."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Impact",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Any requests made during that time failed, and returned an error.",
+   "note": "From the incident review summary as read."
+  },
+  {
+   "label": "The lesson",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Seemingly simple Pacemaker configuration can lead to extremely unusual behaviour.",
+   "note": "From the incident review."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check cluster status and error counts.",
+    "why": "Counts cleared without effect."
+   },
+   {
+    "step": "Check the replica's state.",
+    "why": "Synchronous replica was healthy."
+   },
+   {
+    "step": "Try the documented promotion path.",
+    "why": "It failed."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Power off the broken primary.",
+    "why": "Prevents split brain."
+   },
+   {
+    "step": "Promote the replica manually.",
+    "why": "At 16:18."
+   },
+   {
+    "step": "Point applications at it.",
+    "why": "Config rollout."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check API and dashboard requests succeed.",
+    "why": "At 16:59."
+   },
+   {
+    "step": "Rebuild a replica.",
+    "why": "Restore redundancy."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Inject faults to test failover.",
+    "why": "GoCardless's plan."
+   },
+   {
+    "step": "Practice manual control.",
+    "why": "Game days."
+   },
+   {
+    "step": "Simplify cluster resources.",
+    "why": "Replace VIPs with proxies."
+   }
+  ],
+  "safety": "Promoting a replica while the old primary may still be running risks split brain. Power off the old primary first."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "The Postgres primary has failed and the cluster will not promote the replica. Requests fail.",
+   "clues": [
+    "Replica is in sync",
+    "Old primary broken",
+    "Automatic failover not working"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "How do you avoid split brain?",
+    "How do you restore service?",
+    "How do you test later?"
+   ],
+   "answer": "Power off the broken primary, promote the replica by hand, repoint apps, then reproduce and fix the cluster rules."
+  },
+  "rootcause": {
+   "q": "How long was the outage?",
+   "options": [
+    "About 1 hour 50 minutes",
+    "5 minutes",
+    "1 day",
+    "1 week"
+   ],
+   "answer": 0,
+   "why": "Per the review."
+  },
+  "remediation": [
+   {
+    "task": "Write a manual failover runbook.",
+    "answer": "Check, fence, promote, repoint, verify."
+   },
+   {
+    "task": "Plan fault injection.",
+    "answer": "Kill primary and replica together in staging."
+   },
+   {
+    "task": "Plan game days.",
+    "answer": "Practice manual operation."
+   }
+  ],
+  "design": {
+   "prompt": "Design a failover that cannot be blocked by one rule.",
+   "constraints": [
+    "Postgres",
+    "Pacemaker",
+    "Strict RPO"
+   ],
+   "answer": "Simple rules, tested failure modes, fencing, manual runbooks and monitoring of promotion events."
+  },
+  "checks": [
+   {
+    "q": "What failed on the primary?",
+    "options": [
+     "A disk array",
+     "A CPU",
+     "A network switch",
+     "A fan"
+    ],
+    "answer": 0,
+    "why": "Per the review."
+   },
+   {
+    "q": "Was the invalid WAL file the cause?",
+    "options": [
+     "No, it was a red herring",
+     "Yes",
+     "Partly",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the review."
+   },
+   {
+    "q": "What is the fix to the colocation rule?",
+    "options": [
+     "Reverse it so the VIP prefers a replica",
+     "Delete the VIP",
+     "Disable Pacemaker",
+     "Add a disk"
+    ],
+    "answer": 0,
+    "why": "Per the review."
+   },
+   {
+    "q": "What did they migrate to?",
+    "options": [
+     "A new Postgres cluster using PgBouncer switchover",
+     "Another database",
+     "A different cloud",
+     "Nothing"
+    ],
+    "answer": 0,
+    "why": "Per the review."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Simple cluster rules",
+   "Fault injection"
+  ],
+  "monitoring": [
+   "Failover events"
+  ],
+  "recovery": [
+   "Manual promotion runbook"
+  ],
+  "practices": [
+   "Game days",
+   "Replace VIP routing with proxies"
+  ]
+ },
+ "sources": [
+  {
+   "title": "GoCardless: Incident review: API and Dashboard outage on 10 October 2017",
+   "url": "https://gocardless.com/blog/incident-review-api-and-dashboard-outage-on-10th-october/",
+   "used": "timeline, cause, fix, lessons"
+  }
+ ],
+ "verification": "Facts were read from GoCardless's incident review on 29 October 2026. Times are BST as in the review. The card describes Corosync, which the review does not mention, so this file does not."
+}

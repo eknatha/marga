@@ -1,0 +1,477 @@
+{
+ "id": "slack-outage-after-the-new-year",
+ "checked": "29 October 2026",
+ "summary": "On 4 January 2021, the first working day after the holidays, a surge of traffic overloaded an AWS Transit Gateway. Slack's web tier, autoscaling and monitoring all struggled at once, and Slack was down for hours.",
+ "overview": {
+  "background": "Slack runs on AWS. Its servers sit in several VPCs that talk to each other through AWS Transit Gateways (TGWs), which AWS manages and scales automatically. Slack's web tier scales on CPU use and Apache worker thread use, and a service called provision-service creates and configures new instances.",
+  "systems": [
+   "AWS Transit Gateways between Slack's VPCs",
+   "Slack web tier behind load balancers",
+   "Autoscaling groups and provision-service",
+   "Dashboard and alerting services, in a separate VPC from their databases",
+   "Message delivery"
+  ],
+  "impact": "Slack became unavailable at about 7:00 AM PST. By 6:57 AM PST only 99 percent of messages were being sent successfully, against more than 99.999 percent normally. By 9:15 AM the web tier had enough working hosts and Slack was degraded rather than down.",
+  "severity": "Slack describes it as an outage of its service for many hours. No formal severity level is published in the post.",
+  "gaps": "The post does not give the exact time of the first external page, logs, raw metrics, the open-files limit value, the AWS quota name or the number of instances provisioned."
+ },
+ "archNote": "The components and relationships are described in Slack's post. The layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Where the first failure sat",
+   "caption": "Traffic between VPCs went through Transit Gateways that did not scale fast enough. The web tier then scaled the wrong way, provisioning bottlenecked, and monitoring in a different VPC lost its databases.",
+   "nodes": [
+    {
+     "id": "users",
+     "label": "Users returning after the holidays",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "lb",
+     "label": "Load balancers",
+     "row": 1,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "web",
+     "label": "Web tier (autoscaling)",
+     "row": 2,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "tgw",
+     "label": "Transit Gateway: overloaded",
+     "row": 3,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "back",
+     "label": "Backends and databases",
+     "row": 4,
+     "col": 1
+    },
+    {
+     "id": "prov",
+     "label": "provision-service: open-files and quota limits",
+     "row": 2,
+     "col": 3,
+     "state": "fail"
+    },
+    {
+     "id": "dash",
+     "label": "Dashboards and alerting in another VPC",
+     "row": 3,
+     "col": 3,
+     "state": "fail"
+    }
+   ],
+   "edges": [
+    {
+     "f": "users",
+     "t": "lb",
+     "label": "cold caches, traffic jump"
+    },
+    {
+     "f": "lb",
+     "t": "web"
+    },
+    {
+     "f": "web",
+     "t": "tgw",
+     "label": "packet loss",
+     "state": "fail"
+    },
+    {
+     "f": "tgw",
+     "t": "back",
+     "state": "fail"
+    },
+    {
+     "f": "web",
+     "t": "prov",
+     "label": "scale up",
+     "state": "fail"
+    },
+    {
+     "f": "dash",
+     "t": "tgw",
+     "label": "needs its databases",
+     "state": "fail"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Slack's stated follow-ups (conceptual)",
+   "caption": "Slack said it would ask AWS to scale TGWs ahead of the next holiday return, put dashboards in the same VPC as their databases, load test provision-service and review health checks and autoscaling. Our picture of those ideas.",
+   "nodes": [
+    {
+     "id": "aws",
+     "label": "Preemptive TGW capacity before peaks",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "tgw",
+     "label": "Transit Gateway with headroom",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "web",
+     "label": "Web tier with reviewed scaling rules",
+     "row": 2,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "prov",
+     "label": "provision-service load tested",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "dash",
+     "label": "Dashboards beside their databases",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "aws",
+     "t": "tgw",
+     "state": "new"
+    },
+    {
+     "f": "tgw",
+     "t": "web",
+     "state": "new"
+    },
+    {
+     "f": "tgw",
+     "t": "prov",
+     "state": "new"
+    },
+    {
+     "f": "web",
+     "t": "dash",
+     "label": "no network dependency",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Network capacity is requested before known traffic peaks instead of waiting for automatic scaling.",
+  "Monitoring no longer needs the network that is failing.",
+  "The tool that creates servers is tested at the load it must handle during a crisis."
+ ],
+ "afterNote": "Notice that every fix reduces a hidden dependency: on network scaling speed, on a single provisioning service, on cross-VPC monitoring.",
+ "timelineNote": "Times are PST on 4 January 2021 as given in Slack's post. Slack does not give the first alert time.",
+ "timeline": [
+  {
+   "t": "Early morning",
+   "phase": "detect",
+   "e": "An external monitoring service pages Slack as error rates rise. No exact time is given."
+  },
+  {
+   "t": "Early investigation",
+   "phase": "investigate",
+   "e": "Slack's dashboarding and alerting service becomes unavailable. Some recent changes are rolled back but are not the cause."
+  },
+  {
+   "t": "About 6:57 AM",
+   "phase": "impact",
+   "e": "Message delivery is at 99 percent, well below the usual rate of more than 99.999 percent."
+  },
+  {
+   "t": "7:00 AM",
+   "phase": "trigger",
+   "e": "A small traffic peak combined with network packet loss saturates the web tier, and Slack becomes unavailable."
+  },
+  {
+   "t": "7:01 to 7:15 AM",
+   "phase": "mitigate",
+   "e": "Autoscaling tries to add 1,200 web servers. Many new instances are not fully provisioned and the autoscaling group size limit is hit."
+  },
+  {
+   "t": "During recovery",
+   "phase": "mitigate",
+   "e": "Downscaling is disabled to preserve capacity. Load balancer panic mode, retries and circuit breaking help."
+  },
+  {
+   "t": "About 8:15 AM",
+   "phase": "recover",
+   "e": "provision-service operates again and healthy instances begin entering service."
+  },
+  {
+   "t": "9:15 AM",
+   "phase": "recover",
+   "e": "The web tier has enough working hosts to serve traffic. Slack is degraded, not down."
+  },
+  {
+   "t": "10:40 AM",
+   "phase": "recover",
+   "e": "AWS's manual Transit Gateway capacity increase has reached all Availability Zones and the network returns to normal."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A post-holiday traffic surge, with cold client caches, overloaded one of Slack's Transit Gateways.",
+  "underlying": "AWS-managed TGWs are meant to scale transparently, but they did not scale fast enough for the jump in packets per second. Packet loss followed. Slack's own systems scale quickly for such peaks, but they depended on the network that did not.",
+  "contributing": [
+   "Dashboards and alerting ran in a different VPC from their backend databases, so they depended on the failing TGW",
+   "Waiting threads lowered CPU, which triggered downscaling just before a rapid upscale",
+   "provision-service was overloaded and hit the Linux open files limit and an AWS quota",
+   "Many new instances were not fully provisioned and the autoscaling group size limit was reached",
+   "Health checks and autoscaling interacted badly with the overloaded provisioning service"
+  ],
+  "propagation": [
+   "Cold caches create a burst of requests across VPCs.",
+   "The TGW drops packets, so the web tier waits on backends.",
+   "Waiting threads reduce CPU, so autoscaling shrinks the fleet, then scales up too fast.",
+   "provision-service overloads, so new instances do not become healthy.",
+   "Without dashboards, engineers lose visibility while AWS raises TGW capacity by hand."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The overloaded component",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "On January 4th, one of our Transit Gateways became overloaded.",
+   "note": "From Slack Engineering."
+  },
+  {
+   "label": "Why monitoring failed",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "our dashboard and alerting services failed because they were running in a different VPC from their backend databases.",
+   "note": "From the same post."
+  },
+  {
+   "label": "A simulated autoscaling surprise",
+   "kind": "simulated",
+   "lang": "text",
+   "body": "web-asg  cpu=22%  worker_threads_busy=98%  desired: 800 -> 640   (scale in, CPU is low)\nweb-asg  cpu=19%  worker_threads_busy=100% desired: 640 -> 1840  (scale out, too late)",
+   "note": "Illustrates the effect described in the post: threads stuck waiting on slow backends make CPU look low. Numbers are invented."
+  },
+  {
+   "label": "A simulated limit check on a provisioning host",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ cat /proc/$(pgrep -f provision-service)/limits | grep 'open files'\nMax open files            1024                 4096                 files\n$ ls /proc/$(pgrep -f provision-service)/fd | wc -l\n1019",
+   "note": "Shows how to check the open files limit that the post names as the most significant bottleneck. Values are invented."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check network health between tiers, not only server health.",
+    "why": "Servers looked busy because they were waiting on a slow network path.",
+    "cmd": "ping -c 20 backend.internal | tail -3\nss -s"
+   },
+   {
+    "step": "Compare CPU against worker thread use.",
+    "why": "Low CPU with high thread use means threads are blocked, not that there is spare capacity.",
+    "cmd": "apachectl status | grep -i 'requests currently'"
+   },
+   {
+    "step": "Check limits on the services that create capacity.",
+    "why": "A new server is useless if the provisioner is hitting file or quota limits.",
+    "cmd": "cat /proc/$(pgrep -f provision-service)/limits | grep -i 'open files'"
+   }
+  ],
+  "correct": [
+   {
+    "step": "Stop the autoscaler from scaling in while you recover.",
+    "why": "Keep every healthy server you have.",
+    "cmd": "aws autoscaling suspend-processes --auto-scaling-group-name web --scaling-processes Terminate"
+   },
+   {
+    "step": "Ask the provider to raise capacity on the overloaded network component.",
+    "why": "You cannot fix a managed service yourself. Open the highest-priority case at once."
+   },
+   {
+    "step": "Raise the limits that block provisioning and slow the rate of new requests.",
+    "why": "A smaller, steady flow of new instances works better than a flood."
+   },
+   {
+    "step": "Use load balancer protection: retries with limits, circuit breaking and panic mode.",
+    "why": "They keep healthy servers from being overwhelmed."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Watch message delivery success rate return toward its normal level.",
+    "why": "This was Slack's own indicator of health."
+   },
+   {
+    "step": "Confirm new instances pass health checks and join the pool.",
+    "why": "Instances that exist but are not ready do not help."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Ask for provider capacity ahead of known peaks, such as the first Monday after a holiday.",
+    "why": "Managed scaling may lag a sudden step in demand."
+   },
+   {
+    "step": "Run dashboards and alerting where they do not depend on the network that may fail.",
+    "why": "You need monitoring most when everything else is failing."
+   },
+   {
+    "step": "Scale on a signal that reflects waiting work, such as busy worker threads, not on CPU alone.",
+    "why": "CPU can look low while the service is saturated."
+   },
+   {
+    "step": "Load test the provisioning path, not only the application.",
+    "why": "Provisioning is the tool you rely on in a crisis."
+   }
+  ],
+  "safety": "Suspending autoscaling and changing limits in production can increase cost and hide problems. Record every change, have a plan to resume the normal settings, and watch spend while you recover."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Monday morning after a long holiday. Error rates climb, the web tier fleet is shrinking and growing in waves, and your dashboards stop loading. Servers show low CPU but all worker threads are busy.",
+   "clues": [
+    "Packet drops reported between two VPCs",
+    "Autoscaling shows both scale-in and scale-out in quick succession",
+    "New instances stay unhealthy",
+    "The provisioning service logs 'too many open files'"
+   ],
+   "question": "What is your plan for the first 30 minutes?",
+   "hints": [
+    "What makes CPU low when the service is saturated?",
+    "How do you stop capacity from shrinking?",
+    "Who can fix a managed network service?"
+   ],
+   "answer": "Suspend scale-in so you keep capacity, open a priority case with the cloud provider about the network component, raise the provisioning limits and reduce the request rate to the provisioner, and use load balancer protections. In parallel get alternative visibility, since dashboards depend on the failing network."
+  },
+  "rootcause": {
+   "q": "What was the first domino?",
+   "options": [
+    "A bad deployment of Slack's code",
+    "An AWS Transit Gateway that did not scale fast enough for a surge in traffic",
+    "A DNS expiry",
+    "A full disk"
+   ],
+   "answer": 1,
+   "why": "Slack says one of its Transit Gateways became overloaded, and rolled back changes were not the cause."
+  },
+  "remediation": [
+   {
+    "task": "Write the scaling signal you would use for a thread-based web server.",
+    "answer": "Use a combination of busy worker threads or queue depth plus latency, with CPU as a secondary signal. Scale out when the share of busy workers stays high, and scale in slowly with a long cool-down."
+   },
+   {
+    "task": "Plan capacity for the first working day of the year.",
+    "answer": "List known peaks, ask providers for pre-scaled capacity for managed network components, raise quotas before the date, pre-warm caches where possible, and schedule extra on-call staff."
+   },
+   {
+    "task": "Redesign the monitoring placement.",
+    "answer": "Run dashboards and alerting in the same network as their data, keep an out-of-band alerting path, and test it by failing the main network in a game day."
+   }
+  ],
+  "design": {
+   "prompt": "Design a web tier that survives a sudden step in traffic while a shared network component is saturated.",
+   "constraints": [
+    "No manual intervention for the first 15 minutes",
+    "Monitoring must keep working",
+    "New capacity must come online quickly"
+   ],
+   "answer": "Keep spare headroom and pre-warmed instances, scale on busy workers and latency, rate-limit provisioning requests, and size network components with headroom. Place monitoring beside its data, add a second out-of-band alert channel, use load shedding and circuit breakers, and test with a surge drill."
+  },
+  "checks": [
+   {
+    "q": "Why can low CPU be misleading?",
+    "options": [
+     "CPU readings are always wrong",
+     "Threads waiting on a slow backend do not use CPU, yet the service is saturated",
+     "CPU is not used on web servers",
+     "Low CPU means more traffic"
+    ],
+    "answer": 1,
+    "why": "Slack found waiting threads lowered CPU, which caused downscaling at the wrong moment."
+   },
+   {
+    "q": "What was the most significant bottleneck in provision-service?",
+    "options": [
+     "Disk space",
+     "The Linux open files limit",
+     "A slow database",
+     "A missing certificate"
+    ],
+    "answer": 1,
+    "why": "The post calls the open files limit the most significant bottleneck, along with an AWS quota."
+   },
+   {
+    "q": "Why did dashboards fail?",
+    "options": [
+     "They were deleted",
+     "They ran in a different VPC from their databases and so depended on the failing gateway",
+     "They ran out of memory",
+     "They were blocked by a firewall rule"
+    ],
+    "answer": 1,
+    "why": "That is the explanation in the post. Running them with their databases removes the network dependency."
+   },
+   {
+    "q": "What is the best action to take before the next known peak?",
+    "options": [
+     "Hope",
+     "Request preemptive capacity from the provider",
+     "Disable monitoring",
+     "Reduce the number of servers"
+    ],
+    "answer": 1,
+    "why": "Slack planned to ask AWS to scale the TGWs in advance at the end of the next holiday season."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Request pre-scaled capacity for known peaks",
+   "Keep monitoring in the same network as its data",
+   "Load test provisioning tools",
+   "Review health checks and autoscaling together"
+  ],
+  "monitoring": [
+   "Alert on busy worker threads and queue depth, not only CPU",
+   "Track packet loss between tiers",
+   "Have an alert path that does not use the production network"
+  ],
+  "recovery": [
+   "Suspend scale-in during incidents",
+   "Open priority cases with providers early",
+   "Use load shedding and circuit breaking to protect healthy servers"
+  ],
+  "practices": [
+   "List the managed services you rely on and their scaling limits",
+   "Practise a post-holiday surge",
+   "Prefer fewer cross-network dependencies for critical tools"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Slack Engineering: Slack's Outage on January 4th 2021",
+   "url": "https://slack.engineering/slacks-outage-on-january-4th-2021/",
+   "used": "timeline, causes, contributing factors, planned remediation"
+  }
+ ],
+ "verification": "Facts marked Reported or Verified were read from Slack's engineering post on 29 October 2026. The post does not include logs or raw metrics, so the evidence blocks marked Simulated are written for teaching with invented numbers."
+}

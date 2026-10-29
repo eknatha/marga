@@ -1,0 +1,369 @@
+{
+ "id": "rogers-network-outage",
+ "checked": "29 October 2026",
+ "summary": "On 8 July 2022 Rogers's network in Canada failed after a routing filter was deleted in its core networks, which overwhelmed router capacity. Millions of customers lost service and 911 was affected. Rogers committed to separating wireless and wireline traffic and more testing.",
+ "overview": {
+  "background": "Rogers runs wireless and wireline services over a shared core. Routers decide how traffic flows. The page was Rogers' CTO account as reported by ITWorldCanada.",
+  "systems": [
+   "Core network routers from more than one vendor",
+   "A routing filter on distribution routers",
+   "Wireless and wireline services on a shared core",
+   "911 emergency services"
+  ],
+  "impact": "Millions of Canadians lost connectivity and 911 services were affected across the country.",
+  "severity": "A national outage. The article does not give the duration; the card says about a day.",
+  "gaps": "The article does not state the year. The case card gives 2022. This file uses that."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A deleted filter overwhelms router capacity",
+   "caption": "Per Rogers, deleting a routing filter overwhelmed router capacity, and the update behaved differently on hardware from different vendors.",
+   "nodes": [
+    {
+     "id": "del",
+     "label": "Routing filter deleted in core",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "ovr",
+     "label": "Routers overwhelmed, cannot direct traffic",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "vend",
+     "label": "Vendors handle the update differently",
+     "row": 1,
+     "col": 0
+    },
+    {
+     "id": "out",
+     "label": "Wireless and wireline down, 911 affected",
+     "row": 2,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "del",
+     "t": "ovr",
+     "state": "fail"
+    },
+    {
+     "f": "vend",
+     "t": "ovr"
+    },
+    {
+     "f": "ovr",
+     "t": "out",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Separated networks and failover (conceptual)",
+   "caption": "Rogers said it would separate wireless and wireline traffic and add failover to a competitor's network. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "w",
+     "label": "Wireless core",
+     "row": 0,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "l",
+     "label": "Wireline core",
+     "row": 0,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "fo",
+     "label": "Failover to another network within seconds",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "test",
+     "label": "Stricter testing across vendors",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "w",
+     "t": "fo",
+     "state": "new"
+    },
+    {
+     "f": "l",
+     "t": "fo",
+     "state": "new"
+    },
+    {
+     "f": "fo",
+     "t": "test",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "A fault on one side does not take down the other.",
+  "Emergency calls have a second path.",
+  "Changes are tested on every vendor."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "8 Jul 2022",
+   "phase": "trigger",
+   "e": "A routing filter is deleted in the core networks during an update."
+  },
+  {
+   "t": "Shortly after",
+   "phase": "impact",
+   "e": "Routers are overwhelmed and the network stops carrying traffic."
+  },
+  {
+   "t": "During the outage",
+   "phase": "impact",
+   "e": "Wireless, internet and 911 services are affected for millions."
+  },
+  {
+   "t": "During the outage",
+   "phase": "investigate",
+   "e": "Rogers finds the update behaved differently across vendors."
+  },
+  {
+   "t": "After the outage",
+   "phase": "mitigate",
+   "e": "Rogers commits to separating wireless and wireline traffic (about C$250 million)."
+  },
+  {
+   "t": "Later",
+   "phase": "recover",
+   "e": "Service returns and Rogers names Ron McKenzie as CTO replacing Jorge Fernandes."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A routing filter was deleted in the core during an update.",
+  "underlying": "The update was handled differently by hardware from different vendors, which Rogers had not anticipated, and the error got past testing.",
+  "contributing": [
+   "Wireless and wireline shared a core",
+   "Insufficient multi-vendor testing",
+   "Management dependence on the same core (per the case card, not the article)"
+  ],
+  "propagation": [
+   "Filter removed.",
+   "Router overload.",
+   "Core failure.",
+   "Services down."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Vendor behaviour",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "very different",
+   "note": "McKenzie's description of behaviour between vendors, as quoted by ITWorldCanada."
+  },
+  {
+   "label": "A simulated pre-change check",
+   "kind": "simulated",
+   "lang": "text",
+   "body": "show route summary | match 'routes'\nshow bgp neighbor | match prefixes",
+   "note": "Generic checks of route counts before and after a filter change. Not Rogers commands."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Compare routing table sizes before and after.",
+    "why": "Overload from route volume."
+   },
+   {
+    "step": "Check behaviour per vendor.",
+    "why": "Differences caused surprises."
+   },
+   {
+    "step": "Check whether management traffic uses the same core.",
+    "why": "Per the card."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Restore the filter.",
+    "why": "Stop route flood."
+   },
+   {
+    "step": "Bring routers back in stages.",
+    "why": "Prevent a second overload."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check 911 and mobile services.",
+    "why": "Test."
+   },
+   {
+    "step": "Check routing tables stable.",
+    "why": "Monitor."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Separate wireless and wireline.",
+    "why": "Rogers's commitment."
+   },
+   {
+    "step": "Test on every vendor.",
+    "why": "Rogers's commitment."
+   },
+   {
+    "step": "Fail over to another network.",
+    "why": "Rogers's commitment."
+   }
+  ],
+  "safety": "Never remove a filter in production without a dry run on every router type."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A network change removed a filter and the core is down. Multiple vendors' routers run in the core.",
+   "clues": [
+    "Behaviour differs",
+    "911 affected",
+    "Management tools use the same network"
+   ],
+   "question": "How do you recover and prevent a repeat?",
+   "hints": [
+    "What do you do first?",
+    "What testing was missing?",
+    "How do you protect emergency calls?"
+   ],
+   "answer": "Restore the filter, recover in stages, test on every vendor, separate networks and add a failover for emergency calls."
+  },
+  "rootcause": {
+   "q": "What was deleted?",
+   "options": [
+    "A routing filter",
+    "A server",
+    "A cable",
+    "A password"
+   ],
+   "answer": 0,
+   "why": "Per the article."
+  },
+  "remediation": [
+   {
+    "task": "Define a multi-vendor test.",
+    "answer": "Run the change in a lab with each router type."
+   },
+   {
+    "task": "Plan network separation.",
+    "answer": "Independent cores."
+   },
+   {
+    "task": "Plan failover.",
+    "answer": "Automatic roaming to another network."
+   }
+  ],
+  "design": {
+   "prompt": "Design a carrier core where one change cannot take down everything.",
+   "constraints": [
+    "Multi-vendor",
+    "Shared services",
+    "911"
+   ],
+   "answer": "Separate domains, staged changes, multi-vendor testing, failover and out-of-band management."
+  },
+  "checks": [
+   {
+    "q": "What was the CTO change?",
+    "options": [
+     "Ron McKenzie replaced Jorge Fernandes",
+     "None",
+     "A merger",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   },
+   {
+    "q": "How much will separation cost?",
+    "options": [
+     "About C$250 million",
+     "C$1",
+     "C$10 billion",
+     "Nothing"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   },
+   {
+    "q": "Did the article give the duration?",
+    "options": [
+     "No",
+     "Yes",
+     "Partly",
+     "Always"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   },
+   {
+    "q": "What difference caused surprise?",
+    "options": [
+     "Different vendors' hardware handled the update differently",
+     "Weather",
+     "Staff",
+     "Time zones"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Separated networks",
+   "Multi-vendor testing"
+  ],
+  "monitoring": [
+   "Routing table size alerts"
+  ],
+  "recovery": [
+   "Restore filter",
+   "Staged recovery"
+  ],
+  "practices": [
+   "Failover for emergency calls",
+   "Out-of-band management"
+  ]
+ },
+ "sources": [
+  {
+   "title": "ITWorldCanada: Hardware vendor differences led to Rogers outage, says Rogers CTO",
+   "url": "https://itworldcanada.com/?p=494468",
+   "used": "cause, impact, commitments"
+  }
+ ],
+ "verification": "Facts were read from ITWorldCanada's report on 29 October 2026. It states the date as July 8 without a year; the card gives 2022. The CRTC page (card source) was not read. Duration comes from the card, not the article. The commands are Simulated."
+}

@@ -1,0 +1,396 @@
+{
+ "id": "solarwinds-supply-chain-attack",
+ "checked": "29 October 2026",
+ "summary": "A threat actor added a malicious version of a SolarWinds Orion library to the vendor's build process, signed with SolarWinds' own certificate. Customers who installed the updates ran a backdoor. CISA described follow-on activity in government and private networks.",
+ "overview": {
+  "background": "SolarWinds Orion is network monitoring software with high privileges in customer networks. CISA says compromises date back to at least March 2020.",
+  "systems": [
+   "SolarWinds build process",
+   "Signed Orion updates (versions 2019.4 HF5 to 2020.2 HF1)",
+   "Customer networks running Orion",
+   "Identity systems such as SAML signing certificates"
+  ],
+  "impact": "U.S. government agencies, critical infrastructure and private organisations were compromised, per CISA.",
+  "severity": "Severe. CISA issued Emergency Directive 21-01 on 13 December 2020.",
+  "gaps": "The alert covers detection and mitigation. It does not give a full timeline of the intrusion."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Trusted update delivers a backdoor",
+   "caption": "Per CISA, the actor added a malicious DLL to the build process, signed with SolarWinds' legitimate certificate; the backdoor beaconed to a victim-specific domain.",
+   "nodes": [
+    {
+     "id": "build",
+     "label": "Malicious DLL added to build",
+     "row": 0,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "sign",
+     "label": "Signed with legitimate certificate",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "cust",
+     "label": "Customers install Orion update",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "c2",
+     "label": "Backdoor beacons to victim-specific domain",
+     "row": 3,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "id",
+     "label": "Follow-on: credentials and SAML abuse",
+     "row": 3,
+     "col": 2,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "build",
+     "t": "sign",
+     "state": "fail"
+    },
+    {
+     "f": "sign",
+     "t": "cust",
+     "state": "fail"
+    },
+    {
+     "f": "cust",
+     "t": "c2",
+     "state": "hit"
+    },
+    {
+     "f": "cust",
+     "t": "id",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Defending the build and the network (conceptual)",
+   "caption": "Controls that reduce the chance and impact of a poisoned update. Not from CISA's alert in detail.",
+   "nodes": [
+    {
+     "id": "bld",
+     "label": "Hardened, reproducible build",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "egr",
+     "label": "Egress restrictions on monitoring servers",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "idp",
+     "label": "Protect identity trust store",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "log",
+     "label": "180 days of centralised logs",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "bld",
+     "t": "egr",
+     "state": "new"
+    },
+    {
+     "f": "bld",
+     "t": "idp",
+     "state": "new"
+    },
+    {
+     "f": "egr",
+     "t": "log",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "The build is tamper evident.",
+  "Management software cannot call the internet freely.",
+  "Identity secrets are guarded."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Earliest known, March 2020",
+   "phase": "trigger",
+   "e": "CISA reports the earliest known compromises."
+  },
+  {
+   "t": "Through 2020",
+   "phase": "impact",
+   "e": "Compromised updates reach customers and the actor operates in some networks."
+  },
+  {
+   "t": "13 Dec 2020",
+   "phase": "detect",
+   "e": "CISA issues Emergency Directive 21-01 ordering agencies to disconnect affected devices."
+  },
+  {
+   "t": "15 Dec 2020",
+   "phase": "mitigate",
+   "e": "Partners redirect the command domain to a Microsoft-blocklisted address."
+  },
+  {
+   "t": "17 Dec 2020",
+   "phase": "change",
+   "e": "CISA publishes the alert."
+  },
+  {
+   "t": "6 Jan 2021",
+   "phase": "recover",
+   "e": "Update with mitigations and indicators; organisations rebuild Orion and rotate credentials."
+  }
+ ],
+ "rootCause": {
+  "trigger": "The actor compromised the SolarWinds build process and added a malicious DLL.",
+  "underlying": "It was signed with the vendor's certificate, so it looked legitimate to customers.",
+  "contributing": [
+   "Orion had broad privileges",
+   "Other access methods such as password spraying and stolen keys were also used",
+   "Identity systems such as SAML signing were abused"
+  ],
+  "propagation": [
+   "Build compromise.",
+   "Signed update.",
+   "Backdoor.",
+   "Follow-on identity abuse."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The build tampering",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "added a malicious version of the binary solarwinds.orion.core.businesslayer.dll",
+   "note": "From CISA's alert."
+  },
+  {
+   "label": "Update advice",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "installing all updates within 48 hours of release",
+   "note": "From CISA's alert; CISA's general advice."
+  },
+  {
+   "label": "A simulated Orion version check",
+   "kind": "simulated",
+   "lang": "powershell",
+   "body": "Get-ItemProperty 'HKLM:\\SOFTWARE\\SolarWinds\\Orion' | Select-Object Version",
+   "note": "Where a version might be read. Illustrative, not from CISA."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Find all Orion servers and versions.",
+    "why": "Compare with the listed affected versions."
+   },
+   {
+    "step": "Look for the indicators CISA lists.",
+    "why": "Domains, files."
+   },
+   {
+    "step": "Classify the network by evidence of follow-on activity.",
+    "why": "CISA's three categories."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Disconnect or power down affected instances.",
+    "why": "CISA's containment advice."
+   },
+   {
+    "step": "Rebuild Orion from trusted sources.",
+    "why": "At least 2020.2.1 HF2."
+   },
+   {
+    "step": "Reset credentials used by Orion.",
+    "why": "CISA's advice."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check no traffic to the command domain.",
+    "why": "Block and monitor."
+   },
+   {
+    "step": "Check identity systems for abuse.",
+    "why": "SAML and Kerberos."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Keep logs for 180 days.",
+    "why": "CISA's advice."
+   },
+   {
+    "step": "Plan incident response out of band.",
+    "why": "CISA's advice."
+   },
+   {
+    "step": "Use least privilege and MFA.",
+    "why": "CISA's advice."
+   }
+  ],
+  "safety": "A full rebuild of the identity environment may be needed. Plan it, do not improvise."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A vendor's signed update turns out to be malicious. It runs on a server that can reach everything.",
+   "clues": [
+    "Signed correctly",
+    "Beacons outbound",
+    "Credentials stored on it"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "How do you contain?",
+    "What do you rotate?",
+    "How do you coordinate?"
+   ],
+   "answer": "Isolate, block the command domain, rebuild from trusted sources, rotate credentials and review identity and logs out of band."
+  },
+  "rootcause": {
+   "q": "What made the update look legitimate?",
+   "options": [
+    "It was signed with the vendor's certificate",
+    "It was free",
+    "It was small",
+    "It was old"
+   ],
+   "answer": 0,
+   "why": "Per CISA."
+  },
+  "remediation": [
+   {
+    "task": "Define egress policy.",
+    "answer": "Management servers may reach only update hosts."
+   },
+   {
+    "task": "Plan credential rotation.",
+    "answer": "Service accounts and signing keys."
+   },
+   {
+    "task": "Plan out-of-band comms.",
+    "answer": "A separate channel."
+   }
+  ],
+  "design": {
+   "prompt": "Design update trust for monitoring tools.",
+   "constraints": [
+    "Privileged tool",
+    "Vendor updates",
+    "Large network"
+   ],
+   "answer": "Staging, hash checks, egress control, least privilege and monitoring of behaviour."
+  },
+  "checks": [
+   {
+    "q": "What date was Emergency Directive 21-01?",
+    "options": [
+     "13 December 2020",
+     "1 March 2020",
+     "6 January 2021",
+     "17 April 2021"
+    ],
+    "answer": 0,
+    "why": "Per CISA."
+   },
+   {
+    "q": "Per CISA, how long should logs be retained?",
+    "options": [
+     "At least 180 days",
+     "7 days",
+     "1 day",
+     "Forever"
+    ],
+    "answer": 0,
+    "why": "Per CISA."
+   },
+   {
+    "q": "Was Orion the only initial access method?",
+    "options": [
+     "No, others existed",
+     "Yes",
+     "Unknown",
+     "Always"
+    ],
+    "answer": 0,
+    "why": "Per CISA."
+   },
+   {
+    "q": "What did CISA advise for updates?",
+    "options": [
+     "Install within 48 hours of release",
+     "Wait a year",
+     "Never update",
+     "Only on Fridays"
+    ],
+    "answer": 0,
+    "why": "Per CISA."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Egress control",
+   "Least privilege",
+   "Hardened builds"
+  ],
+  "monitoring": [
+   "Centralised logs for 180 days"
+  ],
+  "recovery": [
+   "Rebuild",
+   "Rotate credentials"
+  ],
+  "practices": [
+   "Out-of-band response",
+   "Identity protection"
+  ]
+ },
+ "sources": [
+  {
+   "title": "CISA: Advanced Persistent Threat Compromise of Government Agencies, Critical Infrastructure, and Private Sector Organizations (AA20-352A)",
+   "url": "https://us-cert.cisa.gov/ncas/alerts/aa20-352a",
+   "used": "versions, timeline, mitigation"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from CISA's alert (archived address). The card used a newer CISA URL, which was not available. The command is Simulated."
+}

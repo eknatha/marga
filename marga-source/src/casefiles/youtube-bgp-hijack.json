@@ -1,0 +1,377 @@
+{
+ "id": "youtube-bgp-hijack",
+ "checked": "29 October 2026",
+ "summary": "On 24 February 2008 Pakistan Telecom announced a more-specific route for a YouTube prefix, intending to block YouTube inside Pakistan. Its upstream propagated the route and YouTube's traffic was drawn to Pakistan for about two hours.",
+ "overview": {
+  "background": "BGP routes are trusted between networks and a longer prefix wins. Pakistan Telecom (AS17557) announced a /24 inside YouTube's /22. Its upstream PCCW Global (AS3491) propagated it.",
+  "systems": [
+   "AS17557 Pakistan Telecom",
+   "AS3491 PCCW Global (upstream)",
+   "AS36561 YouTube",
+   "RIPE NCC RIS route collectors"
+  ],
+  "impact": "Traffic for YouTube was drawn to Pakistan Telecom for about 2 hours 14 minutes.",
+  "severity": "A global service disruption that lasted from 18:47 to 21:01 UTC.",
+  "gaps": "The page's IP addresses were stripped when it was read, so prefixes are described by length only."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A more-specific announcement wins",
+   "caption": "RIPE NCC's case study shows the hijacked /24 was seen by 105 peers against the legitimate /22 seen by 112.",
+   "nodes": [
+    {
+     "id": "pt",
+     "label": "AS17557 announces a /24 inside YouTube's /22",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "up",
+     "label": "AS3491 propagates it",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "rt",
+     "label": "Routers prefer the longer prefix",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "yt",
+     "label": "YouTube traffic goes to Pakistan",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "pt",
+     "t": "up",
+     "state": "fail"
+    },
+    {
+     "f": "up",
+     "t": "rt",
+     "state": "fail"
+    },
+    {
+     "f": "rt",
+     "t": "yt",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Origin validation and customer filtering (conceptual)",
+   "caption": "Controls that would reject this route. Not part of RIPE NCC's case study.",
+   "nodes": [
+    {
+     "id": "pt",
+     "label": "Customer announcement",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "flt",
+     "label": "Upstream filters customer prefixes",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "val",
+     "label": "RPKI origin validation",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "ok",
+     "label": "Only valid origins accepted",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "pt",
+     "t": "flt",
+     "state": "new"
+    },
+    {
+     "f": "pt",
+     "t": "val",
+     "state": "new"
+    },
+    {
+     "f": "flt",
+     "t": "ok",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Customers announce only what they own.",
+  "Upstreams filter.",
+  "Origins are validated."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "18:47 UTC, 24 Feb 2008",
+   "phase": "trigger",
+   "e": "AS17557 begins announcing the prefix, propagated by AS3491."
+  },
+  {
+   "t": "20:07",
+   "phase": "investigate",
+   "e": "YouTube begins announcing the prefix from AS36561."
+  },
+  {
+   "t": "20:18",
+   "phase": "mitigate",
+   "e": "YouTube announces more-specific prefixes, which win on longest-prefix match."
+  },
+  {
+   "t": "20:51",
+   "phase": "mitigate",
+   "e": "Pakistan Telecom's announcements appear with extra prepending, so more routers prefer YouTube's route."
+  },
+  {
+   "t": "21:01",
+   "phase": "recover",
+   "e": "AS3491 withdraws all prefixes originated by AS17557, ending the hijack."
+  },
+  {
+   "t": "21:01:22",
+   "phase": "change",
+   "e": "The last unauthorised announcement from Pakistan is received."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Pakistan Telecom announced a prefix it did not own.",
+  "underlying": "A longer prefix wins in BGP and the upstream propagated the announcement.",
+  "contributing": [
+   "No prefix filter at the upstream",
+   "No origin validation at the time",
+   "Routers prefer longer prefixes by design"
+  ],
+  "propagation": [
+   "Announcement.",
+   "Propagation.",
+   "Traffic diverted.",
+   "Counter-announcement and withdrawal."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Start of the hijack",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Pakistan Telecom (AS17557) started an unauthorised announcement of the prefix",
+   "note": "From the RIPE NCC case study."
+  },
+  {
+   "label": "End of the hijack",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "withdraws all prefixes originated by AS17557 (Pakistan Telecom), thus stopping the hijack",
+   "note": "From the same page."
+  },
+  {
+   "label": "A simulated lookup",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ curl -s 'https://stat.ripe.net/data/routing-status/data.json?resource=AS36561' | jq '.data'",
+   "note": "How a present-day lookup on an AS could be made. Not 2008 data."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Look at BGP for the prefix.",
+    "why": "A new origin appeared."
+   },
+   {
+    "step": "Compare prefix lengths.",
+    "why": "A more-specific was announced."
+   },
+   {
+    "step": "Find the upstream.",
+    "why": "AS3491."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Announce more-specific prefixes yourself.",
+    "why": "YouTube did at 20:18."
+   },
+   {
+    "step": "Ask the upstream to withdraw.",
+    "why": "PCCW withdrew at 21:01."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check routes return to the legitimate origin.",
+    "why": "Check route collectors."
+   },
+   {
+    "step": "Check service reachability.",
+    "why": "Test from many networks."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Filter customer announcements.",
+    "why": "General practice."
+   },
+   {
+    "step": "Publish and validate ROAs.",
+    "why": "General practice."
+   },
+   {
+    "step": "Monitor routes for your prefixes.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Announcing more-specific prefixes can leak traffic or increase the routing table. Use it as a short-term response only."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Part of the internet cannot reach your service. Route collectors show a longer prefix from an unknown origin.",
+   "clues": [
+    "It is a hijack",
+    "Upstream carries it",
+    "You own the space"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "How do you regain traffic quickly?",
+    "Who can stop it?",
+    "What stops it recurring?"
+   ],
+   "answer": "Announce the same or more-specific prefixes, contact the upstream and origin, then use ROAs and monitoring."
+  },
+  "rootcause": {
+   "q": "How long did the unauthorised announcement last?",
+   "options": [
+    "About 2 hours 14 minutes",
+    "5 minutes",
+    "2 days",
+    "1 week"
+   ],
+   "answer": 0,
+   "why": "18:47 to 21:01 UTC."
+  },
+  "remediation": [
+   {
+    "task": "Write a hijack alert.",
+    "answer": "Alert on new origin AS for your prefixes."
+   },
+   {
+    "task": "Plan ROAs.",
+    "answer": "Publish ROAs with max length."
+   },
+   {
+    "task": "List contacts.",
+    "answer": "Upstreams and big peers."
+   }
+  ],
+  "design": {
+   "prompt": "Design monitoring against hijacks.",
+   "constraints": [
+    "Own /22",
+    "Multiple upstreams",
+    "Global users"
+   ],
+   "answer": "ROAs, route collector monitoring, defined contacts and a playbook for more-specific announcements."
+  },
+  "checks": [
+   {
+    "q": "Which AS was the hijacker?",
+    "options": [
+     "AS17557",
+     "AS36561",
+     "AS3333",
+     "AS3491"
+    ],
+    "answer": 0,
+    "why": "Per the case study."
+   },
+   {
+    "q": "Which AS was the legitimate origin?",
+    "options": [
+     "AS36561",
+     "AS17557",
+     "AS3491",
+     "AS3356"
+    ],
+    "answer": 0,
+    "why": "Per the case study."
+   },
+   {
+    "q": "How did YouTube counter?",
+    "options": [
+     "Announced more-specific prefixes",
+     "Turned off the site",
+     "Changed DNS",
+     "Waited"
+    ],
+    "answer": 0,
+    "why": "Per the case study."
+   },
+   {
+    "q": "What ended the hijack?",
+    "options": [
+     "PCCW withdrew the prefixes",
+     "A reboot",
+     "A court order",
+     "A patch"
+    ],
+    "answer": 0,
+    "why": "Per the case study."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Customer filtering",
+   "ROAs and validation"
+  ],
+  "monitoring": [
+   "Origin change alerts"
+  ],
+  "recovery": [
+   "More-specific announcement",
+   "Upstream withdrawal"
+  ],
+  "practices": [
+   "Contact lists",
+   "Playbook for hijacks"
+  ]
+ },
+ "sources": [
+  {
+   "title": "RIPE NCC: YouTube Hijacking: A RIPE NCC RIS case study",
+   "url": "https://www.ripe.net/publications/news/youtube-hijacking-a-ripe-ncc-ris-case-study/",
+   "used": "times, ASNs, resolution"
+  }
+ ],
+ "verification": "Facts were read from the RIPE NCC page on 29 October 2026. The card cited a similarly named RIPEstat URL, which was not available; this page is the one found by search. IP addresses were stripped when read, so prefixes are described by length. The lookup command is Simulated."
+}

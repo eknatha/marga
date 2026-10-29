@@ -1,0 +1,382 @@
+{
+ "id": "o2-and-ericsson-expired-certificate",
+ "checked": "29 October 2026",
+ "summary": "On 6 December 2018 an expired certificate in two versions of Ericsson's SGSN-MME software stopped mobile data for operators in multiple countries, including O2 in the UK (about 32 million people reached with downstream effects) and SoftBank in Japan.",
+ "overview": {
+  "background": "Mobile operators run core network software that handles connections between devices and the network. Ericsson's SGSN-MME was used by several operators.",
+  "systems": [
+   "Ericsson SGSN-MME software, two specific versions",
+   "O2 UK and operators using its network",
+   "SoftBank Japan",
+   "Services such as TfL timetables and NHS trusts (affected by O2)"
+  ],
+  "impact": "O2's outage including downstream effects reached about 32 million people. SoftBank's outage ran from about 13:39 to just after 18:00 local time, mostly in Tokyo and Osaka.",
+  "severity": "Severe. Ericsson described it as affecting a limited number of customers, which the article disputes.",
+  "gaps": "Ericsson's newsroom (the card source) was not read. The report is Computing's article."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "One expired certificate in shared software",
+   "caption": "Per Ericsson, an expired certificate in the software versions installed with these customers caused the failures across countries.",
+   "nodes": [
+    {
+     "id": "cert",
+     "label": "Certificate expires in SGSN-MME versions",
+     "row": 0,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "op1",
+     "label": "O2 UK data service down",
+     "row": 1,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "op2",
+     "label": "SoftBank Japan data service down",
+     "row": 1,
+     "col": 2,
+     "state": "fail"
+    },
+    {
+     "id": "down",
+     "label": "MVNOs and services relying on O2 affected",
+     "row": 2,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "rest",
+     "label": "Faulty software decommissioned",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "cert",
+     "t": "op1",
+     "state": "fail"
+    },
+    {
+     "f": "cert",
+     "t": "op2",
+     "state": "fail"
+    },
+    {
+     "f": "op1",
+     "t": "down",
+     "state": "hit"
+    },
+    {
+     "f": "op2",
+     "t": "rest",
+     "label": "recovery"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Vendor certificate tracking (conceptual)",
+   "caption": "General controls for operators and vendors.",
+   "nodes": [
+    {
+     "id": "vend",
+     "label": "Vendor lists certificates in shipped software",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "inv",
+     "label": "Operator inventory with expiry dates",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "alert",
+     "label": "Alerts on expiry",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "test",
+     "label": "Test with clock moved forward",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "vend",
+     "t": "inv",
+     "state": "new"
+    },
+    {
+     "f": "vend",
+     "t": "alert",
+     "state": "new"
+    },
+    {
+     "f": "inv",
+     "t": "test",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Certificates in vendor software are known.",
+  "Expiry is tested.",
+  "A single flaw does not hit everyone at once."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "6 Dec 2018",
+   "phase": "trigger",
+   "e": "An expired certificate in two SGSN-MME software versions stops the core network."
+  },
+  {
+   "t": "From the start",
+   "phase": "impact",
+   "e": "Mobile data fails for O2 and operators using its network, and for SoftBank in Japan."
+  },
+  {
+   "t": "During the day",
+   "phase": "impact",
+   "e": "SoftBank's outage lasts from about 13:39 to just after 18:00 local time."
+  },
+  {
+   "t": "During the day",
+   "phase": "investigate",
+   "e": "Ericsson identifies the expired certificate."
+  },
+  {
+   "t": "Later that day",
+   "phase": "mitigate",
+   "e": "Ericsson restores service for most customers."
+  },
+  {
+   "t": "After restoration",
+   "phase": "recover",
+   "e": "The faulty software is decommissioned and a full root cause analysis begins."
+  }
+ ],
+ "rootCause": {
+  "trigger": "An expired certificate in the software versions installed with these customers.",
+  "underlying": "The same software version in use across operators caused simultaneous failure.",
+  "contributing": [
+   "Common software across countries",
+   "Certificate expiry not tracked",
+   "Fault appeared everywhere at once"
+  ],
+  "propagation": [
+   "Certificate expires.",
+   "Core software stops.",
+   "Data fails across operators."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Ericsson's explanation",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "an expired certificate in the software versions installed with these customers",
+   "note": "From Ericsson as quoted by Computing."
+  },
+  {
+   "label": "Next step",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "A complete and comprehensive root cause analysis is still in progress.",
+   "note": "From the same statement."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check core software logs for certificate errors.",
+    "why": "Expiry."
+   },
+   {
+    "step": "Check which versions are installed.",
+    "why": "Two versions."
+   },
+   {
+    "step": "Check other operators with the same software.",
+    "why": "Multiple countries."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Replace or renew the certificate.",
+    "why": "Restores service."
+   },
+   {
+    "step": "Decommission faulty software.",
+    "why": "Ericsson's step."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check data service returns.",
+    "why": "Test."
+   },
+   {
+    "step": "Complete root cause analysis.",
+    "why": "Ericsson's step."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Track certificates in vendor software.",
+    "why": "General practice."
+   },
+   {
+    "step": "Test with the clock moved forward.",
+    "why": "General practice."
+   },
+   {
+    "step": "Stagger versions.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Do not change system clocks in production to test expiry."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Mobile data has failed at several of your sites. All run the same vendor core software.",
+   "clues": [
+    "Same versions",
+    "Certificate errors in logs",
+    "Vendor silent"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "How do you confirm cause?",
+    "What do you ask the vendor?",
+    "What do you tell customers?"
+   ],
+   "answer": "Look for expiry errors, ask the vendor for a renewed certificate, roll it out and communicate."
+  },
+  "rootcause": {
+   "q": "On what date did the outage occur?",
+   "options": [
+    "6 December 2018",
+    "1 January 2019",
+    "12 March 2018",
+    "Unknown"
+   ],
+   "answer": 0,
+   "why": "Per Computing."
+  },
+  "remediation": [
+   {
+    "task": "Write an expiry list for vendor software.",
+    "answer": "Ask for it in contracts."
+   },
+   {
+    "task": "Plan a clock-forward test.",
+    "answer": "In a lab."
+   },
+   {
+    "task": "Plan version staggering.",
+    "answer": "Not all nodes on one version."
+   }
+  ],
+  "design": {
+   "prompt": "Design a core network resilient to a shared fault.",
+   "constraints": [
+    "Multiple countries",
+    "Same vendor",
+    "Critical service"
+   ],
+   "answer": "Version diversity, canaries, certificate tracking, vendor SLAs and failover."
+  },
+  "checks": [
+   {
+    "q": "What software was affected?",
+    "options": [
+     "SGSN-MME",
+     "A browser",
+     "A phone OS",
+     "A database"
+    ],
+    "answer": 0,
+    "why": "Per Computing."
+   },
+   {
+    "q": "Which Japanese operator was affected?",
+    "options": [
+     "SoftBank",
+     "NTT",
+     "KDDI",
+     "Rakuten"
+    ],
+    "answer": 0,
+    "why": "Per Computing."
+   },
+   {
+    "q": "How many people did O2's outage reach?",
+    "options": [
+     "About 32 million",
+     "32",
+     "320",
+     "3 million"
+    ],
+    "answer": 0,
+    "why": "Per Computing."
+   },
+   {
+    "q": "What did Ericsson call the number of customers affected?",
+    "options": [
+     "A limited number",
+     "All",
+     "None",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per Computing."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Certificate tracking",
+   "Version diversity"
+  ],
+  "monitoring": [
+   "Core software logs"
+  ],
+  "recovery": [
+   "Renew certificate"
+  ],
+  "practices": [
+   "Clock-forward tests",
+   "Vendor contract terms"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Computing: Ericsson apologises for O2 network outage",
+   "url": "https://www.computing.co.uk/news/3067847/ericsson-apologises-for-o2-network-outage",
+   "used": "date, cause, affected operators, impact"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from Computing's article. The card source (Ericsson newsroom) was not read."
+}

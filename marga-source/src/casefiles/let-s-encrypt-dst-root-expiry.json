@@ -1,0 +1,379 @@
+{
+ "id": "let-s-encrypt-dst-root-expiry",
+ "checked": "29 October 2026",
+ "summary": "On 30 September 2021 the DST Root CA X3 certificate expired. Let's Encrypt certificates still chained to it for older devices, and some clients, especially those using OpenSSL 1.0.x or lacking ISRG Root X1, began to show certificate errors.",
+ "overview": {
+  "background": "Let's Encrypt certificates are trusted through ISRG Root X1, but older devices do not have that root. A cross-signature from DST Root CA X3 let those devices trust Let's Encrypt until it expired.",
+  "systems": [
+   "DST Root CA X3 (expired 30 September 2021)",
+   "ISRG Root X1",
+   "Older devices and OpenSSL 1.0.x clients",
+   "API clients and IoT devices"
+  ],
+  "impact": "Older devices and some API clients showed certificate warnings or failed to connect. Typical websites saw little impact because most visitors trust the newer root.",
+  "severity": "Moderate for most, severe for fleets of old devices and some APIs.",
+  "gaps": "The page is a forward-looking advisory, not an incident report. It does not report real-world failure counts."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "The old cross-sign ends and clients without the new root fail",
+   "caption": "Per Let's Encrypt, clients must trust ISRG Root X1, and OpenSSL 1.0.x clients can fail even if they trust it because of a verification quirk.",
+   "nodes": [
+    {
+     "id": "exp",
+     "label": "DST Root CA X3 expires",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "old",
+     "label": "Devices without ISRG Root X1 lose trust",
+     "row": 1,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "ssl",
+     "label": "OpenSSL 1.0.x clients mis-handle the chain",
+     "row": 1,
+     "col": 2,
+     "state": "fail"
+    },
+    {
+     "id": "api",
+     "label": "APIs and IoT devices fail to connect",
+     "row": 2,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "exp",
+     "t": "old",
+     "state": "fail"
+    },
+    {
+     "f": "exp",
+     "t": "ssl",
+     "state": "fail"
+    },
+    {
+     "f": "old",
+     "t": "api",
+     "state": "hit"
+    },
+    {
+     "f": "ssl",
+     "t": "api",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Trust store management for client fleets (conceptual)",
+   "caption": "General practice: know what roots your clients trust and test chains before expiry.",
+   "nodes": [
+    {
+     "id": "inv",
+     "label": "Inventory of client trust stores and OpenSSL versions",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "test",
+     "label": "Test against the new chain before expiry",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "upd",
+     "label": "Update roots and libraries",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "alert",
+     "label": "Alert on handshake failures",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "inv",
+     "t": "test",
+     "state": "new"
+    },
+    {
+     "f": "inv",
+     "t": "upd",
+     "state": "new"
+    },
+    {
+     "f": "test",
+     "t": "alert",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "You know what your clients trust.",
+  "Chains are tested before expiry.",
+  "Old libraries are replaced."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Before September 2021",
+   "phase": "change",
+   "e": "Let's Encrypt publishes guidance about the expiry."
+  },
+  {
+   "t": "Before 30 Sep 2021",
+   "phase": "detect",
+   "e": "Operators of APIs and IoT fleets test clients and find those without ISRG Root X1."
+  },
+  {
+   "t": "30 Sep 2021",
+   "phase": "trigger",
+   "e": "DST Root CA X3 expires."
+  },
+  {
+   "t": "After expiry",
+   "phase": "impact",
+   "e": "Older devices and OpenSSL 1.0.x clients show errors."
+  },
+  {
+   "t": "After expiry",
+   "phase": "mitigate",
+   "e": "Operators update trust stores or libraries, or use a different certificate chain."
+  },
+  {
+   "t": "After updates",
+   "phase": "recover",
+   "e": "Clients connect again."
+  }
+ ],
+ "rootCause": {
+  "trigger": "DST Root CA X3 expired.",
+  "underlying": "Some clients did not trust ISRG Root X1 or mishandled the chain.",
+  "contributing": [
+   "Devices that never receive software updates",
+   "OpenSSL 1.0.x verification quirk",
+   "Programs that do not use the operating system trust store"
+  ],
+  "propagation": [
+   "Root expires.",
+   "Chain fails on old clients.",
+   "Connections fail."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Who must act",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "all clients of your API must trust ISRG Root X1 (not just DST Root CA X3)",
+   "note": "From Let's Encrypt's page as read."
+  },
+  {
+   "label": "The device issue",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "some older devices won't ever trust it because they don't get software updates",
+   "note": "From the same page."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "List client types and OpenSSL versions.",
+    "why": "1.0.x is risky."
+   },
+   {
+    "step": "Test with a client that lacks the new root.",
+    "why": "Reproduce the error."
+   },
+   {
+    "step": "Check what chain the server presents.",
+    "why": "Chain choice matters."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Update the trust store.",
+    "why": "Add ISRG Root X1."
+   },
+   {
+    "step": "Upgrade OpenSSL to 1.1.0 or later.",
+    "why": "Let's Encrypt's advice."
+   },
+   {
+    "step": "Choose the chain for compatibility.",
+    "why": "Per Let's Encrypt's guidance."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Test connections from old clients.",
+    "why": "Verify."
+   },
+   {
+    "step": "Monitor handshake failures.",
+    "why": "Confirm drop."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Know your client fleet.",
+    "why": "General practice."
+   },
+   {
+    "step": "Replace unsupported devices.",
+    "why": "General practice."
+   },
+   {
+    "step": "Read CA announcements.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Pinning to an intermediate or root can break at renewal. Avoid it unless you can update clients."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "After a root expires, some of your IoT devices cannot connect to your API. They run an old OpenSSL.",
+   "clues": [
+    "Devices cannot be updated quickly",
+    "Server uses Let's Encrypt",
+    "Most users fine"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "How do you see which devices fail?",
+    "Can you change the chain?",
+    "What is the long-term fix?"
+   ],
+   "answer": "Identify failing clients, choose a compatible chain where possible, update libraries and plan device replacement."
+  },
+  "rootcause": {
+   "q": "When did DST Root CA X3 expire?",
+   "options": [
+    "30 September 2021",
+    "1 January 2020",
+    "15 March 2022",
+    "Unknown"
+   ],
+   "answer": 0,
+   "why": "Per the page."
+  },
+  "remediation": [
+   {
+    "task": "Write a client inventory.",
+    "answer": "OS, library and trust store version."
+   },
+   {
+    "task": "Plan a pre-expiry test.",
+    "answer": "Test all client types a month before."
+   },
+   {
+    "task": "Plan device replacement.",
+    "answer": "Retire unsupported devices."
+   }
+  ],
+  "design": {
+   "prompt": "Design certificate trust for a fleet of long-lived devices.",
+   "constraints": [
+    "10 years in field",
+    "No updates",
+    "Public CA"
+   ],
+   "answer": "Own the private CA or pin intermediates with update channels; avoid relying on public roots that change."
+  },
+  "checks": [
+   {
+    "q": "Which clients are named as having a quirk?",
+    "options": [
+     "OpenSSL 1.0.x",
+     "Chrome",
+     "Firefox",
+     "Safari"
+    ],
+    "answer": 0,
+    "why": "Per the page."
+   },
+   {
+    "q": "What should API clients trust?",
+    "options": [
+     "ISRG Root X1",
+     "Only DST Root CA X3",
+     "No roots",
+     "Any"
+    ],
+    "answer": 0,
+    "why": "Per the page."
+   },
+   {
+    "q": "Do typical websites see big impact?",
+    "options": [
+     "Little or none",
+     "Total outage",
+     "Always",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the page."
+   },
+   {
+    "q": "Is this page an incident report?",
+    "options": [
+     "No, it is an advisory",
+     "Yes",
+     "Partly",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "See verification."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Know client trust stores",
+   "Update libraries"
+  ],
+  "monitoring": [
+   "TLS handshake failures"
+  ],
+  "recovery": [
+   "Update trust stores",
+   "Choose a compatible chain"
+  ],
+  "practices": [
+   "Pre-expiry testing",
+   "Retire unsupported devices"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Let's Encrypt: DST Root CA X3 Expiration (September 2021)",
+   "url": "https://letsencrypt.org/id/docs/dst-root-ca-x3-expiration-september-2021/",
+   "used": "expiry, affected clients, advice"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from the Indonesian-language path of Let's Encrypt's English page. The page is a pre-expiry advisory with a 2024 update, so this file describes the mechanism and risks it names and does not claim real-world failure counts."
+}

@@ -1,0 +1,374 @@
+{
+ "id": "docker-hub-pull-rate-limits",
+ "checked": "29 October 2026",
+ "summary": "Docker Hub limits how many image pulls are allowed from a source, so CI systems and clusters that pull from shared IP addresses can suddenly fail with 'too many requests' errors. This file uses Docker's current documentation, not the 2020 announcement.",
+ "overview": {
+  "background": "Docker Hub counts image pulls. Per Docker's current documentation, unauthenticated pulls are limited to 100 per 6 hours per IPv4 address or IPv6 /64 subnet, Personal accounts to 200, and paid plans have no pull limit.",
+  "systems": [
+   "Docker Hub registry",
+   "CI runners and Kubernetes nodes pulling images",
+   "Shared NAT addresses",
+   "Authentication and registry mirrors"
+  ],
+  "impact": "Builds and deployments fail when pulls exceed the limit, for example on shared addresses where many nodes appear as one.",
+  "severity": "A recurring operational risk rather than a single dated outage.",
+  "gaps": "This case file describes a mechanism using current docs. It does not describe one specific outage and gives no incident timeline."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Many nodes behind one address share one budget",
+   "caption": "Per Docker's docs, limits apply per IP address (or IPv6 /64) when unauthenticated. A shared NAT makes many nodes share it.",
+   "nodes": [
+    {
+     "id": "ci",
+     "label": "CI runners and cluster nodes",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "nat",
+     "label": "One shared egress IP",
+     "row": 1,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "hub",
+     "label": "Docker Hub pull limit",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "err",
+     "label": "Too many requests, pulls fail",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "ci",
+     "t": "nat"
+    },
+    {
+     "f": "nat",
+     "t": "hub",
+     "state": "hit"
+    },
+    {
+     "f": "hub",
+     "t": "err",
+     "state": "fail"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Mirror, authenticate, pin (conceptual)",
+   "caption": "General ways to reduce dependence on a public registry.",
+   "nodes": [
+    {
+     "id": "ci",
+     "label": "CI and nodes",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "mir",
+     "label": "Pull-through cache or private registry",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "auth",
+     "label": "Authenticated pulls",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "hub",
+     "label": "Docker Hub",
+     "row": 2,
+     "col": 1
+    }
+   ],
+   "edges": [
+    {
+     "f": "ci",
+     "t": "mir",
+     "state": "new"
+    },
+    {
+     "f": "ci",
+     "t": "auth",
+     "state": "new"
+    },
+    {
+     "f": "mir",
+     "t": "hub"
+    },
+    {
+     "f": "auth",
+     "t": "hub"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Builds do not depend on an anonymous public quota.",
+  "Frequently used images are cached.",
+  "Failures are clear and alerted."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Any time",
+   "phase": "trigger",
+   "e": "A burst of pulls from one shared address, for example a scaled-up CI run."
+  },
+  {
+   "t": "Within the window",
+   "phase": "impact",
+   "e": "Docker Hub returns a rate limit error for further pulls."
+  },
+  {
+   "t": "Within the window",
+   "phase": "detect",
+   "e": "Builds fail and logs show a too many requests error."
+  },
+  {
+   "t": "Next",
+   "phase": "investigate",
+   "e": "Engineers check the account, address and the number of pulls."
+  },
+  {
+   "t": "Next",
+   "phase": "mitigate",
+   "e": "Authenticate the pulls or point to a mirror or private registry."
+  },
+  {
+   "t": "After the change",
+   "phase": "recover",
+   "e": "Pulls succeed again and builds run."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Pulls from a shared address exceeded the unauthenticated limit.",
+  "underlying": "Docker's documentation sets limits per source address for unauthenticated users.",
+  "contributing": [
+   "Shared NAT egress made many nodes count as one",
+   "Images pulled again on every build instead of cached",
+   "No mirror or private registry"
+  ],
+  "propagation": [
+   "Burst of pulls.",
+   "Limit reached.",
+   "Pulls rejected.",
+   "Builds and deploys fail."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The documented limits (paraphrased)",
+   "kind": "simulated",
+   "lang": "text",
+   "body": "Unauthenticated: 100 pulls per 6 hours per IPv4 address or IPv6 /64. Personal: 200. Paid: no pull limit.",
+   "note": "A paraphrase of Docker's current documentation, not a verbatim quote. Check the page for current numbers."
+  },
+  {
+   "label": "A simulated error",
+   "kind": "simulated",
+   "lang": "text",
+   "body": "toomanyrequests: You have reached your pull rate limit.",
+   "note": "Typical shape of the message; wording may differ."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Read the error from the failing pull.",
+    "why": "It names a rate limit."
+   },
+   {
+    "step": "Find the egress address and count pulls.",
+    "why": "Shared NAT matters."
+   },
+   {
+    "step": "Check whether pulls are authenticated.",
+    "why": "Limits differ by account."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Authenticate pulls with a service account.",
+    "why": "Raises the limit per Docker's docs."
+   },
+   {
+    "step": "Add a pull-through cache or private registry.",
+    "why": "Reduces pulls from Docker Hub."
+   },
+   {
+    "step": "Cache base images in CI.",
+    "why": "Fewer pulls."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Rerun builds and check pulls succeed.",
+    "why": "Confirms."
+   },
+   {
+    "step": "Watch pull counts.",
+    "why": "Check headroom."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Mirror key images to your own registry.",
+    "why": "General practice."
+   },
+   {
+    "step": "Pin versions and reduce rebuild pulls.",
+    "why": "General practice."
+   },
+   {
+    "step": "Alert on pull failures.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Do not put registry credentials in logs or public repositories. Use secrets storage."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Your CI fails with too many requests errors at the start of the working day. All runners share one egress address.",
+   "clues": [
+    "Many builds start at once",
+    "Pulls are anonymous",
+    "No mirror"
+   ],
+   "question": "How do you fix it?",
+   "hints": [
+    "What raises your limit?",
+    "What reduces pulls?",
+    "What do you alert on?"
+   ],
+   "answer": "Authenticate pulls, add a pull-through cache, cache base images and alert on rate-limit errors."
+  },
+  "rootcause": {
+   "q": "Why does a shared NAT matter?",
+   "options": [
+    "Limits apply per address for anonymous pulls",
+    "It slows pulls",
+    "It blocks DNS",
+    "It changes digests"
+   ],
+   "answer": 0,
+   "why": "Per the docs."
+  },
+  "remediation": [
+   {
+    "task": "Design a mirror.",
+    "answer": "Pull-through cache in your cloud account."
+   },
+   {
+    "task": "Write an alert.",
+    "answer": "Alert on rate-limit strings in build logs."
+   },
+   {
+    "task": "Plan dependency pinning.",
+    "answer": "Digests for base images."
+   }
+  ],
+  "design": {
+   "prompt": "Design image supply for a cluster that does not rely on anonymous public pulls.",
+   "constraints": [
+    "Hundreds of nodes",
+    "Frequent deploys",
+    "Air-gapped region"
+   ],
+   "answer": "Private registry with replication, signed images, pinned digests, pull-through cache and authentication."
+  },
+  "checks": [
+   {
+    "q": "What is the unauthenticated limit in the current docs?",
+    "options": [
+     "100 pulls per 6 hours per IPv4 or IPv6 /64",
+     "Unlimited",
+     "1",
+     "10 per day"
+    ],
+    "answer": 0,
+    "why": "Per the docs page."
+   },
+   {
+    "q": "Is this file about one dated outage?",
+    "options": [
+     "No, it describes a mechanism",
+     "Yes",
+     "Sometimes",
+     "Always"
+    ],
+    "answer": 0,
+    "why": "See verification."
+   },
+   {
+    "q": "What does authentication change?",
+    "options": [
+     "The applicable limit",
+     "The image contents",
+     "The DNS",
+     "The protocol"
+    ],
+    "answer": 0,
+    "why": "Per the docs."
+   },
+   {
+    "q": "Which fix reduces calls to Docker Hub?",
+    "options": [
+     "A pull-through cache",
+     "A larger node",
+     "A new DNS",
+     "A longer timeout"
+    ],
+    "answer": 0,
+    "why": "General practice."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Mirror images",
+   "Authenticate pulls"
+  ],
+  "monitoring": [
+   "Rate-limit errors in logs"
+  ],
+  "recovery": [
+   "Authenticate and cache"
+  ],
+  "practices": [
+   "Pin by digest",
+   "Own your base images"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Docker Docs: Usage and limits for pulls",
+   "url": "https://docs.docker.com/docker-hub/usage/pulls/",
+   "used": "current limits"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from Docker's current documentation. The 2020 announcement text was not read, so this file does not describe that rollout. The documented-limit line is a paraphrase marked as such. The error text is Simulated."
+}

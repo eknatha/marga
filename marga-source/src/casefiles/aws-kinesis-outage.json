@@ -1,0 +1,446 @@
+{
+ "id": "aws-kinesis-outage",
+ "checked": "29 October 2026",
+ "summary": "On 25 November 2020 a small capacity addition to Kinesis's front-end fleet pushed every server over an operating system thread limit. Kinesis failed for hours and took Cognito, CloudWatch, Lambda and others with it.",
+ "overview": {
+  "background": "Kinesis Data Streams front-end servers each keep a shard-map cache built by talking to every other front-end server. Many AWS services use Kinesis for streaming data, and CloudWatch and Cognito depend on it.",
+  "systems": [
+   "Kinesis front-end fleet and its shard-map cache",
+   "Kinesis back-end clusters",
+   "Amazon Cognito",
+   "Amazon CloudWatch and CloudWatch Events",
+   "AWS Lambda, Auto Scaling, ECS and EKS",
+   "Service Health Dashboard posting tool"
+  ],
+  "impact": "Errors on Kinesis put and get calls from 5:15 AM PST. Cognito, CloudWatch metrics and logs, Lambda, container provisioning and Auto Scaling were all degraded, and Kinesis was fully normal at 10:23 PM PST.",
+  "severity": "A multi-service, region-wide event in US-EAST-1. AWS does not publish a numeric severity.",
+  "gaps": "The post gives no raw logs and no customer counts."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Thread limit on every front-end server",
+   "caption": "Each front-end server builds its shard map by contacting its peers, so a bigger fleet meant more threads per server. All servers crossed the limit together.",
+   "nodes": [
+    {
+     "id": "cap",
+     "label": "Capacity added to the front-end fleet",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "fe",
+     "label": "Front-end fleet: threads over the OS limit",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "map",
+     "label": "Shard-map caches unusable",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "be",
+     "label": "Back-end Kinesis clusters unreachable",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "dep",
+     "label": "Cognito, CloudWatch, Lambda, ECS, EKS",
+     "row": 3,
+     "col": 3,
+     "state": "hit"
+    },
+    {
+     "id": "dash",
+     "label": "Status posting tool needs Cognito",
+     "row": 4,
+     "col": 3,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "cap",
+     "t": "fe",
+     "label": "more peers, more threads"
+    },
+    {
+     "f": "fe",
+     "t": "map",
+     "label": "cache build fails",
+     "state": "fail"
+    },
+    {
+     "f": "map",
+     "t": "be",
+     "label": "cannot route",
+     "state": "fail"
+    },
+    {
+     "f": "be",
+     "t": "dep",
+     "label": "dependents fail",
+     "state": "fail"
+    },
+    {
+     "f": "dep",
+     "t": "dash",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Smaller blast radius for the front end (conceptual)",
+   "caption": "AWS said it would move to larger servers, dedicate a fleet to the shard-map cache, partition large callers and speed up cellularization. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "cell1",
+     "label": "Cell A: front-end fleet",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "cell2",
+     "label": "Cell B: CloudWatch partition",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "cache",
+     "label": "Dedicated shard-map cache fleet",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "alarm",
+     "label": "Thread-count alarms",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "be",
+     "label": "Back-end clusters",
+     "row": 3,
+     "col": 1
+    }
+   ],
+   "edges": [
+    {
+     "f": "cache",
+     "t": "cell1",
+     "state": "new"
+    },
+    {
+     "f": "cache",
+     "t": "cell2",
+     "state": "new"
+    },
+    {
+     "f": "cell1",
+     "t": "be",
+     "state": "new"
+    },
+    {
+     "f": "cell2",
+     "t": "be",
+     "state": "new"
+    },
+    {
+     "f": "alarm",
+     "t": "cell1",
+     "label": "early warning",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "A capacity change affects one cell, not all of Kinesis.",
+  "Fewer, larger servers need fewer threads each.",
+  "A thread alarm fires long before the limit."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "2:44 to 3:47 AM",
+   "phase": "change",
+   "e": "A small amount of capacity is added to the front-end fleet. AWS calls this the trigger, not the root cause."
+  },
+  {
+   "t": "5:15 AM",
+   "phase": "trigger",
+   "e": "Errors appear on putting and getting Kinesis records and alarms fire."
+  },
+  {
+   "t": "5:15 AM",
+   "phase": "investigate",
+   "e": "Teams review logs and start removing the new capacity as a precaution."
+  },
+  {
+   "t": "7:51 AM",
+   "phase": "investigate",
+   "e": "The root cause is narrowed to a few candidates. Each fix needs a full front-end restart."
+  },
+  {
+   "t": "9:39 AM",
+   "phase": "mitigate",
+   "e": "The cause is confirmed and recovery starts after the added capacity is removed."
+  },
+  {
+   "t": "10:07 AM",
+   "phase": "recover",
+   "e": "The first restarted front-end servers take traffic. Traffic is added slowly."
+  },
+  {
+   "t": "Noon onward",
+   "phase": "recover",
+   "e": "The error rate steadily falls."
+  },
+  {
+   "t": "10:23 PM",
+   "phase": "recover",
+   "e": "Kinesis is fully back to normal."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Adding servers made every existing server open more threads to talk to its peers.",
+  "underlying": "The fleet exceeded the maximum number of operating system threads, so cache construction failed and servers had unusable shard maps.",
+  "contributing": [
+   "The thread limit was not alarmed",
+   "A full-fleet restart was needed, and restarts must be paced because servers rebuild caches",
+   "Cognito depended on Kinesis and could exhaust buffers",
+   "The status posting tool depended on Cognito"
+  ],
+  "propagation": [
+   "Capacity is added.",
+   "Every server exceeds its thread limit.",
+   "Shard maps cannot be built.",
+   "Kinesis requests fail and dependent services degrade."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The cause in AWS's words",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "the new capacity had caused all of the servers in the fleet to exceed the maximum number of threads",
+   "note": "From AWS's summary."
+  },
+  {
+   "label": "The planned alarm",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "We are adding fine-grained alarming for thread consumption in the service.",
+   "note": "From AWS's corrective actions."
+  },
+  {
+   "label": "A simulated thread check",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ ls /proc/$(pgrep -f frontend)/task | wc -l\n32611\n$ cat /proc/sys/kernel/threads-max\n32768",
+   "note": "Shows how to read thread use against the system limit. Numbers are invented."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Count threads per process and compare with limits.",
+    "why": "A fleet-wide limit shows up as many hosts near the same number.",
+    "cmd": "ls /proc/$(pgrep -f frontend)/task | wc -l\ncat /proc/sys/kernel/threads-max"
+   },
+   {
+    "step": "Correlate the first errors with recent change events.",
+    "why": "AWS saw the capacity change first."
+   },
+   {
+    "step": "Check whether failures are in the service or in the cache bootstrap.",
+    "why": "Servers were running but could not route."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Roll back the capacity change.",
+    "why": "AWS removed the added capacity."
+   },
+   {
+    "step": "Restart servers in small groups.",
+    "why": "Each restarted server rebuilds its cache, so a mass restart can stall. AWS added traffic slowly."
+   },
+   {
+    "step": "Point bootstrap at the authoritative metadata store.",
+    "why": "It sped up the rebuild."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Watch the error rate fall as each group joins.",
+    "why": "Confirm the pool is healthy, not just running."
+   },
+   {
+    "step": "Check dependent services (Cognito, CloudWatch) separately.",
+    "why": "They recovered on their own timelines."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Alarm on thread count against the limit.",
+    "why": "Catch the next ceiling early."
+   },
+   {
+    "step": "Use fewer, larger servers.",
+    "why": "AWS said this reduces threads per server."
+   },
+   {
+    "step": "Separate big callers into partitions and cells.",
+    "why": "Limits shared fate."
+   },
+   {
+    "step": "Keep an independent status tool.",
+    "why": "AWS's posting tool depended on Cognito."
+   }
+  ],
+  "safety": "Restarting a whole fleet at once can make an outage longer. Change one group at a time and keep removing capacity as the first step."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Error rates for a streaming service jump after you add servers. Servers are up but cannot route requests.",
+   "clues": [
+    "The change was small",
+    "All servers show the same thread count",
+    "Dependent services also fail"
+   ],
+   "question": "What do you check and in what order?",
+   "hints": [
+    "What grows when the fleet grows?",
+    "Is it a bug or a limit?",
+    "How do you restart safely?"
+   ],
+   "answer": "Look at the recent change, check thread and file limits per host, roll back the change, restart in small groups while watching caches, and then verify dependents."
+  },
+  "rootcause": {
+   "q": "What was the root cause?",
+   "options": [
+    "A disk failure",
+    "Every front-end server exceeded a thread limit after capacity was added",
+    "A bad certificate",
+    "A DDoS attack"
+   ],
+   "answer": 1,
+   "why": "AWS says the new capacity caused all servers to exceed the maximum number of threads."
+  },
+  "remediation": [
+   {
+    "task": "Write the alarm.",
+    "answer": "Alarm when threads in use exceed about 70 percent of the limit on any host, and page above 85 percent."
+   },
+   {
+    "task": "Plan a safe restart.",
+    "answer": "Restart a few servers, wait for caches to build, check error rate, then continue in growing steps."
+   },
+   {
+    "task": "Decouple the status tool.",
+    "answer": "Host it on infrastructure that does not use the services it reports on."
+   }
+  ],
+  "design": {
+   "prompt": "Design a front end that scales without every node talking to every node.",
+   "constraints": [
+    "Thousands of servers",
+    "Fast bootstrap",
+    "Isolated large customers"
+   ],
+   "answer": "Use cells, a dedicated cache tier, partitioned fleets for the largest callers, and limits that are alarmed."
+  },
+  "checks": [
+   {
+    "q": "What did AWS call the small capacity addition?",
+    "options": [
+     "The root cause",
+     "The trigger",
+     "A fix",
+     "A test"
+    ],
+    "answer": 1,
+    "why": "AWS says it was the trigger, not the root cause."
+   },
+   {
+    "q": "Why was the status page delayed?",
+    "options": [
+     "It was down for maintenance",
+     "Its posting tool depended on Cognito, which depended on Kinesis",
+     "It was blocked",
+     "Nobody noticed"
+    ],
+    "answer": 1,
+    "why": "AWS notes early updates were delayed for this reason."
+   },
+   {
+    "q": "Why was a full restart slow?",
+    "options": [
+     "Servers rebuild caches and must be added slowly",
+     "Servers were offline",
+     "Power was out",
+     "DNS was wrong"
+    ],
+    "answer": 0,
+    "why": "AWS added traffic slowly as servers rebuilt."
+   },
+   {
+    "q": "Which action reduces threads per server?",
+    "options": [
+     "Using larger servers and fewer of them",
+     "Using more small servers",
+     "Adding more logs",
+     "Disabling alarms"
+    ],
+    "answer": 0,
+    "why": "That is one of AWS's corrective actions."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Alarm on OS limits",
+   "Cellularize the front end",
+   "Reduce dependencies between core services"
+  ],
+  "monitoring": [
+   "Thread consumption",
+   "Per-cell error rates"
+  ],
+  "recovery": [
+   "Roll back capacity first",
+   "Restart in small groups"
+  ],
+  "practices": [
+   "Keep an independent status path",
+   "Test limits when you scale"
+  ]
+ },
+ "sources": [
+  {
+   "title": "AWS: Summary of the Amazon Kinesis Event in the Northern Virginia (US-EAST-1) Region",
+   "url": "https://aws.amazon.com/message/11201/",
+   "used": "timeline, cause, affected services, corrective actions"
+  }
+ ],
+ "verification": "Facts were read from AWS's published summary on 29 October 2026. AWS gives no logs, so the commands and output are Simulated. The after diagram is Conceptual."
+}

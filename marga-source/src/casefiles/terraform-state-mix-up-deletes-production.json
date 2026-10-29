@@ -1,0 +1,389 @@
+{
+ "id": "terraform-state-mix-up-deletes-production",
+ "checked": "29 October 2026",
+ "summary": "On 26 February 2026 an AI coding agent running Terraform destroyed the production infrastructure of the DataTalks.Club course platform, including its database and automated snapshots. The Terraform state file was on an old laptop and an older state file was swapped in. AWS Support restored a snapshot about 24 hours later. This file uses secondary reports of the author's account.",
+ "overview": {
+  "background": "Alexey Grigorev used Claude Code to move a site to AWS, reusing the Terraform configuration of his course platform, so both shared one VPC. The Terraform state file stayed on his previous computer.",
+  "systems": [
+   "Terraform and its state file",
+   "An AI coding agent given Terraform access",
+   "VPC, RDS, ECS cluster, load balancers and a bastion host",
+   "Automated snapshots"
+  ],
+  "impact": "The platform was down for about a day. The restored courses_answer table had 1,943,200 rows according to one report.",
+  "severity": "Severe for a small platform, with data restored after AWS Business Support intervened.",
+  "gaps": "The author's post (the card source) could not be fetched. This file uses two secondary reports, which may differ in detail."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Missing state, a swapped state file and a destroy",
+   "caption": "Per the secondary reports, Terraform believed nothing existed without the state file, an older state file was put in place, and terraform destroy removed the real production resources, including snapshots.",
+   "nodes": [
+    {
+     "id": "st",
+     "label": "State file left on an old laptop",
+     "row": 0,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "old",
+     "label": "Older state file swapped in",
+     "row": 0,
+     "col": 2,
+     "state": "fail"
+    },
+    {
+     "id": "ag",
+     "label": "Agent runs terraform destroy",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "prod",
+     "label": "Production VPC, RDS, ECS and snapshots destroyed",
+     "row": 2,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "aws",
+     "label": "AWS Support finds a hidden snapshot, restores",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "st",
+     "t": "ag",
+     "state": "fail"
+    },
+    {
+     "f": "old",
+     "t": "ag",
+     "state": "fail"
+    },
+    {
+     "f": "ag",
+     "t": "prod",
+     "state": "hit"
+    },
+    {
+     "f": "prod",
+     "t": "aws",
+     "label": "recovery"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Remote state, deletion protection and separate backups (conceptual)",
+   "caption": "Safeguards the author said were added.",
+   "nodes": [
+    {
+     "id": "rs",
+     "label": "Terraform state in remote storage with versioning",
+     "row": 0,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "dp",
+     "label": "Deletion protection on critical resources",
+     "row": 0,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "ap",
+     "label": "Manual approval for destructive actions",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "bk",
+     "label": "Backups outside Terraform, restore-tested",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "rs",
+     "t": "ap",
+     "state": "new"
+    },
+    {
+     "f": "dp",
+     "t": "bk",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "State is shared and safe.",
+  "Critical resources cannot be deleted by accident.",
+  "Backups survive the stack."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Thu 26 Feb 2026",
+   "phase": "trigger",
+   "e": "Terraform plans to create many resources that already exist because the state file is missing."
+  },
+  {
+   "t": "26 Feb",
+   "phase": "investigate",
+   "e": "The agent is asked to clean up duplicates; an older state file is placed on the new machine."
+  },
+  {
+   "t": "Thu 26 Feb, ~11 PM",
+   "phase": "impact",
+   "e": "terraform destroy removes the VPC, RDS database, ECS cluster, load balancers and bastion host."
+  },
+  {
+   "t": "26 Feb",
+   "phase": "detect",
+   "e": "Automated snapshots also appear to be gone; the author upgrades to AWS Business Support."
+  },
+  {
+   "t": "Fri 27 Feb",
+   "phase": "mitigate",
+   "e": "AWS engineers confirm the deletion and find a snapshot not visible in the console."
+  },
+  {
+   "t": "Fri 27 Feb, ~10 PM",
+   "phase": "recover",
+   "e": "The database is restored and back online, about 24 hours after the deletion."
+  }
+ ],
+ "rootCause": {
+  "trigger": "The Terraform state file was not on the new machine, then an older state was used, and a destroy ran against production.",
+  "underlying": "An AI agent was allowed to run Terraform commands without review.",
+  "contributing": [
+   "Two projects shared one configuration and VPC",
+   "Snapshots were tied to the database and deleted with it",
+   "No deletion protection or remote state"
+  ],
+  "propagation": [
+   "State missing.",
+   "Old state swapped in.",
+   "Destroy.",
+   "Snapshots lost with the database."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Responsibility",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "This incident was my fault.",
+   "note": "The author, as quoted in a secondary report."
+  },
+  {
+   "label": "On snapshots",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "I did not expect snapshots to disappear together with the database.",
+   "note": "The author, as quoted in the same report."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check Terraform state location and version.",
+    "why": "Missing then wrong."
+   },
+   {
+    "step": "Review the plan before apply or destroy.",
+    "why": "Skipped."
+   },
+   {
+    "step": "Check what shares the configuration.",
+    "why": "Two projects."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Stop the agent from running destructive commands.",
+    "why": "Author's change."
+   },
+   {
+    "step": "Contact cloud support quickly.",
+    "why": "Business Support."
+   },
+   {
+    "step": "Restore from a snapshot.",
+    "why": "A hidden snapshot existed."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check restored data against expectations.",
+    "why": "Row counts."
+   },
+   {
+    "step": "Test restores nightly.",
+    "why": "Author's change."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Keep state in remote versioned storage.",
+    "why": "Author's change."
+   },
+   {
+    "step": "Enable deletion protection.",
+    "why": "Author's change."
+   },
+   {
+    "step": "Require manual approval for destructive actions.",
+    "why": "Author's change."
+   }
+  ],
+  "safety": "Never let an agent run apply or destroy on production without a human reading the plan."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Terraform proposes creating everything because the state file is missing. An agent offers to clean up and destroy duplicates.",
+   "clues": [
+    "Production shares the configuration",
+    "Snapshots managed with the database",
+    "No deletion protection"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "What do you check first?",
+    "What do you forbid?",
+    "What do you prepare?"
+   ],
+   "answer": "Stop, find the right state, never destroy on production without review, enable protection and keep backups outside the stack."
+  },
+  "rootcause": {
+   "q": "What went missing that caused Terraform to plan everything again?",
+   "options": [
+    "The state file",
+    "The provider",
+    "The VPN",
+    "A DNS record"
+   ],
+   "answer": 0,
+   "why": "Per the reports."
+  },
+  "remediation": [
+   {
+    "task": "Move state remote.",
+    "answer": "S3 with versioning and locking."
+   },
+   {
+    "task": "Define approval rules.",
+    "answer": "Humans approve destroy."
+   },
+   {
+    "task": "Test restores.",
+    "answer": "Nightly."
+   }
+  ],
+  "design": {
+   "prompt": "Design infrastructure automation safe from accidental destroy.",
+   "constraints": [
+    "Shared accounts",
+    "AI agents",
+    "Small team"
+   ],
+   "answer": "Remote state, locks, deletion protection, separate backups, scoped credentials and review."
+  },
+  "checks": [
+   {
+    "q": "How long until the database was restored?",
+    "options": [
+     "About 24 hours",
+     "5 minutes",
+     "A week",
+     "Never"
+    ],
+    "answer": 0,
+    "why": "Per the reports."
+   },
+   {
+    "q": "What did AWS find?",
+    "options": [
+     "A snapshot not visible in the console",
+     "Nothing",
+     "A bug",
+     "A fire"
+    ],
+    "answer": 0,
+    "why": "Per the reports."
+   },
+   {
+    "q": "Which date did the deletion occur?",
+    "options": [
+     "26 February 2026",
+     "1 January 2024",
+     "5 May 2025",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the reports."
+   },
+   {
+    "q": "Who does the author say was at fault?",
+    "options": [
+     "Himself",
+     "AWS",
+     "Terraform",
+     "Nobody"
+    ],
+    "answer": 0,
+    "why": "Per the reports."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Remote state",
+   "Deletion protection",
+   "Separate backups"
+  ],
+  "monitoring": [
+   "Backup restore tests"
+  ],
+  "recovery": [
+   "Contact support",
+   "Restore snapshot"
+  ],
+  "practices": [
+   "Approval gates",
+   "Agent permissions"
+  ]
+ },
+ "sources": [
+  {
+   "title": "UC Strategies: Claude Code wiped out 2.5 years of production data in minutes",
+   "url": "https://ucstrategies.com/news/claude-code-wiped-out-2-5-years-of-production-data-in-minutes-the-post-mortem-every-developer-should-read/",
+   "used": "timeline, cause, recovery, changes"
+  },
+  {
+   "title": "AI Incident Database: report 7027",
+   "url": "https://incidentdatabase.ai/reports/7027",
+   "used": "summary of the incident"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from two secondary reports; the author's own post could not be fetched. Details such as exact times may differ from the original. Quotes are as given in those reports."
+}

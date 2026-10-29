@@ -1,0 +1,373 @@
+{
+ "id": "dyn-dns-attack",
+ "checked": "29 October 2026",
+ "summary": "On 21 October 2016 a distributed denial-of-service attack on the DNS provider Dyn, partly from devices infected with the Mirai botnet, made many popular sites unreachable for users on the US East Coast. Dyn described it as sophisticated and highly distributed, involving tens of millions of IP addresses.",
+ "overview": {
+  "background": "Dyn provided DNS for many large sites. DNS turns names into addresses, so if the provider is unreachable, names stop resolving even though the sites themselves are up.",
+  "systems": [
+   "Dyn's DNS servers",
+   "Customers using Dyn as their DNS provider",
+   "Mirai-infected devices such as cameras",
+   "US East Coast users"
+  ],
+  "impact": "Users on the US East Coast reaching Dyn servers could not access some customer sites. Dyn said it did not have a system-wide outage.",
+  "severity": "Two attack waves with service restored around 1:00 pm ET, per the report.",
+  "gaps": "The Dyn analysis page (the card source) was not read. Details come from a trade-press report of Dyn's statements."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Attack on the DNS provider hides many sites",
+   "caption": "Per the report, Dyn was hit in waves by a highly distributed attack. Sites that used Dyn as their DNS provider could not be reached from affected regions.",
+   "nodes": [
+    {
+     "id": "bot",
+     "label": "Mirai-infected devices",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "dyn",
+     "label": "Dyn DNS servers overwhelmed in waves",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "res",
+     "label": "Resolvers cannot get answers",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "sites",
+     "label": "Customer sites unreachable in affected regions",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "bot",
+     "t": "dyn",
+     "state": "fail"
+    },
+    {
+     "f": "dyn",
+     "t": "res",
+     "state": "fail"
+    },
+    {
+     "f": "res",
+     "t": "sites",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "More than one DNS provider (conceptual)",
+   "caption": "A general design: use two independent DNS providers so one attack does not hide your names.",
+   "nodes": [
+    {
+     "id": "zone",
+     "label": "Your DNS zone",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "p1",
+     "label": "Provider 1",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "p2",
+     "label": "Provider 2",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "mon",
+     "label": "Resolution monitoring from many regions",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "zone",
+     "t": "p1",
+     "state": "new"
+    },
+    {
+     "f": "zone",
+     "t": "p2",
+     "state": "new"
+    },
+    {
+     "f": "p1",
+     "t": "mon",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Names resolve if one provider fails.",
+  "Failures are seen from several regions.",
+  "Recovery does not depend on one vendor."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Fri 21 Oct 2016, ~7:00 am ET",
+   "phase": "trigger",
+   "e": "The first attack wave begins."
+  },
+  {
+   "t": "About 2 hours later",
+   "phase": "mitigate",
+   "e": "Dyn mitigates the first wave."
+  },
+  {
+   "t": "Just before noon ET",
+   "phase": "impact",
+   "e": "A second, more global wave hits."
+  },
+  {
+   "t": "Just over an hour later",
+   "phase": "mitigate",
+   "e": "Dyn mitigates the second wave; service is restored around 1:00 pm ET."
+  },
+  {
+   "t": "Later that day",
+   "phase": "detect",
+   "e": "Dyn verifies an attempted third wave, mitigated without customer impact."
+  },
+  {
+   "t": "Following days",
+   "phase": "recover",
+   "e": "Dyn confirms Mirai-based botnets as a main source of attack traffic."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A highly distributed attack, in part from Mirai-infected devices, overwhelmed Dyn's DNS service.",
+  "underlying": "Many sites used Dyn as their only DNS provider.",
+  "contributing": [
+   "Single DNS provider dependency",
+   "Insecure internet-connected devices",
+   "The card also notes resolver retries added load; the report read does not mention retries"
+  ],
+  "propagation": [
+   "Botnet traffic.",
+   "DNS overloaded.",
+   "Names not resolved.",
+   "Sites unreachable."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Dyn's description",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "sophisticated, highly distributed attack",
+   "note": "From the report of Dyn's statement."
+  },
+  {
+   "label": "Scope of outage",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Dyn did not experience a system-wide outage at any time",
+   "note": "From the same report."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check if your names resolve from several regions.",
+    "why": "Failures were regional."
+   },
+   {
+    "step": "Check which DNS provider you use.",
+    "why": "A single provider is a single point of failure."
+   },
+   {
+    "step": "Check provider status.",
+    "why": "Dyn's statements."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Add a second DNS provider.",
+    "why": "General practice."
+   },
+   {
+    "step": "Use short time to live and cached fallbacks where possible.",
+    "why": "General practice."
+   },
+   {
+    "step": "Communicate with customers.",
+    "why": "General practice."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check resolution from many networks.",
+    "why": "Confirm."
+   },
+   {
+    "step": "Test failover of DNS providers.",
+    "why": "Drill."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Use multiple DNS providers.",
+    "why": "Core lesson."
+   },
+   {
+    "step": "Secure IoT devices.",
+    "why": "General practice."
+   },
+   {
+    "step": "Monitor DNS from outside.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Changing DNS records or name servers during an attack can extend the outage. Plan and test before you need to."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Your site is up but users in some regions cannot resolve your names. Your only DNS provider is under attack.",
+   "clues": [
+    "Provider reports an attack",
+    "Origin healthy",
+    "Registrar access available"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "What can you change quickly?",
+    "What should you have set up?",
+    "How do you tell customers?"
+   ],
+   "answer": "Wait for the provider if you must, but add a second provider, update name servers with care and communicate. Long term, run two providers."
+  },
+  "rootcause": {
+   "q": "What did Dyn say about the attack?",
+   "options": [
+    "Sophisticated, highly distributed",
+    "Simple",
+    "A hoax",
+    "Local only"
+   ],
+   "answer": 0,
+   "why": "Per the report."
+  },
+  "remediation": [
+   {
+    "task": "Plan dual-provider DNS.",
+    "answer": "Sync zones with automation."
+   },
+   {
+    "task": "Plan DNS monitoring.",
+    "answer": "Probes from several networks."
+   },
+   {
+    "task": "Plan IoT hygiene.",
+    "answer": "Change default passwords."
+   }
+  ],
+  "design": {
+   "prompt": "Design DNS for a global consumer service.",
+   "constraints": [
+    "Many names",
+    "Zero tolerance for DNS outage",
+    "Hostile internet"
+   ],
+   "answer": "Two independent providers, automated sync, anycast, monitoring and runbooks."
+  },
+  "checks": [
+   {
+    "q": "When did the first wave begin?",
+    "options": [
+     "Around 7:00 am ET",
+     "Midnight",
+     "Noon",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "What botnet was named?",
+    "options": [
+     "Mirai",
+     "Conficker",
+     "Zeus",
+     "Storm"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "Did Dyn say it had a system-wide outage?",
+    "options": [
+     "No",
+     "Yes",
+     "Partly",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "How many waves did Dyn verify?",
+    "options": [
+     "Three, with the third mitigated without impact",
+     "One",
+     "Ten",
+     "None"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Two DNS providers",
+   "IoT hygiene"
+  ],
+  "monitoring": [
+   "External DNS monitoring"
+  ],
+  "recovery": [
+   "Mitigation by provider"
+  ],
+  "practices": [
+   "Dual-provider drills"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Channel Futures: Dyn: DDoS Attack Involved 10s of Millions of IP Addresses",
+   "url": "https://www.channelfutures.com/security/dyn-ddos-attack-involved-10s-of-millions-of-ip-addresses",
+   "used": "waves, Mirai, impact"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from a trade-press report of Dyn's statements. Dyn's own analysis page could not be read. The card says resolver retries added load; the report does not mention retries, so the root cause lists it only as the card's claim."
+}

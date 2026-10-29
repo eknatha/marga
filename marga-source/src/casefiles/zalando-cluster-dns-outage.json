@@ -1,0 +1,416 @@
+{
+ "id": "zalando-cluster-dns-outage",
+ "checked": "29 October 2026",
+ "summary": "On 7 January 2019 a retry storm from one application overloaded CoreDNS in Zalando's Kubernetes clusters. Pods were killed for running out of memory, DNS went down and product pages failed for over an hour.",
+ "overview": {
+  "background": "Zalando runs Kubernetes on AWS. Applications resolve names through CoreDNS pods in the cluster. Monitoring also ran inside the cluster.",
+  "systems": [
+   "CoreDNS pods",
+   "Aggregation layer for product and outfit pages",
+   "Ingress",
+   "Node.js applications using default DNS",
+   "In-cluster monitoring"
+  ],
+  "impact": "Product and outfit pages returned errors for over one hour.",
+  "severity": "Customer-facing outage. The postmortem is published in Zalando's Kubernetes documentation.",
+  "gaps": "The postmortem gives no clock times, so none are shown."
+ },
+ "archNote": "Components and the chain of events are from the postmortem. The layout is ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A retry storm exhausts DNS",
+   "caption": "Timeouts to a non-critical service caused 404s and client retries. More traffic meant more DNS queries, and CoreDNS ran out of memory.",
+   "nodes": [
+    {
+     "id": "cli",
+     "label": "Clients retry on 404",
+     "row": 0,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "ing",
+     "label": "Ingress traffic spike",
+     "row": 1,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "agg",
+     "label": "Aggregation layer",
+     "row": 2,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "node",
+     "label": "Node.js apps: no DNS cache, ndots 5",
+     "row": 2,
+     "col": 2,
+     "state": "hit"
+    },
+    {
+     "id": "dns",
+     "label": "CoreDNS pods OOM killed (100Mi)",
+     "row": 3,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "mon",
+     "label": "In-cluster monitoring down with DNS",
+     "row": 4,
+     "col": 1,
+     "state": "fail"
+    }
+   ],
+   "edges": [
+    {
+     "f": "cli",
+     "t": "ing",
+     "state": "fail"
+    },
+    {
+     "f": "ing",
+     "t": "agg"
+    },
+    {
+     "f": "agg",
+     "t": "node"
+    },
+    {
+     "f": "node",
+     "t": "dns",
+     "label": "up to 10 queries per lookup",
+     "state": "fail"
+    },
+    {
+     "f": "dns",
+     "t": "mon",
+     "state": "fail"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Cached DNS and outside monitoring (conceptual)",
+   "caption": "Zalando raised CoreDNS memory, planned dnsmasq on every node and external alerting. This picture shows the shape of those fixes.",
+   "nodes": [
+    {
+     "id": "app",
+     "label": "Applications",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "cache",
+     "label": "Node-local DNS cache (dnsmasq)",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "dns",
+     "label": "CoreDNS with 2000Mi memory",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "ext",
+     "label": "External alerting",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "app",
+     "t": "cache",
+     "state": "new"
+    },
+    {
+     "f": "cache",
+     "t": "dns",
+     "label": "fewer queries",
+     "state": "new"
+    },
+    {
+     "f": "dns",
+     "t": "ext",
+     "label": "watched from outside",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Most lookups are served from a cache on the same node.",
+  "DNS has memory headroom.",
+  "Alerts do not depend on the cluster they watch."
+ ],
+ "afterNote": "One application should not be able to take out DNS, and the fixes enforce that.",
+ "timelineNote": "The postmortem describes the sequence without clock times.",
+ "timeline": [
+  {
+   "t": "Monday 7 January 2019",
+   "phase": "trigger",
+   "e": "Timeouts to a non-critical downstream service make the aggregation layer return 404s, and clients retry."
+  },
+  {
+   "t": "Soon after",
+   "phase": "impact",
+   "e": "Ingress traffic and DNS queries spike."
+  },
+  {
+   "t": "Soon after",
+   "phase": "impact",
+   "e": "CoreDNS pods are killed for running out of memory and DNS is fully down."
+  },
+  {
+   "t": "During the incident",
+   "phase": "impact",
+   "e": "Circuit breakers open. In-cluster monitoring is down with DNS, so on-call staff are reached manually."
+  },
+  {
+   "t": "Recovery",
+   "phase": "mitigate",
+   "e": "CoreDNS memory is raised from 100Mi to 2000Mi."
+  },
+  {
+   "t": "After over one hour",
+   "phase": "recover",
+   "e": "Product and outfit pages work again."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Timeouts to a non-critical service caused 404s and client retries, sharply raising traffic.",
+  "underlying": "CoreDNS pods had a 100Mi memory limit that could not handle the query volume and were killed repeatedly.",
+  "contributing": [
+   "Node.js default DNS has no caching",
+   "ndots 5 turns one external lookup into about 10 queries",
+   "Short connection lifetimes cause many lookups",
+   "No vertical pod autoscaler for CoreDNS",
+   "Monitoring ran inside the same cluster"
+  ],
+  "propagation": [
+   "Retries multiply requests.",
+   "Each request multiplies DNS queries.",
+   "CoreDNS runs out of memory.",
+   "Every service in the cluster loses name resolution."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The key finding",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "It should not be possible for a single application to “DoS” our DNS infrastructure.",
+   "note": "From Zalando's postmortem."
+  },
+  {
+   "label": "Simulated DNS check",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ kubectl -n kube-system get pods -l k8s-app=kube-dns\nNAME            READY  STATUS     RESTARTS\ncoredns-abc12   0/1    OOMKilled  14\n$ kubectl -n kube-system top pod -l k8s-app=kube-dns",
+   "note": "Output invented to show the symptom."
+  },
+  {
+   "label": "Simulated resolver setting",
+   "kind": "simulated",
+   "lang": "yaml",
+   "body": "dnsConfig:\n  options:\n    - name: ndots\n      value: \"2\"",
+   "note": "A pod-level setting that reduces query multiplication. Teaching example."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check CoreDNS pod status and restarts.",
+    "why": "OOM kills explain total DNS loss.",
+    "cmd": "kubectl -n kube-system get pods -l k8s-app=kube-dns"
+   },
+   {
+    "step": "Look at the reason for the last restart.",
+    "why": "Confirms memory exhaustion.",
+    "cmd": "kubectl -n kube-system describe pod -l k8s-app=kube-dns | grep -A3 'Last State'"
+   },
+   {
+    "step": "Find what generates the query load.",
+    "why": "A single application can dominate."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Raise the CoreDNS memory limit.",
+    "why": "Zalando raised it from 100Mi to 2000Mi.",
+    "cmd": "kubectl -n kube-system set resources deployment/coredns --limits=memory=2000Mi"
+   },
+   {
+    "step": "Reduce the retry storm at the source.",
+    "why": "Circuit breakers and backoff reduce amplification."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Resolve a name from a test pod.",
+    "why": "Proves DNS works.",
+    "cmd": "kubectl run t --rm -it --image=busybox -- nslookup kubernetes.default"
+   },
+   {
+    "step": "Confirm CoreDNS has stopped restarting.",
+    "why": "Stable pods show the limit is adequate."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Run a DNS cache on every node.",
+    "why": "Zalando planned dnsmasq in front of CoreDNS."
+   },
+   {
+    "step": "Lower ndots or use fully qualified names for external hosts.",
+    "why": "Cuts queries per lookup."
+   },
+   {
+    "step": "Add external alerting.",
+    "why": "Monitoring must survive DNS loss."
+   },
+   {
+    "step": "Size CoreDNS with autoscaling.",
+    "why": "Load changes."
+   }
+  ],
+  "safety": "Raising memory limits may need node capacity and can hide a retry storm. Fix amplification too. Edit resources in a controlled change."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Everything in the cluster fails to resolve names. Dashboards are blank. CoreDNS pods keep restarting.",
+   "clues": [
+    "OOMKilled status",
+    "Memory limit 100Mi",
+    "Traffic spiked after a downstream timeout"
+   ],
+   "question": "What do you do to restore service and why did the spike happen?",
+   "hints": [
+    "Why is monitoring blank?",
+    "What multiplies queries?",
+    "Raise or reduce?"
+   ],
+   "answer": "Raise the CoreDNS memory limit to stop the restarts, use a test pod to confirm resolution, then trace the retry storm and reduce DNS amplification with caching and lower ndots."
+  },
+  "rootcause": {
+   "q": "Why did DNS fail?",
+   "options": [
+    "Certificate expiry",
+    "CoreDNS pods ran out of memory under a surge of queries",
+    "A bad route",
+    "A disk fault"
+   ],
+   "answer": 1,
+   "why": "The postmortem states pods were OOM killed."
+  },
+  "remediation": [
+   {
+    "task": "Explain ndots 5.",
+    "answer": "With ndots 5, a name with fewer than five dots is tried with each search domain first, so one external name can produce around 10 queries."
+   },
+   {
+    "task": "Create an out-of-cluster alert.",
+    "answer": "Run a probe from outside the cluster against an ingress and DNS, and page from an external service."
+   },
+   {
+    "task": "Propose DNS capacity rules.",
+    "answer": "Set requests and limits based on peak tests, add autoscaling, and alert on restarts and query rate."
+   }
+  ],
+  "design": {
+   "prompt": "Design DNS so that one misbehaving app cannot affect others.",
+   "constraints": [
+    "Thousands of pods",
+    "Bursty traffic",
+    "Must stay up if CoreDNS dies"
+   ],
+   "answer": "Use node-local caches, rate limit per source, set sensible ndots, autoscale CoreDNS, keep cached answers when upstream is down, and monitor externally."
+  },
+  "checks": [
+   {
+    "q": "What was CoreDNS memory raised from and to?",
+    "options": [
+     "100Mi to 2000Mi",
+     "1Gi to 2Gi",
+     "2000Mi to 100Mi",
+     "No change"
+    ],
+    "answer": 0,
+    "why": "The postmortem states 100Mi to 2000Mi."
+   },
+   {
+    "q": "Why was monitoring down?",
+    "options": [
+     "It ran inside the cluster and depended on DNS",
+     "It was turned off",
+     "It was too old",
+     "It had no license"
+    ],
+    "answer": 0,
+    "why": "The postmortem says monitoring went down with DNS."
+   },
+   {
+    "q": "What does ndots 5 cause?",
+    "options": [
+     "About 10 queries per external lookup",
+     "Faster lookups",
+     "Encrypted DNS",
+     "No effect"
+    ],
+    "answer": 0,
+    "why": "The postmortem lists this amplification."
+   },
+   {
+    "q": "What fix did Zalando plan on each node?",
+    "options": [
+     "dnsmasq in front of CoreDNS",
+     "A bigger router",
+     "A new database",
+     "More pods for ads"
+    ],
+    "answer": 0,
+    "why": "They planned dnsmasq on every node."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Node-local DNS cache",
+   "Lower ndots",
+   "Autoscale CoreDNS"
+  ],
+  "monitoring": [
+   "External alerts",
+   "Alert on CoreDNS restarts and query rates"
+  ],
+  "recovery": [
+   "Raise the limit first",
+   "Test resolution from a pod"
+  ],
+  "practices": [
+   "Retry with backoff and circuit breakers",
+   "Make escalation easy when tools are down"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Zalando Kubernetes on AWS: Postmortem, January 2019 DNS outage",
+   "url": "https://kubernetes-on-aws.readthedocs.io/en/latest/postmortems/jan-2019-dns-outage.html",
+   "used": "all verified facts and the quote"
+  }
+ ],
+ "verification": "Facts were read from Zalando's published postmortem on 29 October 2026. No clock times or logs are given, so command output is Simulated."
+}

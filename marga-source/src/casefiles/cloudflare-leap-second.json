@@ -1,0 +1,394 @@
+{
+ "id": "cloudflare-leap-second",
+ "checked": "29 October 2026",
+ "summary": "At midnight UTC on 1 January 2017 a leap second made a time difference negative in Cloudflare's custom DNS software. A call that panics on negative input then failed, causing errors for customers who used CNAME records until about 06:45 UTC.",
+ "overview": {
+  "background": "Cloudflare's DNS software, RRDNS, written in Go, measures round-trip times to upstream resolvers with time.Now() and smooths them to choose among upstreams by weight.",
+  "systems": [
+   "RRDNS (Cloudflare's DNS server in Go)",
+   "Upstream resolver selection and smoothing",
+   "CNAME resolution path",
+   "102 data centers"
+  ],
+  "impact": "Only customers using CNAME records were affected, and only a small number of machines. At peak about 0.2 percent of DNS queries and under 1 percent of HTTP requests saw errors.",
+  "severity": "Short and narrow but global. Cloudflare says it was a bug, not an attack.",
+  "gaps": "The post gives no exact count of machines."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Time goes backwards, a negative reaches a panic",
+   "caption": "A negative duration was smoothed into resolver data. Weighted selection passed it to rand.Int63n, which panics on a negative argument. Go's recover caught the panic.",
+   "nodes": [
+    {
+     "id": "clock",
+     "label": "Leap second: clock steps back at 00:00 UTC",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "rtt",
+     "label": "time.Now() difference goes negative",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "smooth",
+     "label": "Negative value smoothed into upstream data",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "rand",
+     "label": "rand.Int63n panics on negative input",
+     "row": 3,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "cname",
+     "label": "CNAME customers see errors",
+     "row": 4,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "clock",
+     "t": "rtt",
+     "label": "not monotonic"
+    },
+    {
+     "f": "rtt",
+     "t": "smooth",
+     "state": "fail"
+    },
+    {
+     "f": "smooth",
+     "t": "rand",
+     "label": "weighted selection",
+     "state": "fail"
+    },
+    {
+     "f": "rand",
+     "t": "cname",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Monotonic time and bad-input handling (conceptual)",
+   "caption": "Cloudflare changed RRDNS to discard its performance data when a negative difference appears. This picture shows the idea together with monotonic clocks.",
+   "nodes": [
+    {
+     "id": "mono",
+     "label": "Monotonic clock for durations",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "chk",
+     "label": "Reject or reset on negative values",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "sel",
+     "label": "Upstream selection always valid",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "alarm",
+     "label": "Alert on panics and recoveries",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "mono",
+     "t": "chk",
+     "state": "new"
+    },
+    {
+     "f": "chk",
+     "t": "sel",
+     "state": "new"
+    },
+    {
+     "f": "sel",
+     "t": "alarm",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Time cannot make a duration negative.",
+  "A bad value is dropped, not used.",
+  "Recovered panics are visible."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "00:00 UTC, 1 Jan 2017",
+   "phase": "trigger",
+   "e": "At midnight UTC a value in RRDNS goes negative when the leap second is applied."
+  },
+  {
+   "t": "00:10",
+   "phase": "detect",
+   "e": "The issue is escalated."
+  },
+  {
+   "t": "00:34",
+   "phase": "investigate",
+   "e": "The issue is confirmed."
+  },
+  {
+   "t": "01:23",
+   "phase": "mitigate",
+   "e": "A fix is deployed to the most impacted data center."
+  },
+  {
+   "t": "Within 90 minutes",
+   "phase": "mitigate",
+   "e": "The most affected machines are patched."
+  },
+  {
+   "t": "06:45",
+   "phase": "recover",
+   "e": "The fix is rolled out worldwide."
+  },
+  {
+   "t": "After the incident",
+   "phase": "change",
+   "e": "RRDNS is changed to discard performance data on a negative difference, and all servers restarted."
+  }
+ ],
+ "rootCause": {
+  "trigger": "The leap second made time.Now() differences negative.",
+  "underlying": "RRDNS assumed time cannot go backwards, so a negative round-trip time was smoothed into upstream data and later passed to a function that panics on negative arguments.",
+  "contributing": [
+   "time.Now() in Go at the time did not guarantee monotonicity",
+   "Smoothing carried the bad value forward",
+   "Only CNAME paths used the affected selection"
+  ],
+  "propagation": [
+   "Negative duration.",
+   "Bad smoothed value.",
+   "Panic at selection.",
+   "CNAME resolution errors."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The belief",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "time cannot go backwards",
+   "note": "From Cloudflare's post (the assumption behind the bug)."
+  },
+  {
+   "label": "A simulated Go snippet",
+   "kind": "simulated",
+   "lang": "go",
+   "body": "start := time.Now()\n// ... query upstream ...\nrtt := time.Since(start)\nif rtt < 0 {\n    rtt = 0 // clock stepped back, discard\n}\nidx := rand.Int63n(totalWeight) // panics if totalWeight <= 0",
+   "note": "A teaching sketch of the failing pattern and a guard. Not Cloudflare code."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check the first error time against known time events.",
+    "why": "Midnight UTC matched a leap second."
+   },
+   {
+    "step": "Read panic messages from the DNS server.",
+    "why": "A panic on a negative argument is the clue."
+   },
+   {
+    "step": "Find which record types are affected.",
+    "why": "Only CNAMEs."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Patch the affected machines first.",
+    "why": "Cloudflare did so within 90 minutes."
+   },
+   {
+    "step": "Discard the bad data when a negative value appears.",
+    "why": "The fix."
+   },
+   {
+    "step": "Restart all servers.",
+    "why": "Prevents recurrence of the state."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check error rates return to zero.",
+    "why": "Query and HTTP errors fall."
+   },
+   {
+    "step": "Check logs for further panics.",
+    "why": "Recovered panics hide problems."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Use a monotonic clock for durations.",
+    "why": "General practice and the lesson."
+   },
+   {
+    "step": "Validate inputs to functions that panic.",
+    "why": "A negative weight must not reach rand."
+   },
+   {
+    "step": "Test around leap seconds.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Restarting all DNS servers at once can cause its own errors. Restart in groups."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "DNS errors begin at exactly midnight UTC on New Year's Day for a subset of record types.",
+   "clues": [
+    "Panics in logs",
+    "A leap second was announced",
+    "Only CNAME paths fail"
+   ],
+   "question": "What is your hypothesis and first action?",
+   "hints": [
+    "What changes at a leap second?",
+    "What could go negative?",
+    "How do you contain?"
+   ],
+   "answer": "Suspect a negative time difference, check for panics on negative arguments, patch the most affected nodes first, discard bad data and restart in groups."
+  },
+  "rootcause": {
+   "q": "What went negative?",
+   "options": [
+    "A duration computed from time.Now()",
+    "A disk size",
+    "A port",
+    "A memory page"
+   ],
+   "answer": 0,
+   "why": "Cloudflare's explanation."
+  },
+  "remediation": [
+   {
+    "task": "Write a guard.",
+    "answer": "Clamp negative durations to zero and count them."
+   },
+   {
+    "task": "Plan leap-second tests.",
+    "answer": "Simulate stepping the clock back in a test environment."
+   },
+   {
+    "task": "Add monitoring.",
+    "answer": "Alert on recovered panics."
+   }
+  ],
+  "design": {
+   "prompt": "Design time handling in a DNS server.",
+   "constraints": [
+    "Go",
+    "Weighted selection",
+    "Clock steps"
+   ],
+   "answer": "Use monotonic readings, validate all weights, drop invalid samples and alert on anomalies."
+  },
+  "checks": [
+   {
+    "q": "What share of DNS queries saw errors at peak?",
+    "options": [
+     "About 0.2 percent",
+     "50 percent",
+     "100 percent",
+     "None"
+    ],
+    "answer": 0,
+    "why": "The post says 0.2 percent."
+   },
+   {
+    "q": "Which customers were affected?",
+    "options": [
+     "Those using CNAME records",
+     "All",
+     "None",
+     "Only free users"
+    ],
+    "answer": 0,
+    "why": "Cloudflare says so."
+   },
+   {
+    "q": "When was the fix global?",
+    "options": [
+     "06:45 UTC",
+     "00:10",
+     "01:23",
+     "Midnight"
+    ],
+    "answer": 0,
+    "why": "The post says 06:45 UTC."
+   },
+   {
+    "q": "What does Go's rand.Int63n do on a negative argument?",
+    "options": [
+     "Panics",
+     "Returns zero",
+     "Returns a random number",
+     "Blocks"
+    ],
+    "answer": 0,
+    "why": "The post says it panics."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Monotonic clocks",
+   "Validate inputs",
+   "Test time anomalies"
+  ],
+  "monitoring": [
+   "Recovered panic count"
+  ],
+  "recovery": [
+   "Patch worst hit first",
+   "Restart in groups"
+  ],
+  "practices": [
+   "Do not assume time only increases",
+   "Handle bad values at the source"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Cloudflare: How and why the leap second affected Cloudflare DNS",
+   "url": "https://blog.cloudflare.com/how-and-why-the-leap-second-affected-cloudflare-dns/",
+   "used": "timeline, cause, impact, fix"
+  }
+ ],
+ "verification": "Facts were read from Cloudflare's post on 29 October 2026. The Go snippet is Simulated. The short quote is the post's own phrasing of the assumption."
+}

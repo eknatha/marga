@@ -1,0 +1,416 @@
+{
+ "id": "cloudflare-19-data-centers-outage",
+ "checked": "29 October 2026",
+ "summary": "On 21 June 2022 a resilience project changed prefix advertisement policy in Cloudflare's busiest locations. A reordered term withdrew critical prefixes, taking 19 data centers, about half of requests, offline for over an hour.",
+ "overview": {
+  "background": "Cloudflare was rolling out a change for its Multi-Colo PoP (MCP) architecture in 19 data centers, which are about 4 percent of its network but handle about half of requests.",
+  "systems": [
+   "19 MCP data centers",
+   "Prefix advertisement policy on routers",
+   "Internal load balancer",
+   "Smaller compute clusters"
+  ],
+  "impact": "Users in affected regions could not reach sites relying on Cloudflare from 06:27 to about 07:42 UTC. Other regions were unaffected.",
+  "severity": "Large, roughly 75 minutes. Cloudflare says it was its own error, not an attack.",
+  "gaps": "The post gives no request counts."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A reordered term rejects site-local prefixes",
+   "caption": "A reject term ended up before the site-local terms, so those prefixes were withdrawn. The internal load balancer went down and smaller clusters overloaded.",
+   "nodes": [
+    {
+     "id": "proj",
+     "label": "Resilience change for MCP sites",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "pol",
+     "label": "Policy terms reordered: reject before site-local",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "wd",
+     "label": "Critical prefixes withdrawn",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "lb",
+     "label": "Internal load balancer off, compute clusters overload",
+     "row": 3,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "dc",
+     "label": "19 data centers offline",
+     "row": 3,
+     "col": 2,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "proj",
+     "t": "pol",
+     "label": "stagger skipped MCP until the end"
+    },
+    {
+     "f": "pol",
+     "t": "wd",
+     "state": "fail"
+    },
+    {
+     "f": "wd",
+     "t": "lb",
+     "state": "hit"
+    },
+    {
+     "f": "wd",
+     "t": "dc",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Staged rollout with auto-rollback (conceptual)",
+   "caption": "Cloudflare planned MCP-specific testing, stronger staggered rollout and automated commit-confirm rollback. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "chg",
+     "label": "Change",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "test",
+     "label": "MCP-specific test environment",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "stage",
+     "label": "Staggered rollout includes MCP early",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "conf",
+     "label": "Commit-confirm automatic rollback",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "dc",
+     "label": "Blast radius of one site",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "chg",
+     "t": "test",
+     "state": "new"
+    },
+    {
+     "f": "chg",
+     "t": "stage",
+     "state": "new"
+    },
+    {
+     "f": "stage",
+     "t": "conf",
+     "state": "new"
+    },
+    {
+     "f": "conf",
+     "t": "dc",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "MCP sites are tested like others.",
+  "A bad change rolls back automatically.",
+  "Early stages include the riskiest sites."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "03:56 UTC, 21 Jun",
+   "phase": "change",
+   "e": "The change is deployed to a first location, which is unaffected because it uses the older architecture."
+  },
+  {
+   "t": "06:17",
+   "phase": "change",
+   "e": "The change reaches the busiest locations, but not the MCP sites."
+  },
+  {
+   "t": "06:27",
+   "phase": "trigger",
+   "e": "The rollout reaches MCP sites and spines. The incident begins, taking 19 locations offline."
+  },
+  {
+   "t": "06:32",
+   "phase": "detect",
+   "e": "An internal incident is declared."
+  },
+  {
+   "t": "06:51",
+   "phase": "investigate",
+   "e": "A first router change is made to verify the root cause."
+  },
+  {
+   "t": "06:58",
+   "phase": "mitigate",
+   "e": "The root cause is identified and the revert begins. The first data center returns."
+  },
+  {
+   "t": "07:42",
+   "phase": "recover",
+   "e": "The last revert completes."
+  },
+  {
+   "t": "08:00",
+   "phase": "recover",
+   "e": "The incident is closed."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A prefix advertisement policy update reordered terms in the MCP locations.",
+  "underlying": "The reject term sat ahead of the site-local terms, so critical prefixes were withdrawn.",
+  "contributing": [
+   "The stagger policy did not include MCP sites until the last step",
+   "The 19 locations handled about half of requests",
+   "Engineers' conflicting changes slowed the revert and reintroduced the problem briefly"
+  ],
+  "propagation": [
+   "Prefixes withdrawn.",
+   "Internal load balancer disabled.",
+   "Smaller clusters overload.",
+   "Sites unreachable."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Ownership",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "This was our error and not the result of an attack or malicious activity.",
+   "note": "From Cloudflare's post."
+  },
+  {
+   "label": "The mechanism",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "a re-ordering of terms caused us to withdraw a critical subset of prefixes.",
+   "note": "From Cloudflare's post."
+  },
+  {
+   "label": "A simulated policy ordering",
+   "kind": "simulated",
+   "lang": "text",
+   "body": "term 1: from site-local-prefixes then accept\nterm 2: from backbone-prefixes then accept\nterm 99: then reject",
+   "note": "Illustrates why a reject term must come last. Generic syntax, invented."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check what changed in the first affected locations.",
+    "why": "A change had just reached MCP."
+   },
+   {
+    "step": "Check which prefixes are advertised from the sites.",
+    "why": "Missing site-local prefixes explained the outage."
+   },
+   {
+    "step": "Check whether load balancers and clusters are healthy.",
+    "why": "The load balancer was down."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Regain control through backup procedures.",
+    "why": "Cloudflare used out-of-band access."
+   },
+   {
+    "step": "Revert the policy.",
+    "why": "The revert restored sites one by one."
+   },
+   {
+    "step": "Coordinate engineers so changes do not conflict.",
+    "why": "Conflicts slowed recovery."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check prefixes are advertised again.",
+    "why": "Confirm routing."
+   },
+   {
+    "step": "Check traffic and load per site.",
+    "why": "Confirm clusters are no longer overloaded."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Add MCP-specific tests and rollout.",
+    "why": "Cloudflare's action."
+   },
+   {
+    "step": "Redesign policy to prevent unintended term order.",
+    "why": "Cloudflare's action."
+   },
+   {
+    "step": "Use commit-confirm rollback.",
+    "why": "Cloudflare's action."
+   }
+  ],
+  "safety": "Several engineers changing one device during recovery can undo each other. Assign one owner per device."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A router policy change just reached your busiest sites. Half of requests fail and site prefixes disappeared.",
+   "clues": [
+    "Reject term appears early",
+    "Out-of-band access exists",
+    "Several engineers are working"
+   ],
+   "question": "What is your plan?",
+   "hints": [
+    "Who changes what?",
+    "How do you get in?",
+    "How do you check?"
+   ],
+   "answer": "Revert the policy using out-of-band access with a single owner per device, confirm prefixes are advertised, then add term-order tests and staged rollout."
+  },
+  "rootcause": {
+   "q": "How many data centers were hit?",
+   "options": [
+    "19",
+    "2",
+    "200",
+    "None"
+   ],
+   "answer": 0,
+   "why": "Cloudflare says 19."
+  },
+  "remediation": [
+   {
+    "task": "Write a policy test.",
+    "answer": "Check that every site-local prefix is accepted by the final policy."
+   },
+   {
+    "task": "Define stages.",
+    "answer": "Include one MCP site in the first stage."
+   },
+   {
+    "task": "Add rollback.",
+    "answer": "Commit-confirm with a timer."
+   }
+  ],
+  "design": {
+   "prompt": "Design a network change process for sites that carry half of traffic.",
+   "constraints": [
+    "Few sites",
+    "Large share of traffic",
+    "Different architecture"
+   ],
+   "answer": "Treat the biggest sites as separate classes with their own tests, small first stages, and automatic rollback."
+  },
+  "checks": [
+   {
+    "q": "What share of the network were the 19 locations?",
+    "options": [
+     "About 4 percent",
+     "50 percent",
+     "100 percent",
+     "1 percent"
+    ],
+    "answer": 0,
+    "why": "They handled about 50 percent of requests."
+   },
+   {
+    "q": "What was wrong with the policy?",
+    "options": [
+     "A reject term sat before the site-local terms",
+     "A missing server",
+     "A certificate",
+     "A DNS typo"
+    ],
+    "answer": 0,
+    "why": "That is Cloudflare's explanation."
+   },
+   {
+    "q": "What slowed the revert?",
+    "options": [
+     "Conflicting changes by engineers",
+     "A power cut",
+     "No tools",
+     "No staff"
+    ],
+    "answer": 0,
+    "why": "Cloudflare notes this."
+   },
+   {
+    "q": "What is commit-confirm?",
+    "options": [
+     "An automatic rollback unless confirmed",
+     "A backup",
+     "A VPN",
+     "A cache"
+    ],
+    "answer": 0,
+    "why": "A rollback mechanism."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Test the biggest sites first",
+   "Order-safe policies",
+   "Automatic rollback"
+  ],
+  "monitoring": [
+   "Prefix advertisement checks"
+  ],
+  "recovery": [
+   "Out-of-band access",
+   "One owner per device"
+  ],
+  "practices": [
+   "Treat architecture classes separately",
+   "Stagger across all classes"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Cloudflare: Cloudflare outage on June 21, 2022",
+   "url": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/",
+   "used": "timeline, cause, impact, follow-ups"
+  }
+ ],
+ "verification": "Facts were read from Cloudflare's post on 29 October 2026. The policy snippet is Simulated."
+}

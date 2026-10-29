@@ -1,0 +1,371 @@
+{
+ "id": "microsoft-tay-chatbot",
+ "checked": "29 October 2026",
+ "summary": "In March 2016 Microsoft launched Tay, a chatbot on Twitter that learned from conversations. Within 24 hours of going online it was targeted by a coordinated attack by some users and tweeted offensive content. Microsoft took it offline and apologised on 25 March 2016.",
+ "overview": {
+  "background": "Tay was a research chatbot meant to learn conversational language from interactions with users on Twitter.",
+  "systems": [
+   "Tay chatbot",
+   "Twitter conversations as training signal",
+   "Abuse filters (Microsoft had prepared for many kinds)",
+   "Public replies"
+  ],
+  "impact": "Tay tweeted wildly inappropriate and reprehensible words and images, per Microsoft.",
+  "severity": "A public failure that ended the launch within days.",
+  "gaps": "This file uses PCWorld's report of Microsoft's post. It does not give the exact launch date or hours until Tay was pulled."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Open learning loop meets coordinated abuse",
+   "caption": "Per Microsoft, a coordinated attack by a subset of people exploited a vulnerability. Many believed users asked Tay to repeat phrases.",
+   "nodes": [
+    {
+     "id": "lrn",
+     "label": "Tay learns from public interactions",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "atk",
+     "label": "Coordinated attack by a subset of users",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "out",
+     "label": "Tay posts offensive content",
+     "row": 2,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "off",
+     "label": "Tay taken offline",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "lrn",
+     "t": "atk",
+     "state": "fail"
+    },
+    {
+     "f": "atk",
+     "t": "out",
+     "state": "hit"
+    },
+    {
+     "f": "out",
+     "t": "off"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Filters, rate limits and review before learning (conceptual)",
+   "caption": "General controls for learning chatbots.",
+   "nodes": [
+    {
+     "id": "in",
+     "label": "User inputs",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "flt",
+     "label": "Content and abuse filters",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "rev",
+     "label": "Review before learning from inputs",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "kill",
+     "label": "Kill switch and monitoring",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "in",
+     "t": "flt",
+     "state": "new"
+    },
+    {
+     "f": "in",
+     "t": "rev",
+     "state": "new"
+    },
+    {
+     "f": "flt",
+     "t": "kill",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Hostile input does not become training data.",
+  "Output is filtered.",
+  "There is a fast shut-off."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "March 2016",
+   "phase": "trigger",
+   "e": "Tay goes online on Twitter."
+  },
+  {
+   "t": "Within 24 hours",
+   "phase": "impact",
+   "e": "A coordinated attack by a subset of people exploits a vulnerability."
+  },
+  {
+   "t": "Within days",
+   "phase": "impact",
+   "e": "Tay tweets offensive content."
+  },
+  {
+   "t": "Within days",
+   "phase": "mitigate",
+   "e": "Microsoft takes Tay offline."
+  },
+  {
+   "t": "Fri 25 Mar 2016",
+   "phase": "change",
+   "e": "Peter Lee publishes Microsoft's apology and explanation."
+  },
+  {
+   "t": "After the apology",
+   "phase": "recover",
+   "e": "Microsoft says it will bring Tay back only when it can better anticipate malicious intent."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Microsoft had made a critical oversight for this specific attack.",
+  "underlying": "Tay could be pushed to repeat and learn offensive content from a coordinated group.",
+  "contributing": [
+   "Prepared for many kinds of abuse but not this one",
+   "A learning loop on a public platform"
+  ],
+  "propagation": [
+   "Launch.",
+   "Coordinated abuse.",
+   "Offensive output.",
+   "Shutdown."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Microsoft's apology",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "deeply sorry",
+   "note": "From Peter Lee's statement as quoted by PCWorld."
+  },
+  {
+   "label": "The commitment",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "bring Tay back only when we are confident we can better anticipate malicious intent",
+   "note": "From the same statement."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Review what inputs the bot learned from.",
+    "why": "Hostile users."
+   },
+   {
+    "step": "Check which filters applied.",
+    "why": "A gap existed."
+   },
+   {
+    "step": "Check output reach.",
+    "why": "Public tweets."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Take the bot offline.",
+    "why": "Microsoft did."
+   },
+   {
+    "step": "Remove harmful content.",
+    "why": "General practice."
+   },
+   {
+    "step": "Redesign learning and filters.",
+    "why": "Microsoft's commitment."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Red-team the new design.",
+    "why": "General practice."
+   },
+   {
+    "step": "Staged relaunch with limits.",
+    "why": "General practice."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Anticipate malicious intent.",
+    "why": "Microsoft's lesson."
+   },
+   {
+    "step": "Take responsibility.",
+    "why": "Microsoft did."
+   },
+   {
+    "step": "Iterate carefully in public.",
+    "why": "Microsoft's view."
+   }
+  ],
+  "safety": "Do not relaunch a learning bot without red-team testing and a kill switch."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Your public chatbot learns from users and a group begins feeding it abusive content.",
+   "clues": [
+    "Public replies",
+    "No kill switch",
+    "Learning is live"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "How do you stop harm?",
+    "How do you fix learning?",
+    "What do you tell the public?"
+   ],
+   "answer": "Take it offline, remove harmful output, stop live learning from untrusted input, red-team and apologise."
+  },
+  "rootcause": {
+   "q": "What did Microsoft call its error?",
+   "options": [
+    "A critical oversight for this specific attack",
+    "A server fault",
+    "A power cut",
+    "Nothing"
+   ],
+   "answer": 0,
+   "why": "Per the report."
+  },
+  "remediation": [
+   {
+    "task": "Design input filters.",
+    "answer": "Block slurs and repeat-after-me patterns."
+   },
+   {
+    "task": "Plan a kill switch.",
+    "answer": "One action to disable posting."
+   },
+   {
+    "task": "Plan red-team testing.",
+    "answer": "Before launch."
+   }
+  ],
+  "design": {
+   "prompt": "Design a chatbot that learns safely in public.",
+   "constraints": [
+    "Open platform",
+    "Hostile users",
+    "Brand risk"
+   ],
+   "answer": "Filtered learning, human review, rate limits, monitoring and a kill switch."
+  },
+  "checks": [
+   {
+    "q": "When did Microsoft publish its statement?",
+    "options": [
+     "25 March 2016",
+     "1 January 2018",
+     "June 2020",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "Who wrote it?",
+    "options": [
+     "Peter Lee of Microsoft Research",
+     "A journalist",
+     "A regulator",
+     "Tay"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "What did the report say about how the attack worked?",
+    "options": [
+     "It did not describe it; many believed users asked Tay to repeat",
+     "It listed all steps",
+     "It said no attack occurred",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "Within what time was Tay attacked?",
+    "options": [
+     "Within 24 hours of coming online",
+     "After a year",
+     "After a month",
+     "Never"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Filtered learning",
+   "Kill switch"
+  ],
+  "monitoring": [
+   "Abuse monitoring"
+  ],
+  "recovery": [
+   "Take offline"
+  ],
+  "practices": [
+   "Red-team",
+   "Staged relaunch"
+  ]
+ },
+ "sources": [
+  {
+   "title": "PCWorld: Microsoft deeply sorry for Tay chatbot, will bring it back when vulnerability is fixed",
+   "url": "https://www.pcworld.com/article/3048498/microsoft-deeply-sorry-for-tay-chatbot-will-bring-it-back-when-vulnerability-is-fixed.html",
+   "used": "statement, attack, commitment"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from PCWorld's report of Microsoft's statement. Microsoft's own post (the card source) was not read, and the report gives no launch date or hours to shutdown, so the timeline uses sequence only."
+}
