@@ -1,7 +1,7 @@
 # CircleCI security incident, January 2023
 company: CircleCI
 date: 16 December 2022 to 4 January 2023
-modules: cicd, security, sre
+modules: cicd, security, sre, cloud-iam
 calc: error-budget, recovery
 source: CircleCI incident report | https://circleci.com/blog/jan-4-2023-incident-report/
 summary: Malware on one engineer laptop stole a session token, and an attacker used it to read customer secrets that were stored in the CI service.

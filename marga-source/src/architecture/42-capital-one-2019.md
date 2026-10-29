@@ -1,7 +1,7 @@
 # Capital One cloud data breach, 2019
 company: Capital One
 date: March to July 2019
-modules: cloud, security, linux
+modules: cloud, security, linux, cloud-iam
 calc: error-budget, cloud-cost
 source: US Department of Justice press release on the case | https://www.justice.gov/usao-wdwa/pr/seattle-tech-worker-arrested-data-theft-involving-large-financial-services-company
 summary: A server-side request forgery flaw in a web application firewall let an attacker obtain role credentials from the metadata service, and the role could read many storage buckets.

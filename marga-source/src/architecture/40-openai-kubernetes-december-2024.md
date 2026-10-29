@@ -1,7 +1,7 @@
 # OpenAI Kubernetes control plane overload, December 2024
 company: OpenAI
 date: 11 December 2024
-modules: kubernetes, observability, sre
+modules: kubernetes, observability, sre, k8s-ops
 calc: capacity, retries
 source: OpenAI status page post-mortem for the 11 December 2024 incident | https://status.openai.com/
 summary: A new telemetry service made heavy calls to the Kubernetes API in every cluster, the control plane failed, and DNS based service discovery stopped working.
