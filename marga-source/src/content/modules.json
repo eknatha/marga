@@ -1,188 +1,216 @@
 [
-  {
-    "id": "linux",
-    "title": "Linux for engineers",
-    "summary": "Navigate, secure, package, schedule and troubleshoot a Linux server the way production work demands.",
-    "level": "Beginner",
-    "requires": []
-  },
-  {
-    "id": "git",
-    "title": "Git and version control",
-    "summary": "Track changes with Git: commits, branches, merging, rebase, remotes, pull requests, tags, hooks, large repositories, and recovery when things go wrong.",
-    "level": "Beginner",
-    "requires": []
-  },
-  {
-    "id": "bash",
-    "title": "Shell scripting",
-    "summary": "Write Bash scripts that fail loudly, run safely, parse JSON from APIs and replace repetitive manual work.",
-    "level": "Beginner",
-    "requires": [
-      "linux"
-    ]
-  },
-  {
-    "id": "python",
-    "title": "Python for automation",
-    "summary": "Write Python scripts that handle files, processes, HTTP APIs and cloud SDKs, with tests and a packaged command-line tool.",
-    "level": "Beginner",
-    "requires": [
-      "linux"
-    ]
-  },
-  {
-    "id": "networking",
-    "title": "Networking essentials",
-    "summary": "Reason about addresses, DNS, HTTP, TLS and firewalls well enough to debug any connectivity failure.",
-    "level": "Beginner",
-    "requires": [
-      "linux"
-    ]
-  },
-  {
-    "id": "docker",
-    "title": "Docker and containers",
-    "summary": "Build small, secure images, run multi-container applications, and understand registries, runtimes and the OCI standard.",
-    "level": "Beginner",
-    "requires": [
-      "linux"
-    ]
-  },
-  {
-    "id": "cicd",
-    "title": "CI/CD and delivery",
-    "summary": "Design pipelines that build, test and ship safely, secure the supply chain, and deploy with rolling, canary and declarative delivery.",
-    "level": "Intermediate",
-    "requires": [
-      "docker"
-    ]
-  },
-  {
-    "id": "kubernetes",
-    "title": "Kubernetes",
-    "summary": "Run workloads on Kubernetes from architecture and networking to Helm, autoscaling, operators, cluster upgrades, RBAC, troubleshooting and exam strategy.",
-    "level": "Intermediate",
-    "requires": [
-      "docker",
-      "networking"
-    ]
-  },
-  {
-    "id": "terraform",
-    "title": "Terraform and infrastructure as code",
-    "summary": "Describe infrastructure as code, use advanced HCL, manage state and secrets safely, and build real AWS and Azure stacks.",
-    "level": "Intermediate",
-    "requires": [
-      "linux"
-    ]
-  },
-  {
-    "id": "cloud",
-    "title": "Cloud platforms: AWS and Azure",
-    "summary": "Core concepts side by side on AWS and Azure: identity, networks, DNS and CDN, compute, serverless, managed Kubernetes, security, monitoring and cost.",
-    "level": "Intermediate",
-    "requires": [
-      "networking"
-    ]
-  },
-  {
-    "id": "observability",
-    "title": "Observability",
-    "summary": "Instrument systems with metrics, logs and traces, ship them with OpenTelemetry, probe from outside, and alert on what users actually feel.",
-    "level": "Intermediate",
-    "requires": [
-      "linux"
-    ]
-  },
-  {
-    "id": "sre",
-    "title": "Site reliability engineering",
-    "summary": "Define reliability with SLOs, respond to incidents, run on-call, plan capacity, practise failure and manage change safely.",
-    "level": "Advanced",
-    "requires": [
-      "observability"
-    ]
-  },
-  {
-    "id": "security",
-    "title": "DevSecOps and security",
-    "summary": "Build security into delivery: threat modeling, secrets, pipeline and supply chain checks, container and Kubernetes hardening, cloud identity and incident response.",
-    "level": "Intermediate",
-    "requires": [
-      "cicd",
-      "docker"
-    ]
-  },
-  {
-    "id": "ansible",
-    "title": "Ansible and configuration management",
-    "summary": "Describe servers in inventories and playbooks, keep them consistent with idempotent roles, protect secrets with Vault and roll changes out safely.",
-    "level": "Intermediate",
-    "requires": [
-      "bash"
-    ]
-  },
-  {
-    "id": "databases",
-    "title": "Databases for operators",
-    "summary": "Run relational databases with confidence: SQL, indexes and plans, transactions, backups, replication, safe migrations, caches and incident triage.",
-    "level": "Intermediate",
-    "requires": [
-      "networking"
-    ]
-  },
-  {
-    "id": "go",
-    "title": "Go for DevOps engineers",
-    "summary": "Write small, fast, reliable Go services and tools: types, errors, interfaces, goroutines, context, HTTP, testing, containers and debugging.",
-    "level": "Intermediate",
-    "requires": []
-  },
-  {
-    "id": "helm",
-    "title": "Helm for beginners",
-    "summary": "Package, configure, upgrade and roll back Kubernetes applications with Helm: charts, values, templates, releases, dependencies and debugging.",
-    "level": "Beginner",
-    "requires": [
-      "kubernetes"
-    ]
-  },
-  {
-    "id": "llm",
-    "title": "LLM fundamentals",
-    "summary": "Understand how large language models work in practice: tokens, context windows, sampling, training, API calls, cost, latency, evaluation and debugging.",
-    "level": "Intermediate",
-    "requires": [
-      "python"
-    ]
-  },
-  {
-    "id": "prompting",
-    "title": "Prompting and structured output",
-    "summary": "Write reliable prompts, give examples, ask for step-by-step reasoning, get validated JSON back, and version and test your prompts.",
-    "level": "Intermediate",
-    "requires": [
-      "llm"
-    ]
-  },
-  {
-    "id": "claude-skills",
-    "title": "Claude Skills",
-    "summary": "Package expertise as skills Claude loads on demand: SKILL.md, descriptions that trigger, progressive disclosure, scripts, testing, sharing and security.",
-    "level": "Intermediate",
-    "requires": [
-      "prompting"
-    ]
-  },
-  {
-    "id": "mcp",
-    "title": "Tool use and MCP",
-    "summary": "Let models call tools safely: function calling, the tool-use loop, the Model Context Protocol, building a server, permissions and prompt injection.",
-    "level": "Intermediate",
-    "requires": [
-      "prompting",
-      "networking"
-    ]
-  }
+ {
+  "id": "linux",
+  "title": "Linux for engineers",
+  "summary": "Navigate, secure, package, schedule and troubleshoot a Linux server the way production work demands.",
+  "level": "Beginner",
+  "requires": []
+ },
+ {
+  "id": "git",
+  "title": "Git and version control",
+  "summary": "Track changes with Git: commits, branches, merging, rebase, remotes, pull requests, tags, hooks, large repositories, and recovery when things go wrong.",
+  "level": "Beginner",
+  "requires": []
+ },
+ {
+  "id": "bash",
+  "title": "Shell scripting",
+  "summary": "Write Bash scripts that fail loudly, run safely, parse JSON from APIs and replace repetitive manual work.",
+  "level": "Beginner",
+  "requires": [
+   "linux"
+  ]
+ },
+ {
+  "id": "python",
+  "title": "Python for automation",
+  "summary": "Write Python scripts that handle files, processes, HTTP APIs and cloud SDKs, with tests and a packaged command-line tool.",
+  "level": "Beginner",
+  "requires": [
+   "linux"
+  ]
+ },
+ {
+  "id": "networking",
+  "title": "Networking essentials",
+  "summary": "Reason about addresses, DNS, HTTP, TLS and firewalls well enough to debug any connectivity failure.",
+  "level": "Beginner",
+  "requires": [
+   "linux"
+  ]
+ },
+ {
+  "id": "docker",
+  "title": "Docker and containers",
+  "summary": "Build small, secure images, run multi-container applications, and understand registries, runtimes and the OCI standard.",
+  "level": "Beginner",
+  "requires": [
+   "linux"
+  ]
+ },
+ {
+  "id": "cicd",
+  "title": "CI/CD and delivery",
+  "summary": "Design pipelines that build, test and ship safely, secure the supply chain, and deploy with rolling, canary and declarative delivery.",
+  "level": "Intermediate",
+  "requires": [
+   "docker"
+  ]
+ },
+ {
+  "id": "kubernetes",
+  "title": "Kubernetes",
+  "summary": "Run workloads on Kubernetes from architecture and networking to Helm, autoscaling, operators, cluster upgrades, RBAC, troubleshooting and exam strategy.",
+  "level": "Intermediate",
+  "requires": [
+   "docker",
+   "networking"
+  ]
+ },
+ {
+  "id": "terraform",
+  "title": "Terraform and infrastructure as code",
+  "summary": "Describe infrastructure as code, use advanced HCL, manage state and secrets safely, and build real AWS and Azure stacks.",
+  "level": "Intermediate",
+  "requires": [
+   "linux"
+  ]
+ },
+ {
+  "id": "cloud",
+  "title": "Cloud platforms: AWS and Azure",
+  "summary": "Core concepts side by side on AWS and Azure: identity, networks, DNS and CDN, compute, serverless, managed Kubernetes, security, monitoring and cost.",
+  "level": "Intermediate",
+  "requires": [
+   "networking"
+  ]
+ },
+ {
+  "id": "observability",
+  "title": "Observability",
+  "summary": "Instrument systems with metrics, logs and traces, ship them with OpenTelemetry, probe from outside, and alert on what users actually feel.",
+  "level": "Intermediate",
+  "requires": [
+   "linux"
+  ]
+ },
+ {
+  "id": "sre",
+  "title": "Site reliability engineering",
+  "summary": "Define reliability with SLOs, respond to incidents, run on-call, plan capacity, practise failure and manage change safely.",
+  "level": "Advanced",
+  "requires": [
+   "observability"
+  ]
+ },
+ {
+  "id": "security",
+  "title": "DevSecOps and security",
+  "summary": "Build security into delivery: threat modeling, secrets, pipeline and supply chain checks, container and Kubernetes hardening, cloud identity and incident response.",
+  "level": "Intermediate",
+  "requires": [
+   "cicd",
+   "docker"
+  ]
+ },
+ {
+  "id": "ansible",
+  "title": "Ansible and configuration management",
+  "summary": "Describe servers in inventories and playbooks, keep them consistent with idempotent roles, protect secrets with Vault and roll changes out safely.",
+  "level": "Intermediate",
+  "requires": [
+   "bash"
+  ]
+ },
+ {
+  "id": "databases",
+  "title": "Databases for operators",
+  "summary": "Run relational databases with confidence: SQL, indexes and plans, transactions, backups, replication, safe migrations, caches and incident triage.",
+  "level": "Intermediate",
+  "requires": [
+   "networking"
+  ]
+ },
+ {
+  "id": "go",
+  "title": "Go for DevOps engineers",
+  "summary": "Write small, fast, reliable Go services and tools: types, errors, interfaces, goroutines, context, HTTP, testing, containers and debugging.",
+  "level": "Intermediate",
+  "requires": []
+ },
+ {
+  "id": "helm",
+  "title": "Helm for beginners",
+  "summary": "Package, configure, upgrade and roll back Kubernetes applications with Helm: charts, values, templates, releases, dependencies and debugging.",
+  "level": "Beginner",
+  "requires": [
+   "kubernetes"
+  ]
+ },
+ {
+  "id": "cloud-iam",
+  "title": "Cloud security and IAM",
+  "summary": "Control who and what can do what in the cloud: identities, roles and policies on AWS and Azure, least privilege, secrets and keys, private networking, audit logs and debugging access errors.",
+  "level": "Intermediate",
+  "requires": [
+   "cloud"
+  ]
+ },
+ {
+  "id": "k8s-ops",
+  "title": "Kubernetes administration and operations",
+  "summary": "Run clusters, not only apps: control plane and etcd, backups, safe upgrades, RBAC, node maintenance, quotas and autoscaling, network and pod security, and debugging cluster faults.",
+  "level": "Advanced",
+  "requires": [
+   "kubernetes"
+  ]
+ },
+ {
+  "id": "argocd",
+  "title": "Continuous delivery with Argo CD",
+  "summary": "Deliver to Kubernetes by letting a controller pull the desired state from a repository: applications, sync and drift, Helm and Kustomize, environments, hooks, access and debugging.",
+  "level": "Intermediate",
+  "requires": [
+   "kubernetes",
+   "helm"
+  ]
+ },
+ {
+  "id": "llm",
+  "title": "LLM fundamentals",
+  "summary": "Understand how large language models work in practice: tokens, context windows, sampling, training, API calls, cost, latency, evaluation and debugging.",
+  "level": "Intermediate",
+  "requires": [
+   "python"
+  ]
+ },
+ {
+  "id": "prompting",
+  "title": "Prompting and structured output",
+  "summary": "Write reliable prompts, give examples, ask for step-by-step reasoning, get validated JSON back, and version and test your prompts.",
+  "level": "Intermediate",
+  "requires": [
+   "llm"
+  ]
+ },
+ {
+  "id": "claude-skills",
+  "title": "Claude Skills",
+  "summary": "Package expertise as skills Claude loads on demand: SKILL.md, descriptions that trigger, progressive disclosure, scripts, testing, sharing and security.",
+  "level": "Intermediate",
+  "requires": [
+   "prompting"
+  ]
+ },
+ {
+  "id": "mcp",
+  "title": "Tool use and MCP",
+  "summary": "Let models call tools safely: function calling, the tool-use loop, the Model Context Protocol, building a server, permissions and prompt injection.",
+  "level": "Intermediate",
+  "requires": [
+   "prompting",
+   "networking"
+  ]
+ }
 ]
