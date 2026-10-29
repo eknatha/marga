@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM fundamentals cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="Tokens, context limits, API calls, sampling, cost, caching, evaluation and a debugging checklist for LLM features.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/llm.html">
+<meta property="og:title" content="LLM fundamentals cheat sheet">
+<meta property="og:description" content="Tokens, context limits, API calls, sampling, cost, caching, evaluation and a debugging checklist for LLM features.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/llm.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=5ba7eef6">
+<script src="../assets/a11y.js?v=5ba7eef6"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="../#/interview">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>LLM fundamentals cheat sheet</h1>
+    <p class="lede">Tokens, context limits, API calls, sampling, cost, caching, evaluation and a debugging checklist for LLM features.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="a-first-api-call">A first API call</h2>
+<div class="code" data-lang="python"><button class="copy" type="button" data-copy="import os
+import anthropic
+
+MODEL = os.environ[&quot;MODEL_ID&quot;]
+client = anthropic.Anthropic()          # reads ANTHROPIC_API_KEY
+resp = client.messages.create(
+    model=MODEL,
+    max_tokens=500,
+    system=&quot;You are a concise assistant.&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Explain a 502 error.&quot;}],
+)
+print(resp.content[0].text, resp.stop_reason, resp.usage)" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">import</span> os
+<span class="hljs-keyword">import</span> anthropic
+
+MODEL = os.environ[<span class="hljs-string">&quot;MODEL_ID&quot;</span>]
+client = anthropic.Anthropic()          <span class="hljs-comment"># reads ANTHROPIC_API_KEY</span>
+resp = client.messages.create(
+    model=MODEL,
+    max_tokens=<span class="hljs-number">500</span>,
+    system=<span class="hljs-string">&quot;You are a concise assistant.&quot;</span>,
+    messages=[{<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;Explain a 502 error.&quot;</span>}],
+)
+<span class="hljs-built_in">print</span>(resp.content[<span class="hljs-number">0</span>].text, resp.stop_reason, resp.usage)</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Never put API keys in code, front-end JavaScript, logs or screenshots. Use a secret manager and rotate on exposure.</p>
+</aside>
+<h2 id="tokens-and-limits">Tokens and limits</h2>
+<div class="code" data-lang="python"><button class="copy" type="button" data-copy="if resp.stop_reason == &quot;max_tokens&quot;:
+    raise RuntimeError(&quot;reply was cut off&quot;)
+print(resp.usage.input_tokens, resp.usage.output_tokens)" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">if</span> resp.stop_reason == <span class="hljs-string">&quot;max_tokens&quot;</span>:
+    <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&quot;reply was cut off&quot;</span>)
+<span class="hljs-built_in">print</span>(resp.usage.input_tokens, resp.usage.output_tokens)</code></pre></div>
+<p>One token is about four English characters. Input, history, documents, tool results and the answer all count toward the context window.</p>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>A reply cut off by the length limit is incomplete. Truncated JSON will not parse, so always check the stop reason.</p>
+</aside>
+<h2 id="sampling">Sampling</h2>
+<div class="code" data-lang="python"><button class="copy" type="button" data-copy="client.messages.create(model=MODEL, max_tokens=300, temperature=0.0,
+                       messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Classify: &quot; + text}])" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">client.messages.create(model=MODEL, max_tokens=<span class="hljs-number">300</span>, temperature=<span class="hljs-number">0.0</span>,
+                       messages=[{<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;Classify: &quot;</span> + text}])</code></pre></div>
+<p>Low temperature for extraction, classification and code. Higher for brainstorming.</p>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Temperature 0 does not guarantee identical output. Test properties and pass rates, not exact sentences.</p>
+</aside>
+<h2 id="errors-and-retries">Errors and retries</h2>
+<div class="code" data-lang="python"><button class="copy" type="button" data-copy="import random, time
+
+def with_retry(call, tries=4):
+    for n in range(tries):
+        try:
+            return call()
+        except anthropic.RateLimitError:
+            time.sleep(2 ** n + random.random())
+    raise RuntimeError(&quot;rate limited&quot;)" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">import</span> random, time
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">with_retry</span>(<span class="hljs-params">call, tries=<span class="hljs-number">4</span></span>):
+    <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(tries):
+        <span class="hljs-keyword">try</span>:
+            <span class="hljs-keyword">return</span> call()
+        <span class="hljs-keyword">except</span> anthropic.RateLimitError:
+            time.sleep(<span class="hljs-number">2</span> ** n + random.random())
+    <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&quot;rate limited&quot;</span>)</code></pre></div>
+<p>Retry 429 and 5xx with backoff and jitter. Do not retry 400, 401 or 403.</p>
+<h2 id="cost-estimate">Cost estimate</h2>
+<div class="code" data-lang="python"><button class="copy" type="button" data-copy="def cost(inp, out, price_in, price_out):
+    return inp / 1e6 * price_in + out / 1e6 * price_out" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">def</span> <span class="hljs-title function_">cost</span>(<span class="hljs-params">inp, out, price_in, price_out</span>):
+    <span class="hljs-keyword">return</span> inp / <span class="hljs-number">1e6</span> * price_in + out / <span class="hljs-number">1e6</span> * price_out</code></pre></div>
+<p>Output tokens usually cost more than input tokens. Use the current price list.</p>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Agents and retry loops can spend a month of budget overnight. Set provider spend limits, alerts and a step cap.</p>
+</aside>
+<h2 id="caching-and-streaming">Caching and streaming</h2>
+<div class="code" data-lang="python"><button class="copy" type="button" data-copy="with client.messages.stream(model=MODEL, max_tokens=500, messages=msgs) as s:
+    for text in s.text_stream:
+        print(text, end=&quot;&quot;, flush=True)" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">with</span> client.messages.stream(model=MODEL, max_tokens=<span class="hljs-number">500</span>, messages=msgs) <span class="hljs-keyword">as</span> s:
+    <span class="hljs-keyword">for</span> text <span class="hljs-keyword">in</span> s.text_stream:
+        <span class="hljs-built_in">print</span>(text, end=<span class="hljs-string">&quot;&quot;</span>, flush=<span class="hljs-literal">True</span>)</code></pre></div>
+<p>Put stable content first and changing content last to benefit from prompt caching.</p>
+<h2 id="evaluate">Evaluate</h2>
+<div class="code" data-lang="json"><button class="copy" type="button" data-copy="{&quot;id&quot;: &quot;t-014&quot;, &quot;input&quot;: &quot;Card charged twice&quot;, &quot;expect&quot;: {&quot;category&quot;: &quot;billing&quot;}}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;t-014&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;input&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Card charged twice&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;expect&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;category&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;billing&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">}</span></code></pre></div>
+<p>Keep 30 to 100 real cases, run every candidate several times, and compare pass rate, cost and latency. Re-run on any change.</p>
+<h2 id="debug-a-bad-answer">Debug a bad answer</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="jq '{id, model, stop_reason, usage, error}' req.json
+jq -r '.prompt' req.json | head -60" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">jq <span class="hljs-string">&#x27;{id, model, stop_reason, usage, error}&#x27;</span> req.json
+jq -r <span class="hljs-string">&#x27;.prompt&#x27;</span> req.json | <span class="hljs-built_in">head</span> -60</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Model output is untrusted. Validate it before it reaches a shell, a database or a customer.</p>
+</aside>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://docs.anthropic.com/en/docs/build-with-claude/overview" target="_blank" rel="noopener">Anthropic documentation: Build with Claude</a><span class="host">docs.anthropic.com</span></li><li><a href="https://docs.anthropic.com/en/docs/about-claude/models/overview" target="_blank" rel="noopener">Anthropic documentation: Models overview</a><span class="host">docs.anthropic.com</span></li><li><a href="https://docs.anthropic.com/en/api/overview" target="_blank" rel="noopener">Anthropic API reference</a><span class="host">docs.anthropic.com</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=5ba7eef6"></script>
+<script src="../assets/counter.js?v=5ba7eef6"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

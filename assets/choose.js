@@ -31,6 +31,7 @@ var GOALS = [
   { id: 'fix-prod', title: 'Fix production faster', text: 'Find the cause of an outage using the system, the network and telemetry.', mods: ['linux', 'networking', 'observability', 'sre'] },
   { id: 'ship-code', title: 'Ship code safely', text: 'From a commit to a running container, with pipelines and rollouts.', mods: ['git', 'docker', 'cicd', 'kubernetes'] },
   { id: 'automate', title: 'Automate the boring work', text: 'Scripts, Python, configuration management and version control.', mods: ['linux', 'git', 'bash', 'python', 'ansible'] },
+  { id: 'ai', title: 'Build with AI', text: 'LLM basics, prompts and structured output, Claude Skills, tool use and MCP.', mods: ['python', 'llm', 'prompting', 'claude-skills', 'mcp'] },
   { id: 'secure', title: 'Build securely', text: 'Secrets, images, pipelines and cloud identity.', mods: ['linux', 'git', 'docker', 'cicd', 'security'] }
 ];
 var GOAL = {}; GOALS.forEach(function (g) { GOAL[g.id] = g; });

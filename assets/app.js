@@ -160,7 +160,7 @@ function renderChrome() {
     '<header class="topbar"><div class="wrap topbar-in">' +
     '<a class="brand" href="#/"><img src="icon.svg" alt="" width="26" height="26"><span><b>MARGA</b></span></a>' +
     '<nav class="topnav" id="topnav" aria-label="Main">' +
-    '<a href="#/skills" data-nav="skills">Skills</a><a href="#/paths" data-nav="paths">Skill trees</a><a class="nav-certs" href="https://certs.eknathalabs.com" target="_blank" rel="noopener" title="Certifications (opens in a new tab)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="9" r="5.5"/><path d="M9.5 9l1.8 1.8 3.2-3.4"/><path d="M8.5 13.8L7 21l5-2.6 5 2.6-1.5-7.2"/></svg><span class="sr">Certifications (opens in a new tab)</span></a><a href="#/cheatsheets" data-nav="cheatsheets">Cheat sheets</a>' +
+    '<a href="#/skills" data-nav="skills">Skills</a><a href="#/paths" data-nav="paths">Skill trees</a><a class="nav-certs" href="https://certs.eknathalabs.com" target="_blank" rel="noopener" title="Certifications (opens in a new tab)">Certifications</a><a href="#/cheatsheets" data-nav="cheatsheets">Cheat sheets</a>' +
     '<a href="#/cases" data-nav="cases">Case studies</a><a href="#/practice" data-nav="practice">Practice</a><a href="#/progress" data-nav="progress">Progress</a><a href="#/interview" data-nav="interview">InterviewHub</a><a href="#/about" data-nav="about">About</a></nav>' +
     '<div class="tools">' +
     '<button class="btn btn-quiet search-btn" type="button" data-act="search" aria-label="Search lessons and cheat sheets">' + ICON.search + '<span>Search</span><kbd>/</kbd></button>' +
@@ -292,7 +292,7 @@ function homeView() {
   var nCases = (D.cases || []).length, nArch = (D.arch || []).length, nDrills = (D.drills || []).length, nIv = (IV || []).length, nEx = (window.MARGA_EXPLAINERS || []).length;
   var stats = [[t.total, 'lessons with checks'], [nCases, 'real incidents'], [nDrills, 'troubleshooting drills'], [nIv, 'interview answers'], [nEx, 'animated explainers']].map(function (x) { return '<div><b>' + x[0] + '</b><span>' + x[1] + '</span></div>'; }).join('');
   var TL = [['09:37', 'An engineer runs a command to remove a few servers.'], ['09:37', 'A mistyped input removes far more than intended.', 1], ['After', 'The index and placement subsystems stop serving requests.'], ['Midday', 'A full restart takes much longer than expected.'], ['About four hours', 'S3 is fully back.']];
-  var tools = [['#/subnet', 'Subnet and CIDR', 'Split networks, plan VLSM, merge routes.'], ['#/playground/yaml', 'YAML playground', 'Find errors and risky Kubernetes settings.'], ['#/playground/python', 'Python playground', 'Run Python with built-in tests.'], ['#/playground/go', 'Go playground', '50 Go exercises run on the Go Playground.'], ['#/playground/hcl', 'Terraform playground', '50 HCL exercises checked in the browser.'], ['#/playground/sql', 'SQL for SREs', '50 SQL exercises on a real SQLite engine.'], ['#/explainers', 'Animated explainers', 'DNS, TLS, pods, rolling updates and more.']];
+  var tools = [['#/subnet', 'Subnet and CIDR', 'Split networks, plan VLSM, merge routes.'], ['#/playground/yaml', 'YAML playground', 'Find errors and risky Kubernetes settings.'], ['#/playground/python', 'Python playground', 'Run Python with built-in tests.'], ['#/playground/go', 'Go playground', '50 Go exercises run on the Go Playground.'], ['#/playground/hcl', 'Terraform playground', '50 HCL exercises checked in the browser.'], ['#/playground/sql', 'SQL for SREs', '50 SQL exercises on a real SQLite engine.'], ['#/explainers', 'Animated explainers', 'DNS, TLS, pods, rolling updates and more.'], ['#/skill-lab', 'Skill-writing lab', 'Write a SKILL.md and check its header, description, size and safety.']];
   view.html =
     '<section class="hero hero2"><div class="wrap hero-grid2">' +
     '<div class="hero-copy"><h1>Learn to fix production before production breaks.</h1>' +
@@ -925,6 +925,7 @@ function buildIndex() {
    ['Go playground', 'Go exercises run on the Go Playground', '#/playground/go', 'go golang run code exercises'],
    ['Terraform playground', 'HCL exercises checked in the browser', '#/playground/hcl', 'terraform hcl lint exercises'],
    ['SQL for SREs', 'SQL exercises on SQLite in the browser', '#/playground/sql', 'sql sqlite query exercises'],
+   ['Skill-writing lab', 'Write a SKILL.md and check it in the browser', '#/skill-lab', 'claude skill skill.md description lab check'],
    ['Daily challenge', 'One question a day with a streak', '#/daily', 'quiz question streak'],
    ['Today: interview and case of the day', 'A fresh question and incident every day', '#/today', 'interview of the day case of the day']].forEach(function (x) { addIdx('Tool', 'Practice', x[0], x[1], x[2], x[1], x[3]); });
   if (window.MargaSearch) MargaSearch.build(INDEX);
@@ -1086,6 +1087,7 @@ if (typeof window.MargaTermLabs === 'function') window.MargaTermLabs(api);
 if (typeof window.MargaFeatures === 'function') window.MargaFeatures(api);
 if (typeof window.MargaBadges === 'function') window.MargaBadges(api);
 if (typeof window.MargaChoose === 'function') window.MargaChoose(api);
+if (typeof window.MargaSkillLabPage === 'function') window.MargaSkillLabPage(api);
 
 /* ---------- accessibility panel ---------- */
 (function () {

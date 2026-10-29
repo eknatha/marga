@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Skills cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="Skill folder layout, SKILL.md header, descriptions that trigger, structure, scripts, tests and a security review checklist.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/claude-skills.html">
+<meta property="og:title" content="Claude Skills cheat sheet">
+<meta property="og:description" content="Skill folder layout, SKILL.md header, descriptions that trigger, structure, scripts, tests and a security review checklist.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/claude-skills.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=5ba7eef6">
+<script src="../assets/a11y.js?v=5ba7eef6"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="../#/interview">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>Claude Skills cheat sheet</h1>
+    <p class="lede">Skill folder layout, SKILL.md header, descriptions that trigger, structure, scripts, tests and a security review checklist.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="folder-layout">Folder layout</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="incident-summary/
+  SKILL.md
+  template.md
+  reference/format.md
+  examples/outage-example.md
+  scripts/check_summary.py" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">incident-summary/
+  SKILL.md
+  template.md
+  reference/format.md
+  examples/outage-example.md
+  scripts/check_summary.py</code></pre></div>
+<h2 id="skill-md">SKILL.md</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="---
+name: incident-summary
+description: Write a blameless incident summary from notes or a timeline. Use when the user asks for an incident summary, post-incident report or outage write-up.
+---
+
+Use template.md. Steps:
+1. Collect start, end, impact, detection and mitigation.
+2. Write &quot;not stated&quot; for anything the notes do not say.
+3. Keep it under 300 words.
+4. Run scripts/check_summary.py and fix what it reports." aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">---
+name: incident-summary
+description: Write a blameless incident summary from notes or a timeline. Use when the user asks for an incident summary, post-incident report or outage write-up.
+---
+
+Use template.md. Steps:
+1. Collect start, end, impact, detection and mitigation.
+2. Write &quot;not stated&quot; for anything the notes do not say.
+3. Keep it under 300 words.
+4. Run scripts/check_summary.py and fix what it reports.</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>The description decides whether the skill is ever used. Say what it does and when to use it, with real nouns and verbs. Check current name and length limits in the product documentation.</p>
+</aside>
+<h2 id="descriptions">Descriptions</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="Weak:   Helps with documents.
+Better: Create and edit Word (.docx) files with headings, tables and tracked changes. Use when the user asks for a Word document or to edit a .docx." aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">Weak:   Helps with documents.
+Better: Create and edit Word (.docx) files with headings, tables and tracked changes. Use when the user asks for a Word document or to edit a .docx.</code></pre></div>
+<p>Add exclusions for neighbouring skills. Keep the key words first.</p>
+<h2 id="progressive-disclosure">Progressive disclosure</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="Level 1: name and description (always)
+Level 2: SKILL.md body (when triggered)
+Level 3: linked files and scripts (when needed)" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">Level 1: name and description (always)
+Level 2: SKILL.md body (when triggered)
+Level 3: linked files and scripts (when needed)</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>A giant SKILL.md wastes context. Move rarely needed detail to linked files, one level deep.</p>
+</aside>
+<h2 id="scripts">Scripts</h2>
+<div class="code" data-lang="python"><button class="copy" type="button" data-copy="#!/usr/bin/env python3
+&quot;&quot;&quot;Check a summary. Usage: python check_summary.py summary.md&quot;&quot;&quot;
+import sys
+text = open(sys.argv[1], encoding=&quot;utf-8&quot;).read()
+problems = [] if len(text.split()) &lt;= 300 else [&quot;over 300 words&quot;]
+print(&quot;OK&quot; if not problems else &quot;\n&quot;.join(problems))
+sys.exit(1 if problems else 0)" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-comment">#!/usr/bin/env python3</span>
+<span class="hljs-string">&quot;&quot;&quot;Check a summary. Usage: python check_summary.py summary.md&quot;&quot;&quot;</span>
+<span class="hljs-keyword">import</span> sys
+text = <span class="hljs-built_in">open</span>(sys.argv[<span class="hljs-number">1</span>], encoding=<span class="hljs-string">&quot;utf-8&quot;</span>).read()
+problems = [] <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(text.split()) &lt;= <span class="hljs-number">300</span> <span class="hljs-keyword">else</span> [<span class="hljs-string">&quot;over 300 words&quot;</span>]
+<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;OK&quot;</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> problems <span class="hljs-keyword">else</span> <span class="hljs-string">&quot;\n&quot;</span>.join(problems))
+sys.exit(<span class="hljs-number">1</span> <span class="hljs-keyword">if</span> problems <span class="hljs-keyword">else</span> <span class="hljs-number">0</span>)</code></pre></div>
+<p>Use scripts for exact work. Keep output short and specific.</p>
+<h2 id="test">Test</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="Should trigger:     &quot;write up last night's outage from these notes&quot;
+Should not trigger: &quot;what does a 502 mean?&quot;" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">Should trigger:     &quot;write up last night&#x27;s outage from these notes&quot;
+Should not trigger: &quot;what does a 502 mean?&quot;</code></pre></div>
+<p>Run 10 should-fire and 10 should-not requests, with and without the skill. Keep the task set in the repository.</p>
+<h2 id="share-safely">Share safely</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="grep -rn &quot;curl\|wget\|urlopen\|requests\.\|eval(\|exec(&quot; skills/NAME/" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">grep -rn <span class="hljs-string">&quot;curl\|wget\|urlopen\|requests\.\|eval(\|exec(&quot;</span> skills/NAME/</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>A skill can steer Claude and include scripts that run. Read every file, look for network calls, downloads and shell commands, and run unknown skills in a sandbox first.</p>
+</aside>
+<h2 id="debug">Debug</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="ls -la .claude/skills/NAME/
+head -6 .claude/skills/NAME/SKILL.md" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-built_in">ls</span> -la .claude/skills/NAME/
+<span class="hljs-built_in">head</span> -6 .claude/skills/NAME/SKILL.md</code></pre></div>
+<p>Check location, exact file name SKILL.md, header syntax, then the description, then the body, then scripts.</p>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Re-run your trigger and task tests after any model, product or description change.</p>
+</aside>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview" target="_blank" rel="noopener">Claude documentation: Agent Skills overview</a><span class="host">docs.claude.com</span></li><li><a href="https://docs.claude.com/en/docs/agents-and-tools/agent-skills/best-practices" target="_blank" rel="noopener">Claude documentation: Skill authoring best practices</a><span class="host">docs.claude.com</span></li><li><a href="https://docs.claude.com/en/docs/claude-code/skills" target="_blank" rel="noopener">Claude Code documentation: Skills</a><span class="host">docs.claude.com</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=5ba7eef6"></script>
+<script src="../assets/counter.js?v=5ba7eef6"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prompting and structured output cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content="Prompt structure, examples, reasoning patterns, system prompts, JSON schemas, validation, retries and versioning.">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/prompting.html">
+<meta property="og:title" content="Prompting and structured output cheat sheet">
+<meta property="og:description" content="Prompt structure, examples, reasoning patterns, system prompts, JSON schemas, validation, retries and versioning.">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/prompting.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=5ba7eef6">
+<script src="../assets/a11y.js?v=5ba7eef6"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="../#/interview">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>Prompting and structured output cheat sheet</h1>
+    <p class="lede">Prompt structure, examples, reasoning patterns, system prompts, JSON schemas, validation, retries and versioning.</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="prompt-template">Prompt template</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="You are helping {{audience}}.
+Task: {{one clear instruction}}.
+Rules:
+- at most 3 sentences
+- if the answer is not in &lt;documents&gt;, say &quot;not stated&quot;
+&lt;documents&gt;{{material}}&lt;/documents&gt;
+&lt;question&gt;{{question}}&lt;/question&gt;
+Return JSON: {&quot;answer&quot;: &quot;...&quot;, &quot;source&quot;: &quot;...&quot;}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">You are helping {{audience}}.
+Task: {{one clear instruction}}.
+Rules:
+- at most 3 sentences
+- if the answer is not in &lt;documents&gt;, say &quot;not stated&quot;
+&lt;documents&gt;{{material}}&lt;/documents&gt;
+&lt;question&gt;{{question}}&lt;/question&gt;
+Return JSON: {&quot;answer&quot;: &quot;...&quot;, &quot;source&quot;: &quot;...&quot;}</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Replace adjectives with limits. &quot;Be brief&quot; varies; &quot;at most three sentences&quot; does not.</p>
+</aside>
+<h2 id="few-shot-examples">Few-shot examples</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="&lt;example&gt;
+&lt;ticket&gt;I was charged twice&lt;/ticket&gt;
+&lt;answer&gt;{&quot;category&quot;: &quot;billing&quot;}&lt;/answer&gt;
+&lt;/example&gt;" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">&lt;example&gt;
+&lt;ticket&gt;I was charged twice&lt;/ticket&gt;
+&lt;answer&gt;{&quot;category&quot;: &quot;billing&quot;}&lt;/answer&gt;
+&lt;/example&gt;</code></pre></div>
+<p>Use 3 to 5 varied, realistic examples with identical format, including a borderline case and an &quot;unknown&quot; case.</p>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not reuse your test cases as examples, and do not let examples contradict your rules. The model follows examples.</p>
+</aside>
+<h2 id="reasoning">Reasoning</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="Think step by step inside &lt;thinking&gt; tags.
+Then give the final result in &lt;answer&gt; tags." aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">Think step by step inside &lt;thinking&gt; tags.
+Then give the final result in &lt;answer&gt; tags.</code></pre></div>
+<div class="code" data-lang="python"><button class="copy" type="button" data-copy="import re
+m = re.search(r&quot;&lt;answer&gt;(.*?)&lt;/answer&gt;&quot;, reply, re.S)
+answer = m.group(1).strip()" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">import</span> re
+m = re.search(<span class="hljs-string">r&quot;&lt;answer&gt;(.*?)&lt;/answer&gt;&quot;</span>, reply, re.S)
+answer = m.group(<span class="hljs-number">1</span>).strip()</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Never show raw reasoning to users or treat an explanation as proof. Verify with code or a person.</p>
+</aside>
+<h2 id="system-prompt-layout">System prompt layout</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="&lt;role&gt;...&lt;/role&gt;
+&lt;rules&gt;...&lt;/rules&gt;
+&lt;documents&gt;...&lt;/documents&gt;
+&lt;question&gt;...&lt;/question&gt;" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">&lt;role&gt;...&lt;/role&gt;
+&lt;rules&gt;...&lt;/rules&gt;
+&lt;documents&gt;...&lt;/documents&gt;
+&lt;question&gt;...&lt;/question&gt;</code></pre></div>
+<p>Long documents first, question last. Keep tag names consistent.</p>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not put secrets in a system prompt. Assume users can make the model repeat it.</p>
+</aside>
+<h2 id="json-schema">JSON schema</h2>
+<div class="code" data-lang="json"><button class="copy" type="button" data-copy="{&quot;type&quot;: &quot;object&quot;,
+ &quot;properties&quot;: {&quot;category&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;enum&quot;: [&quot;billing&quot;, &quot;account&quot;, &quot;unknown&quot;]}},
+ &quot;required&quot;: [&quot;category&quot;], &quot;additionalProperties&quot;: false}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;object&quot;</span><span class="hljs-punctuation">,</span>
+ <span class="hljs-attr">&quot;properties&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;category&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;string&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;enum&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;billing&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;account&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;unknown&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+ <span class="hljs-attr">&quot;required&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;category&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;additionalProperties&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">}</span></code></pre></div>
+<p>Methods: prompt only, forced tool use, schema-constrained output. Use enums and an explicit unknown value.</p>
+<h2 id="validate-and-retry">Validate and retry</h2>
+<div class="code" data-lang="python"><button class="copy" type="button" data-copy="for attempt in range(3):
+    reply = call_model(prompt, feedback)
+    try:
+        data = json.loads(reply)
+        validate(data, SCHEMA)
+        return data
+    except Exception as err:
+        feedback = &quot;Rejected: &quot; + str(err)
+raise RuntimeError(&quot;failed validation&quot;)" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-keyword">for</span> attempt <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">3</span>):
+    reply = call_model(prompt, feedback)
+    <span class="hljs-keyword">try</span>:
+        data = json.loads(reply)
+        validate(data, SCHEMA)
+        <span class="hljs-keyword">return</span> data
+    <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> err:
+        feedback = <span class="hljs-string">&quot;Rejected: &quot;</span> + <span class="hljs-built_in">str</span>(err)
+<span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&quot;failed validation&quot;</span>)</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Cap retries. A model that fails three times needs a changed prompt, not a fourth try. Never repair data by guessing.</p>
+</aside>
+<h2 id="version-and-test">Version and test</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="prompts/triage/v7.txt     # changed: added unknown category" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">prompts/triage/v7.txt     # changed: added unknown category</code></pre></div>
+<p>Run the evaluation set in CI, pin the model version, log the prompt version with each request, and release gradually.</p>
+<h2 id="debug">Debug</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="python run_evals.py --case pii-014 --runs 10" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">python run_evals.py --<span class="hljs-keyword">case</span> pii-014 --runs 10</code></pre></div>
+<p>Reproduce, reduce the prompt, change one thing, re-run the whole set, and add the case to the tests.</p>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank" rel="noopener">Anthropic documentation: Prompt engineering overview</a><span class="host">docs.anthropic.com</span></li><li><a href="https://json-schema.org/understanding-json-schema/" target="_blank" rel="noopener">JSON Schema</a><span class="host">json-schema.org</span></li><li><a href="https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests" target="_blank" rel="noopener">Anthropic documentation: Test and evaluate</a><span class="host">docs.anthropic.com</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=5ba7eef6"></script>
+<script src="../assets/counter.js?v=5ba7eef6"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>
