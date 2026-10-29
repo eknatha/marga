@@ -963,3 +963,104 @@ def: A dependency installed as part of the parent chart release, configured thro
 module: helm
 plain: Go back to an earlier release revision.
 def: A command that creates a new revision applying an earlier manifest. It restores objects but not data.
+
+## Token
+module: llm
+plain: A small piece of text that models read and count.
+def: The unit a model reads and writes, roughly four characters of English. Limits and prices are measured in tokens.
+
+## Context window
+module: llm
+plain: How much text the model can look at in one request.
+def: The maximum number of tokens in one request, covering the prompt, history, documents, tool results and the answer.
+
+## Hallucination
+module: llm
+plain: A confident answer that is not true.
+def: Fluent output that is not supported by the input or by facts. It is reduced by supplying source text and allowing the model to say it does not know.
+
+## Temperature
+module: llm
+plain: A setting for how adventurous the wording is.
+def: A sampling setting. Low values make the most likely token win almost always, while higher values give more varied output.
+
+## Prompt caching
+module: llm
+plain: Reusing a repeated start of a prompt at lower cost.
+def: A feature that stores a stable prefix of a prompt so repeated requests cost less and start faster.
+
+## Few-shot prompt
+module: prompting
+plain: A prompt that includes a few worked examples.
+def: A prompt with several examples that show the format and style wanted. With none it is zero-shot.
+
+## Structured output
+module: prompting
+plain: An answer in a fixed shape such as JSON.
+def: Model output that follows a schema so programs can read it, obtained by schema-constrained output, forced tool use or careful prompting, then validated.
+
+## JSON Schema
+module: prompting
+plain: A description of what valid JSON looks like.
+def: A standard format for describing the types, required fields and allowed values of JSON data, used to validate output and define tool inputs.
+
+## Prompt injection
+module: prompting
+plain: Text that tries to give the model new orders.
+def: Content that attempts to override the intended instructions of an AI system. It can arrive through documents, web pages or tool results, so systems must limit what a fooled model can do.
+
+## Evaluation set
+module: prompting
+plain: A collection of test cases for an AI feature.
+def: A saved set of realistic inputs with expected properties, used to compare prompts and models and to catch regressions.
+
+## Skill
+module: claude-skills
+plain: A folder of instructions Claude loads when needed.
+def: A folder with a SKILL.md file and optional resources and scripts, whose description lets Claude decide when to load it.
+
+## SKILL.md
+module: claude-skills
+plain: The main file of a skill.
+def: A Markdown file with a header giving the skill name and description, followed by instructions for Claude.
+
+## Progressive disclosure
+module: claude-skills
+plain: Show details only when they are needed.
+def: Loading information in layers: metadata first, the skill body when triggered, and linked files or scripts only on demand.
+
+## Trigger
+module: claude-skills
+plain: What makes a skill get used.
+def: The match between a request and a skill description that causes Claude to load the skill.
+
+## Skill sandbox
+module: claude-skills
+plain: A restricted place to test an unknown skill.
+def: An environment with limited files and network access in which a skill is run safely before it is trusted.
+
+## Tool use
+module: mcp
+plain: The model asks your code to run a function.
+def: A pattern where the model requests a defined tool with arguments, the application runs it and returns the result, and the model continues.
+
+## MCP
+module: mcp
+plain: A standard way to plug tools into AI apps.
+def: The Model Context Protocol, an open protocol based on JSON-RPC that lets AI applications connect to servers exposing tools, resources and prompts.
+aliases: Model Context Protocol
+
+## MCP server
+module: mcp
+plain: A program that offers tools and data over MCP.
+def: A program that exposes tools, resources and prompts to MCP clients over stdio or HTTP.
+
+## Tool result
+module: mcp
+plain: The answer your code sends back to the model.
+def: A message block that returns the output or error of a tool call, matched to the call by its ID.
+
+## Excessive agency
+module: mcp
+plain: Giving an AI more power than it needs.
+def: A risk where a model-driven system has broader permissions or tools than its task requires, so mistakes or injected instructions can cause harm.
