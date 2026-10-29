@@ -1,6 +1,6 @@
 /* MARGA animated explainers: data only. Each step moves a message between two actors (from, to are indexes into actors; equal means the actor does something itself). */
 window.MARGA_EXPLAINERS = [
-{ id: 'dns-lookup', module: 'networking', title: 'How a DNS lookup works', summary: 'What happens between typing a name and getting an IP address.',
+{ id: 'dns-lookup', module: 'networking', lesson: "networking/dns", title: 'How a DNS lookup works', summary: 'What happens between typing a name and getting an IP address.',
   actors: ['Browser', 'Resolver', 'Root server', 'TLD server', 'Authoritative server'],
   steps: [
     { f: 0, t: 0, l: 'Check caches', n: 'The browser and the operating system look in their own caches first. If the answer is there and has not expired, the lookup ends here.' },
@@ -13,7 +13,7 @@ window.MARGA_EXPLAINERS = [
     { f: 4, t: 1, l: 'A record: 203.0.113.10 (TTL 300)', n: 'The authoritative server answers with the IP address and a TTL. The TTL says how many seconds the answer may be cached.' },
     { f: 1, t: 0, l: '203.0.113.10', n: 'The resolver caches the answer for the TTL and returns it. The browser can now open a connection.' }
   ] },
-{ id: 'tcp-handshake', module: 'networking', title: 'The TCP three-way handshake', summary: 'How two machines agree to talk before any data moves.',
+{ id: 'tcp-handshake', module: 'networking', lesson: "networking/latency-mtu-and-network-performance", title: 'The TCP three-way handshake', summary: 'How two machines agree to talk before any data moves.',
   actors: ['Client', 'Server'],
   steps: [
     { f: 1, t: 1, l: 'Listening on port 443', n: 'The server has a program bound to a port and waiting for connections.' },
@@ -24,7 +24,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: 'ACK + response data', n: 'The server acknowledges what it got and sends its reply.' },
     { f: 0, t: 1, l: 'FIN', n: 'When finished, one side sends FIN to close its direction. The other side acknowledges, then sends its own FIN.' }
   ] },
-{ id: 'tls-handshake', module: 'networking', title: 'The TLS 1.3 handshake', summary: 'How a browser checks who it is talking to and sets up encryption.',
+{ id: 'tls-handshake', module: 'networking', lesson: "networking/http-and-tls", title: 'The TLS 1.3 handshake', summary: 'How a browser checks who it is talking to and sets up encryption.',
   actors: ['Browser', 'Web server', 'Certificate authority'],
   steps: [
     { f: 0, t: 1, l: 'ClientHello + key share', n: 'The browser lists the cipher suites it supports and sends its half of a key exchange. It also sends the server name it wants (SNI).' },
@@ -35,7 +35,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: 'Finished', n: 'The browser confirms the handshake too. The connection is encrypted and the server is identified.' },
     { f: 0, t: 1, l: 'Encrypted HTTP request', n: 'Application data now travels encrypted with the session keys. A certificate that expires or does not match is why you see browser warnings.' }
   ] },
-{ id: 'pod-scheduling', module: 'kubernetes', title: 'What happens when you create a pod', summary: 'From kubectl apply to a running container.',
+{ id: 'pod-scheduling', module: 'kubernetes', lesson: "kubernetes/scheduling-and-troubleshooting", title: 'What happens when you create a pod', summary: 'From kubectl apply to a running container.',
   actors: ['kubectl', 'API server', 'etcd', 'Scheduler', 'Kubelet'],
   steps: [
     { f: 0, t: 1, l: 'kubectl apply -f pod.yaml', n: 'kubectl sends the object to the API server. The API server is the only component that talks to the cluster database.' },
@@ -48,7 +48,7 @@ window.MARGA_EXPLAINERS = [
     { f: 4, t: 4, l: 'Pull image, start containers', n: 'The kubelet asks the container runtime to pull the image and start the containers, then runs the probes.' },
     { f: 4, t: 1, l: 'Status: Running, Ready', n: 'The kubelet reports status back. Once the readiness probe passes, Services start sending traffic to the pod.' }
   ] },
-{ id: 'rolling-update', module: 'kubernetes', title: 'A rolling update of a Deployment', summary: 'How Kubernetes replaces pods without downtime.',
+{ id: 'rolling-update', module: 'kubernetes', lesson: "kubernetes/pods-and-deployments", title: 'A rolling update of a Deployment', summary: 'How Kubernetes replaces pods without downtime.',
   actors: ['You', 'Deployment', 'New ReplicaSet', 'Old ReplicaSet', 'Service'],
   steps: [
     { f: 0, t: 1, l: 'Change image to v2', n: 'You update the pod template in the Deployment. Any change to the template starts a rollout.' },
@@ -59,7 +59,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: 'Repeat until v2 is complete', n: 'Steps of scale up and scale down repeat until every pod runs the new version and the old ReplicaSet has zero pods.' },
     { f: 0, t: 1, l: 'kubectl rollout undo', n: 'The old ReplicaSet is kept so a rollback is fast: scale it back up and scale the new one down.' }
   ] },
-{ id: 'terraform-workflow', module: 'terraform', title: 'The Terraform workflow', summary: 'Write, plan, apply, and where state fits in.',
+{ id: 'terraform-workflow', module: 'terraform', lesson: "terraform/iac-and-hcl-basics", title: 'The Terraform workflow', summary: 'Write, plan, apply, and where state fits in.',
   actors: ['You', 'Terraform', 'State file', 'Cloud API'],
   steps: [
     { f: 0, t: 1, l: 'terraform init', n: 'Terraform downloads the providers and modules that the code needs and configures the state backend.' },
@@ -72,7 +72,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: 'Create and update resources', n: 'Terraform calls the cloud API for each change.' },
     { f: 1, t: 2, l: 'Save the new state', n: 'The results are written to the state file and the lock is released. The state now matches reality again.' }
   ] },
-{ id: 'cicd-pipeline', module: 'cicd', title: 'A change travelling through a pipeline', summary: 'From a code push to production, and where it can stop.',
+{ id: 'cicd-pipeline', module: 'cicd', lesson: "cicd/pipeline-fundamentals", title: 'A change travelling through a pipeline', summary: 'From a code push to production, and where it can stop.',
   actors: ['Developer', 'Repository', 'CI runner', 'Registry', 'Production'],
   steps: [
     { f: 0, t: 1, l: 'Push a branch, open a review', n: 'The change is pushed and reviewed by a colleague. Branch rules can require passing checks before merging.' },
@@ -85,7 +85,7 @@ window.MARGA_EXPLAINERS = [
     { f: 4, t: 2, l: 'Healthy: promote to 100 percent', n: 'If the numbers stay good the rollout continues. If not, the pipeline rolls back automatically.' }
   ] }
 ,
-{ id: 'linux-boot', module: 'linux', title: 'How a Linux server boots', summary: 'From power on to a login prompt.',
+{ id: 'linux-boot', module: 'linux', lesson: "linux/boot-and-kernel", title: 'How a Linux server boots', summary: 'From power on to a login prompt.',
   actors: ['Firmware', 'Bootloader', 'Kernel', 'systemd', 'Services'],
   steps: [
     { f: 0, t: 0, l: 'Power-on self test', n: 'The firmware (UEFI or BIOS) checks the hardware, finds memory and devices, and decides which disk to boot from.' },
@@ -97,7 +97,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 4, l: 'Start services in parallel', n: 'Networking, logging, SSH and your applications start, in parallel where dependencies allow. A failed unit can be seen with systemctl --failed.' },
     { f: 4, t: 3, l: 'Login prompt ready', n: 'When the target is reached the machine is up. The command systemd-analyze blame shows which units took the longest.' }
   ] },
-{ id: 'linux-permissions', module: 'linux', title: 'How Linux decides if you may open a file', summary: 'The checks behind "Permission denied".',
+{ id: 'linux-permissions', module: 'linux', lesson: "linux/users-groups-permissions", title: 'How Linux decides if you may open a file', summary: 'The checks behind "Permission denied".',
   actors: ['Process', 'Kernel', 'Path', 'File owner and mode'],
   steps: [
     { f: 0, t: 1, l: 'open("/srv/app/data.txt", read)', n: 'A process asks the kernel to open a file. The kernel acts for the process using its user ID and group IDs.' },
@@ -108,7 +108,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: 'Other layers: ACLs, SELinux, mounts', n: 'Access control lists, SELinux or AppArmor, and read-only mounts can still refuse a request that the mode bits allow.' },
     { f: 1, t: 0, l: 'File descriptor, or EACCES', n: 'If every check passes, the process gets a file descriptor. Otherwise it gets the error that programs show as Permission denied. Use namei -l on the path to see each step.' }
   ] },
-{ id: 'linux-process', module: 'linux', title: 'A process starts, runs and is stopped', summary: 'fork, exec, signals and why SIGTERM comes before SIGKILL.',
+{ id: 'linux-process', module: 'linux', lesson: "linux/processes-and-services", title: 'A process starts, runs and is stopped', summary: 'fork, exec, signals and why SIGTERM comes before SIGKILL.',
   actors: ['Shell', 'Kernel', 'New process', 'Operator'],
   steps: [
     { f: 0, t: 1, l: 'fork()', n: 'The shell asks the kernel to copy itself. The copy, the child, has a new process ID and starts with the same memory contents.' },
@@ -120,7 +120,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 2, l: 'kill -9 PID (SIGKILL)', n: 'SIGKILL cannot be caught or ignored: the kernel removes the process at once. Nothing is cleaned up, so use it only after SIGTERM has had time to work.' },
     { f: 1, t: 0, l: 'Exit status to the parent', n: 'The kernel tells the parent the exit status. The shell stores it in $?. If a parent never collects it, the child stays as a zombie entry.' }
   ] },
-{ id: 'bash-expansion', module: 'bash', title: 'How the shell reads a command line', summary: 'Why quoting matters: expansion, splitting and globbing.',
+{ id: 'bash-expansion', module: 'bash', lesson: "bash/arrays-and-parameter-expansion", title: 'How the shell reads a command line', summary: 'Why quoting matters: expansion, splitting and globbing.',
   actors: ['You type', 'Shell', 'Program'],
   steps: [
     { f: 0, t: 1, l: 'rm $dir/*.log', n: 'You type a command containing a variable and a wildcard. The shell, not the program, processes these first.' },
@@ -131,7 +131,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: 'Safer: rm -- "$dir"/*.log', n: 'Quote variables so they stay one word, and use -- so a name starting with a dash is not read as an option.' },
     { f: 1, t: 0, l: 'Check with echo or set -x', n: 'Put echo in front of a dangerous command, or run with set -x, to see exactly what the shell is about to run.' }
   ] },
-{ id: 'bash-pipeline', module: 'bash', title: 'A pipeline and its exit codes', summary: 'What set -euo pipefail changes.',
+{ id: 'bash-pipeline', module: 'bash', lesson: "bash/text-processing", title: 'A pipeline and its exit codes', summary: 'What set -euo pipefail changes.',
   actors: ['Script', 'curl', 'jq', 'wc'],
   steps: [
     { f: 0, t: 0, l: 'set -euo pipefail', n: 'The script turns on three safety options: stop on a failing command (-e), treat unset variables as errors (-u), and make a pipeline fail if any part fails (pipefail).' },
@@ -142,7 +142,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: 'Without pipefail: status 0', n: 'The pipeline looks successful because wc succeeded, and the script carries on with a wrong count of zero.' },
     { f: 3, t: 0, l: 'With pipefail: status 22', n: 'The pipeline now returns the failure of curl, and set -e stops the script at that line. Check ${PIPESTATUS[@]} to see every status.' }
   ] },
-{ id: 'python-import', module: 'python', title: 'How Python finds a module', summary: 'The import path, virtual environments and the wrong-version problem.',
+{ id: 'python-import', module: 'python', lesson: "python/basics-and-environments", title: 'How Python finds a module', summary: 'The import path, virtual environments and the wrong-version problem.',
   actors: ['Your script', 'Import system', 'sys.path folders', 'Virtual environment'],
   steps: [
     { f: 0, t: 1, l: 'import requests', n: 'Your script asks to import a module. Python first checks whether it was already imported, which is stored in sys.modules.' },
@@ -153,7 +153,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: 'Module is ready to use', n: 'Your script can now call requests.get. A second import returns the same object quickly without running the file again.' },
     { f: 1, t: 0, l: 'ModuleNotFoundError', n: 'If no folder has the module you get this error. Check which python and which pip are in use, and run python -m pip so they match.' }
   ] },
-{ id: 'python-retry', module: 'python', title: 'An API call with a timeout and retry', summary: 'How a robust client treats slow and failing services.',
+{ id: 'python-retry', module: 'python', lesson: "python/http-apis-and-json", title: 'An API call with a timeout and retry', summary: 'How a robust client treats slow and failing services.',
   actors: ['Your code', 'HTTP client', 'API server'],
   steps: [
     { f: 0, t: 1, l: 'get(url, timeout=5)', n: 'Always set a timeout. Without one a request can wait forever and hang the whole program.' },
@@ -165,7 +165,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: '200 OK with data', n: 'The server has recovered and the call succeeds.' },
     { f: 1, t: 0, l: 'Give up with a clear error', n: 'After the last attempt, raise an error that says what failed and how many times it was tried, so the failure shows up in logs.' }
   ] },
-{ id: 'lb-request', module: 'networking', title: 'A web request through a load balancer', summary: 'DNS, TLS, health checks and the path to a healthy server.',
+{ id: 'lb-request', module: 'networking', lesson: "networking/firewalls-and-load-balancing", title: 'A web request through a load balancer', summary: 'DNS, TLS, health checks and the path to a healthy server.',
   actors: ['Browser', 'Load balancer', 'Server A', 'Server B', 'Database'],
   steps: [
     { f: 0, t: 1, l: 'HTTPS request to shop.example.com', n: 'After DNS and the TLS handshake, the browser sends its request to the address of the load balancer.' },
@@ -177,7 +177,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: '200 OK, response body', n: 'Server A returns the response to the load balancer.' },
     { f: 1, t: 0, l: 'Encrypted response', n: 'The load balancer encrypts the response and returns it. If every backend were unhealthy the user would see a 502 or 503 from the load balancer instead.' }
   ] },
-{ id: 'docker-build', module: 'docker', title: 'How a Docker image is built and cached', summary: 'Layers, the build cache and why instruction order matters.',
+{ id: 'docker-build', module: 'docker', lesson: "docker/writing-dockerfiles", title: 'How a Docker image is built and cached', summary: 'Layers, the build cache and why instruction order matters.',
   actors: ['Dockerfile', 'Builder', 'Layer cache', 'Registry'],
   steps: [
     { f: 0, t: 1, l: 'FROM python:3.12-slim', n: 'The builder pulls the base image. Its layers become the bottom of your image.' },
@@ -188,7 +188,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: 'CMD sets the start command', n: 'CMD and ENTRYPOINT add metadata, not a new filesystem. They say what runs when a container starts.' },
     { f: 1, t: 3, l: 'Push app:3f9c2a1', n: 'The image is pushed to the registry. Only layers that the registry does not already have are uploaded.' }
   ] },
-{ id: 'docker-run', module: 'docker', title: 'What docker run does', summary: 'From a command to an isolated process.',
+{ id: 'docker-run', module: 'docker', lesson: "docker/runtimes-oci-and-podman", title: 'What docker run does', summary: 'From a command to an isolated process.',
   actors: ['docker CLI', 'Docker daemon', 'Registry', 'Container runtime', 'Kernel'],
   steps: [
     { f: 0, t: 1, l: 'docker run -p 8080:80 nginx', n: 'The command line tool sends the request to the Docker daemon, which does the actual work.' },
@@ -199,7 +199,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 4, l: 'Publish host port 8080 to 80', n: 'A rule forwards traffic arriving on host port 8080 to port 80 inside the container.' },
     { f: 4, t: 0, l: 'Container running: nginx is PID 1', n: 'The container is just a process on the host with restricted views. When that main process exits, the container stops.' }
   ] },
-{ id: 'bluegreen-deploy', module: 'cicd', title: 'Blue-green deployment', summary: 'Two copies of production and an instant switch.',
+{ id: 'bluegreen-deploy', module: 'cicd', lesson: "cicd/deployment-strategies", title: 'Blue-green deployment', summary: 'Two copies of production and an instant switch.',
   actors: ['Users', 'Router', 'Blue (v1)', 'Green (v2)'],
   steps: [
     { f: 0, t: 1, l: 'All traffic goes to blue', n: 'Blue is the live version. Users reach it through a router or load balancer.' },
@@ -210,7 +210,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: 'Green serves users', n: 'Users now get v2. Watch error rate and latency closely during the first minutes.' },
     { f: 1, t: 2, l: 'Rollback: switch back to blue', n: 'If something is wrong, switching back is as fast as the switch forward, because blue is still running. Remove blue only after green has proved stable.' }
   ] },
-{ id: 'k8s-service', module: 'kubernetes', title: 'How a request reaches a pod through a Service', summary: 'ClusterIP, endpoints and kube-proxy.',
+{ id: 'k8s-service', module: 'kubernetes', lesson: "kubernetes/services-and-ingress", title: 'How a request reaches a pod through a Service', summary: 'ClusterIP, endpoints and kube-proxy.',
   actors: ['Client pod', 'Cluster DNS', 'Service', 'kube-proxy rules', 'Backend pod'],
   steps: [
     { f: 0, t: 1, l: 'Resolve payments.shop.svc', n: 'The client pod asks cluster DNS for the name of the Service.' },
@@ -221,7 +221,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 4, l: 'Forward to 10.244.1.9:8080', n: 'The packet reaches one backend pod. The next connection may reach a different pod.' },
     { f: 4, t: 0, l: 'Response returns', n: 'The pod answers and the reply returns through the same translation. If a Service has no endpoints, check that its selector matches the pod labels.' }
   ] },
-{ id: 'k8s-hpa', module: 'kubernetes', title: 'Autoscaling with the HPA', summary: 'How pods are added when load rises.',
+{ id: 'k8s-hpa', module: 'kubernetes', lesson: "kubernetes/autoscaling", title: 'Autoscaling with the HPA', summary: 'How pods are added when load rises.',
   actors: ['Metrics server', 'HPA controller', 'Deployment', 'Scheduler', 'Cluster autoscaler'],
   steps: [
     { f: 0, t: 0, l: 'Collect CPU use from the kubelets', n: 'The metrics server gathers resource usage of every pod. The HPA needs CPU requests to be set, because it works on a percentage of the request.' },
@@ -232,7 +232,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 4, l: 'Pods stay Pending: no room', n: 'If every node is full the pods wait, which is when the cluster autoscaler can add a node.' },
     { f: 4, t: 3, l: 'New node joins, pods run', n: 'Adding a node takes minutes, so keep some headroom or scale on a leading signal for sudden traffic.' }
   ] },
-{ id: 'terraform-lock', module: 'terraform', title: 'Two engineers apply at once: state locking', summary: 'Why remote state needs a lock.',
+{ id: 'terraform-lock', module: 'terraform', lesson: "terraform/state", title: 'Two engineers apply at once: state locking', summary: 'Why remote state needs a lock.',
   actors: ['Engineer A', 'Engineer B', 'Remote backend', 'Cloud API'],
   steps: [
     { f: 0, t: 2, l: 'terraform apply: take the lock', n: 'Engineer A starts an apply. Terraform asks the backend for a lock on the state before it reads anything.' },
@@ -243,7 +243,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: 'Write new state and release the lock', n: 'The new state is saved first and then the lock is released.' },
     { f: 1, t: 2, l: 'B tries again and plans from fresh state', n: 'B now plans from the updated state, so the plan includes A\'s changes. Use force-unlock only when you are sure that the first run has died.' }
   ] },
-{ id: 'aws-iam', module: 'cloud', title: 'How a cloud request is authorised (IAM)', summary: 'Identity, policy evaluation and temporary credentials.',
+{ id: 'aws-iam', module: 'cloud', lesson: "cloud/identity-and-access", title: 'How a cloud request is authorised (IAM)', summary: 'Identity, policy evaluation and temporary credentials.',
   actors: ['Application', 'Security token service', 'IAM policy engine', 'Storage service'],
   steps: [
     { f: 0, t: 1, l: 'Assume the role "report-reader"', n: 'Instead of a stored password, the application asks for temporary credentials for a role. The workload identity proves who it is.' },
@@ -254,7 +254,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: 'Allow', n: 'The role policy allows s3:GetObject on that bucket prefix, and no deny applies, so the request is permitted.' },
     { f: 3, t: 0, l: 'Object returned, or 403 AccessDenied', n: 'With an Allow the data is returned. Otherwise the caller gets AccessDenied, and the audit log records the attempt.' }
   ] },
-{ id: 'cloud-autoscale', module: 'cloud', title: 'An auto scaling group reacts to load', summary: 'Scale out, health replacement and scale in.',
+{ id: 'cloud-autoscale', module: 'cloud', lesson: "cloud/compute-and-storage", title: 'An auto scaling group reacts to load', summary: 'Scale out, health replacement and scale in.',
   actors: ['Load balancer', 'Monitoring', 'Auto scaling group', 'Instances'],
   steps: [
     { f: 0, t: 3, l: 'Traffic rises', n: 'More requests per instance push CPU or request count above the target you set.' },
@@ -265,7 +265,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 2, l: 'One instance fails its check', n: 'If an instance becomes unhealthy, the group terminates it and launches a replacement to keep the desired capacity.' },
     { f: 1, t: 2, l: 'Load falls: scale in after a cooldown', n: 'Scale in is slower and more careful than scale out. Instances finish in-flight requests (connection draining) before they stop.' }
   ] },
-{ id: 'cloud-multi-az', module: 'cloud', title: 'A zone fails: multi-AZ database failover', summary: 'What a standby does and how long the gap lasts.',
+{ id: 'cloud-multi-az', module: 'cloud', lesson: "cloud/high-availability-and-disaster-recovery", title: 'A zone fails: multi-AZ database failover', summary: 'What a standby does and how long the gap lasts.',
   actors: ['Application', 'DNS endpoint', 'Primary (zone A)', 'Standby (zone B)'],
   steps: [
     { f: 0, t: 1, l: 'Connect to db.example.internal', n: 'The application always uses one DNS name, never an instance address.' },
@@ -276,7 +276,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: 'Name now points to zone B', n: 'The DNS record changes. Applications with long-lived DNS caches or open connections may need to reconnect.' },
     { f: 0, t: 3, l: 'Reconnect and retry', n: 'Applications must retry with backoff for the gap. A new standby is built in the background to restore redundancy.' }
   ] },
-{ id: 'prometheus-alert', module: 'observability', title: 'From a metric to a page', summary: 'Scrape, store, evaluate, route and notify.',
+{ id: 'prometheus-alert', module: 'observability', lesson: "observability/alerting-and-dashboards", title: 'From a metric to a page', summary: 'Scrape, store, evaluate, route and notify.',
   actors: ['Application', 'Prometheus', 'Alertmanager', 'On-call engineer'],
   steps: [
     { f: 0, t: 0, l: 'Expose /metrics', n: 'The application publishes counters and histograms, such as the total number of requests by status code.' },
@@ -287,7 +287,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: 'Page the on-call', n: 'A notification goes to the on-call tool by phone or chat according to routing labels such as team and severity.' },
     { f: 3, t: 2, l: 'Acknowledge, then open the runbook', n: 'The engineer acknowledges the page and follows the runbook linked in the alert annotations. Good pages say what users feel and what to check first.' }
   ] },
-{ id: 'distributed-trace', module: 'observability', title: 'A distributed trace across services', summary: 'How one request is followed from service to service.',
+{ id: 'distributed-trace', module: 'observability', lesson: "observability/logs-and-traces", title: 'A distributed trace across services', summary: 'How one request is followed from service to service.',
   actors: ['Gateway', 'Orders service', 'Payments service', 'Trace backend'],
   steps: [
     { f: 0, t: 0, l: 'Create trace ID 4bf9...', n: 'The first service creates a trace ID and a root span that records the start time and the operation name.' },
@@ -298,7 +298,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: 'Spans are exported', n: 'Each service sends its finished spans, usually through an OpenTelemetry collector, to the trace backend. Sampling keeps cost down.' },
     { f: 3, t: 3, l: 'Assemble the waterfall', n: 'The backend joins spans by trace ID into one waterfall view, so an engineer can click from an alert to the exact slow request.' }
   ] },
-{ id: 'log-pipeline', module: 'observability', title: 'How logs get from an app to a search box', summary: 'Collect, parse, ship, index and query.',
+{ id: 'log-pipeline', module: 'observability', lesson: "observability/log-pipelines", title: 'How logs get from an app to a search box', summary: 'Collect, parse, ship, index and query.',
   actors: ['Application', 'Node agent', 'Log store', 'Engineer'],
   steps: [
     { f: 0, t: 0, l: 'Write JSON lines to stdout', n: 'In containers the application writes one structured event per line to standard output and does not manage log files itself.' },
@@ -309,7 +309,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 2, l: 'Query: error and trace ID', n: 'During an incident the engineer searches by label and time range, and by trace ID to find the logs for one request.' },
     { f: 2, t: 3, l: 'Matching lines returned', n: 'Results come back in time order. A good log line has a level, a message, and an ID that links to the trace.' }
   ] },
-{ id: 'incident-response', module: 'sre', title: 'The life of an incident', summary: 'Detect, respond, mitigate, learn.',
+{ id: 'incident-response', module: 'sre', lesson: "sre/incident-response", title: 'The life of an incident', summary: 'Detect, respond, mitigate, learn.',
   actors: ['Monitoring', 'On-call', 'Incident commander', 'Customers', 'Team'],
   steps: [
     { f: 0, t: 1, l: 'Alert: checkout errors 8 percent', n: 'Monitoring detects the problem from a user-facing signal and pages the on-call engineer.' },
@@ -321,7 +321,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: 'Confirm recovery on the same graphs', n: 'Check that the user-facing signal returns to normal, then resolve the incident and tell customers.' },
     { f: 2, t: 4, l: 'Blameless postmortem, actions with owners', n: 'Within days the team writes up the timeline, causes and follow-ups. Good actions change the system, have an owner and a date.' }
   ] },
-{ id: 'error-budget-policy', module: 'sre', title: 'An error budget decides the release pace', summary: 'How a 99.9 percent SLO turns into decisions.',
+{ id: 'error-budget-policy', module: 'sre', lesson: "sre/slos-and-error-budgets", title: 'An error budget decides the release pace', summary: 'How a 99.9 percent SLO turns into decisions.',
   actors: ['Users', 'Monitoring', 'Error budget', 'Product team', 'SRE team'],
   steps: [
     { f: 0, t: 1, l: 'Requests succeed or fail', n: 'The SLI is the share of requests that succeed. Monitoring counts good and bad events continuously.' },
@@ -332,7 +332,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 4, l: 'Budget nearly spent: policy applies', n: 'The agreed policy now applies: slow or pause risky launches and put the time into reliability work.' },
     { f: 4, t: 3, l: 'Fix reliability, budget recovers', n: 'As the window moves forward and failures fall out of it, the budget recovers and normal release pace returns.' }
   ] },
-{ id: 'retry-storm', module: 'sre', title: 'A retry storm, and how to stop it', summary: 'Why naive retries turn a blip into an outage.',
+{ id: 'retry-storm', module: 'sre', lesson: "sre/reliability-patterns", title: 'A retry storm, and how to stop it', summary: 'Why naive retries turn a blip into an outage.',
   actors: ['Clients', 'Service', 'Database'],
   steps: [
     { f: 2, t: 2, l: 'Database slows down', n: 'A maintenance task makes the database slower. Requests to the service start to time out.' },
@@ -344,7 +344,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: 'Shed load, return 503 early', n: 'A service that rejects excess requests quickly protects itself and recovers sooner than one that tries to serve everything.' }
   ] }
 ,
-{ id: 'ssh-login', module: 'linux', title: 'How an SSH login works', summary: 'Key exchange, host check and key-based sign-in.',
+{ id: 'ssh-login', module: 'linux', lesson: "linux/ssh-and-remote-access", title: 'How an SSH login works', summary: 'Key exchange, host check and key-based sign-in.',
   actors: ['Your laptop', 'sshd on the server', 'PAM and shell'],
   steps: [
     { f: 0, t: 1, l: 'Open TCP port 22', n: 'The client connects to the server. Both sides send the protocol version they support.' },
@@ -356,7 +356,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: 'Account and policy checks', n: 'PAM checks that the account is valid and not locked, and applies limits. Wrong file permissions on ~/.ssh make the server ignore your key.' },
     { f: 2, t: 0, l: 'Shell starts, session is open', n: 'The server starts the login shell for the user. Use ssh -v to see each of these stages when a login fails.' }
   ] },
-{ id: 'cron-run', module: 'bash', title: 'A cron job runs, and why it behaves differently', summary: 'The small environment of scheduled jobs.',
+{ id: 'cron-run', module: 'bash', lesson: "bash/safe-automation", title: 'A cron job runs, and why it behaves differently', summary: 'The small environment of scheduled jobs.',
   actors: ['cron daemon', 'Shell (sh)', 'Your script', 'Mail or log'],
   steps: [
     { f: 0, t: 0, l: 'Every minute: read the crontab', n: 'The cron daemon wakes up each minute and checks whether any entry matches the current time.' },
@@ -367,7 +367,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: 'Two runs overlap', n: 'If a run is still going when the next one starts, you get two copies. Guard with flock -n /tmp/backup.lock.' },
     { f: 2, t: 3, l: 'Exit status, then alert', n: 'Cron does not alert on failure by itself. Have the script report success or failure to a monitoring check.' }
   ] },
-{ id: 'exit-codes', module: 'bash', title: 'Exit codes and how a script decides what to do', summary: 'From a failed command to the exit of the script.',
+{ id: 'exit-codes', module: 'bash', lesson: "bash/script-basics", title: 'Exit codes and how a script decides what to do', summary: 'From a failed command to the exit of the script.',
   actors: ['Script', 'Command', 'Shell variables'],
   steps: [
     { f: 0, t: 1, l: 'Run grep -q ready status.txt', n: 'Every command ends with an exit status. Zero means success. Any other number means some kind of failure.' },
@@ -378,7 +378,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 0, l: 'trap runs the cleanup', n: 'A trap on EXIT or ERR removes temp files and reports where the script failed.' },
     { f: 0, t: 2, l: 'exit 3 tells the caller why', n: 'Choose clear exit codes and document them. A caller such as cron, CI or another script reads them to decide what to do next.' }
   ] },
-{ id: 'python-boto3', module: 'python', title: 'How boto3 finds credentials and calls AWS', summary: 'The credential chain and a signed request.',
+{ id: 'python-boto3', module: 'python', lesson: "python/cloud-sdks", title: 'How boto3 finds credentials and calls AWS', summary: 'The credential chain and a signed request.',
   actors: ['Your script', 'boto3 credential chain', 'STS or metadata service', 'AWS API'],
   steps: [
     { f: 0, t: 1, l: 'boto3.client("s3")', n: 'You create a client without passing keys. boto3 looks for credentials in a fixed order.' },
@@ -389,7 +389,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: 'list_objects_v2 (signed)', n: 'The request is signed with the credentials, so the server can check who sent it and that nobody changed it.' },
     { f: 3, t: 0, l: 'Response or ClientError', n: 'You get data, or a ClientError with a code such as AccessDenied. Use sts get_caller_identity to see which identity was used.' }
   ] },
-{ id: 'python-container-signal', module: 'python', title: 'A Python service in a container and SIGTERM', summary: 'Graceful shutdown during a deployment.',
+{ id: 'python-container-signal', module: 'python', lesson: "python/files-and-processes", title: 'A Python service in a container and SIGTERM', summary: 'Graceful shutdown during a deployment.',
   actors: ['Orchestrator', 'Container runtime', 'Python service', 'In-flight requests'],
   steps: [
     { f: 0, t: 1, l: 'Rolling update: stop the old pod', n: 'The orchestrator asks the runtime to stop the container, after it removes it from the load balancer.' },
@@ -400,7 +400,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: 'After the grace period: SIGKILL', n: 'If the process is still running when terminationGracePeriodSeconds ends, it is killed at once and requests are cut off.' },
     { f: 0, t: 1, l: 'Use exec form for the entrypoint', n: 'Write CMD ["python", "app.py"] so Python is PID 1 and receives the signal. Add an init such as tini if you spawn children.' }
   ] },
-{ id: 'docker-network', module: 'docker', title: 'Container to container networking', summary: 'Bridge networks, DNS names and published ports.',
+{ id: 'docker-network', module: 'docker', lesson: "docker/volumes-and-networking", title: 'Container to container networking', summary: 'Bridge networks, DNS names and published ports.',
   actors: ['Browser on the host', 'Published port rule', 'web container', 'db container', 'Embedded DNS'],
   steps: [
     { f: 0, t: 1, l: 'localhost:8080', n: 'The browser connects to a port on the host. Docker has a rule that forwards it to a container.' },
@@ -411,7 +411,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 2, l: 'Query result', n: 'The database answers. Keeping the database off the host ports means that only the web container can reach it.' },
     { f: 2, t: 0, l: 'HTML response', n: 'The web container sends the page back through the published port. On the default bridge network, name lookup does not work, so create your own network.' }
   ] },
-{ id: 'docker-multistage', module: 'docker', title: 'A multi-stage build gives a small image', summary: 'Build in one stage, ship only what you need.',
+{ id: 'docker-multistage', module: 'docker', lesson: "docker/slim-images-and-faster-builds", title: 'A multi-stage build gives a small image', summary: 'Build in one stage, ship only what you need.',
   actors: ['Dockerfile', 'Build stage', 'Final stage', 'Registry'],
   steps: [
     { f: 0, t: 1, l: 'FROM golang:1.23 AS build', n: 'The first stage has the full compiler and tools. It can be large, and it never ships.' },
@@ -422,7 +422,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: 'Push 20 MB instead of 900 MB', n: 'The registry stores only the final stage. Pulls are faster and scale-out is quicker.' },
     { f: 0, t: 1, l: 'Debug with --target build', n: 'docker build --target build gives you the first stage, with all the tools, when you need to investigate.' }
   ] },
-{ id: 'canary-release', module: 'cicd', title: 'Canary release with automatic checks', summary: 'Send 5 percent of traffic to the new version and watch.',
+{ id: 'canary-release', module: 'cicd', lesson: "cicd/deployment-strategies", title: 'Canary release with automatic checks', summary: 'Send 5 percent of traffic to the new version and watch.',
   actors: ['Pipeline', 'Router', 'Stable v1', 'Canary v2', 'Metrics'],
   steps: [
     { f: 0, t: 3, l: 'Deploy v2 beside v1', n: 'The new version runs next to the stable one. At first it receives no user traffic.' },
@@ -433,7 +433,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: 'Failure: route 0 percent to v2', n: 'If errors rise, the router sends all traffic back to v1 at once. Only a small share of users saw the problem.' },
     { f: 0, t: 2, l: 'Retire v1 after a soak period', n: 'Keep the old version for a while after 100 percent so that you can roll back quickly.' }
   ] },
-{ id: 'pr-checks', module: 'cicd', title: 'What happens when you open a pull request', summary: 'Checks, review and a protected main branch.',
+{ id: 'pr-checks', module: 'cicd', lesson: "cicd/building-a-pipeline", title: 'What happens when you open a pull request', summary: 'Checks, review and a protected main branch.',
   actors: ['Developer', 'CI system', 'Reviewer', 'Main branch'],
   steps: [
     { f: 0, t: 1, l: 'Open a pull request', n: 'The change triggers the pipeline. It runs in a clean environment on the proposed result of the merge.' },
@@ -444,7 +444,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 1, l: 'Branch protection allows merge', n: 'The main branch requires passing checks and an approval. Nobody pushes to it directly.' },
     { f: 1, t: 3, l: 'Build once, release the artifact', n: 'After the merge the pipeline builds the artifact once, tags it with the commit, and passes it on to later stages.' }
   ] },
-{ id: 'k8s-crashloop', module: 'kubernetes', title: 'Why a pod ends in CrashLoopBackOff', summary: 'Restarts, back-off and where to look.',
+{ id: 'k8s-crashloop', module: 'kubernetes', lesson: "kubernetes/debugging-kubernetes-workloads", title: 'Why a pod ends in CrashLoopBackOff', summary: 'Restarts, back-off and where to look.',
   actors: ['kubelet', 'Container', 'Pod status', 'You'],
   steps: [
     { f: 0, t: 1, l: 'Start the container', n: 'The kubelet starts the container with the command and environment from the pod spec.' },
@@ -455,7 +455,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 1, l: 'kubectl logs --previous', n: 'The logs of the crashed run show the real error. Plain logs may show the new, empty container.' },
     { f: 3, t: 2, l: 'Fix config, memory or probes', n: 'Common causes are a missing variable or secret, a memory limit that is too low, or a liveness probe that kills a slow start. Use a startup probe for slow starts.' }
   ] },
-{ id: 'tf-modules-plan', module: 'terraform', title: 'How Terraform builds a plan', summary: 'Configuration, state and the real world compared.',
+{ id: 'tf-modules-plan', module: 'terraform', lesson: "terraform/modules", title: 'How Terraform builds a plan', summary: 'Configuration, state and the real world compared.',
   actors: ['Configuration', 'Terraform core', 'State', 'Provider and cloud'],
   steps: [
     { f: 0, t: 1, l: 'Read the .tf files and modules', n: 'Terraform loads all configuration files in the folder and the modules that they call, and builds a graph of resources.' },
@@ -466,7 +466,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: 'apply: call the provider in order', n: 'Dependencies decide the order. Independent resources are created in parallel.' },
     { f: 1, t: 2, l: 'Save the new state', n: 'After each successful change the state is updated, so an interrupted apply can continue from where it stopped.' }
   ] },
-{ id: 'tf-drift', module: 'terraform', title: 'Detecting and fixing drift', summary: 'Someone changed production by hand.',
+{ id: 'tf-drift', module: 'terraform', lesson: "terraform/workflows-and-drift", title: 'Detecting and fixing drift', summary: 'Someone changed production by hand.',
   actors: ['Engineer in the console', 'Cloud resource', 'Terraform plan', 'Team'],
   steps: [
     { f: 0, t: 1, l: 'Open port 22 to the world in the console', n: 'During an incident someone changes a security group by hand. The code and the state are not updated.' },
@@ -477,7 +477,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: 'Reduce console access', n: 'Give read-only access to most people, and use break-glass roles that are logged.' },
     { f: 3, t: 2, l: 'Alert on drift in a pipeline', n: 'A scheduled plan that fails when it finds changes turns drift into a ticket, instead of a surprise.' }
   ] },
-{ id: 'vpc-routing', module: 'cloud', title: 'Public and private subnets, NAT and the internet', summary: 'Which route table sends traffic where.',
+{ id: 'vpc-routing', module: 'cloud', lesson: "cloud/virtual-networks", title: 'Public and private subnets, NAT and the internet', summary: 'Which route table sends traffic where.',
   actors: ['Private app server', 'NAT gateway (public subnet)', 'Internet gateway', 'Internet service'],
   steps: [
     { f: 0, t: 0, l: 'App needs to call an update server', n: 'The server in the private subnet has only a private address. Nobody on the internet can start a connection to it.' },
@@ -488,7 +488,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 1, l: 'Response returns to NAT', n: 'The reply comes back to the NAT gateway, which maps it to the original private address.' },
     { f: 1, t: 0, l: 'Response reaches the app', n: 'Outbound works but inbound does not start here. NAT gateways charge by hour and by data, and a VPC endpoint avoids them for cloud services.' }
   ] },
-{ id: 'slo-burn-alert', module: 'observability', title: 'Multi-window burn rate alerting', summary: 'Page fast for big problems, ticket slowly for small ones.',
+{ id: 'slo-burn-alert', module: 'observability', lesson: "observability/alerting-and-dashboards", title: 'Multi-window burn rate alerting', summary: 'Page fast for big problems, ticket slowly for small ones.',
   actors: ['Error budget', 'Fast window (1h and 5m)', 'Slow window (6h and 30m)', 'On-call', 'Ticket queue'],
   steps: [
     { f: 0, t: 0, l: 'SLO 99.9 percent, budget 0.1 percent', n: 'The budget is the share of requests that may fail in the SLO period. Burn rate says how fast it is being spent.' },
@@ -499,7 +499,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 4, l: 'Open a ticket for the daytime', n: 'A ticket is picked up during working hours. This keeps pages for what is urgent and avoids alert fatigue.' },
     { f: 0, t: 3, l: 'Tune with real history', n: 'Review thresholds after incidents and false alarms. Alerts should match the SLO, not every cause of trouble.' }
   ] },
-{ id: 'chaos-experiment', module: 'sre', title: 'Running a chaos experiment safely', summary: 'Hypothesis, small blast radius, abort rule.',
+{ id: 'chaos-experiment', module: 'sre', lesson: "sre/chaos-engineering-and-game-days", title: 'Running a chaos experiment safely', summary: 'Hypothesis, small blast radius, abort rule.',
   actors: ['Team', 'Experiment tool', 'Service', 'Dashboards'],
   steps: [
     { f: 0, t: 0, l: 'Write a hypothesis', n: 'For example: if one of three replicas dies, the success rate stays above 99.9 percent.' },
@@ -510,7 +510,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: 'Stop and restore', n: 'The experiment ends after the planned time, or earlier if the abort rule is hit. All changes are reverted.' },
     { f: 0, t: 0, l: 'Record the result and fix the gap', n: 'If the hypothesis failed, you found a weakness cheaply. Make an action with an owner and repeat the test after the fix.' }
   ] },
-{ id: 'ingress-request', module: 'networking', title: 'An HTTPS request through a Kubernetes ingress', summary: 'Load balancer, ingress controller, Service and pod.',
+{ id: 'ingress-request', module: 'networking', lesson: "networking/firewalls-and-load-balancing", title: 'An HTTPS request through a Kubernetes ingress', summary: 'Load balancer, ingress controller, Service and pod.',
   actors: ['Client', 'Cloud load balancer', 'Ingress controller', 'Service', 'Pod'],
   steps: [
     { f: 0, t: 1, l: 'https://shop.example.com/api', n: 'DNS maps the name to the public address of the cloud load balancer.' },
@@ -521,7 +521,7 @@ window.MARGA_EXPLAINERS = [
     { f: 4, t: 0, l: 'Response travels back', n: 'The answer returns along the same path. Each hop adds a little latency and has its own timeout.' },
     { f: 2, t: 2, l: 'Where to look when it fails', n: 'A 404 means no rule matched. A 502 or 503 means no healthy backend. Check kubectl describe ingress and the controller logs.' }
   ] },
-{ id: 'tcp-teardown', module: 'networking', title: 'How a TCP connection closes, and TIME_WAIT', summary: 'FIN, ACK and why sockets stay for a while.',
+{ id: 'tcp-teardown', module: 'networking', lesson: "networking/latency-mtu-and-network-performance", title: 'How a TCP connection closes, and TIME_WAIT', summary: 'FIN, ACK and why sockets stay for a while.',
   actors: ['Client', 'Server'],
   steps: [
     { f: 0, t: 1, l: 'FIN: I have no more to send', n: 'The side that finishes first sends a FIN segment. This closes one direction of the connection.' },
@@ -532,7 +532,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: 'Server socket is freed', n: 'The server frees its socket as soon as it sees the last ACK. Many TIME_WAIT sockets on a busy client are normal.' },
     { f: 0, t: 1, l: 'Reuse connections', n: 'If you run out of ports, use keep-alive and connection pools instead of tuning the kernel. Check with ss -s.' }
   ] },
-{ id: 'oom-kill', module: 'linux', title: 'How the OOM killer picks a victim', summary: 'Memory pressure, reclaim and the kill.',
+{ id: 'oom-kill', module: 'linux', lesson: "linux/processes-memory-and-the-oom-killer", title: 'How the OOM killer picks a victim', summary: 'Memory pressure, reclaim and the kill.',
   actors: ['Applications', 'Kernel memory manager', 'OOM killer', 'Logs'],
   steps: [
     { f: 0, t: 1, l: 'Programs ask for more memory', n: 'A service grows, for example from a leak or a traffic spike. The kernel gives pages when they are touched.' },
@@ -543,7 +543,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: 'Message in dmesg and journal', n: 'Look for "Out of memory: Killed process" in dmesg -T or journalctl -k. In containers the cgroup limit gives exit code 137.' },
     { f: 0, t: 1, l: 'Prevent: limits and monitoring', n: 'Set memory limits per service, alert on available memory, and find the leak. Adding swap hides a problem, it does not solve it.' }
   ] },
-{ id: "dhcp-lease", module: "networking", title: "How a device gets an IP address with DHCP", summary: "Discover, offer, request, acknowledge, and what happens when the lease runs out.",
+{ id: "dhcp-lease", module: "networking", lesson: "networking/dhcp-arp-and-the-local-network", title: "How a device gets an IP address with DHCP", summary: "Discover, offer, request, acknowledge, and what happens when the lease runs out.",
   actors: ["New device", "DHCP server"],
   steps: [
     { f: 0, t: 0, l: "No address yet", n: "A device that joins the network has no IP address, so it can only send broadcasts on the local segment." },
@@ -555,7 +555,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Renew at half the lease", n: "After half of the lease time the device asks the same server to extend the lease, so its address does not change while it stays online." },
     { f: 1, t: 0, l: "ACK: lease extended", n: "The server extends the lease. If the server is unreachable, the device tries again later, and after the lease ends it must start from DISCOVER." }
   ] },
-{ id: "cdn-cache", module: "networking", title: "How a CDN serves a cached page", summary: "Edge cache hit, cache miss, and why headers decide what is stored.",
+{ id: "cdn-cache", module: "networking", lesson: "networking/http-and-tls", title: "How a CDN serves a cached page", summary: "Edge cache hit, cache miss, and why headers decide what is stored.",
   actors: ["Browser", "CDN edge", "Origin server"],
   steps: [
     { f: 0, t: 1, l: "GET /logo.png", n: "The browser is sent to the nearest edge location, usually by DNS or anycast routing, and asks for the file." },
@@ -567,7 +567,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: "200 OK, X-Cache: HIT", n: "The edge answers from its cache with no trip to the origin. This lowers latency and the load on the origin." },
     { f: 1, t: 2, l: "After 1 hour: conditional request", n: "When the copy is stale, the edge can ask the origin if it changed, using ETag. A 304 means the stored copy is still good." }
   ] },
-{ id: "bash-trap-cleanup", module: "bash", title: "Cleaning up with trap when a script is stopped", summary: "How trap runs your cleanup on exit, on Ctrl+C and on errors.",
+{ id: "bash-trap-cleanup", module: "bash", lesson: "bash/temporary-files-and-atomic-writes", title: "Cleaning up with trap when a script is stopped", summary: "How trap runs your cleanup on exit, on Ctrl+C and on errors.",
   actors: ["Script", "Shell", "Operating system"],
   steps: [
     { f: 0, t: 1, l: "trap cleanup EXIT INT TERM", n: "The script registers a function to run when the shell exits or receives an interrupt or terminate signal." },
@@ -578,7 +578,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "rm -rf \"$tmp\"", n: "The cleanup removes files with a quoted variable. If the variable were empty, an unquoted command could delete the wrong path, so check it first." },
     { f: 1, t: 2, l: "Exit with a status", n: "The shell exits with the proper status code. A SIGKILL cannot be trapped, so cleanup may not run in that case." }
   ] },
-{ id: "auto-rollback", module: "cicd", title: "Automatic rollback after a failed health check", summary: "A deploy that watches its own health and returns to the last good version.",
+{ id: "auto-rollback", module: "cicd", lesson: "cicd/deployment-strategies", title: "Automatic rollback after a failed health check", summary: "A deploy that watches its own health and returns to the last good version.",
   actors: ["Pipeline", "Orchestrator", "New version", "Monitoring"],
   steps: [
     { f: 0, t: 1, l: "Deploy version 42", n: "The pipeline asks the orchestrator to roll out the new version, and remembers that version 41 was the last good one." },
@@ -589,7 +589,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Remove version 42", n: "The new instances are drained and removed. Users on the old instances were never affected much, because the exposure was small." },
     { f: 0, t: 0, l: "Mark the release failed", n: "The pipeline marks the change as failed, notifies the owner and links the data. Later, the team fixes the cause and tries again." }
   ] },
-{ id: "nat-gateway", module: "cloud", title: "How a private server reaches the internet through NAT", summary: "Route table, NAT gateway, and why the internet cannot start connections back.",
+{ id: "nat-gateway", module: "cloud", lesson: "cloud/virtual-networks", title: "How a private server reaches the internet through NAT", summary: "Route table, NAT gateway, and why the internet cannot start connections back.",
   actors: ["Private server", "NAT gateway", "Internet host"],
   steps: [
     { f: 0, t: 0, l: "Needs to download updates", n: "The server has only a private address such as 10.0.2.15, so the internet cannot route replies to it directly." },
@@ -601,7 +601,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: "Unsolicited connection from outside", n: "A host that tries to connect to the private server first has no mapping, so the gateway drops it. This is why NAT hides the server." },
     { f: 1, t: 1, l: "Watch the data charges", n: "NAT gateways bill by the amount of data processed, so large downloads can cost much. Use endpoints for cloud storage and registries." }
   ] },
-{ id: "presigned-url", module: "cloud", title: "How a pre-signed URL gives temporary access", summary: "Letting a user upload to a private bucket without sharing credentials.",
+{ id: "presigned-url", module: "cloud", lesson: "cloud/object-storage-and-data-lifecycle", title: "How a pre-signed URL gives temporary access", summary: "Letting a user upload to a private bucket without sharing credentials.",
   actors: ["Browser", "Application", "Object storage"],
   steps: [
     { f: 0, t: 1, l: "I want to upload report.pdf", n: "The user asks the application for permission to upload. The bucket itself stays private." },
@@ -612,7 +612,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "Verify the signature", n: "Storage recomputes the signature and checks the expiry and the permissions of the signer. The request is accepted only if everything matches." },
     { f: 2, t: 0, l: "200 OK", n: "The object is stored. After the expiry time the same URL stops working." }
   ] },
-{ id: "image-pull", module: "docker", title: "How docker pull downloads only the layers it needs", summary: "Manifest, layers, the local cache, and why base images matter.",
+{ id: "image-pull", module: "docker", lesson: "docker/registries-and-supply-chain", title: "How docker pull downloads only the layers it needs", summary: "Manifest, layers, the local cache, and why base images matter.",
   actors: ["Docker CLI", "Docker daemon", "Registry"],
   steps: [
     { f: 0, t: 1, l: "docker pull shop/api:1.8", n: "The CLI sends the request to the daemon, which does the work." },
@@ -623,7 +623,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: "Verify and unpack", n: "Each layer is checked against its digest, and then unpacked into the storage driver." },
     { f: 1, t: 0, l: "Status: Downloaded newer image", n: "The image is ready. A tag can move, so for production deployments use the digest, which never changes." }
   ] },
-{ id: "readiness-probe", module: "kubernetes", title: "Readiness probes and traffic", summary: "How a pod is added to and removed from a Service without dropping requests.",
+{ id: "readiness-probe", module: "kubernetes", lesson: "kubernetes/probes-metrics-and-logging", title: "Readiness probes and traffic", summary: "How a pod is added to and removed from a Service without dropping requests.",
   actors: ["Kubelet", "Pod", "Endpoints", "Service traffic"],
   steps: [
     { f: 1, t: 1, l: "Container starts", n: "The application starts, loads its cache and connects to the database. This takes about 20 seconds." },
@@ -634,7 +634,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "Add the pod to the endpoints", n: "The pod IP is added to the endpoint list of the Service, and the proxies on every node update their rules." },
     { f: 3, t: 1, l: "Requests begin to arrive", n: "Traffic is spread across all ready pods. If the probe later fails, the pod is removed from the list again, without a restart." }
   ] },
-{ id: "systemd-restart", module: "linux", title: "How systemd restarts a crashing service", summary: "Restart policy, back-off, and the start limit that stops a restart loop.",
+{ id: "systemd-restart", module: "linux", lesson: "linux/processes-and-services", title: "How systemd restarts a crashing service", summary: "Restart policy, back-off, and the start limit that stops a restart loop.",
   actors: ["systemd", "Service process", "Journal"],
   steps: [
     { f: 0, t: 1, l: "Start the service", n: "systemd runs the command from the unit file. With Restart=on-failure it will react to a non-zero exit." },
@@ -645,7 +645,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 0, l: "Start limit reached", n: "After StartLimitBurst failures within StartLimitIntervalSec, systemd stops trying and marks the unit as failed." },
     { f: 0, t: 2, l: "Read the cause", n: "An operator runs journalctl, fixes the config, and then uses systemctl reset-failed before starting the service again." }
   ] },
-{ id: "metrics-scrape", module: "observability", title: "How Prometheus scrapes and stores metrics", summary: "Targets, scrape, storage, query, and why the pull model helps.",
+{ id: "metrics-scrape", module: "observability", lesson: "observability/metrics-and-prometheus", title: "How Prometheus scrapes and stores metrics", summary: "Targets, scrape, storage, query, and why the pull model helps.",
   actors: ["Prometheus", "Application", "Storage", "Grafana"],
   steps: [
     { f: 0, t: 0, l: "Read the target list", n: "Prometheus knows what to scrape from static config or service discovery, for example from Kubernetes pods." },
@@ -656,7 +656,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 2, l: "Query: rate(http_requests_total[5m])", n: "Grafana sends a PromQL query. rate turns an ever-growing counter into a per-second value." },
     { f: 2, t: 3, l: "Series for the graph", n: "The result is drawn as a graph. Alert rules use the same queries and fire when a condition holds for a given time." }
   ] },
-{ id: "requests-timeout", module: "python", title: "Why every HTTP call needs a timeout", summary: "What happens to a script when the server stops answering.",
+{ id: "requests-timeout", module: "python", lesson: "python/http-apis-and-json", title: "Why every HTTP call needs a timeout", summary: "What happens to a script when the server stops answering.",
   actors: ["Script", "requests library", "API server"],
   steps: [
     { f: 0, t: 1, l: "requests.get(url)", n: "The script makes a call with no timeout argument. By default the library waits with no limit." },
@@ -667,7 +667,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: "raises Timeout", n: "After the limit the library raises an exception. The script can retry with back-off, or report a failure." },
     { f: 0, t: 0, l: "Log and continue or fail", n: "The script logs the problem with the URL and the time, and moves on or exits with an error. It does not hang." }
   ] },
-{ id: "oncall-escalation", module: "sre", title: "How an alert escalates to a person", summary: "Page, acknowledge, escalate and hand over to an incident commander.",
+{ id: "oncall-escalation", module: "sre", lesson: "sre/on-call", title: "How an alert escalates to a person", summary: "Page, acknowledge, escalate and hand over to an incident commander.",
   actors: ["Alert system", "Primary on-call", "Secondary on-call", "Incident commander"],
   steps: [
     { f: 0, t: 0, l: "SLO burn alert fires", n: "Monitoring decides that users are affected and creates a page, with a link to the runbook and the dashboard." },
@@ -679,7 +679,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 3, l: "Keep a timeline and updates", n: "The commander posts status updates on a schedule and writes down decisions. This is the raw material for the postmortem." },
     { f: 0, t: 0, l: "If nobody acknowledges", n: "Without an acknowledgement, the system escalates to the secondary after a set time, then to a manager. This is why escalation policies matter." }
   ] },
-{ id: "tf-import", module: "terraform", title: "Bringing an existing resource under Terraform with import", summary: "Config first, import into state, then plan until there is no diff.",
+{ id: "tf-import", module: "terraform", lesson: "terraform/import-refactor-and-moved-blocks", title: "Bringing an existing resource under Terraform with import", summary: "Config first, import into state, then plan until there is no diff.",
   actors: ["Engineer", "Terraform", "Cloud API", "State file"],
   steps: [
     { f: 0, t: 0, l: "A bucket exists but is not managed", n: "Someone created it in the console. Terraform does not know about it, and a plan would try to create a second one." },
@@ -690,7 +690,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: "Show a diff", n: "For example, the tags in the code are missing in reality. The engineer adjusts the code until the plan shows no changes." },
     { f: 0, t: 1, l: "Review before apply", n: "Only when the plan is clean or shows changes you want do you apply. From now on, changes go through code." }
   ] },
-{ id: "sec-secret-injection", module: "security", title: "How an app gets a secret without storing it", summary: "Workload identity, a secrets manager and a short-lived credential.",
+{ id: "sec-secret-injection", module: "security", lesson: "security/secrets-management", title: "How an app gets a secret without storing it", summary: "Workload identity, a secrets manager and a short-lived credential.",
   actors: ["Application", "Identity service", "Secrets manager"],
   steps: [
     { f: 0, t: 0, l: "Start up with no secret inside", n: "The container image holds no passwords. It only knows where to ask and which identity it runs as." },
@@ -701,7 +701,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "Check the policy and log", n: "The manager checks that this role may read only this secret, then writes an audit record of who read it and when." },
     { f: 2, t: 0, l: "Return the secret value", n: "The app keeps the value in memory and connects to the database. A rotation job changes the secret on a schedule." }
   ] },
-{ id: "sec-pipeline-gates", module: "security", title: "Security gates in a pull request", summary: "Scans that run before code can merge.",
+{ id: "sec-pipeline-gates", module: "security", lesson: "security/policy-as-code-and-compliance", title: "Security gates in a pull request", summary: "Scans that run before code can merge.",
   actors: ["Developer", "Pipeline", "Scanners", "Reviewer"],
   steps: [
     { f: 0, t: 1, l: "Open pull request", n: "The developer pushes a branch and opens a pull request, which triggers the pipeline on a clean, isolated runner." },
@@ -712,7 +712,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 0, l: "Fix the finding", n: "The developer updates the library, pushes again and the scans repeat. Small fixes are cheap at this stage." },
     { f: 3, t: 1, l: "Review and approve", n: "A reviewer sees green checks, reads the change and approves. The branch rules block merge without both." }
   ] },
-{ id: "sec-image-signing", module: "security", title: "Signing an image and verifying it at deploy time", summary: "From build to a cluster that only runs trusted images.",
+{ id: "sec-image-signing", module: "security", lesson: "security/supply-chain-sboms-and-provenance", title: "Signing an image and verifying it at deploy time", summary: "From build to a cluster that only runs trusted images.",
   actors: ["Pipeline", "Registry", "Signing service", "Cluster admission"],
   steps: [
     { f: 0, t: 0, l: "Build the image", n: "The pipeline builds on a clean runner from pinned inputs and records an SBOM." },
@@ -723,7 +723,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 3, l: "Allow or deny", n: "A valid signature lets the pod start. An unsigned or altered image is rejected with a clear message." },
     { f: 3, t: 0, l: "Report the denial", n: "The deny event reaches the team. This is how a tampered or untested image is stopped before it runs." }
   ] },
-{ id: "sec-pod-network-policy", module: "security", title: "How a default deny network policy works", summary: "Blocking all pod traffic, then allowing only what is needed.",
+{ id: "sec-pod-network-policy", module: "security", lesson: "security/kubernetes-security", title: "How a default deny network policy works", summary: "Blocking all pod traffic, then allowing only what is needed.",
   actors: ["Web pod", "Network plugin", "API pod", "Database pod"],
   steps: [
     { f: 0, t: 2, l: "Call the API pod", n: "Before any policy exists, every pod can reach every other pod. This is what an attacker relies on after a breach." },
@@ -734,7 +734,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "Web pod calls the API", n: "A second allow rule permits web to API on port 8080. The path the application needs is open." },
     { f: 1, t: 1, l: "Everything else is denied", n: "A compromised web pod can now reach only one port on one service, which limits what an attacker can do." }
   ] },
-{ id: "sec-incident-contain", module: "security", title: "The first hour of a security incident", summary: "Detect, contain, preserve evidence and start recovery.",
+{ id: "sec-incident-contain", module: "security", lesson: "security/cloud-incident-playbooks", title: "The first hour of a security incident", summary: "Detect, contain, preserve evidence and start recovery.",
   actors: ["Alert system", "On-call", "Incident commander", "Cloud account"],
   steps: [
     { f: 0, t: 1, l: "Alert: shell in a production container", n: "A runtime detection fires. It names the pod, the user and the command that started." },
@@ -745,7 +745,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Rotate and rebuild", n: "Secrets the pod could read are rotated. The workload is redeployed from a known good, signed image." },
     { f: 2, t: 2, l: "Communicate and review", n: "Stakeholders get updates on a schedule. Afterward the team holds a blameless review and ships the control changes." }
   ] },
-{ id: "exit-code-pipeline", module: "bash", title: "How exit codes and pipefail decide success", summary: "Why a failed step inside a pipe can go unnoticed.",
+{ id: "exit-code-pipeline", module: "bash", lesson: "bash/safe-automation", title: "How exit codes and pipefail decide success", summary: "Why a failed step inside a pipe can go unnoticed.",
   actors: ["Script", "Command A", "Command B"],
   steps: [
     { f: 0, t: 1, l: "Run: A | B", n: "The shell starts both commands, with the output of A connected to the input of B." },
@@ -755,7 +755,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 0, l: "Add set -o pipefail", n: "With pipefail the pipeline returns the status of the last command that failed, which is 2." },
     { f: 0, t: 0, l: "set -e stops the script", n: "Now the script exits at that line instead of going on with bad data. Use it together with checks of results that matter." }
   ] },
-{ id: "blue-green-switch", module: "cicd", title: "Switching traffic with a blue-green deploy", summary: "Two identical environments and a fast, safe switch.",
+{ id: "blue-green-switch", module: "cicd", lesson: "cicd/deployment-strategies", title: "Switching traffic with a blue-green deploy", summary: "Two identical environments and a fast, safe switch.",
   actors: ["Pipeline", "Router", "Blue (live)", "Green (new)"],
   steps: [
     { f: 2, t: 2, l: "Blue serves all users", n: "The current version runs in the blue environment and receives all traffic." },
@@ -766,7 +766,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "If bad, switch back", n: "Rollback is the same single switch in the other direction. Blue is still running and untouched." },
     { f: 0, t: 2, l: "Retire blue later", n: "After a safe period, blue is kept as the next idle environment. Database changes must work for both versions." }
   ] },
-{ id: "vpc-endpoint", module: "cloud", title: "Reaching cloud storage privately with an endpoint", summary: "Keeping traffic off the internet and off the NAT gateway.",
+{ id: "vpc-endpoint", module: "cloud", lesson: "cloud/virtual-networks", title: "Reaching cloud storage privately with an endpoint", summary: "Keeping traffic off the internet and off the NAT gateway.",
   actors: ["App in private subnet", "Route table", "VPC endpoint", "Object storage"],
   steps: [
     { f: 0, t: 0, l: "Needs a file from storage", n: "The application uses the storage API name. DNS resolves it to a private address when an endpoint exists." },
@@ -776,7 +776,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 3, l: "Check the endpoint policy", n: "A policy on the endpoint and one on the bucket both allow only your account. A request for another account bucket is denied." },
     { f: 3, t: 0, l: "Response returns the same way", n: "The data comes back through the endpoint. There is no NAT data charge and no public path to monitor." }
   ] },
-{ id: "docker-healthcheck", module: "docker", title: "How a container health check works", summary: "From a probe command to a restart decision.",
+{ id: "docker-healthcheck", module: "docker", lesson: "docker/running-containers-in-production", title: "How a container health check works", summary: "From a probe command to a restart decision.",
   actors: ["Docker daemon", "Container", "Orchestrator"],
   steps: [
     { f: 1, t: 1, l: "Application starts", n: "The process starts and needs a few seconds before it can serve requests." },
@@ -786,7 +786,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "Report the status", n: "The status is visible in docker ps and to the orchestrator, which can stop sending traffic to it." },
     { f: 2, t: 1, l: "Replace the container", n: "The orchestrator or a restart policy replaces the unhealthy container. The cause should still be found in the logs." }
   ] },
-{ id: "k8s-config-reload", module: "kubernetes", title: "How a ConfigMap change reaches a pod", summary: "Env vars versus mounted files and why pods need a restart sometimes.",
+{ id: "k8s-config-reload", module: "kubernetes", lesson: "kubernetes/config-and-secrets", title: "How a ConfigMap change reaches a pod", summary: "Env vars versus mounted files and why pods need a restart sometimes.",
   actors: ["Engineer", "API server", "Kubelet", "Pod"],
   steps: [
     { f: 0, t: 1, l: "Update the ConfigMap", n: "The engineer applies a changed ConfigMap. The API server stores the new version in etcd." },
@@ -796,7 +796,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Roll the deployment", n: "To apply env changes, the engineer restarts the rollout, or uses a checksum annotation so a change triggers a new revision." },
     { f: 1, t: 3, l: "New pods start with new values", n: "Pods are replaced gradually, each reading the current ConfigMap, with readiness checks protecting traffic." }
   ] },
-{ id: "linux-oom-score", module: "linux", title: "How the kernel chooses which process to kill", summary: "Out of memory, OOM scores and what you can do about it.",
+{ id: "linux-oom-score", module: "linux", lesson: "linux/processes-memory-and-the-oom-killer", title: "How the kernel chooses which process to kill", summary: "Out of memory, OOM scores and what you can do about it.",
   actors: ["Process", "Kernel", "Administrator"],
   steps: [
     { f: 0, t: 1, l: "Ask for more memory", n: "A service keeps allocating memory. The kernel agrees as long as free memory or swap exists." },
@@ -806,7 +806,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Message in dmesg", n: "The kernel logs the victim and the memory state. The administrator finds it with dmesg or the journal." },
     { f: 2, t: 0, l: "Fix the cause", n: "Set limits with cgroups, fix the leak, add memory or protect key services with a lower oom_score_adj." }
   ] },
-{ id: "http-redirect-hsts", module: "networking", title: "HTTP to HTTPS and HSTS", summary: "Why the first request is the weak one.",
+{ id: "http-redirect-hsts", module: "networking", lesson: "networking/http-and-tls", title: "HTTP to HTTPS and HSTS", summary: "Why the first request is the weak one.",
   actors: ["Browser", "Web server"],
   steps: [
     { f: 0, t: 1, l: "GET http://shop.example.com", n: "The user types the name without a scheme, so the browser tries plain HTTP first." },
@@ -816,7 +816,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 0, l: "Remember the rule", n: "The browser stores the HSTS policy. Later visits skip the plain HTTP step completely." },
     { f: 0, t: 0, l: "Preload for the first visit", n: "Sites can join a preload list built into browsers, so even the very first visit is protected." }
   ] },
-{ id: "alert-to-dashboard", module: "observability", title: "From an alert to the cause", summary: "How metrics, traces and logs work together in an investigation.",
+{ id: "alert-to-dashboard", module: "observability", lesson: "observability/alerting-and-dashboards", title: "From an alert to the cause", summary: "How metrics, traces and logs work together in an investigation.",
   actors: ["Alert", "Engineer", "Metrics", "Traces", "Logs"],
   steps: [
     { f: 0, t: 1, l: "High error rate on checkout", n: "The alert fires on a symptom: 6 percent of requests fail. It links to a dashboard and a runbook." },
@@ -826,7 +826,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: "Mitigate first", n: "The engineer rolls back the 14:00 release. The error rate returns to normal within minutes." },
     { f: 1, t: 1, l: "Write down the timeline", n: "Notes from the alert, graphs and log lines go into the incident record for the review." }
   ] },
-{ id: "python-context-manager", module: "python", title: "How a with block cleans up", summary: "Files and locks that are closed even when errors occur.",
+{ id: "python-context-manager", module: "python", lesson: "python/files-and-processes", title: "How a with block cleans up", summary: "Files and locks that are closed even when errors occur.",
   actors: ["Your code", "with statement", "File"],
   steps: [
     { f: 0, t: 1, l: "with open(path) as f:", n: "The with statement calls the object enter method. For a file this opens it and returns the file object." },
@@ -836,7 +836,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: "Exception continues", n: "The error is passed to the caller or handler, with no leaked file descriptor left behind." },
     { f: 0, t: 0, l: "Same idea for locks and connections", n: "Any object with enter and exit works, and contextlib helps you write your own for temporary directories or timers." }
   ] },
-{ id: "slo-review-meeting", module: "sre", title: "The weekly reliability review", summary: "Using the error budget to decide what to do next.",
+{ id: "slo-review-meeting", module: "sre", lesson: "sre/slos-and-error-budgets", title: "The weekly reliability review", summary: "Using the error budget to decide what to do next.",
   actors: ["SRE", "Product team", "Dashboard"],
   steps: [
     { f: 0, t: 2, l: "Open the SLO dashboard", n: "The review starts with the facts: current availability, budget left and the burn rate of the past week." },
@@ -846,7 +846,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Decide with the policy", n: "The error budget policy says: slow risky releases and finish reliability work first when more than half is gone." },
     { f: 0, t: 0, l: "Record the decision", n: "The decisions and owners are written down, and the next review checks them. The numbers, not opinions, set the pace." }
   ] },
-{ id: "tf-plan-review", module: "terraform", title: "Reading a plan before you apply", summary: "Spotting replacements and surprises.",
+{ id: "tf-plan-review", module: "terraform", lesson: "terraform/workflows-and-drift", title: "Reading a plan before you apply", summary: "Spotting replacements and surprises.",
   actors: ["Engineer", "Terraform", "Reviewer"],
   steps: [
     { f: 0, t: 1, l: "terraform plan -out=plan.bin", n: "Terraform reads the state and the real resources, then computes the difference to the code." },
@@ -856,7 +856,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 0, l: "Approve or ask for a change", n: "If the plan shows a surprise, the code changes and a new plan is created. Nothing has been applied yet." },
     { f: 0, t: 1, l: "terraform apply plan.bin", n: "Applying the saved plan guarantees that what was reviewed is exactly what runs." }
   ] },
-{ id: "sec-zero-trust-request", module: "security", title: "How zero trust checks one request", summary: "Identity, device and policy are checked every time.",
+{ id: "sec-zero-trust-request", module: "security", lesson: "security/identity-authentication-and-zero-trust", title: "How zero trust checks one request", summary: "Identity, device and policy are checked every time.",
   actors: ["User", "Identity-aware proxy", "Application"],
   steps: [
     { f: 0, t: 1, l: "Request a page", n: "The user opens an internal app from a managed laptop. The request goes to the proxy, not straight to the app." },
@@ -866,7 +866,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "Check permission for the action", n: "The application checks that this user may read this record. The proxy check alone is not enough." },
     { f: 2, t: 0, l: "Return the data and log the decision", n: "Every allow and deny is logged, so an investigator can reconstruct who reached what." }
   ] },
-{ id: "sec-oauth-oidc-login", module: "security", title: "Sign in with OIDC and call an API", summary: "From login to an access token and a protected call.",
+{ id: "sec-oauth-oidc-login", module: "security", lesson: "security/identity-authentication-and-zero-trust", title: "Sign in with OIDC and call an API", summary: "From login to an access token and a protected call.",
   actors: ["Browser", "Identity provider", "API"],
   steps: [
     { f: 0, t: 1, l: "Redirect to sign in", n: "The app sends the user to the identity provider with its client id, scope and a random state value." },
@@ -877,7 +877,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "Validate the token", n: "The API checks signature, issuer, audience, expiry and scope before doing any work." },
     { f: 2, t: 0, l: "Return only allowed data", n: "The response contains only what the scope and the user's permissions allow." }
   ] },
-{ id: "sec-sql-injection", module: "security", title: "How parameterised queries stop injection", summary: "The same input, treated as text instead of code.",
+{ id: "sec-sql-injection", module: "security", lesson: "security/application-security-for-devops", title: "How parameterised queries stop injection", summary: "The same input, treated as text instead of code.",
   actors: ["Attacker", "Application", "Database"],
   steps: [
     { f: 0, t: 1, l: "Send a crafted name", n: "The attacker enters x' OR '1'='1 into a search box." },
@@ -887,7 +887,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Safe version sends a parameter", n: "The code sends the query with a placeholder and the value separately." },
     { f: 2, t: 1, l: "Value is treated as data", n: "The database searches for a user literally named x' OR '1'='1 and finds none." }
   ] },
-{ id: "sec-policy-rollout", module: "security", title: "Rolling out a policy without an outage", summary: "Audit, fix, enforce in stages.",
+{ id: "sec-policy-rollout", module: "security", lesson: "security/policy-as-code-and-compliance", title: "Rolling out a policy without an outage", summary: "Audit, fix, enforce in stages.",
   actors: ["Security team", "Cluster", "Service owners"],
   steps: [
     { f: 0, t: 1, l: "Install the policy in audit mode", n: "The rule reports violations but blocks nothing." },
@@ -898,7 +898,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: "Watch the denials", n: "The team checks denied requests and corrects confusing messages." },
     { f: 0, t: 1, l: "Enforce everywhere", n: "Production follows once the denial rate is near zero. Exceptions expire automatically." }
   ] },
-{ id: "sec-ransomware-recovery", module: "security", title: "Recovering from ransomware with an immutable backup", summary: "Contain, restore in order, and verify.",
+{ id: "sec-ransomware-recovery", module: "security", lesson: "security/ransomware-resilience-and-recovery", title: "Recovering from ransomware with an immutable backup", summary: "Contain, restore in order, and verify.",
   actors: ["Responders", "Backup vault", "Production"],
   steps: [
     { f: 0, t: 2, l: "Isolate affected systems", n: "Network access is cut and tokens are revoked so the attacker cannot spread or delete more." },
@@ -908,7 +908,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "Redeploy applications from signed builds", n: "Applications are deployed from trusted code, not cleaned in place." },
     { f: 0, t: 2, l: "Verify and return users in stages", n: "Checks run on each stage before traffic returns. Credentials are rotated." }
   ] },
-{ id: "x-linux-permission-check", module: "linux", title: "How the kernel checks a file permission", summary: "Owner, group, other and the execute bit on directories.",
+{ id: "x-linux-permission-check", module: "linux", lesson: "linux/users-groups-permissions", title: "How the kernel checks a file permission", summary: "Owner, group, other and the execute bit on directories.",
   actors: ["Process", "Kernel", "Filesystem"],
   steps: [
     { f: 0, t: 1, l: "open(/srv/app/data.txt)", n: "The program asks the kernel to open a file. The call carries the user and group ids of the process." },
@@ -918,7 +918,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: "Compare with the request", n: "Opening for reading needs r. Opening for writing needs w. The decision is made on that one class." },
     { f: 1, t: 0, l: "Return a handle or an error", n: "A file descriptor on success, or Permission denied. SELinux can still deny after this step." }
   ] },
-{ id: "x-linux-boot", module: "linux", title: "What happens between power on and a login prompt", summary: "Firmware, boot loader, kernel and systemd.",
+{ id: "x-linux-boot", module: "linux", lesson: "linux/boot-and-kernel", title: "What happens between power on and a login prompt", summary: "Firmware, boot loader, kernel and systemd.",
   actors: ["Firmware", "Boot loader", "Kernel", "systemd"],
   steps: [
     { f: 0, t: 0, l: "Power on self test", n: "The firmware checks hardware and finds the boot device." },
@@ -928,7 +928,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Start PID 1", n: "The kernel starts systemd as the first process." },
     { f: 3, t: 3, l: "Reach the target", n: "systemd starts services in dependency order until multi-user.target and the login prompt appear." }
   ] },
-{ id: "x-bash-pipe", module: "bash", title: "How a pipeline connects commands", summary: "Standard output of one command becomes input of the next.",
+{ id: "x-bash-pipe", module: "bash", lesson: "bash/text-processing", title: "How a pipeline connects commands", summary: "Standard output of one command becomes input of the next.",
   actors: ["Shell", "grep", "wc"],
   steps: [
     { f: 0, t: 0, l: "Parse cat log | grep ERROR | wc -l", n: "The shell splits the line at the pipe characters into three commands." },
@@ -938,7 +938,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "Count lines", n: "wc -l counts the lines until the pipe closes." },
     { f: 2, t: 0, l: "Return the status", n: "Without pipefail the shell reports only the status of the last command." }
   ] },
-{ id: "x-bash-quoting", module: "bash", title: "Why quoting protects a variable", summary: "Word splitting and globbing without quotes.",
+{ id: "x-bash-quoting", module: "bash", lesson: "bash/advanced-patterns", title: "Why quoting protects a variable", summary: "Word splitting and globbing without quotes.",
   actors: ["Script", "Shell expansion", "Command"],
   steps: [
     { f: 0, t: 0, l: "file=\"my report.txt\"", n: "The variable holds one name with a space inside." },
@@ -948,7 +948,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "One argument arrives", n: "rm receives my report.txt exactly as stored." },
     { f: 2, t: 0, l: "Safe result", n: "Quote variables by default. Unquoted use is the exception." }
   ] },
-{ id: "x-python-venv", module: "python", title: "How a virtual environment isolates packages", summary: "Separate site-packages for each project.",
+{ id: "x-python-venv", module: "python", lesson: "python/basics-and-environments", title: "How a virtual environment isolates packages", summary: "Separate site-packages for each project.",
   actors: ["Developer", "venv", "pip"],
   steps: [
     { f: 0, t: 1, l: "python -m venv .venv", n: "A folder is created with its own interpreter link and an empty site-packages." },
@@ -958,7 +958,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "pip freeze > requirements.txt", n: "The exact versions are recorded so others can rebuild the same environment." },
     { f: 0, t: 1, l: "Delete and recreate", n: "Removing the folder and reinstalling from the file gives a clean copy." }
   ] },
-{ id: "x-python-retry", module: "python", title: "Retrying a failed API call with backoff", summary: "Waiting longer after each failure.",
+{ id: "x-python-retry", module: "python", lesson: "python/http-apis-and-json", title: "Retrying a failed API call with backoff", summary: "Waiting longer after each failure.",
   actors: ["Script", "API", "Timer"],
   steps: [
     { f: 0, t: 1, l: "First request", n: "The script sends the request with a timeout." },
@@ -968,7 +968,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: "503 again", n: "The wait grows to 2 seconds, then 4, up to a limit." },
     { f: 0, t: 1, l: "Third request succeeds", n: "The call returns 200. If the limit is reached, the script reports the failure instead of looping forever." }
   ] },
-{ id: "x-net-tcp-handshake", module: "networking", title: "How a TCP connection starts and ends", summary: "SYN, SYN-ACK and ACK, then FIN.",
+{ id: "x-net-tcp-handshake", module: "networking", lesson: "networking/latency-mtu-and-network-performance", title: "How a TCP connection starts and ends", summary: "SYN, SYN-ACK and ACK, then FIN.",
   actors: ["Client", "Server"],
   steps: [
     { f: 0, t: 1, l: "SYN", n: "The client picks a starting sequence number and asks to connect." },
@@ -978,7 +978,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "FIN", n: "One side says it has finished sending." },
     { f: 1, t: 0, l: "FIN and ACK", n: "The other side closes too. A firewall that drops these packets leaves half open connections." }
   ] },
-{ id: "x-net-tls", module: "networking", title: "How TLS protects an HTTPS request", summary: "Certificate check and a shared key.",
+{ id: "x-net-tls", module: "networking", lesson: "networking/http-and-tls", title: "How TLS protects an HTTPS request", summary: "Certificate check and a shared key.",
   actors: ["Browser", "Server", "CA"],
   steps: [
     { f: 0, t: 1, l: "ClientHello", n: "The browser lists the TLS versions and ciphers it supports and the server name." },
@@ -988,7 +988,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: "Finished", n: "Both confirm the handshake. From now on everything is encrypted." },
     { f: 0, t: 1, l: "Send the HTTP request", n: "The request and the response travel encrypted with the session key." }
   ] },
-{ id: "x-docker-build-cache", module: "docker", title: "How the Docker build cache decides what to rebuild", summary: "Layers are reused until something changes.",
+{ id: "x-docker-build-cache", module: "docker", lesson: "docker/buildkit-caching-and-multi-arch", title: "How the Docker build cache decides what to rebuild", summary: "Layers are reused until something changes.",
   actors: ["Developer", "Builder", "Cache"],
   steps: [
     { f: 0, t: 1, l: "docker build .", n: "The builder reads the Dockerfile from top to bottom." },
@@ -998,7 +998,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: "Rebuild from there on", n: "Every later instruction runs again, because each layer depends on the one before." },
     { f: 1, t: 0, l: "Image ready", n: "Putting rarely changed steps first keeps most of the build cached." }
   ] },
-{ id: "x-docker-compose-up", module: "docker", title: "What docker compose up does", summary: "Network, volumes and ordered startup.",
+{ id: "x-docker-compose-up", module: "docker", lesson: "docker/compose", title: "What docker compose up does", summary: "Network, volumes and ordered startup.",
   actors: ["Compose", "Docker engine", "Containers"],
   steps: [
     { f: 0, t: 0, l: "Read compose.yaml", n: "Compose parses services, networks, volumes and dependencies." },
@@ -1008,7 +1008,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: "Report healthy", n: "When the check passes, services that depend on it with the healthy condition can start." },
     { f: 1, t: 2, l: "Start the app", n: "The app connects to db by name and the published port opens on the host." }
   ] },
-{ id: "x-cicd-pr-flow", module: "cicd", title: "From a pull request to production", summary: "Checks, review, merge and deploy.",
+{ id: "x-cicd-pr-flow", module: "cicd", lesson: "cicd/building-a-pipeline", title: "From a pull request to production", summary: "Checks, review, merge and deploy.",
   actors: ["Developer", "Pipeline", "Reviewer", "Production"],
   steps: [
     { f: 0, t: 1, l: "Open a pull request", n: "The pipeline starts with lint, unit tests and scans." },
@@ -1018,7 +1018,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: "Build once on main", n: "The pipeline builds one artifact and stores it with a version." },
     { f: 1, t: 3, l: "Deploy the same artifact", n: "The tested artifact is promoted step by step to production with a health check." }
   ] },
-{ id: "x-cicd-cache", module: "cicd", title: "How a pipeline cache speeds up builds", summary: "Dependencies restored by a key.",
+{ id: "x-cicd-cache", module: "cicd", lesson: "cicd/fast-pipelines-caching-parallelism-monorepos", title: "How a pipeline cache speeds up builds", summary: "Dependencies restored by a key.",
   actors: ["Job", "Cache store"],
   steps: [
     { f: 0, t: 0, l: "Compute the cache key", n: "The key is built from the hash of the lock file, so it changes only when dependencies change." },
@@ -1028,7 +1028,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Miss: install and save", n: "On a miss the job installs normally and saves the folder under the new key." },
     { f: 1, t: 0, l: "Next run is faster", n: "Never cache secrets or build outputs that must be fresh." }
   ] },
-{ id: "x-k8s-pod-start", module: "kubernetes", title: "What happens when you create a pod", summary: "API server, scheduler and kubelet.",
+{ id: "x-k8s-pod-start", module: "kubernetes", lesson: "kubernetes/pods-and-deployments", title: "What happens when you create a pod", summary: "API server, scheduler and kubelet.",
   actors: ["kubectl", "API server", "Scheduler", "Kubelet"],
   steps: [
     { f: 0, t: 1, l: "kubectl apply -f pod.yaml", n: "The request is authenticated, authorized and validated." },
@@ -1038,7 +1038,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 1, l: "Kubelet sees its pod", n: "The kubelet on that node pulls the image and starts the containers." },
     { f: 3, t: 1, l: "Report Running", n: "Status goes back to the API server and kubectl get pods shows Running." }
   ] },
-{ id: "x-k8s-hpa", module: "kubernetes", title: "How the horizontal autoscaler adds pods", summary: "Metrics, target and replica count.",
+{ id: "x-k8s-hpa", module: "kubernetes", lesson: "kubernetes/autoscaling", title: "How the horizontal autoscaler adds pods", summary: "Metrics, target and replica count.",
   actors: ["Metrics server", "Autoscaler", "Deployment"],
   steps: [
     { f: 0, t: 0, l: "Collect CPU use", n: "The metrics server reports current CPU use of every pod." },
@@ -1048,7 +1048,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "New pods start", n: "The scheduler places them if nodes have room. Otherwise a node autoscaler must add a node." },
     { f: 1, t: 2, l: "Wait before scaling down", n: "A stabilisation window avoids flapping when load drops for a short time." }
   ] },
-{ id: "x-tf-remote-state", module: "terraform", title: "How remote state and locking protect a team", summary: "One source of truth and one writer at a time.",
+{ id: "x-tf-remote-state", module: "terraform", lesson: "terraform/state", title: "How remote state and locking protect a team", summary: "One source of truth and one writer at a time.",
   actors: ["Engineer", "Terraform", "Backend"],
   steps: [
     { f: 0, t: 1, l: "terraform apply", n: "Terraform starts and needs the current state." },
@@ -1058,7 +1058,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Write the new state", n: "The updated state is saved with a new version." },
     { f: 1, t: 2, l: "Release the lock", n: "Others can now run. Versioning allows a rollback of the state file." }
   ] },
-{ id: "x-tf-module-use", module: "terraform", title: "How a module is reused", summary: "One definition, many environments.",
+{ id: "x-tf-module-use", module: "terraform", lesson: "terraform/modules", title: "How a module is reused", summary: "One definition, many environments.",
   actors: ["Root config", "Module", "Provider"],
   steps: [
     { f: 0, t: 1, l: "module \"network\" { source = ... }", n: "The root passes variables such as cidr and name." },
@@ -1068,7 +1068,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 0, l: "Use the outputs", n: "Other modules receive the ids by reference." },
     { f: 0, t: 1, l: "Reuse for staging", n: "Another call with other inputs creates a second copy without copied code." }
   ] },
-{ id: "x-cloud-assume-role", module: "cloud", title: "How a role gives temporary access", summary: "Assume role and short-lived credentials.",
+{ id: "x-cloud-assume-role", module: "cloud", lesson: "cloud/identity-and-access", title: "How a role gives temporary access", summary: "Assume role and short-lived credentials.",
   actors: ["Application", "Security token service", "Storage"],
   steps: [
     { f: 0, t: 1, l: "Request the role", n: "The application proves its identity, for example with its instance profile." },
@@ -1078,7 +1078,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "Check the permission policy", n: "The storage service checks that the role may read this bucket." },
     { f: 2, t: 0, l: "Return the data", n: "After expiry the keys stop working, so a leak has a short life." }
   ] },
-{ id: "x-cloud-lambda", module: "cloud", title: "What happens when a function is invoked", summary: "Cold start, run and scale out.",
+{ id: "x-cloud-lambda", module: "cloud", lesson: "cloud/serverless", title: "What happens when a function is invoked", summary: "Cold start, run and scale out.",
   actors: ["Caller", "Function service", "Execution environment"],
   steps: [
     { f: 0, t: 1, l: "Invoke the function", n: "An event or an HTTP request arrives." },
@@ -1088,7 +1088,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 0, l: "Return the result", n: "The response goes back. The environment stays warm for a while." },
     { f: 1, t: 2, l: "Scale out", n: "More concurrent requests create more environments, up to the account limit." }
   ] },
-{ id: "x-obs-trace", module: "observability", title: "How a distributed trace follows a request", summary: "Trace id passed from service to service.",
+{ id: "x-obs-trace", module: "observability", lesson: "observability/logs-and-traces", title: "How a distributed trace follows a request", summary: "Trace id passed from service to service.",
   actors: ["Gateway", "Order service", "Payment service", "Trace backend"],
   steps: [
     { f: 0, t: 0, l: "Create a trace id", n: "The first service creates a trace id and a root span." },
@@ -1098,7 +1098,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Export spans", n: "Every service sends its spans to the backend in the background." },
     { f: 3, t: 3, l: "Assemble the trace", n: "The backend joins spans by trace id and shows where the time went." }
   ] },
-{ id: "x-obs-log-pipeline", module: "observability", title: "How logs travel from a container to a search page", summary: "Collect, parse, ship and index.",
+{ id: "x-obs-log-pipeline", module: "observability", lesson: "observability/log-pipelines", title: "How logs travel from a container to a search page", summary: "Collect, parse, ship and index.",
   actors: ["Container", "Collector", "Storage", "Search UI"],
   steps: [
     { f: 0, t: 0, l: "Write JSON to standard output", n: "The app writes one event per line with level, message and request id." },
@@ -1108,7 +1108,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "Index and store", n: "Events are indexed by time and labels, with a retention period." },
     { f: 3, t: 2, l: "Query by request id", n: "An engineer searches one request id and sees all events across services." }
   ] },
-{ id: "x-sre-error-budget", module: "sre", title: "How an error budget guides releases", summary: "Spend, watch and decide.",
+{ id: "x-sre-error-budget", module: "sre", lesson: "sre/slos-and-error-budgets", title: "How an error budget guides releases", summary: "Spend, watch and decide.",
   actors: ["Team", "Monitoring", "Release process"],
   steps: [
     { f: 0, t: 0, l: "Set the SLO", n: "For example 99.9 percent of requests succeed over 30 days." },
@@ -1118,7 +1118,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Budget is nearly spent", n: "Releases slow down and reliability work takes priority." },
     { f: 2, t: 0, l: "Review at the end of the period", n: "The team resets, learns from the burn and adjusts the SLO if needed." }
   ] },
-{ id: "x-sre-postmortem", module: "sre", title: "From incident to learning", summary: "Timeline, causes and follow up.",
+{ id: "x-sre-postmortem", module: "sre", lesson: "sre/postmortems-and-toil", title: "From incident to learning", summary: "Timeline, causes and follow up.",
   actors: ["Incident lead", "Team", "Tracker"],
   steps: [
     { f: 0, t: 0, l: "Collect the timeline", n: "Alerts, chat messages and deploys are put in time order." },
@@ -1128,7 +1128,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 0, l: "Track to completion", n: "Open items are reviewed weekly." },
     { f: 0, t: 1, l: "Share the lessons", n: "The write-up is shared, so other teams avoid the same failure." }
   ] },
-{ id: "x-linux-namespaces", module: "linux", title: "What a namespace changes for a process", summary: "How the kernel gives a process its own view of the system.",
+{ id: "x-linux-namespaces", module: "linux", lesson: "linux/namespaces-and-cgroups", title: "What a namespace changes for a process", summary: "How the kernel gives a process its own view of the system.",
   actors: ["Container runtime", "Kernel", "Process", "Host"],
   steps: [
     { f: 0, t: 1, l: "Create with new namespaces", n: "The runtime asks the kernel to start a process with new pid, mount, network and hostname namespaces, using clone or unshare." },
@@ -1138,7 +1138,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 1, l: "Host still sees everything", n: "From the host the same process has a normal pid, and tools like lsns and nsenter can enter its namespaces to debug it." },
     { f: 0, t: 3, l: "Enter to debug", n: "nsenter runs a host tool inside the namespaces of the process, which helps when the container image has no tools of its own." }
   ] },
-{ id: "x-linux-cgroup-throttle", module: "linux", title: "Memory limit versus CPU limit in a cgroup", summary: "Why going over memory kills a process but going over CPU only slows it.",
+{ id: "x-linux-cgroup-throttle", module: "linux", lesson: "linux/namespaces-and-cgroups", title: "Memory limit versus CPU limit in a cgroup", summary: "Why going over memory kills a process but going over CPU only slows it.",
   actors: ["Process", "cgroup controller", "Kernel scheduler", "Monitoring"],
   steps: [
     { f: 0, t: 1, l: "Runs with limits set", n: "The group has memory.max of 512 MB and a CPU quota of half a core, written as files under /sys/fs/cgroup." },
@@ -1148,7 +1148,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Memory grows past the limit", n: "Memory use reaches memory.max and the kernel cannot reclaim enough pages from the group." },
     { f: 1, t: 0, l: "OOM kill, exit 137", n: "The kernel kills a process in the group. The runtime reports exit code 137 and OOMKilled, and memory.events counts the kill." }
   ] },
-{ id: "x-linux-inode-exhaustion", module: "linux", title: "Out of space with free space", summary: "How a filesystem can refuse new files while df shows free blocks.",
+{ id: "x-linux-inode-exhaustion", module: "linux", lesson: "linux/disks-and-filesystems", title: "Out of space with free space", summary: "How a filesystem can refuse new files while df shows free blocks.",
   actors: ["Application", "Filesystem", "Operator", "Cleanup job"],
   steps: [
     { f: 0, t: 1, l: "Create a session file", n: "The application creates a small file for each user session in one directory." },
@@ -1158,7 +1158,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: "Run df -h and df -i", n: "df -h shows 60 percent free, but df -i shows 100 percent of inodes used, which names the real problem." },
     { f: 2, t: 3, l: "Remove old files, fix the job", n: "The operator deletes old session files, repairs the cleanup job and adds an alert on inode use." }
   ] },
-{ id: "x-linux-package-verify", module: "linux", title: "How a package install is verified", summary: "Why apt and dnf check signatures before installing.",
+{ id: "x-linux-package-verify", module: "linux", lesson: "linux/package-management", title: "How a package install is verified", summary: "Why apt and dnf check signatures before installing.",
   actors: ["Admin", "Package manager", "Repository", "Local keyring"],
   steps: [
     { f: 0, t: 1, l: "apt install nginx", n: "The admin asks the package manager to install a package and its dependencies." },
@@ -1168,7 +1168,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: "Check checksums and dependencies", n: "The package manager compares each hash with the signed list and resolves which other packages are needed." },
     { f: 1, t: 0, l: "Install and run scripts", n: "Files are unpacked and maintainer scripts run as root, which is why you only trust repositories you have checked." }
   ] },
-{ id: "x-bash-getopts", module: "bash", title: "How getopts reads options", summary: "How a script turns -d dir -n into variables.",
+{ id: "x-bash-getopts", module: "bash", lesson: "bash/advanced-patterns", title: "How getopts reads options", summary: "How a script turns -d dir -n into variables.",
   actors: ["Caller", "Script", "getopts", "Variables"],
   steps: [
     { f: 0, t: 1, l: "rotate.sh -d /tmp -k 7 -n", n: "The caller starts the script with short options. -d and -k take a value, and -n is a flag." },
@@ -1178,7 +1178,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: "Unknown option gives ?", n: "If the caller passes -x, getopts sets opt to a question mark and the script prints usage to standard error." },
     { f: 1, t: 0, l: "Exit code 64 on bad usage", n: "The script exits with 64, the usage error convention, so callers and pipelines can tell a mistake from a failure." }
   ] },
-{ id: "x-bash-quoted-array", module: "bash", title: "Why \"${files[@]}\" matters", summary: "What happens to names with spaces when expanding arrays.",
+{ id: "x-bash-quoted-array", module: "bash", lesson: "bash/arrays-and-parameter-expansion", title: "Why \"${files[@]}\" matters", summary: "What happens to names with spaces when expanding arrays.",
   actors: ["Script", "Array", "Shell expansion", "Command"],
   steps: [
     { f: 0, t: 1, l: "files=(\"a b\" c)", n: "The array holds two elements. The first one contains a space." },
@@ -1188,7 +1188,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Loop sees \"a b\" and c", n: "The loop runs twice with the real names, so the command acts on exactly the files in the array." },
     { f: 0, t: 3, l: "Compare counts", n: "A careful script also compares how many items it found with how many it processed, which catches this kind of error." }
   ] },
-{ id: "x-bash-pipefail", module: "bash", title: "What pipefail changes", summary: "How a failure in the middle of a pipeline is noticed.",
+{ id: "x-bash-pipefail", module: "bash", lesson: "bash/safe-automation", title: "What pipefail changes", summary: "How a failure in the middle of a pipeline is noticed.",
   actors: ["Script", "Command one", "Command two", "Shell status"],
   steps: [
     { f: 0, t: 1, l: "curl -s url | jq .name", n: "The script downloads data and pipes it to a second command." },
@@ -1198,7 +1198,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "set -o pipefail", n: "With pipefail the pipeline returns the failing status of any command in it, here the 22 from curl." },
     { f: 3, t: 0, l: "set -e now stops", n: "Combined with set -e, the script stops at the failed download instead of carrying on with empty data." }
   ] },
-{ id: "x-bash-cron-env", module: "bash", title: "Why a script works by hand but not in cron", summary: "How the cron environment differs from your login shell.",
+{ id: "x-bash-cron-env", module: "bash", lesson: "bash/debugging-shell-scripts", title: "Why a script works by hand but not in cron", summary: "How the cron environment differs from your login shell.",
   actors: ["Admin", "Login shell", "cron", "Script"],
   steps: [
     { f: 0, t: 1, l: "Test in terminal", n: "The admin runs the script by hand. It works because the login shell has a long PATH and the right working directory." },
@@ -1208,7 +1208,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Reproduce with env -i", n: "Running the script with env -i and a short PATH shows the same error in a terminal." },
     { f: 0, t: 3, l: "Fix the script", n: "The admin uses full paths, sets PATH at the top, changes to the script directory and redirects output to a log file." }
   ] },
-{ id: "x-python-threadpool", module: "python", title: "A thread pool running 100 checks", summary: "How a worker limit keeps a script fast and polite.",
+{ id: "x-python-threadpool", module: "python", lesson: "python/concurrency-for-operations", title: "A thread pool running 100 checks", summary: "How a worker limit keeps a script fast and polite.",
   actors: ["Script", "Thread pool", "Remote service", "Results"],
   steps: [
     { f: 0, t: 1, l: "Submit 100 tasks", n: "The script submits one task for each URL and the pool holds them in a queue." },
@@ -1218,7 +1218,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: "One call times out", n: "A task that exceeds its timeout raises an error, and the script records the failure instead of stopping." },
     { f: 0, t: 3, l: "Report problems", n: "At the end the script prints how many checks failed and which ones, so nothing is lost silently." }
   ] },
-{ id: "x-python-asyncio", module: "python", title: "asyncio with a semaphore", summary: "How one thread handles many network calls at once.",
+{ id: "x-python-asyncio", module: "python", lesson: "python/concurrency-for-operations", title: "asyncio with a semaphore", summary: "How one thread handles many network calls at once.",
   actors: ["Main coroutine", "Event loop", "Semaphore", "Remote service"],
   steps: [
     { f: 0, t: 1, l: "gather(*tasks)", n: "The program creates one coroutine for each URL and asks the event loop to run them all." },
@@ -1228,7 +1228,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 1, l: "Reply arrives", n: "When the response comes in, the loop resumes the waiting coroutine and releases the semaphore slot." },
     { f: 1, t: 0, l: "Exceptions as results", n: "With return_exceptions set, a failed call is returned as a value and does not cancel the others." }
   ] },
-{ id: "x-python-argparse", module: "python", title: "From command line to function call", summary: "How argparse validates input before your code runs.",
+{ id: "x-python-argparse", module: "python", lesson: "python/writing-command-line-tools", title: "From command line to function call", summary: "How argparse validates input before your code runs.",
   actors: ["User", "Shell", "argparse", "main()"],
   steps: [
     { f: 0, t: 1, l: "svcctl status web --json", n: "The user types a command with a subcommand, a name and a flag." },
@@ -1238,7 +1238,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Call main logic", n: "With valid input, your function receives an object with the fields, and the code does not parse text itself." },
     { f: 3, t: 0, l: "Result on stdout", n: "The tool prints its result, such as JSON, to standard output and logs to standard error, and returns an exit code." }
   ] },
-{ id: "x-python-traceback", module: "python", title: "Reading a traceback from the bottom", summary: "How to find the cause of an exception quickly.",
+{ id: "x-python-traceback", module: "python", lesson: "python/debugging-python", title: "Reading a traceback from the bottom", summary: "How to find the cause of an exception quickly.",
   actors: ["Developer", "Traceback", "Source code", "Test"],
   steps: [
     { f: 0, t: 1, l: "Run the script", n: "The script fails and Python prints a traceback with several frames." },
@@ -1248,7 +1248,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Write a failing test", n: "The developer copies the smallest failing input into a test, which proves the bug and guards against its return." },
     { f: 0, t: 2, l: "Fix and re-run", n: "The code is changed, for example with a default, and the test and the script now pass." }
   ] },
-{ id: "x-net-ipv6-slaac", module: "networking", title: "How a host gets an IPv6 address", summary: "Router advertisements and stateless autoconfiguration.",
+{ id: "x-net-ipv6-slaac", module: "networking", lesson: "networking/ipv6-essentials", title: "How a host gets an IPv6 address", summary: "Router advertisements and stateless autoconfiguration.",
   actors: ["Host", "Router", "Neighbours", "DNS server"],
   steps: [
     { f: 0, t: 0, l: "Make a link-local address", n: "The interface builds an fe80:: address for itself, which works only on this network segment." },
@@ -1258,7 +1258,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 0, l: "Build a global address", n: "The host combines the prefix with an interface identifier and now has a routable address, with no server keeping a lease." },
     { f: 0, t: 3, l: "Find DNS and go", n: "The host learns DNS servers from the advertisement or DHCPv6, and can open connections over IPv6." }
   ] },
-{ id: "x-net-happy-eyeballs", module: "networking", title: "Why a broken IPv6 path makes a site slow", summary: "How clients choose between IPv6 and IPv4 and what a timeout costs.",
+{ id: "x-net-happy-eyeballs", module: "networking", lesson: "networking/ipv6-essentials", title: "Why a broken IPv6 path makes a site slow", summary: "How clients choose between IPv6 and IPv4 and what a timeout costs.",
   actors: ["Browser", "DNS", "IPv6 path", "IPv4 path"],
   steps: [
     { f: 0, t: 1, l: "Look up AAAA and A", n: "The browser asks for both IPv6 and IPv4 addresses of the site." },
@@ -1268,7 +1268,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Fall back to IPv4", n: "Modern clients start an IPv4 attempt after a short delay, but older ones wait for the full timeout before they try." },
     { f: 3, t: 0, l: "Connected, but late", n: "Users on IPv6-first networks see a delay of seconds or more. Testing with curl -6 finds the problem quickly." }
   ] },
-{ id: "x-net-mtu-blackhole", module: "networking", title: "An MTU black hole in a VPN", summary: "Why small packets work and large ones hang.",
+{ id: "x-net-mtu-blackhole", module: "networking", lesson: "networking/latency-mtu-and-network-performance", title: "An MTU black hole in a VPN", summary: "Why small packets work and large ones hang.",
   actors: ["Client", "VPN tunnel", "Router with filter", "Server"],
   steps: [
     { f: 0, t: 3, l: "Small request", n: "A short SSH login or a health check fits into small packets, so everything seems to work." },
@@ -1278,7 +1278,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "ICMP is filtered", n: "A firewall drops that ICMP message, so the server never learns that it must send smaller packets." },
     { f: 3, t: 0, l: "Connection stalls", n: "The server keeps resending large packets that never arrive. Lowering the MTU or clamping the MSS fixes it." }
   ] },
-{ id: "x-net-tcp-window", module: "networking", title: "Why a fast link can still be slow", summary: "How round trip time limits one TCP connection.",
+{ id: "x-net-tcp-window", module: "networking", lesson: "networking/latency-mtu-and-network-performance", title: "Why a fast link can still be slow", summary: "How round trip time limits one TCP connection.",
   actors: ["Sender", "Network", "Receiver", "Operator"],
   steps: [
     { f: 0, t: 1, l: "Send a window of data", n: "TCP lets the sender have only a limited amount of unacknowledged data in flight, called the window." },
@@ -1288,7 +1288,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Measure with iperf3", n: "The operator runs a single stream and then four parallel streams to see how much the window is the limit." },
     { f: 3, t: 2, l: "Choose a remedy", n: "Use larger buffers, parallel connections, a closer endpoint or a CDN, rather than buying a bigger link." }
   ] },
-{ id: "x-docker-buildkit-cache", module: "docker", title: "How layer caching speeds up a build", summary: "What stays cached and what is rebuilt after a code change.",
+{ id: "x-docker-buildkit-cache", module: "docker", lesson: "docker/buildkit-caching-and-multi-arch", title: "How layer caching speeds up a build", summary: "What stays cached and what is rebuilt after a code change.",
   actors: ["Developer", "BuildKit", "Layer cache", "Registry"],
   steps: [
     { f: 0, t: 1, l: "docker build", n: "The developer changes one source file and builds the image again." },
@@ -1298,7 +1298,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Push with cache export", n: "In a pipeline the cache is exported to a registry, so a clean runner can import it and avoid starting from zero." },
     { f: 1, t: 0, l: "Fast build", n: "Only the last layers were rebuilt, and the build took seconds instead of minutes." }
   ] },
-{ id: "x-docker-secret-mount", module: "docker", title: "Passing a secret to a build safely", summary: "Why a secret mount leaves nothing in the image.",
+{ id: "x-docker-secret-mount", module: "docker", lesson: "docker/buildkit-caching-and-multi-arch", title: "Passing a secret to a build safely", summary: "Why a secret mount leaves nothing in the image.",
   actors: ["Developer", "BuildKit", "Build container", "Final image"],
   steps: [
     { f: 0, t: 1, l: "--secret id=npmrc", n: "The developer passes the file to the build as a secret, instead of as an ARG or COPY." },
@@ -1308,7 +1308,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Layers created", n: "The image layers contain the installed packages but not the credentials." },
     { f: 0, t: 3, l: "Check history", n: "docker history on the finished image shows no token, which a security scan can verify." }
   ] },
-{ id: "x-docker-oom", module: "docker", title: "What happens when a container hits its memory limit", summary: "From growth to restart.",
+{ id: "x-docker-oom", module: "docker", lesson: "docker/container-logging-and-resource-limits", title: "What happens when a container hits its memory limit", summary: "From growth to restart.",
   actors: ["Application", "Container cgroup", "Kernel", "Docker"],
   steps: [
     { f: 0, t: 1, l: "Memory grows", n: "A cache without a size limit holds more entries every minute." },
@@ -1318,7 +1318,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 3, l: "Record exit 137", n: "Docker sees the exit, records exit code 137 and OOMKilled true in the container state." },
     { f: 3, t: 0, l: "Restart policy", n: "If a policy is set, Docker restarts the container, and the cycle repeats until the cause is fixed." }
   ] },
-{ id: "x-docker-multiarch", module: "docker", title: "A multi-architecture image", summary: "How one tag works on amd64 and arm64.",
+{ id: "x-docker-multiarch", module: "docker", lesson: "docker/buildkit-caching-and-multi-arch", title: "A multi-architecture image", summary: "How one tag works on amd64 and arm64.",
   actors: ["Developer", "buildx", "Registry", "Docker host"],
   steps: [
     { f: 0, t: 1, l: "buildx --platform amd64,arm64", n: "The developer asks for two platforms in a single build." },
@@ -1328,7 +1328,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Send the matching image", n: "The registry returns the image that matches the host, so an arm64 laptop and an amd64 server use the same tag." },
     { f: 3, t: 3, l: "Run without exec format error", n: "The binary matches the CPU, so the container starts. A single-platform image would fail with exec format error." }
   ] },
-{ id: "x-cicd-feature-flag", module: "cicd", title: "A gradual release with a feature flag", summary: "Deploy first, release later, and switch off in seconds.",
+{ id: "x-cicd-feature-flag", module: "cicd", lesson: "cicd/release-management-and-feature-flags", title: "A gradual release with a feature flag", summary: "Deploy first, release later, and switch off in seconds.",
   actors: ["Pipeline", "Application", "Flag service", "Users"],
   steps: [
     { f: 0, t: 1, l: "Deploy with flag off", n: "The new code reaches production, but the flag is off, so nobody sees the new behaviour." },
@@ -1338,7 +1338,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Problem seen", n: "Error rate rises for the group with the flag on. The owner turns the flag off." },
     { f: 2, t: 1, l: "Back to normal in seconds", n: "No redeploy is needed. The old behaviour returns for everyone, and the fix is released later." }
   ] },
-{ id: "x-cicd-test-sharding", module: "cicd", title: "Splitting tests across parallel jobs", summary: "How a long test stage becomes short.",
+{ id: "x-cicd-test-sharding", module: "cicd", lesson: "cicd/testing-and-quality-gates", title: "Splitting tests across parallel jobs", summary: "How a long test stage becomes short.",
   actors: ["Pipeline", "Shard 1", "Shard 2", "Timing data"],
   steps: [
     { f: 0, t: 3, l: "Read previous timings", n: "The pipeline loads the durations recorded from earlier runs to know which tests are slow." },
@@ -1348,7 +1348,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Update timings", n: "Every shard writes new durations, so the next split is better balanced." },
     { f: 0, t: 0, l: "Merge reports", n: "The pipeline combines the reports into one view. The stage takes the time of the slowest shard, not the sum." }
   ] },
-{ id: "x-cicd-cache-key", module: "cicd", title: "A dependency cache keyed on the lockfile", summary: "Why the key decides if the cache is safe.",
+{ id: "x-cicd-cache-key", module: "cicd", lesson: "cicd/fast-pipelines-caching-parallelism-monorepos", title: "A dependency cache keyed on the lockfile", summary: "Why the key decides if the cache is safe.",
   actors: ["Pipeline", "Lockfile", "Cache store", "Package registry"],
   steps: [
     { f: 0, t: 1, l: "Hash the lockfile", n: "The pipeline computes a hash of package-lock.json. The hash is the cache key." },
@@ -1358,7 +1358,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "Save under the new key", n: "After a successful install the download directory is stored with the new key for later runs." },
     { f: 0, t: 0, l: "Never stale", n: "A branch-name key could serve old packages after a lockfile change. A lockfile hash cannot." }
   ] },
-{ id: "x-cicd-argocd-sync", module: "cicd", title: "The Argo CD sync loop", summary: "How the cluster is pulled towards the declared state.",
+{ id: "x-cicd-argocd-sync", module: "cicd", lesson: "cicd/declarative-delivery-with-argo-cd", title: "The Argo CD sync loop", summary: "How the cluster is pulled towards the declared state.",
   actors: ["Developer", "Config repository", "Argo CD", "Cluster"],
   steps: [
     { f: 0, t: 1, l: "Merge a manifest change", n: "The developer changes the image tag in a manifest and merges it after review." },
@@ -1368,7 +1368,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Apply the change", n: "With automated sync, Argo CD applies the new manifests, and Kubernetes rolls out the new version." },
     { f: 3, t: 2, l: "Report health", n: "Argo CD watches the rollout and shows Synced and Healthy. If someone edits the cluster by hand, it shows the drift and can revert it." }
   ] },
-{ id: "x-k8s-probes", module: "kubernetes", title: "Startup, readiness and liveness probes", summary: "Which probe controls what.",
+{ id: "x-k8s-probes", module: "kubernetes", lesson: "kubernetes/probes-metrics-and-logging", title: "Startup, readiness and liveness probes", summary: "Which probe controls what.",
   actors: ["Kubelet", "Container", "Service endpoints", "Operator"],
   steps: [
     { f: 0, t: 1, l: "Startup probe", n: "While the app is starting, the kubelet runs only the startup probe. Other probes wait until it succeeds." },
@@ -1378,7 +1378,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Liveness probe", n: "A separate check detects a stuck process, for example a frozen event loop." },
     { f: 0, t: 1, l: "Liveness failure restarts", n: "After several failures the kubelet restarts the container. A liveness check on the database would restart every Pod during a database fault." }
   ] },
-{ id: "x-k8s-mesh-mtls", module: "kubernetes", title: "A request inside a service mesh", summary: "How sidecars add identity and encryption.",
+{ id: "x-k8s-mesh-mtls", module: "kubernetes", lesson: "kubernetes/service-mesh-and-mtls", title: "A request inside a service mesh", summary: "How sidecars add identity and encryption.",
   actors: ["Checkout app", "Checkout proxy", "Payments proxy", "Payments app"],
   steps: [
     { f: 0, t: 1, l: "Plain call to payments", n: "The application calls http://payments as usual. It knows nothing about certificates." },
@@ -1388,7 +1388,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Forward in plain form", n: "If the policy allows it, the proxy delivers the request to the payments container on the same Pod." },
     { f: 3, t: 0, l: "Reply with telemetry", n: "The reply goes back the same way, and both proxies record request counts, errors and latency for the mesh dashboards." }
   ] },
-{ id: "x-k8s-rbac-check", module: "kubernetes", title: "How the API server decides on a request", summary: "Authentication, authorization and admission.",
+{ id: "x-k8s-rbac-check", module: "kubernetes", lesson: "kubernetes/rbac-and-security", title: "How the API server decides on a request", summary: "Authentication, authorization and admission.",
   actors: ["kubectl", "API server", "RBAC", "Admission"],
   steps: [
     { f: 0, t: 1, l: "kubectl delete pod web", n: "The request reaches the API server with a client certificate or token." },
@@ -1398,7 +1398,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Admission controllers", n: "Mutating and validating policies can change or reject the request, for example a rule against privileged Pods." },
     { f: 1, t: 0, l: "Write to etcd and reply", n: "If every step passes, the change is stored in etcd and the caller receives the result." }
   ] },
-{ id: "x-k8s-pvc-binding", module: "kubernetes", title: "From a claim to a mounted volume", summary: "How storage reaches a Pod.",
+{ id: "x-k8s-pvc-binding", module: "kubernetes", lesson: "kubernetes/storage", title: "From a claim to a mounted volume", summary: "How storage reaches a Pod.",
   actors: ["Developer", "PersistentVolumeClaim", "Provisioner", "Pod"],
   steps: [
     { f: 0, t: 1, l: "Create a claim", n: "The developer asks for 20 GB of storage with a storage class, without choosing a disk." },
@@ -1408,7 +1408,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 1, l: "Pod uses the claim", n: "The Pod refers to the claim by name and the scheduler places it on a node that can reach the disk." },
     { f: 3, t: 3, l: "Mount into the container", n: "The kubelet attaches and mounts the disk, and the container reads and writes data that survives restarts." }
   ] },
-{ id: "x-tf-test-layers", module: "terraform", title: "Testing layers for Terraform changes", summary: "From a quick format check to a real deployment.",
+{ id: "x-tf-test-layers", module: "terraform", lesson: "terraform/testing-terraform", title: "Testing layers for Terraform changes", summary: "From a quick format check to a real deployment.",
   actors: ["Developer", "Pipeline", "Plan policy", "Test account"],
   steps: [
     { f: 0, t: 1, l: "Push a change", n: "The developer opens a pull request that changes a module." },
@@ -1418,7 +1418,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Integration test", n: "For widely used modules, terraform test creates real resources with random names in a separate account." },
     { f: 3, t: 1, l: "Destroy and report", n: "The test removes its resources, and the result is posted to the pull request before anyone reviews the change." }
   ] },
-{ id: "x-tf-moved-block", module: "terraform", title: "Renaming a resource without destroying it", summary: "How a moved block keeps the object.",
+{ id: "x-tf-moved-block", module: "terraform", lesson: "terraform/import-refactor-and-moved-blocks", title: "Renaming a resource without destroying it", summary: "How a moved block keeps the object.",
   actors: ["Developer", "Terraform", "State", "Cloud"],
   steps: [
     { f: 0, t: 0, l: "Rename in code", n: "The developer changes aws_db_instance.main to aws_db_instance.database for a naming rule." },
@@ -1428,7 +1428,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Plan again", n: "Terraform renames the entry in the state and the plan says no changes for the database." },
     { f: 1, t: 3, l: "Apply changes nothing real", n: "The cloud resource stays untouched. Only the address in the state changed." }
   ] },
-{ id: "x-tf-apply-saved-plan", module: "terraform", title: "Reviewing and applying the same plan", summary: "Why the pipeline applies the saved plan file.",
+{ id: "x-tf-apply-saved-plan", module: "terraform", lesson: "terraform/workflows-and-drift", title: "Reviewing and applying the same plan", summary: "Why the pipeline applies the saved plan file.",
   actors: ["Author", "Pipeline", "Reviewer", "Cloud"],
   steps: [
     { f: 0, t: 1, l: "Open a pull request", n: "The author pushes the change and the pipeline starts." },
@@ -1438,7 +1438,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "terraform apply tfplan", n: "The pipeline applies the saved plan, so exactly what was approved is what runs, even if the cloud changed meanwhile." },
     { f: 1, t: 0, l: "Plan again to confirm", n: "A final plan should say no changes. If it does not, the author looks at drift before the next change." }
   ] },
-{ id: "x-tf-state-split", module: "terraform", title: "Splitting state to shorten plans", summary: "Why separate stacks are faster and safer.",
+{ id: "x-tf-state-split", module: "terraform", lesson: "terraform/environments-and-team-workflows", title: "Splitting state to shorten plans", summary: "Why separate stacks are faster and safer.",
   actors: ["Engineer", "Network stack", "App stack", "Data stack"],
   steps: [
     { f: 0, t: 1, l: "Change a security group", n: "The engineer needs an urgent change in the network." },
@@ -1448,7 +1448,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: "Read network values", n: "The app stack reads what it needs, without owning or changing those resources." },
     { f: 3, t: 3, l: "Database state is separate", n: "A mistake in the app code cannot destroy the data stack, because it is a separate state with separate permissions." }
   ] },
-{ id: "x-cloud-pilot-light", module: "cloud", title: "Failover with a pilot light", summary: "How a small standby grows when the main region fails.",
+{ id: "x-cloud-pilot-light", module: "cloud", lesson: "cloud/high-availability-and-disaster-recovery", title: "Failover with a pilot light", summary: "How a small standby grows when the main region fails.",
   actors: ["Users", "Primary region", "DNS health check", "Secondary region"],
   steps: [
     { f: 0, t: 1, l: "Normal traffic", n: "All users reach the primary region while data is replicated to the secondary region." },
@@ -1458,7 +1458,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Scale up the standby", n: "Automation, defined as code, builds out the application tier in the secondary region and promotes the replica database." },
     { f: 0, t: 3, l: "Traffic moves", n: "DNS now answers with the secondary region, and the recovery time is the time to scale up plus DNS caching." }
   ] },
-{ id: "x-cloud-landing-zone", module: "cloud", title: "A guardrail in a multi-account setup", summary: "Why even an administrator cannot turn off audit logs.",
+{ id: "x-cloud-landing-zone", module: "cloud", lesson: "cloud/landing-zones-and-multi-account-strategy", title: "A guardrail in a multi-account setup", summary: "Why even an administrator cannot turn off audit logs.",
   actors: ["Team admin", "Workload account", "Organisation policy", "Log archive account"],
   steps: [
     { f: 0, t: 1, l: "Try to stop audit logging", n: "An administrator in a workload account tries to disable the audit trail." },
@@ -1468,7 +1468,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Logs keep flowing", n: "Audit events continue to a central log archive that workload administrators cannot change." },
     { f: 2, t: 3, l: "Alert on the attempt", n: "The attempt itself is recorded and a detection rule notifies the security team." }
   ] },
-{ id: "x-cloud-cdn-oac", module: "cloud", title: "A private bucket behind a CDN", summary: "How a static site is served without making storage public.",
+{ id: "x-cloud-cdn-oac", module: "cloud", lesson: "cloud/dns-and-cdn", title: "A private bucket behind a CDN", summary: "How a static site is served without making storage public.",
   actors: ["Browser", "CDN edge", "Origin access control", "Private bucket"],
   steps: [
     { f: 0, t: 1, l: "Request /index.html", n: "The browser connects to the CDN over HTTPS using the site domain and a valid certificate." },
@@ -1478,7 +1478,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 1, l: "Return the object", n: "The object travels back to the edge with cache headers such as max-age." },
     { f: 1, t: 0, l: "Serve and cache", n: "The CDN returns the file and keeps a copy. Direct requests to the bucket address still fail." }
   ] },
-{ id: "x-cloud-policy-eval", module: "cloud", title: "How the cloud decides to allow a request", summary: "Identity policy, resource policy and explicit deny.",
+{ id: "x-cloud-policy-eval", module: "cloud", lesson: "cloud/security-and-governance", title: "How the cloud decides to allow a request", summary: "Identity policy, resource policy and explicit deny.",
   actors: ["Caller", "Provider API", "Policy engine", "Resource"],
   steps: [
     { f: 0, t: 1, l: "GetObject on a bucket", n: "A role calls the storage API with temporary credentials." },
@@ -1488,7 +1488,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: "Decision", n: "No matching allow means a default deny. The result is returned to the API." },
     { f: 1, t: 3, l: "Allow or AccessDenied", n: "On allow the object is read. On deny the error names the action and resource, and the audit log records the caller." }
   ] },
-{ id: "x-obs-red-drilldown", module: "observability", title: "From a RED alert to a cause", summary: "Using the standard dashboard to narrow down.",
+{ id: "x-obs-red-drilldown", module: "observability", lesson: "observability/red-use-and-golden-signals", title: "From a RED alert to a cause", summary: "Using the standard dashboard to narrow down.",
   actors: ["On-call", "Dashboard", "Trace store", "Log store"],
   steps: [
     { f: 0, t: 1, l: "Latency alert fires", n: "The p99 for checkout is above its objective, and the alert links to the service dashboard." },
@@ -1498,7 +1498,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Jump to logs by trace id", n: "The trace id leads to a log line: connection pool exhausted, waiting for a free connection." },
     { f: 0, t: 0, l: "Act", n: "The on-call engineer rolls back or raises the pool size, and watches the same p99 panel recover." }
   ] },
-{ id: "x-obs-cardinality", module: "observability", title: "How one label creates millions of series", summary: "Why request ids do not belong on metrics.",
+{ id: "x-obs-cardinality", module: "observability", lesson: "observability/telemetry-cost-and-cardinality", title: "How one label creates millions of series", summary: "Why request ids do not belong on metrics.",
   actors: ["Developer", "Application", "Metrics server", "Operator"],
   steps: [
     { f: 0, t: 1, l: "Add request_id label", n: "A developer adds the request id as a label on a request counter to help debugging." },
@@ -1508,7 +1508,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 2, l: "Find the culprit", n: "The operator lists metrics by series count and sees the counter with millions of series." },
     { f: 3, t: 1, l: "Remove and move to logs", n: "The label is removed, relabel rules drop the existing series, and the request id stays in logs and traces." }
   ] },
-{ id: "x-obs-tail-sampling", module: "observability", title: "Tail sampling in a collector", summary: "Keeping the traces that matter.",
+{ id: "x-obs-tail-sampling", module: "observability", lesson: "observability/opentelemetry", title: "Tail sampling in a collector", summary: "Keeping the traces that matter.",
   actors: ["Service A", "Service B", "Collector", "Trace store"],
   steps: [
     { f: 0, t: 1, l: "Request with trace id", n: "Service A calls B and passes the trace context, so both record spans for the same trace." },
@@ -1518,7 +1518,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Store kept traces", n: "Only the chosen traces are written, so storage cost drops, but every failure is still available." },
     { f: 2, t: 2, l: "Drop the rest", n: "Dropped traces still count in metrics, so rates and error ratios remain correct." }
   ] },
-{ id: "x-obs-otel-collector", module: "observability", title: "The path of telemetry through a collector", summary: "Receive, process, export.",
+{ id: "x-obs-otel-collector", module: "observability", lesson: "observability/opentelemetry", title: "The path of telemetry through a collector", summary: "Receive, process, export.",
   actors: ["Application", "Receiver", "Processor", "Backend"],
   steps: [
     { f: 0, t: 1, l: "Send OTLP data", n: "The application sends metrics, logs and traces with the OpenTelemetry protocol to the local collector." },
@@ -1528,7 +1528,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Export to backends", n: "Exporters send traces to the tracing system, metrics to the metrics store and logs to the log store." },
     { f: 3, t: 0, l: "Change backend without code", n: "Switching vendors only changes the exporter configuration. The application code stays the same." }
   ] },
-{ id: "x-sre-prr", module: "sre", title: "A production readiness review", summary: "How a team finds gaps before launch.",
+{ id: "x-sre-prr", module: "sre", lesson: "sre/production-readiness-reviews", title: "A production readiness review", summary: "How a team finds gaps before launch.",
   actors: ["Service team", "Reviewers", "Checklist", "Launch"],
   steps: [
     { f: 0, t: 1, l: "Request a review", n: "The team asks for a review six weeks before launch, while design changes are still cheap." },
@@ -1538,7 +1538,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Fix the must-do items", n: "The team adds a rollback test, a runbook and an alert on user impact before the date." },
     { f: 1, t: 3, l: "Agree to launch", n: "Reviewers confirm the launch criteria are met, and the accepted risks are written down with a name." }
   ] },
-{ id: "x-sre-incident-comms", module: "sre", title: "Communication during an incident", summary: "Who tells whom what and when.",
+{ id: "x-sre-incident-comms", module: "sre", lesson: "sre/incident-communication-and-stakeholders", title: "Communication during an incident", summary: "Who tells whom what and when.",
   actors: ["Commander", "Responders", "Comms lead", "Customers and support"],
   steps: [
     { f: 0, t: 1, l: "Declare and assign roles", n: "The commander opens an incident channel, names the roles and sets a severity based on impact." },
@@ -1548,7 +1548,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Regular updates", n: "Updates follow the schedule even when there is no news, so support and customers are not left guessing." },
     { f: 0, t: 3, l: "Resolve and follow up", n: "After user metrics are verified, the all-clear goes out, and a blameless review is scheduled within a few days." }
   ] },
-{ id: "x-sre-load-shedding", module: "sre", title: "Load shedding under overload", summary: "Protecting the service by refusing some work.",
+{ id: "x-sre-load-shedding", module: "sre", lesson: "sre/reliability-patterns", title: "Load shedding under overload", summary: "Protecting the service by refusing some work.",
   actors: ["Clients", "Load balancer", "Service", "Dependency"],
   steps: [
     { f: 0, t: 1, l: "Traffic doubles", n: "A marketing email sends twice the normal traffic in a few minutes." },
@@ -1558,7 +1558,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Dependency stays healthy", n: "Fewer calls reach the database, so it does not fall over and slow everything even more." },
     { f: 0, t: 0, l: "Clients back off", n: "Well-behaved clients wait with exponential backoff and jitter, and the surge passes without a full outage." }
   ] },
-{ id: "x-sre-toil-automation", module: "sre", title: "Turning toil into automation", summary: "How a repeated manual task is removed.",
+{ id: "x-sre-toil-automation", module: "sre", lesson: "sre/postmortems-and-toil", title: "Turning toil into automation", summary: "How a repeated manual task is removed.",
   actors: ["On-call engineer", "Ticket queue", "Automation", "Service"],
   steps: [
     { f: 0, t: 1, l: "Same ticket again", n: "The engineer clears a full disk by hand for the fourth time this month, following the same five steps." },
@@ -1568,7 +1568,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 0, l: "Report the action", n: "The on-call person receives a note instead of a page when the automation succeeds." },
     { f: 0, t: 1, l: "Fix the cause", n: "The team removes the source of the growth, so the automation becomes a safety net and not a daily habit." }
   ] },
-{ id: "x-sec-kms-envelope", module: "security", title: "Envelope encryption with a KMS", summary: "How data is protected without exposing the master key.",
+{ id: "x-sec-kms-envelope", module: "security", lesson: "security/encryption-and-key-management", title: "Envelope encryption with a KMS", summary: "How data is protected without exposing the master key.",
   actors: ["Application", "KMS", "Data key", "Storage"],
   steps: [
     { f: 0, t: 1, l: "Request a data key", n: "The application asks the key management service for a new data key under a named master key." },
@@ -1578,7 +1578,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Later: decrypt the data key", n: "To read the data, the application sends the wrapped key to the KMS, which checks policy and logs the call." },
     { f: 1, t: 0, l: "Return the plain key", n: "Only roles allowed to use the master key can get the data key back, and the master key never leaves the service." }
   ] },
-{ id: "x-sec-detection", module: "security", title: "From a log event to a detection", summary: "How a suspicious action becomes an alert.",
+{ id: "x-sec-detection", module: "security", lesson: "security/detection-and-security-logging", title: "From a log event to a detection", summary: "How a suspicious action becomes an alert.",
   actors: ["Cloud account", "Central log store", "Detection rule", "Security analyst"],
   steps: [
     { f: 0, t: 1, l: "Audit event shipped", n: "Every control plane call is sent within minutes to a central, protected log store." },
@@ -1588,7 +1588,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Contain", n: "If it is real, the analyst disables the key or isolates the host reversibly, and keeps evidence." },
     { f: 3, t: 2, l: "Tune the rule", n: "Known automation is added to an allow list and the rule precision is tracked, so alerts stay trustworthy." }
   ] },
-{ id: "x-sec-secret-scan-block", module: "security", title: "A secret scanner in the pipeline", summary: "How a leaked token is stopped before it is merged.",
+{ id: "x-sec-secret-scan-block", module: "security", lesson: "security/secrets-management", title: "A secret scanner in the pipeline", summary: "How a leaked token is stopped before it is merged.",
   actors: ["Developer", "Pipeline", "Secret scanner", "Security team"],
   steps: [
     { f: 0, t: 1, l: "Push a change", n: "The developer accidentally includes an access key in a configuration file." },
@@ -1598,7 +1598,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Rotate the key", n: "The developer revokes the key and gets a new one from the secret manager, which is read at run time." },
     { f: 3, t: 1, l: "Keep the control on", n: "The security team makes the scanner a required check and reviews how many findings occur each month." }
   ] },
-{ id: "x-sec-admission-deny", module: "security", title: "An admission policy rejecting a Pod", summary: "How a security rule is enforced before a workload runs.",
+{ id: "x-sec-admission-deny", module: "security", lesson: "security/kubernetes-security", title: "An admission policy rejecting a Pod", summary: "How a security rule is enforced before a workload runs.",
   actors: ["Developer", "API server", "Policy engine", "Cluster"],
   steps: [
     { f: 0, t: 1, l: "Apply a Deployment", n: "The developer applies a manifest whose container runs as root with a privileged flag." },
@@ -1608,7 +1608,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 0, l: "Deny with a message", n: "The request is rejected with a clear message naming the rule and the field to change." },
     { f: 0, t: 3, l: "Fix and apply again", n: "The developer sets runAsNonRoot and removes privileged. The Pod is accepted and scheduled." }
   ] },
-  { id: "x-ans-run", module: "ansible", title: "What happens when you run a playbook", summary: "From the command to a changed server, step by step.",
+  { id: "x-ans-run", module: "ansible", lesson: "ansible/playbooks-tasks-and-idempotence", title: "What happens when you run a playbook", summary: "From the command to a changed server, step by step.",
   actors: ["Engineer", "Control node", "Managed node"],
   steps: [
     { f: 0, t: 1, l: "Run ansible-playbook", n: "The engineer runs the command with an inventory and a playbook file." },
@@ -1619,7 +1619,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: "Report the result", n: "The module returns ok, changed or failed as JSON and is removed from the node." },
     { f: 1, t: 0, l: "Show the recap", n: "The engineer sees counts per host, and a second run should show changed=0." }
   ] },
-  { id: "x-ans-handler", module: "ansible", title: "A template change triggering a reload", summary: "How a handler runs once when configuration changes.",
+  { id: "x-ans-handler", module: "ansible", lesson: "ansible/handlers-conditionals-and-loops", title: "A template change triggering a reload", summary: "How a handler runs once when configuration changes.",
   actors: ["Playbook", "Template task", "Handler queue", "Web server"],
   steps: [
     { f: 0, t: 1, l: "Run the template task", n: "The play reaches the task that renders the web server configuration." },
@@ -1629,7 +1629,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "End of the play", n: "When all tasks finish for the host, the queued handlers are due." },
     { f: 2, t: 3, l: "Reload once", n: "The handler reloads the web server a single time, even if several tasks notified it." }
   ] },
-  { id: "x-ans-vault", module: "ansible", title: "How Vault protects a password in a run", summary: "Where the secret is encrypted and where it appears in clear text.",
+  { id: "x-ans-vault", module: "ansible", lesson: "ansible/vault-secrets-and-safe-practice", title: "How Vault protects a password in a run", summary: "Where the secret is encrypted and where it appears in clear text.",
   actors: ["Repository", "Engineer or pipeline", "Control node", "Target host"],
   steps: [
     { f: 0, t: 0, l: "Store the secret encrypted", n: "The password sits in the repository inside an encrypted vault file." },
@@ -1639,7 +1639,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Write the secret safely", n: "The password goes into a file on the host with strict owner and permissions." },
     { f: 3, t: 3, l: "Service reads the file", n: "The application reads the password locally. No other user on the host can read it." }
   ] },
-  { id: "x-ans-rolling", module: "ansible", title: "A rolling update with a canary", summary: "How serial batches and health checks limit damage.",
+  { id: "x-ans-rolling", module: "ansible", lesson: "ansible/ansible-at-scale", title: "A rolling update with a canary", summary: "How serial batches and health checks limit damage.",
   actors: ["Playbook", "Load balancer", "Canary host", "Remaining hosts"],
   steps: [
     { f: 0, t: 1, l: "Drain the first host", n: "The play asks the load balancer to stop sending traffic to the canary host." },
@@ -1649,7 +1649,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Continue in waves", n: "The play repeats the same steps for the next batch, then the next." },
     { f: 0, t: 0, l: "Stop on failure", n: "If failures pass max_fail_percentage the play stops and the remaining hosts stay on the old version." }
   ] },
-  { id: "x-ans-tf", module: "ansible", title: "Terraform and Ansible working together", summary: "Provisioning first, configuration second.",
+  { id: "x-ans-tf", module: "ansible", lesson: "ansible/ansible-at-scale", title: "Terraform and Ansible working together", summary: "Provisioning first, configuration second.",
   actors: ["Terraform", "Cloud", "Inventory", "Ansible"],
   steps: [
     { f: 0, t: 1, l: "Create the servers", n: "Terraform asks the cloud to create networks, instances and security rules." },
@@ -1659,7 +1659,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 1, l: "Configure over SSH", n: "Ansible installs packages, writes files and starts services on each instance." },
     { f: 3, t: 0, l: "Report back", n: "A clean second run shows changed=0. Later infrastructure changes go back through Terraform." }
   ] },
-  { id: "x-db-query", module: "databases", title: "How a query reaches the data", summary: "What the database does between your SQL and the answer.",
+  { id: "x-db-query", module: "databases", lesson: "databases/indexes-and-query-plans", title: "How a query reaches the data", summary: "What the database does between your SQL and the answer.",
   actors: ["Client", "Planner", "Index and table", "Write-ahead log"],
   steps: [
     { f: 0, t: 1, l: "Send SQL", n: "The client sends a query over a connection to the database." },
@@ -1669,7 +1669,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 0, l: "Return the result", n: "The matching rows travel back to the client." },
     { f: 0, t: 3, l: "A write is logged first", n: "For an update the change is written to the log and flushed before the commit is acknowledged." }
   ] },
-  { id: "x-db-lock", module: "databases", title: "How a long transaction blocks a migration", summary: "One idle session can stop a busy table.",
+  { id: "x-db-lock", module: "databases", lesson: "databases/transactions-and-locking", title: "How a long transaction blocks a migration", summary: "One idle session can stop a busy table.",
   actors: ["Report session", "ALTER TABLE", "App queries", "Database"],
   steps: [
     { f: 0, t: 3, l: "Open a transaction", n: "A reporting session starts a transaction and reads the orders table, then stays open." },
@@ -1679,7 +1679,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 2, l: "Connections pile up", n: "The connection pool fills with waiting statements and the application times out." },
     { f: 1, t: 3, l: "Cancel the ALTER", n: "Cancelling the migration releases the queue at once. Setting lock_timeout would have done this automatically." }
   ] },
-  { id: "x-db-pitr", module: "databases", title: "Point-in-time recovery", summary: "Restoring to the minute before a mistake.",
+  { id: "x-db-pitr", module: "databases", lesson: "databases/backups-and-recovery", title: "Point-in-time recovery", summary: "Restoring to the minute before a mistake.",
   actors: ["Primary", "Archive", "Restore host", "Operator"],
   steps: [
     { f: 0, t: 1, l: "Archive the log continuously", n: "As changes are made, the write-ahead log segments are copied to the archive." },
@@ -1689,7 +1689,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Replay the log", n: "Archived log segments are applied until the target time is reached." },
     { f: 2, t: 3, l: "Verify and promote", n: "The operator checks the data, then promotes the restored server or copies back the missing rows." }
   ] },
-  { id: "x-db-failover", module: "databases", title: "A safe database failover", summary: "Quorum, fencing, promotion and redirection.",
+  { id: "x-db-failover", module: "databases", lesson: "databases/replication-and-failover", title: "A safe database failover", summary: "Quorum, fencing, promotion and redirection.",
   actors: ["Health checks", "Quorum", "Replica", "Clients"],
   steps: [
     { f: 0, t: 1, l: "Primary stops answering", n: "Several health checks fail, and the group votes on whether the primary is really down." },
@@ -1699,7 +1699,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "Promote it", n: "The replica stops replaying and becomes the new primary." },
     { f: 2, t: 3, l: "Redirect clients", n: "A proxy, virtual address or DNS change sends clients to the new primary, and connections reconnect." }
   ] },
-  { id: "x-db-pool", module: "databases", title: "Why a connection pooler helps", summary: "Many clients sharing a few database connections.",
+  { id: "x-db-pool", module: "databases", lesson: "databases/performance-and-connection-pooling", title: "Why a connection pooler helps", summary: "Many clients sharing a few database connections.",
   actors: ["App instances", "Pooler", "Database", "Monitoring"],
   steps: [
     { f: 0, t: 1, l: "Hundreds of clients connect", n: "Each application instance opens its pool to the pooler instead of the database." },
@@ -1709,7 +1709,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Stable resources", n: "The database sees a steady, small number of sessions and keeps memory for queries." },
     { f: 3, t: 1, l: "Watch the queue", n: "Monitoring shows clients waiting for a connection, which tells you when to tune or scale." }
   ] },
-  { id: "x-ans-inventory", module: "ansible", title: "How Ansible finds the hosts to change", summary: "From an inventory file and a group name to a list of machines.",
+  { id: "x-ans-inventory", module: "ansible", lesson: "ansible/ansible-basics-inventory-and-ad-hoc", title: "How Ansible finds the hosts to change", summary: "From an inventory file and a group name to a list of machines.",
   actors: ["Engineer", "Control node", "Inventory", "Target hosts"],
   steps: [
     { f: 0, t: 1, l: "Run a play against a group", n: "The engineer runs a playbook that says hosts: web. Ansible must now work out which machines belong to web." },
@@ -1719,7 +1719,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Connect to each host", n: "The control node opens an SSH connection to every host in the list, a few at a time (the forks setting)." },
     { f: 3, t: 1, l: "Report results", n: "Each host returns ok, changed, failed or unreachable, and the run summary counts them per host." }
   ] },
-  { id: "x-ans-idempotent", module: "ansible", title: "Why running a playbook twice is safe", summary: "A module checks the current state before it changes anything.",
+  { id: "x-ans-idempotent", module: "ansible", lesson: "ansible/playbooks-tasks-and-idempotence", title: "Why running a playbook twice is safe", summary: "A module checks the current state before it changes anything.",
   actors: ["Playbook", "Module", "Target host", "Run summary"],
   steps: [
     { f: 0, t: 1, l: "Task asks for a state", n: "The task says a package must be present or a line must exist in a file. It describes the end state, not the steps." },
@@ -1729,7 +1729,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "State differs on a new host", n: "On a different host the package is missing, so the module installs it." },
     { f: 1, t: 3, l: "Report changed", n: "That host is reported as changed. Counting changed tasks tells you whether a second run found drift." }
   ] },
-  { id: "x-ans-precedence", module: "ansible", title: "Which variable value wins", summary: "Several places define the same variable, and Ansible has a fixed order.",
+  { id: "x-ans-precedence", module: "ansible", lesson: "ansible/variables-facts-and-templates", title: "Which variable value wins", summary: "Several places define the same variable, and Ansible has a fixed order.",
   actors: ["Role defaults", "Group variables", "Host variables", "Command line", "Task using the variable"],
   steps: [
     { f: 0, t: 4, l: "Start with role defaults", n: "A role ships a default value, designed to be the easiest thing to override. It has very low priority." },
@@ -1739,7 +1739,7 @@ window.MARGA_EXPLAINERS = [
     { f: 4, t: 4, l: "Use the final value", n: "The task sees one value. When it is not the one you expected, run with -vvv or use the debug module." },
     { f: 4, t: 2, l: "Keep it simple", n: "Define each variable in as few places as you can, so the answer to which value wins is obvious." }
   ] },
-  { id: "x-ans-template", module: "ansible", title: "Turning a template into a config file", summary: "Facts and variables are merged into a Jinja2 template on the control node.",
+  { id: "x-ans-template", module: "ansible", lesson: "ansible/variables-facts-and-templates", title: "Turning a template into a config file", summary: "Facts and variables are merged into a Jinja2 template on the control node.",
   actors: ["Template file", "Variables and facts", "Control node", "Target host"],
   steps: [
     { f: 2, t: 3, l: "Gather facts", n: "The control node collects facts such as the host name, addresses and memory from the target." },
@@ -1749,7 +1749,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Copy the result", n: "The template module compares the rendered text with the file on the host and writes it only if different." },
     { f: 3, t: 3, l: "Notify a handler", n: "When the file changed, the task notifies a handler so the service reloads once at the end." }
   ] },
-  { id: "x-ans-role", module: "ansible", title: "What happens when a role is applied", summary: "A role bundles tasks, defaults, templates and handlers behind one name.",
+  { id: "x-ans-role", module: "ansible", lesson: "ansible/roles-and-collections", title: "What happens when a role is applied", summary: "A role bundles tasks, defaults, templates and handlers behind one name.",
   actors: ["Playbook", "Role", "Task list", "Target host"],
   steps: [
     { f: 0, t: 1, l: "Name the role", n: "The playbook lists roles: [nginx]. Ansible looks for the role folder in the roles path or a collection." },
@@ -1759,7 +1759,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: "Collect handler notifications", n: "Tasks that changed something notify handlers. Handlers run after the tasks of the play." },
     { f: 1, t: 3, l: "Restart or reload once", n: "The handler runs one time, even if five tasks notified it, and the service picks up the new config." }
   ] },
-  { id: "x-ans-check-mode", module: "ansible", title: "Previewing a change with check mode", summary: "Check mode and diff show what would change without changing it.",
+  { id: "x-ans-check-mode", module: "ansible", lesson: "ansible/testing-and-linting-ansible", title: "Previewing a change with check mode", summary: "Check mode and diff show what would change without changing it.",
   actors: ["Engineer", "Ansible", "Target host", "Review"],
   steps: [
     { f: 0, t: 1, l: "Run with --check --diff", n: "The engineer adds the two flags to the normal command. Nothing will be written to the hosts." },
@@ -1769,7 +1769,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Review the preview", n: "A colleague checks the diff. Surprises here are cheap, because nothing has been changed yet." },
     { f: 0, t: 1, l: "Run for real", n: "After approval the same command runs without --check. Tasks that cannot preview, such as shell commands, still need care." }
   ] },
-  { id: "x-ans-debug", module: "ansible", title: "Debugging a failed run step by step", summary: "From a vague error to the line that explains it.",
+  { id: "x-ans-debug", module: "ansible", lesson: "ansible/debugging-ansible-runs", title: "Debugging a failed run step by step", summary: "From a vague error to the line that explains it.",
   actors: ["Engineer", "Ansible output", "Target host", "Playbook"],
   steps: [
     { f: 0, t: 1, l: "Read the failing task", n: "The output names the task, the host and the error message. Start with the first failure, not the last." },
@@ -1779,7 +1779,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Narrow with limit and tags", n: "Use --limit for one host and --start-at-task to repeat only the failing part of the run." },
     { f: 0, t: 3, l: "Fix and run again", n: "After the fix, run the whole play again. Because tasks are idempotent, the earlier steps report ok." }
   ] },
-  { id: "x-ans-collection", module: "ansible", title: "Installing and using a collection", summary: "How modules from a collection reach your playbook.",
+  { id: "x-ans-collection", module: "ansible", lesson: "ansible/roles-and-collections", title: "Installing and using a collection", summary: "How modules from a collection reach your playbook.",
   actors: ["requirements.yml", "Control node", "Collection source", "Playbook"],
   steps: [
     { f: 0, t: 1, l: "List the collections", n: "The requirements file names each collection and a version range, so every engineer gets the same set." },
@@ -1789,7 +1789,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Run the module", n: "Ansible loads the module code from the collection and runs it like any built-in module." },
     { f: 0, t: 0, l: "Pin and review versions", n: "Pinning versions in the requirements file means an update is a reviewed change, not a surprise." }
   ] },
-  { id: "x-db-index", module: "databases", title: "How an index speeds up a query", summary: "A lookup that walks a tree instead of reading every row.",
+  { id: "x-db-index", module: "databases", lesson: "databases/indexes-and-query-plans", title: "How an index speeds up a query", summary: "A lookup that walks a tree instead of reading every row.",
   actors: ["Application", "Query planner", "Index", "Table"],
   steps: [
     { f: 0, t: 1, l: "Send a query", n: "The application asks for the orders of customer 42. The planner decides how to find them." },
@@ -1799,7 +1799,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Fetch the matching rows", n: "The index entries point to the rows, and only those rows are read from the table." },
     { f: 3, t: 0, l: "Return the result", n: "The answer comes back in milliseconds. The cost is that every insert and update must also maintain the index." }
   ] },
-  { id: "x-db-explain", module: "databases", title: "Reading a query plan", summary: "What EXPLAIN tells you before you change anything.",
+  { id: "x-db-explain", module: "databases", lesson: "databases/indexes-and-query-plans", title: "Reading a query plan", summary: "What EXPLAIN tells you before you change anything.",
   actors: ["Engineer", "Database", "Planner", "Plan output"],
   steps: [
     { f: 0, t: 1, l: "Prefix the query with EXPLAIN", n: "The engineer asks the database how it would run the query, without necessarily running it." },
@@ -1809,7 +1809,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Compare estimate and reality", n: "EXPLAIN ANALYZE runs the query and shows actual rows. A big gap suggests stale statistics." },
     { f: 0, t: 1, l: "Change one thing", n: "Add an index or rewrite the query, then explain again. Keep the change only if the plan really improved." }
   ] },
-  { id: "x-db-mvcc", module: "databases", title: "Readers and writers without waiting", summary: "Multi-version concurrency lets a reader see a steady snapshot.",
+  { id: "x-db-mvcc", module: "databases", lesson: "databases/postgres-vacuum-bloat-and-maintenance", title: "Readers and writers without waiting", summary: "Multi-version concurrency lets a reader see a steady snapshot.",
   actors: ["Reader", "Writer", "Row versions", "Commit log"],
   steps: [
     { f: 0, t: 2, l: "Reader starts a transaction", n: "The reader gets a snapshot, which means it sees only data committed before it started." },
@@ -1819,7 +1819,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Reader finishes", n: "When the reader ends, old versions that nobody needs any more can be removed." },
     { f: 2, t: 2, l: "Clean up dead versions", n: "A background process (vacuum in some databases) removes them. Very long transactions delay this cleanup." }
   ] },
-  { id: "x-db-deadlock", module: "databases", title: "How a deadlock happens and resolves", summary: "Two transactions wait for each other until one is cancelled.",
+  { id: "x-db-deadlock", module: "databases", lesson: "databases/transactions-and-locking", title: "How a deadlock happens and resolves", summary: "Two transactions wait for each other until one is cancelled.",
   actors: ["Transaction A", "Transaction B", "Row 1", "Row 2", "Lock manager"],
   steps: [
     { f: 0, t: 2, l: "A locks row 1", n: "Transaction A updates row 1 and holds a lock on it until it commits." },
@@ -1829,7 +1829,7 @@ window.MARGA_EXPLAINERS = [
     { f: 4, t: 4, l: "Detect the cycle", n: "The lock manager notices the circular wait after a short timeout." },
     { f: 4, t: 1, l: "Cancel one transaction", n: "One transaction is rolled back with a deadlock error, and the other can finish. The application should retry the cancelled one." }
   ] },
-  { id: "x-db-replica-lag", module: "databases", title: "Why a replica can show old data", summary: "Replication copies changes after the primary has committed them.",
+  { id: "x-db-replica-lag", module: "databases", lesson: "databases/replication-and-failover", title: "Why a replica can show old data", summary: "Replication copies changes after the primary has committed them.",
   actors: ["Application", "Primary", "Replication stream", "Replica"],
   steps: [
     { f: 0, t: 1, l: "Write to the primary", n: "The application saves an order. The primary commits it and returns success." },
@@ -1839,7 +1839,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Replica catches up", n: "The change arrives and is applied. A moment later the same read would succeed." },
     { f: 0, t: 1, l: "Read your own writes", n: "Send reads that must see a fresh write to the primary, or wait until the replica reports the matching position." }
   ] },
-  { id: "x-db-expand-contract", module: "databases", title: "Changing a column without downtime", summary: "The expand and contract pattern in small safe releases.",
+  { id: "x-db-expand-contract", module: "databases", lesson: "databases/safe-schema-migrations", title: "Changing a column without downtime", summary: "The expand and contract pattern in small safe releases.",
   actors: ["Engineer", "Old application", "Database", "New application"],
   steps: [
     { f: 0, t: 2, l: "Expand: add the new column", n: "The engineer adds a nullable column. The old application ignores it, so nothing breaks." },
@@ -1849,7 +1849,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "Contract: stop writing the old one", n: "After a safe period the code stops writing the old column." },
     { f: 0, t: 2, l: "Drop the old column", n: "Only now is the old column removed. Each step could be rolled back until this one." }
   ] },
-  { id: "x-db-cache-aside", module: "databases", title: "The cache-aside pattern", summary: "Check the cache first, fall back to the database, and fill the cache.",
+  { id: "x-db-cache-aside", module: "databases", lesson: "databases/nosql-caches-and-choosing", title: "The cache-aside pattern", summary: "Check the cache first, fall back to the database, and fill the cache.",
   actors: ["Application", "Cache", "Database", "Next request"],
   steps: [
     { f: 0, t: 1, l: "Look in the cache", n: "The application asks the cache for the product with a key such as product:42." },
@@ -1859,7 +1859,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Store with an expiry", n: "The application writes the value into the cache with a time to live, so stale data cannot stay forever." },
     { f: 3, t: 1, l: "Hit next time", n: "The next request finds the value in the cache and never touches the database. After an update, delete the cache key." }
   ] },
-  { id: "x-db-restore-test", module: "databases", title: "Proving a backup can be restored", summary: "A backup is only real once a restore has worked.",
+  { id: "x-db-restore-test", module: "databases", lesson: "databases/backups-and-recovery", title: "Proving a backup can be restored", summary: "A backup is only real once a restore has worked.",
   actors: ["Scheduler", "Backup storage", "Test server", "Checker"],
   steps: [
     { f: 0, t: 1, l: "Take the backup", n: "The scheduler creates a base backup and keeps the log files, on storage separate from the database server." },
@@ -1869,7 +1869,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Report the outcome", n: "A failed restore raises an alert the same day, not on the day of the real disaster." },
     { f: 2, t: 0, l: "Measure the time", n: "The restore time becomes a real number for your recovery objective, instead of a guess." }
   ] },
-  { id: "x-linux-journal", module: "linux", title: "How a service log reaches journalctl", summary: "From a program writing a line to you reading it.",
+  { id: "x-linux-journal", module: "linux", lesson: "linux/logs-and-troubleshooting", title: "How a service log reaches journalctl", summary: "From a program writing a line to you reading it.",
   actors: ["Service", "systemd-journald", "Disk", "Engineer"],
   steps: [
     { f: 0, t: 1, l: "Write to standard output", n: "The service just prints a line. Under systemd, standard output and error are connected to the journal." },
@@ -1879,7 +1879,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Return the entries", n: "Matching entries come back in time order, and -f keeps following new ones." },
     { f: 1, t: 2, l: "Rotate and limit", n: "Size and age limits remove old entries, so a noisy service cannot fill the disk." }
   ] },
-  { id: "x-linux-sudo", module: "linux", title: "What happens when you run sudo", summary: "A rule lookup, a password check and a logged command.",
+  { id: "x-linux-sudo", module: "linux", lesson: "linux/users-groups-permissions", title: "What happens when you run sudo", summary: "A rule lookup, a password check and a logged command.",
   actors: ["User", "sudo", "Sudoers rules", "Command", "Auth log"],
   steps: [
     { f: 0, t: 1, l: "Run sudo systemctl restart nginx", n: "The user prefixes the command with sudo. The sudo program is installed with the setuid bit, so it starts as root." },
@@ -1889,7 +1889,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Run the command as root", n: "With permission granted, sudo starts the command with root rights for that one command." },
     { f: 1, t: 4, l: "Log the event", n: "Every use is written to the auth log with the user, the command and the result, which makes review possible." }
   ] },
-  { id: "x-bash-redirect", module: "bash", title: "Where output goes: stdout, stderr and redirects", summary: "Two streams, and how the shell wires them to files.",
+  { id: "x-bash-redirect", module: "bash", lesson: "bash/advanced-patterns", title: "Where output goes: stdout, stderr and redirects", summary: "Two streams, and how the shell wires them to files.",
   actors: ["Script", "Standard output", "Standard error", "Terminal", "Log file"],
   steps: [
     { f: 0, t: 1, l: "Normal results", n: "A command writes its results to standard output, file descriptor 1." },
@@ -1899,7 +1899,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 4, l: "Join the streams", n: "Writing 'cmd > out.log 2>&1' sends errors to the same place as standard output. The order matters." },
     { f: 2, t: 3, l: "Keep errors visible", n: "Sending only results to a file and keeping errors on the terminal is often the most useful setup for scripts." }
   ] },
-  { id: "x-bash-loop-read", module: "bash", title: "Reading a file line by line", summary: "How while read processes input one record at a time.",
+  { id: "x-bash-loop-read", module: "bash", lesson: "bash/control-flow-and-functions", title: "Reading a file line by line", summary: "How while read processes input one record at a time.",
   actors: ["File", "Shell loop", "Variables", "Command in the loop"],
   steps: [
     { f: 0, t: 1, l: "Redirect the file into the loop", n: "'done < file' attaches the file to the loop's standard input." },
@@ -1909,7 +1909,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 1, l: "Next iteration", n: "When the body finishes, the loop reads the next line." },
     { f: 1, t: 1, l: "Stop at the end", n: "At end of file, read returns failure and the loop ends. A last line without a newline needs extra care." }
   ] },
-  { id: "x-python-venv-install", module: "python", title: "What pip does inside a virtual environment", summary: "Packages are installed next to the project, not into the system.",
+  { id: "x-python-venv-install", module: "python", lesson: "python/basics-and-environments", title: "What pip does inside a virtual environment", summary: "Packages are installed next to the project, not into the system.",
   actors: ["Engineer", "venv", "pip", "Package index", "Project folder"],
   steps: [
     { f: 0, t: 1, l: "Create the environment", n: "python3 -m venv .venv makes a private folder with its own interpreter and site-packages." },
@@ -1919,7 +1919,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: "Install into the venv", n: "The packages go into the venv, so the system Python stays clean and other projects are unaffected." },
     { f: 1, t: 4, l: "Run the project", n: "The project imports what it needs from the venv. Delete the folder and rebuild when things get confusing." }
   ] },
-  { id: "x-python-exceptions", module: "python", title: "How an exception travels up the call stack", summary: "Raise, propagate, catch and clean up.",
+  { id: "x-python-exceptions", module: "python", lesson: "python/debugging-python", title: "How an exception travels up the call stack", summary: "Raise, propagate, catch and clean up.",
   actors: ["main()", "load_config()", "open()", "except block"],
   steps: [
     { f: 0, t: 1, l: "Call the function", n: "main calls load_config, which is a normal function call that adds a frame to the stack." },
@@ -1929,7 +1929,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Catch it", n: "main has try/except FileNotFoundError and the handler runs, where it can print a clear message." },
     { f: 3, t: 0, l: "Exit with a status", n: "The handler logs the cause and exits with a non-zero code. A finally block would run on every path." }
   ] },
-  { id: "x-net-arp", module: "networking", title: "How a machine finds a neighbour's hardware address", summary: "ARP maps an IP address to a MAC address on the local network.",
+  { id: "x-net-arp", module: "networking", lesson: "networking/dhcp-arp-and-the-local-network", title: "How a machine finds a neighbour's hardware address", summary: "ARP maps an IP address to a MAC address on the local network.",
   actors: ["Host A", "Switch", "Host B", "ARP cache"],
   steps: [
     { f: 0, t: 0, l: "Decide the next hop", n: "Host A wants to reach 10.0.0.20 on the same network, so it must send the frame straight to that machine." },
@@ -1939,7 +1939,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 0, l: "Reply with the MAC", n: "Host B answers directly to A with its hardware address." },
     { f: 0, t: 3, l: "Cache and send", n: "A stores the mapping for a short time and sends the data frame to B's MAC." }
   ] },
-  { id: "x-net-nat", module: "networking", title: "How NAT lets a private host reach the internet", summary: "Source address rewriting and the translation table.",
+  { id: "x-net-nat", module: "networking", lesson: "networking/routing-and-nat", title: "How NAT lets a private host reach the internet", summary: "Source address rewriting and the translation table.",
   actors: ["Private host", "NAT router", "Translation table", "Internet server"],
   steps: [
     { f: 0, t: 1, l: "Send a packet out", n: "A host at 192.168.1.10 sends a packet to a public server. Its source address is private and not routable." },
@@ -1949,7 +1949,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Look up the entry", n: "The router finds which private host and port belong to that public port." },
     { f: 1, t: 0, l: "Rewrite and deliver", n: "The destination is changed back and the reply reaches the host. Unrequested inbound traffic has no entry and is dropped." }
   ] },
-  { id: "x-docker-layers", module: "docker", title: "How image layers and the container layer work", summary: "Shared read-only layers plus one thin writable layer.",
+  { id: "x-docker-layers", module: "docker", lesson: "docker/containers-and-images", title: "How image layers and the container layer work", summary: "Shared read-only layers plus one thin writable layer.",
   actors: ["Image layers", "Container", "Writable layer", "Another container"],
   steps: [
     { f: 0, t: 0, l: "Build creates layers", n: "Each instruction in the build adds a read-only layer. Unchanged layers are reused from the cache." },
@@ -1959,7 +1959,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Share the layers", n: "A second container from the same image reuses the same layers, so it starts quickly and uses little disk." },
     { f: 2, t: 2, l: "Remove the container", n: "Removing the container deletes its writable layer. Data that must stay belongs in a volume." }
   ] },
-  { id: "x-docker-registry-push", module: "docker", title: "Pushing an image to a registry", summary: "Tags, digests and which layers are uploaded.",
+  { id: "x-docker-registry-push", module: "docker", lesson: "docker/registries-and-supply-chain", title: "Pushing an image to a registry", summary: "Tags, digests and which layers are uploaded.",
   actors: ["Developer", "Docker engine", "Registry", "Cluster node"],
   steps: [
     { f: 0, t: 1, l: "Tag the image", n: "docker tag adds a name that includes the registry address, the repository and a version tag." },
@@ -1969,7 +1969,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: "Store the manifest", n: "The registry stores the manifest and returns a digest, a hash that identifies exactly this image." },
     { f: 3, t: 2, l: "Pull by digest", n: "A node pulls using the digest. Tags can move, but a digest always points to the same content." }
   ] },
-  { id: "x-cicd-artifact", module: "cicd", title: "Building once and promoting the same artifact", summary: "Why staging and production run the identical build.",
+  { id: "x-cicd-artifact", module: "cicd", lesson: "cicd/versioning-and-artifacts", title: "Building once and promoting the same artifact", summary: "Why staging and production run the identical build.",
   actors: ["Pipeline", "Artifact store", "Staging", "Production"],
   steps: [
     { f: 0, t: 0, l: "Build one artifact", n: "The pipeline compiles the code and packages it exactly once for this commit." },
@@ -1979,7 +1979,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Promote to production", n: "After approval production pulls the identical artifact. Nothing is rebuilt." },
     { f: 3, t: 0, l: "Know what runs", n: "The running version maps back to one commit and one test record, which makes rollback and audit simple." }
   ] },
-  { id: "x-cicd-approval", module: "cicd", title: "A deploy gate with approval", summary: "Automatic checks first, then a person for risky changes.",
+  { id: "x-cicd-approval", module: "cicd", lesson: "cicd/environments-promotion-and-approvals", title: "A deploy gate with approval", summary: "Automatic checks first, then a person for risky changes.",
   actors: ["Pipeline", "Policy checks", "Approver", "Production"],
   steps: [
     { f: 0, t: 1, l: "Run automatic checks", n: "Tests, security scans and policy rules run first. Failing any of them stops the pipeline." },
@@ -1989,7 +1989,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Deploy gradually", n: "The pipeline deploys with the rollout strategy defined for the service, such as canary then full." },
     { f: 3, t: 0, l: "Verify and record", n: "Health checks decide whether the release is kept. The approval, the time and the version are stored for audit." }
   ] },
-  { id: "x-k8s-ingress-tls", module: "kubernetes", title: "How an ingress terminates TLS", summary: "From a browser request to a pod, with the certificate handled at the edge.",
+  { id: "x-k8s-ingress-tls", module: "kubernetes", lesson: "kubernetes/services-and-ingress", title: "How an ingress terminates TLS", summary: "From a browser request to a pod, with the certificate handled at the edge.",
   actors: ["Browser", "Load balancer", "Ingress controller", "Service", "Pod"],
   steps: [
     { f: 0, t: 1, l: "Connect to the public address", n: "The browser opens a connection to the cloud load balancer that fronts the cluster." },
@@ -1999,7 +1999,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Forward to the service", n: "The request goes to the service named in the matching rule." },
     { f: 3, t: 4, l: "Choose a ready pod", n: "The service sends it to one of the ready pods, which answers over plain HTTP inside the cluster." }
   ] },
-  { id: "x-k8s-job", module: "kubernetes", title: "How a Job and a CronJob run to completion", summary: "Unlike a Deployment, a Job is meant to finish.",
+  { id: "x-k8s-job", module: "kubernetes", lesson: "kubernetes/jobs-cronjobs-daemonsets", title: "How a Job and a CronJob run to completion", summary: "Unlike a Deployment, a Job is meant to finish.",
   actors: ["CronJob", "Job controller", "Pod", "Cluster events"],
   steps: [
     { f: 0, t: 1, l: "Schedule fires", n: "At the scheduled time the CronJob creates a Job object, unless the previous run is still going and the policy forbids it." },
@@ -2009,7 +2009,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Retry on failure", n: "On failure the controller creates a new pod, up to the backoff limit, with growing delays." },
     { f: 1, t: 3, l: "Finish and clean up", n: "When the required number of pods succeed, the Job completes. Old Jobs are removed by the history limits." }
   ] },
-  { id: "x-tf-count-foreach", module: "terraform", title: "Why for_each is safer than count", summary: "Removing an item from the middle of a list.",
+  { id: "x-tf-count-foreach", module: "terraform", lesson: "terraform/expressions-and-dynamic-blocks", title: "Why for_each is safer than count", summary: "Removing an item from the middle of a list.",
   actors: ["Configuration", "Plan", "State", "Real servers"],
   steps: [
     { f: 0, t: 2, l: "Start with count over a list", n: "Three servers are created with count and a list of names. State addresses them as [0], [1] and [2]." },
@@ -2019,7 +2019,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "Use for_each with a set or map", n: "Each server is addressed by its key, such as web-b, so the address is stable." },
     { f: 1, t: 3, l: "Only the removed one is destroyed", n: "The plan now destroys exactly the removed key and leaves the others alone." }
   ] },
-  { id: "x-tf-workspace-env", module: "terraform", title: "Separate environments with separate state", summary: "Why dev and prod must not share a state file.",
+  { id: "x-tf-workspace-env", module: "terraform", lesson: "terraform/environments-and-team-workflows", title: "Separate environments with separate state", summary: "Why dev and prod must not share a state file.",
   actors: ["Engineer", "Dev state", "Prod state", "Cloud accounts"],
   steps: [
     { f: 0, t: 1, l: "Plan in dev", n: "The engineer runs plan with the dev settings. It reads the dev state and the dev account only." },
@@ -2029,7 +2029,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Apply in prod", n: "Prod changes happen only after the change was proven in dev. A mistake in dev cannot reach the prod state." },
     { f: 0, t: 2, l: "Limit access", n: "Separate credentials and state locations mean most people can change dev but not prod." }
   ] },
-  { id: "x-cloud-load-balancer-health", module: "cloud", title: "How a cloud load balancer removes a broken server", summary: "Health checks and draining.",
+  { id: "x-cloud-load-balancer-health", module: "cloud", lesson: "cloud/high-availability-and-disaster-recovery", title: "How a cloud load balancer removes a broken server", summary: "Health checks and draining.",
   actors: ["Client", "Load balancer", "Server A", "Server B"],
   steps: [
     { f: 1, t: 2, l: "Probe each server", n: "The load balancer sends a health request to every target every few seconds." },
@@ -2039,7 +2039,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Mark unhealthy after a threshold", n: "After a few failed probes in a row the balancer stops sending new requests to A." },
     { f: 1, t: 3, l: "All traffic goes to B", n: "Server B carries the load. Capacity and alerts matter here, because one server is now doing the work of two." }
   ] },
-  { id: "x-cloud-secrets-manager", module: "cloud", title: "Fetching a secret at run time", summary: "The application asks for the secret with its own identity.",
+  { id: "x-cloud-secrets-manager", module: "cloud", lesson: "cloud/security-and-governance", title: "Fetching a secret at run time", summary: "The application asks for the secret with its own identity.",
   actors: ["Application", "Instance identity", "Secrets service", "Audit log"],
   steps: [
     { f: 0, t: 1, l: "Start with an attached role", n: "The workload runs with an identity assigned by the platform, so no password is stored in its image." },
@@ -2049,7 +2049,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Record the access", n: "Who read which secret and when is written to the audit log." },
     { f: 2, t: 0, l: "Rotate on a schedule", n: "The service creates a new value on a schedule. Applications that fetch at start-up or refresh periodically pick it up." }
   ] },
-  { id: "x-obs-alert-routing", module: "observability", title: "How an alert reaches the right person", summary: "Rules, grouping, routing and silence.",
+  { id: "x-obs-alert-routing", module: "observability", lesson: "observability/alerting-and-dashboards", title: "How an alert reaches the right person", summary: "Rules, grouping, routing and silence.",
   actors: ["Metrics store", "Alert rule", "Alert manager", "Chat channel", "On-call person"],
   steps: [
     { f: 0, t: 1, l: "Evaluate the rule", n: "The rule runs every minute against the metrics, for example error ratio above 5 percent for 10 minutes." },
@@ -2059,7 +2059,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 4, l: "Page for high severity", n: "High severity pages the person on call, using the schedule, with a link to the dashboard and runbook." },
     { f: 2, t: 2, l: "Resolve or silence", n: "When the condition clears a resolved message is sent. A silence mutes planned work." }
   ] },
-  { id: "x-obs-slo-dashboard", module: "observability", title: "From request logs to an SLO number", summary: "How raw events become one reliability figure.",
+  { id: "x-obs-slo-dashboard", module: "observability", lesson: "observability/alerting-and-dashboards", title: "From request logs to an SLO number", summary: "How raw events become one reliability figure.",
   actors: ["Service", "Metrics pipeline", "SLI query", "SLO report"],
   steps: [
     { f: 0, t: 1, l: "Emit counters", n: "Each request increments a counter labelled with its status code and route." },
@@ -2069,7 +2069,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 3, l: "Show the error budget", n: "The remaining budget is the allowed bad fraction minus the actual bad fraction, shown as minutes or requests." },
     { f: 3, t: 0, l: "Decide what to do", n: "With budget left the team ships. With it nearly spent, the team focuses on reliability work." }
   ] },
-  { id: "x-sre-blameless-review", module: "sre", title: "Running a blameless review", summary: "Learning from an incident without pointing fingers.",
+  { id: "x-sre-blameless-review", module: "sre", lesson: "sre/postmortems-and-toil", title: "Running a blameless review", summary: "Learning from an incident without pointing fingers.",
   actors: ["Facilitator", "Responders", "Timeline", "Action items"],
   steps: [
     { f: 0, t: 1, l: "Invite everyone involved", n: "The facilitator brings in responders, owners of affected systems and anyone who made a decision." },
@@ -2079,7 +2079,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Agree on actions", n: "Each action has an owner, a date and a measurable outcome. Fewer, stronger actions beat a long list." },
     { f: 3, t: 0, l: "Share and follow up", n: "The review is shared widely and the actions are tracked until done, which is how trust in the process is earned." }
   ] },
-  { id: "x-sre-capacity", module: "sre", title: "Planning capacity before it runs out", summary: "Forecasting from growth and headroom.",
+  { id: "x-sre-capacity", module: "sre", lesson: "sre/capacity-planning", title: "Planning capacity before it runs out", summary: "Forecasting from growth and headroom.",
   actors: ["Metrics", "Forecast", "Capacity plan", "Procurement or autoscaling"],
   steps: [
     { f: 0, t: 1, l: "Collect usage trends", n: "Weeks of data on traffic, CPU, memory and storage show the growth rate and the daily peaks." },
@@ -2089,7 +2089,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Verify with load tests", n: "A load test shows if the system really scales as predicted, and where the next bottleneck is." },
     { f: 0, t: 1, l: "Review on a schedule", n: "Forecasts are compared with reality each quarter, and the model is corrected where it was wrong." }
   ] },
-  { id: "x-sec-threat-model", module: "security", title: "A quick threat model session", summary: "Four questions applied to one feature.",
+  { id: "x-sec-threat-model", module: "security", lesson: "security/security-mindset-and-threat-modeling", title: "A quick threat model session", summary: "Four questions applied to one feature.",
   actors: ["Team", "Diagram", "Threat list", "Backlog"],
   steps: [
     { f: 0, t: 1, l: "Draw the data flow", n: "The team draws users, services, data stores and the lines between them, marking trust boundaries." },
@@ -2099,7 +2099,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Choose a response for each", n: "Fix, reduce, accept or transfer. Every accepted risk has a named owner." },
     { f: 3, t: 0, l: "Revisit when the design changes", n: "New features and integrations change the diagram, so the model is updated rather than filed away." }
   ] },
-  { id: "x-sec-dependency-scan", module: "security", title: "Handling a vulnerable dependency", summary: "From a scanner finding to a safe release.",
+  { id: "x-sec-dependency-scan", module: "security", lesson: "security/securing-the-pipeline", title: "Handling a vulnerable dependency", summary: "From a scanner finding to a safe release.",
   actors: ["Scanner", "Engineer", "Package registry", "Pipeline"],
   steps: [
     { f: 0, t: 1, l: "Report a finding", n: "The scanner reports that a library version has a known vulnerability, with a severity score." },
@@ -2109,7 +2109,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Scan again", n: "The pipeline repeats the scan on the new build and confirms the finding is gone." },
     { f: 3, t: 1, l: "Ship within the agreed time", n: "The fix is released within the time the policy sets for that severity, and an exception is recorded if it cannot be." }
   ] },
-{ id: "git-three-areas", module: "git", title: "From edit to commit", summary: "How a change moves through the working tree, staging area and repository.",
+{ id: "git-three-areas", module: "git", lesson: "git/first-repository-and-commits", title: "From edit to commit", summary: "How a change moves through the working tree, staging area and repository.",
   actors: ["Working tree", "Staging area", "Repository"],
   steps: [
     { f: 0, t: 0, l: "Edit backup.sh", n: "You change a file in your working tree. Git notices the difference but has not saved anything yet." },
@@ -2120,7 +2120,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "New commit 3f9c2ab", n: "The branch pointer moves forward to the new commit, and the history grows by one step." },
     { f: 0, t: 0, l: "notes.txt still modified", n: "The unstaged change is untouched, ready to become a separate commit with its own message." }
   ] },
-{ id: "git-branch-ff-merge", module: "git", title: "Branch and fast-forward merge", summary: "Create a branch, commit on it and merge it back when main has not moved.",
+{ id: "git-branch-ff-merge", module: "git", lesson: "git/branches-and-merging", title: "Branch and fast-forward merge", summary: "Create a branch, commit on it and merge it back when main has not moved.",
   actors: ["Developer", "main", "feature/retry"],
   steps: [
     { f: 0, t: 1, l: "main at commit B", n: "The history is A, B and main points to B. You start from here." },
@@ -2132,7 +2132,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: "Fast-forward complete", n: "History is a straight line A, B, C, D and no merge commit was created." },
     { f: 0, t: 2, l: "git branch -d feature/retry", n: "The merged branch label is deleted. The commits remain because main points to them." }
   ] },
-{ id: "git-merge-conflict", module: "git", title: "Resolving a merge conflict", summary: "Two branches change the same line and Git asks you to decide.",
+{ id: "git-merge-conflict", module: "git", lesson: "git/branches-and-merging", title: "Resolving a merge conflict", summary: "Two branches change the same line and Git asks you to decide.",
   actors: ["Developer", "Git", "File"],
   steps: [
     { f: 0, t: 1, l: "git merge feature/retry", n: "You ask Git to merge the feature branch into main, which also changed the same file." },
@@ -2144,7 +2144,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "git commit", n: "Git creates the merge commit with two parents, finishing the merge." },
     { f: 0, t: 0, l: "Run the tests", n: "A textually clean merge can still be logically wrong, so you test the combined result before pushing." }
   ] },
-{ id: "git-rebase-replay", module: "git", title: "Rebase replays your commits", summary: "Update a feature branch on the latest main by replaying commits.",
+{ id: "git-rebase-replay", module: "git", lesson: "git/rebase-and-clean-history", title: "Rebase replays your commits", summary: "Update a feature branch on the latest main by replaying commits.",
   actors: ["Developer", "Feature branch", "main"],
   steps: [
     { f: 2, t: 2, l: "main moved ahead", n: "While you worked, teammates merged two new commits to main, so your branch is based on old code." },
@@ -2156,7 +2156,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Force push with lease", n: "The rewritten branch must replace the remote copy, so you use force-with-lease on your own branch only." },
     { f: 0, t: 2, l: "Rule", n: "Never rebase commits that other people have already pulled, because their copies would no longer match." }
   ] },
-{ id: "git-fetch-vs-pull", module: "git", title: "Fetch compared with pull", summary: "What each command changes on your machine.",
+{ id: "git-fetch-vs-pull", module: "git", lesson: "git/remotes-fetch-pull-and-push", title: "Fetch compared with pull", summary: "What each command changes on your machine.",
   actors: ["You", "Local branch main", "origin/main", "Remote server"],
   steps: [
     { f: 0, t: 3, l: "git fetch origin", n: "You ask the server for new commits. Nothing in your working files changes." },
@@ -2167,7 +2167,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: "Possible merge commit", n: "If both sides had new commits, a plain pull creates a merge commit that you did not ask for." },
     { f: 0, t: 1, l: "pull.ff only", n: "Setting pull.ff to only makes pull fail instead of surprising you, which pushes you to decide on purpose." }
   ] },
-{ id: "git-push-rejected", module: "git", title: "A rejected push", summary: "Why a push fails and how to fix it without force.",
+{ id: "git-push-rejected", module: "git", lesson: "git/remotes-fetch-pull-and-push", title: "A rejected push", summary: "Why a push fails and how to fix it without force.",
   actors: ["You", "Local branch", "Remote branch"],
   steps: [
     { f: 2, t: 2, l: "Colleague pushes commit X", n: "While you worked, the remote branch received a new commit that you do not have." },
@@ -2179,7 +2179,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "git push", n: "The push is now a fast-forward of the remote branch, so the server accepts it." },
     { f: 0, t: 2, l: "Do not use force", n: "A forced push would have discarded commit X. Force-with-lease is only for your own rewritten branches." }
   ] },
-{ id: "git-pull-request-flow", module: "git", title: "A pull request from start to merge", summary: "The path of a change through branch, review, checks and merge.",
+{ id: "git-pull-request-flow", module: "git", lesson: "git/team-workflows-pull-requests-and-reviews", title: "A pull request from start to merge", summary: "The path of a change through branch, review, checks and merge.",
   actors: ["Author", "Branch", "Reviewer", "CI checks", "main"],
   steps: [
     { f: 0, t: 1, l: "Create feature branch", n: "You branch from the latest main and make small commits with clear messages." },
@@ -2191,7 +2191,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 4, l: "Merge", n: "The platform merges by the chosen policy, squash, rebase or merge commit, into the protected main branch." },
     { f: 4, t: 3, l: "Deploy pipeline", n: "The merged commit triggers the build of one artifact that moves through the environments." }
   ] },
-{ id: "git-revert-shared", module: "git", title: "Reverting a shared commit", summary: "Undo a bad change on main without rewriting history.",
+{ id: "git-revert-shared", module: "git", lesson: "git/staging-undoing-and-stashing", title: "Reverting a shared commit", summary: "Undo a bad change on main without rewriting history.",
   actors: ["Team", "main", "Revert commit", "Production"],
   steps: [
     { f: 3, t: 0, l: "Errors increase", n: "After a deploy the error rate rises and the on-call engineer links it to the latest change." },
@@ -2202,7 +2202,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Deploy the revert", n: "The pipeline builds and deploys the fixed state, and the error rate returns to normal." },
     { f: 0, t: 1, l: "Fix properly later", n: "The original change is fixed on a new branch and re-applied with tests that cover the failure." }
   ] },
-{ id: "git-reflog-recover", module: "git", title: "Recovering a lost commit", summary: "Use the reflog after a hard reset.",
+{ id: "git-reflog-recover", module: "git", lesson: "git/debugging-git-problems", title: "Recovering a lost commit", summary: "Use the reflog after a hard reset.",
   actors: ["You", "Branch main", "Reflog", "Recovery branch"],
   steps: [
     { f: 0, t: 1, l: "git reset --hard origin/main", n: "Your branch now points to a different commit, and the work you had committed seems to be gone." },
@@ -2214,7 +2214,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Merge or cherry-pick", n: "You bring the rescued work back into main with a merge or cherry-pick." },
     { f: 0, t: 0, l: "Limit", n: "Uncommitted edits were never saved by Git, so the reflog cannot bring them back." }
   ] },
-{ id: "git-bisect", module: "git", title: "Finding the bad commit with bisect", summary: "A binary search through 200 commits.",
+{ id: "git-bisect", module: "git", lesson: "git/debugging-git-problems", title: "Finding the bad commit with bisect", summary: "A binary search through 200 commits.",
   actors: ["You", "Git", "Test script"],
   steps: [
     { f: 0, t: 1, l: "git bisect start", n: "You begin a bisect session and tell Git a bad commit (current) and a good one (v1.3.0)." },
@@ -2226,7 +2226,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: "First bad commit found", n: "After about eight steps Git prints the commit that introduced the bug and its message." },
     { f: 0, t: 1, l: "git bisect reset", n: "You return to your original branch and use the finding to write the fix and a regression test." }
   ] },
-{ id: "git-secret-response", module: "git", title: "A secret was committed", summary: "The correct order of actions after a credential reaches the repository.",
+{ id: "git-secret-response", module: "git", lesson: "git/hooks-signing-and-secrets-in-history", title: "A secret was committed", summary: "The correct order of actions after a credential reaches the repository.",
   actors: ["Scanner", "Engineer", "Cloud account", "Repository", "Team"],
   steps: [
     { f: 0, t: 1, l: "Alert: key in config file", n: "The scanner flags an access key in a commit. You assume it is already copied." },
@@ -2238,7 +2238,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Add prevention", n: "Push protection, pipeline scanning and a secret manager are enabled so the same mistake is blocked." },
     { f: 1, t: 4, l: "Write a short review", n: "The team records what happened and what changed, without blaming a person." }
   ] },
-{ id: "git-stash-hotfix", module: "git", title: "Stash, hotfix and return", summary: "Pause half-done work to ship an urgent fix.",
+{ id: "git-stash-hotfix", module: "git", lesson: "git/staging-undoing-and-stashing", title: "Stash, hotfix and return", summary: "Pause half-done work to ship an urgent fix.",
   actors: ["You", "Stash", "hotfix branch", "main"],
   steps: [
     { f: 0, t: 0, l: "Half-done work", n: "You have uncommitted edits on a feature branch when an urgent bug report arrives." },
@@ -2250,7 +2250,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: "git stash pop", n: "The saved edits come back into the working tree and the stash entry is removed." },
     { f: 3, t: 0, l: "Update the feature branch", n: "You rebase or merge main so your feature also has the fix before you continue." }
   ] },
-{ id: "git-release-tag-hotfix", module: "git", title: "Tag a release and ship a hotfix", summary: "Annotated tags, artifacts and a fix for an older version.",
+{ id: "git-release-tag-hotfix", module: "git", lesson: "git/tags-releases-and-versioning", title: "Tag a release and ship a hotfix", summary: "Annotated tags, artifacts and a fix for an older version.",
   actors: ["Developer", "main", "Tag", "CI", "hotfix branch"],
   steps: [
     { f: 0, t: 1, l: "Merge release work", n: "The release changes are merged to main and the tests pass." },
@@ -2261,7 +2261,7 @@ window.MARGA_EXPLAINERS = [
     { f: 4, t: 2, l: "Tag v1.4.1", n: "After the fix and tests, a new annotated tag is created. The old tag v1.4.0 is never moved." },
     { f: 4, t: 1, l: "Cherry-pick to main", n: "The fix commit is copied to main, so the next release does not bring the bug back." }
   ] },
-{ id: "git-shallow-sparse", module: "git", title: "Faster clones for CI", summary: "Shallow, partial and sparse clones cut the pipeline start time.",
+{ id: "git-shallow-sparse", module: "git", lesson: "git/large-repositories-submodules-and-worktrees", title: "Faster clones for CI", summary: "Shallow, partial and sparse clones cut the pipeline start time.",
   actors: ["CI job", "Remote repository", "Local copy"],
   steps: [
     { f: 0, t: 1, l: "Full clone", n: "A normal clone downloads every commit and file version, which for a large repository takes minutes." },
@@ -2272,7 +2272,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 0, l: "Build starts in seconds", n: "The first build step runs after a clone that takes seconds instead of minutes." },
     { f: 0, t: 2, l: "Deepen only if needed", n: "If a tool needs history, such as git describe, the job fetches more commits before it runs." }
   ] },
-{ id: "x-go-build-run", module: "go", title: "From go build to a running program", summary: "How source files become one static binary and start running.",
+{ id: "x-go-build-run", module: "go", lesson: "go/why-go-and-your-first-program", title: "From go build to a running program", summary: "How source files become one static binary and start running.",
   actors: ["Developer", "go command", "Compiler and linker", "Binary"],
   steps: [
     { f: 0, t: 1, l: "go build ./cmd/api", n: "The go command reads go.mod to find the module and the packages that the program imports." },
@@ -2282,7 +2282,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Write the binary", n: "The result is a single file, static when CGO is disabled, which runs on a minimal container image." },
     { f: 0, t: 3, l: "./api", n: "Starting the file runs the runtime first, which sets up the scheduler and memory manager, then calls main." }
   ] },
-{ id: "x-go-goroutine-scheduler", module: "go", title: "How goroutines are scheduled", summary: "How many goroutines share a few operating system threads.",
+{ id: "x-go-goroutine-scheduler", module: "go", lesson: "go/goroutines-channels-and-sync", title: "How goroutines are scheduled", summary: "How many goroutines share a few operating system threads.",
   actors: ["Your code", "Go scheduler", "OS thread", "Run queue"],
   steps: [
     { f: 0, t: 1, l: "go handle(req)", n: "The go statement creates a goroutine with a small stack and hands it to the scheduler." },
@@ -2292,7 +2292,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Park it, run another", n: "The scheduler parks the blocked goroutine and runs the next one from the queue on the same thread." },
     { f: 1, t: 0, l: "Wake on ready", n: "When the network data arrives, the goroutine becomes runnable again and continues where it stopped." }
   ] },
-{ id: "x-go-channel-handoff", module: "go", title: "Channels hand off values safely", summary: "How an unbuffered channel synchronises a sender and a receiver.",
+{ id: "x-go-channel-handoff", module: "go", lesson: "go/goroutines-channels-and-sync", title: "Channels hand off values safely", summary: "How an unbuffered channel synchronises a sender and a receiver.",
   actors: ["Producer", "Channel", "Consumer"],
   steps: [
     { f: 0, t: 0, l: "Compute a result", n: "The producer goroutine finishes some work and has a value ready." },
@@ -2302,7 +2302,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "close(ch)", n: "The producer closes the channel when it has nothing more to send." },
     { f: 2, t: 2, l: "range ends", n: "The consumer loop over the channel finishes when it is closed and empty, so it can exit cleanly." }
   ] },
-{ id: "x-go-context-cancel", module: "go", title: "Cancelling work with context", summary: "How one cancellation stops every goroutine a request started.",
+{ id: "x-go-context-cancel", module: "go", lesson: "go/context-timeouts-and-cancellation", title: "Cancelling work with context", summary: "How one cancellation stops every goroutine a request started.",
   actors: ["Handler", "Context", "Worker A", "Worker B"],
   steps: [
     { f: 0, t: 1, l: "WithTimeout(ctx, 2s)", n: "The handler derives a context with a deadline from the request context and defers cancel." },
@@ -2313,7 +2313,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Done channel closed", n: "Worker B stops too, so no goroutine is left running for a request that has already failed." },
     { f: 0, t: 0, l: "Return error", n: "The handler returns a timeout error to the client and the resources are released." }
   ] },
-{ id: "x-go-http-request", module: "go", title: "A request through net/http", summary: "How a Go server routes and answers one HTTP request.",
+{ id: "x-go-http-request", module: "go", lesson: "go/http-services-and-json", title: "A request through net/http", summary: "How a Go server routes and answers one HTTP request.",
   actors: ["Client", "Server", "Mux", "Handler"],
   steps: [
     { f: 0, t: 1, l: "GET /orders/42", n: "The client connects and sends the request. The server runs each connection in its own goroutine." },
@@ -2323,7 +2323,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 3, l: "Encode JSON", n: "The handler sets the content type and writes the encoded response, handling encoding errors." },
     { f: 3, t: 0, l: "200 OK + body", n: "The response goes back. If the client disconnects, the request context is cancelled." }
   ] },
-{ id: "x-go-graceful-shutdown", module: "go", title: "Graceful shutdown", summary: "How a Go service finishes in-flight requests before exiting.",
+{ id: "x-go-graceful-shutdown", module: "go", lesson: "go/context-timeouts-and-cancellation", title: "Graceful shutdown", summary: "How a Go service finishes in-flight requests before exiting.",
   actors: ["Orchestrator", "Service", "Server", "In-flight request"],
   steps: [
     { f: 0, t: 1, l: "SIGTERM", n: "The orchestrator asks the service to stop, usually with a grace period before killing it." },
@@ -2333,7 +2333,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: "Cancel background work", n: "A root context is cancelled so workers flush and stop." },
     { f: 1, t: 0, l: "Exit 0", n: "The process exits cleanly before the grace period ends, with no dropped requests." }
   ] },
-{ id: "x-go-error-wrapping", module: "go", title: "Wrapping and checking errors", summary: "How context is added to an error without losing the cause.",
+{ id: "x-go-error-wrapping", module: "go", lesson: "go/functions-errors-and-defer", title: "Wrapping and checking errors", summary: "How context is added to an error without losing the cause.",
   actors: ["Low-level code", "Service layer", "Handler", "Logger"],
   steps: [
     { f: 0, t: 0, l: "os.Open fails", n: "The standard library returns an error that wraps the system error for a missing file." },
@@ -2343,7 +2343,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "errors.Is(err, fs.ErrNotExist)", n: "The handler can still test for the original cause through the wrapping." },
     { f: 2, t: 3, l: "Log once with context", n: "The error is logged at the edge with request details instead of at every layer." }
   ] },
-{ id: "x-go-test-table", module: "go", title: "A table-driven test run", summary: "How go test runs many cases of one function.",
+{ id: "x-go-test-table", module: "go", lesson: "go/testing-benchmarks-and-tooling", title: "A table-driven test run", summary: "How go test runs many cases of one function.",
   actors: ["go test", "Test function", "Subtest", "Result"],
   steps: [
     { f: 0, t: 1, l: "Find TestParse", n: "go test builds the package with its test files and calls each function that starts with Test." },
@@ -2353,7 +2353,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Pass or fail per case", n: "Results are collected per subtest and shown with -v." },
     { f: 0, t: 3, l: "-race and -cover", n: "Adding flags checks data races and reports which lines the tests touched." }
   ] },
-{ id: "x-go-race-condition", module: "go", title: "A data race and its fix", summary: "How two goroutines corrupt a counter and how a mutex fixes it.",
+{ id: "x-go-race-condition", module: "go", lesson: "go/goroutines-channels-and-sync", title: "A data race and its fix", summary: "How two goroutines corrupt a counter and how a mutex fixes it.",
   actors: ["Goroutine A", "Counter", "Goroutine B", "Mutex"],
   steps: [
     { f: 0, t: 1, l: "Read count = 5", n: "Goroutine A reads the value before incrementing." },
@@ -2363,7 +2363,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Lock before change", n: "With a mutex, A takes the lock first and B has to wait." },
     { f: 2, t: 1, l: "Read 6, write 7", n: "After A unlocks, B sees six and writes seven. Run go test -race to catch the unsafe version." }
   ] },
-{ id: "x-go-container-build", module: "go", title: "A multi-stage Go image", summary: "How a Go program ends up in a tiny container.",
+{ id: "x-go-container-build", module: "go", lesson: "go/building-containers-and-cli-tools", title: "A multi-stage Go image", summary: "How a Go program ends up in a tiny container.",
   actors: ["Dockerfile", "Build stage", "Final stage", "Registry"],
   steps: [
     { f: 0, t: 1, l: "FROM golang AS build", n: "The first stage has the full toolchain needed to compile." },
@@ -2373,7 +2373,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "USER nonroot", n: "The final image runs as a non-root user on a minimal base such as distroless." },
     { f: 2, t: 3, l: "Push image", n: "The result is tens of megabytes, which pulls and starts quickly." }
   ] },
-{ id: "x-go-pprof-profile", module: "go", title: "Profiling a slow Go service", summary: "How pprof shows where CPU time goes.",
+{ id: "x-go-pprof-profile", module: "go", lesson: "go/debugging-go-programs", title: "Profiling a slow Go service", summary: "How pprof shows where CPU time goes.",
   actors: ["Engineer", "Service", "pprof endpoint", "Flame graph"],
   steps: [
     { f: 0, t: 1, l: "Notice high CPU", n: "Dashboards show the service using more CPU for the same traffic." },
@@ -2383,7 +2383,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Find JSON encoding in a loop", n: "The widest box is repeated encoding of the same value, which can be cached." },
     { f: 0, t: 1, l: "Fix and compare", n: "After the change a new profile shows the box gone and CPU use down." }
   ] },
-{ id: "x-go-goroutine-leak", module: "go", title: "How a goroutine leaks", summary: "How an abandoned sender blocks forever and memory grows.",
+{ id: "x-go-goroutine-leak", module: "go", lesson: "go/debugging-go-programs", title: "How a goroutine leaks", summary: "How an abandoned sender blocks forever and memory grows.",
   actors: ["Handler", "Worker goroutine", "Channel", "Metrics"],
   steps: [
     { f: 0, t: 1, l: "Start worker", n: "The handler starts a goroutine that will send its result on an unbuffered channel." },
@@ -2393,7 +2393,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Goroutine count rises", n: "Every timed-out request leaves one blocked goroutine, so memory grows steadily." },
     { f: 0, t: 1, l: "Fix with ctx and buffer", n: "Using select on ctx.Done and a buffer of one lets the worker exit and the count stays flat." }
   ] },
-{ id: "x-go-modules-checksum", module: "go", title: "Modules and go.sum", summary: "How Go verifies dependencies.",
+{ id: "x-go-modules-checksum", module: "go", lesson: "go/interfaces-and-packages", title: "Modules and go.sum", summary: "How Go verifies dependencies.",
   actors: ["Developer", "go.mod", "Module proxy", "go.sum"],
   steps: [
     { f: 0, t: 1, l: "go get example.com/lib@v1.4.0", n: "A dependency is added with an exact version in go.mod." },
@@ -2403,7 +2403,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Later build compares", n: "On another machine, the downloaded content must match the recorded hash." },
     { f: 3, t: 0, l: "Mismatch fails the build", n: "If the content differs, the build stops, which protects against tampered or changed modules." }
   ] },
-{ id: "x-helm-install-flow", module: "helm", title: "What helm install does", summary: "From command to objects running in the cluster.",
+{ id: "x-helm-install-flow", module: "helm", lesson: "helm/what-helm-is-and-why-use-it", title: "What helm install does", summary: "From command to objects running in the cluster.",
   actors: ["Engineer", "Helm CLI", "Kubernetes API", "Release Secret"],
   steps: [
     { f: 0, t: 1, l: "helm install shop-web ./chart -f prod.yaml", n: "The command names the release, the chart and the values files." },
@@ -2413,7 +2413,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Store revision 1", n: "The release record with chart, values and manifest is stored as a Secret in the namespace." },
     { f: 2, t: 0, l: "Pods start", n: "The cluster creates the objects and pods start. helm status shows the release as deployed." }
   ] },
-{ id: "x-helm-upgrade-atomic", module: "helm", title: "An atomic upgrade that rolls back", summary: "How --atomic protects a release from a bad rollout.",
+{ id: "x-helm-upgrade-atomic", module: "helm", lesson: "helm/upgrade-rollback-and-release-history", title: "An atomic upgrade that rolls back", summary: "How --atomic protects a release from a bad rollout.",
   actors: ["Pipeline", "Helm", "Cluster", "Release history"],
   steps: [
     { f: 0, t: 1, l: "helm upgrade --atomic --wait", n: "The pipeline asks for an upgrade that must become healthy before it counts as done." },
@@ -2423,7 +2423,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Timeout reached, roll back", n: "After the timeout Helm re-applies the manifest of revision 4." },
     { f: 1, t: 0, l: "Exit with error", n: "The pipeline fails while the site keeps serving the old version." }
   ] },
-{ id: "x-helm-values-merge", module: "helm", title: "How values are merged", summary: "Which setting wins when several sources provide the same key.",
+{ id: "x-helm-values-merge", module: "helm", lesson: "helm/values-per-environment-and-secrets", title: "How values are merged", summary: "Which setting wins when several sources provide the same key.",
   actors: ["Chart values.yaml", "values-prod.yaml", "--set flag", "Final values"],
   steps: [
     { f: 0, t: 3, l: "replicaCount: 2", n: "The chart supplies a default for every setting it supports." },
@@ -2433,7 +2433,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "hosts: [c]", n: "The environment list replaces the whole default list, not just one item." },
     { f: 3, t: 3, l: "helm get values -a", n: "After installing, this command shows exactly which values were used." }
   ] },
-{ id: "x-helm-template-render", module: "helm", title: "Rendering a template", summary: "How curly braces become YAML.",
+{ id: "x-helm-template-render", module: "helm", lesson: "helm/templates-and-the-go-template-language", title: "Rendering a template", summary: "How curly braces become YAML.",
   actors: ["values.yaml", "Template file", "Template engine", "Manifest"],
   steps: [
     { f: 1, t: 1, l: "replicas: {{ .Values.replicaCount }}", n: "The template contains a placeholder for the value." },
@@ -2443,7 +2443,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "replicas: 4", n: "The result is a plain Kubernetes manifest with no braces left." },
     { f: 3, t: 3, l: "helm template shows it", n: "Running helm template prints the result so you can check it before applying." }
   ] },
-{ id: "x-helm-rollback", module: "helm", title: "Rolling back a release", summary: "How a rollback creates a new revision from an older one.",
+{ id: "x-helm-rollback", module: "helm", lesson: "helm/upgrade-rollback-and-release-history", title: "Rolling back a release", summary: "How a rollback creates a new revision from an older one.",
   actors: ["Engineer", "Helm", "Release history", "Cluster"],
   steps: [
     { f: 0, t: 1, l: "helm history shop-web", n: "The engineer lists revisions and finds the last good one, revision 7." },
@@ -2453,7 +2453,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Record revision 9", n: "A new revision is stored. History only grows." },
     { f: 3, t: 0, l: "Pods ready", n: "The previous version serves traffic again. Data changes are not undone." }
   ] },
-{ id: "x-helm-secret-leak", module: "helm", title: "Why secrets do not belong in values", summary: "Where a password in values ends up.",
+{ id: "x-helm-secret-leak", module: "helm", lesson: "helm/values-per-environment-and-secrets", title: "Why secrets do not belong in values", summary: "Where a password in values ends up.",
   actors: ["Developer", "Repository", "Helm release", "Reader"],
   steps: [
     { f: 0, t: 1, l: "Commit values-prod.yaml", n: "A password is committed in a values file." },
@@ -2463,7 +2463,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 0, l: "Rotate the password", n: "Treat the secret as exposed and change it." },
     { f: 0, t: 2, l: "Use existingSecret", n: "The chart now takes only the name of a Secret created by a secret manager." }
   ] },
-{ id: "x-helm-dependency-update", module: "helm", title: "Updating chart dependencies", summary: "How a subchart is pinned and fetched.",
+{ id: "x-helm-dependency-update", module: "helm", lesson: "helm/dependencies-subcharts-and-registries", title: "Updating chart dependencies", summary: "How a subchart is pinned and fetched.",
   actors: ["Chart.yaml", "helm dependency update", "Repository", "Chart.lock"],
   steps: [
     { f: 0, t: 1, l: "dependencies: redis 19.6.2", n: "The chart lists the dependency with a version and a repository." },
@@ -2473,7 +2473,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 3, l: "Commit Chart.lock", n: "Committing the lock keeps builds repeatable." },
     { f: 1, t: 3, l: "helm dependency build", n: "CI rebuilds from the lock and does not pick up unreviewed updates." }
   ] },
-{ id: "x-helm-oci-publish", module: "helm", title: "Publishing a chart to an OCI registry", summary: "From chart folder to a versioned package.",
+{ id: "x-helm-oci-publish", module: "helm", lesson: "helm/dependencies-subcharts-and-registries", title: "Publishing a chart to an OCI registry", summary: "From chart folder to a versioned package.",
   actors: ["Developer", "Helm", "Registry", "Cluster"],
   steps: [
     { f: 0, t: 1, l: "helm package ./chart", n: "The chart is packed into a versioned .tgz file." },
@@ -2483,7 +2483,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 2, l: "helm install oci://...", n: "A cluster pipeline pulls the exact version." },
     { f: 2, t: 3, l: "Return the chart", n: "The pipeline now installs the same package that was reviewed." }
   ] },
-{ id: "x-helm-hook-migration", module: "helm", title: "A pre-upgrade migration hook", summary: "How a Job runs before the new version starts.",
+{ id: "x-helm-hook-migration", module: "helm", lesson: "helm/upgrade-rollback-and-release-history", title: "A pre-upgrade migration hook", summary: "How a Job runs before the new version starts.",
   actors: ["Helm", "Hook Job", "Database", "Deployment"],
   steps: [
     { f: 0, t: 0, l: "Start upgrade", n: "Helm renders all templates, including those marked as hooks." },
@@ -2493,7 +2493,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Update Deployment", n: "Now the new application version is rolled out." },
     { f: 0, t: 1, l: "Delete policy removes Job", n: "A delete policy cleans up the finished Job. A failed hook stops the whole upgrade." }
   ] },
-{ id: "x-helm-pending-upgrade", module: "helm", title: "A release stuck in pending-upgrade", summary: "How an interrupted job blocks later deployments.",
+{ id: "x-helm-pending-upgrade", module: "helm", lesson: "helm/upgrade-rollback-and-release-history", title: "A release stuck in pending-upgrade", summary: "How an interrupted job blocks later deployments.",
   actors: ["Pipeline", "Helm", "Release history", "On-call engineer"],
   steps: [
     { f: 0, t: 1, l: "helm upgrade starts", n: "The pipeline begins an upgrade." },
@@ -2503,7 +2503,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: "another operation is in progress", n: "Helm refuses because the last revision never finished." },
     { f: 3, t: 1, l: "helm rollback to deployed revision", n: "The engineer rolls back to the last deployed revision, which resets the state, and the next upgrade works." }
   ] },
-{ id: "x-helm-test-hook", module: "helm", title: "Running helm test", summary: "How a smoke test pod checks a release.",
+{ id: "x-helm-test-hook", module: "helm", lesson: "helm/debugging-helm-releases", title: "Running helm test", summary: "How a smoke test pod checks a release.",
   actors: ["Engineer", "Helm", "Test pod", "Application"],
   steps: [
     { f: 0, t: 1, l: "helm test shop-web", n: "After a deploy, the engineer or pipeline asks Helm to run the chart tests." },
@@ -2513,7 +2513,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: "Exit 0", n: "The pod exits successfully and Helm reports the test as passed." },
     { f: 1, t: 0, l: "Pipeline continues", n: "A failed test fails the job and can trigger a rollback." }
   ] },
-{ id: "x-helm-diff-drift", module: "helm", title: "Detecting drift before an upgrade", summary: "How a diff shows changes made outside Helm.",
+{ id: "x-helm-diff-drift", module: "helm", lesson: "helm/upgrade-rollback-and-release-history", title: "Detecting drift before an upgrade", summary: "How a diff shows changes made outside Helm.",
   actors: ["Engineer", "helm diff", "Stored release", "Live cluster"],
   steps: [
     { f: 0, t: 1, l: "helm diff upgrade", n: "Before applying, the engineer asks what would change." },
@@ -2523,7 +2523,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: "Show differences", n: "The output shows a replica count that someone edited by hand, plus the planned changes." },
     { f: 0, t: 0, l: "Decide", n: "The engineer decides whether to keep or overwrite the manual change and records it in version control." }
   ] },
-{ id: "x-linux-syscall", module: "linux", title: "A system call, step by step", summary: "How a program asks the kernel to read a file.",
+{ id: "x-linux-syscall", module: "linux", lesson: "linux/system-calls-strace-and-perf", title: "A system call, step by step", summary: "How a program asks the kernel to read a file.",
   actors: ["Program", "C library", "Kernel", "Disk"],
   steps: [
     { f: 0, t: 1, l: "read(fd, buf, 4096)", n: "The program calls a library function and does not touch the hardware itself." },
@@ -2533,7 +2533,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 2, l: "Data arrives", n: "The block is placed in the page cache and the process is woken." },
     { f: 2, t: 0, l: "Return bytes read", n: "The kernel copies the data to the program buffer and switches back to user mode. strace shows this exchange." }
   ] },
-{ id: "x-linux-oom-kill", module: "linux", title: "How the OOM killer acts", summary: "What happens when memory runs out.",
+{ id: "x-linux-oom-kill", module: "linux", lesson: "linux/processes-memory-and-the-oom-killer", title: "How the OOM killer acts", summary: "What happens when memory runs out.",
   actors: ["Application", "Kernel allocator", "Reclaim", "OOM killer"],
   steps: [
     { f: 0, t: 1, l: "Request more memory", n: "The application touches new pages and the kernel needs physical memory for them." },
@@ -2543,7 +2543,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "SIGKILL the victim", n: "The chosen process is killed immediately and cannot clean up." },
     { f: 3, t: 3, l: "Log the decision", n: "dmesg shows the killed process, its memory use and a table of candidates." }
   ] },
-{ id: "x-linux-page-cache-write", module: "linux", title: "A write and fsync", summary: "Why a write can return before data is on disk.",
+{ id: "x-linux-page-cache-write", module: "linux", lesson: "linux/filesystems-page-cache-and-io", title: "A write and fsync", summary: "Why a write can return before data is on disk.",
   actors: ["Application", "Page cache", "Kernel flusher", "Disk"],
   steps: [
     { f: 0, t: 1, l: "write(fd, data)", n: "The application writes and the kernel copies the data into a page of the cache." },
@@ -2553,7 +2553,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Write blocks and flush", n: "The device receives the data and flushes its own cache." },
     { f: 3, t: 0, l: "fsync returns", n: "Only now is the data safe against power loss. This is why databases are limited by disk latency." }
   ] },
-{ id: "x-linux-boot-kernel", module: "linux", title: "From power on to login", summary: "The main stages of a Linux boot.",
+{ id: "x-linux-boot-kernel", module: "linux", lesson: "linux/boot-and-kernel", title: "From power on to login", summary: "The main stages of a Linux boot.",
   actors: ["Firmware", "Bootloader", "Kernel", "systemd"],
   steps: [
     { f: 0, t: 0, l: "Self-test and find boot device", n: "The firmware tests hardware and chooses a boot entry." },
@@ -2563,7 +2563,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Start PID 1", n: "The kernel starts systemd as the first process." },
     { f: 3, t: 3, l: "Reach the default target", n: "systemd starts services in dependency order until the login prompt or network services are ready." }
   ] },
-{ id: "x-linux-conntrack-full", module: "linux", title: "A full connection tracking table", summary: "Why new connections fail while CPU is idle.",
+{ id: "x-linux-conntrack-full", module: "linux", lesson: "linux/networking-in-the-kernel-sockets-and-conntrack", title: "A full connection tracking table", summary: "Why new connections fail while CPU is idle.",
   actors: ["Client", "NAT gateway", "conntrack table", "Kernel log"],
   steps: [
     { f: 0, t: 1, l: "New connection", n: "A client opens a connection through the gateway." },
@@ -2573,7 +2573,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 0, l: "Retry and time out", n: "The client sees timeouts although the application servers are idle." },
     { f: 1, t: 2, l: "Raise limit, cut timeouts", n: "The operator raises the limit with memory in mind and shortens timeouts." }
   ] },
-{ id: "x-linux-sysctl-persist", module: "linux", title: "Changing a kernel setting for good", summary: "Runtime change versus persistent change.",
+{ id: "x-linux-sysctl-persist", module: "linux", lesson: "linux/kernel-modules-sysctl-and-boot-parameters", title: "Changing a kernel setting for good", summary: "Runtime change versus persistent change.",
   actors: ["Engineer", "sysctl", "Running kernel", "/etc/sysctl.d"],
   steps: [
     { f: 0, t: 1, l: "sysctl -w net.core.somaxconn=4096", n: "The engineer changes the value on the running system." },
@@ -2583,7 +2583,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Write 90-net.conf", n: "The engineer saves the setting in a file under /etc/sysctl.d." },
     { f: 0, t: 1, l: "sysctl --system", n: "Reloading applies it now and the file applies it at every boot." }
   ] },
-{ id: "x-bash-pipeline", module: "bash", title: "How a pipeline runs", summary: "Processes connected by pipes.",
+{ id: "x-bash-pipeline", module: "bash", lesson: "bash/text-processing", title: "How a pipeline runs", summary: "Processes connected by pipes.",
   actors: ["Shell", "grep", "sort", "uniq"],
   steps: [
     { f: 0, t: 0, l: "Parse the line", n: "The shell splits the command line at pipe characters." },
@@ -2593,7 +2593,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Sorted lines to uniq", n: "sort needs all input before it can output, then uniq counts duplicates." },
     { f: 3, t: 0, l: "Exit status", n: "The pipeline returns the status of the last command unless pipefail is set." }
   ] },
-{ id: "x-python-requests-retry", module: "python", title: "A request with retry and backoff", summary: "How a script survives a flaky API.",
+{ id: "x-python-requests-retry", module: "python", lesson: "python/http-apis-and-json", title: "A request with retry and backoff", summary: "How a script survives a flaky API.",
   actors: ["Script", "HTTP client", "API", "Timer"],
   steps: [
     { f: 0, t: 1, l: "get(url, timeout=5)", n: "The script sets a timeout so it never waits forever." },
@@ -2603,7 +2603,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Retry", n: "The second attempt is sent after the pause to give the API time to recover." },
     { f: 2, t: 0, l: "200 OK", n: "The result is returned. After a few failures the client stops and raises a clear error." }
   ] },
-{ id: "x-net-http-keepalive", module: "networking", title: "Keep-alive connections", summary: "Why reusing a connection saves time.",
+{ id: "x-net-http-keepalive", module: "networking", lesson: "networking/http-and-tls", title: "Keep-alive connections", summary: "Why reusing a connection saves time.",
   actors: ["Client", "Server", "Handshake", "Pool"],
   steps: [
     { f: 0, t: 2, l: "First request: TCP and TLS", n: "A new connection needs a TCP handshake and a TLS handshake before data." },
@@ -2613,7 +2613,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "GET /b on same connection", n: "The next request skips the handshakes and starts at once." },
     { f: 1, t: 0, l: "Idle timeout closes it", n: "Unused connections are closed by timeouts. Middleboxes may close them earlier." }
   ] },
-{ id: "x-net-load-balancer-failover", module: "networking", title: "Failing over with a health check", summary: "How a load balancer stops sending to a broken server.",
+{ id: "x-net-load-balancer-failover", module: "networking", lesson: "networking/firewalls-and-load-balancing", title: "Failing over with a health check", summary: "How a load balancer stops sending to a broken server.",
   actors: ["Client", "Load balancer", "Server A", "Server B"],
   steps: [
     { f: 0, t: 1, l: "Request", n: "A client sends a request to the load balancer address." },
@@ -2623,7 +2623,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Next request", n: "New requests keep arriving while server A is still broken." },
     { f: 1, t: 3, l: "Forward to B", n: "Traffic goes to the remaining healthy server until A passes checks again." }
   ] },
-{ id: "x-docker-container-start", module: "docker", title: "What docker run does", summary: "From image to running process.",
+{ id: "x-docker-container-start", module: "docker", lesson: "docker/containers-and-images", title: "What docker run does", summary: "From image to running process.",
   actors: ["CLI", "Docker daemon", "Registry", "Kernel"],
   steps: [
     { f: 0, t: 1, l: "docker run -p 8080:80 web", n: "The CLI sends the request to the daemon." },
@@ -2633,7 +2633,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Start the process", n: "The image command becomes process 1 in the container." },
     { f: 3, t: 0, l: "Port mapped", n: "Traffic to host port 8080 reaches port 80 in the container." }
   ] },
-{ id: "x-cicd-canary", module: "cicd", title: "A canary release", summary: "Sending a small share of traffic to the new version.",
+{ id: "x-cicd-canary", module: "cicd", lesson: "cicd/deployment-strategies", title: "A canary release", summary: "Sending a small share of traffic to the new version.",
   actors: ["Pipeline", "Router", "Stable version", "Canary version"],
   steps: [
     { f: 0, t: 3, l: "Deploy canary", n: "The pipeline starts the new version beside the old one." },
@@ -2643,7 +2643,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Increase to 50, then 100", n: "Traffic is shifted in steps with checks between them." },
     { f: 0, t: 2, l: "Roll back if worse", n: "If error rates rise, traffic returns to the stable version at once." }
   ] },
-{ id: "x-k8s-rolling-update", module: "kubernetes", title: "A rolling update", summary: "How a Deployment replaces pods without downtime.",
+{ id: "x-k8s-rolling-update", module: "kubernetes", lesson: "kubernetes/pods-and-deployments", title: "A rolling update", summary: "How a Deployment replaces pods without downtime.",
   actors: ["Engineer", "Deployment", "New pods", "Old pods"],
   steps: [
     { f: 0, t: 1, l: "Set new image", n: "The engineer changes the image in the Deployment." },
@@ -2653,7 +2653,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Repeat", n: "The controller continues in small steps until all pods are new." },
     { f: 1, t: 0, l: "Rollout complete", n: "kubectl rollout status reports success. A failing probe stops the rollout and keeps old pods." }
   ] },
-{ id: "x-k8s-crashloop", module: "kubernetes", title: "Why a pod is in CrashLoopBackOff", summary: "How restarts slow down after repeated failure.",
+{ id: "x-k8s-crashloop", module: "kubernetes", lesson: "kubernetes/debugging-kubernetes-workloads", title: "Why a pod is in CrashLoopBackOff", summary: "How restarts slow down after repeated failure.",
   actors: ["kubelet", "Container", "API server", "Engineer"],
   steps: [
     { f: 0, t: 1, l: "Start container", n: "The kubelet starts the container." },
@@ -2663,7 +2663,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "Report CrashLoopBackOff", n: "The delay grows up to five minutes and the pod status shows the back-off." },
     { f: 3, t: 2, l: "kubectl logs --previous", n: "The engineer reads the last run logs and describe events to find the cause." }
   ] },
-{ id: "x-tf-plan-apply", module: "terraform", title: "Plan and apply", summary: "How Terraform compares code, state and reality.",
+{ id: "x-tf-plan-apply", module: "terraform", lesson: "terraform/workflows-and-drift", title: "Plan and apply", summary: "How Terraform compares code, state and reality.",
   actors: ["Engineer", "Terraform", "State file", "Cloud API"],
   steps: [
     { f: 0, t: 1, l: "terraform plan", n: "The engineer asks what would change." },
@@ -2673,7 +2673,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "terraform apply", n: "After approval, Terraform makes the calls." },
     { f: 1, t: 2, l: "Update state", n: "The state is written with the new resource IDs." }
   ] },
-{ id: "x-cloud-iam-assume-role", module: "cloud", title: "Assuming a role", summary: "How a service gets temporary credentials.",
+{ id: "x-cloud-iam-assume-role", module: "cloud", lesson: "cloud/identity-and-access", title: "Assuming a role", summary: "How a service gets temporary credentials.",
   actors: ["Service", "Identity service", "Role policy", "Resource"],
   steps: [
     { f: 0, t: 1, l: "Request a role", n: "The service asks to assume a role." },
@@ -2683,7 +2683,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Call the resource", n: "The service calls the resource with them." },
     { f: 3, t: 0, l: "Allowed by permissions", n: "The permission policy of the role limits what succeeds. No long-term keys are stored." }
   ] },
-{ id: "x-obs-trace-request", module: "observability", title: "One request traced across services", summary: "How a trace connects spans.",
+{ id: "x-obs-trace-request", module: "observability", lesson: "observability/logs-and-traces", title: "One request traced across services", summary: "How a trace connects spans.",
   actors: ["User", "Gateway", "Orders service", "Database"],
   steps: [
     { f: 0, t: 1, l: "Request", n: "The user request reaches the gateway, which creates a trace ID." },
@@ -2693,7 +2693,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: "Response", n: "The span ends and the response returns." },
     { f: 1, t: 0, l: "Trace shows the slow span", n: "In the trace view, the long database span is clearly the cause." }
   ] },
-{ id: "x-sre-error-budget", module: "sre", title: "Spending an error budget", summary: "How an SLO guides release decisions.",
+{ id: "x-sre-error-budget-spending", module: "sre", lesson: "sre/slos-and-error-budgets", title: "Spending an error budget", summary: "How an SLO guides release decisions.",
   actors: ["Team", "SLO", "Error budget", "Release process"],
   steps: [
     { f: 0, t: 1, l: "Set 99.9 percent", n: "The team agrees on a target for successful requests." },
@@ -2703,7 +2703,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Fix causes", n: "Work is prioritised on the causes of the outage." },
     { f: 2, t: 3, l: "Budget recovers", n: "When the period resets or the budget is healthy, normal releases continue." }
   ] },
-{ id: "x-sec-secret-rotation", module: "security", title: "Rotating a leaked secret", summary: "The order of actions after a secret leaks.",
+{ id: "x-sec-secret-rotation", module: "security", lesson: "security/secrets-management", title: "Rotating a leaked secret", summary: "The order of actions after a secret leaks.",
   actors: ["Responder", "Secret manager", "Service", "Audit log"],
   steps: [
     { f: 0, t: 1, l: "Revoke the old secret", n: "The first step makes the leaked value useless." },
@@ -2713,7 +2713,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "Clean history", n: "Copies in repositories and tickets are removed." },
     { f: 0, t: 0, l: "Prevent a repeat", n: "Scanning, shorter lifetimes and review of the cause close the incident." }
   ] },
-{ id: "x-ansible-playbook-run", module: "ansible", title: "A playbook run", summary: "How Ansible changes servers over SSH.",
+{ id: "x-ansible-playbook-run", module: "ansible", lesson: "ansible/playbooks-tasks-and-idempotence", title: "A playbook run", summary: "How Ansible changes servers over SSH.",
   actors: ["Control node", "Inventory", "Web server", "Handler"],
   steps: [
     { f: 0, t: 1, l: "ansible-playbook site.yml", n: "The control node reads the playbook and selects hosts from the inventory." },
@@ -2723,7 +2723,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Config changed: notify", n: "A changed file notifies a handler." },
     { f: 3, t: 2, l: "Restart once at end", n: "The handler restarts the service once. A second run reports no changes, which shows idempotence." }
   ] },
-{ id: "x-db-replication-lag", module: "databases", title: "Replication and lag", summary: "Why a read replica may return old data.",
+{ id: "x-db-replication-lag", module: "databases", lesson: "databases/replication-and-failover", title: "Replication and lag", summary: "Why a read replica may return old data.",
   actors: ["Application", "Primary", "Replica", "Log"],
   steps: [
     { f: 0, t: 1, l: "Write order", n: "The application writes to the primary." },
@@ -2733,7 +2733,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 0, l: "Old value", n: "The application sees stale data. This delay is called replication lag." },
     { f: 0, t: 1, l: "Read from primary when needed", n: "Read-your-writes cases use the primary or wait for the replica." }
   ] },
-{ id: "x-git-cherry-pick", module: "git", title: "Cherry-pick a fix", summary: "Copying one commit to another branch.",
+{ id: "x-git-cherry-pick", module: "git", lesson: "git/rebase-and-clean-history", title: "Cherry-pick a fix", summary: "Copying one commit to another branch.",
   actors: ["Developer", "main", "release branch", "Reviewer"],
   steps: [
     { f: 0, t: 1, l: "Fix merged on main", n: "The fix is committed and reviewed on main first." },
@@ -2743,7 +2743,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Open a pull request", n: "The release change is reviewed like any other." },
     { f: 3, t: 2, l: "Merge and tag", n: "After checks pass, the fix is merged and a patch release is tagged." }
   ] },
-{ id: "x-llm-tokenization", module: "llm", title: "How text becomes tokens", summary: "What the model reads and what you are billed for.",
+{ id: "x-llm-tokenization", module: "llm", lesson: "llm/what-an-llm-is-and-how-it-predicts-tokens", title: "How text becomes tokens", summary: "What the model reads and what you are billed for.",
   actors: ["Your app", "Tokenizer", "Model", "Billing"],
   steps: [
     { f: 0, t: 1, l: "Send text", n: "Your application sends the prompt as ordinary text." },
@@ -2753,7 +2753,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Count usage", n: "Input and output tokens are counted for the request." },
     { f: 3, t: 0, l: "Report usage", n: "The response includes token counts, which you log to track cost and limits." }
   ] },
-{ id: "x-llm-next-token-loop", module: "llm", title: "The next-token loop", summary: "How one answer is produced one token at a time.",
+{ id: "x-llm-next-token-loop", module: "llm", lesson: "llm/what-an-llm-is-and-how-it-predicts-tokens", title: "The next-token loop", summary: "How one answer is produced one token at a time.",
   actors: ["Prompt", "Model", "Sampler", "Output"],
   steps: [
     { f: 0, t: 1, l: "Read the prompt", n: "The model receives all prompt tokens as its starting context." },
@@ -2763,7 +2763,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 1, l: "Feed it back", n: "The new token becomes part of the context for the next step." },
     { f: 2, t: 3, l: "Stop", n: "The loop ends at an end token or the length limit, and the stop reason is reported." }
   ] },
-{ id: "x-llm-context-window", module: "llm", title: "Filling the context window", summary: "Why long chats and big documents run into a limit.",
+{ id: "x-llm-context-window", module: "llm", lesson: "llm/tokens-context-windows-and-limits", title: "Filling the context window", summary: "Why long chats and big documents run into a limit.",
   actors: ["System prompt", "Chat history", "Documents", "Model"],
   steps: [
     { f: 0, t: 3, l: "Fixed instructions", n: "The system prompt is sent first on every request and always uses space." },
@@ -2773,7 +2773,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 1, l: "Limit reached", n: "If the total is too large the request fails or older parts must be removed." },
     { f: 1, t: 1, l: "Trim or summarise", n: "Your application removes or summarises old turns so the important parts still fit." }
   ] },
-{ id: "x-llm-temperature", module: "llm", title: "What temperature changes", summary: "How the same prompt can give different answers.",
+{ id: "x-llm-temperature", module: "llm", lesson: "llm/sampling-temperature-and-determinism", title: "What temperature changes", summary: "How the same prompt can give different answers.",
   actors: ["Model scores", "Low temperature", "High temperature", "Your test"],
   steps: [
     { f: 0, t: 0, l: "Probabilities", n: "The model gives each candidate token a probability, such as 60, 25 and 15 percent." },
@@ -2783,7 +2783,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Varied results", n: "Answers differ between runs, which suits brainstorming but is harder to test." },
     { f: 3, t: 3, l: "Test the property", n: "Even at low temperature you check required properties over several runs, not exact text." }
   ] },
-{ id: "x-llm-stateless-chat", module: "llm", title: "Why the API forgets", summary: "How a chat works when the API is stateless.",
+{ id: "x-llm-stateless-chat", module: "llm", lesson: "llm/calling-an-llm-api", title: "Why the API forgets", summary: "How a chat works when the API is stateless.",
   actors: ["User", "Your app", "Model API", "Database"],
   steps: [
     { f: 0, t: 1, l: "Ask question one", n: "The user sends the first message." },
@@ -2793,7 +2793,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Ask question two", n: "The user sends a follow-up that depends on the first answer." },
     { f: 1, t: 2, l: "Resend all history", n: "Your application sends the earlier messages plus the new one, which is why the model seems to remember." }
   ] },
-{ id: "x-llm-streaming", module: "llm", title: "Streaming a response", summary: "How tokens reach the screen before the answer is finished.",
+{ id: "x-llm-streaming", module: "llm", lesson: "llm/calling-an-llm-api", title: "Streaming a response", summary: "How tokens reach the screen before the answer is finished.",
   actors: ["Browser", "Your server", "Model API", "Parser"],
   steps: [
     { f: 0, t: 1, l: "Open request", n: "The browser asks for an answer and keeps the connection open." },
@@ -2803,7 +2803,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Final event", n: "A last event carries the stop reason and the usage counts." },
     { f: 3, t: 3, l: "Parse after completion", n: "Structured data is parsed only when the full reply has arrived and the stop reason is normal." }
   ] },
-{ id: "x-llm-prompt-caching", module: "llm", title: "Prompt caching", summary: "How a repeated prefix becomes cheaper and faster.",
+{ id: "x-llm-prompt-caching", module: "llm", lesson: "llm/cost-latency-and-caching", title: "Prompt caching", summary: "How a repeated prefix becomes cheaper and faster.",
   actors: ["Request one", "Cache", "Request two", "Billing"],
   steps: [
     { f: 0, t: 1, l: "Mark a stable prefix", n: "The first request puts a long, unchanging manual at the start of the prompt." },
@@ -2813,7 +2813,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Reuse", n: "The stored work is reused, so the answer starts sooner." },
     { f: 2, t: 3, l: "Pay less", n: "The reused tokens are billed at a lower rate, and the usage report shows cache reads." }
   ] },
-{ id: "x-llm-rate-limit-backoff", module: "llm", title: "Handling a rate limit", summary: "Why retrying at once makes things worse.",
+{ id: "x-llm-rate-limit-backoff", module: "llm", lesson: "llm/calling-an-llm-api", title: "Handling a rate limit", summary: "Why retrying at once makes things worse.",
   actors: ["Worker", "Model API", "Backoff timer", "Alert"],
   steps: [
     { f: 0, t: 1, l: "Send a burst", n: "A batch job sends many requests at once." },
@@ -2823,7 +2823,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Retry", n: "The worker tries again with lower concurrency." },
     { f: 0, t: 3, l: "Alert on persistent errors", n: "If failures continue, an alert warns the team instead of looping forever." }
   ] },
-{ id: "x-llm-grounded-answer", module: "llm", title: "A grounded answer with retrieval", summary: "How supplying facts reduces invented answers.",
+{ id: "x-llm-grounded-answer", module: "llm", lesson: "llm/training-fine-tuning-and-where-knowledge-comes-from", title: "A grounded answer with retrieval", summary: "How supplying facts reduces invented answers.",
   actors: ["Question", "Search index", "Prompt builder", "Model"],
   steps: [
     { f: 0, t: 1, l: "Question arrives", n: "A customer asks about the returns policy." },
@@ -2833,7 +2833,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 0, l: "Show sources", n: "The reply links to the source passages so the customer can check." },
     { f: 1, t: 1, l: "Monitor retrieval", n: "Known test questions confirm that the right passage is still found after each update." }
   ] },
-{ id: "x-llm-truncated-reply", module: "llm", title: "A reply cut off by the limit", summary: "Why JSON sometimes fails to parse.",
+{ id: "x-llm-truncated-reply", module: "llm", lesson: "llm/tokens-context-windows-and-limits", title: "A reply cut off by the limit", summary: "Why JSON sometimes fails to parse.",
   actors: ["Request", "Model", "Stop reason", "Parser"],
   steps: [
     { f: 0, t: 1, l: "Ask for a long report", n: "The request asks for a large JSON document with a small output limit." },
@@ -2843,7 +2843,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 3, l: "Parse error", n: "The parser fails because the JSON is unfinished." },
     { f: 2, t: 0, l: "Check first", n: "A good pipeline reads the stop reason, raises the limit or shortens the task, and tries again." }
   ] },
-{ id: "x-llm-choose-technique", module: "llm", title: "Prompt, retrieve or fine-tune", summary: "How to choose how to give a model what it needs.",
+{ id: "x-llm-choose-technique", module: "llm", lesson: "llm/training-fine-tuning-and-where-knowledge-comes-from", title: "Prompt, retrieve or fine-tune", summary: "How to choose how to give a model what it needs.",
   actors: ["Problem", "Prompt", "Retrieval", "Fine-tuning"],
   steps: [
     { f: 0, t: 1, l: "Start with the prompt", n: "Clear instructions and examples solve many problems cheaply." },
@@ -2853,7 +2853,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Fine-tune for behaviour", n: "Training helps with a stable style or format that prompting cannot achieve." },
     { f: 3, t: 0, l: "Compare cost and risk", n: "Compare quality gain with data work and maintenance, and keep the evaluation as the judge." }
   ] },
-{ id: "x-llm-eval-in-ci", module: "llm", title: "Evaluation in CI", summary: "How a model or prompt change is checked before release.",
+{ id: "x-llm-eval-in-ci", module: "llm", lesson: "llm/choosing-and-evaluating-models", title: "Evaluation in CI", summary: "How a model or prompt change is checked before release.",
   actors: ["Developer", "CI pipeline", "Evaluation set", "Model API"],
   steps: [
     { f: 0, t: 1, l: "Open a pull request", n: "A change to a prompt or model version is proposed." },
@@ -2863,7 +2863,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: "Compare to threshold", n: "The pass rate is compared with the last release and a minimum." },
     { f: 1, t: 0, l: "Block or allow", n: "The pull request fails with the failing cases listed if the rate drops." }
   ] },
-{ id: "x-llm-incident-trace", module: "llm", title: "Investigating a bad answer", summary: "How stored traces explain a wrong answer.",
+{ id: "x-llm-incident-trace", module: "llm", lesson: "llm/debugging-llm-applications", title: "Investigating a bad answer", summary: "How stored traces explain a wrong answer.",
   actors: ["User report", "Trace store", "Engineer", "Evaluation set"],
   steps: [
     { f: 0, t: 2, l: "Report a wrong answer", n: "A user shares the time and the question that went wrong." },
@@ -2873,7 +2873,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Add the case", n: "The question is added to the evaluation set with the expected fact." },
     { f: 2, t: 1, l: "Fix and monitor", n: "The index job is repaired and an alert watches for stale documents." }
   ] },
-{ id: "x-prompting-anatomy", module: "prompting", title: "Parts of a good prompt", summary: "What each piece of a prompt is for.",
+{ id: "x-prompting-anatomy", module: "prompting", lesson: "prompting/anatomy-of-a-good-prompt", title: "Parts of a good prompt", summary: "What each piece of a prompt is for.",
   actors: ["Author", "Prompt", "Model", "Reviewer"],
   steps: [
     { f: 0, t: 1, l: "State the task", n: "One clear sentence says what the model must produce." },
@@ -2883,7 +2883,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Specify the format", n: "The exact output shape is described, with an example if needed." },
     { f: 2, t: 3, l: "Review on real inputs", n: "The reviewer checks answers on varied real examples, not one sample." }
   ] },
-{ id: "x-prompting-few-shot", module: "prompting", title: "How examples steer output", summary: "Why a few good examples beat a long description.",
+{ id: "x-prompting-few-shot", module: "prompting", lesson: "prompting/examples-and-few-shot-prompting", title: "How examples steer output", summary: "Why a few good examples beat a long description.",
   actors: ["Author", "Examples", "Model", "Evaluation set"],
   steps: [
     { f: 0, t: 1, l: "Pick varied cases", n: "Choose three to five realistic inputs that cover normal, borderline and unknown cases." },
@@ -2893,7 +2893,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Test on unseen inputs", n: "Cases that are not in the prompt measure whether the pattern generalises." },
     { f: 3, t: 0, l: "Rebalance", n: "If one label is over-predicted, examples are rebalanced and definitions added." }
   ] },
-{ id: "x-prompting-reasoning", module: "prompting", title: "Reasoning before answering", summary: "When step-by-step thinking helps and when it costs.",
+{ id: "x-prompting-reasoning", module: "prompting", lesson: "prompting/reasoning-and-step-by-step-prompts", title: "Reasoning before answering", summary: "When step-by-step thinking helps and when it costs.",
   actors: ["Task", "Direct prompt", "Reasoning prompt", "Evaluation set"],
   steps: [
     { f: 0, t: 1, l: "Try a direct answer", n: "The model answers a multi-step question in one go." },
@@ -2903,7 +2903,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "Separate the answer", n: "The final answer is placed in its own tag so code can extract it." },
     { f: 3, t: 0, l: "Choose by data", n: "Simple lookups stay direct, and hard tasks keep the reasoning step." }
   ] },
-{ id: "x-prompting-system-layout", module: "prompting", title: "Layout of a system prompt", summary: "Where rules, data and user text belong.",
+{ id: "x-prompting-system-layout", module: "prompting", lesson: "prompting/system-prompts-roles-and-context-layout", title: "Layout of a system prompt", summary: "Where rules, data and user text belong.",
   actors: ["System message", "Context block", "User message", "Model"],
   steps: [
     { f: 0, t: 3, l: "Role and rules", n: "Stable instructions about role, boundaries and style go first." },
@@ -2913,7 +2913,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 2, l: "Answer within rules", n: "The model uses the rules, the data and the question together." },
     { f: 0, t: 1, l: "No secrets", n: "Secrets and permission checks stay in code, because prompt text can often be revealed." }
   ] },
-{ id: "x-prompting-structured-output", module: "prompting", title: "Getting reliable JSON", summary: "From schema to validated data.",
+{ id: "x-prompting-structured-output", module: "prompting", lesson: "prompting/structured-output-json-and-schemas", title: "Getting reliable JSON", summary: "From schema to validated data.",
   actors: ["Schema", "Model", "Validator", "Your code"],
   steps: [
     { f: 0, t: 1, l: "Define the schema", n: "Types, required fields and allowed values are written as JSON Schema." },
@@ -2923,7 +2923,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: "Retry with the error", n: "On failure, the error message is sent back once for a corrected answer." },
     { f: 2, t: 3, l: "Use or review", n: "Valid data goes on, and repeated failures go to a visible review queue." }
   ] },
-{ id: "x-prompting-repair-loop", module: "prompting", title: "The repair and retry loop", summary: "Handling output that does not validate.",
+{ id: "x-prompting-repair-loop", module: "prompting", lesson: "prompting/validating-repairing-and-retrying-outputs", title: "The repair and retry loop", summary: "Handling output that does not validate.",
   actors: ["Model", "Parser", "Retry logic", "Review queue"],
   steps: [
     { f: 0, t: 1, l: "Reply arrives", n: "The model returns text that should be JSON." },
@@ -2933,7 +2933,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Second reply", n: "The next reply parses and validates." },
     { f: 2, t: 3, l: "Send failures onward", n: "After the limit, the item goes to a review queue and a counter metric increases." }
   ] },
-{ id: "x-prompting-version-test", module: "prompting", title: "Versioning and testing prompts", summary: "How a prompt change reaches production safely.",
+{ id: "x-prompting-version-test", module: "prompting", lesson: "prompting/prompt-versioning-and-testing", title: "Versioning and testing prompts", summary: "How a prompt change reaches production safely.",
   actors: ["Author", "Repository", "CI", "Production"],
   steps: [
     { f: 0, t: 1, l: "Edit the prompt file", n: "The prompt lives in version control with a changelog." },
@@ -2943,7 +2943,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Release gradually", n: "A passing change goes to a small share of traffic first." },
     { f: 3, t: 1, l: "Roll back by config", n: "A bad result is reverted by switching the version, not by editing text under pressure." }
   ] },
-{ id: "x-prompting-injection", module: "prompting", title: "Prompt injection path", summary: "How untrusted text becomes an action.",
+{ id: "x-prompting-injection", module: "prompting", lesson: "prompting/system-prompts-roles-and-context-layout", title: "Prompt injection path", summary: "How untrusted text becomes an action.",
   actors: ["Attacker", "Document", "Assistant", "Email tool"],
   steps: [
     { f: 0, t: 1, l: "Plant instructions", n: "The attacker writes instructions inside a document or ticket." },
@@ -2953,7 +2953,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Data leaves", n: "Without limits the data reaches the attacker." },
     { f: 2, t: 3, l: "Defence in depth", n: "Least privilege, approvals and allowed recipients stop the action even if the model is fooled." }
   ] },
-{ id: "x-prompting-injection-defence", module: "prompting", title: "Layers of defence", summary: "How to limit damage from injected text.",
+{ id: "x-prompting-injection-defence", module: "prompting", lesson: "prompting/system-prompts-roles-and-context-layout", title: "Layers of defence", summary: "How to limit damage from injected text.",
   actors: ["Untrusted text", "Prompt", "Policy layer", "Human approver"],
   steps: [
     { f: 0, t: 1, l: "Mark as data", n: "Untrusted content is wrapped in tags and described as data." },
@@ -2963,7 +2963,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 2, l: "Approve or deny", n: "The decision and the exact arguments are recorded." },
     { f: 2, t: 0, l: "Log everything", n: "Every request and decision is logged to review attempts later." }
   ] },
-{ id: "x-prompting-regression", module: "prompting", title: "A silent prompt regression", summary: "How a small edit breaks a case no one tested.",
+{ id: "x-prompting-regression", module: "prompting", lesson: "prompting/prompt-versioning-and-testing", title: "A silent prompt regression", summary: "How a small edit breaks a case no one tested.",
   actors: ["Edit", "Production", "Users", "Evaluation set"],
   steps: [
     { f: 0, t: 1, l: "Shorten the prompt", n: "Examples are removed to save tokens." },
@@ -2973,7 +2973,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Build the set", n: "The failing invoices are added to an evaluation set." },
     { f: 3, t: 1, l: "Prevent", n: "CI now runs the set on every prompt change and blocks drops." }
   ] },
-{ id: "x-prompting-guardrail-check", module: "prompting", title: "Checking output in code", summary: "Why exact checks beat polite reminders.",
+{ id: "x-prompting-guardrail-check", module: "prompting", lesson: "prompting/validating-repairing-and-retrying-outputs", title: "Checking output in code", summary: "Why exact checks beat polite reminders.",
   actors: ["Model", "Output check", "Rules", "User"],
   steps: [
     { f: 0, t: 1, l: "Produce a reply", n: "The model writes a customer message." },
@@ -2983,7 +2983,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Pass clean replies", n: "Only checked replies reach the user." },
     { f: 2, t: 2, l: "Update rules", n: "New incidents become new checks, so the same problem cannot return silently." }
   ] },
-{ id: "x-prompting-prompt-debug", module: "prompting", title: "Debugging a bad prompt", summary: "A methodical way to find which part fails.",
+{ id: "x-prompting-prompt-debug", module: "prompting", lesson: "prompting/debugging-bad-prompts", title: "Debugging a bad prompt", summary: "A methodical way to find which part fails.",
   actors: ["Failing case", "Minimal prompt", "Change log", "Evaluation set"],
   steps: [
     { f: 0, t: 1, l: "Collect failures", n: "Gather the real inputs where the prompt fails and find what they share." },
@@ -2993,7 +2993,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 2, l: "Keep or revert", n: "Only changes that improve the whole set are kept." },
     { f: 2, t: 3, l: "Add the failures", n: "The original failing inputs join the set permanently." }
   ] },
-{ id: "x-skills-loading", module: "claude-skills", title: "How a skill loads", summary: "Why skills cost little context until needed.",
+{ id: "x-skills-loading", module: "claude-skills", lesson: "claude-skills/what-a-claude-skill-is", title: "How a skill loads", summary: "Why skills cost little context until needed.",
   actors: ["User request", "Skill list", "Claude", "Skill folder"],
   steps: [
     { f: 1, t: 2, l: "Descriptions only", n: "At start Claude sees only each skill name and description." },
@@ -3003,7 +3003,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Open linked files", n: "Reference files or scripts are opened only if the task needs them." },
     { f: 2, t: 0, l: "Answer using the skill", n: "The answer follows the skill workflow and any script results." }
   ] },
-{ id: "x-skills-anatomy", module: "claude-skills", title: "Inside a skill folder", summary: "What belongs where.",
+{ id: "x-skills-anatomy", module: "claude-skills", lesson: "claude-skills/anatomy-of-a-skill-folder", title: "Inside a skill folder", summary: "What belongs where.",
   actors: ["SKILL.md", "references", "scripts", "assets"],
   steps: [
     { f: 0, t: 0, l: "Header", n: "The top of SKILL.md has a name and a description." },
@@ -3013,7 +3013,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Templates", n: "Output templates or sample files are stored as assets." },
     { f: 0, t: 0, l: "Keep it small", n: "The main file stays short so it is cheap to load and easy to review." }
   ] },
-{ id: "x-skills-description-writing", module: "claude-skills", title: "Writing a description that triggers", summary: "From vague to specific.",
+{ id: "x-skills-description-writing", module: "claude-skills", lesson: "claude-skills/writing-descriptions-that-trigger", title: "Writing a description that triggers", summary: "From vague to specific.",
   actors: ["Draft", "Trigger tests", "Neighbour skills", "Final"],
   steps: [
     { f: 0, t: 0, l: "Vague draft", n: "A description such as Helps with documents will fire rarely or everywhere." },
@@ -3023,7 +3023,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Re-test", n: "Run the requests again and count misses and false triggers." },
     { f: 3, t: 3, l: "Save the tests", n: "The request list is stored with the skill for future edits." }
   ] },
-{ id: "x-skills-progressive-disclosure", module: "claude-skills", title: "Progressive disclosure", summary: "Three layers of information.",
+{ id: "x-skills-progressive-disclosure", module: "claude-skills", lesson: "claude-skills/progressive-disclosure-and-structure", title: "Progressive disclosure", summary: "Three layers of information.",
   actors: ["Metadata", "Body", "Linked files", "Context"],
   steps: [
     { f: 0, t: 3, l: "Layer one", n: "The name and description are always in context and cost only a few tokens." },
@@ -3033,7 +3033,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "Table of contents", n: "A long file starts with a short list of its sections." },
     { f: 3, t: 3, l: "Result", n: "The context stays small, so more room remains for the user's task." }
   ] },
-{ id: "x-skills-script-step", module: "claude-skills", title: "A script inside a skill", summary: "Letting code do exact work.",
+{ id: "x-skills-script-step", module: "claude-skills", lesson: "claude-skills/scripts-and-deterministic-steps", title: "A script inside a skill", summary: "Letting code do exact work.",
   actors: ["Claude", "SKILL.md", "Script", "Report"],
   steps: [
     { f: 0, t: 1, l: "Read the workflow", n: "The skill says to run the checker on the uploaded file." },
@@ -3043,7 +3043,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Use the result", n: "Claude copies the numbers from the output into the report." },
     { f: 3, t: 0, l: "Explain", n: "Claude adds judgement and wording, not arithmetic." }
   ] },
-{ id: "x-skills-testing-loop", module: "claude-skills", title: "Testing a skill", summary: "A loop that measures the real benefit.",
+{ id: "x-skills-testing-loop", module: "claude-skills", lesson: "claude-skills/testing-and-evaluating-a-skill", title: "Testing a skill", summary: "A loop that measures the real benefit.",
   actors: ["Task set", "Without skill", "With skill", "Scores"],
   steps: [
     { f: 0, t: 0, l: "Write tasks", n: "Collect 10 to 20 realistic tasks with a checklist of expected results." },
@@ -3053,7 +3053,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Find failures", n: "Look at tasks where the skill did not help." },
     { f: 3, t: 0, l: "Change one thing", n: "Edit one part of the skill and run the set again." }
   ] },
-{ id: "x-skills-not-triggering", module: "claude-skills", title: "A skill that does not trigger", summary: "Debugging in the right order.",
+{ id: "x-skills-not-triggering", module: "claude-skills", lesson: "claude-skills/debugging-skills-that-do-not-trigger-or-misbehave", title: "A skill that does not trigger", summary: "Debugging in the right order.",
   actors: ["Folder", "Header", "Description", "Test"],
   steps: [
     { f: 0, t: 0, l: "Check location", n: "The folder is in a place the product reads skills from." },
@@ -3063,7 +3063,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "Improve the description", n: "Add trigger phrases and tasks in the user's words." },
     { f: 2, t: 3, l: "Measure again", n: "Run should-trigger and should-not-trigger requests." }
   ] },
-{ id: "x-skills-security-review", module: "claude-skills", title: "Reviewing an outside skill", summary: "Treat a skill like code you did not write.",
+{ id: "x-skills-security-review", module: "claude-skills", lesson: "claude-skills/sharing-versioning-and-skill-security", title: "Reviewing an outside skill", summary: "Treat a skill like code you did not write.",
   actors: ["Outside skill", "Reviewer", "Sandbox", "Approved list"],
   steps: [
     { f: 0, t: 1, l: "Download", n: "The skill is fetched without installing it." },
@@ -3073,7 +3073,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Pin a version", n: "A reviewed commit is added to the approved list with an owner." },
     { f: 3, t: 1, l: "Re-review updates", n: "Each update is reviewed before it replaces the pinned version." }
   ] },
-{ id: "x-skills-team-workflow", module: "claude-skills", title: "Skills as a team asset", summary: "From idea to shared, versioned skill.",
+{ id: "x-skills-team-workflow", module: "claude-skills", lesson: "claude-skills/sharing-versioning-and-skill-security", title: "Skills as a team asset", summary: "From idea to shared, versioned skill.",
   actors: ["Author", "Repository", "Reviewer", "Team"],
   steps: [
     { f: 0, t: 1, l: "Write the skill", n: "The author drafts the skill and a set of test tasks." },
@@ -3083,7 +3083,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Feedback", n: "Users report misses with the request that failed." },
     { f: 0, t: 1, l: "Improve", n: "New requests become test tasks and the next version is released." }
   ] },
-{ id: "x-skills-vs-prompt-tool", module: "claude-skills", title: "Skill, prompt or tool", summary: "Choosing the right building block.",
+{ id: "x-skills-vs-prompt-tool", module: "claude-skills", lesson: "claude-skills/what-a-claude-skill-is", title: "Skill, prompt or tool", summary: "Choosing the right building block.",
   actors: ["Need", "Prompt", "Skill", "Tool"],
   steps: [
     { f: 0, t: 1, l: "One-off request", n: "A single conversation need is solved with a prompt." },
@@ -3093,7 +3093,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "Bundle scripts", n: "A skill can also carry scripts for exact, repeatable steps." },
     { f: 0, t: 2, l: "Review and share", n: "Skills are files, so they can be reviewed and versioned like code." }
   ] },
-{ id: "x-skills-structure-split", module: "claude-skills", title: "Splitting a long skill", summary: "From one giant file to a lean skill.",
+{ id: "x-skills-structure-split", module: "claude-skills", lesson: "claude-skills/progressive-disclosure-and-structure", title: "Splitting a long skill", summary: "From one giant file to a lean skill.",
   actors: ["Giant file", "Workflow", "References", "Scripts"],
   steps: [
     { f: 0, t: 0, l: "Spot the problem", n: "A 1,400-line SKILL.md is slow to load and hard to review." },
@@ -3103,7 +3103,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Link from the body", n: "Each step links to the file it needs, one level deep." },
     { f: 1, t: 1, l: "Re-test", n: "The task set confirms that quality did not drop after the split." }
   ] },
-{ id: "x-mcp-tool-loop", module: "mcp", title: "The tool-use loop", summary: "How a model uses your code to get facts.",
+{ id: "x-mcp-tool-loop", module: "mcp", lesson: "mcp/the-tool-use-loop", title: "The tool-use loop", summary: "How a model uses your code to get facts.",
   actors: ["User", "App", "Model", "Tool"],
   steps: [
     { f: 0, t: 1, l: "Ask a question", n: "The user asks for the status of ticket TCK-1042." },
@@ -3113,7 +3113,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 1, l: "Return the result", n: "The tool output is sent back as a tool result tied to the call ID." },
     { f: 2, t: 0, l: "Final answer", n: "The model uses the result to answer, and the loop ends." }
   ] },
-{ id: "x-mcp-schema-validation", module: "mcp", title: "Validating tool arguments", summary: "Never trust arguments the model produced.",
+{ id: "x-mcp-schema-validation", module: "mcp", lesson: "mcp/function-calling-and-tool-schemas", title: "Validating tool arguments", summary: "Never trust arguments the model produced.",
   actors: ["Model", "Schema check", "Business rules", "Tool"],
   steps: [
     { f: 0, t: 1, l: "Propose arguments", n: "The model returns a tool name and JSON arguments." },
@@ -3123,7 +3123,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Return a clear error", n: "On failure the tool result explains the problem so the model can correct it." },
     { f: 2, t: 2, l: "Log the call", n: "The request ID, arguments and result are logged for later review." }
   ] },
-{ id: "x-mcp-architecture", module: "mcp", title: "Host, client and server", summary: "Who talks to whom in MCP.",
+{ id: "x-mcp-architecture", module: "mcp", lesson: "mcp/mcp-architecture-hosts-clients-servers-transports", title: "Host, client and server", summary: "Who talks to whom in MCP.",
   actors: ["Host app", "MCP client", "MCP server", "Backend"],
   steps: [
     { f: 0, t: 1, l: "Create a client", n: "The host application creates one client per connected server." },
@@ -3133,7 +3133,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Call a tool", n: "When the model asks, the host has its client send tools/call." },
     { f: 2, t: 3, l: "Use the backend", n: "The server calls the real system and returns a result." }
   ] },
-{ id: "x-mcp-stdio-transport", module: "mcp", title: "The stdio transport", summary: "A local server as a child process.",
+{ id: "x-mcp-stdio-transport", module: "mcp", lesson: "mcp/mcp-architecture-hosts-clients-servers-transports", title: "The stdio transport", summary: "A local server as a child process.",
   actors: ["Host", "Child process", "Standard input", "Standard error"],
   steps: [
     { f: 0, t: 1, l: "Start the process", n: "The host launches the server command from its configuration." },
@@ -3143,7 +3143,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: "Banner breaks parsing", n: "A text banner on standard output corrupts the JSON stream and the host fails." },
     { f: 0, t: 1, l: "Stop", n: "The host closes the pipes and ends the process." }
   ] },
-{ id: "x-mcp-http-transport", module: "mcp", title: "A remote MCP server", summary: "Streamable HTTP with authentication.",
+{ id: "x-mcp-http-transport", module: "mcp", lesson: "mcp/mcp-architecture-hosts-clients-servers-transports", title: "A remote MCP server", summary: "Streamable HTTP with authentication.",
   actors: ["Client", "Authorization server", "MCP server over HTTP", "Backend API"],
   steps: [
     { f: 0, t: 2, l: "Request without a token", n: "The client calls the server and receives a request to authenticate." },
@@ -3153,7 +3153,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 2, l: "Check audience and scope", n: "The server verifies that the token was issued for it and allows the action." },
     { f: 2, t: 3, l: "Use separate credentials", n: "The server calls the backend with its own scoped credentials, never passing the user token on." }
   ] },
-{ id: "x-mcp-primitives", module: "mcp", title: "Tools, resources and prompts", summary: "Three kinds of capability.",
+{ id: "x-mcp-primitives", module: "mcp", lesson: "mcp/resources-prompts-and-other-primitives", title: "Tools, resources and prompts", summary: "Three kinds of capability.",
   actors: ["Model", "User", "Host", "Server"],
   steps: [
     { f: 3, t: 2, l: "Expose a tool", n: "A tool is an action the model can request, such as create_ticket." },
@@ -3163,7 +3163,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: "User picks the rest", n: "Resources and prompts are selected by the application or the person." },
     { f: 2, t: 2, l: "Check support", n: "Hosts differ in what they support, so test in the host you use." }
   ] },
-{ id: "x-mcp-injection-via-tool-result", module: "mcp", title: "Injection through a tool result", summary: "How a ticket can steer an agent.",
+{ id: "x-mcp-injection-via-tool-result", module: "mcp", lesson: "mcp/permissions-auth-and-prompt-injection-defence", title: "Injection through a tool result", summary: "How a ticket can steer an agent.",
   actors: ["Attacker", "Ticket system", "Agent", "Email tool"],
   steps: [
     { f: 0, t: 1, l: "Write a ticket", n: "The attacker files a ticket containing instructions for an AI assistant." },
@@ -3173,7 +3173,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Email tool is available", n: "With broad email access the agent could send data out." },
     { f: 3, t: 0, l: "Allowlist stops it", n: "A recipient allowlist and an approval step block the external address." }
   ] },
-{ id: "x-mcp-approval-flow", module: "mcp", title: "Human approval for risky tools", summary: "Showing the exact action before it runs.",
+{ id: "x-mcp-approval-flow", module: "mcp", lesson: "mcp/permissions-auth-and-prompt-injection-defence", title: "Human approval for risky tools", summary: "Showing the exact action before it runs.",
   actors: ["Model", "Host policy", "Person", "Tool"],
   steps: [
     { f: 0, t: 1, l: "Request delete_file", n: "The model asks to delete a file with a path argument." },
@@ -3183,7 +3183,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Run in a safe area", n: "An approved call runs with least privilege and moves to a trash folder." },
     { f: 3, t: 0, l: "Return the result", n: "The model receives either the result or the reason for denial." }
   ] },
-{ id: "x-mcp-server-debugging", module: "mcp", title: "Debugging an MCP server", summary: "Working from the bottom up.",
+{ id: "x-mcp-server-debugging", module: "mcp", lesson: "mcp/debugging-tool-use-and-mcp", title: "Debugging an MCP server", summary: "Working from the bottom up.",
   actors: ["Inspector", "Server", "Host", "Model"],
   steps: [
     { f: 0, t: 1, l: "Call the server directly", n: "Use an inspector to connect without the host." },
@@ -3193,7 +3193,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Check the tool list", n: "Confirm that the host refreshed its list and passed the tool to the model." },
     { f: 3, t: 2, l: "Read traces", n: "Traces show whether the model considered and chose the tool." }
   ] },
-{ id: "x-mcp-tool-description", module: "mcp", title: "Why descriptions decide choices", summary: "How the model picks between tools.",
+{ id: "x-mcp-tool-description", module: "mcp", lesson: "mcp/function-calling-and-tool-schemas", title: "Why descriptions decide choices", summary: "How the model picks between tools.",
   actors: ["Model", "search_logs", "get_request_trace", "Result"],
   steps: [
     { f: 0, t: 0, l: "Read definitions", n: "The model sees only names, descriptions and schemas." },
@@ -3203,7 +3203,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Get the right data", n: "The right tool returns the data needed for the answer." },
     { f: 0, t: 3, l: "Test choices", n: "A conversation test confirms the right tool is chosen for typical requests." }
   ] },
-{ id: "x-mcp-agent-limits", module: "mcp", title: "Limits for an agent loop", summary: "Stopping runaway tool use.",
+{ id: "x-mcp-agent-limits", module: "mcp", lesson: "mcp/the-tool-use-loop", title: "Limits for an agent loop", summary: "Stopping runaway tool use.",
   actors: ["Agent loop", "Step counter", "Budget guard", "Repeat detector"],
   steps: [
     { f: 0, t: 1, l: "Count steps", n: "Each model call and tool call increases a counter." },
@@ -3213,7 +3213,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Break the loop", n: "The agent is told the tool returns nothing new and must change approach or stop." },
     { f: 2, t: 0, l: "Report", n: "The final answer states what was done and what is incomplete." }
   ] },
-{ id: "x-mcp-confused-deputy", module: "mcp", title: "The confused deputy", summary: "Why a server must not pass tokens through.",
+{ id: "x-mcp-confused-deputy", module: "mcp", lesson: "mcp/permissions-auth-and-prompt-injection-defence", title: "The confused deputy", summary: "Why a server must not pass tokens through.",
   actors: ["User", "MCP server", "Internal service", "Attacker"],
   steps: [
     { f: 0, t: 1, l: "Connect with a token", n: "The user connects with a broad token for several services." },
@@ -3223,7 +3223,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: "Validate audience", n: "A safe server accepts only tokens issued for itself." },
     { f: 1, t: 2, l: "Use its own credentials", n: "It calls the internal service with a narrow credential and checks the user's rights itself." }
   ] },
-{ id: "x-skills-script-safety", module: "claude-skills", title: "A safe script in a skill", summary: "What a trustworthy bundled script looks like.",
+{ id: "x-skills-script-safety", module: "claude-skills", lesson: "claude-skills/scripts-and-deterministic-steps", title: "A safe script in a skill", summary: "What a trustworthy bundled script looks like.",
   actors: ["Author", "Script", "Sandbox", "Reviewer"],
   steps: [
     { f: 0, t: 1, l: "Keep it read-only", n: "The script reads inputs and prints results, and writes only to a named output file." },
@@ -3233,7 +3233,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Review the output", n: "The reviewer compares behaviour with the description and checks exit codes." },
     { f: 3, t: 0, l: "Fix and re-test", n: "Findings are fixed and the script tests are run again before release." }
   ] },
-{ id: "x-cloud-iam-authn-authz", module: "cloud-iam", title: "Authentication then authorization", summary: "One request, two separate checks.",
+{ id: "x-cloud-iam-authn-authz", module: "cloud-iam", lesson: "cloud-iam/identities-principals-and-permissions", title: "Authentication then authorization", summary: "One request, two separate checks.",
   actors: ["User", "Identity provider", "Cloud API", "Policy engine"],
   steps: [
     { f: 0, t: 1, l: "Sign in", n: "The user proves who they are, ideally with single sign-on and a second factor." },
@@ -3243,7 +3243,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Ask for a decision", n: "The request is compared with policies for that principal, action, resource and conditions." },
     { f: 3, t: 2, l: "Allow or deny", n: "With no matching allow the answer is no, and an explicit deny beats every allow." }
   ] },
-{ id: "x-cloud-iam-assume-role", module: "cloud-iam", title: "Assuming a role", summary: "How a workload gets temporary credentials.",
+{ id: "x-cloud-iam-assume-role-flow", module: "cloud-iam", lesson: "cloud-iam/aws-iam-policies-roles-and-assume-role", title: "Assuming a role", summary: "How a workload gets temporary credentials.",
   actors: ["Application", "Token service", "Role", "Storage"],
   steps: [
     { f: 0, t: 1, l: "Ask to assume", n: "The application calls the token service and names the role it needs." },
@@ -3253,7 +3253,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Call storage", n: "The request is signed with the temporary credentials and carries the session identity." },
     { f: 3, t: 0, l: "Check permissions", n: "Storage allows only what the role's permission policy grants, then the session expires on its own." }
   ] },
-{ id: "x-cloud-iam-policy-evaluation", module: "cloud-iam", title: "How a policy decision is made", summary: "Default deny, allows and explicit denies.",
+{ id: "x-cloud-iam-policy-evaluation", module: "cloud-iam", lesson: "cloud-iam/aws-iam-policies-roles-and-assume-role", title: "How a policy decision is made", summary: "Default deny, allows and explicit denies.",
   actors: ["Request", "Organization guardrail", "Identity policy", "Resource policy"],
   steps: [
     { f: 0, t: 1, l: "Request arrives", n: "A principal asks for an action on a resource with some context such as network and MFA." },
@@ -3263,7 +3263,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Explicit deny wins", n: "Any matching deny ends the evaluation with a refusal." },
     { f: 3, t: 0, l: "No allow means no", n: "If nothing allows the request, the default answer is deny." }
   ] },
-{ id: "x-cloud-iam-least-privilege-loop", module: "cloud-iam", title: "Shrinking permissions with usage data", summary: "From broad to narrow without breaking things.",
+{ id: "x-cloud-iam-least-privilege-loop", module: "cloud-iam", lesson: "cloud-iam/least-privilege-and-access-reviews", title: "Shrinking permissions with usage data", summary: "From broad to narrow without breaking things.",
   actors: ["Owner", "Access analysis", "Policy", "Audit log"],
   steps: [
     { f: 0, t: 2, l: "Start with a broad role", n: "A team holds a role with hundreds of allowed actions, granted to get going quickly." },
@@ -3273,7 +3273,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Watch for denials", n: "Audit logs show any denied call so a missing permission is added quickly." },
     { f: 0, t: 1, l: "Schedule a review", n: "The same check is repeated every quarter and recorded." }
   ] },
-{ id: "x-cloud-iam-azure-rbac", module: "cloud-iam", title: "Azure role assignment and scope", summary: "Principal, role and scope.",
+{ id: "x-cloud-iam-azure-rbac", module: "cloud-iam", lesson: "cloud-iam/azure-entra-id-rbac-and-managed-identities", title: "Azure role assignment and scope", summary: "Principal, role and scope.",
   actors: ["Principal", "Role definition", "Scope", "Resource"],
   steps: [
     { f: 0, t: 1, l: "Pick a role", n: "A built-in role such as Reader lists the actions it allows." },
@@ -3283,7 +3283,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Request a resource", n: "The principal reads a resource in the group and is allowed." },
     { f: 0, t: 3, l: "Outside the scope", n: "A resource in another group is refused because no assignment covers it." }
   ] },
-{ id: "x-cloud-iam-managed-identity", module: "cloud-iam", title: "A managed identity gets a token", summary: "No secret stored in the application.",
+{ id: "x-cloud-iam-managed-identity", module: "cloud-iam", lesson: "cloud-iam/azure-entra-id-rbac-and-managed-identities", title: "A managed identity gets a token", summary: "No secret stored in the application.",
   actors: ["App service", "Local token endpoint", "Entra ID", "Key vault"],
   steps: [
     { f: 0, t: 0, l: "Enable the identity", n: "The platform creates an identity for the app service and manages its credentials." },
@@ -3293,7 +3293,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Call the vault", n: "The app presents the token to read one secret." },
     { f: 3, t: 0, l: "Check the role", n: "The vault allows the read only because the identity holds a narrow role on it." }
   ] },
-{ id: "x-cloud-iam-secret-fetch", module: "cloud-iam", title: "Fetching a secret at run time", summary: "Keep passwords out of images and code.",
+{ id: "x-cloud-iam-secret-fetch", module: "cloud-iam", lesson: "cloud-iam/secrets-and-encryption-with-kms-and-key-vaults", title: "Fetching a secret at run time", summary: "Keep passwords out of images and code.",
   actors: ["Service", "Secrets manager", "Audit log", "Database"],
   steps: [
     { f: 0, t: 1, l: "Start up", n: "The service starts with only its identity, not a password." },
@@ -3303,7 +3303,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: "Return the value", n: "The service keeps the value in memory and never writes it to disk or logs." },
     { f: 0, t: 3, l: "Connect", n: "The service connects to the database with the fetched password." }
   ] },
-{ id: "x-cloud-iam-envelope-encryption", module: "cloud-iam", title: "Envelope encryption", summary: "A data key under a master key.",
+{ id: "x-cloud-iam-envelope-encryption", module: "cloud-iam", lesson: "cloud-iam/secrets-and-encryption-with-kms-and-key-vaults", title: "Envelope encryption", summary: "A data key under a master key.",
   actors: ["Application", "Key service", "Data key", "Storage"],
   steps: [
     { f: 0, t: 1, l: "Ask for a data key", n: "The application requests a new key from the key management service." },
@@ -3313,7 +3313,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Store both", n: "The ciphertext and the encrypted data key are stored together." },
     { f: 0, t: 1, l: "Decrypt later", n: "To read, the encrypted data key is sent to the key service, which allows it only if policy permits." }
   ] },
-{ id: "x-cloud-iam-private-endpoint", module: "cloud-iam", title: "Reaching storage through a private endpoint", summary: "Keep traffic off the internet.",
+{ id: "x-cloud-iam-private-endpoint", module: "cloud-iam", lesson: "cloud-iam/network-boundaries-and-private-access", title: "Reaching storage through a private endpoint", summary: "Keep traffic off the internet.",
   actors: ["Application", "Private network", "Private endpoint", "Storage service"],
   steps: [
     { f: 0, t: 1, l: "Resolve the name", n: "Private DNS resolves the storage name to a private address inside the network." },
@@ -3323,7 +3323,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Respond", n: "The data returns over the same private path." },
     { f: 0, t: 3, l: "Public path fails", n: "A request from outside the network is refused by the policy." }
   ] },
-{ id: "x-cloud-iam-audit-detection", module: "cloud-iam", title: "From audit log to alert", summary: "Spotting a risky action.",
+{ id: "x-cloud-iam-audit-detection", module: "cloud-iam", lesson: "cloud-iam/logging-detection-and-audit-trails", title: "From audit log to alert", summary: "Spotting a risky action.",
   actors: ["Principal", "Control plane", "Audit log", "Alert"],
   steps: [
     { f: 0, t: 1, l: "An action happens", n: "A principal tries to stop audit logging at night." },
@@ -3333,7 +3333,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Page the responder", n: "The on-call engineer gets the alert with the principal and source address." },
     { f: 0, t: 2, l: "Review and respond", n: "They restore logging, review recent actions and disable the identity if it is not legitimate." }
   ] },
-{ id: "x-cloud-iam-leaked-key", module: "cloud-iam", title: "Responding to a leaked key", summary: "Contain, assess, remove, recover.",
+{ id: "x-cloud-iam-leaked-key", module: "cloud-iam", lesson: "cloud-iam/logging-detection-and-audit-trails", title: "Responding to a leaked key", summary: "Contain, assess, remove, recover.",
   actors: ["Scanner", "Responder", "Audit log", "Platform"],
   steps: [
     { f: 0, t: 1, l: "Alert", n: "A scanner reports a live key in a public repository." },
@@ -3343,7 +3343,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Replace", n: "The pipeline moves to a role with short-lived credentials." },
     { f: 1, t: 0, l: "Learn", n: "Secret scanning and guardrails are added so the same path cannot recur." }
   ] },
-{ id: "x-cloud-iam-conditional-access", module: "cloud-iam", title: "A sign-in with conditional access", summary: "Rules decide how strong the proof must be.",
+{ id: "x-cloud-iam-conditional-access", module: "cloud-iam", lesson: "cloud-iam/aws-iam-policies-roles-and-assume-role", title: "A sign-in with conditional access", summary: "Rules decide how strong the proof must be.",
   actors: ["User", "Sign-in service", "Policy", "Application"],
   steps: [
     { f: 0, t: 1, l: "Start sign-in", n: "The user opens the application and is sent to the sign-in service." },
@@ -3353,7 +3353,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: "Issue a token", n: "A short-lived token is issued with the claims the application needs." },
     { f: 0, t: 3, l: "Use the application", n: "The application trusts the token and applies its own authorization." }
   ] },
-{ id: "x-k8s-ops-request-flow", module: "k8s-ops", title: "A request through the API server", summary: "Authenticate, authorise, admit, store.",
+{ id: "x-k8s-ops-request-flow", module: "k8s-ops", lesson: "k8s-ops/the-control-plane-in-depth", title: "A request through the API server", summary: "Authenticate, authorise, admit, store.",
   actors: ["Client", "API server", "Admission", "etcd"],
   steps: [
     { f: 0, t: 1, l: "Send a request", n: "kubectl sends a create request over TLS with a credential." },
@@ -3363,7 +3363,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Persist", n: "The validated object is written to etcd, the only place state is stored." },
     { f: 1, t: 0, l: "Respond", n: "The caller receives the stored object, and controllers begin to act on it." }
   ] },
-{ id: "x-k8s-ops-etcd-quorum", module: "k8s-ops", title: "etcd and quorum", summary: "Why a majority of members is needed.",
+{ id: "x-k8s-ops-etcd-quorum", module: "k8s-ops", lesson: "k8s-ops/etcd-backup-and-restore", title: "etcd and quorum", summary: "Why a majority of members is needed.",
   actors: ["Leader", "Follower A", "Follower B", "API server"],
   steps: [
     { f: 3, t: 0, l: "Write request", n: "The API server sends a write to the etcd leader." },
@@ -3373,7 +3373,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Commit", n: "With a majority the leader commits and tells the API server the write succeeded." },
     { f: 2, t: 2, l: "A member is lost", n: "The cluster keeps working with two of three, but losing a second member stops writes." }
   ] },
-{ id: "x-k8s-ops-etcd-restore", module: "k8s-ops", title: "Restoring etcd from a snapshot", summary: "Bring the cluster state back.",
+{ id: "x-k8s-ops-etcd-restore", module: "k8s-ops", lesson: "k8s-ops/etcd-backup-and-restore", title: "Restoring etcd from a snapshot", summary: "Bring the cluster state back.",
   actors: ["Operator", "API servers", "etcd members", "Snapshot file"],
   steps: [
     { f: 0, t: 1, l: "Stop the API servers", n: "Nothing should write while state is being replaced." },
@@ -3383,7 +3383,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Start the API servers", n: "The API servers connect and serve the restored state." },
     { f: 0, t: 1, l: "Reconcile", n: "Objects created after the snapshot are re-applied from the repository, and the team checks volumes separately." }
   ] },
-{ id: "x-k8s-ops-upgrade-flow", module: "k8s-ops", title: "Upgrading a cluster one minor version", summary: "Order of an upgrade.",
+{ id: "x-k8s-ops-upgrade-flow", module: "k8s-ops", lesson: "k8s-ops/upgrading-clusters-safely", title: "Upgrading a cluster one minor version", summary: "Order of an upgrade.",
   actors: ["Operator", "Control plane", "Worker node", "Workloads"],
   steps: [
     { f: 0, t: 0, l: "Prepare", n: "Read release notes, scan for removed APIs and take an etcd snapshot." },
@@ -3393,7 +3393,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "Uncordon", n: "The node is schedulable again and pods return." },
     { f: 0, t: 3, l: "Check workloads", n: "Smoke tests and dashboards confirm the services are healthy before the next node." }
   ] },
-{ id: "x-k8s-ops-node-drain", module: "k8s-ops", title: "A node drain step by step", summary: "Respecting disruption budgets.",
+{ id: "x-k8s-ops-node-drain", module: "k8s-ops", lesson: "k8s-ops/nodes-draining-taints-and-capacity", title: "A node drain step by step", summary: "Respecting disruption budgets.",
   actors: ["Operator", "Node", "Eviction API", "Scheduler"],
   steps: [
     { f: 0, t: 1, l: "Cordon", n: "The node is marked unschedulable so nothing new lands on it." },
@@ -3403,7 +3403,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Recreate elsewhere", n: "The owning controller makes a new pod and the scheduler places it on another node." },
     { f: 0, t: 1, l: "Maintain and uncordon", n: "After the work the node is opened for scheduling again." }
   ] },
-{ id: "x-k8s-ops-rbac-decision", module: "k8s-ops", title: "An RBAC decision", summary: "Subject, verb and resource.",
+{ id: "x-k8s-ops-rbac-decision", module: "k8s-ops", lesson: "k8s-ops/rbac-and-service-accounts", title: "An RBAC decision", summary: "Subject, verb and resource.",
   actors: ["Subject", "API server", "Binding", "Role"],
   steps: [
     { f: 0, t: 1, l: "Request", n: "A service account asks to list secrets in the shop namespace." },
@@ -3413,7 +3413,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: "Forbidden", n: "The caller receives an error naming the subject, verb and resource." },
     { f: 0, t: 2, l: "Fix narrowly", n: "A new rule allows only list on secrets in that namespace." }
   ] },
-{ id: "x-k8s-ops-quota-admission", module: "k8s-ops", title: "A quota stops a deployment", summary: "Namespace limits in action.",
+{ id: "x-k8s-ops-quota-admission", module: "k8s-ops", lesson: "k8s-ops/resource-quotas-limits-and-autoscaling", title: "A quota stops a deployment", summary: "Namespace limits in action.",
   actors: ["Team", "Deployment controller", "Quota check", "Namespace"],
   steps: [
     { f: 0, t: 1, l: "Scale up", n: "The team raises replicas from 10 to 14." },
@@ -3423,7 +3423,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 0, l: "See the event", n: "The team reads the event on the ReplicaSet." },
     { f: 0, t: 3, l: "Right-size or request more", n: "They reduce oversized requests or ask for a higher quota through review." }
   ] },
-{ id: "x-k8s-ops-autoscaler-nodes", module: "k8s-ops", title: "Node autoscaling", summary: "Pending pods add nodes.",
+{ id: "x-k8s-ops-autoscaler-nodes", module: "k8s-ops", lesson: "k8s-ops/resource-quotas-limits-and-autoscaling", title: "Node autoscaling", summary: "Pending pods add nodes.",
   actors: ["HPA", "Scheduler", "Node autoscaler", "Cloud"],
   steps: [
     { f: 0, t: 1, l: "Add replicas", n: "Load rises and the HPA increases the replica count." },
@@ -3433,7 +3433,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 1, l: "Node joins", n: "The node registers and the scheduler places the pending pods." },
     { f: 2, t: 3, l: "Scale down later", n: "Under-used nodes are drained and removed when pods can move safely." }
   ] },
-{ id: "x-k8s-ops-network-policy", module: "k8s-ops", title: "A network policy decision", summary: "Allow lists for pod traffic.",
+{ id: "x-k8s-ops-network-policy", module: "k8s-ops", lesson: "k8s-ops/network-policies-and-pod-security", title: "A network policy decision", summary: "Allow lists for pod traffic.",
   actors: ["Web pod", "Network plugin", "API pod", "Database pod"],
   steps: [
     { f: 0, t: 1, l: "Web calls API", n: "A packet leaves the web pod for the API pod." },
@@ -3443,7 +3443,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Web calls database", n: "A direct call from the web pod to the database is attempted." },
     { f: 1, t: 3, l: "Dropped", n: "No policy allows it, so the packet is dropped and nothing reaches the database." }
   ] },
-{ id: "x-k8s-ops-pod-security", module: "k8s-ops", title: "Pod security admission", summary: "A privileged pod is refused.",
+{ id: "x-k8s-ops-pod-security", module: "k8s-ops", lesson: "k8s-ops/network-policies-and-pod-security", title: "Pod security admission", summary: "A privileged pod is refused.",
   actors: ["Developer", "API server", "Pod Security", "Namespace"],
   steps: [
     { f: 0, t: 1, l: "Apply a pod", n: "A manifest asks for privileged mode and host networking." },
@@ -3453,7 +3453,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 0, l: "Fix the manifest", n: "The developer removes the extra powers and sets a non-root security context." },
     { f: 0, t: 1, l: "Apply again", n: "The hardened pod passes admission and starts." }
   ] },
-{ id: "x-k8s-ops-node-notready", module: "k8s-ops", title: "Why a node goes NotReady", summary: "From missed heartbeats to rescheduling.",
+{ id: "x-k8s-ops-node-notready", module: "k8s-ops", lesson: "k8s-ops/debugging-cluster-and-node-problems", title: "Why a node goes NotReady", summary: "From missed heartbeats to rescheduling.",
   actors: ["Kubelet", "Node controller", "API server", "Scheduler"],
   steps: [
     { f: 0, t: 2, l: "Heartbeats", n: "The kubelet sends regular heartbeats that update the node lease." },
@@ -3463,7 +3463,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Evict after timeout", n: "After the toleration period, pods on the node are marked for removal." },
     { f: 3, t: 2, l: "Reschedule", n: "Controllers create replacements and the scheduler places them on healthy nodes." }
   ] },
-{ id: "x-k8s-ops-cert-expiry", module: "k8s-ops", title: "Certificate expiry in a cluster", summary: "A silent clock.",
+{ id: "x-k8s-ops-cert-expiry", module: "k8s-ops", lesson: "k8s-ops/debugging-cluster-and-node-problems", title: "Certificate expiry in a cluster", summary: "A silent clock.",
   actors: ["Certificates", "Monitor", "Operator", "API server"],
   steps: [
     { f: 0, t: 0, l: "Issued", n: "Cluster certificates are created with a one year lifetime." },
@@ -3473,7 +3473,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Restart components", n: "The control plane components are restarted to load the new files." },
     { f: 0, t: 3, l: "Without monitoring", n: "An unnoticed expiry breaks every client connection to the API server." }
   ] },
-{ id: "x-argocd-push-vs-pull", module: "argocd", title: "Push and pull delivery", summary: "Where the credentials live.",
+{ id: "x-argocd-push-vs-pull", module: "argocd", lesson: "argocd/pull-based-delivery-and-the-repository-as-source-of-truth", title: "Push and pull delivery", summary: "Where the credentials live.",
   actors: ["CI", "Registry", "Repository", "Controller"],
   steps: [
     { f: 0, t: 1, l: "Build and push the image", n: "CI builds the image and publishes it to the registry." },
@@ -3483,7 +3483,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 3, l: "Apply the change", n: "The controller applies the difference from inside the cluster." },
     { f: 3, t: 2, l: "Report status", n: "The result shows as Synced and Healthy; CI never held cluster credentials." }
   ] },
-{ id: "x-argocd-reconcile-loop", module: "argocd", title: "The reconcile loop", summary: "Desired against live state.",
+{ id: "x-argocd-reconcile-loop", module: "argocd", lesson: "argocd/pull-based-delivery-and-the-repository-as-source-of-truth", title: "The reconcile loop", summary: "Desired against live state.",
   actors: ["Repository", "Repo server", "Controller", "Cluster"],
   steps: [
     { f: 0, t: 1, l: "Fetch", n: "The repo server clones the repository at the target revision." },
@@ -3493,7 +3493,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Sync if allowed", n: "With automation on, the controller applies the difference." },
     { f: 2, t: 2, l: "Repeat", n: "The loop runs again on new commits or when live state changes." }
   ] },
-{ id: "x-argocd-install-first-app", module: "argocd", title: "Creating the first Application", summary: "From install to a running service.",
+{ id: "x-argocd-install-first-app", module: "argocd", lesson: "argocd/installing-argo-cd-and-the-application-resource", title: "Creating the first Application", summary: "From install to a running service.",
   actors: ["Engineer", "Argo CD", "Repository", "Cluster"],
   steps: [
     { f: 0, t: 1, l: "Install Argo CD", n: "The components start in their own namespace." },
@@ -3503,7 +3503,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: "Show OutOfSync", n: "Nothing is deployed yet, so the application is OutOfSync." },
     { f: 0, t: 3, l: "Sync", n: "The engineer presses sync and the objects appear and become Healthy." }
   ] },
-{ id: "x-argocd-drift-selfheal", module: "argocd", title: "Drift and self-heal", summary: "A manual edit is reverted.",
+{ id: "x-argocd-drift-selfheal", module: "argocd", lesson: "argocd/sync-health-and-drift", title: "Drift and self-heal", summary: "A manual edit is reverted.",
   actors: ["Engineer", "Cluster", "Controller", "Repository"],
   steps: [
     { f: 0, t: 1, l: "Edit by hand", n: "An engineer changes the replica count directly in the cluster." },
@@ -3513,7 +3513,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: "Back to desired", n: "The replica count returns to the committed number." },
     { f: 0, t: 3, l: "Change by commit", n: "The engineer makes the change in the repository so it lasts." }
   ] },
-{ id: "x-argocd-sync-and-health", module: "argocd", title: "Sync status and health", summary: "Two different questions.",
+{ id: "x-argocd-sync-and-health", module: "argocd", lesson: "argocd/sync-health-and-drift", title: "Sync status and health", summary: "Two different questions.",
   actors: ["Manifests", "Argo CD", "Pods", "Dashboard"],
   steps: [
     { f: 0, t: 1, l: "Apply manifests", n: "Argo CD applies the rendered manifests." },
@@ -3523,7 +3523,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 3, l: "Show both", n: "The dashboard shows Synced and Degraded together." },
     { f: 3, t: 2, l: "Debug the workload", n: "The team looks at events and logs, not at the manifest diff." }
   ] },
-{ id: "x-argocd-prune", module: "argocd", title: "What prune does", summary: "Removing what left the repository.",
+{ id: "x-argocd-prune", module: "argocd", lesson: "argocd/sync-health-and-drift", title: "What prune does", summary: "Removing what left the repository.",
   actors: ["Repository", "Controller", "Cluster", "Protection"],
   steps: [
     { f: 0, t: 0, l: "Delete a file", n: "A manifest for an old service is removed from the repository." },
@@ -3533,7 +3533,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Mark stateful data", n: "Databases and volumes carry the annotation so they survive a mistake." },
     { f: 1, t: 0, l: "Review first", n: "A render check in the pull request shows what would be removed." }
   ] },
-{ id: "x-argocd-helm-values", module: "argocd", title: "Helm values from the repository", summary: "Rendering without a release.",
+{ id: "x-argocd-helm-values", module: "argocd", lesson: "argocd/helm-and-kustomize-with-argo-cd", title: "Helm values from the repository", summary: "Rendering without a release.",
   actors: ["Chart", "Values file", "Repo server", "Cluster"],
   steps: [
     { f: 0, t: 2, l: "Pin the chart", n: "The Application names an exact chart version." },
@@ -3543,7 +3543,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "No release record", n: "Helm itself keeps no release, because Argo CD tracks the resources." },
     { f: 1, t: 0, l: "Review the diff", n: "A change to a value shows up as a reviewed difference." }
   ] },
-{ id: "x-argocd-app-of-apps", module: "argocd", title: "App-of-apps bootstrap", summary: "One parent creates many applications.",
+{ id: "x-argocd-app-of-apps", module: "argocd", lesson: "argocd/environments-app-of-apps-and-applicationsets", title: "App-of-apps bootstrap", summary: "One parent creates many applications.",
   actors: ["Engineer", "Parent app", "Child apps", "Cluster"],
   steps: [
     { f: 0, t: 1, l: "Create the parent", n: "One Application points at a folder of Application manifests." },
@@ -3553,7 +3553,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Detect the new child", n: "The parent creates the new Application automatically." },
     { f: 2, t: 3, l: "New service appears", n: "The new service is delivered with no extra clicks." }
   ] },
-{ id: "x-argocd-applicationset", module: "argocd", title: "An ApplicationSet generating applications", summary: "One template, many targets.",
+{ id: "x-argocd-applicationset", module: "argocd", lesson: "argocd/environments-app-of-apps-and-applicationsets", title: "An ApplicationSet generating applications", summary: "One template, many targets.",
   actors: ["Generator", "ApplicationSet", "Applications", "Clusters"],
   steps: [
     { f: 0, t: 1, l: "List the targets", n: "A generator lists staging and production, or every registered cluster." },
@@ -3563,7 +3563,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "A target is added", n: "A new cluster is registered and the generator sees it." },
     { f: 1, t: 2, l: "New application appears", n: "A new Application is created and delivers the same service." }
   ] },
-{ id: "x-argocd-promotion", module: "argocd", title: "Promoting a version", summary: "Staging first, then production.",
+{ id: "x-argocd-promotion", module: "argocd", lesson: "argocd/environments-app-of-apps-and-applicationsets", title: "Promoting a version", summary: "Staging first, then production.",
   actors: ["Developer", "Staging overlay", "Production overlay", "Reviewer"],
   steps: [
     { f: 0, t: 1, l: "Commit the new tag", n: "The new image tag is committed to the staging overlay." },
@@ -3573,7 +3573,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 2, l: "Merge", n: "The merge is the approval and leaves an audit record." },
     { f: 2, t: 2, l: "Production syncs", n: "Production delivers the same version that was tested in staging." }
   ] },
-{ id: "x-argocd-hooks-waves", module: "argocd", title: "Waves and hooks in a sync", summary: "Running things in order.",
+{ id: "x-argocd-hooks-waves", module: "argocd", lesson: "argocd/hooks-sync-waves-and-progressive-delivery", title: "Waves and hooks in a sync", summary: "Running things in order.",
   actors: ["Controller", "Wave minus one", "Hooks", "Wave zero"],
   steps: [
     { f: 0, t: 1, l: "Start the sync", n: "The controller sorts resources by sync wave." },
@@ -3583,7 +3583,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Wave zero", n: "The Deployment and Service are applied." },
     { f: 0, t: 2, l: "PostSync hook", n: "A smoke test runs and the hook is cleaned up when it succeeds." }
   ] },
-{ id: "x-argocd-rollout-canary", module: "argocd", title: "A canary rollout with analysis", summary: "Gradual traffic with a safety net.",
+{ id: "x-argocd-rollout-canary", module: "argocd", lesson: "argocd/hooks-sync-waves-and-progressive-delivery", title: "A canary rollout with analysis", summary: "Gradual traffic with a safety net.",
   actors: ["Rollout", "Canary pods", "Metrics", "Stable pods"],
   steps: [
     { f: 0, t: 1, l: "Start the canary", n: "A small number of pods run the new version." },
@@ -3593,7 +3593,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Fail", n: "If the threshold is crossed, traffic returns to the stable pods automatically." },
     { f: 0, t: 1, l: "Finish", n: "After the last step the canary becomes the stable version." }
   ] },
-{ id: "x-argocd-project-boundary", module: "argocd", title: "A project blocks a deployment", summary: "Teams stay inside their boundary.",
+{ id: "x-argocd-project-boundary", module: "argocd", lesson: "argocd/access-projects-secrets-and-multi-cluster", title: "A project blocks a deployment", summary: "Teams stay inside their boundary.",
   actors: ["Team A application", "AppProject", "Argo CD", "Team B namespace"],
   steps: [
     { f: 0, t: 1, l: "Application created", n: "Team A defines an application that targets team B's namespace." },
@@ -3603,7 +3603,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Pass", n: "The destination is allowed, so the sync proceeds." },
     { f: 2, t: 3, l: "Resources limited", n: "The project also blocks cluster-level kinds that the team has no need for." }
   ] },
-{ id: "x-argocd-secrets-external", module: "argocd", title: "Secrets without storing them in the repository", summary: "A reference instead of a value.",
+{ id: "x-argocd-secrets-external", module: "argocd", lesson: "argocd/access-projects-secrets-and-multi-cluster", title: "Secrets without storing them in the repository", summary: "A reference instead of a value.",
   actors: ["Repository", "Argo CD", "External Secrets Operator", "Secrets manager"],
   steps: [
     { f: 0, t: 1, l: "Commit a reference", n: "The repository holds a resource that names a secret, not its value." },
@@ -3613,7 +3613,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: "Hide the value", n: "Argo CD ignores the generated Secret contents so they never appear in diffs." },
     { f: 3, t: 2, l: "Rotate", n: "A new value in the manager is picked up automatically on the next refresh." }
   ] },
-{ id: "x-argocd-multi-cluster", module: "argocd", title: "Delivering to a second cluster", summary: "A hub and its targets.",
+{ id: "x-argocd-multi-cluster", module: "argocd", lesson: "argocd/access-projects-secrets-and-multi-cluster", title: "Delivering to a second cluster", summary: "A hub and its targets.",
   actors: ["Hub Argo CD", "Cluster credential", "Target cluster", "Application"],
   steps: [
     { f: 0, t: 2, l: "Register the target", n: "A command adds the remote cluster and creates a service account there." },
@@ -3623,7 +3623,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 0, l: "Report health", n: "The remote resources' health is reported back to the hub." },
     { f: 0, t: 2, l: "Limit the role", n: "The service account in the target has only the rights the applications need." }
   ] },
-{ id: "x-argocd-debug-stages", module: "argocd", title: "Debugging by stage", summary: "Fetch, render, apply, health.",
+{ id: "x-argocd-debug-stages", module: "argocd", lesson: "argocd/debugging-argo-cd", title: "Debugging by stage", summary: "Fetch, render, apply, health.",
   actors: ["Engineer", "Repo server", "API server", "Workload"],
   steps: [
     { f: 0, t: 1, l: "Read the condition", n: "argocd app get shows which stage failed first." },
@@ -3633,7 +3633,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Health", n: "If everything applied, the pods are debugged with events and logs." },
     { f: 0, t: 0, l: "Record the cause", n: "The fix and a prevention are written down." }
   ] },
-{ id: "x-linux-signal-delivery", module: "linux", title: "How a signal reaches a process", summary: "From kill to exit.",
+{ id: "x-linux-signal-delivery", module: "linux", lesson: "linux/processes-and-services", title: "How a signal reaches a process", summary: "From kill to exit.",
   actors: ["Shell", "Kernel", "Process", "Handler"],
   steps: [
     { f: 0, t: 1, l: "Send SIGTERM", n: "The kill command asks the kernel to deliver SIGTERM to the process ID." },
@@ -3643,7 +3643,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Escalate if stuck", n: "If the process ignores SIGTERM, a later SIGKILL is sent." },
     { f: 1, t: 2, l: "Kill without a handler", n: "SIGKILL cannot be caught, so the kernel removes the process at once." }
   ] },
-{ id: "x-linux-file-write-path", module: "linux", title: "How a file write reaches the disk", summary: "Page cache and fsync.",
+{ id: "x-linux-file-write-path", module: "linux", lesson: "linux/filesystems-page-cache-and-io", title: "How a file write reaches the disk", summary: "Page cache and fsync.",
   actors: ["Program", "Page cache", "Filesystem", "Disk"],
   steps: [
     { f: 0, t: 1, l: "write() call", n: "The program writes bytes, which go to memory in the page cache." },
@@ -3653,7 +3653,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Write blocks", n: "The filesystem writes data and its journal to the disk." },
     { f: 3, t: 0, l: "Confirm", n: "Only after the disk reports completion does fsync return, so a crash no longer loses the data." }
   ] },
-{ id: "x-git-squash-merge", module: "git", title: "A squash merge", summary: "Many commits become one.",
+{ id: "x-git-squash-merge", module: "git", lesson: "git/rebase-and-clean-history", title: "A squash merge", summary: "Many commits become one.",
   actors: ["Feature branch", "Pull request", "main", "History"],
   steps: [
     { f: 0, t: 1, l: "Open the pull request", n: "The feature branch has twelve small commits, including fixes." },
@@ -3663,7 +3663,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 0, l: "Branch left behind", n: "The old branch still has the twelve commits and is deleted." },
     { f: 2, t: 3, l: "Revert is easy", n: "If it causes trouble, one revert undoes the whole feature." }
   ] },
-{ id: "x-git-reflog-rescue", module: "git", title: "Rescuing work with the reflog", summary: "Undoing a bad reset.",
+{ id: "x-git-reflog-rescue", module: "git", lesson: "git/debugging-git-problems", title: "Rescuing work with the reflog", summary: "Undoing a bad reset.",
   actors: ["Developer", "Branch", "Reflog", "Recovered branch"],
   steps: [
     { f: 0, t: 1, l: "Reset by mistake", n: "A hard reset moves the branch back and the last three commits vanish from view." },
@@ -3673,7 +3673,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 1, l: "Commits return", n: "All three commits are reachable again." },
     { f: 0, t: 1, l: "Move on", n: "The developer merges or cherry-picks the work back where it belongs." }
   ] },
-{ id: "x-bash-read-lines", module: "bash", title: "Reading a file line by line safely", summary: "Why while read needs care.",
+{ id: "x-bash-read-lines", module: "bash", lesson: "bash/text-processing", title: "Reading a file line by line safely", summary: "Why while read needs care.",
   actors: ["Script", "File", "Loop", "Command"],
   steps: [
     { f: 0, t: 1, l: "Open the file", n: "The script redirects the file into a while loop." },
@@ -3683,7 +3683,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: "Repeat", n: "The loop continues until read returns end of file." },
     { f: 0, t: 3, l: "Check the exit code", n: "The script checks the status and stops on failure." }
   ] },
-{ id: "x-bash-lock-file", module: "bash", title: "A script that refuses to run twice", summary: "Locking with flock.",
+{ id: "x-bash-lock-file", module: "bash", lesson: "bash/safe-automation", title: "A script that refuses to run twice", summary: "Locking with flock.",
   actors: ["Cron", "Script", "Lock file", "Second run"],
   steps: [
     { f: 0, t: 1, l: "Start the job", n: "Cron starts the script on schedule." },
@@ -3693,7 +3693,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 2, l: "Lock is busy", n: "The second run cannot get the lock and exits quietly." },
     { f: 1, t: 2, l: "Release", n: "When the first run ends, the lock is released automatically." }
   ] },
-{ id: "x-python-package-publish", module: "python", title: "Publishing a Python package", summary: "From source to installable.",
+{ id: "x-python-package-publish", module: "python", lesson: "python/testing-and-packaging", title: "Publishing a Python package", summary: "From source to installable.",
   actors: ["Developer", "Build tool", "Index", "User"],
   steps: [
     { f: 0, t: 1, l: "Set the version", n: "The developer updates the version in the project metadata." },
@@ -3703,7 +3703,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 2, l: "Install", n: "A user installs the package, preferably with a pinned version." },
     { f: 3, t: 0, l: "Verify", n: "Hashes and a lock file ensure the same files are used each time." }
   ] },
-{ id: "x-python-exit-codes", module: "python", title: "A Python tool exits with the right code", summary: "So automation can react.",
+{ id: "x-python-exit-codes", module: "python", lesson: "python/writing-command-line-tools", title: "A Python tool exits with the right code", summary: "So automation can react.",
   actors: ["Script", "Exception handler", "Shell", "Pipeline"],
   steps: [
     { f: 0, t: 1, l: "Run the work", n: "The script calls an API and the call fails." },
@@ -3713,7 +3713,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Pipeline stops", n: "The pipeline step fails and the team is notified." },
     { f: 0, t: 3, l: "Success path", n: "On success the script exits with zero and later steps continue." }
   ] },
-{ id: "x-go-interface-satisfaction", module: "go", title: "How a Go type satisfies an interface", summary: "No implements keyword.",
+{ id: "x-go-interface-satisfaction", module: "go", lesson: "go/interfaces-and-packages", title: "How a Go type satisfies an interface", summary: "No implements keyword.",
   actors: ["Interface", "Type", "Compiler", "Caller"],
   steps: [
     { f: 0, t: 2, l: "Define the interface", n: "The interface lists the methods a caller needs." },
@@ -3723,7 +3723,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 1, l: "Swap in a fake", n: "A test passes a small fake type that has the same methods." },
     { f: 2, t: 3, l: "Mismatch fails early", n: "A missing method is reported as a compile error." }
   ] },
-{ id: "x-go-cli-exit", module: "go", title: "A Go command-line tool", summary: "Flags, work and exit codes.",
+{ id: "x-go-cli-exit", module: "go", lesson: "go/building-containers-and-cli-tools", title: "A Go command-line tool", summary: "Flags, work and exit codes.",
   actors: ["User", "flag package", "main", "os.Exit"],
   steps: [
     { f: 0, t: 1, l: "Pass flags", n: "The user runs the tool with flags such as a timeout and a path." },
@@ -3733,7 +3733,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Exit", n: "The process ends with a status that scripts can test." },
     { f: 2, t: 0, l: "Print errors to stderr", n: "Messages go to standard error so output stays clean." }
   ] },
-{ id: "x-net-arp-lookup", module: "networking", title: "How ARP finds a MAC address", summary: "Local delivery on a subnet.",
+{ id: "x-net-arp-lookup", module: "networking", lesson: "networking/dhcp-arp-and-the-local-network", title: "How ARP finds a MAC address", summary: "Local delivery on a subnet.",
   actors: ["Host A", "Switch", "Host B", "ARP cache"],
   steps: [
     { f: 0, t: 3, l: "Check the cache", n: "Host A looks for host B's MAC address in its ARP cache." },
@@ -3743,7 +3743,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Cache the answer", n: "Host A stores the mapping for a short time." },
     { f: 0, t: 2, l: "Send the frame", n: "The frame goes to host B's MAC address through the switch." }
   ] },
-{ id: "x-net-nat-translation", module: "networking", title: "How NAT rewrites a connection", summary: "Private addresses reaching the internet.",
+{ id: "x-net-nat-translation", module: "networking", lesson: "networking/routing-and-nat", title: "How NAT rewrites a connection", summary: "Private addresses reaching the internet.",
   actors: ["Private host", "NAT gateway", "Translation table", "Server"],
   steps: [
     { f: 0, t: 1, l: "Send a packet", n: "A private host sends a packet to a public server." },
@@ -3753,7 +3753,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Look up the mapping", n: "The gateway finds which private host owns that port." },
     { f: 1, t: 0, l: "Rewrite back", n: "The destination is changed to the private host and the packet is delivered." }
   ] },
-{ id: "x-docker-bind-vs-volume", module: "docker", title: "Bind mount and volume", summary: "Where container data lives.",
+{ id: "x-docker-bind-vs-volume", module: "docker", lesson: "docker/volumes-and-networking", title: "Bind mount and volume", summary: "Where container data lives.",
   actors: ["Container", "Bind mount", "Volume", "Host"],
   steps: [
     { f: 0, t: 1, l: "Mount a host folder", n: "A bind mount maps an existing host path into the container." },
@@ -3763,7 +3763,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "Remove the container", n: "The volume remains with its data until it is removed explicitly." },
     { f: 1, t: 3, l: "Beware permissions", n: "Host paths bring host ownership and permissions into the container." }
   ] },
-{ id: "x-docker-image-scan", module: "docker", title: "Scanning an image before it ships", summary: "Catch known flaws early.",
+{ id: "x-docker-image-scan", module: "docker", lesson: "docker/registries-and-supply-chain", title: "Scanning an image before it ships", summary: "Catch known flaws early.",
   actors: ["Build", "Scanner", "Registry", "Policy"],
   steps: [
     { f: 0, t: 1, l: "Build the image", n: "The pipeline builds the image from the Dockerfile." },
@@ -3773,7 +3773,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "Push", n: "The clean image is pushed to the registry." },
     { f: 2, t: 3, l: "Rescan regularly", n: "New flaws are published daily, so stored images are scanned again." }
   ] },
-{ id: "x-cicd-manual-approval", module: "cicd", title: "A pipeline with approval", summary: "A gate before production.",
+{ id: "x-cicd-manual-approval", module: "cicd", lesson: "cicd/environments-promotion-and-approvals", title: "A pipeline with approval", summary: "A gate before production.",
   actors: ["Pipeline", "Staging", "Approver", "Production"],
   steps: [
     { f: 0, t: 1, l: "Deploy to staging", n: "The pipeline deploys the build and runs tests automatically." },
@@ -3783,7 +3783,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Deploy to production", n: "The same artifact that was tested is deployed." },
     { f: 3, t: 0, l: "Verify", n: "A health check confirms the release, and the pipeline reports success." }
   ] },
-{ id: "x-cicd-rollback-artifact", module: "cicd", title: "Rolling back by redeploying an artifact", summary: "Previous version, same process.",
+{ id: "x-cicd-rollback-artifact", module: "cicd", lesson: "cicd/versioning-and-artifacts", title: "Rolling back by redeploying an artifact", summary: "Previous version, same process.",
   actors: ["Pipeline", "Artifact store", "Production", "Monitor"],
   steps: [
     { f: 0, t: 2, l: "Release v42", n: "The pipeline deploys build 42 to production." },
@@ -3793,7 +3793,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "Redeploy", n: "v41 is deployed with the same process as any release." },
     { f: 3, t: 0, l: "Recover", n: "Error rates return to normal and the team investigates v42 calmly." }
   ] },
-{ id: "x-k8s-statefulset-order", module: "kubernetes", title: "How a StatefulSet starts pods", summary: "Stable names and order.",
+{ id: "x-k8s-statefulset-order", module: "kubernetes", lesson: "kubernetes/statefulsets-and-running-databases", title: "How a StatefulSet starts pods", summary: "Stable names and order.",
   actors: ["StatefulSet controller", "Pod 0", "Pod 1", "Volume"],
   steps: [
     { f: 0, t: 1, l: "Create pod 0", n: "The controller creates pod 0 first with a stable name." },
@@ -3803,7 +3803,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Own volume", n: "Pod 1 receives a separate volume claim." },
     { f: 0, t: 3, l: "Replace in place", n: "A failed pod returns with the same name and the same volume." }
   ] },
-{ id: "x-k8s-node-failure", module: "kubernetes", title: "A node fails", summary: "Rescheduling workloads.",
+{ id: "x-k8s-node-failure", module: "kubernetes", lesson: "kubernetes/scheduling-and-troubleshooting", title: "A node fails", summary: "Rescheduling workloads.",
   actors: ["Node", "Node controller", "Deployment controller", "Scheduler"],
   steps: [
     { f: 0, t: 0, l: "Node stops responding", n: "Power loss stops the kubelet heartbeats." },
@@ -3813,7 +3813,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Place them", n: "The scheduler assigns the new pods to healthy nodes." },
     { f: 3, t: 0, l: "Service recovers", n: "Traffic goes to the new pods once they are ready." }
   ] },
-{ id: "x-helm-diff-before-upgrade", module: "helm", title: "Checking a change with helm diff", summary: "See before you apply.",
+{ id: "x-helm-diff-before-upgrade", module: "helm", lesson: "helm/upgrade-rollback-and-release-history", title: "Checking a change with helm diff", summary: "See before you apply.",
   actors: ["Engineer", "helm diff", "Cluster", "Release"],
   steps: [
     { f: 0, t: 1, l: "Prepare the change", n: "The engineer updates values or the chart version." },
@@ -3823,7 +3823,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 0, l: "Review", n: "The engineer checks image tags, replicas and resources." },
     { f: 0, t: 3, l: "Upgrade", n: "Only then does helm upgrade run, with the diff attached to the review." }
   ] },
-{ id: "x-helm-repo-version", module: "helm", title: "Choosing a chart version", summary: "From repository index to release.",
+{ id: "x-helm-repo-version", module: "helm", lesson: "helm/dependencies-subcharts-and-registries", title: "Choosing a chart version", summary: "From repository index to release.",
   actors: ["Engineer", "Repository index", "Chart", "Cluster"],
   steps: [
     { f: 0, t: 1, l: "Update the index", n: "helm repo update downloads the list of available chart versions." },
@@ -3833,7 +3833,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Install", n: "The release is installed with the pinned version and recorded." },
     { f: 0, t: 1, l: "Upgrade deliberately", n: "New versions are adopted by a reviewed change." }
   ] },
-{ id: "x-terraform-workspaces", module: "terraform", title: "Workspaces and separate state", summary: "Two ways to separate environments.",
+{ id: "x-terraform-workspaces", module: "terraform", lesson: "terraform/environments-and-team-workflows", title: "Workspaces and separate state", summary: "Two ways to separate environments.",
   actors: ["Engineer", "Workspace", "State file", "Environment"],
   steps: [
     { f: 0, t: 1, l: "Select a workspace", n: "The engineer chooses a workspace named staging." },
@@ -3843,7 +3843,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "Prefer separate directories", n: "Many teams use separate configurations and backends for clearer boundaries and permissions." },
     { f: 0, t: 3, l: "Check before apply", n: "The plan header shows which environment is targeted." }
   ] },
-{ id: "x-terraform-failed-apply", module: "terraform", title: "Recovering from a failed apply", summary: "Half-created infrastructure.",
+{ id: "x-terraform-failed-apply", module: "terraform", lesson: "terraform/workflows-and-drift", title: "Recovering from a failed apply", summary: "Half-created infrastructure.",
   actors: ["Terraform", "Cloud API", "State", "Engineer"],
   steps: [
     { f: 0, t: 1, l: "Apply", n: "Terraform creates resources one by one." },
@@ -3853,7 +3853,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Run apply again", n: "The next apply continues from the saved state." },
     { f: 0, t: 2, l: "Check the plan", n: "The plan shows only the remaining work and no duplicates." }
   ] },
-{ id: "x-ansible-handlers", module: "ansible", title: "Handlers and notifications", summary: "Restart only when something changed.",
+{ id: "x-ansible-handlers", module: "ansible", lesson: "ansible/handlers-conditionals-and-loops", title: "Handlers and notifications", summary: "Restart only when something changed.",
   actors: ["Playbook", "Task", "Handler", "Service"],
   steps: [
     { f: 0, t: 1, l: "Run the task", n: "A task updates the configuration file." },
@@ -3863,7 +3863,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Run handlers at the end", n: "The restart runs once, after the tasks that needed it." },
     { f: 0, t: 3, l: "No change, no restart", n: "On a second run nothing changes and the service is not touched." }
   ] },
-{ id: "x-ansible-dynamic-inventory", module: "ansible", title: "Dynamic inventory from the cloud", summary: "Hosts found at run time.",
+{ id: "x-ansible-dynamic-inventory", module: "ansible", lesson: "ansible/dynamic-inventory-for-cloud", title: "Dynamic inventory from the cloud", summary: "Hosts found at run time.",
   actors: ["Playbook", "Inventory plugin", "Cloud API", "Hosts"],
   steps: [
     { f: 0, t: 1, l: "Ask for inventory", n: "The playbook run starts with an inventory plugin." },
@@ -3873,7 +3873,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Run on the group", n: "The play targets the web group and connects to those hosts." },
     { f: 0, t: 3, l: "Always current", n: "New servers are included next run and deleted servers disappear." }
   ] },
-{ id: "x-cloud-health-check", module: "cloud", title: "A load balancer health check", summary: "Only healthy targets get traffic.",
+{ id: "x-cloud-health-check", module: "cloud", lesson: "cloud/high-availability-and-disaster-recovery", title: "A load balancer health check", summary: "Only healthy targets get traffic.",
   actors: ["Load balancer", "Target A", "Target B", "Users"],
   steps: [
     { f: 0, t: 1, l: "Probe", n: "The load balancer requests the health path from each target." },
@@ -3883,7 +3883,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 2, l: "Remove", n: "After the threshold, target B receives no new traffic." },
     { f: 3, t: 0, l: "Users unaffected", n: "Requests go to target A while B is repaired and re-added." }
   ] },
-{ id: "x-cloud-budget-alert", module: "cloud", title: "A cost budget alert", summary: "Catch a bill spike early.",
+{ id: "x-cloud-budget-alert", module: "cloud", lesson: "cloud/managed-services-and-cost", title: "A cost budget alert", summary: "Catch a bill spike early.",
   actors: ["Billing data", "Budget", "Alert", "Team"],
   steps: [
     { f: 0, t: 1, l: "Collect costs", n: "Usage and cost data is collected daily by tag." },
@@ -3893,7 +3893,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Investigate", n: "They find idle large servers left running." },
     { f: 3, t: 1, l: "Fix and prevent", n: "They remove the servers and add scheduled shutdown for test environments." }
   ] },
-{ id: "x-obs-slo-dashboard", module: "observability", title: "How an SLO is computed", summary: "From events to a budget.",
+{ id: "x-obs-slo-dashboard-reading", module: "observability", lesson: "observability/alerting-and-dashboards", title: "How an SLO is computed", summary: "From events to a budget.",
   actors: ["Requests", "Metrics", "Query", "Dashboard"],
   steps: [
     { f: 0, t: 1, l: "Count requests", n: "Every request increments total and error counters." },
@@ -3903,7 +3903,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Show the burn rate", n: "A second panel shows how fast the budget is being used." },
     { f: 3, t: 0, l: "Decide", n: "The team slows releases if the budget is nearly spent." }
   ] },
-{ id: "x-obs-trace-id-logs", module: "observability", title: "Linking logs and traces", summary: "One ID across tools.",
+{ id: "x-obs-trace-id-logs", module: "observability", lesson: "observability/logs-and-traces", title: "Linking logs and traces", summary: "One ID across tools.",
   actors: ["Gateway", "Service", "Log search", "Trace view"],
   steps: [
     { f: 0, t: 1, l: "Create a trace ID", n: "The gateway creates an ID and passes it in a header." },
@@ -3913,7 +3913,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 2, l: "Open the trace", n: "The trace view shows the same request and where it was slow." },
     { f: 2, t: 3, l: "Fix with evidence", n: "Logs show the error and the trace shows the slow call that caused it." }
   ] },
-{ id: "x-sre-capacity-planning", module: "sre", title: "Capacity planning from a trend", summary: "Plan before you run out.",
+{ id: "x-sre-capacity-planning", module: "sre", lesson: "sre/capacity-planning", title: "Capacity planning from a trend", summary: "Plan before you run out.",
   actors: ["Metrics", "Forecast", "Plan", "Review"],
   steps: [
     { f: 0, t: 1, l: "Collect usage", n: "Weekly peaks for CPU, memory and storage are collected." },
@@ -3923,7 +3923,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Review monthly", n: "The forecast is compared with actual growth." },
     { f: 3, t: 2, l: "Adjust", n: "Differences change the plan, not only the numbers." }
   ] },
-{ id: "x-sre-oncall-handoff", module: "sre", title: "An on-call handoff", summary: "Passing context safely.",
+{ id: "x-sre-oncall-handoff", module: "sre", lesson: "sre/on-call", title: "An on-call handoff", summary: "Passing context safely.",
   actors: ["Outgoing engineer", "Notes", "Incoming engineer", "Alerts"],
   steps: [
     { f: 0, t: 1, l: "Write the notes", n: "The outgoing engineer lists open issues, recent changes and risky tasks." },
@@ -3933,7 +3933,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Confirm", n: "The incoming engineer confirms ownership and the pager is switched." },
     { f: 0, t: 2, l: "Stay reachable", n: "The outgoing engineer remains available for a short overlap." }
   ] },
-{ id: "x-security-dependency-scan", module: "security", title: "Scanning dependencies", summary: "Known flaws in libraries.",
+{ id: "x-security-dependency-scan", module: "security", lesson: "security/securing-the-pipeline", title: "Scanning dependencies", summary: "Known flaws in libraries.",
   actors: ["Developer", "Pipeline", "Scanner", "Advisory data"],
   steps: [
     { f: 0, t: 1, l: "Open a pull request", n: "The change updates dependencies." },
@@ -3943,7 +3943,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 0, l: "Update", n: "The developer upgrades to the fixed version." },
     { f: 1, t: 1, l: "Pass", n: "The scan is clean and the pull request can merge." }
   ] },
-{ id: "x-security-rotate-credential", module: "security", title: "Rotating a credential", summary: "Replace without an outage.",
+{ id: "x-security-rotate-credential", module: "security", lesson: "security/secrets-management", title: "Rotating a credential", summary: "Replace without an outage.",
   actors: ["Secret store", "Service A", "Database", "Operator"],
   steps: [
     { f: 0, t: 0, l: "Create the new secret", n: "The operator creates version 2 while version 1 remains valid." },
@@ -3953,7 +3953,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 3, l: "Retire the old", n: "Version 1 is removed from the database." },
     { f: 0, t: 0, l: "Record", n: "The date and owner are recorded for the next rotation." }
   ] },
-{ id: "x-db-write-ahead-log", module: "databases", title: "Write-ahead logging", summary: "Durability before the data file.",
+{ id: "x-db-write-ahead-log", module: "databases", lesson: "databases/backups-and-recovery", title: "Write-ahead logging", summary: "Durability before the data file.",
   actors: ["Client", "Database", "Log", "Data files"],
   steps: [
     { f: 0, t: 1, l: "Commit", n: "The client commits a transaction." },
@@ -3963,7 +3963,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 1, l: "Crash", n: "The server loses power before data files are written." },
     { f: 2, t: 3, l: "Replay", n: "On restart the log is replayed so committed changes are restored." }
   ] },
-{ id: "x-db-connection-exhaustion", module: "databases", title: "Running out of connections", summary: "Why a pool and a limit matter.",
+{ id: "x-db-connection-exhaustion", module: "databases", lesson: "databases/performance-and-connection-pooling", title: "Running out of connections", summary: "Why a pool and a limit matter.",
   actors: ["Application", "Pool", "Database", "Alert"],
   steps: [
     { f: 0, t: 1, l: "Traffic grows", n: "More application instances start, each opening its own connections." },
@@ -3973,7 +3973,7 @@ window.MARGA_EXPLAINERS = [
     { f: 1, t: 2, l: "Add a pooler", n: "A pooler shares a small number of server connections among many clients." },
     { f: 0, t: 1, l: "Set pool sizes", n: "Each application gets a limit so the total stays under the cap." }
   ] },
-{ id: "x-llm-cheaper-model", module: "llm", title: "Choosing a cheaper model for simple steps", summary: "Match model to task.",
+{ id: "x-llm-cheaper-model", module: "llm", lesson: "llm/choosing-and-evaluating-models", title: "Choosing a cheaper model for simple steps", summary: "Match model to task.",
   actors: ["Router", "Small model", "Large model", "Evaluation"],
   steps: [
     { f: 0, t: 3, l: "Collect examples", n: "Real requests are labelled by difficulty." },
@@ -3983,7 +3983,7 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 0, l: "Route", n: "The router sends each step to the cheapest model that passes." },
     { f: 3, t: 0, l: "Recheck", n: "The evaluation runs again on every model or prompt change." }
   ] },
-{ id: "x-llm-batch-processing", module: "llm", title: "Batch processing", summary: "Non-urgent work at lower cost.",
+{ id: "x-llm-batch-processing", module: "llm", lesson: "llm/cost-latency-and-caching", title: "Batch processing", summary: "Non-urgent work at lower cost.",
   actors: ["Job", "Batch API", "Model", "Results"],
   steps: [
     { f: 0, t: 1, l: "Collect requests", n: "A nightly job gathers ten thousand summaries to produce." },
@@ -3993,7 +3993,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Download results", n: "Results are returned with the same IDs." },
     { f: 3, t: 0, l: "Match and validate", n: "Each result is matched to its request and validated, and failures are retried." }
   ] },
-{ id: "x-prompting-tags-data", module: "prompting", title: "Separating data from instructions", summary: "Tags keep roles clear.",
+{ id: "x-prompting-tags-data", module: "prompting", lesson: "prompting/system-prompts-roles-and-context-layout", title: "Separating data from instructions", summary: "Tags keep roles clear.",
   actors: ["Instructions", "Document", "Prompt", "Model"],
   steps: [
     { f: 0, t: 2, l: "Write the task", n: "The instructions say what to do with the document." },
@@ -4003,7 +4003,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Not a guarantee", n: "Tags help but do not replace limiting what the system can do." },
     { f: 3, t: 0, l: "Validate", n: "The output is validated in code before anything uses it." }
   ] },
-{ id: "x-prompting-ab-compare", module: "prompting", title: "Comparing two prompt versions", summary: "Decide with data.",
+{ id: "x-prompting-ab-compare", module: "prompting", lesson: "prompting/prompt-versioning-and-testing", title: "Comparing two prompt versions", summary: "Decide with data.",
   actors: ["Version A", "Version B", "Evaluation set", "Decision"],
   steps: [
     { f: 0, t: 2, l: "Run version A", n: "The saved cases are run through version A several times." },
@@ -4013,7 +4013,7 @@ window.MARGA_EXPLAINERS = [
     { f: 3, t: 0, l: "Choose", n: "The better version is released gradually." },
     { f: 3, t: 2, l: "Keep the cases", n: "Failures become new cases for the future." }
   ] },
-{ id: "x-skills-reference-on-demand", module: "claude-skills", title: "Loading a reference file on demand", summary: "Only when a step needs it.",
+{ id: "x-skills-reference-on-demand", module: "claude-skills", lesson: "claude-skills/progressive-disclosure-and-structure", title: "Loading a reference file on demand", summary: "Only when a step needs it.",
   actors: ["Request", "SKILL.md", "Reference file", "Claude"],
   steps: [
     { f: 0, t: 3, l: "Skill triggers", n: "The request matches the skill and the body loads." },
@@ -4023,7 +4023,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Use the detail", n: "The rules are applied to the task." },
     { f: 3, t: 0, l: "Stay lean", n: "Other requests never pay for the reference in context." }
   ] },
-{ id: "x-skills-version-update", module: "claude-skills", title: "Updating a skill", summary: "Change with tests.",
+{ id: "x-skills-version-update", module: "claude-skills", lesson: "claude-skills/sharing-versioning-and-skill-security", title: "Updating a skill", summary: "Change with tests.",
   actors: ["Author", "Test tasks", "Repository", "Team"],
   steps: [
     { f: 0, t: 1, l: "Edit the skill", n: "The author improves a description or step." },
@@ -4033,7 +4033,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 3, l: "Roll out", n: "The team installs the new version from the repository." },
     { f: 3, t: 0, l: "Report problems", n: "A missed request is added to the test tasks for next time." }
   ] },
-{ id: "x-mcp-resource-template", module: "mcp", title: "Reading a resource by URI", summary: "Data the application attaches.",
+{ id: "x-mcp-resource-template", module: "mcp", lesson: "mcp/resources-prompts-and-other-primitives", title: "Reading a resource by URI", summary: "Data the application attaches.",
   actors: ["User", "Host", "MCP server", "Backend"],
   steps: [
     { f: 0, t: 1, l: "Pick a document", n: "The user selects a runbook in the host's attachment menu." },
@@ -4043,7 +4043,7 @@ window.MARGA_EXPLAINERS = [
     { f: 2, t: 1, l: "Attach", n: "The host adds it to the model's context for the conversation." },
     { f: 1, t: 0, l: "Respect size", n: "Large documents are summarised or limited to save context." }
   ] },
-{ id: "x-mcp-tracing-calls", module: "mcp", title: "Tracing tool calls", summary: "Make agent runs debuggable.",
+{ id: "x-mcp-tracing-calls", module: "mcp", lesson: "mcp/debugging-tool-use-and-mcp", title: "Tracing tool calls", summary: "Make agent runs debuggable.",
   actors: ["Agent", "Tool", "Trace store", "Engineer"],
   steps: [
     { f: 0, t: 1, l: "Create a run ID", n: "Each conversation gets a run ID and each call a step number." },
@@ -4052,5 +4052,581 @@ window.MARGA_EXPLAINERS = [
     { f: 0, t: 1, l: "Repeat", n: "Later steps are logged in order." },
     { f: 3, t: 2, l: "Investigate", n: "An engineer opens the trace for a wrong answer." },
     { f: 3, t: 2, l: "Find the cause", n: "They see the tool returned an empty result and the agent gave up." }
+  ] },
+{ id: "f-linux-disk-full", module: "linux", kind: "failure", lesson: "linux/disks-and-filesystems", title: "Failure and recovery: a full disk stops a service", summary: "Logs fill /var, writes fail, and the fix has two parts.",
+  actors: ["Service", "Filesystem", "Operator", "Logrotate"],
+  steps: [
+    { f: 0, t: 1, l: "Normal writes", n: "The service writes a little log data each second and the filesystem has plenty of free space." },
+    { f: 0, t: 1, l: "Logs grow", n: "A debug flag left on triples the log volume and nobody notices for days." },
+    { f: 1, t: 0, l: "Disk fills", n: "The filesystem reaches one hundred percent and the next write returns no space left on device." },
+    { f: 0, t: 2, l: "Symptom", n: "Requests start failing and the service logs an error about being unable to write its own state." },
+    { f: 2, t: 1, l: "Check usage", n: "The operator runs df -h to find the full filesystem and du -xh to find the biggest directories." },
+    { f: 2, t: 1, l: "Find held files", n: "lsof shows a deleted log file still held open, so deleting it freed no space until the process restarts." },
+    { f: 2, t: 0, l: "Fix", n: "Truncate the log, restart the service to release the file, and turn the debug flag off." },
+    { f: 3, t: 1, l: "Prevent", n: "Logrotate with size limits and a disk usage alert at eighty percent keeps it from recurring." }
+  ] },
+{ id: "f-linux-oom-kill", module: "linux", kind: "failure", lesson: "linux/processes-memory-and-the-oom-killer", title: "Failure and recovery: the OOM killer ends the wrong process", summary: "Memory runs out and the kernel picks a victim.",
+  actors: ["Application", "Kernel", "Operator", "Monitoring"],
+  steps: [
+    { f: 0, t: 1, l: "Allocate memory", n: "The application keeps asking for more memory as a cache grows without a size limit." },
+    { f: 1, t: 1, l: "Memory pressure", n: "Free memory and page cache are used up and swap, if any, fills." },
+    { f: 1, t: 0, l: "OOM kill", n: "The kernel scores processes and ends the one with the highest score, which is the large database process." },
+    { f: 3, t: 2, l: "Alert fires", n: "A process-restart alert fires and the operator sees the database vanished at the same moment." },
+    { f: 2, t: 1, l: "Read the log", n: "dmesg or journalctl -k shows Out of memory: Killed process with the process name and its memory use." },
+    { f: 2, t: 0, l: "Find the cause", n: "The real culprit is the cache with no limit, not the database that was killed." },
+    { f: 2, t: 0, l: "Fix", n: "Cap the cache size, set a memory limit with systemd, and protect the database with a lower oom score." },
+    { f: 3, t: 2, l: "Verify", n: "Memory graphs stay flat, no new kill messages appear, and the database stays up for a full day." }
+  ] },
+{ id: "f-git-force-push", module: "git", kind: "failure", lesson: "git/branches-and-merging", title: "Failure and recovery: a force push overwrites a teammate's work", summary: "Lost commits are usually still recoverable.",
+  actors: ["Developer", "Remote", "Teammate", "Reflog"],
+  steps: [
+    { f: 0, t: 1, l: "Shared branch", n: "Two people work on the same branch and the remote has three commits from the teammate." },
+    { f: 0, t: 1, l: "Rewrite history", n: "The developer rebases locally and runs a plain force push because the normal push was rejected." },
+    { f: 1, t: 1, l: "Remote moves", n: "The remote branch now points at the developer's history and the teammate's commits are no longer on it." },
+    { f: 2, t: 1, l: "Symptom", n: "The teammate's next pull reports a diverged history and the commits seem to be gone." },
+    { f: 2, t: 3, l: "Look locally", n: "The teammate's own clone still has the commits and git reflog lists them by position." },
+    { f: 2, t: 1, l: "Restore", n: "Create a branch at the lost commit with git branch rescue and push it so the work is safe." },
+    { f: 0, t: 1, l: "Merge it back", n: "The developer rebases onto the rescue branch and pushes again, without losing either set of changes." },
+    { f: 1, t: 0, l: "Prevent", n: "Protect shared branches and use force-with-lease instead of a plain force push." }
+  ] },
+{ id: "f-git-secret-committed", module: "git", kind: "failure", lesson: "git/hooks-signing-and-secrets-in-history", title: "Failure and recovery: a secret reaches the repository", summary: "Rotating the secret matters more than rewriting history.",
+  actors: ["Developer", "Repository", "Scanner", "Security"],
+  steps: [
+    { f: 0, t: 1, l: "Commit a config", n: "A developer commits a file that contains a real access key and pushes it to the shared repository." },
+    { f: 1, t: 2, l: "Scan finds it", n: "A scheduled scanner finds a string that matches the key pattern in the latest commit." },
+    { f: 2, t: 3, l: "Alert", n: "The scanner opens a finding and the security team is told which key and which commit." },
+    { f: 3, t: 0, l: "Revoke first", n: "The key is revoked and a new one issued before anything else, because anyone who cloned has the old one." },
+    { f: 3, t: 1, l: "Rewrite history", n: "The file is removed from all commits with a history rewrite tool and the repository is force pushed." },
+    { f: 1, t: 0, l: "Clean clones", n: "Everyone re-clones or resets, since old clones and forks still hold the secret." },
+    { f: 0, t: 1, l: "Move the secret", n: "The new key is read from a secret manager at runtime and the file now holds only a placeholder." },
+    { f: 2, t: 1, l: "Prevent", n: "A pre-commit hook and a push check block the pattern before it reaches the remote." }
+  ] },
+{ id: "f-bash-unset-variable", module: "bash", kind: "failure", lesson: "bash/safe-automation", title: "Failure and recovery: an unset variable deletes the wrong path", summary: "A tiny script bug becomes a large deletion.",
+  actors: ["Script", "Shell", "Filesystem", "Reviewer"],
+  steps: [
+    { f: 0, t: 1, l: "The script", n: "A cleanup script runs rm -rf with a variable named BUILD_DIR followed by a slash." },
+    { f: 0, t: 1, l: "Variable empty", n: "A typo means BUILD_DIR was never set, so the shell expands it to an empty string." },
+    { f: 1, t: 2, l: "Dangerous path", n: "The command becomes rm -rf slash, and only the protection of the system saves the whole machine." },
+    { f: 2, t: 0, l: "Damage", n: "Files under directories the user owns are deleted before the command is stopped." },
+    { f: 3, t: 0, l: "Review", n: "A reviewer asks why the script did not stop when the variable was empty." },
+    { f: 0, t: 1, l: "Fix the script", n: "Add set -u so unset variables are an error, and use the expansion that fails when the value is empty." },
+    { f: 0, t: 2, l: "Guard", n: "Check that the path starts with the expected directory and exists before any delete." },
+    { f: 2, t: 0, l: "Recover", n: "Restore from backup and add a dry run option that only prints what would be removed." }
+  ] },
+{ id: "f-bash-partial-write", module: "bash", kind: "failure", lesson: "bash/temporary-files-and-atomic-writes", title: "Failure and recovery: a half-written file is read by another job", summary: "Atomic writes prevent torn reads.",
+  actors: ["Writer", "Temp file", "Reader", "Filesystem"],
+  steps: [
+    { f: 0, t: 1, l: "Write directly", n: "A job writes its report straight to the final file name over a few seconds." },
+    { f: 2, t: 3, l: "Read too early", n: "A second job reads the same file in the middle of the write." },
+    { f: 3, t: 2, l: "Truncated data", n: "The reader gets half the lines and builds a wrong summary without any error." },
+    { f: 2, t: 0, l: "Spot it", n: "Numbers in the summary do not match, and the file modified time is within the reader's run." },
+    { f: 0, t: 1, l: "Fix: temp file", n: "The writer creates a temporary file in the same directory and writes everything there." },
+    { f: 1, t: 3, l: "Fix: rename", n: "A rename onto the final name is atomic, so the reader sees either the old file or the complete new one." },
+    { f: 0, t: 1, l: "Clean up", n: "A trap removes the temp file if the script fails, so no stale partial files remain." },
+    { f: 2, t: 0, l: "Verify", n: "Re-running both jobs together always gives a complete report." }
+  ] },
+{ id: "f-python-unhandled-timeout", module: "python", kind: "failure", lesson: "python/http-apis-and-json", title: "Failure and recovery: a request with no timeout hangs a script", summary: "One slow API stalls a whole job.",
+  actors: ["Script", "HTTP client", "API", "Scheduler"],
+  steps: [
+    { f: 0, t: 1, l: "Normal call", n: "A nightly script calls an API with the requests library and finishes in seconds." },
+    { f: 1, t: 2, l: "API slows", n: "The API stops answering and keeps the connection open without sending data." },
+    { f: 1, t: 1, l: "Wait forever", n: "The call has no timeout, so it waits and the script never reaches its next line." },
+    { f: 3, t: 0, l: "Symptom", n: "The scheduler reports the job still running hours later and the next run is skipped or overlaps." },
+    { f: 3, t: 0, l: "Diagnose", n: "Stack dump or py-spy shows the thread blocked in a socket read inside the client." },
+    { f: 0, t: 1, l: "Fix", n: "Set a connect and read timeout on every call and catch the timeout error." },
+    { f: 0, t: 1, l: "Retry safely", n: "Retry with a small backoff and a limit, then fail clearly with a message and a non-zero exit code." },
+    { f: 3, t: 0, l: "Verify", n: "The scheduler shows the job ending within its time limit even when the API is down." }
+  ] },
+{ id: "f-python-wrong-environment", module: "python", kind: "failure", lesson: "python/basics-and-environments", title: "Failure and recovery: the wrong Python environment breaks a deploy", summary: "Works on my machine, fails on the server.",
+  actors: ["Developer", "Server", "Package index", "Virtualenv"],
+  steps: [
+    { f: 0, t: 1, l: "Works locally", n: "The script runs fine on a laptop where the packages were installed globally over time." },
+    { f: 0, t: 1, l: "Deploy", n: "The script is copied to a server without a lock file or a recorded list of packages." },
+    { f: 1, t: 1, l: "Import error", n: "The server reports a missing module, and after installing it, a newer version behaves differently." },
+    { f: 1, t: 0, l: "Symptom", n: "The job fails with ModuleNotFoundError, then with a changed function signature." },
+    { f: 0, t: 3, l: "Investigate", n: "pip freeze on both machines shows different versions and which python is used is not the same." },
+    { f: 0, t: 3, l: "Fix", n: "Create a virtualenv, pin versions in a requirements file with hashes, and install from it." },
+    { f: 0, t: 1, l: "Automate", n: "The deploy step creates the environment from the lock file, so every machine is the same." },
+    { f: 1, t: 0, l: "Verify", n: "A fresh server runs the script with the same versions and the same results." }
+  ] },
+{ id: "f-net-dns-stale", module: "networking", kind: "failure", lesson: "networking/dns", title: "Failure and recovery: a stale DNS answer sends traffic to the old server", summary: "Cached records outlive a cutover.",
+  actors: ["Client", "Resolver", "Authoritative DNS", "Old server"],
+  steps: [
+    { f: 0, t: 1, l: "Normal lookup", n: "A client asks a resolver for the service name and receives an address with a long time to live." },
+    { f: 1, t: 2, l: "Cutover", n: "The team moves the service to a new address and updates the record at the authoritative server." },
+    { f: 1, t: 0, l: "Cache holds", n: "The resolver keeps serving the old answer until the cached time to live runs out." },
+    { f: 0, t: 3, l: "Symptom", n: "Some users reach the old server, which is draining, and see errors while others work fine." },
+    { f: 0, t: 1, l: "Diagnose", n: "dig shows different answers from different resolvers and the remaining time to live in each." },
+    { f: 2, t: 1, l: "Fix", n: "Wait for the time to live, or flush the caches you control, and keep the old server serving until then." },
+    { f: 2, t: 1, l: "Next time", n: "Lower the time to live a day before a planned cutover and raise it again afterwards." },
+    { f: 0, t: 3, l: "Verify", n: "dig from several resolvers returns the new address and the old server sees no more traffic." }
+  ] },
+{ id: "f-net-mtu-blackhole", module: "networking", kind: "failure", lesson: "networking/latency-mtu-and-network-performance", title: "Failure and recovery: a smaller path MTU drops large packets", summary: "Small requests work, large ones hang.",
+  actors: ["Client", "Router", "Tunnel", "Server"],
+  steps: [
+    { f: 0, t: 1, l: "Normal path", n: "Packets of 1500 bytes travel from client to server over ordinary links." },
+    { f: 1, t: 2, l: "Tunnel added", n: "A VPN tunnel is added on the path and its overhead lowers the usable packet size to about 1400 bytes." },
+    { f: 1, t: 0, l: "Drop", n: "A large packet with the do not fragment bit cannot fit and the router drops it, but the message back is blocked." },
+    { f: 0, t: 3, l: "Symptom", n: "Pings and small requests work, but a large download or a TLS handshake stalls and times out." },
+    { f: 0, t: 1, l: "Diagnose", n: "ping with a set size and the do not fragment flag finds the largest size that passes." },
+    { f: 0, t: 2, l: "Fix", n: "Lower the MTU on the tunnel interface or clamp the segment size so packets fit." },
+    { f: 1, t: 0, l: "Allow messages", n: "Permit the needed ICMP messages so path discovery can work for other traffic." },
+    { f: 0, t: 3, l: "Verify", n: "Large transfers complete at normal speed and the handshake no longer hangs." }
+  ] },
+{ id: "f-docker-restart-loop", module: "docker", kind: "failure", lesson: "docker/debugging-containers", title: "Failure and recovery: a container restarts in a loop", summary: "The exit code points at the cause.",
+  actors: ["Orchestrator", "Container", "Image", "Operator"],
+  steps: [
+    { f: 0, t: 1, l: "Start", n: "The orchestrator starts a new container from the latest image tag." },
+    { f: 1, t: 1, l: "Crash", n: "The main process exits right after start with a non-zero exit code." },
+    { f: 0, t: 1, l: "Restart", n: "The restart policy starts it again and again, with a growing delay between attempts." },
+    { f: 3, t: 0, l: "Symptom", n: "The status shows restarting or crash loop and the service is never ready." },
+    { f: 3, t: 1, l: "Read logs", n: "docker logs shows a missing environment variable that the new image now requires." },
+    { f: 3, t: 1, l: "Check exit code", n: "Code 1 points at the application and 137 would point at memory limits being hit." },
+    { f: 3, t: 2, l: "Fix", n: "Provide the variable or roll back to the previous image tag that worked." },
+    { f: 0, t: 1, l: "Verify", n: "The container stays running, passes its health check, and the restart count stops increasing." }
+  ] },
+{ id: "f-docker-rate-limit", module: "docker", kind: "failure", lesson: "docker/registries-and-supply-chain", title: "Failure and recovery: an image pull hits the registry rate limit", summary: "Builds stall on a public registry.",
+  actors: ["CI runner", "Registry", "Mirror", "Team"],
+  steps: [
+    { f: 0, t: 1, l: "Normal pulls", n: "The pipeline pulls base images from a public registry without logging in." },
+    { f: 0, t: 1, l: "Many builds", n: "A busy day produces many builds from the same shared address." },
+    { f: 1, t: 0, l: "Limit reached", n: "The registry returns too many requests and refuses further pulls for a few hours." },
+    { f: 3, t: 0, l: "Symptom", n: "Builds fail at the pull step with a rate limit message, even though the code did not change." },
+    { f: 3, t: 1, l: "Confirm", n: "The response headers show the remaining pulls and the time when the limit resets." },
+    { f: 3, t: 2, l: "Fix now", n: "Log in with a registry account to raise the limit, or retry after the reset." },
+    { f: 3, t: 2, l: "Fix for good", n: "Mirror the needed base images into a private registry or pull through a cache." },
+    { f: 0, t: 2, l: "Verify", n: "Builds pull from the private registry and no longer depend on the public limit." }
+  ] },
+{ id: "f-cicd-bad-deploy", module: "cicd", kind: "failure", lesson: "cicd/deployment-strategies", title: "Failure and recovery: a bad release is caught by a canary", summary: "Small blast radius, fast rollback.",
+  actors: ["Pipeline", "Canary", "Monitoring", "Operator"],
+  steps: [
+    { f: 0, t: 1, l: "Build and test", n: "The pipeline builds the release and all tests pass, so it is approved for production." },
+    { f: 0, t: 1, l: "Canary start", n: "Only five percent of traffic is routed to the new version while ninety five stays on the old one." },
+    { f: 1, t: 2, l: "Metrics flow", n: "The canary reports errors and latency, and monitoring compares them with the old version." },
+    { f: 2, t: 0, l: "Threshold breach", n: "The canary error rate is ten times higher than the baseline for three minutes in a row." },
+    { f: 0, t: 1, l: "Automatic abort", n: "The pipeline stops the rollout and sends all traffic back to the old version without waiting for a person." },
+    { f: 3, t: 2, l: "Investigate", n: "The operator reads the canary logs and finds a missing database column the new code expects." },
+    { f: 3, t: 0, l: "Fix forward", n: "A migration is added and tested, and a new release is built." },
+    { f: 0, t: 1, l: "Verify", n: "The next canary stays within thresholds, so the rollout moves from five percent to fifty and then to everyone." }
+  ] },
+{ id: "f-cicd-flaky-pipeline", module: "cicd", kind: "failure", lesson: "cicd/testing-and-quality-gates", title: "Failure and recovery: a flaky test erodes trust in the pipeline", summary: "Retries hide the problem, quarantine fixes it.",
+  actors: ["Developer", "Pipeline", "Test", "Tracker"],
+  steps: [
+    { f: 0, t: 1, l: "Green most days", n: "The pipeline passes on most runs and developers merge without thinking about it." },
+    { f: 1, t: 2, l: "Random failure", n: "One test fails about one run in ten with a timing error that has nothing to do with the change." },
+    { f: 0, t: 1, l: "Rerun habit", n: "Developers press the rerun button until it passes and stop reading the failures." },
+    { f: 1, t: 0, l: "Cost", n: "Each rerun adds ten minutes, and a real failure is dismissed as just the flaky one." },
+    { f: 3, t: 1, l: "Measure", n: "A report of pass and fail by test over the last fifty runs shows which test is flaky." },
+    { f: 3, t: 2, l: "Quarantine", n: "The flaky test is moved to a separate non-blocking job with an owner and a due date." },
+    { f: 3, t: 2, l: "Fix", n: "The test waits for a condition instead of a fixed sleep, and its shared state is isolated." },
+    { f: 1, t: 0, l: "Restore", n: "The test returns to the blocking set and the failure rate is tracked to stay at zero." }
+  ] },
+{ id: "f-k8s-crashloop", module: "kubernetes", kind: "failure", lesson: "kubernetes/debugging-kubernetes-workloads", title: "Failure and recovery: a pod stuck in CrashLoopBackOff", summary: "Read the events and the previous logs.",
+  actors: ["Kubelet", "Pod", "API server", "Operator"],
+  steps: [
+    { f: 0, t: 1, l: "Create", n: "A deployment rollout creates new pods with a changed config map reference." },
+    { f: 1, t: 1, l: "Start fails", n: "The container starts, the application exits with an error, and the kubelet records the exit code." },
+    { f: 0, t: 1, l: "Back off", n: "The kubelet restarts the container with growing delays, and the status becomes CrashLoopBackOff." },
+    { f: 3, t: 2, l: "Symptom", n: "kubectl get pods shows a growing restart count and the pod never becomes ready." },
+    { f: 3, t: 2, l: "Describe", n: "kubectl describe pod shows the last state, the exit code and events about back-off restarting." },
+    { f: 3, t: 1, l: "Previous logs", n: "kubectl logs with the previous flag shows the application complaining about a missing config key." },
+    { f: 3, t: 2, l: "Fix", n: "Correct the config map key, apply it, and roll the deployment so the pods pick it up." },
+    { f: 2, t: 3, l: "Verify", n: "Pods become ready, the restart count stays at zero, and the rollout reports successfully rolled out." }
+  ] },
+{ id: "f-k8s-service-no-endpoints", module: "kubernetes", kind: "failure", lesson: "kubernetes/services-and-ingress", title: "Failure and recovery: a Service has no endpoints", summary: "Selectors and labels must match.",
+  actors: ["Client", "Service", "Pods", "Operator"],
+  steps: [
+    { f: 0, t: 1, l: "Working service", n: "A Service selects pods by the label app equals web and traffic reaches them." },
+    { f: 3, t: 2, l: "Relabel", n: "A change renames the pod label to app equals website but leaves the Service selector unchanged." },
+    { f: 1, t: 2, l: "Mismatch", n: "The Service now matches zero pods, so its list of endpoints becomes empty." },
+    { f: 0, t: 1, l: "Symptom", n: "Clients get connection refused or timeouts even though every pod is running and ready." },
+    { f: 3, t: 1, l: "Check endpoints", n: "kubectl get endpoints shows none for the Service, which points at the selector." },
+    { f: 3, t: 1, l: "Compare labels", n: "kubectl get pods with show-labels and the Service selector show different values." },
+    { f: 3, t: 1, l: "Fix", n: "Make the selector and pod labels match, and prefer one shared label set in a single template." },
+    { f: 0, t: 1, l: "Verify", n: "Endpoints list the pod addresses and requests reach the pods again." }
+  ] },
+{ id: "f-k8sops-etcd-quorum", module: "k8s-ops", kind: "failure", lesson: "k8s-ops/etcd-backup-and-restore", title: "Failure and recovery: etcd loses quorum", summary: "Restore from a snapshot, then bring members back.",
+  actors: ["Control plane", "etcd", "Backup", "Operator"],
+  steps: [
+    { f: 0, t: 1, l: "Healthy cluster", n: "Three etcd members agree on every write and the API server answers quickly." },
+    { f: 1, t: 1, l: "Members fail", n: "Two of three members are lost together when a rack fails, and quorum needs two." },
+    { f: 0, t: 1, l: "Writes stop", n: "The API server cannot write, so kubectl commands time out and no new pods can be scheduled." },
+    { f: 3, t: 0, l: "Symptom", n: "Existing pods keep running, but nothing changes, and the API server logs say etcd is unavailable." },
+    { f: 3, t: 2, l: "Locate backup", n: "The operator finds the latest snapshot and checks its date and size." },
+    { f: 3, t: 1, l: "Restore", n: "A snapshot is restored into a new data directory and a fresh cluster of members is started from it." },
+    { f: 3, t: 0, l: "Rejoin", n: "The API servers point at the restored members and nodes reconnect." },
+    { f: 3, t: 0, l: "Verify", n: "kubectl shows the expected objects, the member list is healthy, and a new snapshot is taken." }
+  ] },
+{ id: "f-k8sops-upgrade-skew", module: "k8s-ops", kind: "failure", lesson: "k8s-ops/upgrading-clusters-safely", title: "Failure and recovery: an upgrade breaks workloads", summary: "Remove deprecated APIs before upgrading.",
+  actors: ["Operator", "Control plane", "Nodes", "Workloads"],
+  steps: [
+    { f: 0, t: 1, l: "Plan", n: "The operator reads the release notes and plans a minor version upgrade, one version at a time." },
+    { f: 0, t: 1, l: "Upgrade control plane", n: "The control plane is upgraded first and starts serving the newer API version." },
+    { f: 1, t: 3, l: "Removed API", n: "A manifest uses an API version that was removed, so applying it now returns an error." },
+    { f: 3, t: 0, l: "Symptom", n: "A deployment pipeline fails to apply, and a controller using the old API stops reconciling." },
+    { f: 0, t: 1, l: "Find usages", n: "A scan of the manifests and the API server metrics lists clients still calling deprecated APIs." },
+    { f: 0, t: 3, l: "Fix", n: "Update the manifests to the supported API version and redeploy the affected workloads." },
+    { f: 0, t: 2, l: "Continue", n: "Nodes are drained and upgraded one at a time, with the drain respecting disruption budgets." },
+    { f: 1, t: 3, l: "Verify", n: "All nodes report the new version and every workload is ready." }
+  ] },
+{ id: "f-tf-state-lock", module: "terraform", kind: "failure", lesson: "terraform/state", title: "Failure and recovery: a stuck state lock blocks every plan", summary: "Unlock safely, only when no run is active.",
+  actors: ["Engineer", "Terraform", "State backend", "Pipeline"],
+  steps: [
+    { f: 0, t: 1, l: "Normal run", n: "Terraform locks the remote state, plans, applies, and releases the lock." },
+    { f: 1, t: 2, l: "Crash", n: "The apply is interrupted when the runner is killed, so the lock is never released." },
+    { f: 0, t: 1, l: "Next plan", n: "An engineer runs plan and sees an error that the state is locked by another operation." },
+    { f: 0, t: 3, l: "Check", n: "The lock info shows a run id and a time, and the pipeline shows no active run." },
+    { f: 0, t: 1, l: "Confirm", n: "The engineer checks that no apply is really running before touching the lock." },
+    { f: 0, t: 1, l: "Unlock", n: "terraform force-unlock with the lock id releases it, and the person records why it was done." },
+    { f: 0, t: 1, l: "Plan again", n: "A new plan shows whether the interrupted apply left a partial change to review." },
+    { f: 1, t: 2, l: "Prevent", n: "Add a timeout and retries to the runner and keep applies in one serialised pipeline job." }
+  ] },
+{ id: "f-tf-drift", module: "terraform", kind: "failure", lesson: "terraform/workflows-and-drift", title: "Failure and recovery: a manual change causes drift", summary: "Plan finds it and code decides what is right.",
+  actors: ["Engineer", "Console", "Terraform", "State"],
+  steps: [
+    { f: 0, t: 1, l: "In sync", n: "The code, the state and the real resources all agree and the plan shows no changes." },
+    { f: 0, t: 1, l: "Manual edit", n: "During an incident someone widens a security group rule in the console." },
+    { f: 2, t: 3, l: "Drift exists", n: "The real resource now differs from the state and from the code." },
+    { f: 0, t: 2, l: "Scheduled plan", n: "A nightly plan reports one change that would remove the new rule." },
+    { f: 0, t: 1, l: "Decide", n: "The team asks whether the manual change should stay or be removed." },
+    { f: 0, t: 1, l: "Keep", n: "If it should stay, update the code so it matches and run the plan to confirm no changes." },
+    { f: 0, t: 1, l: "Revert", n: "If not, apply to restore the declared value, and note it in the incident record." },
+    { f: 0, t: 3, l: "Prevent", n: "Restrict console edits and run the drift plan on a schedule with alerts." }
+  ] },
+{ id: "f-cloud-region-outage", module: "cloud", kind: "failure", lesson: "cloud/high-availability-and-disaster-recovery", title: "Failure and recovery: a region outage and a failover", summary: "Rehearsed failover turns a disaster into a drill.",
+  actors: ["User", "DNS", "Primary region", "Standby region"],
+  steps: [
+    { f: 0, t: 1, l: "Normal", n: "Traffic goes through DNS to the primary region and the standby receives replicated data." },
+    { f: 2, t: 2, l: "Region fails", n: "A power and network failure makes the primary region unavailable to users." },
+    { f: 3, t: 2, l: "Health check", n: "Health checks from outside the region fail three times in a row." },
+    { f: 1, t: 3, l: "Failover", n: "DNS answers change to the standby region, or a traffic manager moves users, within the record's time to live." },
+    { f: 3, t: 3, l: "Promote data", n: "The standby database is promoted and the application config points at it." },
+    { f: 0, t: 3, l: "Users recover", n: "New requests succeed in the standby region after a short interruption." },
+    { f: 3, t: 2, l: "Failback", n: "When the primary is healthy again, data is synced back before traffic is moved in a quiet window." },
+    { f: 3, t: 1, l: "Review", n: "The measured recovery time is compared with the target and the runbook is updated." }
+  ] },
+{ id: "f-cloud-cost-spike", module: "cloud", kind: "failure", lesson: "cloud/managed-services-and-cost", title: "Failure and recovery: an unexpected cloud bill", summary: "Budgets and tags find the owner fast.",
+  actors: ["Budget alert", "Cost report", "Owner", "Resource"],
+  steps: [
+    { f: 0, t: 1, l: "Normal spend", n: "Daily spend follows the usual pattern and stays below the monthly budget line." },
+    { f: 3, t: 3, l: "Runaway resource", n: "A test job leaves a large cluster running and a log bucket with no lifecycle rule grows daily." },
+    { f: 0, t: 1, l: "Alert", n: "A budget alert fires at eighty percent of the month on day twelve." },
+    { f: 1, t: 2, l: "Break down", n: "The cost report grouped by tag and service shows one project accounting for most of the rise." },
+    { f: 2, t: 3, l: "Owner confirms", n: "The tag points at the owner who confirms the cluster is not needed." },
+    { f: 2, t: 3, l: "Stop the cost", n: "The cluster is deleted and the bucket gets an expiry rule for old data." },
+    { f: 1, t: 2, l: "Prevent", n: "Tags become mandatory, budgets get alerts per team, and idle resources are reported weekly." },
+    { f: 0, t: 1, l: "Verify", n: "Daily spend returns to the normal line the next day." }
+  ] },
+{ id: "f-iam-access-denied", module: "cloud-iam", kind: "failure", lesson: "cloud-iam/debugging-access-denied-and-cloud-security-incidents", title: "Failure and recovery: debugging an AccessDenied error", summary: "Work out which layer said no.",
+  actors: ["Engineer", "Identity", "Policy engine", "Resource"],
+  steps: [
+    { f: 0, t: 3, l: "Request", n: "A deployment role calls an action on a storage bucket and the call returns AccessDenied." },
+    { f: 2, t: 3, l: "Identity policy", n: "The engineer checks that the role's own policy allows the action on that exact resource." },
+    { f: 2, t: 3, l: "Resource policy", n: "The bucket policy has an explicit deny for requests that do not come through the private endpoint." },
+    { f: 2, t: 3, l: "Boundaries", n: "A permissions boundary or an organisation policy can also remove permissions, so they are checked too." },
+    { f: 1, t: 2, l: "Find the layer", n: "The decision log shows an explicit deny in the bucket policy, and an explicit deny always wins." },
+    { f: 0, t: 2, l: "Fix", n: "Route the call through the private endpoint, or update the policy condition for this role." },
+    { f: 0, t: 3, l: "Retry", n: "The same call now succeeds, and the change is made in code, not in the console." },
+    { f: 1, t: 2, l: "Keep least privilege", n: "The fix adds one condition and no wildcard, and the access review notes it." }
+  ] },
+{ id: "f-iam-leaked-key", module: "cloud-iam", kind: "failure", lesson: "cloud-iam/logging-detection-and-audit-trails", title: "Failure and recovery: a leaked access key", summary: "Revoke first, investigate second.",
+  actors: ["Attacker", "Key", "Audit log", "Security team"],
+  steps: [
+    { f: 0, t: 1, l: "Key leaks", n: "A long-lived access key is pushed into a public repository by mistake." },
+    { f: 0, t: 1, l: "Abuse", n: "Within minutes, a bot uses the key to start large instances in many regions." },
+    { f: 2, t: 3, l: "Detection", n: "A usage anomaly alert and the audit log show unusual calls from an unknown address." },
+    { f: 3, t: 1, l: "Revoke", n: "The security team deactivates the key at once, before anything else is done." },
+    { f: 3, t: 2, l: "Investigate", n: "The audit log lists every call made with that key and the resources created." },
+    { f: 3, t: 3, l: "Clean up", n: "Unwanted resources are deleted, and any new credentials created by the attacker are removed." },
+    { f: 3, t: 1, l: "Replace", n: "The workload moves to short-lived role credentials so there is no long-lived key to leak." },
+    { f: 3, t: 2, l: "Prevent", n: "Secret scanning, least-privilege roles and cost alerts shorten the time to notice next time." }
+  ] },
+{ id: "f-obs-alert-storm", module: "observability", kind: "failure", lesson: "observability/alerting-and-dashboards", title: "Failure and recovery: an alert storm buries the real problem", summary: "Group and route so one cause is one page.",
+  actors: ["Service", "Alertmanager", "On-call", "Dashboard"],
+  steps: [
+    { f: 0, t: 1, l: "One root cause", n: "A database slows down and fifty services that depend on it start timing out." },
+    { f: 1, t: 2, l: "Fifty alerts", n: "Each service fires its own alert and the on-call phone receives fifty pages in two minutes." },
+    { f: 2, t: 2, l: "Overwhelm", n: "The responder cannot tell which alert is the cause and which are the effects." },
+    { f: 2, t: 3, l: "Group", n: "Alerts are grouped by cluster and dependency so a single message shows the common cause." },
+    { f: 2, t: 3, l: "Inhibit", n: "A rule suppresses the downstream alerts while the database alert is firing." },
+    { f: 2, t: 3, l: "Find cause", n: "The dashboard for the database shows slow queries and connection saturation." },
+    { f: 2, t: 1, l: "Fix", n: "Raise the pool and kill the long query, and services recover without any change to the services." },
+    { f: 1, t: 2, l: "Verify", n: "Alerts resolve in order, the page count is one, and the rules are kept for the next time." }
+  ] },
+{ id: "f-obs-high-cardinality", module: "observability", kind: "failure", lesson: "observability/telemetry-cost-and-cardinality", title: "Failure and recovery: high cardinality crashes the metrics server", summary: "One label can create millions of series.",
+  actors: ["Application", "Prometheus", "Dashboard", "Engineer"],
+  steps: [
+    { f: 0, t: 1, l: "Normal metrics", n: "A request counter carries labels for method and status code, giving a few dozen series." },
+    { f: 0, t: 1, l: "New label", n: "A change adds the user id as a label so that debugging a single user is easier." },
+    { f: 1, t: 1, l: "Series explode", n: "Every user becomes a new series, and memory use climbs with each scrape." },
+    { f: 2, t: 3, l: "Symptom", n: "Dashboards slow down, queries time out, and the server is killed for running out of memory." },
+    { f: 3, t: 1, l: "Find it", n: "A query for the series count by metric name shows one metric with millions of series." },
+    { f: 3, t: 0, l: "Remove", n: "The label is dropped in code and relabelling drops it at scrape time right away." },
+    { f: 3, t: 1, l: "Keep detail", n: "Per-user data goes to logs or traces, which are built for high cardinality." },
+    { f: 1, t: 2, l: "Prevent", n: "A limit on series per target and a review check on new labels stop it next time." }
+  ] },
+{ id: "f-sre-error-budget", module: "sre", kind: "failure", lesson: "sre/slos-and-error-budgets", title: "Failure and recovery: the error budget runs out", summary: "Reliability work takes priority.",
+  actors: ["Service", "SLO tracker", "Product team", "SRE"],
+  steps: [
+    { f: 0, t: 1, l: "Budget set", n: "A ninety nine point nine percent target gives the service forty three minutes of errors per month." },
+    { f: 0, t: 1, l: "Bad release", n: "A release causes errors for thirty minutes and a second incident adds fifteen more." },
+    { f: 1, t: 1, l: "Budget gone", n: "The tracker shows the monthly budget fully used on day nineteen, with eleven days still to go." },
+    { f: 1, t: 2, l: "Policy", n: "The agreed policy says feature releases pause and reliability work comes first until the budget recovers." },
+    { f: 3, t: 2, l: "Review", n: "The SRE and product team list the causes and choose the fixes that remove the most risk." },
+    { f: 2, t: 0, l: "Fix", n: "Add a canary step, a rollback test, and a timeout fix for the slow dependency." },
+    { f: 2, t: 3, l: "Resume", n: "Releases restart when the rolling window shows budget back, with the new checks in place." },
+    { f: 1, t: 2, l: "Verify", n: "The next month ends with budget left and fewer pages." }
+  ] },
+{ id: "f-sre-bad-change", module: "sre", kind: "failure", lesson: "sre/incident-response", title: "Failure and recovery: a bad change during an incident", summary: "Recent changes are the first suspect.",
+  actors: ["Responder", "Change log", "Service", "Incident lead"],
+  steps: [
+    { f: 0, t: 1, l: "Alert", n: "Error rates rise at 10:02 and the responder starts an incident." },
+    { f: 3, t: 0, l: "Roles", n: "The incident lead assigns a responder, a communicator and a note taker." },
+    { f: 0, t: 1, l: "Ask what changed", n: "The change log shows a config rollout at 10:00 to the same service." },
+    { f: 0, t: 2, l: "Hypothesis", n: "The rollout is the leading suspect because the timing and the affected service match." },
+    { f: 0, t: 2, l: "Mitigate", n: "Roll back the config first, since a rollback is quicker and safer than diagnosing under pressure." },
+    { f: 2, t: 0, l: "Recovery", n: "Error rates fall within three minutes, which confirms the hypothesis." },
+    { f: 3, t: 0, l: "Follow up", n: "The team writes down the timeline, and the cause is found later in calm conditions." },
+    { f: 3, t: 1, l: "Improve", n: "Staged rollouts and an automatic rollback on error spikes become action items." }
+  ] },
+{ id: "f-sec-ransomware", module: "security", kind: "failure", lesson: "security/ransomware-resilience-and-recovery", title: "Failure and recovery: ransomware and a clean restore", summary: "Immutable backups decide the outcome.",
+  actors: ["Attacker", "Servers", "Backups", "Response team"],
+  steps: [
+    { f: 0, t: 1, l: "Foothold", n: "A stolen password for a remote access account gives the attacker a way into the network." },
+    { f: 0, t: 1, l: "Spread", n: "The attacker moves between servers and gains an administrator account." },
+    { f: 0, t: 2, l: "Backups targeted", n: "The attacker tries to delete backups, but the immutable copies cannot be changed before their retention date." },
+    { f: 0, t: 1, l: "Encrypt", n: "Files are encrypted and a ransom note appears on the servers." },
+    { f: 3, t: 1, l: "Contain", n: "The response team isolates affected network segments and disables the stolen accounts." },
+    { f: 3, t: 2, l: "Restore", n: "Clean systems are rebuilt from known good images and data is restored from the immutable backup." },
+    { f: 3, t: 1, l: "Harden", n: "Multi-factor authentication, network segmentation and tested restore times are put in place." },
+    { f: 3, t: 2, l: "Review", n: "The timeline and gaps become action items, and the restore time is compared with the target." }
+  ] },
+{ id: "f-sec-vuln-patch", module: "security", kind: "failure", lesson: "security/vulnerability-management-and-security-incidents", title: "Failure and recovery: a critical vulnerability is announced", summary: "Know where it runs, then patch by priority.",
+  actors: ["Advisory", "Inventory", "Team", "Pipeline"],
+  steps: [
+    { f: 0, t: 1, l: "Advisory", n: "A critical flaw is announced in a widely used library, with a fix released the same day." },
+    { f: 1, t: 2, l: "Find usage", n: "The software inventory lists every service and image that includes the vulnerable version." },
+    { f: 2, t: 2, l: "Prioritise", n: "Internet-facing services go first, then internal ones, and unused images are removed." },
+    { f: 2, t: 3, l: "Patch", n: "The dependency is updated and the pipeline rebuilds and tests each affected service." },
+    { f: 3, t: 1, l: "Deploy", n: "Fixed versions are rolled out in stages, with the same checks as any release." },
+    { f: 1, t: 2, l: "Verify", n: "A rescan shows no remaining vulnerable versions in running workloads." },
+    { f: 2, t: 0, l: "Communicate", n: "The team records what was affected, when it was fixed and what monitoring watched meanwhile." },
+    { f: 1, t: 2, l: "Improve", n: "An automatic dependency update and a scan on every build cut the time next time." }
+  ] },
+{ id: "f-ans-partial-failure", module: "ansible", kind: "failure", lesson: "ansible/playbooks-tasks-and-idempotence", title: "Failure and recovery: a playbook fails halfway across a fleet", summary: "Idempotent tasks make re-running safe.",
+  actors: ["Operator", "Ansible", "Hosts", "Load balancer"],
+  steps: [
+    { f: 0, t: 1, l: "Run", n: "The operator runs a playbook that updates the configuration on twenty web servers." },
+    { f: 1, t: 2, l: "Rolling batch", n: "Without a batch limit, all hosts restart their service at nearly the same moment." },
+    { f: 2, t: 2, l: "Error", n: "A template contains a typo, and the service fails to start on every host that applied it." },
+    { f: 2, t: 3, l: "Outage", n: "The load balancer sees every back end as unhealthy and the site is down." },
+    { f: 0, t: 1, l: "Stop", n: "The operator stops the play and uses the previous config from version control to restore service." },
+    { f: 0, t: 1, l: "Fix", n: "Correct the template, run a syntax check, and use check mode with diff before applying." },
+    { f: 0, t: 1, l: "Re-run", n: "Idempotent tasks skip hosts that are already correct and only change what is still wrong." },
+    { f: 1, t: 3, l: "Prevent", n: "Use serial batches and a failure threshold so one bad host stops the run early." }
+  ] },
+{ id: "f-ans-vault-password", module: "ansible", kind: "failure", lesson: "ansible/vault-secrets-and-safe-practice", title: "Failure and recovery: a lost Vault password", summary: "Plan secret recovery before you need it.",
+  actors: ["Operator", "Vault file", "Secret store", "Playbook"],
+  steps: [
+    { f: 0, t: 1, l: "Encrypted vars", n: "Secrets for the playbooks are stored in an encrypted vault file." },
+    { f: 0, t: 1, l: "Password gone", n: "The one engineer who knew the vault password leaves and the password was only on their laptop." },
+    { f: 3, t: 1, l: "Failure", n: "The playbook cannot decrypt the file and every deploy fails with a decryption error." },
+    { f: 0, t: 2, l: "Look for copies", n: "The team checks the secret store and the pipeline for a stored copy of the password." },
+    { f: 0, t: 2, l: "Recover", n: "If a copy exists, it is used to re-key the vault with a new password stored in the secret store." },
+    { f: 0, t: 1, l: "Last resort", n: "If none exists, every secret in the file must be rotated at its source and the file recreated." },
+    { f: 0, t: 1, l: "Prevent", n: "The password is held in the shared secret manager with two named owners and an access log." },
+    { f: 3, t: 0, l: "Verify", n: "A fresh clone of the repository decrypts and runs in the pipeline using the stored password." }
+  ] },
+{ id: "f-db-replica-lag", module: "databases", kind: "failure", lesson: "databases/replication-and-failover", title: "Failure and recovery: replica lag serves stale data", summary: "Reads from a replica can be behind.",
+  actors: ["Application", "Primary", "Replica", "Operator"],
+  steps: [
+    { f: 0, t: 1, l: "Normal", n: "The application writes to the primary and reads from a replica a few milliseconds behind." },
+    { f: 0, t: 1, l: "Heavy write", n: "A bulk update runs on the primary and produces a large amount of change data quickly." },
+    { f: 1, t: 2, l: "Lag grows", n: "The replica applies changes more slowly and falls minutes behind." },
+    { f: 0, t: 2, l: "Symptom", n: "Users save a change and then see the old value, and support calls say it did not save." },
+    { f: 3, t: 2, l: "Measure", n: "The replica lag metric and replication status show the delay and the slow apply thread." },
+    { f: 3, t: 1, l: "Mitigate", n: "Send reads that must see the latest write to the primary and pause the bulk job." },
+    { f: 3, t: 1, l: "Fix", n: "Break the job into small batches and give the replica more resources for applying changes." },
+    { f: 0, t: 2, l: "Verify", n: "Lag stays under a second during the next bulk job and read-your-write cases work." }
+  ] },
+{ id: "f-db-long-transaction", module: "databases", kind: "failure", lesson: "databases/transactions-and-locking", title: "Failure and recovery: a long transaction blocks the table", summary: "One idle transaction can stall writers.",
+  actors: ["Session A", "Session B", "Lock manager", "DBA"],
+  steps: [
+    { f: 0, t: 1, l: "Open transaction", n: "A tool opens a transaction, updates a row and then sits idle without committing." },
+    { f: 0, t: 2, l: "Lock held", n: "The row lock stays held for as long as the transaction is open." },
+    { f: 1, t: 2, l: "Others wait", n: "Another session tries to update the same row and waits in the lock queue." },
+    { f: 1, t: 3, l: "Pile up", n: "More sessions queue behind it and the connection pool fills with waiting requests." },
+    { f: 3, t: 2, l: "Find blocker", n: "The DBA queries the lock views and finds the idle transaction at the head of the chain." },
+    { f: 3, t: 0, l: "Resolve", n: "The blocking session is ended, which rolls it back and releases the lock." },
+    { f: 3, t: 1, l: "Fix the cause", n: "Set an idle in transaction timeout and make the tool commit or roll back promptly." },
+    { f: 3, t: 2, l: "Verify", n: "The queue clears, requests complete, and the lock wait graph is empty." }
+  ] },
+{ id: "f-go-goroutine-leak", module: "go", kind: "failure", lesson: "go/context-timeouts-and-cancellation", title: "Failure and recovery: a goroutine leak grows memory", summary: "Every goroutine needs a way to stop.",
+  actors: ["Handler", "Goroutine", "Channel", "Profiler"],
+  steps: [
+    { f: 0, t: 1, l: "Request", n: "Each request starts a goroutine that sends its result on an unbuffered channel." },
+    { f: 0, t: 1, l: "Early return", n: "The handler times out and returns before it reads from the channel." },
+    { f: 1, t: 2, l: "Blocked forever", n: "The goroutine waits to send and nothing will ever receive, so it never exits." },
+    { f: 3, t: 1, l: "Growth", n: "Memory and the goroutine count climb with every timed-out request until the pod is killed." },
+    { f: 3, t: 0, l: "Diagnose", n: "A goroutine profile shows thousands stuck at the same channel send line." },
+    { f: 0, t: 1, l: "Fix", n: "Pass a context, use a buffered channel or select on the context so the goroutine can stop." },
+    { f: 0, t: 1, l: "Test", n: "A test checks that the goroutine count returns to its starting value after a timeout." },
+    { f: 3, t: 0, l: "Verify", n: "The goroutine count stays flat under load and the pod no longer restarts." }
+  ] },
+{ id: "f-go-nil-map", module: "go", kind: "failure", lesson: "go/functions-errors-and-defer", title: "Failure and recovery: a nil map write panics a service", summary: "A panic should not take down everything.",
+  actors: ["Request", "Handler", "Recover", "Logs"],
+  steps: [
+    { f: 0, t: 1, l: "Request", n: "A handler builds a response using a map declared with var and never created." },
+    { f: 1, t: 1, l: "Write", n: "The handler writes a key to the nil map, and Go raises a panic." },
+    { f: 1, t: 0, l: "Crash", n: "With no recovery, the panic ends the whole process and every in-flight request fails." },
+    { f: 3, t: 0, l: "Symptom", n: "The service restarts, and the logs show a stack trace pointing at the map assignment." },
+    { f: 3, t: 1, l: "Find it", n: "The stack trace names the file and line, and the map was never initialised with make." },
+    { f: 1, t: 1, l: "Fix", n: "Create the map with make before writing to it, or return an error when input is missing." },
+    { f: 1, t: 2, l: "Contain", n: "A recover in middleware turns an unexpected panic into a 500 response and a logged stack." },
+    { f: 3, t: 0, l: "Verify", n: "A test with empty input passes, and the service stays up under the same request." }
+  ] },
+{ id: "f-helm-failed-upgrade", module: "helm", kind: "failure", lesson: "helm/upgrade-rollback-and-release-history", title: "Failure and recovery: a failed Helm upgrade and rollback", summary: "The release history is your safety net.",
+  actors: ["Operator", "Helm", "Cluster", "Release history"],
+  steps: [
+    { f: 0, t: 1, l: "Upgrade", n: "The operator runs helm upgrade with a new image tag and a changed values file." },
+    { f: 1, t: 2, l: "Apply", n: "Helm renders the templates and applies the changes, and the new pods fail their readiness probe." },
+    { f: 1, t: 3, l: "Failed status", n: "The release is marked failed and the old pods are still serving because of the rolling update." },
+    { f: 0, t: 1, l: "Look", n: "helm status and helm history show the failed revision and the last good revision." },
+    { f: 0, t: 2, l: "Find cause", n: "kubectl describe on the pods shows the readiness probe path changed in the new chart version." },
+    { f: 0, t: 1, l: "Roll back", n: "helm rollback to the last good revision restores the previous manifests as a new revision." },
+    { f: 0, t: 1, l: "Fix the chart", n: "Correct the probe path, test with helm template and a dry run, then upgrade again." },
+    { f: 1, t: 2, l: "Prevent", n: "Use atomic with a timeout so a failed upgrade rolls back automatically." }
+  ] },
+{ id: "f-helm-values-typo", module: "helm", kind: "failure", lesson: "helm/values-per-environment-and-secrets", title: "Failure and recovery: a values typo is silently ignored", summary: "Schema validation catches mistakes early.",
+  actors: ["Engineer", "Values file", "Chart", "Cluster"],
+  steps: [
+    { f: 0, t: 1, l: "Set a value", n: "The engineer sets replicaCont instead of replicaCount in the production values file." },
+    { f: 1, t: 2, l: "Render", n: "The chart does not know that key, so it ignores it and uses the default of one replica." },
+    { f: 2, t: 3, l: "Deploy", n: "The release succeeds, so there is no error message to warn anyone." },
+    { f: 3, t: 0, l: "Symptom", n: "Under load the service has one pod and falls over, while the values file looks right." },
+    { f: 0, t: 2, l: "Compare", n: "helm get values and helm template show the rendered replica count is one." },
+    { f: 0, t: 1, l: "Fix", n: "Correct the key, and add a values schema file so unknown keys fail at install time." },
+    { f: 0, t: 2, l: "Review", n: "A diff check between rendered environments is added to the pipeline." },
+    { f: 3, t: 2, l: "Verify", n: "The release shows the expected replicas and a bad key now fails with a clear message." }
+  ] },
+{ id: "f-argo-outofsync-loop", module: "argocd", kind: "failure", lesson: "argocd/sync-health-and-drift", title: "Failure and recovery: Argo CD syncs and then flips back", summary: "Two controllers fight over one field.",
+  actors: ["Repository", "Argo CD", "Cluster", "Autoscaler"],
+  steps: [
+    { f: 0, t: 1, l: "Desired state", n: "The repository says replicas is two and Argo CD syncs it to the cluster." },
+    { f: 3, t: 2, l: "Autoscaler acts", n: "The horizontal autoscaler changes replicas to five because of load." },
+    { f: 1, t: 2, l: "Drift seen", n: "Argo CD compares and marks the application OutOfSync because replicas differs." },
+    { f: 1, t: 2, l: "Self-heal", n: "With self-heal on, Argo CD sets replicas back to two and the autoscaler sets it to five again." },
+    { f: 1, t: 0, l: "Loop", n: "The application flips between the two states and the history fills with syncs." },
+    { f: 0, t: 1, l: "Diagnose", n: "The diff shows only the replicas field, which points at two owners for one field." },
+    { f: 0, t: 1, l: "Fix", n: "Remove replicas from the manifest, or tell Argo CD to ignore that field in the application." },
+    { f: 1, t: 2, l: "Verify", n: "The application stays Synced and Healthy while the autoscaler changes the count." }
+  ] },
+{ id: "f-argo-bad-sync-rollback", module: "argocd", kind: "failure", lesson: "argocd/debugging-argo-cd", title: "Failure and recovery: a bad commit reaches the cluster", summary: "Revert in the repository, not in the cluster.",
+  actors: ["Developer", "Repository", "Argo CD", "Cluster"],
+  steps: [
+    { f: 0, t: 1, l: "Merge", n: "A change with a wrong image tag is merged to the main branch of the config repository." },
+    { f: 1, t: 2, l: "Auto sync", n: "Argo CD sees the new commit and applies it to the cluster within minutes." },
+    { f: 2, t: 3, l: "Degraded", n: "The pods cannot pull the image and the application becomes Degraded." },
+    { f: 2, t: 0, l: "Alert", n: "An alert shows the health status and the sync revision that caused it." },
+    { f: 0, t: 1, l: "Revert", n: "The developer reverts the commit in the repository, which keeps the history honest." },
+    { f: 1, t: 2, l: "Resync", n: "Argo CD syncs the reverted state and the old pods become the desired state again." },
+    { f: 2, t: 3, l: "Healthy", n: "Pods run, the application shows Synced and Healthy, and traffic is normal." },
+    { f: 0, t: 1, l: "Prevent", n: "A required review and a preview environment catch a bad tag before it is merged." }
+  ] },
+{ id: "f-llm-context-overflow", module: "llm", kind: "failure", lesson: "llm/tokens-context-windows-and-limits", title: "Failure and recovery: the prompt overflows the context window", summary: "Long input is cut or rejected.",
+  actors: ["User", "Application", "Model", "Logs"],
+  steps: [
+    { f: 0, t: 1, l: "Short chats", n: "Early conversations fit easily in the model context window and answers are accurate." },
+    { f: 0, t: 1, l: "Long chat", n: "A long conversation with pasted documents grows past the window limit." },
+    { f: 1, t: 2, l: "Truncation", n: "The application silently drops the oldest messages to make the request fit." },
+    { f: 2, t: 0, l: "Symptom", n: "The model forgets earlier instructions and answers as if they were never given." },
+    { f: 3, t: 1, l: "Diagnose", n: "Logs of token counts show the request was trimmed and the system instructions were among the dropped parts." },
+    { f: 1, t: 1, l: "Fix", n: "Keep instructions pinned, summarise older turns, and retrieve only the relevant document parts." },
+    { f: 1, t: 2, l: "Guard", n: "Count tokens before sending and warn or compact when the request nears the limit." },
+    { f: 0, t: 1, l: "Verify", n: "A long conversation test keeps following the original instructions to the end." }
+  ] },
+{ id: "f-llm-hallucinated-answer", module: "llm", kind: "failure", lesson: "llm/debugging-llm-applications", title: "Failure and recovery: a confident wrong answer", summary: "Ground answers in sources and check them.",
+  actors: ["User", "Application", "Model", "Knowledge base"],
+  steps: [
+    { f: 0, t: 1, l: "Question", n: "A user asks about an internal policy that the model was never trained on." },
+    { f: 1, t: 2, l: "No context", n: "The application sends the question without any policy text." },
+    { f: 2, t: 1, l: "Guess", n: "The model produces a fluent, specific answer that is not true." },
+    { f: 1, t: 0, l: "Impact", n: "The user follows the wrong guidance, and the error is only noticed later." },
+    { f: 3, t: 1, l: "Diagnose", n: "Reviewing the prompt shows there was no source text, so the answer could not have been grounded." },
+    { f: 1, t: 3, l: "Fix", n: "Retrieve the relevant policy passages and instruct the model to answer only from them and to say when unsure." },
+    { f: 1, t: 0, l: "Show sources", n: "The answer cites the passages so a user can check them." },
+    { f: 3, t: 1, l: "Evaluate", n: "A test set of questions with known answers measures how often the system now cites correctly." }
+  ] },
+{ id: "f-prompt-format-drift", module: "prompting", kind: "failure", lesson: "prompting/validating-repairing-and-retrying-outputs", title: "Failure and recovery: the model stops returning valid JSON", summary: "Validate, repair, and retry.",
+  actors: ["Application", "Model", "Validator", "Logs"],
+  steps: [
+    { f: 0, t: 1, l: "Works", n: "A prompt asks for JSON and the model has returned valid JSON in every test." },
+    { f: 1, t: 2, l: "Slight change", n: "The model adds a short sentence before the JSON on some responses." },
+    { f: 2, t: 0, l: "Parse error", n: "The application's JSON parser fails and the request returns a server error." },
+    { f: 3, t: 0, l: "Symptom", n: "An error rate of a few percent appears with no code change on the application side." },
+    { f: 3, t: 2, l: "Diagnose", n: "Logged raw outputs show the extra text and a trailing comma in a few cases." },
+    { f: 0, t: 2, l: "Repair", n: "Use structured output with a schema, validate every response, and retry once with the error message." },
+    { f: 2, t: 3, l: "Fallback", n: "If it still fails, return a clear error or a safe default and log the sample." },
+    { f: 3, t: 0, l: "Verify", n: "The error rate returns to near zero, and failures are visible in a dashboard." }
+  ] },
+{ id: "f-prompt-regression", module: "prompting", kind: "failure", lesson: "prompting/prompt-versioning-and-testing", title: "Failure and recovery: a prompt edit breaks a working case", summary: "Test prompts like code.",
+  actors: ["Author", "Prompt", "Test set", "Reviewer"],
+  steps: [
+    { f: 0, t: 1, l: "Improve", n: "An author rewrites a prompt to fix one complaint and sees that example improve." },
+    { f: 1, t: 2, l: "No tests", n: "There is no test set, so no one checks the other twenty common cases." },
+    { f: 1, t: 0, l: "Release", n: "The new prompt goes live and handles the complaint well." },
+    { f: 3, t: 0, l: "Symptom", n: "A week later, support finds that refund requests are now answered in the wrong format." },
+    { f: 3, t: 1, l: "Find the change", n: "Prompt version history shows the edit and the date that matches the first bad answer." },
+    { f: 0, t: 2, l: "Fix", n: "Revert to the previous version and build a test set from real cases that includes the complaint." },
+    { f: 2, t: 3, l: "Gate", n: "Every prompt change runs the test set and the reviewer sees what got better and what got worse." },
+    { f: 0, t: 1, l: "Verify", n: "The next edit passes all cases, with the previous failure now a permanent test." }
+  ] },
+{ id: "f-skill-never-triggers", module: "claude-skills", kind: "failure", lesson: "claude-skills/writing-descriptions-that-trigger", title: "Failure and recovery: a skill never triggers", summary: "The description decides when it loads.",
+  actors: ["User", "Claude", "Skill", "Author"],
+  steps: [
+    { f: 0, t: 1, l: "Request", n: "A user asks for a task that the skill was written to handle." },
+    { f: 1, t: 2, l: "Match", n: "Claude reads the skill descriptions and the description is vague, so it does not match the request." },
+    { f: 1, t: 0, l: "Skipped", n: "Claude answers without the skill and the output ignores the team conventions." },
+    { f: 3, t: 0, l: "Symptom", n: "The author expects the skill to run, yet the transcript shows it was never loaded." },
+    { f: 3, t: 2, l: "Diagnose", n: "Comparing the description with real requests shows missing words that users actually use." },
+    { f: 3, t: 2, l: "Fix", n: "Rewrite the description to say what it does and when to use it, with the trigger phrases." },
+    { f: 3, t: 1, l: "Test", n: "Try ten phrasings, including ones that should not trigger, and record which load the skill." },
+    { f: 0, t: 1, l: "Verify", n: "The skill loads on the right requests and stays quiet on the others." }
+  ] },
+{ id: "f-skill-overbroad", module: "claude-skills", kind: "failure", lesson: "claude-skills/debugging-skills-that-do-not-trigger-or-misbehave", title: "Failure and recovery: an overbroad skill triggers on everything", summary: "Narrow scope and add a boundary.",
+  actors: ["User", "Claude", "Skill", "Author"],
+  steps: [
+    { f: 0, t: 1, l: "Install", n: "A skill for writing release notes is installed with a short generic description." },
+    { f: 0, t: 1, l: "Unrelated ask", n: "A user asks for a meeting summary and the skill loads anyway." },
+    { f: 1, t: 2, l: "Wrong format", n: "The skill's template makes the summary read like release notes." },
+    { f: 2, t: 0, l: "Symptom", n: "Users complain that unrelated answers now follow a strange structure." },
+    { f: 3, t: 1, l: "Diagnose", n: "The description says documents and writing, which matches almost any request." },
+    { f: 3, t: 2, l: "Fix", n: "Narrow the description to release notes for software changes and add when not to use it." },
+    { f: 3, t: 1, l: "Test", n: "Run requests that should and should not trigger and check each outcome." },
+    { f: 0, t: 1, l: "Verify", n: "Meeting summaries are normal again and release notes use the template." }
+  ] },
+{ id: "f-mcp-tool-timeout", module: "mcp", kind: "failure", lesson: "mcp/debugging-tool-use-and-mcp", title: "Failure and recovery: a tool call times out", summary: "Bound the wait and report clearly.",
+  actors: ["Agent", "Host", "MCP server", "Backend"],
+  steps: [
+    { f: 0, t: 1, l: "Call", n: "The agent asks the host to call a search tool provided by an MCP server." },
+    { f: 1, t: 2, l: "Forward", n: "The host forwards the request to the server, which queries a slow backend." },
+    { f: 2, t: 3, l: "Backend hangs", n: "The backend takes much longer than expected and the server keeps waiting." },
+    { f: 1, t: 0, l: "Timeout", n: "The host reaches its time limit and returns an error to the agent." },
+    { f: 0, t: 1, l: "Agent reacts", n: "A good agent reports the failure and tries a smaller query, while a bad one repeats the call forever." },
+    { f: 3, t: 2, l: "Diagnose", n: "Server logs with a request id show the backend latency and where time was spent." },
+    { f: 2, t: 3, l: "Fix", n: "Add a timeout and a limit on results in the server, and a clear error message the model can use." },
+    { f: 0, t: 1, l: "Verify", n: "The agent recovers within its retry limit and gives the user an honest answer." }
+  ] },
+{ id: "f-mcp-prompt-injection", module: "mcp", kind: "failure", lesson: "mcp/permissions-auth-and-prompt-injection-defence", title: "Failure and recovery: a tool result tries to give orders", summary: "Treat tool output as data, not instructions.",
+  actors: ["User", "Agent", "Tool", "Policy"],
+  steps: [
+    { f: 0, t: 1, l: "Task", n: "A user asks the agent to summarise a web page using a fetch tool." },
+    { f: 1, t: 2, l: "Fetch", n: "The tool returns the page text, and it contains hidden text telling the assistant to send private data away." },
+    { f: 2, t: 1, l: "Injection", n: "The text looks like an instruction and the model may follow it as if the user had written it." },
+    { f: 3, t: 1, l: "Block", n: "A policy layer denies any call to a send tool that the user did not request." },
+    { f: 1, t: 0, l: "Ask", n: "The agent shows the user what the page asked for and asks whether to proceed." },
+    { f: 3, t: 1, l: "Contain", n: "Tool output is marked as untrusted content, and tools run with the minimum permissions." },
+    { f: 3, t: 2, l: "Log", n: "The attempt is logged with the source address so the page can be reported." },
+    { f: 0, t: 1, l: "Verify", n: "A test page with hidden commands is now ignored and the summary stays accurate." }
   ] }
 ];

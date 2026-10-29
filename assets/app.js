@@ -454,7 +454,7 @@ function pathView(id) {
     '<button class="btn btn-quiet" type="button" data-act="pick-path" data-id="' + p.id + '" data-go="home">Make this my home path</button>' + printBar() + '</div>' + voiceSlot() + '</section>' +
     '<div class="wrap"><div class="pipe-panel">' + treeHtml(p) + '</div>' +
     '<h2 class="sub-h">What you will be able to do</h2><ul class="outcomes">' + p.outcomes.map(function (o) { return '<li>' + e(o) + '</li>'; }).join('') + '</ul>' +
-    (window.MargaFeatures && MargaFeatures.pathCaps ? MargaFeatures.pathCaps(p.id) : '') + '<h2 class="sub-h">Stages</h2><div class="stage-list">' + p.modules.map(function (mid, i) { return stageRow(MOD[mid], i); }).join('') + '</div></div>';
+    (window.MargaFeatures && MargaFeatures.pathCaps ? MargaFeatures.pathCaps(p.id) : '') + (window.MargaExLinks ? MargaExLinks.path(p) : '') + '<h2 class="sub-h">Stages</h2><div class="stage-list">' + p.modules.map(function (mid, i) { return stageRow(MOD[mid], i); }).join('') + '</div></div>';
   view.voice = '#main'; view.voiceLabel = p.title + ' path';
   view.after = armTree;
 }
@@ -483,6 +483,13 @@ function moduleView(id) {
     '<dl class="facts"><div><dt>Level</dt><dd>' + e(m.level) + '</dd></div><div><dt>Study time</dt><dd>About ' + hours(m.minutes) + '</dd></div><div><dt>Progress</dt><dd>' + n + ' of ' + tot + ' lessons</dd></div></dl>' +
     '<div class="bar wide" role="img" aria-label="' + pct + ' percent complete"><i style="width:' + pct + '%"></i></div>' + lock +
     '<p class="small">Practice this stage: <a href="#/drills/' + m.id + '">troubleshooting drills</a>, <a href="#/cases/' + m.id + '">case studies</a>, <a href="#/flashcards">flashcards</a>.</p>' +
+    (function () {
+      var pm = (D.arch || []).filter(function (a) { return a.modules && a.modules.indexOf(m.id) >= 0; }).length, bits = [];
+      var exl = window.MargaExLinks ? MargaExLinks.module(m.id) : '';
+      if (exl) bits.push(exl);
+      if (pm) bits.push('<a href="#/architecture">' + plural(pm, 'architecture post-mortem') + '</a>');
+      return bits.length ? '<p class="small">Watch and study: ' + bits.join(', ') + '.</p>' : '';
+    })() +
     (sheets.length ? '<p class="small">Cheat sheet: ' + sheets.map(function (k) { return '<a href="#/cheatsheet/' + k + '">' + e(SHEETS[k].title) + '</a>'; }).join(', ') + '</p>' : '') +
     '<div class="actions">' + printBar() + '</div>' + voiceSlot() +
     '</section><div class="wrap"><ol class="jobs">' + m.lessons.map(function (lid, i) { return jobHtml(lid, i); }).join('') + '</ol>' + refsHtml(m.refs, 'Official documentation for this stage') + (window.MargaFeatures && MargaFeatures.moduleExtras ? MargaFeatures.moduleExtras(m.id) : '') + (api.chooseModule ? api.chooseModule(m.id) : '') + '</div>';
@@ -529,6 +536,7 @@ function lessonView(mid, slug) {
     '<div class="actions lesson-tools">' + printBar() + '<button type="button" class="btn btn-quiet" data-act="read-toggle" aria-pressed="false">Reading mode</button></div>' + voiceSlot() +
     (window.MargaFeatures ? MargaFeatures.levelsHtml(l) : '') +
     '<div class="lesson-grid"><div class="prose" id="prose">' + l.html + refsHtml(l.refs) + '</div>' + toc + '</div>' +
+    (window.MargaExLinks ? MargaExLinks.lesson(id) : '') +
     '<section class="check" id="check" aria-labelledby="check-h"><h2 id="check-h">Lesson check</h2><div id="quiz"></div></section>' +
     '<section class="cardsec" id="cards" aria-labelledby="cards-h"><h2 id="cards-h">Flashcards</h2><div id="deck"></div></section>' +
     '<nav class="pager" aria-label="Lesson navigation">' +
