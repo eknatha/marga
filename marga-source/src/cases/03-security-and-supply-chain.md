@@ -13,7 +13,7 @@ lesson: Keep an inventory so you know what to patch, patch quickly, and make sur
 company: Capital One
 year: 2019
 area: Security
-modules: cloud, networking, terraform, security
+modules: cloud, networking, terraform, security, cloud-iam
 source: Capital One statement | https://www.capitalone.com/digital/facts2019/
 what: In 2019 an attacker obtained data on about 100 million customers from storage buckets in the cloud.
 cause: A misconfigured web application firewall allowed a server-side request forgery attack. The attacker used it to reach the instance metadata service and obtain temporary credentials for a role that had much broader access than the application needed.
@@ -90,7 +90,7 @@ lesson: Small oddities can reveal big problems. Watch performance changes, and t
 company: CircleCI
 year: 2023
 area: Security
-modules: cicd, cloud, sre, security
+modules: cicd, cloud, sre, security, cloud-iam
 source: CircleCI incident report | https://circleci.com/blog/jan-4-2023-incident-report/
 what: In January 2023 CircleCI told all customers to rotate every secret stored in the service, because attackers had been able to read them.
 cause: Malware on an engineer's laptop stole a session token that was valid even after two-factor authentication. The attacker then used the engineer's access to production systems and customer data.

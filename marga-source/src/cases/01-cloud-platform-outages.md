@@ -156,7 +156,7 @@ lesson: Date arithmetic needs a real library and edge-case tests. Make failure h
 company: Cloudflare
 year: 2019
 area: Deployment and release
-modules: cloud, python, cicd, sre, go
+modules: cloud, python, cicd, sre, go, argocd
 source: Cloudflare blog | https://blog.cloudflare.com/details-of-the-cloudflare-outage-on-july-2-2019/
 what: In July 2019 Cloudflare's network returned errors for about half an hour. CPU use across its servers rose to the limit and web traffic stopped being served.
 cause: A new web application firewall rule contained a regular expression with catastrophic backtracking. It was deployed to every server at once, and there was no limit on the CPU time one rule could use.

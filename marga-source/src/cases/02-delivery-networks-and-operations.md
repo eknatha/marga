@@ -46,7 +46,7 @@ lesson: Make deletion reversible, validate script input, and practise restoring 
 company: Knight Capital Group
 year: 2012
 area: Deployment and release
-modules: cicd, sre, ansible
+modules: cicd, sre, ansible, argocd
 source: SEC administrative order | https://www.sec.gov/files/litigation/admin/2013/34-70694.pdf
 what: On 1 August 2012 a trading firm lost about 440 million dollars in roughly 45 minutes when its systems sent a flood of unintended orders.
 cause: A new feature was deployed by hand to eight servers, but one server was missed. A flag reused from older code activated unused code on that server. There was no kill switch, and alerts were not acted on.
@@ -57,7 +57,7 @@ lesson: Automate and verify deployments, remove dead code, and give operators a 
 company: CrowdStrike
 year: 2024
 area: Deployment and release
-modules: cicd, linux, sre, ansible
+modules: cicd, linux, sre, ansible, argocd
 source: CrowdStrike root cause analysis | https://www.crowdstrike.com/wp-content/uploads/2024/08/Channel-File-291-Incident-Root-Cause-Analysis-08.06.2024.pdf
 what: On 19 July 2024 a security update caused millions of Windows computers to crash and fail to restart. Airlines, hospitals and banks were disrupted worldwide.
 cause: A content update defined a template with more input fields than the sensor code expected. The mismatch caused an out-of-bounds memory read in a kernel driver. The update went to all customers at once, and validation did not catch the mismatch.
@@ -68,7 +68,7 @@ lesson: Roll out every change, including data and content, in stages, and watch 
 company: Reddit
 year: 2023
 area: Kubernetes
-modules: kubernetes, networking, sre, helm
+modules: kubernetes, networking, sre, helm, k8s-ops, argocd
 source: Reddit engineering | https://www.reddit.com/r/RedditEng/comments/11xx5o0/you_broke_reddit_the_piday_outage/
 what: On 14 March 2023 Reddit was down or degraded for several hours after an upgrade of a Kubernetes cluster.
 cause: The upgrade changed how nodes are labelled. The network layer's route reflectors were selected by a node label that no longer matched, so routes were lost and Pods lost their network connectivity. The rollback was hard because the upgrade was not simple to reverse.
@@ -112,7 +112,7 @@ lesson: Know the hard limits of your file system and database, alert on them, an
 company: UniSuper
 year: 2024
 area: Database
-modules: cloud, terraform, sre
+modules: cloud, terraform, sre, cloud-iam
 source: UniSuper and Google Cloud joint statement | https://www.unisuper.com.au/about-us/media-centre/2024/a-joint-statement-from-unisuper-and-google-cloud
 what: In May 2024 a pension fund lost its cloud environment for about two weeks after the provider deleted its private cloud subscription. Members could not access their accounts.
 cause: A one-off misconfiguration during provisioning caused the deletion. The deletion also removed backups held in the same region. The fund had backups with another provider, which allowed recovery.

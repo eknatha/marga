@@ -24,7 +24,7 @@ lesson: A known and deferred risk is a scheduled outage; alert on it, and keep l
 company: Zalando
 year: 2019
 area: Kubernetes
-modules: kubernetes, networking, observability
+modules: kubernetes, networking, observability, k8s-ops
 source: Zalando post-mortem | https://kubernetes-on-aws.readthedocs.io/en/latest/postmortems/jan-2019-dns-outage.html
 what: On 7 January 2019 product pages of the Zalando fashion store returned errors for more than an hour because DNS stopped working in one Kubernetes cluster.
 cause: The cluster DNS pods had a low memory limit. A burst of retries after a downstream timeout raised the number of DNS lookups, which were multiplied by the default search domain setting and by a service that did not cache lookups. The DNS pods ran out of memory, restarted and could not recover under the load. In-cluster monitoring also depended on DNS, so the on-call engineer was paged late.
@@ -35,7 +35,7 @@ lesson: Cluster DNS is shared infrastructure that needs limits, caching and moni
 company: Preply
 year: 2020
 area: Kubernetes
-modules: kubernetes, networking, linux
+modules: kubernetes, networking, linux, k8s-ops
 source: Preply engineering post-mortem | https://medium.com/preply-engineering/dns-postmortem-e169efd45afd
 what: On 28 February 2020 some services in a production cluster had a partial DNS failure for about 26 minutes and roughly 15,000 events were dropped.
 cause: The autoscaler for the cluster DNS reduced the pods from three to two during low load. The node network proxy then failed to remove a stale connection tracking entry, so some traffic kept going to a pod that no longer existed. The team suspected a known conntrack issue but could not confirm it.
@@ -101,7 +101,7 @@ lesson: Service account credentials need strict storage rules, support uploads s
 company: Uber
 year: 2014
 area: Cloud security
-modules: security, cloud, cicd, git
+modules: security, cloud, cicd, git, cloud-iam
 source: US Federal Trade Commission analysis | https://www.ftc.gov/system/files/documents/cases/1523054_uber_technologies_analysis.pdf
 what: In May 2014 an intruder opened an Amazon S3 data store of Uber and read a file with details of drivers, including licence numbers. Uber found out in September 2014.
 cause: An access key with full administrative rights had been posted publicly in a code-sharing site by an engineer. The FTC alleged that Uber used one shared key, did not limit access by job role, did not require multifactor authentication and stored sensitive data unencrypted.
