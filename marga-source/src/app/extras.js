@@ -27,45 +27,141 @@ function say(btn, text) { return '<button type="button" class="btn btn-quiet say
 /* =========================================================== Practice hub */
 function labN(l) { return ((D.labs || {})[l] || []).length; }
 function labDone(l) { var m = (S().lab || {}); return ((D.labs || {})[l] || []).filter(function (x) { return m[l + ':' + x.id]; }).length; }
-function practiceView() {
+/* Practice hub: grouped tools, a next-step panel, filters, favourites, a week strip. Tests rely on every tool being a link inside a .prac list, once. */
+var PRF = { flag: 'all', q: '', skip: 0, why: false };
+function prNums(meta) { var m = /(\d+) of (\d+)/.exec(meta || ''); return m ? [Number(m[1]), Number(m[2])] : null; }
+function prDayKey(d) { var m = d.getMonth() + 1, dd = d.getDate(); return d.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (dd < 10 ? '0' : '') + dd; }
+function prWeek() {
+  var days = S().days || [], set = {}; days.forEach(function (k) { set[k] = 1; });
+  var now = new Date(), dow = (now.getDay() + 6) % 7, out = [], n = 0, i, d;
+  for (i = 0; i < 7; i++) { d = new Date(now); d.setDate(now.getDate() - dow + i); var on = !!set[prDayKey(d)]; if (on) n++; out.push({ on: on, today: i === dow, label: 'MTWTFSS'.charAt(i), name: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][i] }); }
+  return { days: out, n: n };
+}
+function prTools() {
   var dr = bag('dr'), solved = Object.keys(dr).filter(function (k) { return dr[k].ok; }).length;
   var fc = bag('fc'), known = Object.keys(fc).filter(function (k) { return fc[k] === 'k'; }).length;
   var mock = bag('mock', 'array'), best = mock.reduce(function (m, x) { return Math.max(m, x.score); }, 0);
   var cs = bag('cs'), read = Object.keys(cs).length;
-  view.title = 'Practice | MARGA by EknathaLabs'; view.nav = 'practice';
-  var items = [
-    ['#/today', 'Today', 'An interview question, a real incident and a quiz question that change every day.', 'New every day'],
-    ['#/daily', 'Daily challenge', 'One quiz question a day from the lessons. Keep the daily streak going.', 'Daily streak ' + (S().dc ? Object.keys(S().dc).length + ' answered' : 'not started')],
-    ['#/explainers', 'Animated explainers', 'Step through how boot, DNS, TLS, pods, pipelines, Terraform, incidents and more really work.', (window.MARGA_EXPLAINERS || []).length + ' explainers'],
-    ['#/subnet', 'Subnet and CIDR playground', 'Inspect networks, split them, plan VLSM for a VPC and merge routes.', 'Runs in your browser'],
-    ['#/playground/yaml', 'YAML playground', 'Check YAML and Kubernetes manifests, convert to JSON, find risky settings, and practise with ' + labN('yaml') + ' exercises.', labDone('yaml') + ' of ' + labN('yaml') + ' solved'],
-    ['#/playground/python', 'Python playground', 'Write and run Python with built-in tests for ' + (8 + labN('python')) + ' exercises.', Object.keys(S().py || {}).length + ' of ' + (8 + labN('python')) + ' solved'],
-    ['#/playground/go', 'Go playground', 'Fifty Go exercises for operations work, run on the public Go Playground.', labDone('go') + ' of ' + labN('go') + ' solved'],
-    ['#/playground/hcl', 'Terraform (HCL) playground', 'Write Terraform configuration and get it checked: variables, resources, modules, state and lifecycle.', labDone('hcl') + ' of ' + labN('hcl') + ' solved'],
-    ['#/playground/sql', 'SQL for SREs', 'Query deploys, incidents, alerts and SLO data with a real SQLite database in your browser.', labDone('sql') + ' of ' + labN('sql') + ' solved'],
-    ['#/glossary', 'Glossary', 'Plain-words meanings for ' + (D.glossary || []).length + ' terms, also shown inside lessons.', (D.glossary || []).length + ' terms'],
-    ['#/drills', 'Troubleshooting drills', 'Read real output, find the cause, pick the fix. Three scenarios for every stage.', solved + ' of ' + DRILLS.length + ' solved'],
-    ['#/interview/mock', 'Mock interview', 'A timed run of questions for your role. Reveal the model answer, score yourself, find weak topics.', mock.length ? 'Best score ' + best + '%' : 'Not tried yet'],
-    ['#/flashcards', 'Interactive flashcards', 'Flip, shuffle and sort cards from every lesson and from InterviewHub. Keyboard friendly.', known + ' cards marked known'],
-    ['#/cases', 'Real-world case studies', plural(CASES.length, 'incident') + ' from cloud providers, networks and software supply chains, with the lesson from each.', read + ' of ' + CASES.length + ' read'],
-    ['#/architecture', 'Architecture post-mortems', plural(ARCH.length, 'detailed review') + ' with timelines, trade-offs and calculators you can change.', 'Calculators included'],
-    ['#/calculators', 'Trade-off calculators', 'Error budgets, redundancy, cloud cost, recovery time, retry storms, cells and capacity.', '7 calculators'],
-    ['#/capstones', 'Capstone projects', 'Four guided builds for each path, with steps to tick off and a self-check at the end.', (window.MargaFeatures && MargaFeatures.capCount ? MargaFeatures.capCount() : '16 projects')],
-    ['#/games', 'Incident games', 'Be on call for a realistic outage in every stage. Choose what to do and see what each choice leads to.', (window.MargaFeatures && MargaFeatures.gameCount ? MargaFeatures.gameCount() : '12 games')],
-    ['#/badges', 'Badges', 'One badge for each stage and path you finish, with your name if you want it. Download it as an image or PDF.', (window.MargaBadges && MargaBadges.count ? MargaBadges.count() : 'Earn your first')],
-    ['#/walkthroughs', 'Architecture walkthroughs', 'Reference designs of a payments service, video site, chat app and more, with request flows and failure points.', (window.MargaFeatures && MargaFeatures.wtCount ? MargaFeatures.wtCount() : 6) + ' walkthroughs'],
-    ['#/reading', 'Reading lists', 'Official documentation, specifications and articles to read next, for every stage.', (Object.keys(D.reading || {}).reduce(function (n, k) { return n + D.reading[k].length; }, 0)) + ' resources'],
-    ['#/mix', 'Mixed practice', 'Twelve questions and drills from different stages in a shuffled order. Interleaving helps long-term memory.', 'Uses the lessons you passed'],
-    ['#/weak', 'Weak-spot review', 'Questions, drills and flashcards you missed come back here until you get them right.', (window.MargaFeatures && MargaFeatures.weakCount ? MargaFeatures.weakCount() : 0) + ' to review'],
-    ['#/review', 'Review due cards', 'Spaced repetition for the lessons you have passed.', 'Cards come back when due'],
-    ['#/terminal-labs', 'Terminal labs', 'Fix broken systems in a simulated terminal for Linux, Shell, Networking and Python. Each lab checks your work and gives hints.', (window.MargaTermLabs && MargaTermLabs.count ? MargaTermLabs.count() : 'Simulated terminal')]
-  ];
-  view.html = head('Practice', 'Learning sticks when you use it. Everything here is open: no lesson needs to be passed first.') +
-    '<div class="wrap"><ul class="prac">' + items.map(function (x) {
-      return '<li><a href="' + x[0] + '"><strong>' + e(x[1]) + '</strong><span>' + e(x[2]) + '</span><em>' + e(x[3]) + '</em></a></li>';
-    }).join('') + '</ul></div>';
-  view.after = null;
+  var F = window.MargaFeatures || {};
+  var pyN = 8 + labN('python'), pyDone = Object.keys(S().py || {}).length;
+  var T = [];
+  function add(g, id, href, title, desc, meta, time, level, skills, prog) { T.push({ g: g, id: id, href: href, title: title, desc: desc, meta: meta, time: time, level: level, skills: skills, prog: prog }); }
+  add('featured', 'explainers', '#/explainers', 'Animated explainers', 'Watch a request move through a system, one step at a time.', (window.MARGA_EXPLAINERS || []).length + ' explainers', '', '', '', null);
+  add('featured', 'architecture', '#/architecture', 'Architecture post-mortems', 'Timelines, trade-offs and numbers you can change.', plural(ARCH.length, 'review') + ', calculators', '', '', '', null);
+  add('featured', 'drills', '#/drills', 'Troubleshooting drills', 'Read the output, find the cause, pick the fix.', solved + ' of ' + DRILLS.length + ' solved', '', '', '', DRILLS.length ? solved / DRILLS.length : 0);
+  add('daily', 'today', '#/today', 'Today', 'An interview question, a real incident and a quiz question.', 'New every day', '5 min', '', '', null);
+  add('daily', 'daily', '#/daily', 'Daily challenge', 'One quiz question a day. Keep the streak going.', S().dc ? Object.keys(S().dc).length + ' answered' : 'Not started', '2 min', '', '', null);
+  add('daily', 'review', '#/review', 'Review due cards', 'Spaced repetition for lessons you have passed.', 'Cards return when due', '5 min', '', '', null);
+  add('labs', 'terminal', '#/terminal-labs', 'Terminal labs', 'Fix broken systems in a simulated terminal, with hints.', (window.MargaTermLabs && MargaTermLabs.count ? MargaTermLabs.count() : 'Simulated terminal'), '20 min', 'starter', 'Linux, Shell, Networking', null);
+  add('labs', 'yaml', '#/playground/yaml', 'YAML playground', 'Check manifests, convert to JSON, find risky settings.', labDone('yaml') + ' of ' + labN('yaml') + ' solved', '10 min', 'starter', 'Kubernetes, Helm', labN('yaml') ? labDone('yaml') / labN('yaml') : 0);
+  add('labs', 'python', '#/playground/python', 'Python playground', 'Write and run Python with built-in tests.', pyDone + ' of ' + pyN + ' solved', '15 min', 'starter', 'Python', pyN ? pyDone / pyN : 0);
+  add('labs', 'go', '#/playground/go', 'Go playground', 'Fifty Go exercises for operations work.', labDone('go') + ' of ' + labN('go') + ' solved', '15 min', 'mid', 'Go', labN('go') ? labDone('go') / labN('go') : 0);
+  add('labs', 'hcl', '#/playground/hcl', 'Terraform (HCL) playground', 'Write configuration and get it checked.', labDone('hcl') + ' of ' + labN('hcl') + ' solved', '15 min', 'mid', 'Terraform, Cloud', labN('hcl') ? labDone('hcl') / labN('hcl') : 0);
+  add('labs', 'sql', '#/playground/sql', 'SQL for SREs', 'Query deploys, incidents and SLO data in a real database.', labDone('sql') + ' of ' + labN('sql') + ' solved', '15 min', 'mid', 'Databases, SRE', labN('sql') ? labDone('sql') / labN('sql') : 0);
+  add('labs', 'subnet', '#/subnet', 'Subnet and CIDR playground', 'Inspect networks, split them and plan VLSM for a VPC.', 'Runs in your browser', '10 min', 'starter', 'Networking, Cloud', null);
+  add('scenarios', 'games', '#/games', 'Incident games', 'Be on call for an outage. Choose, then see where it leads.', (F.gameCount ? F.gameCount() : '12 games'), '10 min', 'mid', 'Every skill', null);
+  add('scenarios', 'capstones', '#/capstones', 'Capstone projects', 'Guided builds for each path, with a self-check.', (F.capCount ? F.capCount() : '16 projects'), '2 hours', 'advanced', 'Every path', null);
+  add('scenarios', 'calculators', '#/calculators', 'Trade-off calculators', 'Error budgets, redundancy, cost, recovery time and capacity.', '7 calculators', '10 min', 'mid', 'SRE, Cloud', null);
+  add('scenarios', 'mix', '#/mix', 'Mixed practice', 'Twelve questions and drills from different stages, shuffled.', 'Uses lessons you passed', '12 min', 'mid', 'Passed lessons', null);
+  add('scenarios', 'weak', '#/weak', 'Weak-spot review', 'Items you missed come back until you get them right.', (F.weakCount ? F.weakCount() : 0) + ' to review', '8 min', '', 'What you missed', null);
+  add('study', 'mock', '#/interview/mock', 'Mock interview', 'A timed run of questions for your role, then score yourself.', mock.length ? 'Best score ' + best + '%' : 'Not tried yet', '30 min', '', '', null);
+  add('study', 'flashcards', '#/flashcards', 'Interactive flashcards', 'Flip, shuffle and sort cards from every lesson.', known + ' cards marked known', '', '', '', null);
+  add('study', 'glossary', '#/glossary', 'Glossary', 'Plain-words meanings, also shown inside lessons.', (D.glossary || []).length + ' terms', '', '', '', null);
+  add('study', 'cases', '#/cases', 'Real-world case studies', 'Incidents from cloud providers and software supply chains.', read + ' of ' + CASES.length + ' read', '', '', '', CASES.length ? read / CASES.length : 0);
+  add('study', 'walkthroughs', '#/walkthroughs', 'Architecture walkthroughs', 'Reference designs with request flows and failure points.', (F.wtCount ? F.wtCount() : 6) + ' walkthroughs', '', '', '', null);
+  add('study', 'reading', '#/reading', 'Reading lists', 'Official documentation and articles to read next.', Object.keys(D.reading || {}).reduce(function (n, k) { return n + D.reading[k].length; }, 0) + ' resources', '', '', '', null);
+  add('study', 'badges', '#/badges', 'Badges', 'One badge for each stage and path you finish.', (window.MargaBadges && MargaBadges.count ? MargaBadges.count() : 'Earn your first'), '', '', '', null);
+  T.forEach(function (x) {
+    var n = prNums(x.meta);
+    if (x.prog === null && n && n[1]) x.prog = n[0] / n[1];
+    x.status = x.prog !== null && x.prog >= 1 ? 'Completed' : (x.prog !== null && x.prog > 0 ? 'Running' : 'Ready');
+  });
+  return T;
 }
+var PR_GROUPS = [
+  ['daily', 'every-day', 'Daily habits, two minutes at a time', 'daily'],
+  ['labs', 'labs', 'Hands-on labs: type, run, get checked', 'labs'],
+  ['scenarios', 'scenarios', 'Judgement calls, not just commands', 'scenarios'],
+  ['study', 'study', 'Interview and study', 'interview']
+];
+var PR_FLAGS = [['all', '--all'], ['daily', '--daily'], ['labs', '--labs'], ['scenarios', '--scenarios'], ['interview', '--interview'], ['study', '--study'], ['starred', '--starred']];
+function prVisual(id) {
+  if (id === 'explainers') return '<svg class="pr-vis" viewBox="0 0 300 120" role="img" aria-label="A message moving between a client, a gateway and a pod, step 3 of 8"><g class="pr-svg"><rect x="10" y="6" width="64" height="20" rx="6" class="f1"/><rect x="118" y="6" width="64" height="20" rx="6" class="f1"/><rect x="226" y="6" width="64" height="20" rx="6" class="f1"/><text x="42" y="20" text-anchor="middle">client</text><text x="150" y="20" text-anchor="middle">gateway</text><text x="258" y="20" text-anchor="middle">pod</text><path d="M42 28 V82 M150 28 V82 M258 28 V82" class="dash"/><path d="M44 46 H146" class="ln"/><path d="M146 46 l-8 -5 v10z" class="fl"/><path d="M152 62 H254" class="ln"/><path d="M254 62 l-8 -5 v10z" class="fl"/><path d="M256 78 H154" class="ln dashed"/><circle cx="150" cy="46" r="5" class="dot"/><circle cx="16" cy="104" r="11" class="play"/><path d="M12 98 l10 6 l-10 6z" class="fl w"/><circle cx="46" cy="104" r="4" class="fl"/><circle cx="62" cy="104" r="4" class="fl"/><circle cx="78" cy="104" r="5" class="fl"/><circle cx="94" cy="104" r="4" class="fl soft"/><circle cx="110" cy="104" r="4" class="fl soft"/><circle cx="126" cy="104" r="4" class="fl soft"/><circle cx="142" cy="104" r="4" class="fl soft"/><circle cx="158" cy="104" r="4" class="fl soft"/><text x="290" y="108" text-anchor="end" class="mono">step 3 of 8</text></g></svg>';
+  if (id === 'architecture') return '<svg class="pr-vis" viewBox="0 0 300 120" role="img" aria-label="An incident timeline with alert, page, rollback and recovery, and an error budget slider"><g class="pr-svg"><path d="M16 46 H284" class="ln soft"/><circle cx="16" cy="46" r="8" class="fl c1"/><circle cx="96" cy="46" r="8" class="fl c2"/><circle cx="170" cy="46" r="8" class="fl c3"/><circle cx="268" cy="46" r="8" class="fl c4"/><text x="16" y="26" text-anchor="start" class="mono">alert</text><text x="96" y="76" text-anchor="middle" class="mono">page</text><text x="170" y="26" text-anchor="middle" class="mono">rollback</text><text x="268" y="76" text-anchor="end" class="mono">recovered</text><rect x="10" y="88" width="280" height="28" rx="8" class="f1"/><text x="20" y="106" class="mono">error budget</text><rect x="120" y="98" width="140" height="8" rx="4" class="soft"/><rect x="120" y="98" width="98" height="8" rx="4" class="fl"/><circle cx="218" cy="102" r="8" class="knob"/></g></svg>';
+  return '<svg class="pr-vis" viewBox="0 0 300 120" role="img" aria-label="A log showing an OOMKilled container and three answer choices, one selected"><g class="pr-svg"><rect x="6" y="4" width="288" height="46" rx="8" class="term"/><text x="16" y="22" class="mono bad">Back-off restarting failed container</text><text x="16" y="40" class="mono good">exit code 137  OOMKilled</text><circle cx="16" cy="68" r="6" class="ring"/><circle cx="16" cy="68" r="3" class="fl"/><text x="30" y="72" class="bold">Raise the memory limit</text><circle cx="16" cy="90" r="6" class="ring"/><text x="30" y="94">Add more replicas</text><circle cx="16" cy="112" r="6" class="ring"/><text x="30" y="116">Restart the node</text></g></svg>';
+}
+function prCard(x, big) {
+  var fav = !!bag('pfav')[x.id], pct = x.prog === null ? 0 : Math.round(x.prog * 100);
+  var tags = (x.time ? '<b class="pr-tag">' + e(x.time) + '</b>' : '') + (x.level ? '<b class="pr-tag lv-' + e(x.level) + '">' + e(x.level) + '</b>' : '');
+  return '<li class="pr-li' + (big ? ' pr-big' : '') + '" data-id="' + e(x.id) + '" data-g="' + e(x.g) + '" data-q="' + e((x.title + ' ' + x.desc + ' ' + x.skills).toLowerCase()) + '">' +
+    '<a href="' + e(x.href) + '" class="pr-a pr-' + e(x.status.toLowerCase()) + '"><strong>' + e(x.title) + '</strong>' +
+    '<span class="pr-st"><i>' + e(x.status) + '</i><u>' + e(x.meta) + '</u></span>' +
+    (x.prog !== null ? '<span class="pr-bar" aria-hidden="true"><i style="width:' + pct + '%"></i></span>' : '') +
+    '<span class="pr-d">' + e(x.desc) + '</span>' + (big ? prVisual(x.id) : '') +
+    (tags ? '<span class="pr-tags">' + tags + '</span>' : '') + (x.skills ? '<span class="pr-sk">Practises ' + e(x.skills) + '</span>' : '') + '</a>' +
+    '<button type="button" class="pr-star" data-act="pr-fav" data-id="' + e(x.id) + '" aria-pressed="' + fav + '" aria-label="' + (fav ? 'Remove ' : 'Pin ') + e(x.title) + (fav ? ' from favourites' : ' to favourites') + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.5 6 .7-4.5 4.1 1.2 6-5.3-3-5.3 3 1.2-6-4.5-4.1 6-.7z"/></svg></button></li>';
+}
+function prNext(T) {
+  var F = window.MargaFeatures || {}, weak = F.weakCount ? F.weakCount() : 0, st = (S().days || []).indexOf(prDayKey(new Date())) >= 0, c = [];
+  if (weak) c.push({ t: 'Review ' + plural(weak, 'item') + ' you missed', d: 'Questions, drills and cards come back until you get them right. A correct answer clears each one.', h: '#/weak', cmd: 'marga next --weak' });
+  if (!st) c.push({ t: 'Do one quick practice today', d: 'A question, an incident and a quiz take about five minutes and keep your day streak going.', h: '#/today', cmd: 'marga next --today' });
+  c.push({ t: 'Try an incident game', d: 'Be on call for an outage and see where each choice leads. About ten minutes.', h: '#/games', cmd: 'marga next --game' });
+  c.push({ t: 'Solve a troubleshooting drill', d: 'Read real output, find the cause and pick the fix.', h: '#/drills', cmd: 'marga next --drill' });
+  c.push({ t: 'Step through an animated explainer', d: 'Watch a request move through a system, one message at a time.', h: '#/explainers', cmd: 'marga next --explainer' });
+  return c;
+}
+function prNextHtml() {
+  var c = prNext(), n = c[PRF.skip % c.length];
+  return '<div class="pr-cmd"><div class="pr-cmd-l"><p class="pr-prompt">$ ' + e(n.cmd) + '</p><h2>' + e(n.t) + '</h2><p class="pr-cmd-d">' + e(n.d) + '</p>' +
+    '<p class="pr-cmd-a"><a class="btn pr-run" href="' + e(n.h) + '">Run it</a><button type="button" class="btn pr-skip" data-act="pr-skip">Skip</button><button type="button" class="pr-why" data-act="pr-why" aria-expanded="' + PRF.why + '">Why this?</button></p>' +
+    '<p class="pr-whyt" id="pr-whyt"' + (PRF.why ? '' : ' hidden') + '>Chosen from your own progress on this device: missed items first, then today\'s practice, then something new. Nothing leaves your browser.</p></div>' +
+    '<div class="pr-cmd-r"><p class="pr-prompt">filters</p><div class="pr-flags" role="group" aria-label="Filter practice tools">' + PR_FLAGS.map(function (f) { return '<button type="button" class="pr-flag" data-act="pr-flag" data-flag="' + f[0] + '" aria-pressed="false">' + f[1] + '</button>'; }).join('') + '</div>' +
+    '<label class="pr-search"><span class="sr">Search practice tools</span><input type="search" id="pr-q" autocomplete="off" placeholder="search practice tools" value="' + e(PRF.q) + '"></label>' +
+    '<p class="small pr-count" id="pr-count" role="status" aria-live="polite"></p></div></div>';
+}
+function practiceView() {
+  view.title = 'Practice | MARGA by EknathaLabs'; view.nav = 'practice';
+  var T = prTools(), wk = prWeek(), closed = bag('prc'), feat = T.filter(function (x) { return x.g === 'featured'; });
+  var week = '<div class="pr-week" role="group" aria-label="Days practised this week"><p><b>This week</b><span>' + wk.n + ' of 7 days</span></p><ol>' + wk.days.map(function (d) { return '<li class="' + (d.on ? 'on' : '') + (d.today ? ' today' : '') + '" aria-label="' + d.name + (d.on ? ', practised' : ', not practised') + (d.today ? ', today' : '') + '">' + (d.on ? '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>' : d.label) + '</li>'; }).join('') + '</ol></div>';
+  view.html = '<section class="page-head wrap pr-head"><div><h1>Practice</h1><p class="lede">Run something. Everything here is open: no lesson needs to be passed first.</p></div>' + week + '</section>' +
+    '<div class="wrap pr" id="pr">' + prNextHtml() +
+    '<section class="pr-node pr-feat" data-g="featured" data-fg="featured"><h2><code>node/featured</code><span>Learn how systems work, fail and recover</span></h2><ul class="prac pr-grid pr-3">' + feat.map(function (x) { return prCard(x, true); }).join('') + '</ul></section>' +
+    PR_GROUPS.map(function (g) {
+      var items = T.filter(function (x) { return x.g === g[0]; });
+      return '<details class="pr-node" data-g="' + g[0] + '" data-fg="' + g[3] + '"' + (closed[g[0]] ? '' : ' open') + '><summary><code>node/' + g[1] + '</code><span>' + e(g[2]) + '</span><em>' + plural(items.length, 'tool') + '</em></summary><ul class="prac pr-grid">' + items.map(function (x) { return prCard(x, false); }).join('') + '</ul></details>';
+    }).join('') +
+    '<div class="empty" id="pr-empty" hidden><h3>No tools match</h3><p>Try another filter or a shorter search.</p><p><button type="button" class="btn btn-primary" data-act="pr-clear">Clear filters</button></p></div></div>';
+  view.after = function () {
+    prApply();
+    var q = $('#pr-q'); if (q) q.addEventListener('input', function () { PRF.q = q.value; prApply(); });
+    $$('#pr details.pr-node').forEach(function (d) { d.addEventListener('toggle', function () { var c = bag('prc'); if (d.open) delete c[d.getAttribute('data-g')]; else c[d.getAttribute('data-g')] = 1; A.save(); }); });
+  };
+}
+function prApply() {
+  if (!$('#pr')) return;
+  var words = PRF.q.trim().toLowerCase().split(/\s+/).filter(Boolean), fav = bag('pfav'), shown = 0, total = 0;
+  $$('#pr .pr-li').forEach(function (li) {
+    total++;
+    var id = li.getAttribute('data-id'), sec = li.closest('.pr-node'), fg = sec.getAttribute('data-fg');
+    var okF = PRF.flag === 'all' || (PRF.flag === 'starred' ? !!fav[id] : (fg === PRF.flag || fg === 'featured'));
+    var okQ = words.every(function (w) { return li.getAttribute('data-q').indexOf(w) >= 0; });
+    li.hidden = !(okF && okQ); if (!li.hidden) shown++;
+  });
+  $$('#pr .pr-node').forEach(function (n) { n.hidden = !n.querySelector('.pr-li:not([hidden])'); });
+  $$('.pr-flag').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-flag') === PRF.flag)); });
+  $('#pr-count').textContent = shown + ' of ' + total + ' tools shown';
+  $('#pr-empty').hidden = shown > 0;
+}
+A.onAct('pr-flag', function (b) { PRF.flag = b.getAttribute('data-flag'); prApply(); });
+A.onAct('pr-clear', function () { PRF.flag = 'all'; PRF.q = ''; var q = $('#pr-q'); if (q) q.value = ''; prApply(); });
+A.onAct('pr-fav', function (b) {
+  var f = bag('pfav'), id = b.getAttribute('data-id'); if (f[id]) delete f[id]; else f[id] = 1; A.save();
+  var on = !!f[id], t = b.getAttribute('aria-label').replace(/^(Pin|Remove) /, '').replace(/ (to|from) favourites$/, '');
+  b.setAttribute('aria-pressed', String(on)); b.setAttribute('aria-label', (on ? 'Remove ' : 'Pin ') + t + (on ? ' from favourites' : ' to favourites'));
+  if (PRF.flag === 'starred') prApply();
+});
+A.onAct('pr-skip', function () { PRF.skip++; var box = $('.pr-cmd'); if (box) { box.outerHTML = prNextHtml(); prApply(); var q = $('#pr-q'); if (q) q.addEventListener('input', function () { PRF.q = q.value; prApply(); }); var r = $('.pr-run'); if (r) r.focus(); } });
+A.onAct('pr-why', function (b) { PRF.why = !PRF.why; b.setAttribute('aria-expanded', String(PRF.why)); var w = $('#pr-whyt'); if (w) w.hidden = !PRF.why; });
 A.addRoute(/^\/practice$/, practiceView);
 
 /* =========================================================== Case studies */
