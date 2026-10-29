@@ -301,6 +301,48 @@
     "Anthropic documentation: Tool use overview",
     "https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview"
    ]
+  ],
+  "cloud-iam": [
+   [
+    "AWS IAM user guide",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html"
+   ],
+   [
+    "Azure role-based access control overview",
+    "https://learn.microsoft.com/en-us/azure/role-based-access-control/overview"
+   ],
+   [
+    "AWS Well-Architected: Security pillar",
+    "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html"
+   ]
+  ],
+  "k8s-ops": [
+   [
+    "Administer a cluster",
+    "https://kubernetes.io/docs/tasks/administer-cluster/"
+   ],
+   [
+    "Using RBAC authorization",
+    "https://kubernetes.io/docs/reference/access-authn-authz/rbac/"
+   ],
+   [
+    "Pod Security Standards",
+    "https://kubernetes.io/docs/concepts/security/pod-security-standards/"
+   ]
+  ],
+  "argocd": [
+   [
+    "Argo CD documentation",
+    "https://argo-cd.readthedocs.io/en/stable/"
+   ],
+   [
+    "Argo CD core concepts",
+    "https://argo-cd.readthedocs.io/en/stable/core_concepts/"
+   ],
+   [
+    "Automated sync policy",
+    "https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/"
+   ]
   ]
  },
  "lessons": {
@@ -3257,6 +3299,246 @@
     "Model Context Protocol: Inspector",
     "https://modelcontextprotocol.io/docs/tools/inspector"
    ]
+  ],
+  "cloud-iam/identities-principals-and-permissions": [
+   [
+    "AWS IAM user guide",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html"
+   ],
+   [
+    "Azure RBAC overview",
+    "https://learn.microsoft.com/en-us/azure/role-based-access-control/overview"
+   ]
+  ],
+  "cloud-iam/aws-iam-policies-roles-and-assume-role": [
+   [
+    "IAM policy evaluation logic",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html"
+   ],
+   [
+    "AWS IAM user guide",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html"
+   ]
+  ],
+  "cloud-iam/azure-entra-id-rbac-and-managed-identities": [
+   [
+    "Azure RBAC overview",
+    "https://learn.microsoft.com/en-us/azure/role-based-access-control/overview"
+   ],
+   [
+    "Managed identities for Azure resources",
+    "https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/overview"
+   ]
+  ],
+  "cloud-iam/least-privilege-and-access-reviews": [
+   [
+    "AWS Well-Architected: Security pillar",
+    "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html"
+   ],
+   [
+    "Azure RBAC overview",
+    "https://learn.microsoft.com/en-us/azure/role-based-access-control/overview"
+   ]
+  ],
+  "cloud-iam/secrets-and-encryption-with-kms-and-key-vaults": [
+   [
+    "AWS Well-Architected: Security pillar",
+    "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html"
+   ],
+   [
+    "Managed identities for Azure resources",
+    "https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/overview"
+   ]
+  ],
+  "cloud-iam/network-boundaries-and-private-access": [
+   [
+    "AWS Well-Architected: Security pillar",
+    "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html"
+   ],
+   [
+    "Azure RBAC overview",
+    "https://learn.microsoft.com/en-us/azure/role-based-access-control/overview"
+   ]
+  ],
+  "cloud-iam/logging-detection-and-audit-trails": [
+   [
+    "AWS Well-Architected: Security pillar",
+    "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html"
+   ],
+   [
+    "Azure RBAC overview",
+    "https://learn.microsoft.com/en-us/azure/role-based-access-control/overview"
+   ]
+  ],
+  "cloud-iam/debugging-access-denied-and-cloud-security-incidents": [
+   [
+    "IAM policy evaluation logic",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html"
+   ],
+   [
+    "AWS Well-Architected: Security pillar",
+    "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html"
+   ]
+  ],
+  "k8s-ops/the-control-plane-in-depth": [
+   [
+    "Kubernetes components",
+    "https://kubernetes.io/docs/concepts/overview/components/"
+   ],
+   [
+    "Administer a cluster",
+    "https://kubernetes.io/docs/tasks/administer-cluster/"
+   ]
+  ],
+  "k8s-ops/etcd-backup-and-restore": [
+   [
+    "Operating etcd clusters for Kubernetes",
+    "https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/"
+   ],
+   [
+    "Administer a cluster",
+    "https://kubernetes.io/docs/tasks/administer-cluster/"
+   ]
+  ],
+  "k8s-ops/upgrading-clusters-safely": [
+   [
+    "Upgrading kubeadm clusters",
+    "https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/"
+   ],
+   [
+    "Version skew policy",
+    "https://kubernetes.io/releases/version-skew-policy/"
+   ]
+  ],
+  "k8s-ops/rbac-and-service-accounts": [
+   [
+    "Using RBAC authorization",
+    "https://kubernetes.io/docs/reference/access-authn-authz/rbac/"
+   ],
+   [
+    "Service accounts",
+    "https://kubernetes.io/docs/concepts/security/service-accounts/"
+   ]
+  ],
+  "k8s-ops/nodes-draining-taints-and-capacity": [
+   [
+    "Safely drain a node",
+    "https://kubernetes.io/docs/tasks/administer-cluster/safely-drain-node/"
+   ],
+   [
+    "Taints and tolerations",
+    "https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/"
+   ]
+  ],
+  "k8s-ops/resource-quotas-limits-and-autoscaling": [
+   [
+    "Resource quotas",
+    "https://kubernetes.io/docs/concepts/policy/resource-quotas/"
+   ],
+   [
+    "Horizontal Pod Autoscaling",
+    "https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/"
+   ]
+  ],
+  "k8s-ops/network-policies-and-pod-security": [
+   [
+    "Network policies",
+    "https://kubernetes.io/docs/concepts/services-networking/network-policies/"
+   ],
+   [
+    "Pod Security Standards",
+    "https://kubernetes.io/docs/concepts/security/pod-security-standards/"
+   ]
+  ],
+  "k8s-ops/debugging-cluster-and-node-problems": [
+   [
+    "Troubleshooting clusters",
+    "https://kubernetes.io/docs/tasks/debug/debug-cluster/"
+   ],
+   [
+    "Debug running pods",
+    "https://kubernetes.io/docs/tasks/debug/debug-application/debug-running-pod/"
+   ]
+  ],
+  "argocd/pull-based-delivery-and-the-repository-as-source-of-truth": [
+   [
+    "Argo CD core concepts",
+    "https://argo-cd.readthedocs.io/en/stable/core_concepts/"
+   ],
+   [
+    "Argo CD documentation",
+    "https://argo-cd.readthedocs.io/en/stable/"
+   ]
+  ],
+  "argocd/installing-argo-cd-and-the-application-resource": [
+   [
+    "Argo CD getting started",
+    "https://argo-cd.readthedocs.io/en/stable/getting_started/"
+   ],
+   [
+    "Argo CD core concepts",
+    "https://argo-cd.readthedocs.io/en/stable/core_concepts/"
+   ]
+  ],
+  "argocd/sync-health-and-drift": [
+   [
+    "Automated sync policy",
+    "https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/"
+   ],
+   [
+    "Argo CD documentation",
+    "https://argo-cd.readthedocs.io/en/stable/"
+   ]
+  ],
+  "argocd/helm-and-kustomize-with-argo-cd": [
+   [
+    "Helm in Argo CD",
+    "https://argo-cd.readthedocs.io/en/stable/user-guide/helm/"
+   ],
+   [
+    "Kustomize in Argo CD",
+    "https://argo-cd.readthedocs.io/en/stable/user-guide/kustomize/"
+   ]
+  ],
+  "argocd/environments-app-of-apps-and-applicationsets": [
+   [
+    "ApplicationSet controller",
+    "https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/"
+   ],
+   [
+    "Cluster bootstrapping",
+    "https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/"
+   ]
+  ],
+  "argocd/hooks-sync-waves-and-progressive-delivery": [
+   [
+    "Sync phases and waves",
+    "https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/"
+   ],
+   [
+    "Resource hooks",
+    "https://argo-cd.readthedocs.io/en/stable/user-guide/resource_hooks/"
+   ]
+  ],
+  "argocd/access-projects-secrets-and-multi-cluster": [
+   [
+    "Argo CD security",
+    "https://argo-cd.readthedocs.io/en/stable/operator-manual/security/"
+   ],
+   [
+    "Projects",
+    "https://argo-cd.readthedocs.io/en/stable/user-guide/projects/"
+   ]
+  ],
+  "argocd/debugging-argo-cd": [
+   [
+    "Argo CD documentation",
+    "https://argo-cd.readthedocs.io/en/stable/"
+   ],
+   [
+    "Automated sync policy",
+    "https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/"
+   ]
   ]
  },
  "sheets": {
@@ -3590,6 +3872,48 @@
    [
     "Anthropic documentation: Tool use overview",
     "https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview"
+   ]
+  ],
+  "cloud-iam": [
+   [
+    "AWS IAM user guide",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html"
+   ],
+   [
+    "Azure role-based access control overview",
+    "https://learn.microsoft.com/en-us/azure/role-based-access-control/overview"
+   ],
+   [
+    "AWS Well-Architected: Security pillar",
+    "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html"
+   ]
+  ],
+  "k8s-ops": [
+   [
+    "Administer a cluster",
+    "https://kubernetes.io/docs/tasks/administer-cluster/"
+   ],
+   [
+    "Using RBAC authorization",
+    "https://kubernetes.io/docs/reference/access-authn-authz/rbac/"
+   ],
+   [
+    "Pod Security Standards",
+    "https://kubernetes.io/docs/concepts/security/pod-security-standards/"
+   ]
+  ],
+  "argocd": [
+   [
+    "Argo CD documentation",
+    "https://argo-cd.readthedocs.io/en/stable/"
+   ],
+   [
+    "Argo CD core concepts",
+    "https://argo-cd.readthedocs.io/en/stable/core_concepts/"
+   ],
+   [
+    "Automated sync policy",
+    "https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/"
    ]
   ]
  }
