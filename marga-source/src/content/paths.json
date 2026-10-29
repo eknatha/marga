@@ -1,187 +1,198 @@
 {
-  "live": [
-    {
-      "id": "devops",
-      "title": "DevOps Engineer",
-      "summary": "Automate the path from code to production: Linux, Bash and Python, networking, containers, pipelines, Kubernetes, infrastructure as code, cloud and monitoring.",
-      "audience": "Sysadmins, developers and support engineers moving into DevOps roles.",
-      "modules": [
-        "linux",
-        "git",
-        "bash",
-        "python",
-        "go",
-        "networking",
-        "docker",
-        "cicd",
-        "kubernetes",
-        "helm",
-        "terraform",
-        "ansible",
-        "cloud",
-        "databases",
-        "observability"
-      ],
-      "outcomes": [
-        "Administer and troubleshoot Linux servers from the command line.",
-        "Automate routine work with safe, readable Bash scripts.",
-        "Package applications as small, secure container images.",
-        "Build CI/CD pipelines with tests, artifacts and staged deployments.",
-        "Deploy and debug workloads on Kubernetes.",
-        "Provision infrastructure with Terraform and keep state safe.",
-        "Add metrics, logs and alerts so you know when a release hurts users.",
-        "Write Python and Bash automation that talks to APIs and cloud SDKs.",
-        "Operate across AWS and Azure well enough to deploy a full stack.",
-        "Keep fleets of servers consistent with Ansible inventories, playbooks and roles.",
-        "Operate relational databases: indexes, backups, replication and safe schema changes.",
-        "Use Git daily: branches, merges, rebase, pull requests, tags and recovery with the reflog."
-      ]
-    },
-    {
-      "id": "cloud",
-      "title": "Cloud Engineer",
-      "summary": "Design and run cloud infrastructure on AWS and Azure with networking, identity, Terraform, serverless, containers and monitoring.",
-      "audience": "Engineers who build and operate infrastructure in public cloud accounts.",
-      "modules": [
-        "linux",
-        "git",
-        "bash",
-        "python",
-        "go",
-        "networking",
-        "cloud",
-        "databases",
-        "terraform",
-        "docker",
-        "kubernetes",
-        "helm",
-        "cicd",
-        "observability"
-      ],
-      "outcomes": [
-        "Explain the shared responsibility model and apply least-privilege identity.",
-        "Design virtual networks with public and private subnets on AWS and Azure.",
-        "Choose between virtual machines, containers and serverless for a workload.",
-        "Provision and change cloud resources safely with Terraform.",
-        "Run managed Kubernetes and ship to it from a pipeline.",
-        "Track cost and apply well-architected practices.",
-        "Build serverless and managed Kubernetes workloads, and secure them with governance controls.",
-        "Script cloud tasks with Python and the CLI.",
-        "Run managed and self-hosted databases with backups, failover and tested restores."
-      ]
-    },
-    {
-      "id": "sre",
-      "title": "Site Reliability Engineer",
-      "summary": "Keep services reliable: Linux, containers and cloud first, then observability, SLOs, on-call, incident response, capacity and chaos testing.",
-      "audience": "Operations and platform engineers who own uptime and on-call.",
-      "modules": [
-        "linux",
-        "git",
-        "bash",
-        "python",
-        "go",
-        "networking",
-        "docker",
-        "cicd",
-        "kubernetes",
-        "helm",
-        "terraform",
-        "ansible",
-        "cloud",
-        "databases",
-        "observability",
-        "sre"
-      ],
-      "outcomes": [
-        "Debug performance and failures on Linux and in Kubernetes.",
-        "Instrument services and write alerts that page for symptoms, not noise.",
-        "Define SLIs and SLOs, and use error budgets to guide release decisions.",
-        "Run an incident with clear roles, communication and a timeline.",
-        "Write blameless postmortems that lead to real fixes.",
-        "Find toil and replace it with automation.",
-        "Run a healthy on-call rotation and plan capacity before it runs out.",
-        "Practise failure with game days and manage change safely.",
-        "Reason about database failure modes, recovery targets and safe change rollouts."
-      ]
-    },
-    {
-      "id": "devsecops",
-      "title": "DevSecOps Engineer",
-      "summary": "Secure delivery from code to cloud: pipeline and supply chain controls, hardened containers and clusters, secrets, cloud identity and security incident response.",
-      "audience": "DevOps, platform and security engineers who own the safety of what ships.",
-      "modules": [
-        "linux",
-        "git",
-        "bash",
-        "python",
-        "go",
-        "networking",
-        "docker",
-        "cicd",
-        "kubernetes",
-        "helm",
-        "terraform",
-        "ansible",
-        "cloud",
-        "databases",
-        "security",
-        "observability"
-      ],
-      "outcomes": [
-        "Run a threat modeling session and turn findings into tracked work.",
-        "Keep secrets out of code and images, and use short-lived credentials.",
-        "Add dependency, code, infrastructure and image scanning to a pipeline with sensible gates.",
-        "Produce an SBOM and sign artifacts so deployments can verify them.",
-        "Harden containers and Kubernetes workloads with least privilege and network policies.",
-        "Design least-privilege cloud identity and protect audit logs.",
-        "Prioritise vulnerabilities by real risk and meet agreed fix times.",
-        "Lead the first hour of a security incident while preserving evidence.",
-        "Protect automation secrets with Vault and keep database backups, access and migrations safe."
-      ]
-    },
-    {
-      "id": "ai",
-      "title": "AI Engineer",
-      "summary": "Build with large language models: how they work, prompting and structured output, Claude Skills, and tool use with the Model Context Protocol, on top of Linux, Git, Python and networking.",
-      "audience": "Developers and DevOps engineers who want to build, package and operate AI features safely.",
-      "modules": [
-        "linux",
-        "git",
-        "python",
-        "networking",
-        "llm",
-        "prompting",
-        "claude-skills",
-        "mcp"
-      ],
-      "outcomes": [
-        "Explain tokens, context windows, sampling and why models make mistakes.",
-        "Call a model API with sensible limits, retries, streaming and cost control.",
-        "Write prompts with clear roles, examples and constraints, and test them like code.",
-        "Get structured JSON from a model and validate, repair or reject it.",
-        "Package repeatable expertise as a Claude Skill with a description that triggers reliably.",
-        "Test, version and review skills before sharing them with a team.",
-        "Define tools with schemas and run the tool-use loop correctly.",
-        "Build a small MCP server and defend it against prompt injection and over-broad permissions."
-      ]
-    }
-  ],
-  "planned": [
-    {
-      "id": "platform",
-      "title": "Platform Engineer",
-      "summary": "Build internal developer platforms, golden paths and self-service infrastructure."
-    },
-    {
-      "id": "k8s-admin",
-      "title": "Kubernetes Administrator (CKA and CKS)",
-      "summary": "A focused path for cluster administration and security certification practice."
-    },
-    {
-      "id": "mlops",
-      "title": "MLOps and AI infrastructure",
-      "summary": "Run model training and serving workloads reliably on shared infrastructure."
-    }
-  ]
+ "live": [
+  {
+   "id": "devops",
+   "title": "DevOps Engineer",
+   "summary": "Automate the path from code to production: Linux, Bash and Python, networking, containers, pipelines, Kubernetes, infrastructure as code, cloud and monitoring.",
+   "audience": "Sysadmins, developers and support engineers moving into DevOps roles.",
+   "modules": [
+    "linux",
+    "git",
+    "bash",
+    "python",
+    "go",
+    "networking",
+    "docker",
+    "cicd",
+    "kubernetes",
+    "helm",
+    "k8s-ops",
+    "argocd",
+    "terraform",
+    "ansible",
+    "cloud",
+    "databases",
+    "observability"
+   ],
+   "outcomes": [
+    "Administer and troubleshoot Linux servers from the command line.",
+    "Automate routine work with safe, readable Bash scripts.",
+    "Package applications as small, secure container images.",
+    "Build CI/CD pipelines with tests, artifacts and staged deployments.",
+    "Deploy and debug workloads on Kubernetes.",
+    "Provision infrastructure with Terraform and keep state safe.",
+    "Add metrics, logs and alerts so you know when a release hurts users.",
+    "Write Python and Bash automation that talks to APIs and cloud SDKs.",
+    "Operate across AWS and Azure well enough to deploy a full stack.",
+    "Keep fleets of servers consistent with Ansible inventories, playbooks and roles.",
+    "Operate relational databases: indexes, backups, replication and safe schema changes.",
+    "Use Git daily: branches, merges, rebase, pull requests, tags and recovery with the reflog."
+   ]
+  },
+  {
+   "id": "cloud",
+   "title": "Cloud Engineer",
+   "summary": "Design and run cloud infrastructure on AWS and Azure with networking, identity, Terraform, serverless, containers and monitoring.",
+   "audience": "Engineers who build and operate infrastructure in public cloud accounts.",
+   "modules": [
+    "linux",
+    "git",
+    "bash",
+    "python",
+    "go",
+    "networking",
+    "cloud",
+    "cloud-iam",
+    "databases",
+    "terraform",
+    "docker",
+    "kubernetes",
+    "helm",
+    "k8s-ops",
+    "argocd",
+    "cicd",
+    "observability"
+   ],
+   "outcomes": [
+    "Explain the shared responsibility model and apply least-privilege identity.",
+    "Design virtual networks with public and private subnets on AWS and Azure.",
+    "Choose between virtual machines, containers and serverless for a workload.",
+    "Provision and change cloud resources safely with Terraform.",
+    "Run managed Kubernetes and ship to it from a pipeline.",
+    "Track cost and apply well-architected practices.",
+    "Build serverless and managed Kubernetes workloads, and secure them with governance controls.",
+    "Script cloud tasks with Python and the CLI.",
+    "Run managed and self-hosted databases with backups, failover and tested restores."
+   ]
+  },
+  {
+   "id": "sre",
+   "title": "Site Reliability Engineer",
+   "summary": "Keep services reliable: Linux, containers and cloud first, then observability, SLOs, on-call, incident response, capacity and chaos testing.",
+   "audience": "Operations and platform engineers who own uptime and on-call.",
+   "modules": [
+    "linux",
+    "git",
+    "bash",
+    "python",
+    "go",
+    "networking",
+    "docker",
+    "cicd",
+    "kubernetes",
+    "helm",
+    "k8s-ops",
+    "argocd",
+    "terraform",
+    "ansible",
+    "cloud",
+    "cloud-iam",
+    "databases",
+    "observability",
+    "sre"
+   ],
+   "outcomes": [
+    "Debug performance and failures on Linux and in Kubernetes.",
+    "Instrument services and write alerts that page for symptoms, not noise.",
+    "Define SLIs and SLOs, and use error budgets to guide release decisions.",
+    "Run an incident with clear roles, communication and a timeline.",
+    "Write blameless postmortems that lead to real fixes.",
+    "Find toil and replace it with automation.",
+    "Run a healthy on-call rotation and plan capacity before it runs out.",
+    "Practise failure with game days and manage change safely.",
+    "Reason about database failure modes, recovery targets and safe change rollouts."
+   ]
+  },
+  {
+   "id": "devsecops",
+   "title": "DevSecOps Engineer",
+   "summary": "Secure delivery from code to cloud: pipeline and supply chain controls, hardened containers and clusters, secrets, cloud identity and security incident response.",
+   "audience": "DevOps, platform and security engineers who own the safety of what ships.",
+   "modules": [
+    "linux",
+    "git",
+    "bash",
+    "python",
+    "go",
+    "networking",
+    "docker",
+    "cicd",
+    "kubernetes",
+    "helm",
+    "k8s-ops",
+    "argocd",
+    "terraform",
+    "ansible",
+    "cloud",
+    "cloud-iam",
+    "databases",
+    "security",
+    "observability"
+   ],
+   "outcomes": [
+    "Run a threat modeling session and turn findings into tracked work.",
+    "Keep secrets out of code and images, and use short-lived credentials.",
+    "Add dependency, code, infrastructure and image scanning to a pipeline with sensible gates.",
+    "Produce an SBOM and sign artifacts so deployments can verify them.",
+    "Harden containers and Kubernetes workloads with least privilege and network policies.",
+    "Design least-privilege cloud identity and protect audit logs.",
+    "Prioritise vulnerabilities by real risk and meet agreed fix times.",
+    "Lead the first hour of a security incident while preserving evidence.",
+    "Protect automation secrets with Vault and keep database backups, access and migrations safe."
+   ]
+  },
+  {
+   "id": "ai",
+   "title": "AI Engineer",
+   "summary": "Build with large language models: how they work, prompting and structured output, Claude Skills, and tool use with the Model Context Protocol, on top of Linux, Git, Python and networking.",
+   "audience": "Developers and DevOps engineers who want to build, package and operate AI features safely.",
+   "modules": [
+    "linux",
+    "git",
+    "python",
+    "networking",
+    "llm",
+    "prompting",
+    "claude-skills",
+    "mcp"
+   ],
+   "outcomes": [
+    "Explain tokens, context windows, sampling and why models make mistakes.",
+    "Call a model API with sensible limits, retries, streaming and cost control.",
+    "Write prompts with clear roles, examples and constraints, and test them like code.",
+    "Get structured JSON from a model and validate, repair or reject it.",
+    "Package repeatable expertise as a Claude Skill with a description that triggers reliably.",
+    "Test, version and review skills before sharing them with a team.",
+    "Define tools with schemas and run the tool-use loop correctly.",
+    "Build a small MCP server and defend it against prompt injection and over-broad permissions."
+   ]
+  }
+ ],
+ "planned": [
+  {
+   "id": "platform",
+   "title": "Platform Engineer",
+   "summary": "Build internal developer platforms, golden paths and self-service infrastructure."
+  },
+  {
+   "id": "k8s-admin",
+   "title": "Kubernetes Administrator (CKA and CKS)",
+   "summary": "A focused path for cluster administration and security certification practice."
+  },
+  {
+   "id": "mlops",
+   "title": "MLOps and AI infrastructure",
+   "summary": "Run model training and serving workloads reliably on shared infrastructure."
+  }
+ ]
 }
