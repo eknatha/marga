@@ -245,6 +245,62 @@
     "Kubernetes documentation",
     "https://kubernetes.io/docs/home/"
    ]
+  ],
+  "llm": [
+   [
+    "Anthropic documentation: Build with Claude",
+    "https://docs.anthropic.com/en/docs/build-with-claude/overview"
+   ],
+   [
+    "Anthropic documentation: Models overview",
+    "https://docs.anthropic.com/en/docs/about-claude/models/overview"
+   ],
+   [
+    "Anthropic API reference",
+    "https://docs.anthropic.com/en/api/overview"
+   ]
+  ],
+  "prompting": [
+   [
+    "Anthropic documentation: Prompt engineering overview",
+    "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview"
+   ],
+   [
+    "JSON Schema",
+    "https://json-schema.org/understanding-json-schema/"
+   ],
+   [
+    "Anthropic documentation: Test and evaluate",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests"
+   ]
+  ],
+  "claude-skills": [
+   [
+    "Claude documentation: Agent Skills overview",
+    "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview"
+   ],
+   [
+    "Claude documentation: Skill authoring best practices",
+    "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/best-practices"
+   ],
+   [
+    "Claude Code documentation: Skills",
+    "https://docs.claude.com/en/docs/claude-code/skills"
+   ]
+  ],
+  "mcp": [
+   [
+    "Model Context Protocol: Introduction",
+    "https://modelcontextprotocol.io/introduction"
+   ],
+   [
+    "Model Context Protocol: Specification",
+    "https://modelcontextprotocol.io/specification"
+   ],
+   [
+    "Anthropic documentation: Tool use overview",
+    "https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview"
+   ]
   ]
  },
  "lessons": {
@@ -2881,6 +2937,326 @@
     "Netfilter conntrack sysctl",
     "https://docs.kernel.org/networking/nf_conntrack-sysctl.html"
    ]
+  ],
+  "llm/what-an-llm-is-and-how-it-predicts-tokens": [
+   [
+    "Anthropic documentation: Models overview",
+    "https://docs.anthropic.com/en/docs/about-claude/models/overview"
+   ],
+   [
+    "Anthropic documentation: Glossary",
+    "https://docs.anthropic.com/en/docs/resources/glossary"
+   ]
+  ],
+  "llm/tokens-context-windows-and-limits": [
+   [
+    "Anthropic documentation: Context windows",
+    "https://docs.anthropic.com/en/docs/build-with-claude/context-windows"
+   ],
+   [
+    "Anthropic documentation: Token counting",
+    "https://docs.anthropic.com/en/docs/build-with-claude/token-counting"
+   ]
+  ],
+  "llm/sampling-temperature-and-determinism": [
+   [
+    "Anthropic API reference: Messages",
+    "https://docs.anthropic.com/en/api/messages"
+   ],
+   [
+    "Anthropic documentation: Reduce hallucinations",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/strengthen-guardrails/reduce-hallucinations"
+   ]
+  ],
+  "llm/training-fine-tuning-and-where-knowledge-comes-from": [
+   [
+    "Anthropic documentation: Reduce hallucinations",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/strengthen-guardrails/reduce-hallucinations"
+   ],
+   [
+    "Anthropic documentation: Models overview",
+    "https://docs.anthropic.com/en/docs/about-claude/models/overview"
+   ]
+  ],
+  "llm/calling-an-llm-api": [
+   [
+    "Anthropic API reference: Messages",
+    "https://docs.anthropic.com/en/api/messages"
+   ],
+   [
+    "Anthropic API: Rate limits",
+    "https://docs.anthropic.com/en/api/rate-limits"
+   ]
+  ],
+  "llm/cost-latency-and-caching": [
+   [
+    "Anthropic documentation: Prompt caching",
+    "https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching"
+   ],
+   [
+    "Anthropic documentation: Message Batches",
+    "https://docs.anthropic.com/en/docs/build-with-claude/batch-processing"
+   ]
+  ],
+  "llm/choosing-and-evaluating-models": [
+   [
+    "Anthropic documentation: Define success criteria",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/define-success"
+   ],
+   [
+    "Anthropic documentation: Develop test cases",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests"
+   ]
+  ],
+  "llm/debugging-llm-applications": [
+   [
+    "Anthropic documentation: Reduce latency",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/strengthen-guardrails/reduce-latency"
+   ],
+   [
+    "Anthropic documentation: Errors",
+    "https://docs.anthropic.com/en/api/errors"
+   ]
+  ],
+  "prompting/anatomy-of-a-good-prompt": [
+   [
+    "Anthropic documentation: Prompt engineering overview",
+    "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview"
+   ],
+   [
+    "Anthropic documentation: Be clear and direct",
+    "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/be-clear-and-direct"
+   ]
+  ],
+  "prompting/examples-and-few-shot-prompting": [
+   [
+    "Anthropic documentation: Use examples (multishot prompting)",
+    "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/multishot-prompting"
+   ],
+   [
+    "Anthropic documentation: Use XML tags",
+    "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/use-xml-tags"
+   ]
+  ],
+  "prompting/reasoning-and-step-by-step-prompts": [
+   [
+    "Anthropic documentation: Extended thinking",
+    "https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking"
+   ],
+   [
+    "Anthropic documentation: Chain prompts",
+    "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/chain-prompts"
+   ]
+  ],
+  "prompting/system-prompts-roles-and-context-layout": [
+   [
+    "Anthropic documentation: System prompts",
+    "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/system-prompts"
+   ],
+   [
+    "Anthropic documentation: Long context tips",
+    "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/long-context-tips"
+   ]
+  ],
+  "prompting/structured-output-json-and-schemas": [
+   [
+    "Anthropic documentation: Tool use overview",
+    "https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview"
+   ],
+   [
+    "JSON Schema",
+    "https://json-schema.org/understanding-json-schema/"
+   ]
+  ],
+  "prompting/validating-repairing-and-retrying-outputs": [
+   [
+    "Anthropic documentation: Increase output consistency",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/strengthen-guardrails/increase-consistency"
+   ],
+   [
+    "Anthropic documentation: Reduce hallucinations",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/strengthen-guardrails/reduce-hallucinations"
+   ]
+  ],
+  "prompting/prompt-versioning-and-testing": [
+   [
+    "Anthropic documentation: Develop test cases",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests"
+   ],
+   [
+    "Anthropic documentation: Using the Evaluation Tool",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/eval-tool"
+   ]
+  ],
+  "prompting/debugging-bad-prompts": [
+   [
+    "Anthropic documentation: Prompt engineering overview",
+    "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview"
+   ],
+   [
+    "Anthropic documentation: Strengthen guardrails",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/strengthen-guardrails/reduce-prompt-leak"
+   ]
+  ],
+  "claude-skills/what-a-claude-skill-is": [
+   [
+    "Claude documentation: Agent Skills overview",
+    "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview"
+   ],
+   [
+    "Claude Code documentation: Skills",
+    "https://docs.claude.com/en/docs/claude-code/skills"
+   ]
+  ],
+  "claude-skills/anatomy-of-a-skill-folder": [
+   [
+    "Claude documentation: Skill authoring best practices",
+    "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/best-practices"
+   ],
+   [
+    "Claude documentation: Agent Skills overview",
+    "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview"
+   ]
+  ],
+  "claude-skills/writing-descriptions-that-trigger": [
+   [
+    "Claude documentation: Skill authoring best practices",
+    "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/best-practices"
+   ],
+   [
+    "Claude Code documentation: Skills",
+    "https://docs.claude.com/en/docs/claude-code/skills"
+   ]
+  ],
+  "claude-skills/progressive-disclosure-and-structure": [
+   [
+    "Claude documentation: Agent Skills overview",
+    "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview"
+   ],
+   [
+    "Claude documentation: Skill authoring best practices",
+    "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/best-practices"
+   ]
+  ],
+  "claude-skills/scripts-and-deterministic-steps": [
+   [
+    "Claude documentation: Skill authoring best practices",
+    "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/best-practices"
+   ],
+   [
+    "Python documentation: sys.exit",
+    "https://docs.python.org/3/library/sys.html#sys.exit"
+   ]
+  ],
+  "claude-skills/testing-and-evaluating-a-skill": [
+   [
+    "Claude documentation: Skill authoring best practices",
+    "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/best-practices"
+   ],
+   [
+    "Anthropic documentation: Develop test cases",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests"
+   ]
+  ],
+  "claude-skills/sharing-versioning-and-skill-security": [
+   [
+    "Claude documentation: Agent Skills overview",
+    "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview"
+   ],
+   [
+    "OWASP Top 10 for LLM Applications",
+    "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+   ]
+  ],
+  "claude-skills/debugging-skills-that-do-not-trigger-or-misbehave": [
+   [
+    "Claude Code documentation: Skills",
+    "https://docs.claude.com/en/docs/claude-code/skills"
+   ],
+   [
+    "Claude documentation: Skill authoring best practices",
+    "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/best-practices"
+   ]
+  ],
+  "mcp/why-tools-and-what-mcp-is": [
+   [
+    "Model Context Protocol: Introduction",
+    "https://modelcontextprotocol.io/introduction"
+   ],
+   [
+    "Model Context Protocol: Architecture",
+    "https://modelcontextprotocol.io/docs/concepts/architecture"
+   ]
+  ],
+  "mcp/function-calling-and-tool-schemas": [
+   [
+    "Anthropic documentation: Tool use overview",
+    "https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview"
+   ],
+   [
+    "JSON Schema",
+    "https://json-schema.org/understanding-json-schema/"
+   ]
+  ],
+  "mcp/the-tool-use-loop": [
+   [
+    "Anthropic documentation: How to implement tool use",
+    "https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/implement-tool-use"
+   ],
+   [
+    "Anthropic documentation: Tool use overview",
+    "https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview"
+   ]
+  ],
+  "mcp/mcp-architecture-hosts-clients-servers-transports": [
+   [
+    "Model Context Protocol: Specification",
+    "https://modelcontextprotocol.io/specification"
+   ],
+   [
+    "Model Context Protocol: Transports",
+    "https://modelcontextprotocol.io/docs/concepts/transports"
+   ]
+  ],
+  "mcp/building-an-mcp-server-in-python": [
+   [
+    "Model Context Protocol: Build a server",
+    "https://modelcontextprotocol.io/docs/develop/build-server"
+   ],
+   [
+    "MCP Python SDK documentation",
+    "https://modelcontextprotocol.io/docs/sdk"
+   ]
+  ],
+  "mcp/resources-prompts-and-other-primitives": [
+   [
+    "Model Context Protocol: Resources",
+    "https://modelcontextprotocol.io/docs/concepts/resources"
+   ],
+   [
+    "Model Context Protocol: Prompts",
+    "https://modelcontextprotocol.io/docs/concepts/prompts"
+   ]
+  ],
+  "mcp/permissions-auth-and-prompt-injection-defence": [
+   [
+    "Model Context Protocol: Authorization",
+    "https://modelcontextprotocol.io/specification/2025-03-26/basic/authorization"
+   ],
+   [
+    "OWASP Top 10 for LLM Applications",
+    "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+   ]
+  ],
+  "mcp/debugging-tool-use-and-mcp": [
+   [
+    "Model Context Protocol: Debugging",
+    "https://modelcontextprotocol.io/docs/tools/debugging"
+   ],
+   [
+    "Model Context Protocol: Inspector",
+    "https://modelcontextprotocol.io/docs/tools/inspector"
+   ]
   ]
  },
  "sheets": {
@@ -3158,6 +3534,62 @@
    [
     "Kubernetes documentation",
     "https://kubernetes.io/docs/home/"
+   ]
+  ],
+  "llm": [
+   [
+    "Anthropic documentation: Build with Claude",
+    "https://docs.anthropic.com/en/docs/build-with-claude/overview"
+   ],
+   [
+    "Anthropic documentation: Models overview",
+    "https://docs.anthropic.com/en/docs/about-claude/models/overview"
+   ],
+   [
+    "Anthropic API reference",
+    "https://docs.anthropic.com/en/api/overview"
+   ]
+  ],
+  "prompting": [
+   [
+    "Anthropic documentation: Prompt engineering overview",
+    "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview"
+   ],
+   [
+    "JSON Schema",
+    "https://json-schema.org/understanding-json-schema/"
+   ],
+   [
+    "Anthropic documentation: Test and evaluate",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests"
+   ]
+  ],
+  "claude-skills": [
+   [
+    "Claude documentation: Agent Skills overview",
+    "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview"
+   ],
+   [
+    "Claude documentation: Skill authoring best practices",
+    "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/best-practices"
+   ],
+   [
+    "Claude Code documentation: Skills",
+    "https://docs.claude.com/en/docs/claude-code/skills"
+   ]
+  ],
+  "mcp": [
+   [
+    "Model Context Protocol: Introduction",
+    "https://modelcontextprotocol.io/introduction"
+   ],
+   [
+    "Model Context Protocol: Specification",
+    "https://modelcontextprotocol.io/specification"
+   ],
+   [
+    "Anthropic documentation: Tool use overview",
+    "https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview"
    ]
   ]
  }
