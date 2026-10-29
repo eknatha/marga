@@ -180,12 +180,12 @@ function caseHtml(c) {
   var text = c.title + '. ' + c.company + ', ' + c.year + '. What happened. ' + c.what + ' Cause. ' + c.cause + ' What changed. ' + c.fix + ' Lesson. ' + c.lesson;
   return '<article class="case' + (open ? ' open' : '') + (read ? ' read' : '') + '" id="case-' + c.id + '" data-id="' + c.id + '">' +
     '<h3><button type="button" class="case-toggle" data-act="case-toggle" aria-expanded="' + open + '" aria-controls="cb-' + c.id + '">' + e(c.title) + '</button></h3>' +
-    '<p class="iv-meta"><span class="chip">' + e(c.company) + ', ' + c.year + '</span><span class="chip lvl-senior">' + e(c.area) + '</span>' + (read ? '<span class="chip pass">Read</span>' : '') + '</p>' +
+    '<p class="iv-meta"><span class="chip">' + e(c.company) + ', ' + c.year + '</span><span class="chip lvl-senior">' + e(c.area) + '</span>' + (read ? '<span class="chip pass">Read</span>' : '') + (A.caseFileFor && A.caseFileFor(c.id) ? '<span class="chip cf-has">Case file</span>' : '') + '</p>' +
     '<div class="case-body" id="cb-' + c.id + '"' + (open ? '' : ' hidden') + '>' +
     '<dl class="case-dl"><dt>What happened</dt><dd>' + e(c.what) + '</dd><dt>Cause</dt><dd>' + e(c.cause) + '</dd><dt>What changed</dt><dd>' + e(c.fix) + '</dd><dt>Lesson</dt><dd class="case-lesson">' + e(c.lesson) + '</dd></dl>' +
     '<p class="small">Related stages: ' + chips(c.modules) + '</p>' +
     '<p class="small">Original source: <a href="' + e(c.source.u) + '" target="_blank" rel="noopener">' + e(c.source.t) + '</a> <span class="host">' + e(c.source.u.replace(/^https:\/\/([^\/]+).*$/, '$1')) + '</span></p>' +
-    '<div class="actions">' + say(null, text) + '<button type="button" class="btn btn-quiet" data-act="case-read">' + (read ? 'Mark as unread' : 'Mark as read') + '</button></div></div></article>';
+    '<div class="actions">' + (A.caseFileFor && A.caseFileFor(c.id) ? '<a class="btn btn-primary" href="' + A.caseFileFor(c.id) + '">Open the full case file</a>' : '') + say(null, text) + '<button type="button" class="btn btn-quiet" data-act="case-read">' + (read ? 'Mark as unread' : 'Mark as read') + '</button></div></div></article>';
 }
 function casesView(param) {
   if (param) { if (MOD[param]) { csFilter.mod = param; csFilter.open = ''; } else if (CASES.some(function (c) { return c.id === param; })) { csFilter.open = param; csFilter.area = ''; csFilter.mod = ''; csFilter.q = ''; } }
