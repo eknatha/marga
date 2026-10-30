@@ -41,6 +41,7 @@ function hours(m) { return m >= 90 ? 'about ' + Math.round(m / 60) + ' hours' : 
 
 /* used by the lesson page: which plan day is this lesson part of */
 window.MargaPlanInfo = {
+  all: function () { return PL.map(function (p) { return { plan: p, s: summary(p) }; }); },
   forLesson: function (lid) {
     var out = [];
     PL.forEach(function (p) { p.days.forEach(function (d, i) { if (d.items.some(function (x) { return x.t === 'lesson' && x.id === lid; })) { var s = summary(p); out.push({ plan: p, day: i + 1, total: p.days.length, pct: s.pct, started: s.done > 0 || Object.keys(ticks(p.id)).length > 0 }); } }); });
