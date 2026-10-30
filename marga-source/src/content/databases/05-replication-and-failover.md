@@ -71,9 +71,9 @@ Replication lag. The replica has not applied the change yet. Read from the prima
 
 ```diagram
 title: A failover
-node: fail | Primary fails | 0 | 1 | Hardware, network or process failure. | A false alarm may trigger an unneeded failover.
+node: fail | Primary fails | 0 | 1 | Hardware, network or process failure. | A false alarm may trigger an unneeded failover. | process
 node: elect | Decide and fence | 1 | 1 | A quorum agrees, and the old primary is cut off. | Without fencing, two primaries can accept writes.
-node: promote | Promote a replica | 2 | 1 | The most up-to-date replica becomes the primary. | A lagging replica loses recent commits.
+node: promote | Promote a replica | 2 | 1 | The most up-to-date replica becomes the primary. | A lagging replica loses recent commits. | process
 node: redirect | Redirect clients | 3 | 1 | DNS, a virtual IP or proxy moves traffic. | Cached DNS and old connections keep going to the failed node.
 edge: fail | elect
 edge: elect | promote

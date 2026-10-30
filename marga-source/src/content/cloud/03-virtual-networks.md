@@ -96,7 +96,7 @@ The database group allows port 5432 only from `sg-0app111`, but the new server w
 ```diagram
 title: A three tier network in the cloud
 node: net | Internet | 0 | 1 | Users reach the public load balancer. | Open rules beyond 80 and 443 expose more.
-node: pub | Public subnet | 1 | 1 | Holds load balancers and NAT. | A server here with a public IP is directly exposed.
+node: pub | Public subnet | 1 | 1 | Holds load balancers and NAT. | A server here with a public IP is directly exposed. | edge
 node: app | Private app subnet | 2 | 0 | Application servers with no public IP. | Missing NAT means they cannot download updates.
 node: db | Private data subnet | 2 | 2 | Databases that accept traffic only from the app tier. | A broad rule exposes data.
 node: nat | NAT gateway | 3 | 0 | Allows outbound traffic from private subnets. | If it fails, patches and external calls stop.
