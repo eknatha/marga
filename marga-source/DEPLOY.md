@@ -196,3 +196,4 @@ Round 22b: System design lab page (src/app/sdlab.js, loaded from shell.html and 
 
 Round 22c: 12 more system-design lessons, mock design interview page (in src/app/sdlab.js). No new settings.
 Round 23: 102 interactive widgets (src/widgets/*.json, src/app/widgets.js) and a Try it panel on every lesson. No new settings.
+Round 24: diagram system, 5 learning plans, lesson page redesign, widget presets. New files: src/app/diagrams.js, src/app/plans.js, src/plans/plans.json. No new settings.

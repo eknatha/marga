@@ -104,3 +104,10 @@ New skill: **System design for platform and SRE** (`system-design`, Advanced, re
 - Motion stops under reduced-motion settings. Nodes marked as controls (a replica, a server) can be toggled with the keyboard.
 - `tools/validate.js` loads the engine and evaluates every expression at the defaults, at every min/max combination of the sliders and with every toggle combination, and fails on bad numbers, unknown lessons, missing verdicts or a skill with fewer than 4 widgets.
 - These are simplified models made for intuition. Some use round illustrative numbers (typical recovery times, relative costs, a goroutine stack size); they are labelled as such on the page and are not measurements.
+
+### Round 24: diagrams, plans, lesson page, widget presets
+
+- **Diagram system.** Every ```diagram block now draws typed components (client, edge, service, data, queue, cache, control, observability, security, external), a legend, numbered arrows with a flow toggle, and highlights a component with its arrows on click. Code in `src/app/diagrams.js`; kinds are inferred from the label, or set with a 7th field on a `node:` line.
+- **Learning plans** at `#/plans` and `#/plan/<id>`: five 30-day plans (SRE, system design, Kubernetes, Linux and shell, cloud and infrastructure as code) in `src/plans/plans.json`, built from contiguous lesson prefixes so the sequential lock never blocks a day. Lessons and widgets tick themselves; drills, case studies and links have a checkbox. No dates. Progress is stored under `pl` and travels with export and import.
+- **Lesson page.** A four-step rail (In this lesson, Try it, Quiz, Next) with a reading progress bar, a Key takeaways box from the lesson's flashcards, a "Part of your plan, day N" chip and a sources line.
+- **Widget presets.** Each widget has "Break it" and "Fix it" presets, found by searching the widget's own verdict rules (`/home/claude/gen/w/presets.js` was the generator; presets are stored in the JSON). "Predict first" hides the result until you guess. The URL keeps the slider values, so "Copy link to this setup" shares the exact state.

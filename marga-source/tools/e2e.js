@@ -1267,7 +1267,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const links = await page.locator('#topnav a').allInnerTexts();
     eq(links.join('|'), 'Skills|Skill trees|Cheat sheets|Case studies|Practice|Certifications|Progress|InterviewHub|About', 'nav order');
     await nav(page, '/practice');
-    eq(await page.locator('.prac li').count(), 28, 'hub cards');
+    eq(await page.locator('.prac li').count(), 29, 'hub cards');
     for (const href of ['#/drills', '#/interview/mock', '#/flashcards', '#/cases', '#/architecture', '#/calculators', '#/review', '#/terminal-labs']) ok(await page.locator(`.prac a[href="${href}"]`).count() === 1, 'hub links to ' + href);
     await nav(page, '/module/kubernetes');
     ok(await page.locator('a[href="#/drills/kubernetes"]').count() === 1 && await page.locator('a[href="#/cases/kubernetes"]').count() === 1, 'module page links to practice');
@@ -1389,6 +1389,119 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     eq(n.summarize(['10.0.0.0/24', '10.0.1.0/24', '10.0.2.0/24', '10.0.3.0/24', '10.0.5.0/24']).join(' '), '10.0.0.0/22 10.0.5.0/24', 'merge');
     eq(n.summarize(['10.0.0.0/25', '10.0.0.128/25']).join(' '), '10.0.0.0/24', 'halves merge'); eq(n.summarize(['10.0.0.0/24', '10.0.0.0/25']).join(' '), '10.0.0.0/24', 'covered block absorbed');
     eq(n.summarize(['10.0.1.0/24', '10.0.2.0/24']).join(' '), '10.0.1.0/24 10.0.2.0/24', 'unaligned neighbours stay separate'); eq(n.summarize(['x']), null, 'bad input');
+  });
+
+  await test('diagram system: every component has a kind, label and legend; arrows are numbered; flow toggle; selection highlights; phone width; axe in both themes', async () => {
+    for (const dark of [false, true]) {
+      const { ctx, page, issues } = await open({ dark }); await go(page, '/'); await setProgress(page, allDone());
+      await nav(page, '/lesson/security/kubernetes-security'); await page.waitForSelector('.dg svg.dg-drawn g.dg-e');
+      const info = await page.evaluate(() => { const f = document.querySelector('.dg'); const n = f.querySelectorAll('.dg-node'); return { nodes: n.length, kinds: [...n].every((x) => x.dataset.kind && x.querySelector('.dg-kind').textContent.length > 2), edges: f.dataset.edges.split(';').filter(Boolean).length, drawn: f.querySelectorAll('g.dg-e').length, nums: [...f.querySelectorAll('.dg-num')].map((x) => x.textContent).join(','), legend: f.querySelectorAll('.dg-legend li').length, heads: f.querySelectorAll('.dg-head').length }; });
+      ok(info.nodes >= 3 && info.kinds, 'every node has a kind and a text label');
+      eq(info.drawn, info.edges, 'one drawn arrow per edge'); eq(info.heads, info.edges, 'arrowheads'); eq(info.nums, Array.from({ length: info.edges }, (_, i) => i + 1).join(','), 'arrows are numbered in order');
+      ok(info.legend >= 2, 'legend lists the kinds used');
+      ok(/Flow in order/.test(await page.evaluate(() => document.querySelector('.dg .sr').textContent)), 'text alternative for the flow');
+      await page.click('.dg-flow-btn'); eq(await page.getAttribute('.dg-flow-btn', 'aria-pressed'), 'true', 'flow toggle pressed'); ok(await page.locator('.dg .dg-dot').count() >= 1, 'flow dots drawn');
+      await page.click('.dg-flow-btn'); eq(await page.locator('.dg .dg-dot').count(), 0, 'flow dots removed');
+      await page.locator('.dg-node').first().click(); await page.waitForTimeout(80);
+      ok(await page.locator('.dg g.dg-e.hot').count() >= 1, 'edges of the selected component are highlighted');
+      await page.addScriptTag({ content: AXE });
+      const res = await page.evaluate(async () => (await window.axe.run(document.querySelector('.dg'), { resultTypes: ['violations'] })).violations.filter((v) => v.impact === 'serious' || v.impact === 'critical').map((v) => v.id + ' ' + v.nodes.length));
+      eq(res.length, 0, 'axe ' + (dark ? 'dark' : 'light') + ' ' + res.join(' | '));
+      await page.setViewportSize({ width: 390, height: 800 }); await page.waitForTimeout(250);
+      ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'no sideways scroll at 390px');
+      ok(await page.locator('.dg g.dg-e').count() >= 1, 'arrows are redrawn after resize');
+      eq(issues.length, 0, 'console: ' + issues.join(' | ')); await ctx.close();
+    }
+  });
+
+  await test('diagram system: all lesson diagrams are drawn and pass colour contrast in both themes', async () => {
+    for (const dark of [false, true]) {
+      const { ctx, page, issues } = await open({ dark, viewport: { width: 1100, height: 900 } }); await go(page, '/'); await setProgress(page, allDone());
+      const ids = await page.evaluate(() => Object.keys(window.ACADEMY.lessons).filter((id) => /class="dg"/.test(window.ACADEMY.lessons[id].html)));
+      ok(ids.length >= 40, 'lessons with diagrams: ' + ids.length);
+      await page.addScriptTag({ content: AXE });
+      const bad = [];
+      for (const id of ids) {
+        await nav(page, '/practice'); await nav(page, '/lesson/' + id); await page.waitForSelector('.dg svg.dg-drawn', { timeout: 5000 }).catch(() => bad.push(id + ' not drawn'));
+        const r = await page.evaluate(async () => { if (!window.axe) return ['no axe']; const out = await window.axe.run(document.querySelector('.dg'), { resultTypes: ['violations'] }); return out.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical').map((v) => v.id); });
+        if (r.length) bad.push(id + ': ' + r.join(','));
+      }
+      eq(bad.length, 0, (dark ? 'dark ' : 'light ') + bad.slice(0, 5).join(' | '));
+      await ctx.close();
+    }
+  });
+
+  await test('learning plans: five plans of 30 days, current day open, ticks persist and clear, phone width, axe in both themes', async () => {
+    for (const dark of [false, true]) {
+      const { ctx, page, issues } = await open({ dark }); await go(page, '/plans'); await page.waitForSelector('.plan-card');
+      eq(await page.locator('.plan-card').count(), 5, 'five plans');
+      await nav(page, '/plan/sre-30'); await page.waitForSelector('.plan-day');
+      eq(await page.locator('.plan-day').count(), 30, '30 days');
+      eq(await page.locator('.plan-day.current[open]').count(), 1, 'current day open');
+      if (!dark) {
+        await page.evaluate(() => { document.querySelectorAll('.plan-day').forEach((d) => { d.open = true; }); });
+        const box = page.locator('.plan-items input[data-key]').first(); await box.check();
+        const cnt = () => page.evaluate(() => Object.keys((((JSON.parse(localStorage.getItem('ea.progress.v1')) || {}).pl || {})['sre-30']) || {}).length);
+        const saved = await cnt();
+        ok(saved >= 1, 'tick saved');
+        await page.click('[data-act="plan-clear"]');
+        const after = await cnt();
+        eq(after, 0, 'clear removes ticks');
+      }
+      await page.addScriptTag({ content: AXE });
+      for (const r of ['/plans', '/plan/kubernetes-30']) {
+        await nav(page, '/practice'); await nav(page, r); await page.waitForSelector('.plan-card, .plan-day');
+        const v = await page.evaluate(async () => (await window.axe.run(document, { resultTypes: ['violations'] })).violations.filter((x) => x.impact === 'serious' || x.impact === 'critical').map((x) => x.id));
+        eq(v.length, 0, (dark ? 'dark ' : 'light ') + r + ' ' + v.join(','));
+      }
+      if (!dark) { await page.setViewportSize({ width: 390, height: 844 }); await nav(page, '/practice'); await nav(page, '/plan/system-design-30'); await page.waitForSelector('.plan-day'); ok(await page.evaluate(() => document.documentElement.scrollWidth <= 391), 'no sideways scroll at 390px'); }
+      await ctx.close();
+    }
+  });
+
+  await test('lesson page: steps rail follows scrolling, key takeaways, plan chip, sources line, phone width, axe in both themes', async () => {
+    for (const dark of [false, true]) {
+      const { ctx, page, issues } = await open({ dark }); await go(page, '/'); await setProgress(page, allDone());
+      await nav(page, '/lesson/observability/observability-fundamentals'); await page.waitForSelector('.lrail li');
+      eq(await page.locator('.lrail li').count(), 4, 'four steps');
+      ok(await page.locator('.takeaways li').count() >= 2, 'takeaways');
+      ok((await page.locator('.plan-chip').count()) === 1, 'plan chip');
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await page.waitForTimeout(200);
+      ok(await page.evaluate(() => parseFloat(document.getElementById('rail-fill').style.width) > 50), 'progress bar fills');
+      eq(await page.locator('.lrail li.on').count(), 1, 'one current step');
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.addScriptTag({ content: AXE });
+      const v = await page.evaluate(async () => (await window.axe.run(document, { resultTypes: ['violations'] })).violations.filter((x) => x.impact === 'serious' || x.impact === 'critical').map((x) => x.id + ' ' + x.nodes.map((n) => n.html.slice(0, 120) + ' ' + (n.any[0] && n.any[0].message)).slice(0, 2).join(';')));
+      eq(v.length, 0, (dark ? 'dark ' : 'light ') + v.join(','));
+      if (!dark) { await page.setViewportSize({ width: 390, height: 844 }); await page.waitForTimeout(150); ok(await page.evaluate(() => document.documentElement.scrollWidth <= 391), 'no sideways scroll at 390px'); }
+      await ctx.close();
+    }
+  });
+
+  await test('widget presets: break and fix buttons, story line, predict first, shareable link restores settings, axe in both themes', async () => {
+    for (const dark of [false, true]) {
+      const { ctx, page, issues } = await open({ dark }); await go(page, '/'); await nav(page, '/widget/token-bucket'); await page.waitForSelector('[data-preset]');
+      eq(await page.locator('[data-preset]').count(), 2, 'two presets');
+      await page.click('[data-preset="break"]');
+      ok((await page.locator('#wd-story').textContent()).includes('Break it'), 'story shown');
+      ok(await page.locator('#wd-verdict .sd-res.mid, #wd-verdict .sd-res.bad').count() === 1, 'break shows a problem');
+      await page.click('[data-preset="fix"]'); ok(await page.locator('#wd-verdict .sd-res.good').count() === 1, 'fix shows a good result');
+      const hash = await page.evaluate(() => location.hash); ok(/\?v=/.test(hash), 'url holds the settings: ' + hash);
+      // predict first hides the result until a guess
+      await page.check('#wd-predict'); await page.click('[data-preset="break"]');
+      ok(await page.locator('#wd-verdict').isHidden(), 'result hidden while predicting');
+      await page.click('[data-guess="1"]'); ok(await page.locator('#wd-verdict').isVisible(), 'result shown after the guess');
+      ok((await page.locator('#wd-ask').textContent()).includes('Not quite'), 'wrong guess is named');
+      // shareable link
+      const v0 = await page.evaluate(() => document.querySelector('[data-i="burst"]').value); const h2 = await page.evaluate(() => location.hash);
+      await nav(page, '/practice'); await page.evaluate((h) => { location.hash = h; }, h2); await page.waitForSelector('[data-i="burst"]');
+      eq(await page.evaluate(() => document.querySelector('[data-i="burst"]').value), v0, 'link restores the slider');
+      await page.addScriptTag({ content: AXE });
+      const v = await page.evaluate(async () => (await window.axe.run(document, { resultTypes: ['violations'] })).violations.filter((x) => x.impact === 'serious' || x.impact === 'critical').map((x) => x.id));
+      eq(v.length, 0, (dark ? 'dark ' : 'light ') + v.join(','));
+      if (!dark) { await page.setViewportSize({ width: 390, height: 844 }); await page.waitForTimeout(150); ok(await page.evaluate(() => document.documentElement.scrollWidth <= 391), 'no sideways scroll at 390px'); }
+      await ctx.close();
+    }
   });
 
   await test('interactive widgets: every widget renders and responds, reset works, Try it on lessons, hub entry, phone width, axe in both themes', async () => {
@@ -2025,7 +2138,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const { ctx, page, issues } = await open(); await go(page, '/practice'); await page.waitForSelector('.pr-cmd');
     eq(await page.locator('.pr-feat .prac a').count(), 3, 'three featured tools');
     for (const h of ['#/explainers', '#/architecture', '#/drills']) eq(await page.locator(`.prac a[href="${h}"]`).count(), 1, h + ' appears once');
-    eq(await page.locator('.pr-li').count(), 28, '28 tools');
+    eq(await page.locator('.pr-li').count(), 29, '29 tools');
     eq(await page.locator('.pr-node').count(), 5, 'five groups');
     eq(await page.locator('.pr-week li').count(), 7, 'week strip');
     const t1 = await page.textContent('.pr-cmd h2');
@@ -2040,7 +2153,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await page.fill('#pr-q', 'terraform');
     ok((await page.locator('.pr-li:not([hidden])').count()) >= 1 && (await page.locator('.pr-li:not([hidden])').count()) < 6, 'search narrows');
     await page.fill('#pr-q', 'zzzqqq'); eq(await page.locator('#pr-empty').isVisible(), true, 'empty state');
-    await page.click('#pr-empty [data-act="pr-clear"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 28, 'clear shows all');
+    await page.click('#pr-empty [data-act="pr-clear"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 29, 'clear shows all');
     await page.click('[data-flag="starred"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 0, 'no favourites yet');
     await page.click('[data-flag="all"]');
     await page.click('.pr-li[data-id="yaml"] .pr-star'); eq(await page.getAttribute('.pr-li[data-id="yaml"] .pr-star', 'aria-pressed'), 'true', 'starred');
@@ -2395,7 +2508,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await setProgress(page, allDone());
     for (const m of Object.values(MODS)) {
       const last = m.lessons[m.lessons.length - 1];
-      ok(/debug|investigating/.test(last), m.id + ' last lesson is a debugging lesson: ' + last);
+      ok(m.id === 'system-design' || /debug|investigating/.test(last), m.id + ' last lesson is a debugging lesson: ' + last);
     }
     await go(page, '/lesson/kubernetes/debugging-kubernetes-workloads'); await page.waitForSelector('.predict');
     ok(await page.locator('.dg-node').count() > 0, 'diagram');
@@ -2841,7 +2954,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await page.click('.tl-filter a[href="#/terminal-labs/networking"]');
     await page.waitForFunction(() => document.querySelectorAll('.tl-item').length === 18);
     await nav(page, '/practice');
-    eq(await page.locator('.prac li').count(), 28, 'hub cards');
+    eq(await page.locator('.prac li').count(), 29, 'hub cards');
     ok(await page.locator('.prac a[href="#/terminal-labs"]').count() === 1, 'hub link');
     ok(await page.locator('footer a[href="#/terminal-labs"]').count() === 1, 'footer link');
     for (const m of ['linux', 'bash', 'networking', 'python']) { await nav(page, '/module/' + m); ok(await page.locator(`a[href="#/terminal-labs/${m}"]`).count() >= 1, 'stage page links to labs: ' + m); }

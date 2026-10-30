@@ -905,6 +905,21 @@ function checkWidgets() {
     let list; try { list = JSON.parse(read(path.join(dir, f))); } catch (x) { err('widgets', f + ': bad JSON'); continue; }
     for (const w of list) {
       n++; const E = (m) => err('widgets', `${w.id || '?'}: ${m}`);
+      if (w.presets !== undefined) {
+        if (!Array.isArray(w.presets) || w.presets.length < 2) E('presets need at least 2 entries');
+        else for (const pr of w.presets) {
+          if (!pr.id || !pr.label || !pr.story || !pr.values) { E('preset needs id, label, story and values'); continue; }
+          if (bad.test(pr.story) || glyph.test(pr.story) || junk.test(pr.story)) E('preset story has banned text');
+          for (const i of (w.inputs || [])) {
+            const x = pr.values[i.id];
+            if (x === undefined) { E(`preset ${pr.id} lacks ${i.id}`); continue; }
+            if (i.type === 'toggle') { if (typeof x !== 'boolean') E(`preset ${pr.id} ${i.id} must be true or false`); }
+            else if (i.type === 'select') { if (!i.options.some((o) => String(o[0]) === String(x))) E(`preset ${pr.id} ${i.id} is not an option`); }
+            else if (typeof x !== 'number' || x < i.min || x > i.max) E(`preset ${pr.id} ${i.id} is outside ${i.min}..${i.max}`);
+          }
+          try { WE.run(w, pr.values); } catch (x) { E(`preset ${pr.id} does not run`); }
+        }
+      }
       if (!/^[a-z0-9-]+$/.test(w.id || '')) { E('bad id'); continue; }
       if (ids.has(w.id)) E('duplicate id'); ids.add(w.id);
       if (!modules.has(w.module)) E('unknown module ' + w.module); perModule[w.module] = (perModule[w.module] || 0) + 1;
@@ -950,6 +965,45 @@ function checkWidgets() {
   if (!/assets\/widgets\.js/.test(html)) err('widgets', 'widgets.js is not loaded by the page');
 }
 
+function checkPlans() {
+  const dir = path.join(SRC, 'plans');
+  if (!fs.existsSync(dir)) return;
+  const modIds = JSON.parse(read(path.join(SRC, 'content/modules.json'))).map((m) => m.id);
+  const order = {}; for (const m of modIds) { const d = path.join(SRC, 'content', m); order[m] = fs.existsSync(d) ? fs.readdirSync(d).filter((x) => x.endsWith('.md')).sort().map((f) => m + '/' + f.replace(/^\d+-/, '').replace(/\.md$/, '')) : []; }
+  const lessonSet = new Set(Object.values(order).flat());
+  const widgetIds = new Set(); const wdir = path.join(SRC, 'widgets'); if (fs.existsSync(wdir)) for (const f of fs.readdirSync(wdir).filter((x) => x.endsWith('.json'))) for (const w of JSON.parse(read(path.join(wdir, f)))) widgetIds.add(w.id);
+  const okHash = /^#\/(flashcards|games|calculators|placement|widgets(\?skill=[a-z0-9-]+)?|system-design-lab|design-interview|interview\/mock|terminal-labs(\/(linux|bash|networking|python))?|playground\/(go|hcl|python|sql|yaml)|capstones|today|daily|mix|weak)$/;
+  const bad = /\bgit(hub|lab|ops|leaks|ea)/i; const glyph = /[←-⇿☀-➿\u{1F300}-\u{1FAFF}]/u; const junk = /\bundefined\b|\bNaN\b|\[object Object\]|\bTODO\b|\bFIXME\b|lorem ipsum/;
+  const ids = new Set(); let n = 0;
+  for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.json')).sort()) {
+    let list; try { list = JSON.parse(read(path.join(dir, f))); } catch (x) { err('plans', f + ': bad JSON'); continue; }
+    for (const p of list) {
+      n++; const E = (m) => err('plans', `${p.id || '?'}: ${m}`);
+      if (!/^[a-z0-9-]+$/.test(p.id || '')) { E('bad id'); continue; } if (ids.has(p.id)) E('duplicate id'); ids.add(p.id);
+      for (const k of ['title', 'summary', 'level', 'who']) if (!p[k] || p[k].length < 8) E(k + ' missing');
+      if (!Array.isArray(p.outcomes) || p.outcomes.length < 3) E('needs 3 outcomes');
+      if (!Array.isArray(p.days) || p.days.length < 14) { E('too few days'); continue; }
+      const raw = JSON.stringify(p); if (junk.test(raw)) E('contains undefined, NaN, TODO or similar'); if (glyph.test(raw)) E('emoji or arrow glyph'); if (bad.test(raw)) E('banned word');
+      const seen = new Set(); const lastIdx = {}; let lessons = 0, widgets = 0, prac = 0;
+      p.days.forEach((d, i) => {
+        if (!d.items || !d.items.length) E(`day ${i + 1} is empty`);
+        if (d.practice) prac++; if (d.practice && !d.title) E(`practice day ${i + 1} needs a title`);
+        for (const it of d.items || []) {
+          if (it.t === 'lesson') { lessons++; if (!lessonSet.has(it.id)) E('unknown lesson ' + it.id); if (seen.has(it.id)) E('lesson twice: ' + it.id); seen.add(it.id); const m = it.id.split('/')[0], ix = order[m].indexOf(it.id); if (lastIdx[m] !== undefined && ix < lastIdx[m]) E('lessons of ' + m + ' are out of order at day ' + (i + 1)); lastIdx[m] = ix; }
+          else if (it.t === 'widget') { widgets++; if (!widgetIds.has(it.id)) E('unknown widget ' + it.id); }
+          else if (it.t === 'drills') { if (!fs.existsSync(path.join(SRC, 'drills', it.module + '.md'))) E('no drills for ' + it.module); }
+          else if (it.t === 'cases') { if (!modIds.includes(it.module)) E('unknown module ' + it.module); }
+          else if (it.t === 'link') { if (!okHash.test(it.href || '')) E('link not allowed: ' + it.href); if (!it.text || !(it.min > 0)) E('link needs text and minutes'); }
+          else E('unknown item type ' + it.t);
+        }
+      });
+      if (lessons < 20) E('needs at least 20 lessons, has ' + lessons); if (widgets < 4) E('needs at least 4 widgets'); if (prac < 3) E('needs at least 3 practice days');
+    }
+  }
+  count('learning plans', n);
+  if (n < 5) err('plans', 'expected at least 5 plans');
+}
+
 const steps = [
   ['content schema', checkSchema],
   ['role paths', checkPaths],
@@ -963,7 +1017,8 @@ const steps = [
   ['glossary, explainers, search, subnet, playgrounds', checkMore],
   ['terminal labs', checkTermLabs],
   ['case files', checkCaseFiles],
-  ['interactive widgets', checkWidgets]
+  ['interactive widgets', checkWidgets],
+  ['learning plans', checkPlans]
 ];
 for (const [name, fn] of steps) {
   const before = errors.length;

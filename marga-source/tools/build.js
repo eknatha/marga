@@ -18,7 +18,7 @@ const SRC = path.join(ROOT, 'src');
 const DIST = path.join(ROOT, 'dist');
 const DOMAIN = 'marga.eknathalabs.com';
 // GoatCounter site code for the visitor count (https://CODE.goatcounter.com). Empty string disables it.
-const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js', 'choose.js', 'skilllab.js', 'casefile.js', 'sdlab.js', 'widgets.js'];
+const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js', 'choose.js', 'skilllab.js', 'casefile.js', 'sdlab.js', 'widgets.js', 'diagrams.js', 'plans.js'];
 // terminal lab engine: loaded only when a terminal lab is opened, but cached for offline use
 const ENGINE = ['term-fs.js', 'term-parse.js', 'term-exec.js', 'term-cmds.js', 'term-text.js', 'term-awk.js', 'term-jq.js', 'term-sys.js', 'term-net.js', 'term-labs.js'];
 const COUNTER = process.env.MARGA_COUNTER !== undefined ? process.env.MARGA_COUNTER : 'marga-eknathalabs';
@@ -196,13 +196,34 @@ function renderPredict(code) {
     `<button type="button" class="btn btn-primary" data-act="predict-reveal" aria-expanded="false">Reveal the answer</button>` +
     `<div class="predict-out" hidden><p class="predict-ans"><strong>Answer:</strong> ${esc(out)}</p>${why ? `<p>${esc(why)}</p>` : ''}</div></div>\n`;
 }
+/* Component kinds give every diagram one visual language: the same colour, border and label for the same sort of part. */
+const DG_KINDS = {
+  client: 'Client', edge: 'Network edge', service: 'Service', queue: 'Queue', store: 'Data store', cache: 'Cache',
+  security: 'Security', observe: 'Observability', process: 'Step', external: 'Outside party'
+};
+function dgKind(label, role, explicit) {
+  if (explicit) { if (!DG_KINDS[explicit]) throw new Error('diagram node kind must be one of ' + Object.keys(DG_KINDS).join(', ') + ', got ' + explicit); return explicit; }
+  const rules = [
+    ['external', /\b(third[- ]party|vendor|provider|partner|outside|external)\b/i],
+    ['client', /\b(users?|clients?|browsers?|visitors?|devices?|customers?|viewers?|developers?|engineers?|laptops?|mobile|phones?|operators?|team members?|admins?)\b/i],
+    ['cache', /\b(cache|caches|ttl|cdn|memcached|redis)\b/i],
+    ['observe', /\b(logs?|metrics?|traces?|alerts?|alertmanager|pager|describe|monitor\w*|dashboards?|health|signals?|telemetry|slo|audit|status|journal\w*|systemctl|prometheus|collectors?)\b/i],
+    ['queue', /\b(queues?|streams?|topics?|brokers?|kafka|buffers?|backlog|events?|messages?|dead[- ]letter|retries|retry)\b/i],
+    ['edge', /\b(load balancers?|gateways?|routers?|dns|ingress|proxy|proxies|internet|network|vpn|route|routing|traffic|endpoints?|nat|waf|edge|firewalls?|listeners?)\b/i],
+    ['security', /\b(secrets?|vault|keys?|kms|iam|auth|authn|authz|identity|identities|tokens?|tls|certificates?|policy|policies|rbac|permissions?|credentials?|encrypt\w*|scan\w*|roles?|signing|signed|provenance)\b/i],
+    ['store', /\b(databases?|db|storage|buckets?|volumes?|disks?|stores?|snapshots?|backups?|state|registry|repositor\w*|repo|wal|archive|tables?|indexes|index|files?|data|objects?|replicas?|primary|ledger|catalog)\b/i],
+    ['service', /\b(apps?|applications?|services?|workers?|api|apis|servers?|pods?|nodes?|controllers?|schedulers?|containers?|functions?|workloads?|resolvers?|clusters?|runtime|instances?|hosts?|backends?|frontends?|pipelines?|jobs?|runners?|agents?|models?|llm|tools?|mcp|skills?|stage|namespaces?|targets?|systems?)\b/i]
+  ];
+  for (const [k, re] of rules) if (re.test(label)) return k;
+  return 'process';
+}
 function renderDiagram(code) {
   const nodes = [], edges = []; let title = '';
   for (const raw of code.split('\n')) {
     const ln = raw.trim(); if (!ln) continue;
     let m;
     if ((m = ln.match(/^title:\s*(.+)$/))) title = m[1];
-    else if ((m = ln.match(/^node:\s*(.+)$/))) { const f = m[1].split('|').map((x) => x.trim()); if (f.length !== 6) throw new Error('diagram node needs 6 fields: ' + ln.slice(0, 60)); nodes.push({ id: f[0], label: f[1], x: Number(f[2]), y: Number(f[3]), role: f[4], fail: f[5] }); }
+    else if ((m = ln.match(/^node:\s*(.+)$/))) { const f = m[1].split('|').map((x) => x.trim()); if (f.length !== 6 && f.length !== 7) throw new Error('diagram node needs 6 fields (7 with a kind): ' + ln.slice(0, 60)); nodes.push({ id: f[0], label: f[1], x: Number(f[2]), y: Number(f[3]), role: f[4], fail: f[5], kind: dgKind(f[1], f[4], f[6]) }); }
     else if ((m = ln.match(/^edge:\s*(.+)$/))) { const f = m[1].split('|').map((x) => x.trim()); edges.push(f); }
     else throw new Error('bad diagram line: ' + ln.slice(0, 60));
   }
@@ -211,11 +232,15 @@ function renderDiagram(code) {
   const cx = (n) => ((n.x + 0.5) / cols) * 100, cy = (n) => ((n.y + 0.5) / rows) * 100;
   const byId = Object.fromEntries(nodes.map((n) => [n.id, n]));
   const lines = edges.map(([a, b]) => { if (!byId[a] || !byId[b]) throw new Error('diagram edge to unknown node ' + a + ' ' + b); return `<line x1="${cx(byId[a]).toFixed(1)}" y1="${cy(byId[a]).toFixed(1)}" x2="${cx(byId[b]).toFixed(1)}" y2="${cy(byId[b]).toFixed(1)}"/>`; }).join('');
-  const btns = nodes.map((n) => `<button type="button" class="dg-node" data-act="dg-pick" data-id="${esc(n.id)}" style="left:${cx(n).toFixed(1)}%;top:${cy(n).toFixed(1)}%;width:${(88 / cols).toFixed(1)}%" aria-pressed="false">${esc(n.label)}</button>`).join('');
-  const dl = nodes.map((n) => `<div class="dg-item" data-id="${esc(n.id)}"><dt>${esc(n.label)}</dt><dd><span class="dg-k">What it does:</span> ${esc(n.role)}</dd><dd><span class="dg-k">If it fails or is weak:</span> ${esc(n.fail)}</dd></div>`).join('');
-  return `<figure class="dg" data-rows="${rows}" style="--rows:${rows}"><figcaption class="dg-title">${esc(title || 'Diagram')}</figcaption>` +
-    `<div class="dg-stage"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">${lines}</svg>${btns}</div>` +
-    `<p class="dg-hint small">Select a component to see what it does and what happens when it fails.</p><div class="dg-live" role="status" aria-live="polite"></div><dl class="dg-list">${dl}</dl></figure>\n`;
+  const btns = nodes.map((n) => `<button type="button" class="dg-node k-${n.kind}" data-act="dg-pick" data-id="${esc(n.id)}" data-kind="${n.kind}" style="left:${cx(n).toFixed(1)}%;top:${cy(n).toFixed(1)}%;--w:${(88 / cols).toFixed(1)}%" aria-pressed="false"><span class="dg-name">${esc(n.label)}</span><span class="dg-kind">${DG_KINDS[n.kind]}</span></button>`).join('');
+  const dl = nodes.map((n) => `<div class="dg-item" data-id="${esc(n.id)}"><dt>${esc(n.label)} <span class="dg-kt">${DG_KINDS[n.kind]}</span></dt><dd><span class="dg-k">What it does:</span> ${esc(n.role)}</dd><dd><span class="dg-k">If it fails or is weak:</span> ${esc(n.fail)}</dd></div>`).join('');
+  const used = [...new Set(nodes.map((n) => n.kind))];
+  const legend = `<ul class="dg-legend" aria-label="Legend">${used.map((k) => `<li><i class="dg-sw k-${k}" aria-hidden="true"></i>${DG_KINDS[k]}</li>`).join('')}${edges.length ? '<li><i class="dg-arrow" aria-hidden="true"></i>Numbered arrows show the order of the flow</li>' : ''}</ul>`;
+  const flow = edges.length ? `<p class="sr">Flow in order: ${edges.map((e2, i) => `${i + 1}, ${esc(byId[e2[0]].label)} to ${esc(byId[e2[1]].label)}${e2[2] ? ' (' + esc(e2[2]) + ')' : ''}`).join('; ')}.</p>` : '';
+  const data = edges.map((e2) => e2[0] + '>' + e2[1] + (e2[2] ? '>' + e2[2].replace(/[;>"]/g, ' ') : '')).join(';');
+  return `<figure class="dg" data-rows="${rows}" data-edges="${esc(data)}" style="--rows:${rows}"><figcaption class="dg-title">${esc(title || 'Diagram')}</figcaption>` +
+    `<div class="dg-stage"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">${lines}</svg>${btns}</div>` + flow + legend +
+    `<p class="dg-hint small">Select a component to see what it does and what happens when it fails.${edges.length ? ' <button type="button" class="btn btn-quiet dg-flow-btn" data-act="dg-flow" aria-pressed="false">Show the flow</button>' : ''}</p><div class="dg-live" role="status" aria-live="polite"></div><dl class="dg-list">${dl}</dl></figure>\n`;
 }
 
 /* ---------- load content ---------- */
@@ -459,7 +484,16 @@ function loadContent() {
       for (const w of j) widgets.push(w);
     }
   }
-  return { modules, paths, lessons, sheets, interview, cases, casefiles, widgets, capstones, walkthroughs, reading, games, arch, drills, glossary, labs, termlabs, predicts: PREDICTS };
+  // Learning plans: src/plans/*.json, each file an array of plans with days of items
+  const plans = [];
+  const plDir = path.join(SRC, 'plans');
+  if (fs.existsSync(plDir)) {
+    for (const f of fs.readdirSync(plDir).filter((x) => x.endsWith('.json')).sort()) {
+      let j; try { j = JSON.parse(fs.readFileSync(path.join(plDir, f), 'utf8')); } catch (x) { throw new Error(`plans/${f}: invalid JSON (${x.message})`); }
+      for (const w of j) plans.push(w);
+    }
+  }
+  return { modules, paths, lessons, sheets, interview, cases, casefiles, widgets, plans, capstones, walkthroughs, reading, games, arch, drills, glossary, labs, termlabs, predicts: PREDICTS };
 
 }
 
