@@ -231,6 +231,91 @@ function labWire() {
   });
   score();
 }
+
+/* ---------------------------------------------------------------- mock design interview */
+var PHASES = [
+  { id: 'clarify', name: 'Clarify', min: 5, ask: 'Who uses it? What must never be wrong? What is the SLO? What is out of scope?', lesson: 'system-design/the-design-method-and-estimation',
+    checks: ['I asked who uses the system and what must never be wrong', 'I stated an availability or latency target', 'I set the scope and said what is out'] },
+  { id: 'estimate', name: 'Estimate', min: 5, ask: 'Requests per second (average and peak), storage, bandwidth. Which number crosses a limit?', lesson: 'system-design/the-design-method-and-estimation',
+    checks: ['I turned users into requests per second with a peak factor', 'I estimated storage or bandwidth', 'I named the number that decides the design'] },
+  { id: 'sketch', name: 'Sketch', min: 10, ask: 'Smallest design that meets the numbers. Read path, write path, data store, and why.', lesson: 'system-design/partitioning-sharding-and-consistent-hashing',
+    checks: ['I drew the smallest design that meets the numbers', 'I chose a data store and said why', 'I showed both the read and the write path'] },
+  { id: 'deep', name: 'Deep-dive', min: 12, ask: 'Design the riskiest part properly: data model and partitioning, consistency, rollout, or failover.', lesson: 'system-design/consistency-and-availability-in-practice',
+    checks: ['I designed the riskiest part in detail', 'I chose a partition key or consistency level on purpose', 'I handled a hot spot or overload'] },
+  { id: 'fail', name: 'Failure modes', min: 8, ask: 'For each box: slow, down, wrong, overloaded. What is shared? How far does a fault spread?', lesson: 'system-design/failure-domains-cells-and-bulkheads',
+    checks: ['I walked the failure modes of each component', 'I found shared dependencies or single points', 'I described detection, recovery and blast radius'] },
+  { id: 'trade', name: 'Trade-offs', min: 5, ask: 'What did you give up? What changes at 10x? Observability, security and cost in a line each.', lesson: 'system-design/capacity-planning-and-cost-trade-offs',
+    checks: ['I said what the design gives up', 'I said what I would change at 10x', 'I covered observability, security and cost briefly'] }
+];
+var PROMPTS = [
+  ['url-shortener', 'Design a URL shortener for 100 million new links a month.', 'system-design/worked-design-a-url-shortener'],
+  ['rate-limiter', 'Design a rate limiter for an API gateway.', 'system-design/worked-design-a-rate-limiter-service'],
+  ['notifications', 'Design a notification system for 50 million users.', 'system-design/worked-design-a-notification-fan-out-system'],
+  ['metrics', 'Design a metrics and log pipeline for 2,000 services.', 'system-design/worked-design-a-metrics-and-log-pipeline'],
+  ['k8s-platform', 'Design a multi-tenant Kubernetes platform for 150 teams.', 'system-design/worked-design-a-multi-tenant-kubernetes-platform'],
+  ['dns', 'Design an authoritative DNS service.', 'system-design/worked-design-an-authoritative-dns-service'],
+  ['global-api', 'Design a public API with a 99.99 percent availability SLO.', 'system-design/worked-design-global-api-at-four-nines'],
+  ['status-page', 'Design a status page that survives the outage it reports.', 'system-design/worked-design-the-status-page-that-survives'],
+  ['chat', 'Design a chat service with group conversations and message history.', ''],
+  ['kv-store', 'Design a replicated key-value store.', 'system-design/quorum-leaders-and-split-brain'],
+  ['cicd', 'Design a CI/CD platform used by 500 engineers.', ''],
+  ['lock', 'Design a distributed lock service.', 'system-design/quorum-leaders-and-split-brain']
+];
+function scoreSession(checks) { var n = 0, t = 0; PHASES.forEach(function (p) { p.checks.forEach(function (c, i) { t++; if (checks[p.id + i]) n++; }); }); return { n: n, t: t, pct: t ? Math.round(n * 100 / t) : 0 }; }
+function weakPhases(checks) { return PHASES.map(function (p) { var got = p.checks.filter(function (c, i) { return checks[p.id + i]; }).length; return { p: p, got: got }; }).filter(function (x) { return x.got < x.p.checks.length; }); }
+function sdiBag() { var s = A.state(); if (!Array.isArray(s.sdi)) s.sdi = []; return s.sdi; }
+function mmss(sec) { var m = Math.floor(Math.abs(sec) / 60), r = Math.abs(sec) % 60; return (sec < 0 ? '-' : '') + m + ':' + String(r).padStart(2, '0'); }
+
+function interviewView() {
+  view.title = 'Mock design interview | MARGA by EknathaLabs'; view.nav = 'practice';
+  var hist = sdiBag().slice(-5).reverse();
+  view.html = '<section class="page-head wrap"><h1>Mock design interview</h1><p class="lede">Practise a system design interview with the six steps and a clock. You write notes for each phase, then score yourself against a checklist. Nothing is sent anywhere.</p></section><div class="wrap narrow sdl" id="sdi">' +
+    '<section class="calc" id="sdi-setup"><h2>Set up</h2><div class="calc-in"><label class="field calc-f"><span>Prompt</span><select id="sdi-p">' + PROMPTS.map(function (p) { return '<option value="' + p[0] + '">' + e(p[1]) + '</option>'; }).join('') + '</select></label>' +
+    '<label class="field calc-f"><span>Length</span><select id="sdi-len"><option value="1">45 minutes (standard)</option><option value="0.5">25 minutes (short)</option></select></label></div>' +
+    '<p class="small">Phases: ' + PHASES.map(function (p) { return e(p.name) + ' ' + p.min; }).join(', ') + ' minutes at standard length. Use the timer as guidance; you can move on early.</p>' +
+    '<button type="button" class="btn btn-primary" id="sdi-go">Start the interview</button></section>' +
+    '<div id="sdi-run" hidden></div>' +
+    (hist.length ? '<section class="calc"><h2>Recent sessions</h2><ul class="sdl-notes">' + hist.map(function (h) { return '<li>' + e(h.prompt) + ': ' + h.pct + ' percent (' + e(h.date) + ')</li>'; }).join('') + '</ul></section>' : '') + '</div>';
+  view.after = interviewWire;
+}
+
+function interviewWire() {
+  var run = $('#sdi-run'), setup = $('#sdi-setup'), st = null, timer = null;
+  function stopTimer() { if (timer) { clearInterval(timer); timer = null; } }
+  function drawPhase() {
+    var p = PHASES[st.i], total = Math.round(p.min * st.scale * 60), left = total - st.sec;
+    run.innerHTML = '<section class="calc"><h2>' + e(st.prompt[1]) + '</h2><p class="small">Phase ' + (st.i + 1) + ' of ' + PHASES.length + ': <strong>' + e(p.name) + '</strong></p>' +
+      '<p class="sdi-clock" id="sdi-clock" role="timer" aria-live="off">' + mmss(left) + '</p><p>' + e(p.ask) + '</p>' +
+      '<label class="field calc-f wide"><span>Your notes for this phase</span><textarea id="sdi-n" rows="6" spellcheck="false">' + e(st.notes[p.id] || '') + '</textarea></label>' +
+      '<div class="actions"><button type="button" class="btn btn-primary" id="sdi-next">' + (st.i === PHASES.length - 1 ? 'Finish and score' : 'Next phase') + '</button> <button type="button" class="btn btn-quiet" id="sdi-quit">Stop</button></div></section>';
+    $('#sdi-n').addEventListener('input', function (ev) { st.notes[p.id] = ev.target.value; });
+    $('#sdi-next').addEventListener('click', function () { st.notes[p.id] = $('#sdi-n').value; if (st.i === PHASES.length - 1) { stopTimer(); drawScore(); } else { st.i++; st.sec = 0; drawPhase(); $('#sdi-n').focus(); } });
+    $('#sdi-quit').addEventListener('click', function () { stopTimer(); run.hidden = true; setup.hidden = false; });
+  }
+  function tick() { if (!document.getElementById('sdi-clock')) { stopTimer(); return; } st.sec++; var p = PHASES[st.i], left = Math.round(p.min * st.scale * 60) - st.sec; var c = $('#sdi-clock'); c.textContent = mmss(left); c.classList.toggle('late', left < 0); }
+  function drawScore() {
+    run.innerHTML = '<section class="calc"><h2>Score yourself</h2><p class="small">Tick what you actually did. Be strict; an interviewer would be.</p>' +
+      PHASES.map(function (p) { return '<fieldset class="sdi-fs"><legend>' + e(p.name) + '</legend>' + p.checks.map(function (c, i) { return '<label class="opt-r"><input type="checkbox" data-k="' + p.id + i + '"> <span>' + e(c) + '</span></label>'; }).join('') + '</fieldset>'; }).join('') +
+      '<div class="actions"><button type="button" class="btn btn-primary" id="sdi-score">See my result</button></div></section>';
+    $('#sdi-score').addEventListener('click', function () {
+      var checks = {}; $$('#sdi-run input[data-k]').forEach(function (b) { if (b.checked) checks[b.getAttribute('data-k')] = true; });
+      var r = scoreSession(checks), weak = weakPhases(checks), d = new Date(), date = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      var h = sdiBag(); h.push({ id: st.prompt[0], prompt: st.prompt[1], pct: r.pct, date: date }); if (h.length > 30) h.splice(0, h.length - 30); A.save();
+      run.innerHTML = '<section class="calc" id="sdi-res"><h2>' + r.n + ' of ' + r.t + ' (' + r.pct + ' percent)</h2><p>' + (r.pct >= 80 ? 'A strong session. Repeat with a different prompt and a shorter clock.' : r.pct >= 50 ? 'A fair base. Work on the phases below, then try again.' : 'Keep the six steps in front of you and repeat. Short sessions help.') + '</p>' +
+        (weak.length ? '<h3>Work on</h3><ul class="sdl-notes">' + weak.map(function (x) { return '<li>' + e(x.p.name) + ' (' + x.got + ' of ' + x.p.checks.length + '): <a href="' + A.hrefLesson(x.p.lesson) + '">review the lesson</a></li>'; }).join('') + '</ul>' : '<p>Every item ticked.</p>') +
+        (st.prompt[2] ? '<p>Compare with the worked design: <a href="' + A.hrefLesson(st.prompt[2]) + '">open the lesson</a>.</p>' : '<p class="small">This prompt has no worked design yet. Use the six steps and the failure-mode tables from the worked designs as a guide.</p>') +
+        '<div class="actions"><button type="button" class="btn btn-primary" id="sdi-again">Another session</button></div></section>';
+      $('#sdi-again').addEventListener('click', function () { run.hidden = true; setup.hidden = false; $('#sdi-go').focus(); });
+    });
+  }
+  $('#sdi-go').addEventListener('click', function () {
+    var id = $('#sdi-p').value, pr = PROMPTS.filter(function (x) { return x[0] === id; })[0];
+    st = { prompt: pr, scale: +$('#sdi-len').value, i: 0, sec: 0, notes: {} };
+    setup.hidden = true; run.hidden = false; drawPhase(); $('#sdi-n').focus(); stopTimer(); timer = setInterval(tick, 1000);
+  });
+  window.MargaSDI = { score: scoreSession };
+}
+A.addRoute(/^\/design-interview$/, interviewView);
 A.addRoute(/^\/system-design-lab$/, labView);
-window.MargaSD = { estimate: estimate, simulate: simulate, designs: DESIGNS, challenges: CHALLENGES };
+window.MargaSD = { score: scoreSession, prompts: PROMPTS, phases: PHASES, estimate: estimate, simulate: simulate, designs: DESIGNS, challenges: CHALLENGES };
 };

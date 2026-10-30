@@ -59,12 +59,14 @@ function prTools() {
   add('labs', 'hcl', '#/playground/hcl', 'Terraform (HCL) playground', 'Write configuration and get it checked.', labDone('hcl') + ' of ' + labN('hcl') + ' solved', '15 min', 'mid', 'Terraform, Cloud', labN('hcl') ? labDone('hcl') / labN('hcl') : 0);
   add('labs', 'sql', '#/playground/sql', 'SQL for SREs', 'Query deploys, incidents and SLO data in a real database.', labDone('sql') + ' of ' + labN('sql') + ' solved', '15 min', 'mid', 'Databases, SRE', labN('sql') ? labDone('sql') / labN('sql') : 0);
   add('labs', 'sdlab', '#/system-design-lab', 'System design lab', 'Size a system, break a design against an error budget, and fix real outages.', 'Runs in your browser', '15 min', 'mid', 'System design, SRE', null);
+  add('labs', 'widgets', '#/widgets', 'Interactive widgets', 'Small simulations for the concepts in each skill. Change a setting and watch the system respond.', (window.MARGA_WIDGET_COUNT || (D.widgets || []).length) + ' widgets', '5 min', 'starter', 'Every skill', null);
   add('labs', 'subnet', '#/subnet', 'Subnet and CIDR playground', 'Inspect networks, split them and plan VLSM for a VPC.', 'Runs in your browser', '10 min', 'starter', 'Networking, Cloud', null);
   add('scenarios', 'games', '#/games', 'Incident games', 'Be on call for an outage. Choose, then see where it leads.', (F.gameCount ? F.gameCount() : '12 games'), '10 min', 'mid', 'Every skill', null);
   add('scenarios', 'capstones', '#/capstones', 'Capstone projects', 'Guided builds for each path, with a self-check.', (F.capCount ? F.capCount() : '16 projects'), '2 hours', 'advanced', 'Every path', null);
   add('scenarios', 'calculators', '#/calculators', 'Trade-off calculators', 'Error budgets, redundancy, cost, recovery time and capacity.', '7 calculators', '10 min', 'mid', 'SRE, Cloud', null);
   add('scenarios', 'mix', '#/mix', 'Mixed practice', 'Twelve questions and drills from different stages, shuffled.', 'Uses lessons you passed', '12 min', 'mid', 'Passed lessons', null);
   add('scenarios', 'weak', '#/weak', 'Weak-spot review', 'Items you missed come back until you get them right.', (F.weakCount ? F.weakCount() : 0) + ' to review', '8 min', '', 'What you missed', null);
+  add('study', 'dmock', '#/design-interview', 'Mock design interview', 'A timed system design session with notes per phase and a self-score.', 'Runs in your browser', '45 min', 'senior', 'System design', null);
   add('study', 'mock', '#/interview/mock', 'Mock interview', 'A timed run of questions for your role, then score yourself.', mock.length ? 'Best score ' + best + '%' : 'Not tried yet', '30 min', '', '', null);
   add('study', 'flashcards', '#/flashcards', 'Interactive flashcards', 'Flip, shuffle and sort cards from every lesson.', known + ' cards marked known', '', '', '', null);
   add('study', 'glossary', '#/glossary', 'Glossary', 'Plain-words meanings, also shown inside lessons.', (D.glossary || []).length + ' terms', '', '', '', null);

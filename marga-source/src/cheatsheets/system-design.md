@@ -88,6 +88,31 @@ psql -Atc "select extract(epoch from now()-pg_last_xact_replay_timestamp())"
 
 > **Warning:** Never promote a node without fencing the old primary first, or two writers will diverge.
 
+## Data
+
+```text
+partition key   many values, even load, keeps related data together; check the biggest value
+range           cheap scans, hot end for sequential keys
+hash            even load, scans hit all partitions
+consistent hash ring + virtual nodes: adding a node moves ~1/N keys
+storage engines B-tree: in-place pages, watch vacuum and bloat | LSM: append and compact, watch compaction debt
+replication     leader/follower | multi-leader (conflicts) | leaderless (R + W > N)
+backup          RPO sets frequency, RTO sets restore speed; independent copy; timed restore test
+```
+
+> **Warning:** Replicas copy deletes. A backup you have not restored is a hope.
+
+## By design: observability, security, cost
+
+```text
+observability  SLI at the edge | golden signals | per-version and per-cell labels | trace id in logs
+               independent probe and paging path | dead-man's switch | cap cardinality
+security       trust boundaries | least privilege | short-lived workload credentials | default-deny network
+               separate accounts and keys | audit logs | secret rotation runbook
+cost/capacity  measure unit throughput at the SLO | N+1 and zone loss (3 zones: run under ~66%)
+               list non-CPU limits | scale on leading signals | write down savings that cut redundancy
+```
+
 ## Change safety checklist
 
 1. Can it be previewed on real data?
