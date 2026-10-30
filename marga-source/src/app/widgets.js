@@ -144,13 +144,31 @@ function inputHtml(i, val) {
   if (i.type === 'select') return '<label class="field calc-f"><span>' + e(i.label) + '</span><select data-i="' + e(i.id) + '">' + i.options.map(function (o) { return '<option value="' + e(o[0]) + '"' + (String(o[0]) === String(val) ? ' selected' : '') + '>' + e(o[1]) + '</option>'; }).join('') + '</select></label>';
   return '<label class="field calc-f wd-rng"><span>' + e(i.label) + ': <output data-o="' + e(i.id) + '">' + e(WE.HELP.fmt(val, i.step < 1 ? 1 : 0)) + (i.unit ? ' ' + e(i.unit) : '') + '</output></span><input type="range" data-i="' + e(i.id) + '" min="' + i.min + '" max="' + i.max + '" step="' + i.step + '" value="' + val + '"></label>';
 }
+function presetsHtml(w) {
+  var P = w.presets || [];
+  return '<div class="wd-presets" role="group" aria-label="Starting points">' + P.map(function (x) { return '<button type="button" class="btn btn-quiet" data-preset="' + e(x.id) + '" aria-describedby="wd-story">' + e(x.label) + '</button>'; }).join('') +
+    '<button type="button" class="btn btn-quiet" id="wd-share">Copy link to this setup</button>' +
+    (P.length ? '<label class="opt-r"><input type="checkbox" id="wd-predict"> <span>Predict first</span></label>' : '') + '</div>' +
+    '<p class="small wd-story" id="wd-story" aria-live="polite"></p><div id="wd-ask" aria-live="polite"></div>';
+}
+function parseQ(w) {
+  var m = (location.hash || '').match(/[?&]v=([^&]+)/), out = {}; if (!m) return out;
+  decodeURIComponent(m[1]).split(',').forEach(function (kv) {
+    var p = kv.split(':'), i = (w.inputs || []).filter(function (x) { return x.id === p[0]; })[0]; if (!i || p.length < 2) return;
+    var raw = p.slice(1).join(':');
+    if (i.type === 'toggle') out[i.id] = raw === '1';
+    else if (i.type === 'select') { var o = i.options.filter(function (q) { return String(q[0]) === raw; })[0]; if (o) out[i.id] = o[0]; }
+    else { var n = +raw; if (isFinite(n)) out[i.id] = Math.min(i.max, Math.max(i.min, n)); }
+  });
+  return out;
+}
 function widgetView(id) {
   var w = BY[id];
   if (!w) { view.title = 'Widget not found | MARGA'; view.nav = 'practice'; view.html = '<section class="page-head wrap"><h1>That widget does not exist</h1><p class="lede"><a href="#/widgets">See all widgets</a>.</p></section>'; return; }
   view.title = w.title + ' | Interactive widgets | MARGA by EknathaLabs'; view.nav = 'practice';
   var L = A.LES[w.lesson];
   view.html = '<section class="page-head wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="#/widgets">Widgets</a><a href="#/widgets?skill=' + e(w.module) + '">' + e(modTitle(w.module)) + '</a></nav><h1>' + e(w.title) + '</h1><p class="lede">' + e(w.summary) + '</p></section>' +
-    '<div class="wrap narrow wdw"><section class="calc" aria-label="Controls"><h2>Change it</h2><div class="calc-in" id="wd-in">' + (w.inputs || []).map(function (i) { return inputHtml(i, i.value); }).join('') + '</div><div class="actions"><button type="button" class="btn btn-quiet" id="wd-reset">Reset</button></div></section>' +
+    '<div class="wrap narrow wdw"><section class="calc" aria-label="Controls"><h2>Change it</h2>' + presetsHtml(w) + '<div class="calc-in" id="wd-in">' + (w.inputs || []).map(function (i) { return inputHtml(i, i.value); }).join('') + '</div><div class="actions"><button type="button" class="btn btn-quiet" id="wd-reset">Reset</button></div></section>' +
     '<section class="calc"><h2>Watch it</h2><div class="sd-wrap" id="wd-dia"></div><div id="wd-chart"></div><dl class="calc-out" id="wd-read"></dl><div id="wd-verdict" aria-live="polite"></div></section>' +
     '<section class="note-panel"><h3>Try this</h3><ul>' + (w.tries || []).map(function (t) { return '<li>' + e(t) + '</li>'; }).join('') + '</ul><p class="small">This is a simplified model made to build intuition. Real systems differ, so measure yours.</p>' +
     (L ? '<p class="small">Related lesson: <a href="' + A.hrefLesson(w.lesson) + '">' + e(L.title) + '</a>.</p>' : '') + '</section></div>';
@@ -158,15 +176,27 @@ function widgetView(id) {
 }
 function wireWidget(w) {
   var vals = WE.defaults(w); var T = bag(); if (!T[w.id]) { T[w.id] = 1; A.save(); }
+  var q0 = parseQ(w); Object.keys(q0).forEach(function (k) { vals[k] = q0[k]; });
+  var pending = false;
+  function sync() {
+    $$('#wd-in [data-i]').forEach(function (c) { var id = c.getAttribute('data-i'); if (c.type === 'checkbox') c.checked = !!vals[id]; else c.value = vals[id]; var o = $('[data-o="' + id + '"]'); if (o) { var inp = w.inputs.filter(function (i) { return i.id === id; })[0]; o.textContent = WE.HELP.fmt(vals[id], inp.step < 1 ? 1 : 0) + (inp.unit ? ' ' + inp.unit : ''); } });
+  }
+  function qs() {
+    var d = WE.defaults(w), parts = (w.inputs || []).filter(function (i) { return vals[i.id] !== d[i.id]; }).map(function (i) { return i.id + ':' + (i.type === 'toggle' ? (vals[i.id] ? 1 : 0) : vals[i.id]); });
+    return parts.length ? '?v=' + encodeURIComponent(parts.join(',')) : '';
+  }
+  function keepUrl() { try { history.replaceState(null, '', location.pathname + location.search + '#/widget/' + w.id + qs()); } catch (x) { /* ignore */ } }
+  function mask(on) { pending = on; ['wd-dia', 'wd-chart', 'wd-read', 'wd-verdict'].forEach(function (k) { var n = document.getElementById(k); if (n) n.hidden = on; }); }
   function draw() {
     var r; try { r = WE.run(w, vals); } catch (x) { $('#wd-verdict').innerHTML = '<p class="calc-err" role="alert">This widget could not run.</p>'; return; }
     $('#wd-dia').innerHTML = svgFor(w, r, vals);
     $('#wd-chart').innerHTML = chartFor(w, vals);
     $('#wd-read').innerHTML = r.readouts.map(function (x) { return '<div class="calc-row"><dt>' + e(x.label) + '</dt><dd>' + e(x.text) + '</dd></div>'; }).join('');
-    var d = r.verdict; $('#wd-verdict').innerHTML = d ? '<div class="sd-res ' + (d.tone === 'bad' ? 'bad' : d.tone === 'warn' ? 'mid' : 'good') + '"><p>' + e(d.text) + '</p></div>' : '';
+    keepUrl(); var d = r.verdict; $('#wd-verdict').innerHTML = d ? '<div class="sd-res ' + (d.tone === 'bad' ? 'bad' : d.tone === 'warn' ? 'mid' : 'good') + '"><p>' + e(d.text) + '</p></div>' : '';
   }
   $('#wd-in').addEventListener('input', function (ev) {
     var t = ev.target, id = t.getAttribute('data-i'); if (!id) return;
+    if (pending) { mask(false); $('#wd-ask').innerHTML = ''; }
     vals[id] = t.type === 'checkbox' ? t.checked : (t.tagName === 'SELECT' ? (isNaN(+t.value) ? t.value : +t.value) : +t.value);
     var o = $('[data-o="' + id + '"]'); if (o) { var inp = w.inputs.filter(function (i) { return i.id === id; })[0]; o.textContent = WE.HELP.fmt(vals[id], inp.step < 1 ? 1 : 0) + (inp.unit ? ' ' + inp.unit : ''); }
     draw();
@@ -179,11 +209,28 @@ function wireWidget(w) {
   $('#wd-dia').addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { var g = ev.target.closest('[data-toggle]'); if (g) { ev.preventDefault(); flip(g); } } });
   $('#wd-reset').addEventListener('click', function () {
     vals = WE.defaults(w);
-    $$('#wd-in [data-i]').forEach(function (c) { var id = c.getAttribute('data-i'); if (c.type === 'checkbox') c.checked = !!vals[id]; else c.value = vals[id]; var o = $('[data-o="' + id + '"]'); if (o) { var inp = w.inputs.filter(function (i) { return i.id === id; })[0]; o.textContent = WE.HELP.fmt(vals[id], inp.step < 1 ? 1 : 0) + (inp.unit ? ' ' + inp.unit : ''); } });
+    sync(); mask(false); $('#wd-story').textContent = ''; $('#wd-ask').innerHTML = '';
     draw();
   });
-  draw();
+  $$('[data-preset]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var x = (w.presets || []).filter(function (p) { return p.id === b.getAttribute('data-preset'); })[0]; if (!x) return;
+      vals = WE.defaults(w); Object.keys(x.values).forEach(function (k) { vals[k] = x.values[k]; }); sync();
+      var pc = $('#wd-predict'), ask = $('#wd-ask'), story = $('#wd-story');
+      if (pc && pc.checked) {
+        var cope = x.tone === 'good'; draw(); mask(true); story.textContent = '';
+        ask.innerHTML = '<div class="note-panel"><p><strong>Predict first.</strong> With these settings, will the system cope?</p><p class="actions"><button type="button" class="btn btn-quiet" data-guess="1">Yes, it copes</button><button type="button" class="btn btn-quiet" data-guess="0">No, it struggles</button></p></div>';
+        $$('[data-guess]', ask).forEach(function (g) { g.addEventListener('click', function () { var right = (g.getAttribute('data-guess') === '1') === cope; mask(false); ask.innerHTML = '<p class="small"><strong>' + (right ? 'You called it.' : 'Not quite.') + '</strong></p>'; story.textContent = x.story; }); });
+      } else { mask(false); ask.innerHTML = ''; draw(); story.textContent = x.label + ': ' + x.story; }
+    });
+  });
+  $('#wd-share').addEventListener('click', function () {
+    var url = location.href, done = function () { $('#wd-story').textContent = 'Link copied. It opens with these settings.'; };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, function () { $('#wd-story').textContent = 'Copy this link: ' + url; });
+    else $('#wd-story').textContent = 'Copy this link: ' + url;
+  });
+  sync(); draw();
 }
 A.addRoute(/^\/widgets(?:\?.*)?$/, indexView);
-A.addRoute(/^\/widget\/([a-z0-9-]+)$/, widgetView);
+A.addRoute(/^\/widget\/([a-z0-9-]+)(?:\?.*)?$/, widgetView);
 };

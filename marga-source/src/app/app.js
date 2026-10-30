@@ -648,12 +648,13 @@ function lessonView(mid, slug) {
   view.html = '<article class="lesson wrap">' +
     '<nav class="crumbs" aria-label="Breadcrumb"><a href="#/paths">Paths</a><a href="#/module/' + m.id + '">' + e(m.title) + '</a></nav>' +
     '<header class="lesson-head"><h1>' + e(l.title) + '</h1><p class="meta"><span>Lesson ' + (i + 1) + ' of ' + m.lessons.length + '</span><span>' + l.minutes + ' min</span>' +
-    (st === 'done' ? '<span class="chip pass">Passed</span>' : '') + '</p></header>' +
+    (st === 'done' ? '<span class="chip pass">Passed</span>' : '') + '</p>' + planChip(id) + trustLine(l) + '</header>' +
+    lessonRail(l) +
     '<div class="actions lesson-tools">' + printBar() + '<button type="button" class="btn btn-quiet" data-act="read-toggle" aria-pressed="false">Reading mode</button></div>' + voiceSlot() +
     (window.MargaFeatures ? MargaFeatures.levelsHtml(l) : '') +
     '<div class="lesson-grid"><div class="prose" id="prose">' + l.html + refsHtml(l.refs) + '</div>' + toc + '</div>' +
-    (window.MargaExLinks ? MargaExLinks.lesson(id) : '') +
-    (window.MargaWidgetLinks ? MargaWidgetLinks.lesson(id) : '') +
+    '<div id="tryit">' + (window.MargaExLinks ? MargaExLinks.lesson(id) : '') +
+    (window.MargaWidgetLinks ? MargaWidgetLinks.lesson(id) : '') + '</div>' + takeaways(l) +
     '<section class="check" id="check" aria-labelledby="check-h"><h2 id="check-h">Lesson check</h2><div id="quiz"></div></section>' +
     '<section class="cardsec" id="cards" aria-labelledby="cards-h"><h2 id="cards-h">Flashcards</h2><div id="deck"></div></section>' +
     '<nav class="pager" aria-label="Lesson navigation">' +
@@ -661,9 +662,42 @@ function lessonView(mid, slug) {
     '<span id="next-slot">' + nextButton(id, nxt) + '</span></nav></article>';
   view.voice = '#prose'; view.voiceLabel = l.title;
   view.after = function () {
+    wireRail();
     var q = $('#quiz'); if (q) startQuiz(id, q);
     var dk = $('#deck'); if (dk) startDeck(dk, l.cards.map(function (c, k) { return { key: id + '#' + k, lesson: id, idx: k, f: c.f, b: c.b }; }), 'lesson');
   };
+}
+
+function planChip(id) {
+  var pi = window.MargaPlanInfo ? MargaPlanInfo.forLesson(id) : [];
+  if (!pi.length) return '';
+  var x = pi.filter(function (y) { return y.started; })[0] || pi[0];
+  return '<p class="plan-chip"><a href="#/plan/' + e(x.plan.id) + '">Part of your plan: ' + e(x.plan.title) + ', day ' + x.day + ' of ' + x.total + '</a></p>';
+}
+function trustLine(l) {
+  var n = (l.refs || []).length;
+  return n ? '<p class="trust small">Written from ' + plural(n, 'official reference') + ', listed at the end of the lesson. Check them for the current detail.</p>' : '';
+}
+function takeaways(l) {
+  var c = (l.cards || []).slice(0, 4);
+  if (c.length < 2) return '';
+  return '<section class="takeaways" id="takeaways" aria-labelledby="tk-h"><h2 id="tk-h">Key takeaways</h2><ul>' + c.map(function (x) { return '<li><strong>' + e(x.f) + '</strong> ' + e(x.b) + '</li>'; }).join('') + '</ul></section>';
+}
+function lessonRail(l) {
+  var steps = [['prose', 'In this lesson'], ['tryit', 'Try it'], ['check', 'Quiz'], ['next-slot', 'Next']];
+  return '<div class="rail-bar" aria-hidden="true"><i id="rail-fill"></i></div><nav class="lrail" aria-label="Lesson steps"><ol>' + steps.map(function (x, i) { return '<li data-step="' + x[0] + '"><a href="#" data-jump="' + x[0] + '"><span class="ln">' + (i + 1) + '</span>' + x[1] + '</a></li>'; }).join('') + '</ol></nav>';
+}
+function wireRail() {
+  var fill = $('#rail-fill'), steps = $$('.lrail li');
+  if (!fill) return;
+  function tick() {
+    var d = document.documentElement, max = d.scrollHeight - window.innerHeight;
+    fill.style.width = (max > 0 ? Math.min(100, Math.max(0, window.scrollY / max * 100)) : 0) + '%';
+    var cur = 0;
+    steps.forEach(function (li, i) { var t = document.getElementById(li.getAttribute('data-step')); if (t && t.getBoundingClientRect().top < window.innerHeight * 0.45) cur = i; });
+    steps.forEach(function (li, i) { li.classList.toggle('on', i === cur); li.classList.toggle('past', i < cur); if (i === cur) li.firstChild.setAttribute('aria-current', 'step'); else li.firstChild.removeAttribute('aria-current'); });
+  }
+  window.addEventListener('scroll', tick, { passive: true }); tick();
 }
 
 function nextButton(id, nxt) {
@@ -979,7 +1013,7 @@ function progressView() {
           var o = JSON.parse(r.result);
           if (!o || o.v !== 1 || typeof o.lessons !== 'object' || !Array.isArray(o.days)) throw new Error('bad');
           S = { v: 1, lessons: o.lessons || {}, cards: o.cards || {}, days: o.days, path: o.path || 'devops', iv: (o.iv && typeof o.iv === 'object') ? o.iv : {} };
-          ['cs', 'dr', 'fc', 'dc', 'py', 'lab', 'wk', 'cap', 'gm', 'bd', 'tl'].forEach(function (k) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) S[k] = o[k]; });
+          ['cs', 'dr', 'fc', 'dc', 'py', 'lab', 'wk', 'cap', 'gm', 'bd', 'tl', 'wgt', 'pl'].forEach(function (k) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) S[k] = o[k]; });
           if (Array.isArray(o.mock)) S.mock = o.mock.slice(-20);
           save(); renderChrome(); toast('Progress imported.'); route();
         } catch (x) { toast('That file is not a MARGA progress export.'); }
@@ -1223,6 +1257,8 @@ if (typeof window.MargaSkillLabPage === 'function') window.MargaSkillLabPage(api
 if (typeof window.MargaCaseFile === 'function') window.MargaCaseFile(api);
 if (typeof window.MargaSDLab === 'function') window.MargaSDLab(api);
 if (typeof window.MargaWidgets === 'function') window.MargaWidgets(api);
+if (typeof window.MargaDiagrams === 'function') window.MargaDiagrams(api);
+if (typeof window.MargaPlans === 'function') window.MargaPlans(api);
 
 /* ---------- accessibility panel ---------- */
 (function () {
