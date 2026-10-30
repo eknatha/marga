@@ -1595,3 +1595,40 @@ html[data-a-contrast="high"] .dg-node { background: var(--surface); }
 
 .wd-presets { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 8px; }
 .wd-story { margin: 0 0 12px; min-height: 1.4em; }
+
+.hero-proof { margin: 0 0 12px; color: var(--ink); } .hero-proof .chip { margin-right: 8px; }
+
+/* replays */
+.rp { border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin: 8px 0 24px; }
+.rp-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; } .rp-n { font-weight: 700; white-space: nowrap; }
+.rp-bar { flex: 1; height: 6px; border-radius: 4px; background: var(--line); overflow: hidden; } .rp-bar i { display: block; height: 100%; background: var(--accent); width: 0; }
+.rp-card { min-height: 8.5rem; border-left: 4px solid var(--accent); padding: 4px 0 4px 16px; }
+.rp-kind { margin: 0 0 6px; font-size: 14px; font-weight: 700; color: var(--muted); } .rp-text { margin: 0; font-size: 1.2rem; line-height: 1.55; max-width: 60ch; }
+.rp-ctl { margin-top: 14px; } .rp-scrub { margin-top: 10px; display: block; } .rp-scrub input { width: 100%; }
+.rp-list { list-style: none; padding: 0; margin: 0 0 20px; } .rp-jump { all: unset; box-sizing: border-box; display: block; width: 100%; padding: 8px 10px; border-radius: 8px; cursor: pointer; color: var(--muted); line-height: 1.45; }
+.rp-jump:hover { background: var(--accent-soft); } .rp-jump:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.rp-list li.cur .rp-jump { background: var(--accent-soft); color: var(--ink); font-weight: 600; } .rp-list li.seen .rp-jump { color: var(--ink); } .rp-k { font-weight: 700; margin-right: 6px; }
+/* portfolio */
+.pf-stats { margin-bottom: 18px; } .pf-skills, .pf-list { list-style: none; padding: 0; margin: 0 0 12px; }
+.pf-skills li { display: grid; grid-template-columns: minmax(8rem, 14rem) 1fr minmax(7rem, auto); gap: 12px; align-items: center; padding: 6px 0; }
+.pf-bar { height: 8px; border-radius: 5px; background: var(--line); overflow: hidden; } .pf-bar i { display: block; height: 100%; background: var(--accent); }
+.pf-list li { padding: 8px 0; border-bottom: 1px solid var(--line); } .pf-list span { display: block; color: var(--muted); font-size: 14px; } .pf-note { margin-top: 18px; }
+@media (max-width: 560px) { .pf-skills li { grid-template-columns: 1fr; gap: 4px; } }
+@media print { .no-print { display: none !important; } .rp-ctl, .rp-scrub { display: none; } }
+
+.realworld { margin: 32px 0 0; padding: 18px 24px; border: 1px solid var(--line); border-radius: 10px; background: var(--accent-soft); max-width: 68ch; }
+.realworld h2 { margin: 0 0 8px; font-size: 1.25rem; } .realworld p { margin: 0 0 8px; } .realworld p:last-child { margin: 0; }
+.gm-explain { margin: 1.2rem 0; padding: 1rem 1.1rem; border: 1px solid var(--line); border-radius: 10px; }
+.gm-explain dt { font-weight: 700; margin-top: .7rem; }
+.gm-explain dd { margin: .15rem 0 0; line-height: 1.6; }
+/* mid-width desktops: keep the whole header on one line, else use the menu button */
+@media (min-width: 901px) and (max-width: 1480px) {
+  .topbar-in { gap: 14px; }
+  .topnav a { padding: 8px 6px; }
+}
+@media (min-width: 901px) and (max-width: 1240px) {
+  .menu-btn { display: inline-flex; }
+  .search-btn span, .search-btn kbd { display: none; }
+  .topnav { display: none; position: absolute; top: 60px; left: 0; right: 0; flex-direction: column; background: var(--surface); border-bottom: 1px solid var(--line); padding: 8px 20px 14px; margin: 0; }
+  .topnav.open { display: flex; }
+}

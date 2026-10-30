@@ -224,6 +224,8 @@ A.onAct('daily-check', function () {
 });
 
 function ivOfDay(key) { return IV.length ? IV[pick(key, 2, IV.length)] : null; }
+function widgetOfDay(key) { var W = (A.D.widgets || []); return W.length ? W[pick(key, 4, W.length)] : null; }
+function gameOfDay(key) { var G = (A.D.games || []); return G.length ? G[pick(key, 5, G.length)] : null; }
 function caseOfDay(key) { return CASES.length ? CASES[pick(key, 3, CASES.length)] : null; }
 function caseSummary(c) {
   return '<article class="case today-case"><h3><a href="#/cases/' + e(c.id) + '">' + e(c.title) + '</a></h3><p class="small">' + e(c.company) + ', ' + c.year + '. ' + e(c.area) + '</p>' +
@@ -231,10 +233,12 @@ function caseSummary(c) {
 }
 function todayView() {
   view.title = 'Today | MARGA by EknathaLabs'; view.nav = 'practice';
-  var key = todayKey(), x = ivOfDay(key), c = caseOfDay(key), st = dailyStreak();
+  var key = todayKey(), x = ivOfDay(key), c = caseOfDay(key), st = dailyStreak(), g = gameOfDay(key), wd = widgetOfDay(key);
   view.html = head('Today, ' + key, 'A new interview question, a real incident and a daily quiz question every day. Everyone sees the same ones on the same date.') +
     '<div class="wrap narrow"><h2 class="sub-h">Interview of the day</h2><div id="iv-list">' + (x ? A.ivListHtml([x]) : '') + '</div>' +
     '<h2 class="sub-h">Case of the day</h2>' + (c ? caseSummary(c) : '') +
+    '<h2 class="sub-h">Incident game of the day</h2>' + (g ? '<article class="case today-case"><h3><a href="#/game/' + e(g.id) + '">' + e(g.title) + '</a></h3><p class="small">' + e(modTitle(g.module)) + ' | ' + e(g.level) + ' | about ' + g.minutes + ' min</p><p>' + e(g.summary) + '</p><p class="actions"><a class="btn btn-primary" href="#/game/' + e(g.id) + '">Play this incident</a></p></article>' : '') +
+    '<h2 class="sub-h">Widget of the day</h2>' + (wd ? '<article class="case today-case"><h3><a href="#/widget/' + e(wd.id) + '">' + e(wd.title) + '</a></h3><p class="small">' + e(modTitle(wd.module)) + '</p><p>' + e(wd.summary) + '</p><p class="actions"><a class="btn btn-primary" href="#/widget/' + e(wd.id) + '">Try it</a></p></article>' : '') +
     '<h2 class="sub-h">Daily challenge</h2><p>' + (bag('dc')[key] ? 'You have answered today. Daily streak: ' + st.cur + '.' : 'One question from the lessons. Daily streak: ' + st.cur + '.') + '</p>' +
     '<p class="actions"><a class="btn btn-primary" href="#/daily">' + (bag('dc')[key] ? 'See your answer' : 'Take today\'s challenge') + '</a></p></div>';
   view.voice = '#iv-list'; view.voiceLabel = 'Interview of the day';
@@ -244,11 +248,13 @@ A.addRoute(/^\/today$/, todayView);
 
 /* home page: the Today strip, built by the landing page */
 function todayStrip() {
-  var key = todayKey(), x = ivOfDay(key), c = caseOfDay(key), st = dailyStreak(), done = !!bag('dc')[key];
+  var key = todayKey(), x = ivOfDay(key), c = caseOfDay(key), st = dailyStreak(), done = !!bag('dc')[key], g = gameOfDay(key), wd = widgetOfDay(key);
   return '<section class="band alt" id="today-band"><div class="wrap"><div class="band-head"><h2>Today</h2><p>New every day, the same for everyone. Two minutes is enough. <a href="#/today">Open Today</a></p></div><ul class="prac">' +
     '<li><a href="#/daily"><strong>Daily challenge</strong><span>' + (done ? 'Answered today. Come back tomorrow.' : 'One quiz question from the lessons.') + '</span><em>Daily streak ' + st.cur + '</em></a></li>' +
     (x ? '<li><a href="#/interview/' + e(x.id) + '"><strong>Interview of the day</strong><span>' + e(x.q) + '</span><em>' + e(modTitle(x.module)) + '</em></a></li>' : '') +
-    (c ? '<li><a href="#/cases/' + e(c.id) + '"><strong>Case of the day</strong><span>' + e(c.title) + ' (' + e(c.company) + ', ' + c.year + ')</span><em>Real incident</em></a></li>' : '') + '</ul></div></section>';
+    (c ? '<li><a href="#/cases/' + e(c.id) + '"><strong>Case of the day</strong><span>' + e(c.title) + ' (' + e(c.company) + ', ' + c.year + ')</span><em>Real incident</em></a></li>' : '') +
+    (g ? '<li><a href="#/game/' + e(g.id) + '"><strong>Incident game of the day</strong><span>' + e(g.title) + '</span><em>' + e(modTitle(g.module)) + '</em></a></li>' : '') +
+    (wd ? '<li><a href="#/widget/' + e(wd.id) + '"><strong>Widget of the day</strong><span>' + e(wd.title) + '</span><em>' + e(modTitle(wd.module)) + '</em></a></li>' : '') + '</ul></div></section>';
 }
 A.todayStrip = todayStrip;
 
@@ -714,7 +720,7 @@ function exSvg(x) {
   return s;
 }
 function exPaint(animate) {
-  var x = EX.x, i = EX.i;
+  var x = EX.x, i = EX.i; if (!x || !$('#ex-step')) return;
   $$('.ex-step').forEach(function (g) { var k = +g.getAttribute('data-i'); g.classList.toggle('shown', k <= i); g.classList.toggle('cur', k === i); });
   $$('.ex-actor').forEach(function (g) { var a = +g.getAttribute('data-a'); g.classList.toggle('act', a === x.steps[i].f || a === x.steps[i].t); });
   var st = x.steps[i], W = Math.max(640, x.actors.length * 150), cw = W / x.actors.length, pkt = $('.ex-pkt');
@@ -765,6 +771,7 @@ function explainerView(id) {
     '<div class="ex-note" aria-live="polite"><p class="small" id="ex-step"></p><h2 id="ex-label"></h2><p id="ex-note"></p></div></div>' +
     '<h2 class="sub-h">More explainers</h2><ul class="prac">' + others.slice(0, 3).map(function (o) { return '<li><a href="#/explainers/' + e(o.id) + '"><strong>' + e(o.title) + '</strong><span>' + e(o.summary) + '</span></a></li>'; }).join('') + '</ul></div>';
   view.after = function () {
+    if (!$('#ex-range')) return;
     exPaint(false);
     $('#ex-range').addEventListener('input', function (ev) { exStop(); exGo(0, +ev.target.value); });
     $('#ex-speed').addEventListener('change', function (ev) { EX.speed = +ev.target.value; if (EX.playing) { exStop(); exPlay(); } });

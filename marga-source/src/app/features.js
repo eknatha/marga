@@ -4,13 +4,20 @@
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (x) { /* ignore */ } return null; }
 
-var LV = [['new', 'I am new to this'], ['pro', 'A practitioner'], ['int', 'In an interview']];
-function level() { var v = store('ea.level'); return v === 'new' || v === 'int' ? v : 'pro'; }
+var LV = [['new', 'I am new to this'], ['pro', 'A practitioner'], ['sen', 'Senior view'], ['int', 'In an interview']];
+function level() { var v = store('ea.level'); return v === 'new' || v === 'int' || v === 'sen' ? v : 'pro'; }
 function levelBody(l, v) {
   if (v === 'new') return '<p><strong>In plain words.</strong> ' + esc(l.lv.s) + '</p><p class="small">The full lesson below goes step by step.</p>';
+  if (v === 'sen' && l.lv.x) return '<p><strong>How a senior engineer reads this.</strong> ' + esc(l.lv.x) + '</p><p class="small">Use this view for design reviews and for the follow-up questions in interviews.</p>';
   if (v === 'int') return '<p><strong>A strong short answer.</strong> ' + esc(l.lv.i) + '</p><p class="small">Practise saying it aloud, then try the <a href="#/interview">InterviewHub</a> questions for this stage.</p>';
   return '<p>The full lesson below is written for people who will run this in production. Use the other two views for a quick analogy or an interview-ready summary.</p>';
 }
+function explainBlock(g) {
+  var x = g.explain; if (!x) return '';
+  return '<section class="gm-explain" aria-labelledby="gx-h"><h3 id="gx-h" class="sub-h">The incident explained</h3><dl>' +
+    '<dt>Root cause</dt><dd>' + esc(x.cause) + '</dd><dt>What you would see</dt><dd>' + esc(x.signs) + '</dd><dt>How to fix it</dt><dd>' + esc(x.fix) + '</dd><dt>Example</dt><dd>' + esc(x.example) + '</dd></dl></section>';
+}
+
 function levelsHtml(l) {
   if (!l || !l.lv) return '';
   var v = level();
@@ -21,6 +28,7 @@ function levelsHtml(l) {
 window.MargaFeatures = function (A) {
   var D = A.D, $ = A.$, $$ = A.$$, e = A.e, view = A.view;
   window.MargaFeatures.levelsHtml = levelsHtml;
+  window.MargaFeatures.realWorld = function (l) { return l && l.lv && l.lv.r ? '<section class="realworld" id="realworld" aria-labelledby="rw-h"><h2 id="rw-h">In the real world</h2><p>' + esc(l.lv.r) + '</p><p class="small">An illustrative composite, not a report about one company. Real incidents are in the <a href="#/cases">case studies</a>.</p></section>' : ''; };
 
   A.onAct('lv-set', function (b) {
     var v = b.getAttribute('data-lv'), sec = b.closest('.levels'), l = A.LES[sec.getAttribute('data-lesson')];
@@ -412,7 +420,7 @@ window.MargaFeatures = function (A) {
       else best.n = (best.n || 0) + 1;
       A.markActive(); A.save(); A.renderChrome();
       html += '<div class="gm-end gm-end-' + sc.end + '"><h2>' + OUTLABEL[sc.end] + '</h2><p>' + esc(sc.text) + '</p><p><strong>What to take away.</strong> ' + esc(sc.takeaway) + '</p>' +
-        '<p class="small">Good decisions: ' + GM.pts + ' of ' + GM.max + ' points.</p></div>' +
+        explainBlock(g) + '<p class="small">Good decisions: ' + GM.pts + ' of ' + GM.max + ' points.</p></div>' +
         '<h3 class="sub-h">Your decisions</h3><ol class="gm-log">' + GM.log.map(function (x) { return '<li><span class="small">' + esc(x.scene) + '</span><br>' + esc(x.choice) + ' <span class="chip' + (x.pts === 2 ? ' pass' : '') + '">' + (x.pts === 2 ? 'Best' : x.pts === 1 ? 'Acceptable' : 'Poor') + '</span><p class="gm-why">' + gmFbHtml(x.fb) + '</p>' + (x.pts < 2 && x.best ? '<p class="gm-why"><strong>A better move:</strong> ' + esc(x.best.t) + '. ' + gmFbHtml(x.best.fb) + '</p>' : '') + '</li>'; }).join('') + '</ol>' +
         '<div class="actions"><button type="button" class="btn btn-primary" data-act="gm-again">Play again and try other choices</button> <a class="btn btn-quiet" href="#/games">More games</a></div>';
       root.innerHTML = html; return;

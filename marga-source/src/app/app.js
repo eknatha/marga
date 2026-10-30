@@ -404,7 +404,8 @@ function homeView() {
   view.html =
     '<section class="hero hero2"><div class="wrap hero-grid2">' +
     '<div class="hero-copy"><h1>Learn to fix production before production breaks.</h1>' +
-    '<p class="hero-free"><strong>Free. No login. No payment. Just practice and learn.</strong></p>' +
+    '<p class="hero-free"><strong>Free. Offline. No sign-up.</strong> No payment, no ads.</p>' +
+    '<p class="hero-proof small"><span class="chip" id="off-chip">Checking offline support</span> Open it once, turn off wifi, and keep learning. Lessons, labs and widgets run from your device.</p>' +
     '<p class="lede">Practical DevOps, cloud and SRE training from someone who runs production. Real incidents, real commands, no login, no ads.</p>' +
     '<div class="roles" role="radiogroup" aria-label="Choose your role">' + roles + '</div>' +
     '<div class="actions">' + cta + '<a class="btn btn-quiet" href="#/placement">Take the 10-question placement check</a></div>' +
@@ -444,7 +445,7 @@ function homeView() {
 
     '<section class="band"><div class="wrap two"><div><h2>How a lesson works</h2><ol class="steps"><li><strong>Read.</strong> Each lesson explains why, then shows commands with their output.</li><li><strong>Check.</strong> Answer a short quiz. Pass it to mark the lesson done and unlock the next.</li><li><strong>Remember.</strong> Flip the flashcards now, and review them again later from the Review cards page.</li></ol></div>' +
     '<div class="note-panel"><h3>Terminal labs</h3><p>Break-and-fix practice for Linux, Shell, Networking and Python, in a simulated terminal in your browser, with automatic checks. It is a simulation, not a real server. Labs for Kubernetes, Docker and Terraform are still planned.</p><p><a href="#/terminal-labs">Open the terminal labs</a> | <a href="#/labs">What is planned</a></p></div></div></section>';
-  view.after = function () { armTree(); armTerm(); };
+  view.after = function () { armTree(); armTerm(); offlineChip(); };
 }
 
 var HD = [
@@ -464,6 +465,13 @@ var HD = [
     ['node', 'Client'], ['node', 'API gateway'], ['node', 'Payment service'], ['node', 'Queue'], ['node bad', 'Card network'],
     ['out warn', 'Where it breaks: the card network is slow.'], ['note', '<b>Effect:</b> the queue grows and clients retry. <b>Fix:</b> make every payment request safe to repeat, with an idempotency key. Every design lists where it breaks.']] }
 ];
+function offlineChip() {
+  var c = $('#off-chip'); if (!c) return;
+  var sw = navigator.serviceWorker;
+  if (!sw) { c.textContent = 'Offline needs a newer browser'; return; }
+  function set() { c.textContent = sw.controller ? (navigator.onLine ? 'Ready to work offline' : 'You are offline and still learning') : 'Reload once to enable offline'; c.classList.toggle('pass', !!sw.controller); }
+  set(); window.addEventListener('online', set); window.addEventListener('offline', set); sw.ready.then(function () { setTimeout(set, 400); }, function () { /* ignore */ });
+}
 function heroDemoHtml() {
   var tabs = HD.map(function (x, n) { return '<button type="button" role="tab" class="hd-tab' + (n ? '' : ' on') + '" id="hd-t' + n + '" aria-selected="' + (n === 0) + '" aria-controls="hd-stage" data-n="' + n + '">' + e(x.tab) + '</button>'; }).join('');
   var sr = HD.map(function (x) { return x.cap; }).join('. ');
@@ -632,6 +640,19 @@ function notFound() {
 
 /* ----- lesson ----- */
 var activeQuiz = null;
+var LOADED = window.ACADEMY_LOADED = window.ACADEMY_LOADED || {}, LOADING = {};
+var VER = (function () { var s = document.querySelector('script[src*="app.js"]'); var m = s && s.src.match(/[?&]v=([\w]+)/); return m ? m[1] : '0'; })();
+function loadModule(mid) {
+  if (LOADED[mid]) return Promise.resolve();
+  if (LOADING[mid]) return LOADING[mid];
+  LOADING[mid] = new Promise(function (res, rej) {
+    var sc = document.createElement('script'); sc.src = 'assets/lessons/' + mid + '.js?v=' + VER;
+    sc.onload = function () { res(); }; sc.onerror = function () { delete LOADING[mid]; rej(new Error('lesson file did not load')); };
+    document.head.appendChild(sc);
+  });
+  return LOADING[mid];
+}
+function loadAll() { return Promise.all(MODS.map(function (m) { return loadModule(m.id); })); }
 function lessonView(mid, slug) {
   var id = mid + '/' + slug, l = LES[id];
   if (!l) return notFound();
@@ -640,6 +661,15 @@ function lessonView(mid, slug) {
     toast('Locked. ' + lockReason(id));
     location.replace('#/module/' + mid);
     return 'redirect';
+  }
+  if (!LOADED[mid]) {
+    var here = location.hash; view.after = null; view.cleanup = null;
+    view.title = l.title + ' | MARGA by EknathaLabs'; view.nav = 'paths';
+    view.html = '<section class="page-head wrap"><h1>' + e(l.title) + '</h1><p class="lede" role="status" id="lload">Loading the lesson.</p></section>';
+    loadModule(mid).then(function () { if (location.hash === here) route(); }, function () {
+      var n = $('#lload'); if (n) n.innerHTML = 'This lesson could not load. Check your connection, then <a href="' + e(here) + '" onclick="location.reload();return false">reload the page</a>.';
+    });
+    return;
   }
   var m = MOD[mid], i = m.lessons.indexOf(id);
   var prev = i > 0 ? m.lessons[i - 1] : null, nxt = i < m.lessons.length - 1 ? m.lessons[i + 1] : null;
@@ -653,7 +683,7 @@ function lessonView(mid, slug) {
     '<div class="actions lesson-tools">' + printBar() + '<button type="button" class="btn btn-quiet" data-act="read-toggle" aria-pressed="false">Reading mode</button></div>' + voiceSlot() +
     (window.MargaFeatures ? MargaFeatures.levelsHtml(l) : '') +
     '<div class="lesson-grid"><div class="prose" id="prose">' + l.html + refsHtml(l.refs) + '</div>' + toc + '</div>' +
-    '<div id="tryit">' + (window.MargaExLinks ? MargaExLinks.lesson(id) : '') +
+    (window.MargaFeatures && MargaFeatures.realWorld ? MargaFeatures.realWorld(l) : '') + '<div id="tryit">' + (window.MargaExLinks ? MargaExLinks.lesson(id) : '') +
     (window.MargaWidgetLinks ? MargaWidgetLinks.lesson(id) : '') + '</div>' + takeaways(l) +
     '<section class="check" id="check" aria-labelledby="check-h"><h2 id="check-h">Lesson check</h2><div id="quiz"></div></section>' +
     '<section class="cardsec" id="cards" aria-labelledby="cards-h"><h2 id="cards-h">Flashcards</h2><div id="deck"></div></section>' +
@@ -1062,7 +1092,7 @@ function buildIndex() {
   MODS.forEach(function (m) { addIdx('Stage', 'Lessons', m.title, m.summary, '#/module/' + m.id, m.summary, '', null, m.id); });
   Object.keys(LES).forEach(function (id) {
     var l = LES[id];
-    addIdx('Lesson', 'Lessons', l.title, MOD[l.module].title, hrefLesson(id), l.summary + ' ' + (l.text || '').slice(0, 9000), l.toc.map(function (x) { return x.text; }).join(' '), id, l.module);
+    addIdx('Lesson', 'Lessons', l.title, MOD[l.module].title, hrefLesson(id), l.summary + ' ' + (l.text || '').slice(0, 9000), (l.toc || []).map(function (x) { return x.text; }).join(' '), id, l.module);
   });
   (D.cases || []).forEach(function (c) { addIdx('Case study', 'Cases', c.title, c.company + ', ' + c.year, '#/cases/' + c.id, c.what + ' ' + c.cause + ' ' + c.fix + ' ' + c.lesson, c.company + ' ' + c.area, null, (c.modules || [])[0]); });
   (D.arch || []).forEach(function (a) { addIdx('Post-mortem', 'Cases', a.title, a.summary, '#/architecture/' + a.id, a.text, a.company, null, (a.modules || [])[0]); });
@@ -1103,6 +1133,7 @@ function pushRecent(q) {
 function openSearch() {
   lastFocus = document.activeElement; searchGroup = ''; searchStage = '';
   if (!INDEX) buildIndex();
+  loadAll().then(function () { INDEX = null; var q = $('#sq'); if (q) { results = searchResults(q.value); paintResults(q.value); } }, function () { /* search still works on titles and summaries */ });
   $('#search-root').innerHTML = '<div class="modal" id="smodal"><div class="modal-back" data-act="close-search"></div>' +
     '<div class="modal-box" role="dialog" aria-modal="true" aria-label="Search"><label class="sr" for="sq">Search lessons, cases, cheat sheets, interview questions and the glossary</label>' +
     '<input id="sq" type="search" placeholder="Search lessons, commands, incidents, terms" autocomplete="off">' +
@@ -1239,7 +1270,7 @@ var api = {
   $: $, $$: $$, e: e, plural: plural, shuffle: shuffle, hours: hours,
   state: function () { return S; }, save: save, markActive: markActive, renderChrome: renderChrome, setNav: setNav,
   view: view, toast: toast, printBar: printBar, voiceSlot: voiceSlot, wireSay: wireSay, refsHtml: refsHtml,
-  hrefLesson: hrefLesson, isDone: isDone, route: route,
+  hrefLesson: hrefLesson, isDone: isDone, route: route, loadAll: loadAll, loadModule: loadModule,
   addRoute: function (re, fn) { routes.push([re, fn]); },
   afterRoute: function (fn) { afterHooks.push(fn); }, ivListHtml: ivListHtml,
   lessonState: lessonState, ICON: ICON, S: function () { return S; },
@@ -1259,6 +1290,8 @@ if (typeof window.MargaSDLab === 'function') window.MargaSDLab(api);
 if (typeof window.MargaWidgets === 'function') window.MargaWidgets(api);
 if (typeof window.MargaDiagrams === 'function') window.MargaDiagrams(api);
 if (typeof window.MargaPlans === 'function') window.MargaPlans(api);
+if (typeof window.MargaReplay === 'function') window.MargaReplay(api);
+if (typeof window.MargaPortfolio === 'function') window.MargaPortfolio(api);
 
 /* ---------- accessibility panel ---------- */
 (function () {
@@ -1296,6 +1329,7 @@ visitors();
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
   var hadSW = !!navigator.serviceWorker.controller, reloaded = false;
   navigator.serviceWorker.addEventListener('controllerchange', function () { if (hadSW && !reloaded) { reloaded = true; location.reload(); } });
+  window.addEventListener('load', function () { var cn = navigator.connection; if (cn && cn.saveData) return; setTimeout(function () { loadAll().catch(function () { /* loads on demand instead */ }); }, 4000); });
   window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(function (r) { try { r.update(); } catch (x) { /* ignore */ } }).catch(function () { /* offline cache is optional */ }); });
 }
 })();
