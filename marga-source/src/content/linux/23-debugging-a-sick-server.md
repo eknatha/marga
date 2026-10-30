@@ -64,7 +64,7 @@ Run df -i to see whether the filesystem has run out of inodes.
 title: A fixed order for a sick server
 node: ask | What changed? | 0 | 1 | Deploys, config edits, package updates and traffic changes in the last hours. | Skipping this step means hours spent on a cause that was introduced this morning.
 node: logs | Logs and kernel messages | 1 | 0 | journalctl and dmesg show crashes, OOM kills and disk errors with timestamps. | Logs rotated away or never kept leave you guessing.
-node: use | CPU, memory, disk, network | 1 | 2 | uptime, free, df, iostat and ss find the saturated resource. | Reading the wrong column, such as free instead of available memory, misleads you.
+node: use | CPU, memory, disk, network | 1 | 2 | uptime, free, df, iostat and ss find the saturated resource. | Reading the wrong column, such as free instead of available memory, misleads you. | process
 node: proc | Responsible process | 2 | 1 | ps, top, lsof and strace link the saturation to one program. | Killing the wrong process fixes nothing and may hide the evidence.
 node: fix | Fix and verify | 3 | 1 | Change one thing, then confirm the metric returns to normal. | Several changes at once leave you unsure what worked.
 edge: ask | logs

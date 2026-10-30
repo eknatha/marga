@@ -73,7 +73,7 @@ Lower the memory request, add node capacity, or free resources by scaling other 
 
 ```diagram
 title: From a broken Pod to a cause
-node: get | Pod state | 0 | 1 | kubectl get pods shows Pending, CrashLoopBackOff or not Ready. | The state alone does not give the cause.
+node: get | Pod state | 0 | 1 | kubectl get pods shows Pending, CrashLoopBackOff or not Ready. | The state alone does not give the cause. | process
 node: desc | Describe and events | 1 | 0 | Shows exit code, scheduling messages, probe failures and pull errors. | Events expire after about an hour, so look soon.
 node: logs | Logs, previous run | 1 | 2 | logs --previous prints output from the crashed container. | Plain logs show only the new, empty container.
 node: svc | Service and endpoints | 2 | 0 | Empty endpoints mean the selector or readiness is wrong. | A correct Pod behind a mismatched selector still receives no traffic.
