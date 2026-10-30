@@ -1,0 +1,2412 @@
+[
+ {
+  "id": "oom-killer",
+  "module": "linux",
+  "lesson": "linux/processes-memory-and-the-oom-killer",
+  "title": "Memory pressure and the OOM killer",
+  "summary": "Apps ask for more memory than the box has. See when swap helps, when the kernel kills a process, and how a cgroup limit contains the damage.",
+  "inputs": [
+   {
+    "id": "ram",
+    "label": "Physical memory",
+    "min": 2,
+    "max": 64,
+    "value": 8,
+    "step": 1,
+    "unit": "GB"
+   },
+   {
+    "id": "demand",
+    "label": "Memory the apps want",
+    "min": 1,
+    "max": 80,
+    "value": 6,
+    "step": 1,
+    "unit": "GB"
+   },
+   {
+    "id": "swap",
+    "label": "Swap",
+    "min": 0,
+    "max": 16,
+    "value": 2,
+    "step": 1,
+    "unit": "GB"
+   },
+   {
+    "id": "cg",
+    "label": "Limit the app with a cgroup at 75% of RAM",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "used",
+    "min(demand, ram)"
+   ],
+   [
+    "spill",
+    "max(0, min(swap, demand - ram))"
+   ],
+   [
+    "over",
+    "demand > ram + swap"
+   ],
+   [
+    "capped",
+    "cg && demand > 0.75 * ram"
+   ],
+   [
+    "hostoom",
+    "over && !capped"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "label": "App",
+    "x": 0,
+    "y": 0,
+    "state": "capped ? 2 : (demand>ram ? 1 : 0)",
+    "sub": "round(demand) + \" GB wanted\""
+   },
+   {
+    "id": "m",
+    "label": "Memory and swap",
+    "x": 1,
+    "y": 0,
+    "state": "hostoom ? 2 : (spill>0 ? 1 : 0)",
+    "sub": "round(used) + \" GB RAM, \" + round(spill) + \" GB swap\""
+   },
+   {
+    "id": "k",
+    "label": "Kernel",
+    "x": 2,
+    "y": 0,
+    "state": "hostoom ? 2 : (capped ? 1 : 0)",
+    "sub": "hostoom ? \"OOM kills something\" : (capped ? \"kills the app only\" : \"quiet\")"
+   }
+  ],
+  "edges": [
+   {
+    "from": "a",
+    "to": "m",
+    "flow": "min(1, demand/80 + 0.2)",
+    "bad": "false"
+   },
+   {
+    "from": "m",
+    "to": "k",
+    "flow": "hostoom ? 1 : 0.3",
+    "bad": "hostoom"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "RAM in use",
+    "expr": "used",
+    "dp": 0,
+    "unit": "GB"
+   },
+   {
+    "label": "Pushed to swap",
+    "expr": "spill",
+    "dp": 0,
+    "unit": "GB"
+   },
+   {
+    "label": "Memory short by",
+    "expr": "max(0, demand - ram - swap)",
+    "dp": 0,
+    "unit": "GB"
+   },
+   {
+    "label": "Who gets killed",
+    "expr": "hostoom ? \"a process chosen by the kernel\" : (capped ? \"the limited app\" : \"nobody\")",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "hostoom",
+    "tone": "bad",
+    "text": "There is no memory left. The kernel picks a process to kill and it may not be the one you would choose. A busy SSH daemon or database can go."
+   },
+   {
+    "when": "capped",
+    "tone": "warn",
+    "text": "The cgroup limit stopped the app first, so only the app is killed and the rest of the host survives."
+   },
+   {
+    "when": "spill > 0",
+    "tone": "warn",
+    "text": "The box is using swap. It still works, but anything touching swapped memory is slow."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Everything fits in RAM."
+   }
+  ],
+  "tries": [
+   "Raise demand above RAM plus swap and watch the host OOM.",
+   "Turn on the cgroup limit. The same overload now kills only the app.",
+   "Add swap. It delays the kill but makes things slow first."
+  ],
+  "chart": {
+   "x": "demand",
+   "y": "min(demand, ram)",
+   "y2": "spill",
+   "xlabel": "Memory wanted (GB)",
+   "ylabel": "RAM in use (GB)",
+   "y2label": "Swap in use (GB)",
+   "title": "RAM and swap against demand",
+   "min": 0
+  }
+ },
+ {
+  "id": "load-average",
+  "module": "linux",
+  "lesson": "linux/performance-triage",
+  "title": "Reading load average",
+  "summary": "Load average counts runnable and waiting tasks. Compare it with the CPU count, and see why a high load can be a disk problem and not a CPU one.",
+  "inputs": [
+   {
+    "id": "load",
+    "label": "Load average",
+    "min": 0,
+    "max": 100,
+    "value": 12,
+    "step": 1
+   },
+   {
+    "id": "cpus",
+    "label": "CPU cores",
+    "min": 1,
+    "max": 64,
+    "value": 8,
+    "step": 1
+   },
+   {
+    "id": "dwait",
+    "label": "Share of load that is disk wait",
+    "min": 0,
+    "max": 100,
+    "value": 0,
+    "step": 5,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "run",
+    "load * (1 - dwait/100)"
+   ],
+   [
+    "per",
+    "run / cpus"
+   ],
+   [
+    "io",
+    "load * dwait/100"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "CPU cores",
+    "x": 0,
+    "y": 0,
+    "state": "per>1.5 ? 2 : (per>1 ? 1 : 0)",
+    "sub": "cpus + \" cores, \" + fmt(per, 2) + \" tasks each\""
+   },
+   {
+    "id": "q",
+    "label": "Run queue",
+    "x": 1,
+    "y": 0,
+    "state": "per>1 ? 1 : 0",
+    "sub": "fmt(run, 1) + \" runnable\""
+   },
+   {
+    "id": "d",
+    "label": "Disk wait",
+    "x": 2,
+    "y": 0,
+    "state": "io>cpus ? 2 : (io>0 ? 1 : 0)",
+    "sub": "fmt(io, 1) + \" blocked\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "q",
+    "flow": "min(1, per/2 + 0.2)",
+    "bad": "per>1.5"
+   },
+   {
+    "from": "q",
+    "to": "d",
+    "flow": "min(1, io/20)",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Runnable tasks per core",
+    "expr": "per",
+    "dp": 2
+   },
+   {
+    "label": "Tasks blocked on disk",
+    "expr": "io",
+    "dp": 1
+   },
+   {
+    "label": "Load per core, all tasks",
+    "expr": "load / cpus",
+    "dp": 2
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "per > 1.5",
+    "tone": "bad",
+    "text": "More than one and a half runnable tasks per core. Work is queuing for CPU, so latency climbs. Find the top consumers or add cores."
+   },
+   {
+    "when": "io > cpus * 0.5",
+    "tone": "warn",
+    "text": "A large part of the load is waiting on disk, not using CPU. Look at I/O, not at the CPU graph."
+   },
+   {
+    "when": "per > 1",
+    "tone": "warn",
+    "text": "The cores are saturated. Latency starts to grow."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Plenty of room. Load per core is under one."
+   }
+  ],
+  "tries": [
+   "Set load 16 on 8 cores with no disk wait.",
+   "Set 80 percent disk wait. The same load is no longer a CPU problem.",
+   "Remember that a load of 8 is fine on 16 cores and bad on 2."
+  ],
+  "chart": {
+   "x": "load",
+   "y": "load / cpus",
+   "xlabel": "Load average",
+   "ylabel": "Load per core",
+   "title": "Load per core",
+   "min": 0
+  }
+ },
+ {
+  "id": "page-cache",
+  "module": "linux",
+  "lesson": "linux/filesystems-page-cache-and-io",
+  "title": "Page cache and read latency",
+  "summary": "Linux uses spare memory to cache files. See how the share of your working set that fits in cache changes average read latency for each kind of disk.",
+  "inputs": [
+   {
+    "id": "ram",
+    "label": "Memory",
+    "min": 4,
+    "max": 128,
+    "value": 16,
+    "step": 2,
+    "unit": "GB"
+   },
+   {
+    "id": "apps",
+    "label": "Memory used by processes",
+    "min": 1,
+    "max": 100,
+    "value": 6,
+    "step": 1,
+    "unit": "GB"
+   },
+   {
+    "id": "ws",
+    "label": "Hot data that is read",
+    "min": 1,
+    "max": 200,
+    "value": 40,
+    "step": 1,
+    "unit": "GB"
+   },
+   {
+    "id": "disk",
+    "label": "Disk",
+    "type": "select",
+    "options": [
+     [
+      "8",
+      "Spinning disk (about 8 ms)"
+     ],
+     [
+      "0.2",
+      "SATA SSD (about 0.2 ms)"
+     ],
+     [
+      "0.08",
+      "NVMe (about 0.08 ms)"
+     ]
+    ],
+    "value": "0.2"
+   }
+  ],
+  "vars": [
+   [
+    "cache",
+    "max(0, ram - apps)"
+   ],
+   [
+    "hit",
+    "min(1, cache / ws)"
+   ],
+   [
+    "miss",
+    "1 - hit"
+   ],
+   [
+    "d",
+    "+disk"
+   ],
+   [
+    "avg",
+    "hit * 0.001 + miss * d"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "r",
+    "label": "Reads",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "\"working set \" + round(ws) + \" GB\""
+   },
+   {
+    "id": "pc",
+    "label": "Page cache",
+    "x": 1,
+    "y": 0,
+    "state": "hit<0.5 ? 2 : (hit<0.9 ? 1 : 0)",
+    "sub": "round(cache) + \" GB, hit \" + pct(hit, 0)"
+   },
+   {
+    "id": "dk",
+    "label": "Disk",
+    "x": 2,
+    "y": 0,
+    "state": "miss>0.5 ? 2 : (miss>0.1 ? 1 : 0)",
+    "sub": "pct(miss, 0) + \" of reads\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "r",
+    "to": "pc",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "pc",
+    "to": "dk",
+    "flow": "min(1, miss + 0.05)",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Cache hit ratio",
+    "expr": "pct(hit, 0)",
+    "dp": 0
+   },
+   {
+    "label": "Average read time",
+    "expr": "avg",
+    "dp": 3,
+    "unit": "ms"
+   },
+   {
+    "label": "Cache available",
+    "expr": "cache",
+    "dp": 0,
+    "unit": "GB"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "hit < 0.5",
+    "tone": "bad",
+    "text": "Most reads go to disk. Latency is close to the raw disk time. More memory or a smaller working set will help far more than tuning."
+   },
+   {
+    "when": "hit < 0.95",
+    "tone": "warn",
+    "text": "Some reads miss the cache and pay the disk price, which dominates the average."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The hot data fits in the page cache, so reads are served from memory."
+   }
+  ],
+  "tries": [
+   "Shrink the working set below the available cache.",
+   "Raise memory used by processes. The cache shrinks and latency rises.",
+   "Switch from spinning disk to NVMe and see the average drop."
+  ],
+  "chart": {
+   "x": "ws",
+   "y": "avg",
+   "xlabel": "Working set (GB)",
+   "ylabel": "Average read time (ms)",
+   "title": "Read latency against working set",
+   "min": 0
+  }
+ },
+ {
+  "id": "clock-drift",
+  "module": "linux",
+  "lesson": "linux/time-ntp-and-timezones",
+  "title": "Clock drift and sync interval",
+  "summary": "Clocks drift between syncs. Pick a drift rate and a sync interval, and compare the worst-case error with what your system can tolerate.",
+  "inputs": [
+   {
+    "id": "ppm",
+    "label": "Clock drift",
+    "min": 1,
+    "max": 500,
+    "value": 50,
+    "step": 1,
+    "unit": "ppm"
+   },
+   {
+    "id": "hrs",
+    "label": "Time between syncs",
+    "min": 0.1,
+    "max": 48,
+    "value": 1,
+    "step": 0.1,
+    "unit": "hours"
+   },
+   {
+    "id": "tol",
+    "label": "What must stay accurate",
+    "type": "select",
+    "options": [
+     [
+      "1",
+      "Cross-host log ordering (1 ms)"
+     ],
+     [
+      "100",
+      "Short-lived tokens (100 ms)"
+     ],
+     [
+      "5000",
+      "Typical TLS clock skew (5 s)"
+     ],
+     [
+      "300000",
+      "Kerberos-style logon (5 min)"
+     ]
+    ],
+    "value": "100"
+   }
+  ],
+  "vars": [
+   [
+    "err",
+    "ppm * hrs * 3600 / 1000"
+   ],
+   [
+    "t",
+    "+tol"
+   ],
+   [
+    "ok",
+    "err <= t"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "h",
+    "label": "Host clock",
+    "x": 0,
+    "y": 0,
+    "state": "err>t ? 2 : 0",
+    "sub": "\"drifts \" + ppm + \" ppm\""
+   },
+   {
+    "id": "n",
+    "label": "Time source",
+    "x": 1,
+    "y": 0,
+    "state": "0",
+    "sub": "\"every \" + fmt(hrs, 1) + \" h\""
+   },
+   {
+    "id": "s",
+    "label": "Your system",
+    "x": 2,
+    "y": 0,
+    "state": "err>t ? 2 : (err>t*0.5 ? 1 : 0)",
+    "sub": "\"needs \" + t + \" ms\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "h",
+    "to": "n",
+    "flow": "0.6",
+    "bad": "false"
+   },
+   {
+    "from": "n",
+    "to": "s",
+    "flow": "0.6",
+    "bad": "err>t"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Worst-case error before the next sync",
+    "expr": "err",
+    "dp": 1,
+    "unit": "ms"
+   },
+   {
+    "label": "What you can tolerate",
+    "expr": "t",
+    "dp": 0,
+    "unit": "ms"
+   },
+   {
+    "label": "Result",
+    "expr": "ok ? \"within tolerance\" : \"too far off\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "err > t",
+    "tone": "bad",
+    "text": "The clock can drift further than the system tolerates before the next sync. Sync more often, use a better clock, or relax the requirement."
+   },
+   {
+    "when": "err > t * 0.5",
+    "tone": "warn",
+    "text": "Within tolerance but with little margin. A missed sync would push it over."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Comfortably inside tolerance."
+   }
+  ],
+  "tries": [
+   "Pick log ordering at 1 ms and watch even frequent syncs fail.",
+   "Lengthen the interval to 24 hours for TLS skew.",
+   "Raise the drift rate to see how a poor clock changes the answer."
+  ],
+  "chart": {
+   "x": "hrs",
+   "y": "ppm * hrs * 3600 / 1000",
+   "xlabel": "Hours between syncs",
+   "ylabel": "Worst-case error (ms)",
+   "title": "Drift error against interval",
+   "min": 0
+  }
+ },
+ {
+  "id": "shell-exit-codes",
+  "module": "bash",
+  "lesson": "bash/safe-automation",
+  "title": "Failing fast in shell scripts",
+  "summary": "A script runs a list of steps and one of them fails. See how set -e and explicit checks decide how many later steps run on bad data.",
+  "inputs": [
+   {
+    "id": "steps",
+    "label": "Steps in the script",
+    "min": 2,
+    "max": 12,
+    "value": 8,
+    "step": 1
+   },
+   {
+    "id": "failat",
+    "label": "Step that fails (0 for none)",
+    "min": 0,
+    "max": 12,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "sete",
+    "label": "set -e is on",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "check",
+    "label": "Step 3 result is checked with || exit",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "fails",
+    "failat > 0 && failat <= steps"
+   ],
+   [
+    "stop",
+    "fails && (sete || check)"
+   ],
+   [
+    "ran",
+    "fails ? (stop ? failat : steps) : steps"
+   ],
+   [
+    "bad",
+    "fails ? max(0, ran - failat) : 0"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "s",
+    "label": "Steps before failure",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "fails ? failat + \" run\" : steps + \" run\""
+   },
+   {
+    "id": "f",
+    "label": "Failing step",
+    "x": 1,
+    "y": 0,
+    "state": "fails ? 2 : 0",
+    "sub": "fails ? \"step \" + failat : \"none\""
+   },
+   {
+    "id": "l",
+    "label": "Later steps",
+    "x": 2,
+    "y": 0,
+    "state": "bad>0 ? 2 : 0",
+    "sub": "bad + \" ran on bad data\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "s",
+    "to": "f",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "f",
+    "to": "l",
+    "flow": "stop ? 0 : (fails ? 0.8 : 0.5)",
+    "bad": "bad>0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Steps that ran",
+    "expr": "ran",
+    "dp": 0
+   },
+   {
+    "label": "Steps run after the failure",
+    "expr": "bad",
+    "dp": 0
+   },
+   {
+    "label": "Script exit status",
+    "expr": "fails && !stop ? \"success, even though a step failed\" : (fails ? \"failure\" : \"success\")",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "bad > 0",
+    "tone": "bad",
+    "text": "The script carried on after the failure, so later steps ran against missing or half-built data and the exit status may say success. Turn on set -e or check the result."
+   },
+   {
+    "when": "fails && stop",
+    "tone": "good",
+    "text": "The script stopped at the failure and returned a failing status, so callers know."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "No step failed."
+   }
+  ],
+  "tries": [
+   "Fail step 3 with set -e off and no check.",
+   "Turn on set -e. The script stops at the failure.",
+   "Remember that set -e has gaps, such as commands in conditions, so explicit checks still matter."
+  ]
+ },
+ {
+  "id": "quoting-words",
+  "module": "bash",
+  "lesson": "bash/arrays-and-parameter-expansion",
+  "title": "Quoting and word splitting",
+  "summary": "An unquoted variable is split on spaces. See how many files an unquoted loop mangles when some names contain spaces.",
+  "inputs": [
+   {
+    "id": "files",
+    "label": "Files",
+    "min": 10,
+    "max": 1000,
+    "value": 200,
+    "step": 10
+   },
+   {
+    "id": "pct",
+    "label": "Names containing spaces",
+    "min": 0,
+    "max": 50,
+    "value": 3,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "words",
+    "label": "Words in such a name",
+    "min": 2,
+    "max": 4,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "quoted",
+    "label": "Variables are quoted",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "spaced",
+    "round(files * pct/100)"
+   ],
+   [
+    "wrong",
+    "quoted ? 0 : spaced"
+   ],
+   [
+    "args",
+    "quoted ? files : files - spaced + spaced * words"
+   ],
+   [
+    "ok",
+    "files - wrong"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "l",
+    "label": "Loop over files",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "files + ' names'"
+   },
+   {
+    "id": "x",
+    "label": "Shell expansion",
+    "x": 1,
+    "y": 0,
+    "state": "wrong>0 ? 2 : 0",
+    "sub": "quoted ? \"kept whole\" : \"split on spaces\""
+   },
+   {
+    "id": "c",
+    "label": "Command runs",
+    "x": 2,
+    "y": 0,
+    "state": "wrong>0 ? 2 : 0",
+    "sub": "args + \" arguments\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "l",
+    "to": "x",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "x",
+    "to": "c",
+    "flow": "0.7",
+    "bad": "wrong>0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Files with a space in the name",
+    "expr": "spaced",
+    "dp": 0
+   },
+   {
+    "label": "Names handled wrongly",
+    "expr": "wrong",
+    "dp": 0
+   },
+   {
+    "label": "Arguments the command receives",
+    "expr": "args",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "wrong > 0",
+    "tone": "bad",
+    "text": "Each name with a space becomes several arguments, so the command acts on files that do not exist, or on the wrong ones. With rm or mv this can be destructive. Quote the variable."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Quoted variables arrive as one argument each, spaces and all."
+   }
+  ],
+  "tries": [
+   "Set 10 percent of names to contain spaces and leave quoting off.",
+   "Turn quoting on and watch the wrong count drop to zero.",
+   "Add words per name to see how the arguments multiply."
+  ]
+ },
+ {
+  "id": "atomic-write",
+  "module": "bash",
+  "lesson": "bash/temporary-files-and-atomic-writes",
+  "title": "Atomic writes",
+  "summary": "A writer updates a file while readers poll it. See how often a reader sees a half-written file, and how write-then-rename removes the risk.",
+  "inputs": [
+   {
+    "id": "size",
+    "label": "File size",
+    "min": 1,
+    "max": 2000,
+    "value": 200,
+    "step": 1,
+    "unit": "MB"
+   },
+   {
+    "id": "speed",
+    "label": "Write speed",
+    "min": 10,
+    "max": 500,
+    "value": 100,
+    "step": 10,
+    "unit": "MB/s"
+   },
+   {
+    "id": "every",
+    "label": "Update interval",
+    "min": 1,
+    "max": 600,
+    "value": 30,
+    "step": 1,
+    "unit": "s"
+   },
+   {
+    "id": "reads",
+    "label": "Reads per minute",
+    "min": 1,
+    "max": 600,
+    "value": 60,
+    "step": 1
+   },
+   {
+    "id": "atomic",
+    "label": "Write to a temp file, then rename",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "win",
+    "size / speed"
+   ],
+   [
+    "prob",
+    "atomic ? 0 : min(1, win / every)"
+   ],
+   [
+    "bad",
+    "reads * 60 * 24 * prob"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "w",
+    "label": "Writer",
+    "x": 0,
+    "y": 0,
+    "state": "win>every ? 2 : (win>1 ? 1 : 0)",
+    "sub": "fmt(win, 1) + \" s to write\""
+   },
+   {
+    "id": "f",
+    "label": "File on disk",
+    "x": 1,
+    "y": 0,
+    "state": "prob>0.05 ? 2 : (prob>0 ? 1 : 0)",
+    "sub": "atomic ? \"swapped in whole\" : \"visible while partial\""
+   },
+   {
+    "id": "r",
+    "label": "Readers",
+    "x": 2,
+    "y": 0,
+    "state": "bad>0 ? 2 : 0",
+    "sub": "reads + \" reads/min\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "w",
+    "to": "f",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "f",
+    "to": "r",
+    "flow": "min(1, 0.3 + prob)",
+    "bad": "prob>0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Time a partial file is visible",
+    "expr": "atomic ? 0 : win",
+    "dp": 1,
+    "unit": "s"
+   },
+   {
+    "label": "Chance a read sees a partial file",
+    "expr": "pct(prob, 1)",
+    "dp": 0
+   },
+   {
+    "label": "Bad reads per day",
+    "expr": "bad",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "prob > 0.05",
+    "tone": "bad",
+    "text": "Readers often catch the file mid-write and parse truncated data. Write to a temporary file in the same directory, then rename it into place."
+   },
+   {
+    "when": "prob > 0",
+    "tone": "warn",
+    "text": "Bad reads are rare but real, and they will happen at the worst moment."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "A rename is atomic on the same filesystem, so readers see the old file or the new one, never half of it."
+   }
+  ],
+  "tries": [
+   "Write a big file slowly with atomic off.",
+   "Turn atomic on. The partial window disappears.",
+   "Shorten the update interval and watch the risk rise."
+  ],
+  "chart": {
+   "x": "size",
+   "y": "100 * min(1, size/speed/every)",
+   "xlabel": "File size (MB)",
+   "ylabel": "Chance of a partial read (%)",
+   "title": "Partial read risk (no atomic write)",
+   "min": 0,
+   "max": 100
+  }
+ },
+ {
+  "id": "parallel-jobs",
+  "module": "bash",
+  "lesson": "bash/advanced-patterns",
+  "title": "Parallel jobs and rate limits",
+  "summary": "Run a batch with N parallel workers. See where more workers stop helping because of CPU cores or an API rate limit.",
+  "inputs": [
+   {
+    "id": "items",
+    "label": "Items to process",
+    "min": 100,
+    "max": 100000,
+    "value": 5000,
+    "step": 100
+   },
+   {
+    "id": "per",
+    "label": "Time per item",
+    "min": 0.01,
+    "max": 5,
+    "value": 0.5,
+    "step": 0.01,
+    "unit": "s"
+   },
+   {
+    "id": "p",
+    "label": "Parallel workers",
+    "min": 1,
+    "max": 64,
+    "value": 4,
+    "step": 1
+   },
+   {
+    "id": "cores",
+    "label": "CPU cores",
+    "min": 1,
+    "max": 32,
+    "value": 4,
+    "step": 1
+   },
+   {
+    "id": "io",
+    "label": "Work mostly waits on the network",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "cap",
+    "label": "API limit",
+    "min": 1,
+    "max": 200,
+    "value": 50,
+    "step": 1,
+    "unit": "req/s"
+   }
+  ],
+  "vars": [
+   [
+    "eff",
+    "io ? p : min(p, cores)"
+   ],
+   [
+    "t1",
+    "items * per / eff"
+   ],
+   [
+    "tapi",
+    "io ? items / cap : 0"
+   ],
+   [
+    "t",
+    "max(t1, tapi)"
+   ],
+   [
+    "limited",
+    "io && tapi > t1"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "q",
+    "label": "Queue",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "items + \" items\""
+   },
+   {
+    "id": "w",
+    "label": "Workers",
+    "x": 1,
+    "y": 0,
+    "state": "p>cores && !io ? 1 : 0",
+    "sub": "p + \" workers, \" + fmt(eff, 0) + \" effective\""
+   },
+   {
+    "id": "a",
+    "label": "API or CPU",
+    "x": 2,
+    "y": 0,
+    "state": "limited ? 2 : 0",
+    "sub": "limited ? \"rate limited\" : \"no limit hit\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "q",
+    "to": "w",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "w",
+    "to": "a",
+    "flow": "min(1, eff/16 + 0.2)",
+    "bad": "limited"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Total time",
+    "expr": "t / 60",
+    "dp": 1,
+    "unit": "min"
+   },
+   {
+    "label": "Effective parallelism",
+    "expr": "eff",
+    "dp": 0
+   },
+   {
+    "label": "Limited by",
+    "expr": "limited ? \"the API rate limit\" : (p > cores && !io ? \"CPU cores\" : \"worker count\")",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "limited",
+    "tone": "warn",
+    "text": "The API limit is the ceiling now. More workers only add errors and retries."
+   },
+   {
+    "when": "p > cores && !io",
+    "tone": "warn",
+    "text": "CPU-bound work does not speed up beyond the number of cores."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "More workers still help."
+   }
+  ],
+  "tries": [
+   "Raise workers on CPU-bound work past the core count.",
+   "Switch to network-bound work and raise workers. Then hit the API limit.",
+   "Lower the API limit and see it set the floor."
+  ],
+  "chart": {
+   "x": "p",
+   "y": "t / 60",
+   "xlabel": "Parallel workers",
+   "ylabel": "Total time (min)",
+   "title": "Time against workers",
+   "min": 0
+  }
+ },
+ {
+  "id": "git-rebase-merge",
+  "module": "git",
+  "lesson": "git/rebase-and-clean-history",
+  "title": "Merge or rebase",
+  "summary": "Bring a feature branch up to date. Compare how many times you resolve conflicts, and what the history looks like afterwards.",
+  "inputs": [
+   {
+    "id": "commits",
+    "label": "Commits on the branch",
+    "min": 1,
+    "max": 50,
+    "value": 12,
+    "step": 1
+   },
+   {
+    "id": "files",
+    "label": "Files that conflict",
+    "min": 1,
+    "max": 10,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "overlap",
+    "label": "Commits touching those files",
+    "min": 0,
+    "max": 100,
+    "value": 40,
+    "step": 5,
+    "unit": "%"
+   },
+   {
+    "id": "squash",
+    "label": "Squash the branch first",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "touch",
+    "max(1, round(commits * overlap/100))"
+   ],
+   [
+    "merge",
+    "files"
+   ],
+   [
+    "rebase",
+    "squash ? files : files * touch"
+   ],
+   [
+    "hist",
+    "squash ? 1 : commits"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "f",
+    "label": "Feature branch",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "commits + ' commits'"
+   },
+   {
+    "id": "s",
+    "label": "Update strategy",
+    "x": 1,
+    "y": 0,
+    "state": "rebase>merge ? 1 : 0",
+    "sub": "\"merge \" + merge + \" | rebase \" + rebase + \" resolutions\""
+   },
+   {
+    "id": "h",
+    "label": "History",
+    "x": 2,
+    "y": 0,
+    "state": "0",
+    "sub": "\"rebase: \" + hist + \" commits, linear\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "f",
+    "to": "s",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "s",
+    "to": "h",
+    "flow": "0.8",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Conflict resolutions with merge",
+    "expr": "merge",
+    "dp": 0
+   },
+   {
+    "label": "Conflict resolutions with rebase",
+    "expr": "rebase",
+    "dp": 0
+   },
+   {
+    "label": "Commits on the branch after rebase",
+    "expr": "hist",
+    "dp": 0
+   },
+   {
+    "label": "Merge adds",
+    "expr": "\"one merge commit\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "rebase > merge * 3",
+    "tone": "warn",
+    "text": "Rebase replays each commit, so the same conflict can come back again and again. Squash first, or merge, if the branch is long and tangled."
+   },
+   {
+    "when": "rebase > merge",
+    "tone": "warn",
+    "text": "Rebase costs more resolutions here but gives a straight history."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Same effort either way. Choose by the history you want. Never rebase commits others have pulled."
+   }
+  ],
+  "tries": [
+   "Make the branch long with high overlap and no squash.",
+   "Squash first. Rebase now costs the same as merge.",
+   "Remember the trade-off is history shape against effort."
+  ]
+ },
+ {
+  "id": "git-bisect",
+  "module": "git",
+  "lesson": "git/debugging-git-problems",
+  "title": "Git bisect",
+  "summary": "Bisect halves the range of suspect commits each step. See how few tests you need, and how a flaky test can send you to the wrong commit.",
+  "inputs": [
+   {
+    "id": "n",
+    "label": "Commits between good and bad",
+    "min": 10,
+    "max": 5000,
+    "value": 500,
+    "step": 10
+   },
+   {
+    "id": "mins",
+    "label": "Minutes per test run",
+    "min": 1,
+    "max": 30,
+    "value": 5,
+    "step": 1
+   },
+   {
+    "id": "flaky",
+    "label": "Chance a test run lies",
+    "min": 0,
+    "max": 30,
+    "value": 0,
+    "step": 1,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "steps",
+    "ceil(log(n) / log(2))"
+   ],
+   [
+    "t",
+    "steps * mins"
+   ],
+   [
+    "lin",
+    "n / 2 * mins"
+   ],
+   [
+    "sure",
+    "pow(1 - flaky/100, steps)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "r",
+    "label": "Suspect commits",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "n + ' commits'"
+   },
+   {
+    "id": "b",
+    "label": "Bisect",
+    "x": 1,
+    "y": 0,
+    "state": "flaky>5 ? 1 : 0",
+    "sub": "steps + \" test runs\""
+   },
+   {
+    "id": "c",
+    "label": "Culprit",
+    "x": 2,
+    "y": 0,
+    "state": "sure<0.7 ? 2 : (sure<0.95 ? 1 : 0)",
+    "sub": "pct(sure, 0) + \" sure of the answer\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "r",
+    "to": "b",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "b",
+    "to": "c",
+    "flow": "0.6",
+    "bad": "flaky>10"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Test runs needed",
+    "expr": "steps",
+    "dp": 0
+   },
+   {
+    "label": "Time with bisect",
+    "expr": "t",
+    "dp": 0,
+    "unit": "min"
+   },
+   {
+    "label": "Time testing one by one, on average",
+    "expr": "lin",
+    "dp": 0,
+    "unit": "min"
+   },
+   {
+    "label": "Chance of a correct answer",
+    "expr": "pct(sure, 0)",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "sure < 0.7",
+    "tone": "bad",
+    "text": "A flaky test lies often enough that bisect probably lands on the wrong commit. Fix the test or repeat each step."
+   },
+   {
+    "when": "sure < 0.95",
+    "tone": "warn",
+    "text": "There is a real chance one wrong answer misleads the search. Repeat the test at each step."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The search is quick and reliable."
+   }
+  ],
+  "tries": [
+   "Raise commits to 5000. The steps barely move.",
+   "Add 10 percent flakiness. The answer becomes unreliable.",
+   "Compare the bisect time with the linear time."
+  ],
+  "chart": {
+   "x": "n",
+   "y": "steps",
+   "xlabel": "Commits in the range",
+   "ylabel": "Test runs needed",
+   "title": "Bisect steps grow slowly",
+   "min": 0
+  }
+ },
+ {
+  "id": "secret-in-history",
+  "module": "git",
+  "lesson": "git/hooks-signing-and-secrets-in-history",
+  "title": "A secret in git history",
+  "summary": "A key was committed. See why rewriting history is not enough and why rotating the key is the only real fix.",
+  "inputs": [
+   {
+    "id": "clones",
+    "label": "Clones and forks that hold a copy",
+    "min": 1,
+    "max": 200,
+    "value": 20,
+    "step": 1
+   },
+   {
+    "id": "days",
+    "label": "Days since the leak",
+    "min": 0,
+    "max": 90,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "public",
+    "label": "Repository is public",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "rewrite",
+    "label": "History was rewritten",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "rotate",
+    "label": "Key was rotated",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "copies",
+    "rewrite ? clones : clones + 1"
+   ],
+   [
+    "exposed",
+    "public || clones > 1"
+   ],
+   [
+    "live",
+    "!rotate"
+   ],
+   [
+    "risk",
+    "live && exposed"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "r",
+    "label": "Repository",
+    "x": 0,
+    "y": 0,
+    "state": "public ? 1 : 0",
+    "sub": "public ? \"public\" : \"private\""
+   },
+   {
+    "id": "c",
+    "label": "Copies of the secret",
+    "x": 1,
+    "y": 0,
+    "state": "copies>1 ? 1 : 0",
+    "sub": "copies + \" places still hold it\""
+   },
+   {
+    "id": "k",
+    "label": "The key",
+    "x": 2,
+    "y": 0,
+    "state": "risk ? 2 : 0",
+    "sub": "rotate ? \"revoked\" : \"still works\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "r",
+    "to": "c",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "c",
+    "to": "k",
+    "flow": "0.7",
+    "bad": "risk"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Places that still hold the secret",
+    "expr": "copies",
+    "dp": 0
+   },
+   {
+    "label": "Key still usable",
+    "expr": "live ? \"yes\" : \"no\"",
+    "dp": 0
+   },
+   {
+    "label": "Days it has been exposed",
+    "expr": "days",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "risk",
+    "tone": "bad",
+    "text": "The key still works and other copies exist. Rewriting history does not reach clones, forks or caches. Rotate the key now, then clean up."
+   },
+   {
+    "when": "rotate",
+    "tone": "good",
+    "text": "The key is revoked, so every leaked copy is now useless. Still clean up and add a pre-commit scan."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Nothing was exposed and the key is no longer live."
+   }
+  ],
+  "tries": [
+   "Rewrite history but do not rotate. The key stays live.",
+   "Rotate the key. The risk goes away even with copies left.",
+   "Make the repository public and see the exposure change."
+  ]
+ },
+ {
+  "id": "git-clone-size",
+  "module": "git",
+  "lesson": "git/large-repositories-submodules-and-worktrees",
+  "title": "Clone size and time",
+  "summary": "Large histories make slow clones. Compare a full clone with a shallow and a partial clone for your repository size and bandwidth.",
+  "inputs": [
+   {
+    "id": "hist",
+    "label": "Full history size",
+    "min": 0.1,
+    "max": 20,
+    "value": 2,
+    "step": 0.1,
+    "unit": "GB"
+   },
+   {
+    "id": "bin",
+    "label": "Share that is old large binaries",
+    "min": 0,
+    "max": 90,
+    "value": 40,
+    "step": 5,
+    "unit": "%"
+   },
+   {
+    "id": "mbps",
+    "label": "Bandwidth",
+    "min": 10,
+    "max": 1000,
+    "value": 100,
+    "step": 10,
+    "unit": "Mbps"
+   },
+   {
+    "id": "mode",
+    "label": "Clone type",
+    "type": "select",
+    "options": [
+     [
+      "full",
+      "Full"
+     ],
+     [
+      "shallow",
+      "Shallow, latest commit only"
+     ],
+     [
+      "partial",
+      "Partial, skip old large files"
+     ]
+    ],
+    "value": "full"
+   }
+  ],
+  "vars": [
+   [
+    "size",
+    "mode==\"full\" ? hist : (mode==\"shallow\" ? hist * 0.1 : hist * (1 - bin/100 * 0.9))"
+   ],
+   [
+    "secs",
+    "size * 8000 / mbps"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "s",
+    "label": "Server",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(hist * 10) / 10 + \" GB of history\""
+   },
+   {
+    "id": "n",
+    "label": "Network",
+    "x": 1,
+    "y": 0,
+    "state": "secs>600 ? 2 : (secs>120 ? 1 : 0)",
+    "sub": "mbps + \" Mbps\""
+   },
+   {
+    "id": "c",
+    "label": "Your clone",
+    "x": 2,
+    "y": 0,
+    "state": "secs>600 ? 2 : (secs>120 ? 1 : 0)",
+    "sub": "fmt(size, 2) + \" GB, \" + fmt(secs / 60, 1) + \" min\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "s",
+    "to": "n",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "n",
+    "to": "c",
+    "flow": "min(1, 0.2 + size/10)",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Data downloaded",
+    "expr": "size",
+    "dp": 2,
+    "unit": "GB"
+   },
+   {
+    "label": "Clone time",
+    "expr": "secs / 60",
+    "dp": 1,
+    "unit": "min"
+   },
+   {
+    "label": "Missing from this clone",
+    "expr": "mode==\"full\" ? \"nothing\" : (mode==\"shallow\" ? \"old history\" : \"old large files until needed\")",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "secs > 600",
+    "tone": "bad",
+    "text": "Over ten minutes per clone. In CI this repeats for every job. Use a shallow or partial clone, or a cache."
+   },
+   {
+    "when": "secs > 120",
+    "tone": "warn",
+    "text": "Slow enough to notice on every fresh checkout."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Fast enough."
+   }
+  ],
+  "tries": [
+   "Raise history to 15 GB on a full clone.",
+   "Switch to shallow. The clone shrinks, but old history is missing.",
+   "Try partial clone with a large share of old binaries."
+  ],
+  "chart": {
+   "x": "hist",
+   "y": "size * 8000 / mbps / 60",
+   "xlabel": "Full history (GB)",
+   "ylabel": "Clone time (min)",
+   "title": "Clone time for the chosen type",
+   "min": 0
+  }
+ },
+ {
+  "id": "docker-layer-cache",
+  "module": "docker",
+  "lesson": "docker/writing-dockerfiles",
+  "title": "Dockerfile order and build cache",
+  "summary": "Docker rebuilds every layer after a change. See how copying dependency files before source changes the build time of everyday code edits.",
+  "inputs": [
+   {
+    "id": "install",
+    "label": "Dependency install time",
+    "min": 1,
+    "max": 20,
+    "value": 6,
+    "step": 1,
+    "unit": "min"
+   },
+   {
+    "id": "compile",
+    "label": "Compile and package time",
+    "min": 1,
+    "max": 10,
+    "value": 2,
+    "step": 1,
+    "unit": "min"
+   },
+   {
+    "id": "change",
+    "label": "What changed",
+    "type": "select",
+    "options": [
+     [
+      "code",
+      "Only application code"
+     ],
+     [
+      "deps",
+      "The dependency list"
+     ]
+    ],
+    "value": "code"
+   },
+   {
+    "id": "good",
+    "label": "Dependency files are copied first",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "isdeps",
+    "change==\"deps\""
+   ],
+   [
+    "t",
+    "isdeps ? install + compile : (good ? compile : install + compile)"
+   ],
+   [
+    "saved",
+    "install + compile - t"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "d",
+    "label": "Dependency layer",
+    "x": 0,
+    "y": 0,
+    "state": "!good && !isdeps ? 1 : 0",
+    "sub": "!good && !isdeps ? 'rebuilt' : (isdeps ? 'rebuilt, list changed' : 'from cache')"
+   },
+   {
+    "id": "c",
+    "label": "Code layer",
+    "x": 1,
+    "y": 0,
+    "state": "0",
+    "sub": "\"rebuilt\""
+   },
+   {
+    "id": "b",
+    "label": "Build",
+    "x": 2,
+    "y": 0,
+    "state": "t>install ? 1 : 0",
+    "sub": "fmt(t, 0) + \" min\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "d",
+    "to": "c",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "c",
+    "to": "b",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Build time",
+    "expr": "t",
+    "dp": 0,
+    "unit": "min"
+   },
+   {
+    "label": "Time saved by the cache",
+    "expr": "saved",
+    "dp": 0,
+    "unit": "min"
+   },
+   {
+    "label": "Layers rebuilt",
+    "expr": "isdeps || !good ? \"dependencies and code\" : \"code only\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!good && !isdeps",
+    "tone": "warn",
+    "text": "A code edit invalidates the dependency install because source was copied first. Copy only the dependency files, install, then copy source."
+   },
+   {
+    "when": "isdeps",
+    "tone": "warn",
+    "text": "The dependency list changed, so the install must run again. That is expected."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Only the code layer rebuilds. The expensive install comes from cache."
+   }
+  ],
+  "tries": [
+   "Edit code with the good order off.",
+   "Turn the good order on. The install layer is cached.",
+   "Change the dependency list and see the cache cannot help."
+  ],
+  "chart": {
+   "x": "install",
+   "y": "good ? compile : install + compile",
+   "xlabel": "Dependency install time (min)",
+   "ylabel": "Build time for a code edit (min)",
+   "title": "Code edit build time",
+   "min": 0
+  }
+ },
+ {
+  "id": "image-pull-time",
+  "module": "docker",
+  "lesson": "docker/slim-images-and-faster-builds",
+  "title": "Image size and rollout pull time",
+  "summary": "Every node pulls the image. See how image size, node count and registry bandwidth set how long a rollout waits just to download.",
+  "inputs": [
+   {
+    "id": "size",
+    "label": "Image size",
+    "min": 10,
+    "max": 2000,
+    "value": 400,
+    "step": 10,
+    "unit": "MB"
+   },
+   {
+    "id": "nodes",
+    "label": "Nodes pulling at once",
+    "min": 1,
+    "max": 200,
+    "value": 20,
+    "step": 1
+   },
+   {
+    "id": "mbps",
+    "label": "Registry bandwidth",
+    "min": 100,
+    "max": 10000,
+    "value": 1000,
+    "step": 100,
+    "unit": "Mbps"
+   },
+   {
+    "id": "cached",
+    "label": "Layers already on the node",
+    "min": 0,
+    "max": 95,
+    "value": 0,
+    "step": 5,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "mb",
+    "size * nodes * (1 - cached/100)"
+   ],
+   [
+    "secs",
+    "mb * 8 / mbps"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "r",
+    "label": "Registry",
+    "x": 0,
+    "y": 0,
+    "state": "secs>120 ? 2 : (secs>30 ? 1 : 0)",
+    "sub": "mbps + ' Mbps shared'"
+   },
+   {
+    "id": "n",
+    "label": "Nodes",
+    "x": 1,
+    "y": 0,
+    "state": "secs>120 ? 1 : 0",
+    "sub": "nodes + \" pulling\""
+   },
+   {
+    "id": "p",
+    "label": "Pull time",
+    "x": 2,
+    "y": 0,
+    "state": "secs>120 ? 2 : (secs>30 ? 1 : 0)",
+    "sub": "fmt(secs, 0) + \" s\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "r",
+    "to": "n",
+    "flow": "min(1, nodes/100 + 0.2)",
+    "bad": "secs>120"
+   },
+   {
+    "from": "n",
+    "to": "p",
+    "flow": "0.6",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Total data pulled",
+    "expr": "mb / 1000",
+    "dp": 1,
+    "unit": "GB"
+   },
+   {
+    "label": "Time until every node has it",
+    "expr": "secs",
+    "dp": 0,
+    "unit": "s"
+   },
+   {
+    "label": "Share saved by cached layers",
+    "expr": "pct(cached/100, 0)",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "secs > 120",
+    "tone": "bad",
+    "text": "Nodes wait minutes just to download. Use a smaller image, reuse base layers, or a registry mirror in the cluster."
+   },
+   {
+    "when": "secs > 30",
+    "tone": "warn",
+    "text": "The pull adds noticeable delay to every rollout and scale-out."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The pull is quick."
+   }
+  ],
+  "tries": [
+   "Raise nodes to 150 with a large image.",
+   "Raise the cached share to simulate shared base layers.",
+   "Halve the image size and compare."
+  ],
+  "chart": {
+   "x": "size",
+   "y": "size * nodes * (1 - cached/100) * 8 / mbps",
+   "xlabel": "Image size (MB)",
+   "ylabel": "Pull time (s)",
+   "title": "Pull time against image size",
+   "min": 0
+  }
+ },
+ {
+  "id": "container-limits",
+  "module": "docker",
+  "lesson": "docker/container-logging-and-resource-limits",
+  "title": "Container memory and CPU limits",
+  "summary": "Set limits and a workload. See when a memory spike kills the container and how a CPU limit slows work down instead.",
+  "inputs": [
+   {
+    "id": "memlimit",
+    "label": "Memory limit",
+    "min": 64,
+    "max": 4096,
+    "value": 512,
+    "step": 64,
+    "unit": "MB"
+   },
+   {
+    "id": "use",
+    "label": "Steady memory use",
+    "min": 32,
+    "max": 4096,
+    "value": 300,
+    "step": 32,
+    "unit": "MB"
+   },
+   {
+    "id": "spike",
+    "label": "Extra memory at peak",
+    "min": 0,
+    "max": 2048,
+    "value": 100,
+    "step": 32,
+    "unit": "MB"
+   },
+   {
+    "id": "cpulim",
+    "label": "CPU limit",
+    "min": 0.1,
+    "max": 4,
+    "value": 1,
+    "step": 0.1,
+    "unit": "cores"
+   },
+   {
+    "id": "need",
+    "label": "CPU the work needs",
+    "min": 0.1,
+    "max": 4,
+    "value": 0.8,
+    "step": 0.1,
+    "unit": "cores"
+   }
+  ],
+  "vars": [
+   [
+    "peak",
+    "use + spike"
+   ],
+   [
+    "oom",
+    "peak > memlimit"
+   ],
+   [
+    "thr",
+    "max(0, 1 - cpulim / need)"
+   ],
+   [
+    "slow",
+    "1 / (1 - min(0.9, thr))"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "label": "Workload",
+    "x": 0,
+    "y": 0,
+    "state": "oom ? 2 : (thr>0 ? 1 : 0)",
+    "sub": "peak + \" MB peak, \" + fmt(need, 1) + \" cores\""
+   },
+   {
+    "id": "l",
+    "label": "Limits",
+    "x": 1,
+    "y": 0,
+    "state": "oom || thr>0 ? 1 : 0",
+    "sub": "memlimit + \" MB, \" + fmt(cpulim, 1) + \" cores\""
+   },
+   {
+    "id": "o",
+    "label": "Outcome",
+    "x": 2,
+    "y": 0,
+    "state": "oom ? 2 : (thr>0 ? 1 : 0)",
+    "sub": "oom ? \"killed (out of memory)\" : (thr>0 ? \"throttled\" : \"healthy\")"
+   }
+  ],
+  "edges": [
+   {
+    "from": "a",
+    "to": "l",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "l",
+    "to": "o",
+    "flow": "0.6",
+    "bad": "oom"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Peak memory",
+    "expr": "peak",
+    "dp": 0,
+    "unit": "MB"
+   },
+   {
+    "label": "Headroom under the memory limit",
+    "expr": "memlimit - peak",
+    "dp": 0,
+    "unit": "MB"
+   },
+   {
+    "label": "Time spent throttled",
+    "expr": "pct(thr, 0)",
+    "dp": 0
+   },
+   {
+    "label": "Work takes about",
+    "expr": "slow",
+    "dp": 1,
+    "unit": "x longer"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "oom",
+    "tone": "bad",
+    "text": "Memory crosses the limit and the kernel kills the container. Memory is not compressible. Raise the limit or reduce the peak."
+   },
+   {
+    "when": "thr > 0",
+    "tone": "warn",
+    "text": "The CPU limit is below what the work needs, so it is throttled and runs slower rather than failing."
+   },
+   {
+    "when": "memlimit - peak < memlimit * 0.1",
+    "tone": "warn",
+    "text": "Very little memory headroom. A small increase would kill the container."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Both limits leave room."
+   }
+  ],
+  "tries": [
+   "Raise the spike above the headroom.",
+   "Lower the CPU limit below what the work needs.",
+   "Compare how the two limits fail differently."
+  ]
+ },
+ {
+  "id": "healthcheck-timing",
+  "module": "docker",
+  "lesson": "docker/running-containers-in-production",
+  "title": "Health check timing",
+  "summary": "A health check marks a container unhealthy after repeated failures. See how fast a real failure is noticed and when a slow start causes false alarms.",
+  "inputs": [
+   {
+    "id": "interval",
+    "label": "Check interval",
+    "min": 5,
+    "max": 120,
+    "value": 30,
+    "step": 5,
+    "unit": "s"
+   },
+   {
+    "id": "retries",
+    "label": "Failures before unhealthy",
+    "min": 1,
+    "max": 10,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "start",
+    "label": "Start period",
+    "min": 0,
+    "max": 300,
+    "value": 0,
+    "step": 5,
+    "unit": "s"
+   },
+   {
+    "id": "boot",
+    "label": "App start time",
+    "min": 5,
+    "max": 300,
+    "value": 60,
+    "step": 5,
+    "unit": "s"
+   }
+  ],
+  "vars": [
+   [
+    "detect",
+    "interval * retries"
+   ],
+   [
+    "early",
+    "max(0, boot - start)"
+   ],
+   [
+    "falsefail",
+    "floor(early / interval)"
+   ],
+   [
+    "fp",
+    "falsefail >= retries"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "label": "App",
+    "x": 0,
+    "y": 0,
+    "state": "fp ? 2 : (early>0 ? 1 : 0)",
+    "sub": "\"takes \" + boot + \" s to start\""
+   },
+   {
+    "id": "h",
+    "label": "Health check",
+    "x": 1,
+    "y": 0,
+    "state": "fp ? 2 : 0",
+    "sub": "\"every \" + interval + \" s, \" + retries + \" tries\""
+   },
+   {
+    "id": "o",
+    "label": "Orchestrator",
+    "x": 2,
+    "y": 0,
+    "state": "fp ? 2 : 0",
+    "sub": "fp ? \"restarts a healthy app\" : \"waits\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "a",
+    "to": "h",
+    "flow": "0.6",
+    "bad": "false"
+   },
+   {
+    "from": "h",
+    "to": "o",
+    "flow": "fp ? 1 : 0.4",
+    "bad": "fp"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Real failure noticed after about",
+    "expr": "detect",
+    "dp": 0,
+    "unit": "s"
+   },
+   {
+    "label": "Failed checks during startup",
+    "expr": "falsefail",
+    "dp": 0
+   },
+   {
+    "label": "False restart during startup",
+    "expr": "fp ? \"yes\" : \"no\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "fp",
+    "tone": "bad",
+    "text": "The checks start before the app is ready, fail enough times, and the container is killed during startup, again and again. Add a start period."
+   },
+   {
+    "when": "detect > 120",
+    "tone": "warn",
+    "text": "A real failure takes a long time to be noticed. Shorten the interval or lower the retries."
+   },
+   {
+    "when": "early > 0",
+    "tone": "warn",
+    "text": "Some startup checks will fail, but not enough to restart the container."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Checks do not fire before the app is ready, and failures are noticed quickly."
+   }
+  ],
+  "tries": [
+   "Set app start to 120 s with no start period.",
+   "Add a start period of 120 s.",
+   "Raise retries and watch detection time grow."
+  ],
+  "chart": {
+   "x": "interval",
+   "y": "interval * retries",
+   "xlabel": "Check interval (s)",
+   "ylabel": "Time to notice a failure (s)",
+   "title": "Detection time",
+   "min": 0
+  }
+ }
+]

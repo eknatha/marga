@@ -1,0 +1,4410 @@
+[
+ {
+  "id": "context-fill",
+  "module": "llm",
+  "lesson": "llm/tokens-context-windows-and-limits",
+  "title": "Context window filling up",
+  "summary": "Each turn adds tokens to the conversation. See when it no longer fits, and what you must drop or summarise.",
+  "inputs": [
+   {
+    "id": "window",
+    "label": "Context window",
+    "min": 8000,
+    "max": 1000000,
+    "value": 128000,
+    "step": 1000,
+    "unit": "tokens"
+   },
+   {
+    "id": "sys",
+    "label": "System prompt and tools",
+    "min": 200,
+    "max": 20000,
+    "value": 3000,
+    "step": 100,
+    "unit": "tokens"
+   },
+   {
+    "id": "turn",
+    "label": "Tokens per turn (question and answer)",
+    "min": 100,
+    "max": 8000,
+    "value": 900,
+    "step": 50,
+    "unit": "tokens"
+   },
+   {
+    "id": "turns",
+    "label": "Turns so far",
+    "min": 1,
+    "max": 400,
+    "value": 60,
+    "step": 1
+   },
+   {
+    "id": "reserve",
+    "label": "Reserved for the next answer",
+    "min": 500,
+    "max": 16000,
+    "value": 4000,
+    "step": 100,
+    "unit": "tokens"
+   }
+  ],
+  "vars": [
+   [
+    "used",
+    "sys + turn * turns"
+   ],
+   [
+    "room",
+    "window - reserve"
+   ],
+   [
+    "over",
+    "used > room"
+   ],
+   [
+    "fit",
+    "floor(max(0, room - sys) / turn)"
+   ],
+   [
+    "drop",
+    "over ? ceil((used - room) / turn) : 0"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "s",
+    "label": "System prompt",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "sys + ' tokens'"
+   },
+   {
+    "id": "h",
+    "label": "Conversation",
+    "x": 1,
+    "y": 0,
+    "state": "over ? 2 : (used>room*0.8 ? 1 : 0)",
+    "sub": "turns + ' turns, ' + round(used) + ' tokens'"
+   },
+   {
+    "id": "m",
+    "label": "Window",
+    "x": 2,
+    "y": 0,
+    "state": "over ? 2 : 0",
+    "sub": "round(room) + ' tokens usable'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "s",
+    "to": "h",
+    "flow": "0.6",
+    "bad": "false"
+   },
+   {
+    "from": "h",
+    "to": "m",
+    "flow": "min(1, used/room)",
+    "bad": "over"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Tokens used",
+    "expr": "used",
+    "dp": 0
+   },
+   {
+    "label": "Turns that fit",
+    "expr": "fit",
+    "dp": 0
+   },
+   {
+    "label": "Turns to drop or summarise",
+    "expr": "drop",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "over",
+    "tone": "bad",
+    "text": "The conversation no longer fits. Something gets cut, and often the oldest part, which may hold the instructions or facts you still need. Summarise or retrieve instead of replaying everything."
+   },
+   {
+    "when": "used > room * 0.8",
+    "tone": "warn",
+    "text": "Close to the limit. Long inputs or tool results could push it over on the next turn."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Plenty of room."
+   }
+  ],
+  "tries": [
+   "Run 400 turns in a 32k window.",
+   "Raise the window.",
+   "Shrink tokens per turn by trimming tool output."
+  ],
+  "chart": {
+   "x": "turns",
+   "y": "sys + turn * turns",
+   "y2": "window - reserve",
+   "xlabel": "Turns",
+   "ylabel": "Tokens used",
+   "y2label": "Usable window",
+   "title": "Conversation size against the window",
+   "min": 0
+  }
+ },
+ {
+  "id": "sampling-temperature",
+  "module": "llm",
+  "lesson": "llm/sampling-temperature-and-determinism",
+  "title": "Temperature and top-p",
+  "summary": "The model scores candidate next tokens. Temperature reshapes those scores, and top-p drops the unlikely tail. See how the odds change.",
+  "inputs": [
+   {
+    "id": "t",
+    "label": "Temperature",
+    "min": 0.1,
+    "max": 2,
+    "value": 1,
+    "step": 0.1
+   },
+   {
+    "id": "topp",
+    "label": "Top-p",
+    "min": 0.1,
+    "max": 1,
+    "value": 1,
+    "step": 0.05
+   }
+  ],
+  "vars": [
+   [
+    "e1",
+    "exp(4 / t)"
+   ],
+   [
+    "e2",
+    "exp(3 / t)"
+   ],
+   [
+    "e3",
+    "exp(2 / t)"
+   ],
+   [
+    "e4",
+    "exp(0 / t)"
+   ],
+   [
+    "z",
+    "e1 + e2 + e3 + e4"
+   ],
+   [
+    "p1",
+    "e1 / z"
+   ],
+   [
+    "p2",
+    "e2 / z"
+   ],
+   [
+    "p3",
+    "e3 / z"
+   ],
+   [
+    "p4",
+    "e4 / z"
+   ],
+   [
+    "k1",
+    "1"
+   ],
+   [
+    "k2",
+    "p1 < topp ? 1 : 0"
+   ],
+   [
+    "k3",
+    "p1 + p2 < topp ? 1 : 0"
+   ],
+   [
+    "k4",
+    "p1 + p2 + p3 < topp ? 1 : 0"
+   ],
+   [
+    "kz",
+    "p1 * k1 + p2 * k2 + p3 * k3 + p4 * k4"
+   ],
+   [
+    "top",
+    "p1 * k1 / kz"
+   ],
+   [
+    "kept",
+    "k1 + k2 + k3 + k4"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Candidates",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "\"4 next tokens\""
+   },
+   {
+    "id": "d",
+    "label": "Reshape and cut",
+    "x": 1,
+    "y": 0,
+    "state": "t>1.4 ? 1 : 0",
+    "sub": "\"T=\" + fmt(t, 1) + \", top-p \" + fmt(topp, 2)"
+   },
+   {
+    "id": "o",
+    "label": "Chance of the top choice",
+    "x": 2,
+    "y": 0,
+    "state": "top<0.5 ? 1 : 0",
+    "sub": "pct(top, 0)"
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "d",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "d",
+    "to": "o",
+    "flow": "top",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Chance of the most likely token",
+    "expr": "pct(top, 0)",
+    "dp": 0
+   },
+   {
+    "label": "Tokens still possible",
+    "expr": "kept",
+    "dp": 0
+   },
+   {
+    "label": "Chance of anything but the top token",
+    "expr": "pct(1 - top, 0)",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "t >= 1.6",
+    "tone": "warn",
+    "text": "At a high temperature unlikely tokens get real probability. Output varies more and is more likely to wander."
+   },
+   {
+    "when": "top > 0.95",
+    "tone": "good",
+    "text": "The top token is almost certain, so the answers are nearly deterministic."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "A balanced spread."
+   }
+  ],
+  "tries": [
+   "Drop the temperature to 0.1.",
+   "Raise it to 2.",
+   "Lower top-p to cut the tail."
+  ],
+  "chart": {
+   "x": "t",
+   "y": "100 * exp(4 / t) / (exp(4 / t) + exp(3 / t) + exp(2 / t) + 1)",
+   "xlabel": "Temperature",
+   "ylabel": "Chance of the top token (%)",
+   "title": "Top token probability against temperature",
+   "min": 0,
+   "max": 100
+  }
+ },
+ {
+  "id": "llm-cost-cache",
+  "module": "llm",
+  "lesson": "llm/cost-latency-and-caching",
+  "title": "Cost and prompt caching",
+  "summary": "Input tokens, output tokens and cached prefixes decide the bill and the wait. Enter your own prices, since they change.",
+  "inputs": [
+   {
+    "id": "reqs",
+    "label": "Requests per day",
+    "min": 100,
+    "max": 1000000,
+    "value": 20000,
+    "step": 100
+   },
+   {
+    "id": "inp",
+    "label": "Input tokens per request",
+    "min": 100,
+    "max": 100000,
+    "value": 6000,
+    "step": 100
+   },
+   {
+    "id": "out",
+    "label": "Output tokens per request",
+    "min": 10,
+    "max": 8000,
+    "value": 500,
+    "step": 10
+   },
+   {
+    "id": "pin",
+    "label": "Price per million input tokens",
+    "min": 0.1,
+    "max": 30,
+    "value": 3,
+    "step": 0.1,
+    "unit": "$"
+   },
+   {
+    "id": "pout",
+    "label": "Price per million output tokens",
+    "min": 0.5,
+    "max": 150,
+    "value": 15,
+    "step": 0.5,
+    "unit": "$"
+   },
+   {
+    "id": "cached",
+    "label": "Share of the input that is a cached prefix",
+    "min": 0,
+    "max": 95,
+    "value": 0,
+    "step": 5,
+    "unit": "%"
+   },
+   {
+    "id": "disc",
+    "label": "Price of cached input compared with normal",
+    "min": 5,
+    "max": 100,
+    "value": 10,
+    "step": 5,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "inc",
+    "reqs * inp * (1 - cached/100) / 1000000 * pin + reqs * inp * cached/100 / 1000000 * pin * disc/100"
+   ],
+   [
+    "outc",
+    "reqs * out / 1000000 * pout"
+   ],
+   [
+    "day",
+    "inc + outc"
+   ],
+   [
+    "month",
+    "day * 30"
+   ],
+   [
+    "nocache",
+    "reqs * inp / 1000000 * pin + outc"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "r",
+    "label": "Requests",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(reqs) + ' a day'"
+   },
+   {
+    "id": "i",
+    "label": "Input cost",
+    "x": 1,
+    "y": 0,
+    "state": "inc>outc ? 1 : 0",
+    "sub": "'$' + fmt(inc, 0) + ' a day'"
+   },
+   {
+    "id": "o",
+    "label": "Output cost",
+    "x": 2,
+    "y": 0,
+    "state": "outc>inc ? 1 : 0",
+    "sub": "'$' + fmt(outc, 0) + ' a day'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "r",
+    "to": "i",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "i",
+    "to": "o",
+    "flow": "0.5",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Cost per day",
+    "expr": "day",
+    "dp": 0,
+    "unit": "$"
+   },
+   {
+    "label": "Cost per month",
+    "expr": "month",
+    "dp": 0,
+    "unit": "$"
+   },
+   {
+    "label": "Per day with no caching",
+    "expr": "nocache",
+    "dp": 0,
+    "unit": "$"
+   },
+   {
+    "label": "Saved per day by caching",
+    "expr": "nocache - day",
+    "dp": 0,
+    "unit": "$"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "inc > outc * 3 && cached < 50",
+    "tone": "warn",
+    "text": "Input dominates. A long, stable prefix like instructions and tool definitions is the best candidate for caching."
+   },
+   {
+    "when": "outc > inc",
+    "tone": "warn",
+    "text": "Output dominates. Shorter answers or a smaller model will help more than caching."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Input and output costs are balanced."
+   }
+  ],
+  "tries": [
+   "Cache 80 percent of a long prompt.",
+   "Raise output length until output costs dominate.",
+   "Use your own prices."
+  ],
+  "chart": {
+   "x": "cached",
+   "y": "reqs * inp * (1 - cached/100) / 1000000 * pin + reqs * inp * cached/100 / 1000000 * pin * disc/100 + reqs * out / 1000000 * pout",
+   "xlabel": "Cached share of the input (%)",
+   "ylabel": "Cost per day ($)",
+   "title": "Daily cost against caching",
+   "min": 0
+  }
+ },
+ {
+  "id": "eval-sample-size",
+  "module": "llm",
+  "lesson": "llm/choosing-and-evaluating-models",
+  "title": "How many eval cases you need",
+  "summary": "Two models score differently on your tests. See whether the gap is real or just noise from a small test set.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Model A score",
+    "min": 30,
+    "max": 99,
+    "value": 82,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "b",
+    "label": "Model B score",
+    "min": 30,
+    "max": 99,
+    "value": 86,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "n",
+    "label": "Test cases",
+    "min": 20,
+    "max": 5000,
+    "value": 200,
+    "step": 10
+   }
+  ],
+  "vars": [
+   [
+    "pa",
+    "a/100"
+   ],
+   [
+    "pb",
+    "b/100"
+   ],
+   [
+    "se",
+    "sqrt(pa * (1 - pa) / n + pb * (1 - pb) / n)"
+   ],
+   [
+    "diff",
+    "abs(pb - pa)"
+   ],
+   [
+    "margin",
+    "1.96 * se"
+   ],
+   [
+    "real",
+    "diff > margin"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "label": "Model A",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "a + '%'"
+   },
+   {
+    "id": "t",
+    "label": "Test set",
+    "x": 1,
+    "y": 0,
+    "state": "real ? 0 : 1",
+    "sub": "n + ' cases'"
+   },
+   {
+    "id": "b",
+    "label": "Model B",
+    "x": 2,
+    "y": 0,
+    "state": "0",
+    "sub": "b + '%'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "a",
+    "to": "t",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "t",
+    "to": "b",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Gap between the models",
+    "expr": "diff * 100",
+    "dp": 1,
+    "unit": "points"
+   },
+   {
+    "label": "Noise margin (95 percent)",
+    "expr": "margin * 100",
+    "dp": 1,
+    "unit": "points"
+   },
+   {
+    "label": "Gap is bigger than noise",
+    "expr": "real ? \"yes\" : \"no\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!real",
+    "tone": "warn",
+    "text": "The gap is inside the noise. You cannot say one model is better from this test set. Add cases, or test on harder ones."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The gap is larger than the sampling noise, so it is probably real. It may still not be the gap that matters for your users."
+   }
+  ],
+  "tries": [
+   "Use 200 cases with a 4 point gap.",
+   "Raise the test cases to 2000.",
+   "Narrow the gap."
+  ],
+  "chart": {
+   "x": "n",
+   "y": "196 * sqrt((a/100) * (1 - a/100) / n + (b/100) * (1 - b/100) / n)",
+   "y2": "abs(b - a)",
+   "xlabel": "Test cases",
+   "ylabel": "Noise margin (points)",
+   "y2label": "Gap (points)",
+   "title": "Noise margin against test size",
+   "min": 0
+  }
+ },
+ {
+  "id": "tool-loop-tokens",
+  "module": "mcp",
+  "lesson": "mcp/the-tool-use-loop",
+  "title": "Tool loop token growth",
+  "summary": "Each tool call adds its result to the context, and the whole context is sent again at every step. See how input tokens add up.",
+  "inputs": [
+   {
+    "id": "steps",
+    "label": "Tool calls in the loop",
+    "min": 1,
+    "max": 60,
+    "value": 12,
+    "step": 1
+   },
+   {
+    "id": "base",
+    "label": "Prompt and tool definitions",
+    "min": 500,
+    "max": 30000,
+    "value": 4000,
+    "step": 100,
+    "unit": "tokens"
+   },
+   {
+    "id": "res",
+    "label": "Tokens per tool result",
+    "min": 50,
+    "max": 10000,
+    "value": 1500,
+    "step": 50,
+    "unit": "tokens"
+   },
+   {
+    "id": "cached",
+    "label": "Share of repeated input served from cache",
+    "min": 0,
+    "max": 95,
+    "value": 0,
+    "step": 5,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "grow",
+    "res * steps * (steps + 1) / 2"
+   ],
+   [
+    "tot",
+    "base * (steps + 1) + grow"
+   ],
+   [
+    "paid",
+    "tot * (1 - cached/100 * 0.9)"
+   ],
+   [
+    "last",
+    "base + res * steps"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "l",
+    "label": "Tool loop",
+    "x": 0,
+    "y": 0,
+    "state": "steps>30 ? 1 : 0",
+    "sub": "steps + ' calls'"
+   },
+   {
+    "id": "c",
+    "label": "Context at the last call",
+    "x": 1,
+    "y": 0,
+    "state": "last>60000 ? 2 : (last>20000 ? 1 : 0)",
+    "sub": "round(last) + ' tokens'"
+   },
+   {
+    "id": "t",
+    "label": "Input processed in total",
+    "x": 2,
+    "y": 0,
+    "state": "tot>500000 ? 2 : (tot>100000 ? 1 : 0)",
+    "sub": "round(tot) + ' tokens'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "l",
+    "to": "c",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "c",
+    "to": "t",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Input tokens processed over the loop",
+    "expr": "tot",
+    "dp": 0
+   },
+   {
+    "label": "After caching, in full-price terms",
+    "expr": "paid",
+    "dp": 0
+   },
+   {
+    "label": "Context size at the last step",
+    "expr": "last",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "tot > 500000",
+    "tone": "bad",
+    "text": "Total input grows with the square of the number of steps. Trim tool results, summarise as you go, or cache the prefix."
+   },
+   {
+    "when": "last > 20000",
+    "tone": "warn",
+    "text": "The context is getting big, which costs money and can bury what matters."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "A short loop with compact results."
+   }
+  ],
+  "tries": [
+   "Run 60 steps with 1500 token results.",
+   "Cut result size to 300 tokens.",
+   "Turn on caching."
+  ],
+  "chart": {
+   "x": "steps",
+   "y": "base * (steps + 1) + res * steps * (steps + 1) / 2",
+   "xlabel": "Tool calls",
+   "ylabel": "Input tokens processed",
+   "title": "Input grows faster than the number of steps",
+   "min": 0
+  }
+ },
+ {
+  "id": "tool-args-validity",
+  "module": "mcp",
+  "lesson": "mcp/function-calling-and-tool-schemas",
+  "title": "Tool arguments and schemas",
+  "summary": "A model fills in the arguments for a tool. See how the chance that every field is valid falls as fields are added, and how tight schemas and retries help.",
+  "inputs": [
+   {
+    "id": "fields",
+    "label": "Arguments",
+    "min": 1,
+    "max": 20,
+    "value": 6,
+    "step": 1
+   },
+   {
+    "id": "err",
+    "label": "Chance one field is wrong",
+    "min": 0,
+    "max": 20,
+    "value": 4,
+    "step": 0.5,
+    "unit": "%"
+   },
+   {
+    "id": "tries",
+    "label": "Retries with the validation error shown",
+    "min": 0,
+    "max": 3,
+    "value": 1,
+    "step": 1
+   },
+   {
+    "id": "strict",
+    "label": "Schema uses enums and clear descriptions",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "e",
+    "strict ? err * 0.4 : err"
+   ],
+   [
+    "p1",
+    "pow(1 - e/100, fields)"
+   ],
+   [
+    "pall",
+    "1 - pow(1 - p1, tries + 1)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "m",
+    "label": "Model fills arguments",
+    "x": 0,
+    "y": 0,
+    "state": "p1<0.7 ? 2 : (p1<0.9 ? 1 : 0)",
+    "sub": "fields + ' fields'"
+   },
+   {
+    "id": "v",
+    "label": "Validation",
+    "x": 1,
+    "y": 0,
+    "state": "p1<0.9 ? 1 : 0",
+    "sub": "'first try ' + pct(p1, 0) + ' valid'"
+   },
+   {
+    "id": "r",
+    "label": "After retries",
+    "x": 2,
+    "y": 0,
+    "state": "pall<0.9 ? 1 : 0",
+    "sub": "pct(pall, 1) + ' valid'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "m",
+    "to": "v",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "v",
+    "to": "r",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Valid on the first try",
+    "expr": "pct(p1, 0)",
+    "dp": 0
+   },
+   {
+    "label": "Valid after retries",
+    "expr": "pct(pall, 1)",
+    "dp": 0
+   },
+   {
+    "label": "Effective error per field",
+    "expr": "e",
+    "dp": 1,
+    "unit": "%"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "pall < 0.9",
+    "tone": "bad",
+    "text": "Even with retries, one call in ten ends in an error. Reduce the number of arguments, use enums and defaults, and return clear validation messages."
+   },
+   {
+    "when": "p1 < 0.9",
+    "tone": "warn",
+    "text": "Retries save you here, but each costs time and tokens. A tighter schema helps more."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Most calls are valid on the first try."
+   }
+  ],
+  "tries": [
+   "Use 15 arguments with no strict schema.",
+   "Turn on the strict schema.",
+   "Add retries."
+  ],
+  "chart": {
+   "x": "fields",
+   "y": "100 * pow(1 - (strict ? err * 0.4 : err)/100, fields)",
+   "xlabel": "Arguments",
+   "ylabel": "Valid on the first try (%)",
+   "title": "First-try validity against arguments",
+   "min": 0,
+   "max": 100
+  }
+ },
+ {
+  "id": "lethal-trifecta",
+  "module": "mcp",
+  "lesson": "mcp/permissions-auth-and-prompt-injection-defence",
+  "title": "The three risky capabilities",
+  "summary": "An agent is most dangerous when it combines private data, untrusted content and a way to send data out. Switch them on to see the risk.",
+  "inputs": [
+   {
+    "id": "priv",
+    "label": "The agent can read private data",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "untrusted",
+    "label": "The agent reads content you do not control (web, email, tickets)",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "out",
+    "label": "The agent can send data out (email, HTTP, a link it renders)",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "approve",
+    "label": "A person approves each outbound action",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "n",
+    "(priv ? 1 : 0) + (untrusted ? 1 : 0) + (out ? 1 : 0)"
+   ],
+   [
+    "all3",
+    "priv && untrusted && out"
+   ],
+   [
+    "risk",
+    "all3 ? (approve ? 1 : 2) : (n==2 ? 1 : 0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "p",
+    "label": "Private data",
+    "x": 0,
+    "y": 0,
+    "state": "priv ? 1 : 0",
+    "sub": "priv ? \"reachable\" : \"out of reach\""
+   },
+   {
+    "id": "u",
+    "label": "Untrusted content",
+    "x": 0,
+    "y": 1,
+    "state": "untrusted ? 1 : 0",
+    "sub": "untrusted ? \"read by the agent\" : \"not read\""
+   },
+   {
+    "id": "a",
+    "label": "Agent",
+    "x": 1,
+    "y": 0.5,
+    "state": "risk",
+    "sub": "all3 ? \"all three present\" : n + \" of 3 present\""
+   },
+   {
+    "id": "o",
+    "label": "Outbound channel",
+    "x": 2,
+    "y": 0.5,
+    "state": "out ? (all3 && !approve ? 2 : 1) : 0",
+    "sub": "out ? (approve ? \"needs approval\" : \"open\") : \"none\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "p",
+    "to": "a",
+    "flow": "priv ? 0.8 : 0",
+    "bad": "false"
+   },
+   {
+    "from": "u",
+    "to": "a",
+    "flow": "untrusted ? 0.8 : 0",
+    "bad": "untrusted && all3"
+   },
+   {
+    "from": "a",
+    "to": "o",
+    "flow": "out ? 0.8 : 0",
+    "bad": "all3 && !approve"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Risky capabilities present",
+    "expr": "n",
+    "dp": 0
+   },
+   {
+    "label": "Injected text can steal data",
+    "expr": "all3 && !approve ? \"yes\" : \"not directly\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "all3 && !approve",
+    "tone": "bad",
+    "text": "Hidden instructions in the content can tell the agent to read private data and send it out, and nothing stops it. Remove one of the three, or put a person in front of the outbound step."
+   },
+   {
+    "when": "all3",
+    "tone": "warn",
+    "text": "All three are present, but a person must approve outbound actions. This holds only if approvers read what is being sent."
+   },
+   {
+    "when": "n == 2",
+    "tone": "warn",
+    "text": "Two of three. One more capability turns this into a full path for data theft."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "At most one of the three is present, so there is no complete path."
+   }
+  ],
+  "tries": [
+   "Switch on all three.",
+   "Add human approval.",
+   "Remove the outbound channel."
+  ]
+ },
+ {
+  "id": "tool-timeout",
+  "module": "mcp",
+  "lesson": "mcp/debugging-tool-use-and-mcp",
+  "title": "Tool timeouts and retries",
+  "summary": "Some tool calls are slow. See how many time out for a given average latency and timeout, and what retries do to total waiting.",
+  "inputs": [
+   {
+    "id": "mean",
+    "label": "Average tool latency",
+    "min": 50,
+    "max": 5000,
+    "value": 800,
+    "step": 50,
+    "unit": "ms"
+   },
+   {
+    "id": "tmo",
+    "label": "Client timeout",
+    "min": 100,
+    "max": 30000,
+    "value": 3000,
+    "step": 100,
+    "unit": "ms"
+   },
+   {
+    "id": "retries",
+    "label": "Retries after a timeout",
+    "min": 0,
+    "max": 4,
+    "value": 1,
+    "step": 1
+   },
+   {
+    "id": "calls",
+    "label": "Calls in a task",
+    "min": 1,
+    "max": 50,
+    "value": 8,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "pt",
+    "exp(0 - tmo / mean)"
+   ],
+   [
+    "pfail",
+    "pow(pt, retries + 1)"
+   ],
+   [
+    "tasks",
+    "pow(1 - pfail, calls)"
+   ],
+   [
+    "wait",
+    "tmo * pt * (1 - pow(pt, retries + 1)) / (1 - pt + 0.0001)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Calls",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "calls + ' per task'"
+   },
+   {
+    "id": "t",
+    "label": "Timeouts",
+    "x": 1,
+    "y": 0,
+    "state": "pt>0.2 ? 2 : (pt>0.05 ? 1 : 0)",
+    "sub": "pct(pt, 1) + ' time out'"
+   },
+   {
+    "id": "r",
+    "label": "Task succeeds",
+    "x": 2,
+    "y": 0,
+    "state": "tasks<0.8 ? 2 : (tasks<0.95 ? 1 : 0)",
+    "sub": "pct(tasks, 0)"
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "t",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "t",
+    "to": "r",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Calls that time out once",
+    "expr": "pct(pt, 1)",
+    "dp": 0
+   },
+   {
+    "label": "Calls still failing after retries",
+    "expr": "pct(pfail, 2)",
+    "dp": 0
+   },
+   {
+    "label": "Tasks that complete",
+    "expr": "pct(tasks, 0)",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "tasks < 0.8",
+    "tone": "bad",
+    "text": "One task in five fails because a call in it timed out. Raise the timeout toward the slow tail, add retries for safe calls, or make the tool faster."
+   },
+   {
+    "when": "pt > 0.05",
+    "tone": "warn",
+    "text": "Timeouts are common enough to notice. Retries help only for idempotent calls."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Timeouts are rare."
+   }
+  ],
+  "tries": [
+   "Set the timeout close to the average latency.",
+   "Raise the timeout.",
+   "Add retries."
+  ],
+  "chart": {
+   "x": "tmo",
+   "y": "100 * exp(0 - tmo / mean)",
+   "xlabel": "Timeout (ms)",
+   "ylabel": "Calls that time out (%)",
+   "title": "Timeouts against the limit",
+   "min": 0,
+   "max": 100
+  }
+ },
+ {
+  "id": "metric-cardinality",
+  "module": "observability",
+  "lesson": "observability/telemetry-cost-and-cardinality",
+  "title": "Metric cardinality",
+  "summary": "Every distinct label combination is a new time series. See how one high-cardinality label multiplies series and memory.",
+  "inputs": [
+   {
+    "id": "metrics",
+    "label": "Metrics",
+    "min": 1,
+    "max": 500,
+    "value": 40,
+    "step": 1
+   },
+   {
+    "id": "endpoints",
+    "label": "Endpoints",
+    "min": 1,
+    "max": 500,
+    "value": 30,
+    "step": 1
+   },
+   {
+    "id": "codes",
+    "label": "Status codes",
+    "min": 1,
+    "max": 10,
+    "value": 5,
+    "step": 1
+   },
+   {
+    "id": "inst",
+    "label": "Instances",
+    "min": 1,
+    "max": 500,
+    "value": 20,
+    "step": 1
+   },
+   {
+    "id": "user",
+    "label": "Also label by user id",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "users",
+    "label": "Distinct users",
+    "min": 100,
+    "max": 1000000,
+    "value": 50000,
+    "step": 100
+   },
+   {
+    "id": "kb",
+    "label": "Memory per series",
+    "min": 1,
+    "max": 10,
+    "value": 3,
+    "step": 1,
+    "unit": "KB"
+   }
+  ],
+  "vars": [
+   [
+    "base",
+    "metrics * endpoints * codes * inst"
+   ],
+   [
+    "series",
+    "user ? base * users : base"
+   ],
+   [
+    "mb",
+    "series * kb / 1024"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "l",
+    "label": "Labels",
+    "x": 0,
+    "y": 0,
+    "state": "user ? 2 : 0",
+    "sub": "user ? 'endpoint, code, instance, user' : 'endpoint, code, instance'"
+   },
+   {
+    "id": "s",
+    "label": "Time series",
+    "x": 1,
+    "y": 0,
+    "state": "series>5000000 ? 2 : (series>500000 ? 1 : 0)",
+    "sub": "round(series) + ' series'"
+   },
+   {
+    "id": "m",
+    "label": "Memory",
+    "x": 2,
+    "y": 0,
+    "state": "mb>16000 ? 2 : (mb>2000 ? 1 : 0)",
+    "sub": "round(mb) + ' MB'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "l",
+    "to": "s",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "s",
+    "to": "m",
+    "flow": "min(1, mb/16000 + 0.1)",
+    "bad": "series>5000000"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Time series",
+    "expr": "series",
+    "dp": 0
+   },
+   {
+    "label": "Memory just for series",
+    "expr": "mb",
+    "dp": 0,
+    "unit": "MB"
+   },
+   {
+    "label": "Multiplier from the user label",
+    "expr": "user ? users : 1",
+    "dp": 0,
+    "unit": "x"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "series > 5000000",
+    "tone": "bad",
+    "text": "Millions of series. The server runs out of memory or the bill explodes. Never use unbounded values like user ids, request ids or URLs as labels. Put them in logs or traces."
+   },
+   {
+    "when": "series > 500000",
+    "tone": "warn",
+    "text": "A large number of series. Check which label multiplies them most."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Bounded labels keep the series count under control."
+   }
+  ],
+  "tries": [
+   "Turn on the user id label.",
+   "Turn it off.",
+   "Raise endpoints and see how each label multiplies."
+  ],
+  "chart": {
+   "x": "users",
+   "y": "metrics * endpoints * codes * inst * users",
+   "xlabel": "Distinct users",
+   "ylabel": "Time series",
+   "title": "Series against users (user label on)",
+   "min": 0
+  }
+ },
+ {
+  "id": "alert-window",
+  "module": "observability",
+  "lesson": "observability/alerting-and-dashboards",
+  "title": "Alert windows and thresholds",
+  "summary": "An alert averages errors over a window. See whether a spike of a given size and length fires it, and how soon.",
+  "inputs": [
+   {
+    "id": "spike",
+    "label": "Error rate during the spike",
+    "min": 1,
+    "max": 100,
+    "value": 20,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "dur",
+    "label": "Spike length",
+    "min": 1,
+    "max": 120,
+    "value": 10,
+    "step": 1,
+    "unit": "min"
+   },
+   {
+    "id": "win",
+    "label": "Alert window",
+    "min": 1,
+    "max": 120,
+    "value": 15,
+    "step": 1,
+    "unit": "min"
+   },
+   {
+    "id": "thr",
+    "label": "Alert threshold",
+    "min": 1,
+    "max": 50,
+    "value": 5,
+    "step": 1,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "avg",
+    "spike * min(dur, win) / win"
+   ],
+   [
+    "fires",
+    "avg >= thr"
+   ],
+   [
+    "when",
+    "spike > 0 ? thr / spike * win : 999"
+   ],
+   [
+    "missed",
+    "!fires"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "s",
+    "label": "Spike",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "spike + '% for ' + dur + ' min'"
+   },
+   {
+    "id": "w",
+    "label": "Window average",
+    "x": 1,
+    "y": 0,
+    "state": "fires ? 0 : 1",
+    "sub": "'peaks at ' + fmt(avg, 1) + '%'"
+   },
+   {
+    "id": "a",
+    "label": "Alert",
+    "x": 2,
+    "y": 0,
+    "state": "fires ? 0 : 2",
+    "sub": "fires ? 'fires after ' + fmt(when, 1) + ' min' : 'never fires'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "s",
+    "to": "w",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "w",
+    "to": "a",
+    "flow": "fires ? 0.8 : 0.1",
+    "bad": "missed"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Highest window average",
+    "expr": "avg",
+    "dp": 1,
+    "unit": "%"
+   },
+   {
+    "label": "Threshold",
+    "expr": "thr",
+    "dp": 0,
+    "unit": "%"
+   },
+   {
+    "label": "Time to fire",
+    "expr": "fires ? when : 0",
+    "dp": 1,
+    "unit": "min"
+   },
+   {
+    "label": "Result",
+    "expr": "fires ? \"fires\" : \"misses the spike\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "missed",
+    "tone": "bad",
+    "text": "The spike is short or small enough that the window average never reaches the threshold, so users hurt while nobody is told. Shorten the window or add a fast-burn alert."
+   },
+   {
+    "when": "when > 10",
+    "tone": "warn",
+    "text": "It fires, but slowly. A shorter window pages sooner and also fires more on small blips."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The alert fires quickly for this spike."
+   }
+  ],
+  "tries": [
+   "Use a 60 minute window with a 10 minute spike.",
+   "Shorten the window.",
+   "Lower the threshold and see the noise trade-off."
+  ],
+  "chart": {
+   "x": "win",
+   "y": "spike * min(dur, win) / win",
+   "y2": "thr",
+   "xlabel": "Alert window (min)",
+   "ylabel": "Window average (%)",
+   "y2label": "Threshold",
+   "title": "Window average against window length",
+   "min": 0
+  }
+ },
+ {
+  "id": "trace-sampling",
+  "module": "observability",
+  "lesson": "observability/opentelemetry",
+  "title": "Head and tail sampling",
+  "summary": "Keeping every trace is expensive. See how head sampling can throw away the errors you needed, and what tail sampling costs.",
+  "inputs": [
+   {
+    "id": "rps",
+    "label": "Requests per second",
+    "min": 10,
+    "max": 20000,
+    "value": 2000,
+    "step": 10
+   },
+   {
+    "id": "err",
+    "label": "Error rate",
+    "min": 0.1,
+    "max": 10,
+    "value": 1,
+    "step": 0.1,
+    "unit": "%"
+   },
+   {
+    "id": "head",
+    "label": "Head sampling rate",
+    "min": 0.1,
+    "max": 100,
+    "value": 5,
+    "step": 0.1,
+    "unit": "%"
+   },
+   {
+    "id": "tail",
+    "label": "Tail sampling: keep all errors and slow traces",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "kb",
+    "label": "Size of one trace",
+    "min": 1,
+    "max": 100,
+    "value": 10,
+    "step": 1,
+    "unit": "KB"
+   }
+  ],
+  "vars": [
+   [
+    "errs",
+    "rps * err/100"
+   ],
+   [
+    "kept",
+    "tail ? errs + (rps - errs) * head/100 : rps * head/100"
+   ],
+   [
+    "errkept",
+    "tail ? errs : errs * head/100"
+   ],
+   [
+    "gb",
+    "kept * kb * 86400 / 1048576"
+   ],
+   [
+    "lost",
+    "errs - errkept"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "r",
+    "label": "Requests",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "rps + ' req/s'"
+   },
+   {
+    "id": "s",
+    "label": "Sampler",
+    "x": 1,
+    "y": 0,
+    "state": "tail ? 1 : 0",
+    "sub": "tail ? 'decides after the trace ends' : 'decides at the start'"
+   },
+   {
+    "id": "k",
+    "label": "Traces stored",
+    "x": 2,
+    "y": 0,
+    "state": "gb>500 ? 2 : (gb>100 ? 1 : 0)",
+    "sub": "fmt(gb, 0) + ' GB a day'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "r",
+    "to": "s",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "s",
+    "to": "k",
+    "flow": "min(1, kept/rps + 0.1)",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Error traces kept per second",
+    "expr": "errkept",
+    "dp": 1
+   },
+   {
+    "label": "Error traces thrown away per second",
+    "expr": "lost",
+    "dp": 1
+   },
+   {
+    "label": "Storage per day",
+    "expr": "gb",
+    "dp": 0,
+    "unit": "GB"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!tail && head < 10",
+    "tone": "warn",
+    "text": "Head sampling decides before it knows which requests fail, so most error traces are discarded. Tail sampling keeps the interesting ones."
+   },
+   {
+    "when": "gb > 500",
+    "tone": "warn",
+    "text": "Large storage use. Lower the baseline rate for healthy traces."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Errors are kept and storage is bounded."
+   }
+  ],
+  "tries": [
+   "Use head sampling at 1 percent.",
+   "Turn on tail sampling.",
+   "Raise the error rate."
+  ],
+  "chart": {
+   "x": "head",
+   "y": "tail ? rps * err/100 + rps * (1 - err/100) * head/100 : rps * head/100",
+   "xlabel": "Head sampling rate (%)",
+   "ylabel": "Traces stored per second",
+   "title": "Stored traces against sampling rate",
+   "min": 0
+  }
+ },
+ {
+  "id": "log-volume",
+  "module": "observability",
+  "lesson": "observability/log-pipelines",
+  "title": "Log volume and retention cost",
+  "summary": "Verbose logs add up quickly. See daily volume, stored volume and relative cost for your retention, and what dropping debug lines saves.",
+  "inputs": [
+   {
+    "id": "svc",
+    "label": "Services",
+    "min": 1,
+    "max": 300,
+    "value": 40,
+    "step": 1
+   },
+   {
+    "id": "lps",
+    "label": "Log lines per second per service",
+    "min": 1,
+    "max": 2000,
+    "value": 50,
+    "step": 1
+   },
+   {
+    "id": "bytes",
+    "label": "Bytes per line",
+    "min": 50,
+    "max": 2000,
+    "value": 250,
+    "step": 10
+   },
+   {
+    "id": "debug",
+    "label": "Share that is debug",
+    "min": 0,
+    "max": 95,
+    "value": 60,
+    "step": 5,
+    "unit": "%"
+   },
+   {
+    "id": "dropdebug",
+    "label": "Drop debug lines at the collector",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "hot",
+    "label": "Days kept searchable",
+    "min": 1,
+    "max": 90,
+    "value": 14,
+    "step": 1
+   },
+   {
+    "id": "cold",
+    "label": "Days kept in cheap storage",
+    "min": 0,
+    "max": 365,
+    "value": 60,
+    "step": 5
+   }
+  ],
+  "vars": [
+   [
+    "share",
+    "dropdebug ? 1 - debug/100 : 1"
+   ],
+   [
+    "gbday",
+    "svc * lps * bytes * 86400 * share / 1073741824"
+   ],
+   [
+    "hotgb",
+    "gbday * hot"
+   ],
+   [
+    "coldgb",
+    "gbday * cold"
+   ],
+   [
+    "cost",
+    "hotgb * 1 + coldgb * 0.1"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "label": "Services",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "svc + ' x ' + lps + ' lines/s'"
+   },
+   {
+    "id": "c",
+    "label": "Collector",
+    "x": 1,
+    "y": 0,
+    "state": "dropdebug ? 0 : (debug>50 ? 1 : 0)",
+    "sub": "dropdebug ? 'drops debug' : 'keeps everything'"
+   },
+   {
+    "id": "s",
+    "label": "Storage",
+    "x": 2,
+    "y": 0,
+    "state": "cost>20000 ? 2 : (cost>5000 ? 1 : 0)",
+    "sub": "fmt(gbday, 0) + ' GB a day'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "a",
+    "to": "c",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "c",
+    "to": "s",
+    "flow": "min(1, share)",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Volume per day",
+    "expr": "gbday",
+    "dp": 0,
+    "unit": "GB"
+   },
+   {
+    "label": "Searchable storage",
+    "expr": "hotgb / 1024",
+    "dp": 1,
+    "unit": "TB"
+   },
+   {
+    "label": "Cheap storage",
+    "expr": "coldgb / 1024",
+    "dp": 1,
+    "unit": "TB"
+   },
+   {
+    "label": "Relative cost, searchable storage as 1 and cheap as 0.1",
+    "expr": "cost",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "cost > 20000 && !dropdebug",
+    "tone": "bad",
+    "text": "Most of the bill is debug noise you rarely read. Drop it at the collector and keep it on only while debugging."
+   },
+   {
+    "when": "cost > 5000",
+    "tone": "warn",
+    "text": "Storage is a large share of the cost. Shorten searchable retention and archive the rest."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Volume and retention are in proportion."
+   }
+  ],
+  "tries": [
+   "Keep 60 percent debug lines.",
+   "Drop debug at the collector.",
+   "Shorten searchable days."
+  ],
+  "chart": {
+   "x": "hot",
+   "y": "svc * lps * bytes * 86400 * (dropdebug ? 1 - debug/100 : 1) / 1073741824 * (hot + cold * 0.1)",
+   "xlabel": "Searchable days",
+   "ylabel": "Relative cost",
+   "title": "Cost against searchable retention",
+   "min": 0
+  }
+ },
+ {
+  "id": "fewshot-cost",
+  "module": "prompting",
+  "lesson": "prompting/examples-and-few-shot-prompting",
+  "title": "What few-shot examples cost",
+  "summary": "Examples travel with every request. See what they add in tokens and money, and how much caching claws back. Use your own prices.",
+  "inputs": [
+   {
+    "id": "k",
+    "label": "Examples",
+    "min": 0,
+    "max": 20,
+    "value": 5,
+    "step": 1
+   },
+   {
+    "id": "tok",
+    "label": "Tokens per example",
+    "min": 50,
+    "max": 2000,
+    "value": 300,
+    "step": 10
+   },
+   {
+    "id": "reqs",
+    "label": "Requests per day",
+    "min": 100,
+    "max": 500000,
+    "value": 20000,
+    "step": 100
+   },
+   {
+    "id": "price",
+    "label": "Price per million input tokens",
+    "min": 0.1,
+    "max": 30,
+    "value": 3,
+    "step": 0.1,
+    "unit": "$"
+   },
+   {
+    "id": "cached",
+    "label": "Share of the example tokens served from cache",
+    "min": 0,
+    "max": 95,
+    "value": 0,
+    "step": 5,
+    "unit": "%"
+   },
+   {
+    "id": "disc",
+    "label": "Cached price compared with normal",
+    "min": 5,
+    "max": 100,
+    "value": 10,
+    "step": 5,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "extra",
+    "k * tok"
+   ],
+   [
+    "daily",
+    "reqs * extra / 1000000 * price * (1 - cached/100 * (1 - disc/100))"
+   ],
+   [
+    "full",
+    "reqs * extra / 1000000 * price"
+   ],
+   [
+    "month",
+    "daily * 30"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "p",
+    "label": "Prompt",
+    "x": 0,
+    "y": 0,
+    "state": "extra>3000 ? 1 : 0",
+    "sub": "k + ' examples = ' + extra + ' tokens'"
+   },
+   {
+    "id": "r",
+    "label": "Every request",
+    "x": 1,
+    "y": 0,
+    "state": "daily>50 ? 1 : 0",
+    "sub": "round(reqs) + ' a day'"
+   },
+   {
+    "id": "c",
+    "label": "Extra cost",
+    "x": 2,
+    "y": 0,
+    "state": "month>3000 ? 2 : (month>500 ? 1 : 0)",
+    "sub": "'$' + fmt(month, 0) + ' a month'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "p",
+    "to": "r",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "r",
+    "to": "c",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Tokens added to every request",
+    "expr": "extra",
+    "dp": 0
+   },
+   {
+    "label": "Cost per month",
+    "expr": "month",
+    "dp": 0,
+    "unit": "$"
+   },
+   {
+    "label": "Without caching",
+    "expr": "full * 30",
+    "dp": 0,
+    "unit": "$"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "month > 3000",
+    "tone": "warn",
+    "text": "Examples are now a real cost line. Use fewer, better examples, shorten them, or cache the stable prefix."
+   },
+   {
+    "when": "extra > 3000",
+    "tone": "warn",
+    "text": "Examples crowd the context. Check that they still help more than they cost."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "A small, affordable overhead."
+   }
+  ],
+  "tries": [
+   "Use 15 long examples at high volume.",
+   "Cache the examples.",
+   "Cut to 3 short examples."
+  ],
+  "chart": {
+   "x": "k",
+   "y": "reqs * k * tok / 1000000 * price * (1 - cached/100 * (1 - disc/100)) * 30",
+   "xlabel": "Examples",
+   "ylabel": "Extra cost per month ($)",
+   "title": "Monthly cost against examples",
+   "min": 0
+  }
+ },
+ {
+  "id": "output-retries",
+  "module": "prompting",
+  "lesson": "prompting/validating-repairing-and-retrying-outputs",
+  "title": "Validate, repair and retry",
+  "summary": "Model output sometimes fails validation. See how retries and repair prompts change the success rate and the average number of calls.",
+  "inputs": [
+   {
+    "id": "p",
+    "label": "Chance an attempt is valid",
+    "min": 50,
+    "max": 99,
+    "value": 85,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "retries",
+    "label": "Retries",
+    "min": 0,
+    "max": 5,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "rp",
+    "label": "Chance a repair attempt is valid",
+    "min": 50,
+    "max": 99,
+    "value": 92,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "repair",
+    "label": "Retry with the error message and the bad output",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "q",
+    "repair ? rp/100 : p/100"
+   ],
+   [
+    "first",
+    "p/100"
+   ],
+   [
+    "succ",
+    "1 - (1 - first) * pow(1 - q, retries)"
+   ],
+   [
+    "calls",
+    "1 + (1 - first) * (retries > 0 ? (1 - pow(1 - q, retries)) / q : 0)"
+   ],
+   [
+    "fail",
+    "1 - succ"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "m",
+    "label": "First attempt",
+    "x": 0,
+    "y": 0,
+    "state": "first<0.8 ? 1 : 0",
+    "sub": "pct(first, 0) + ' valid'"
+   },
+   {
+    "id": "r",
+    "label": "Retries",
+    "x": 1,
+    "y": 0,
+    "state": "0",
+    "sub": "retries + (repair ? ' with repair' : ' plain')"
+   },
+   {
+    "id": "o",
+    "label": "Final result",
+    "x": 2,
+    "y": 0,
+    "state": "fail>0.05 ? 2 : (fail>0.01 ? 1 : 0)",
+    "sub": "pct(succ, 1) + ' valid'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "m",
+    "to": "r",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "r",
+    "to": "o",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Valid in the end",
+    "expr": "pct(succ, 1)",
+    "dp": 0
+   },
+   {
+    "label": "Still invalid",
+    "expr": "pct(fail, 1)",
+    "dp": 0
+   },
+   {
+    "label": "Average calls per item",
+    "expr": "calls",
+    "dp": 2
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "fail > 0.05",
+    "tone": "bad",
+    "text": "One in twenty items still fails. Add a fallback, such as a human queue or a safe default, so a failure never reaches users as junk."
+   },
+   {
+    "when": "fail > 0.01",
+    "tone": "warn",
+    "text": "Mostly fine, with a small tail of failures. Send the error message back with each retry."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Retries with feedback keep failures rare, at the cost of a few extra calls."
+   }
+  ],
+  "tries": [
+   "Use 70 percent valid with no retries.",
+   "Add 2 retries with repair.",
+   "Compare plain retries with repair."
+  ],
+  "chart": {
+   "x": "retries",
+   "y": "100 * (1 - (1 - p/100) * pow(1 - (repair ? rp/100 : p/100), retries))",
+   "xlabel": "Retries",
+   "ylabel": "Valid in the end (%)",
+   "title": "Success against retries",
+   "min": 50,
+   "max": 100
+  }
+ },
+ {
+  "id": "prompt-regression",
+  "module": "prompting",
+  "lesson": "prompting/prompt-versioning-and-testing",
+  "title": "Prompt regression check",
+  "summary": "A new prompt fixes some cases and breaks others. See the net change and why overall score hides the damage.",
+  "inputs": [
+   {
+    "id": "n",
+    "label": "Test cases",
+    "min": 20,
+    "max": 1000,
+    "value": 200,
+    "step": 10
+   },
+   {
+    "id": "pass0",
+    "label": "Cases the old prompt passes",
+    "min": 0,
+    "max": 1000,
+    "value": 150,
+    "step": 5
+   },
+   {
+    "id": "fixed",
+    "label": "Cases the new prompt fixes",
+    "min": 0,
+    "max": 200,
+    "value": 20,
+    "step": 1
+   },
+   {
+    "id": "broke",
+    "label": "Cases the new prompt breaks",
+    "min": 0,
+    "max": 200,
+    "value": 12,
+    "step": 1
+   },
+   {
+    "id": "tol",
+    "label": "Breaks you will accept",
+    "min": 0,
+    "max": 50,
+    "value": 3,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "p0",
+    "min(pass0, n)"
+   ],
+   [
+    "f",
+    "min(fixed, n - p0)"
+   ],
+   [
+    "b",
+    "min(broke, p0)"
+   ],
+   [
+    "p1",
+    "p0 + f - b"
+   ],
+   [
+    "net",
+    "p1 - p0"
+   ],
+   [
+    "ok",
+    "b <= tol"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "o",
+    "label": "Old prompt",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "pct(p0 / n, 0) + ' pass'"
+   },
+   {
+    "id": "c",
+    "label": "Changes",
+    "x": 1,
+    "y": 0,
+    "state": "b>tol ? 2 : 0",
+    "sub": "'+' + f + ' fixed, -' + b + ' broken'"
+   },
+   {
+    "id": "n",
+    "label": "New prompt",
+    "x": 2,
+    "y": 0,
+    "state": "net<0 ? 2 : 0",
+    "sub": "pct(p1 / n, 0) + ' pass'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "o",
+    "to": "c",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "c",
+    "to": "n",
+    "flow": "0.7",
+    "bad": "b>tol"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Net change",
+    "expr": "net",
+    "dp": 0,
+    "unit": "cases"
+   },
+   {
+    "label": "Newly broken",
+    "expr": "b",
+    "dp": 0,
+    "unit": "cases"
+   },
+   {
+    "label": "Score now",
+    "expr": "pct(p1 / n, 1)",
+    "dp": 0
+   },
+   {
+    "label": "Decision",
+    "expr": "ok ? \"can ship\" : \"hold back\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "net < 0",
+    "tone": "bad",
+    "text": "The new prompt is worse overall."
+   },
+   {
+    "when": "b > tol",
+    "tone": "warn",
+    "text": "The score may rise, but the prompt breaks cases that worked. If those matter to users, hold back and fix them first."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Gains outweigh breaks and breaks are within what you accept."
+   }
+  ],
+  "tries": [
+   "Fix 20 cases and break 12.",
+   "Set a tolerance of zero.",
+   "Read the list of broken cases before shipping."
+  ]
+ },
+ {
+  "id": "context-packing",
+  "module": "prompting",
+  "lesson": "prompting/system-prompts-roles-and-context-layout",
+  "title": "Packing the context",
+  "summary": "Instructions, retrieved passages, history and the answer all share one window. See what gets squeezed out as you add retrieval.",
+  "inputs": [
+   {
+    "id": "window",
+    "label": "Window",
+    "min": 8000,
+    "max": 200000,
+    "value": 32000,
+    "step": 1000,
+    "unit": "tokens"
+   },
+   {
+    "id": "sys",
+    "label": "Instructions",
+    "min": 200,
+    "max": 10000,
+    "value": 1500,
+    "step": 100,
+    "unit": "tokens"
+   },
+   {
+    "id": "k",
+    "label": "Retrieved passages",
+    "min": 0,
+    "max": 40,
+    "value": 8,
+    "step": 1
+   },
+   {
+    "id": "chunk",
+    "label": "Tokens per passage",
+    "min": 100,
+    "max": 3000,
+    "value": 600,
+    "step": 50
+   },
+   {
+    "id": "hist",
+    "label": "History",
+    "min": 0,
+    "max": 50000,
+    "value": 6000,
+    "step": 500,
+    "unit": "tokens"
+   },
+   {
+    "id": "out",
+    "label": "Reserved for the answer",
+    "min": 200,
+    "max": 8000,
+    "value": 1500,
+    "step": 100,
+    "unit": "tokens"
+   }
+  ],
+  "vars": [
+   [
+    "rt",
+    "k * chunk"
+   ],
+   [
+    "need",
+    "sys + rt + hist + out"
+   ],
+   [
+    "over",
+    "need - window"
+   ],
+   [
+    "fit",
+    "over <= 0"
+   ],
+   [
+    "keepk",
+    "fit ? k : max(0, floor((window - sys - hist - out) / chunk))"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "s",
+    "label": "Instructions and history",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(sys + hist) + ' tokens'"
+   },
+   {
+    "id": "r",
+    "label": "Retrieved passages",
+    "x": 1,
+    "y": 0,
+    "state": "fit ? 0 : 2",
+    "sub": "k + ' x ' + chunk + ' = ' + round(rt)"
+   },
+   {
+    "id": "w",
+    "label": "Window",
+    "x": 2,
+    "y": 0,
+    "state": "fit ? 0 : 2",
+    "sub": "fit ? round(window - need) + \" spare\" : round(over) + \" over\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "s",
+    "to": "r",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "r",
+    "to": "w",
+    "flow": "0.7",
+    "bad": "!fit"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Tokens needed",
+    "expr": "need",
+    "dp": 0
+   },
+   {
+    "label": "Window",
+    "expr": "window",
+    "dp": 0
+   },
+   {
+    "label": "Passages that fit",
+    "expr": "keepk",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!fit",
+    "tone": "bad",
+    "text": "Everything does not fit. Something is truncated, and it is often the end of the prompt where the question or instructions sit. Retrieve fewer, better passages and trim history."
+   },
+   {
+    "when": "need > window * 0.9",
+    "tone": "warn",
+    "text": "Nearly full. One long user message will overflow it."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "There is room for the answer."
+   }
+  ],
+  "tries": [
+   "Retrieve 40 passages in a 32k window.",
+   "Trim history.",
+   "Raise the window."
+  ],
+  "chart": {
+   "x": "k",
+   "y": "sys + k * chunk + hist + out",
+   "y2": "window",
+   "xlabel": "Retrieved passages",
+   "ylabel": "Tokens needed",
+   "y2label": "Window",
+   "title": "Tokens needed against passages",
+   "min": 0
+  }
+ },
+ {
+  "id": "threads-gil",
+  "module": "python",
+  "lesson": "python/concurrency-for-operations",
+  "title": "Threads, processes and the GIL",
+  "summary": "Run many tasks in parallel. See why threads speed up waiting on the network, but not work that burns CPU.",
+  "inputs": [
+   {
+    "id": "n",
+    "label": "Tasks",
+    "min": 10,
+    "max": 1000,
+    "value": 200,
+    "step": 10
+   },
+   {
+    "id": "sec",
+    "label": "Seconds per task",
+    "min": 0.05,
+    "max": 5,
+    "value": 0.5,
+    "step": 0.05,
+    "unit": "s"
+   },
+   {
+    "id": "w",
+    "label": "Workers",
+    "min": 1,
+    "max": 64,
+    "value": 16,
+    "step": 1
+   },
+   {
+    "id": "cores",
+    "label": "CPU cores",
+    "min": 1,
+    "max": 32,
+    "value": 4,
+    "step": 1
+   },
+   {
+    "id": "cpu",
+    "label": "Tasks are CPU-bound",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "procs",
+    "label": "Use processes, not threads",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "par",
+    "cpu ? (procs ? min(w, cores) : 1) : w"
+   ],
+   [
+    "t",
+    "n * sec / par"
+   ],
+   [
+    "serial",
+    "n * sec"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "q",
+    "label": "Tasks",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "n + ' tasks'"
+   },
+   {
+    "id": "w",
+    "label": "Workers",
+    "x": 1,
+    "y": 0,
+    "state": "cpu && !procs && w>1 ? 2 : 0",
+    "sub": "w + (procs ? ' processes' : ' threads') + ', ' + par + ' effective'"
+   },
+   {
+    "id": "r",
+    "label": "Time",
+    "x": 2,
+    "y": 0,
+    "state": "t>serial*0.8 ? 1 : 0",
+    "sub": "fmt(t, 1) + ' s'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "q",
+    "to": "w",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "w",
+    "to": "r",
+    "flow": "0.7",
+    "bad": "cpu && !procs && w>1"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Time with this setup",
+    "expr": "t",
+    "dp": 1,
+    "unit": "s"
+   },
+   {
+    "label": "Time one by one",
+    "expr": "serial",
+    "dp": 1,
+    "unit": "s"
+   },
+   {
+    "label": "Speed-up",
+    "expr": "serial / t",
+    "dp": 1,
+    "unit": "x"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "cpu && !procs && w > 1",
+    "tone": "bad",
+    "text": "CPU-bound threads take turns holding the interpreter lock, so extra threads add overhead and no speed. Use processes, or move the hot loop to native code."
+   },
+   {
+    "when": "cpu && procs && w > cores",
+    "tone": "warn",
+    "text": "More processes than cores adds switching cost. Match the core count."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The workers genuinely run in parallel here."
+   }
+  ],
+  "tries": [
+   "Run CPU-bound work on 16 threads.",
+   "Switch to processes.",
+   "Make the work network-bound and add threads."
+  ],
+  "chart": {
+   "x": "w",
+   "y": "n * sec / (cpu ? (procs ? min(w, cores) : 1) : w)",
+   "xlabel": "Workers",
+   "ylabel": "Time (s)",
+   "title": "Time against workers",
+   "min": 0
+  }
+ },
+ {
+  "id": "log-disk-fill",
+  "module": "python",
+  "lesson": "python/logging-for-scripts-and-services",
+  "title": "Logging and disk space",
+  "summary": "A chatty log fills a disk faster than people expect. See how log level and rotation decide how long you have.",
+  "inputs": [
+   {
+    "id": "rps",
+    "label": "Requests per second",
+    "min": 1,
+    "max": 2000,
+    "value": 100,
+    "step": 1
+   },
+   {
+    "id": "lines",
+    "label": "Log lines per request",
+    "min": 1,
+    "max": 50,
+    "value": 6,
+    "step": 1
+   },
+   {
+    "id": "bytes",
+    "label": "Bytes per line",
+    "min": 60,
+    "max": 1000,
+    "value": 200,
+    "step": 10
+   },
+   {
+    "id": "disk",
+    "label": "Disk for logs",
+    "min": 1,
+    "max": 500,
+    "value": 20,
+    "step": 1,
+    "unit": "GB"
+   },
+   {
+    "id": "rotate",
+    "label": "Rotate and keep 7 days compressed",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "mbday",
+    "rps * lines * bytes * 86400 / 1048576"
+   ],
+   [
+    "gbday",
+    "mbday / 1024"
+   ],
+   [
+    "days",
+    "disk / gbday"
+   ],
+   [
+    "kept",
+    "rotate ? gbday * 7 * 0.15 : gbday * days"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "r",
+    "label": "Requests",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "rps + ' req/s'"
+   },
+   {
+    "id": "l",
+    "label": "Log files",
+    "x": 1,
+    "y": 0,
+    "state": "rotate ? 0 : (days<3 ? 2 : 1)",
+    "sub": "fmt(gbday, 1) + ' GB a day'"
+   },
+   {
+    "id": "d",
+    "label": "Disk",
+    "x": 2,
+    "y": 0,
+    "state": "rotate ? (kept>disk ? 2 : 0) : (days<3 ? 2 : (days<14 ? 1 : 0))",
+    "sub": "rotate ? 'kept to ' + fmt(kept, 1) + ' GB' : 'full in ' + fmt(days, 1) + ' days'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "r",
+    "to": "l",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "l",
+    "to": "d",
+    "flow": "0.7",
+    "bad": "!rotate && days<3"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Log volume",
+    "expr": "gbday",
+    "dp": 1,
+    "unit": "GB a day"
+   },
+   {
+    "label": "Days until the disk is full, no rotation",
+    "expr": "days",
+    "dp": 1
+   },
+   {
+    "label": "Disk used with rotation",
+    "expr": "kept",
+    "dp": 1,
+    "unit": "GB"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!rotate && days < 3",
+    "tone": "bad",
+    "text": "The disk fills in days and the service falls over when it does, usually on a weekend. Rotate logs, cap size and ship them off the machine."
+   },
+   {
+    "when": "rotate && kept > disk",
+    "tone": "warn",
+    "text": "Even with rotation, a week of logs does not fit. Lower the level or shorten retention."
+   },
+   {
+    "when": "!rotate",
+    "tone": "warn",
+    "text": "It works for now. Without rotation it only postpones the failure."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Rotation keeps logs bounded."
+   }
+  ],
+  "tries": [
+   "Log 20 lines per request with no rotation.",
+   "Turn on rotation.",
+   "Lower lines per request."
+  ],
+  "chart": {
+   "x": "lines",
+   "y": "disk / (rps * lines * bytes * 86400 / 1073741824)",
+   "xlabel": "Log lines per request",
+   "ylabel": "Days until the disk is full",
+   "title": "Time to full disk",
+   "min": 0,
+   "max": 60
+  }
+ },
+ {
+  "id": "stream-vs-load",
+  "module": "python",
+  "lesson": "python/files-and-processes",
+  "title": "Read the file or stream it",
+  "summary": "Loading a whole file into memory fails once the file outgrows free memory. See where reading in chunks keeps you safe.",
+  "inputs": [
+   {
+    "id": "size",
+    "label": "File size",
+    "min": 0.01,
+    "max": 100,
+    "value": 2,
+    "step": 0.01,
+    "unit": "GB"
+   },
+   {
+    "id": "ram",
+    "label": "Free memory",
+    "min": 0.5,
+    "max": 64,
+    "value": 4,
+    "step": 0.5,
+    "unit": "GB"
+   },
+   {
+    "id": "chunk",
+    "label": "Chunk size",
+    "min": 1,
+    "max": 1024,
+    "value": 64,
+    "step": 1,
+    "unit": "MB"
+   },
+   {
+    "id": "stream",
+    "label": "Read in chunks or line by line",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "peak",
+    "stream ? chunk / 1024 : size * 1.5"
+   ],
+   [
+    "oom",
+    "peak > ram"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "f",
+    "label": "File",
+    "x": 0,
+    "y": 0,
+    "state": "size>ram ? 1 : 0",
+    "sub": "fmt(size, 2) + ' GB'"
+   },
+   {
+    "id": "p",
+    "label": "Program",
+    "x": 1,
+    "y": 0,
+    "state": "oom ? 2 : 0",
+    "sub": "stream ? 'one chunk at a time' : 'whole file in memory'"
+   },
+   {
+    "id": "m",
+    "label": "Peak memory",
+    "x": 2,
+    "y": 0,
+    "state": "oom ? 2 : (peak>ram*0.7 ? 1 : 0)",
+    "sub": "fmt(peak, 2) + ' GB of ' + ram"
+   }
+  ],
+  "edges": [
+   {
+    "from": "f",
+    "to": "p",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "p",
+    "to": "m",
+    "flow": "min(1, peak/ram)",
+    "bad": "oom"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Peak memory",
+    "expr": "peak",
+    "dp": 2,
+    "unit": "GB"
+   },
+   {
+    "label": "Free memory",
+    "expr": "ram",
+    "dp": 1,
+    "unit": "GB"
+   },
+   {
+    "label": "Outcome",
+    "expr": "oom ? \"killed for lack of memory\" : \"fits\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "oom",
+    "tone": "bad",
+    "text": "The program asks for more memory than exists and is killed, often hours into a job. Read in chunks or by line and write results as you go."
+   },
+   {
+    "when": "peak > ram * 0.7",
+    "tone": "warn",
+    "text": "It fits, but leaves little room, and a slightly bigger file next week will break it."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Memory use is small and does not grow with the file."
+   }
+  ],
+  "tries": [
+   "Load a 10 GB file with 4 GB free.",
+   "Switch to streaming.",
+   "Raise the chunk size."
+  ],
+  "chart": {
+   "x": "size",
+   "y": "stream ? chunk / 1024 : size * 1.5",
+   "y2": "ram",
+   "xlabel": "File size (GB)",
+   "ylabel": "Peak memory (GB)",
+   "y2label": "Free memory",
+   "title": "Peak memory against file size",
+   "min": 0
+  }
+ },
+ {
+  "id": "test-feedback-time",
+  "module": "python",
+  "lesson": "python/testing-and-packaging",
+  "title": "Test order and feedback time",
+  "summary": "A suite has fast and slow tests. See how long you wait to learn about a bug depending on where it is caught and how tests are ordered.",
+  "inputs": [
+   {
+    "id": "unit",
+    "label": "Unit tests",
+    "min": 10,
+    "max": 5000,
+    "value": 1500,
+    "step": 10
+   },
+   {
+    "id": "unitms",
+    "label": "Time per unit test",
+    "min": 1,
+    "max": 100,
+    "value": 5,
+    "step": 1,
+    "unit": "ms"
+   },
+   {
+    "id": "integ",
+    "label": "Integration tests",
+    "min": 1,
+    "max": 500,
+    "value": 60,
+    "step": 1
+   },
+   {
+    "id": "integs",
+    "label": "Time per integration test",
+    "min": 0.1,
+    "max": 10,
+    "value": 1,
+    "step": 0.1,
+    "unit": "s"
+   },
+   {
+    "id": "e2e",
+    "label": "End-to-end tests",
+    "min": 1,
+    "max": 100,
+    "value": 12,
+    "step": 1
+   },
+   {
+    "id": "e2es",
+    "label": "Time per end-to-end test",
+    "min": 1,
+    "max": 120,
+    "value": 20,
+    "step": 1,
+    "unit": "s"
+   },
+   {
+    "id": "where",
+    "label": "The bug is caught by",
+    "type": "select",
+    "options": [
+     [
+      "u",
+      "a unit test"
+     ],
+     [
+      "i",
+      "an integration test"
+     ],
+     [
+      "e",
+      "an end-to-end test"
+     ]
+    ],
+    "value": "i"
+   },
+   {
+    "id": "fast",
+    "label": "Run fast tests first",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "tu",
+    "unit * unitms / 1000"
+   ],
+   [
+    "ti",
+    "integ * integs"
+   ],
+   [
+    "te",
+    "e2e * e2es"
+   ],
+   [
+    "all",
+    "tu + ti + te"
+   ],
+   [
+    "first",
+    "fast ? (where==\"u\" ? tu : (where==\"i\" ? tu + ti : all)) : all"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "u",
+    "label": "Unit tests",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "fmt(tu, 1) + ' s'"
+   },
+   {
+    "id": "i",
+    "label": "Integration tests",
+    "x": 1,
+    "y": 0,
+    "state": "ti>300 ? 1 : 0",
+    "sub": "fmt(ti, 0) + ' s'"
+   },
+   {
+    "id": "e",
+    "label": "End-to-end tests",
+    "x": 2,
+    "y": 0,
+    "state": "te>300 ? 2 : (te>120 ? 1 : 0)",
+    "sub": "fmt(te, 0) + ' s'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "u",
+    "to": "i",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "i",
+    "to": "e",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Whole suite",
+    "expr": "all / 60",
+    "dp": 1,
+    "unit": "min"
+   },
+   {
+    "label": "Time until you see the failure",
+    "expr": "first",
+    "dp": 0,
+    "unit": "s"
+   },
+   {
+    "label": "Wait avoided by ordering",
+    "expr": "all - first",
+    "dp": 0,
+    "unit": "s"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "first > 600",
+    "tone": "bad",
+    "text": "You wait ten minutes or more to learn about a failure. Run the fast tests first and stop on the first failure."
+   },
+   {
+    "when": "first > 120",
+    "tone": "warn",
+    "text": "A couple of minutes of waiting adds up across a team."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Feedback arrives quickly."
+   }
+  ],
+  "tries": [
+   "Catch the bug in a unit test with fast-first off.",
+   "Turn on fast-first.",
+   "Add more end-to-end tests."
+  ]
+ },
+ {
+  "id": "defense-in-depth",
+  "module": "security",
+  "lesson": "security/security-mindset-and-threat-modeling",
+  "title": "Defence in depth",
+  "summary": "No single control stops every attack. See how stacking independent layers cuts what gets through, and why layers that fail together do not add up.",
+  "inputs": [
+   {
+    "id": "l1",
+    "label": "Network filtering stops",
+    "min": 0,
+    "max": 99,
+    "value": 70,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "l2",
+    "label": "Authentication stops",
+    "min": 0,
+    "max": 99,
+    "value": 80,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "l3",
+    "label": "Input validation stops",
+    "min": 0,
+    "max": 99,
+    "value": 60,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "l4",
+    "label": "Monitoring and response stops",
+    "min": 0,
+    "max": 99,
+    "value": 50,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "att",
+    "label": "Attack attempts",
+    "min": 10,
+    "max": 100000,
+    "value": 10000,
+    "step": 10
+   },
+   {
+    "id": "shared",
+    "label": "The layers share one weakness (one misconfiguration breaks them all)",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "indep",
+    "(1 - l1/100) * (1 - l2/100) * (1 - l3/100) * (1 - l4/100)"
+   ],
+   [
+    "corr",
+    "1 - max(l1, l2, l3, l4)/100"
+   ],
+   [
+    "pass",
+    "shared ? corr : indep"
+   ],
+   [
+    "thru",
+    "att * pass"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "label": "Attempts",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "att + ' attempts'"
+   },
+   {
+    "id": "l",
+    "label": "Four layers",
+    "x": 1,
+    "y": 0,
+    "state": "shared ? 2 : 0",
+    "sub": "shared ? 'fail together' : 'independent'"
+   },
+   {
+    "id": "t",
+    "label": "Get through",
+    "x": 2,
+    "y": 0,
+    "state": "pass>0.1 ? 2 : (pass>0.02 ? 1 : 0)",
+    "sub": "round(thru) + ' (' + pct(pass, 2) + ')'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "a",
+    "to": "l",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "l",
+    "to": "t",
+    "flow": "min(1, pass + 0.1)",
+    "bad": "shared"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Share that gets through",
+    "expr": "pct(pass, 2)",
+    "dp": 0
+   },
+   {
+    "label": "Attempts that get through",
+    "expr": "thru",
+    "dp": 0
+   },
+   {
+    "label": "Best single layer alone",
+    "expr": "pct(corr, 0)",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "shared",
+    "tone": "bad",
+    "text": "When layers share one weakness they fall together, so you get only the best layer, not the product. Make layers independent: different teams, mechanisms and failure modes."
+   },
+   {
+    "when": "pass > 0.1",
+    "tone": "warn",
+    "text": "Too much gets through. Strengthen the weakest layer."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Independent layers multiply, so a good set leaves very little."
+   }
+  ],
+  "tries": [
+   "Tick the shared weakness.",
+   "Raise the weakest layer.",
+   "Untick it."
+  ]
+ },
+ {
+  "id": "secret-rotation-effort",
+  "module": "security",
+  "lesson": "security/secrets-management",
+  "title": "Secret rotation effort",
+  "summary": "Rotating a leaked secret means finding every place it lives. See how scattered copies turn a quick fix into a long one, and how a central store helps.",
+  "inputs": [
+   {
+    "id": "apps",
+    "label": "Applications using the secret",
+    "min": 1,
+    "max": 100,
+    "value": 12,
+    "step": 1
+   },
+   {
+    "id": "envs",
+    "label": "Environments",
+    "min": 1,
+    "max": 6,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "places",
+    "label": "Places per app that hold a copy",
+    "min": 1,
+    "max": 6,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "mins",
+    "label": "Minutes to change and verify one place",
+    "min": 1,
+    "max": 30,
+    "value": 6,
+    "step": 1
+   },
+   {
+    "id": "central",
+    "label": "Apps read it from one central store at run time",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "n",
+    "central ? 1 : apps * envs * places"
+   ],
+   [
+    "t",
+    "n * mins"
+   ],
+   [
+    "miss",
+    "central ? 0 : 0.03 * n"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "l",
+    "label": "Leak found",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "\"rotate now\""
+   },
+   {
+    "id": "c",
+    "label": "Copies to change",
+    "x": 1,
+    "y": 0,
+    "state": "n>50 ? 2 : (n>10 ? 1 : 0)",
+    "sub": "n + ' places'"
+   },
+   {
+    "id": "t",
+    "label": "Time to finish",
+    "x": 2,
+    "y": 0,
+    "state": "t>240 ? 2 : (t>60 ? 1 : 0)",
+    "sub": "fmt(t / 60, 1) + ' h'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "l",
+    "to": "c",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "c",
+    "to": "t",
+    "flow": "0.7",
+    "bad": "n>50"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Places that hold a copy",
+    "expr": "n",
+    "dp": 0
+   },
+   {
+    "label": "Time to rotate",
+    "expr": "t / 60",
+    "dp": 1,
+    "unit": "h"
+   },
+   {
+    "label": "Copies you are likely to miss",
+    "expr": "miss",
+    "dp": 1
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "t > 240",
+    "tone": "bad",
+    "text": "Hours of work while the old secret still works, and some copies will be missed. Keep one source of truth and read it at run time."
+   },
+   {
+    "when": "n > 10",
+    "tone": "warn",
+    "text": "Many copies. Each one is something to find during an incident."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "One place to change, and everything picks it up."
+   }
+  ],
+  "tries": [
+   "Use 40 apps in 5 environments with 3 copies each.",
+   "Turn on the central store.",
+   "Reduce copies per app."
+  ],
+  "chart": {
+   "x": "apps",
+   "y": "central ? mins / 60 : apps * envs * places * mins / 60",
+   "xlabel": "Applications",
+   "ylabel": "Hours to rotate",
+   "title": "Rotation time against applications",
+   "min": 0
+  }
+ },
+ {
+  "id": "vuln-backlog",
+  "module": "security",
+  "lesson": "security/vulnerability-management-and-security-incidents",
+  "title": "Vulnerability backlog",
+  "summary": "Findings arrive every month and fixes leave at a fixed pace. See whether the backlog shrinks or grows and how long findings stay open.",
+  "inputs": [
+   {
+    "id": "found",
+    "label": "New findings per month",
+    "min": 5,
+    "max": 500,
+    "value": 80,
+    "step": 5
+   },
+   {
+    "id": "fixed",
+    "label": "Fixed per month",
+    "min": 5,
+    "max": 500,
+    "value": 70,
+    "step": 5
+   },
+   {
+    "id": "start",
+    "label": "Backlog today",
+    "min": 0,
+    "max": 2000,
+    "value": 150,
+    "step": 10
+   },
+   {
+    "id": "sla",
+    "label": "Days you promise to fix a critical",
+    "min": 1,
+    "max": 90,
+    "value": 14,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "net",
+    "found - fixed"
+   ],
+   [
+    "m12",
+    "max(0, start + net * 12)"
+   ],
+   [
+    "age",
+    "fixed > 0 ? start / fixed * 30 : 999"
+   ],
+   [
+    "clear",
+    "net < 0 ? start / (0 - net) : 999"
+   ],
+   [
+    "late",
+    "age > sla"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "f",
+    "label": "Found",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "found + \" a month\""
+   },
+   {
+    "id": "b",
+    "label": "Backlog",
+    "x": 1,
+    "y": 0,
+    "state": "net>0 ? 2 : 0",
+    "sub": "round(start) + ' now, ' + round(m12) + ' in a year'"
+   },
+   {
+    "id": "x",
+    "label": "Time an item waits",
+    "x": 2,
+    "y": 0,
+    "state": "late ? 2 : 0",
+    "sub": "fmt(min(age, 999), 0) + ' days'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "f",
+    "to": "b",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "b",
+    "to": "x",
+    "flow": "0.7",
+    "bad": "net>0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Backlog after a year",
+    "expr": "m12",
+    "dp": 0
+   },
+   {
+    "label": "Average days an item waits",
+    "expr": "min(age, 999)",
+    "dp": 0
+   },
+   {
+    "label": "Months to clear it",
+    "expr": "clear >= 999 ? \"never at this pace\" : fmt(clear, 1)",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "net > 0",
+    "tone": "bad",
+    "text": "Findings arrive faster than they are fixed, so the backlog grows without end. Fix more, find less noise, or fix by risk and accept the rest."
+   },
+   {
+    "when": "late",
+    "tone": "warn",
+    "text": "The backlog shrinks, but the average item waits longer than your promise."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The team keeps pace with new findings."
+   }
+  ],
+  "tries": [
+   "Find 80 and fix 70 a month.",
+   "Raise the fix rate.",
+   "Shorten the promise."
+  ],
+  "chart": {
+   "x": "fixed",
+   "y": "max(0, start + (found - fixed) * 12)",
+   "xlabel": "Fixed per month",
+   "ylabel": "Backlog after a year",
+   "title": "Backlog against fix rate",
+   "min": 0
+  }
+ },
+ {
+  "id": "ransomware-recovery",
+  "module": "security",
+  "lesson": "security/ransomware-resilience-and-recovery",
+  "title": "Ransomware and backup retention",
+  "summary": "Attackers often sit inside before they encrypt. See whether any clean backup is left, and how long a restore takes.",
+  "inputs": [
+   {
+    "id": "dwell",
+    "label": "Days the attacker was inside before the attack",
+    "min": 0,
+    "max": 120,
+    "value": 30,
+    "step": 1
+   },
+   {
+    "id": "keep",
+    "label": "Days of backups you keep",
+    "min": 1,
+    "max": 365,
+    "value": 14,
+    "step": 1
+   },
+   {
+    "id": "tb",
+    "label": "Data to restore",
+    "min": 0.1,
+    "max": 500,
+    "value": 20,
+    "step": 0.1,
+    "unit": "TB"
+   },
+   {
+    "id": "gbps",
+    "label": "Restore speed",
+    "min": 0.1,
+    "max": 40,
+    "value": 2,
+    "step": 0.1,
+    "unit": "Gbps"
+   },
+   {
+    "id": "immut",
+    "label": "Backups are immutable and offline-capable",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "tested",
+    "label": "Restores are tested",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "tainted",
+    "dwell"
+   ],
+   [
+    "clean",
+    "keep > dwell"
+   ],
+   [
+    "hrs",
+    "tb * 8000 / gbps / 3600"
+   ],
+   [
+    "ok",
+    "clean || immut"
+   ],
+   [
+    "hrs2",
+    "tested ? hrs : hrs * 2"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "label": "Attacker inside",
+    "x": 0,
+    "y": 0,
+    "state": "dwell>keep ? 2 : 0",
+    "sub": "dwell + ' days'"
+   },
+   {
+    "id": "b",
+    "label": "Backups kept",
+    "x": 1,
+    "y": 0,
+    "state": "ok ? 0 : 2",
+    "sub": "keep + ' days' + (immut ? ', immutable' : '')"
+   },
+   {
+    "id": "r",
+    "label": "Restore",
+    "x": 2,
+    "y": 0,
+    "state": "hrs2>48 ? 2 : (hrs2>12 ? 1 : 0)",
+    "sub": "ok ? fmt(hrs2, 1) + ' h' : 'no clean copy'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "a",
+    "to": "b",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "b",
+    "to": "r",
+    "flow": "ok ? 0.7 : 0",
+    "bad": "!ok"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "A clean backup exists",
+    "expr": "ok ? \"yes\" : \"no\"",
+    "dp": 0
+   },
+   {
+    "label": "Restore time",
+    "expr": "hrs2",
+    "dp": 1,
+    "unit": "h"
+   },
+   {
+    "label": "Backups that may carry the attacker",
+    "expr": "min(keep, dwell)",
+    "dp": 0,
+    "unit": "days"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!ok",
+    "tone": "bad",
+    "text": "The attacker was inside longer than you keep backups, so every backup may be tainted. Keep older backups and make some immutable."
+   },
+   {
+    "when": "hrs2 > 48",
+    "tone": "warn",
+    "text": "A clean copy exists, but restoring takes days. Plan what runs in the meantime."
+   },
+   {
+    "when": "!tested",
+    "tone": "warn",
+    "text": "Untested restores usually take longer than the plan says. Test them."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "A clean copy exists and the restore is quick enough."
+   }
+  ],
+  "tries": [
+   "Keep 14 days with a 30 day dwell.",
+   "Make backups immutable.",
+   "Raise the data size."
+  ],
+  "chart": {
+   "x": "gbps",
+   "y": "tb * 8000 / gbps / 3600",
+   "xlabel": "Restore speed (Gbps)",
+   "ylabel": "Restore time (h)",
+   "title": "Restore time against speed",
+   "min": 0
+  }
+ },
+ {
+  "id": "tf-drift-window",
+  "module": "terraform",
+  "lesson": "terraform/workflows-and-drift",
+  "title": "Drift and plan frequency",
+  "summary": "People change things by hand. See how many drifted resources sit unnoticed between plans, and what the next apply will undo.",
+  "inputs": [
+   {
+    "id": "hand",
+    "label": "Hand changes per week",
+    "min": 0,
+    "max": 100,
+    "value": 8,
+    "step": 1
+   },
+   {
+    "id": "interval",
+    "label": "Days between plans",
+    "min": 1,
+    "max": 90,
+    "value": 14,
+    "step": 1
+   },
+   {
+    "id": "res",
+    "label": "Resources managed",
+    "min": 20,
+    "max": 2000,
+    "value": 300,
+    "step": 10
+   }
+  ],
+  "vars": [
+   [
+    "drift",
+    "min(res, hand * interval / 7)"
+   ],
+   [
+    "share",
+    "drift / res"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "h",
+    "label": "Hand changes",
+    "x": 0,
+    "y": 0,
+    "state": "hand>30 ? 1 : 0",
+    "sub": "hand + ' a week'"
+   },
+   {
+    "id": "d",
+    "label": "Unseen drift",
+    "x": 1,
+    "y": 0,
+    "state": "drift>20 ? 2 : (drift>5 ? 1 : 0)",
+    "sub": "fmt(drift, 0) + ' resources'"
+   },
+   {
+    "id": "p",
+    "label": "Next plan",
+    "x": 2,
+    "y": 0,
+    "state": "drift>20 ? 2 : 0",
+    "sub": "'reverts or reports ' + fmt(drift, 0)"
+   }
+  ],
+  "edges": [
+   {
+    "from": "h",
+    "to": "d",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "d",
+    "to": "p",
+    "flow": "0.7",
+    "bad": "drift>20"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Resources that differ from code",
+    "expr": "drift",
+    "dp": 0
+   },
+   {
+    "label": "Share of the estate",
+    "expr": "pct(share, 1)",
+    "dp": 0
+   },
+   {
+    "label": "Average age of a drifted change",
+    "expr": "interval / 2",
+    "dp": 0,
+    "unit": "days"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "drift > 20",
+    "tone": "bad",
+    "text": "Many resources differ from code by the time you plan. An apply now silently reverts someone urgent fix. Plan on a schedule and alert on drift."
+   },
+   {
+    "when": "drift > 5",
+    "tone": "warn",
+    "text": "A noticeable amount of drift. Tighten how often you plan."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Frequent plans catch drift while it is small."
+   }
+  ],
+  "tries": [
+   "Plan every 90 days with 8 hand changes a week.",
+   "Plan daily.",
+   "Reduce hand changes with access controls."
+  ],
+  "chart": {
+   "x": "interval",
+   "y": "min(res, hand * interval / 7)",
+   "xlabel": "Days between plans",
+   "ylabel": "Drifted resources",
+   "title": "Drift against plan interval",
+   "min": 0
+  }
+ },
+ {
+  "id": "count-vs-for-each",
+  "module": "terraform",
+  "lesson": "terraform/expressions-and-dynamic-blocks",
+  "title": "count and for_each",
+  "summary": "Remove one item from a list. With count, everything after it shifts and is replaced. With for_each, only that item goes.",
+  "inputs": [
+   {
+    "id": "n",
+    "label": "Items in the list",
+    "min": 2,
+    "max": 50,
+    "value": 10,
+    "step": 1
+   },
+   {
+    "id": "pos",
+    "label": "Position of the item removed",
+    "min": 1,
+    "max": 50,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "fe",
+    "label": "Use for_each with stable keys",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "p",
+    "min(pos, n)"
+   ],
+   [
+    "hit",
+    "fe ? 1 : n - p + 1"
+   ],
+   [
+    "survive",
+    "n - hit"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "l",
+    "label": "List",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "n + ' resources'"
+   },
+   {
+    "id": "p",
+    "label": "Plan",
+    "x": 1,
+    "y": 0,
+    "state": "hit>3 ? 2 : (hit>1 ? 1 : 0)",
+    "sub": "fe ? 'removes one key' : 'indexes shift'"
+   },
+   {
+    "id": "r",
+    "label": "Changes",
+    "x": 2,
+    "y": 0,
+    "state": "hit>3 ? 2 : (hit>1 ? 1 : 0)",
+    "sub": "hit + ' destroyed or replaced'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "l",
+    "to": "p",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "p",
+    "to": "r",
+    "flow": "min(1, hit/n + 0.2)",
+    "bad": "hit>3"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Resources destroyed or replaced",
+    "expr": "hit",
+    "dp": 0
+   },
+   {
+    "label": "Resources left alone",
+    "expr": "survive",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "hit > 3",
+    "tone": "bad",
+    "text": "Count identifies resources by position, so removing one early shifts all the others and Terraform replaces them. For databases or load balancers that means downtime. Use for_each with stable keys."
+   },
+   {
+    "when": "hit > 1",
+    "tone": "warn",
+    "text": "More than the one you meant is affected."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Only the removed item changes."
+   }
+  ],
+  "tries": [
+   "Remove item 1 of 20 with count.",
+   "Switch to for_each.",
+   "Remove the last item with count."
+  ],
+  "chart": {
+   "x": "pos",
+   "y": "fe ? 1 : n - min(pos, n) + 1",
+   "xlabel": "Position removed",
+   "ylabel": "Resources replaced",
+   "title": "Impact against position",
+   "min": 0
+  }
+ },
+ {
+  "id": "tf-plan-time",
+  "module": "terraform",
+  "lesson": "terraform/large-configurations-and-performance",
+  "title": "Plan time and state size",
+  "summary": "Every plan refreshes every resource. See how plan time grows with state size, and what splitting states does.",
+  "inputs": [
+   {
+    "id": "res",
+    "label": "Resources in the estate",
+    "min": 50,
+    "max": 20000,
+    "value": 3000,
+    "step": 50
+   },
+   {
+    "id": "lat",
+    "label": "API latency per read",
+    "min": 20,
+    "max": 1000,
+    "value": 150,
+    "step": 10,
+    "unit": "ms"
+   },
+   {
+    "id": "par",
+    "label": "Parallelism",
+    "min": 1,
+    "max": 50,
+    "value": 10,
+    "step": 1
+   },
+   {
+    "id": "states",
+    "label": "Separate state files",
+    "min": 1,
+    "max": 50,
+    "value": 1,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "per",
+    "res / states"
+   ],
+   [
+    "t",
+    "per * lat / par / 1000"
+   ],
+   [
+    "whole",
+    "res * lat / par / 1000"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "e",
+    "label": "Estate",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "res + ' resources'"
+   },
+   {
+    "id": "s",
+    "label": "State files",
+    "x": 1,
+    "y": 0,
+    "state": "states==1 && res>2000 ? 1 : 0",
+    "sub": "states + ' x ' + round(per)"
+   },
+   {
+    "id": "p",
+    "label": "One plan",
+    "x": 2,
+    "y": 0,
+    "state": "t>600 ? 2 : (t>120 ? 1 : 0)",
+    "sub": "fmt(t, 0) + ' s'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "e",
+    "to": "s",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "s",
+    "to": "p",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Resources per state",
+    "expr": "per",
+    "dp": 0
+   },
+   {
+    "label": "Plan time for one state",
+    "expr": "t",
+    "dp": 0,
+    "unit": "s"
+   },
+   {
+    "label": "One state for everything",
+    "expr": "whole",
+    "dp": 0,
+    "unit": "s"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "t > 600",
+    "tone": "bad",
+    "text": "Plans take ten minutes or more, so people skip them or run them rarely. Split state by lifecycle and ownership, and target what changed."
+   },
+   {
+    "when": "t > 120",
+    "tone": "warn",
+    "text": "Slow enough to hurt. A split along team lines helps."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Plans stay quick."
+   }
+  ],
+  "tries": [
+   "Put 10000 resources in one state.",
+   "Split into 10 states.",
+   "Raise parallelism."
+  ],
+  "chart": {
+   "x": "states",
+   "y": "res / states * lat / par / 1000",
+   "xlabel": "State files",
+   "ylabel": "Plan time (s)",
+   "title": "Plan time against splitting",
+   "min": 0
+  }
+ },
+ {
+  "id": "tf-state-exposure",
+  "module": "terraform",
+  "lesson": "terraform/secrets-and-sensitive-data",
+  "title": "Secrets inside state",
+  "summary": "Marking a value sensitive hides it from output, not from state. See who can read secrets and what protects them.",
+  "inputs": [
+   {
+    "id": "people",
+    "label": "People with access to the state",
+    "min": 1,
+    "max": 200,
+    "value": 25,
+    "step": 1
+   },
+   {
+    "id": "secrets",
+    "label": "Secret values stored in state",
+    "min": 0,
+    "max": 100,
+    "value": 12,
+    "step": 1
+   },
+   {
+    "id": "sens",
+    "label": "Variables marked sensitive",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "enc",
+    "label": "State is encrypted and access-controlled",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "ext",
+    "label": "Secrets are fetched at run time and not stored in state",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "inst",
+    "ext ? 0 : secrets"
+   ],
+   [
+    "readers",
+    "enc ? min(people, 5) : people"
+   ],
+   [
+    "exposure",
+    "inst * readers"
+   ],
+   [
+    "shown",
+    "sens ? \"hidden in plan output\" : \"printed in plan output\""
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "s",
+    "label": "Secrets in state",
+    "x": 0,
+    "y": 0,
+    "state": "inst>0 ? 1 : 0",
+    "sub": "inst + ' values'"
+   },
+   {
+    "id": "r",
+    "label": "Who can read the state",
+    "x": 1,
+    "y": 0,
+    "state": "readers>20 ? 2 : (readers>5 ? 1 : 0)",
+    "sub": "readers + ' people'"
+   },
+   {
+    "id": "o",
+    "label": "Plan output",
+    "x": 2,
+    "y": 0,
+    "state": "sens ? 0 : 2",
+    "sub": "shown"
+   }
+  ],
+  "edges": [
+   {
+    "from": "s",
+    "to": "r",
+    "flow": "inst>0 ? 0.7 : 0",
+    "bad": "false"
+   },
+   {
+    "from": "r",
+    "to": "o",
+    "flow": "0.6",
+    "bad": "readers>20 && inst>0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Secrets stored in state",
+    "expr": "inst",
+    "dp": 0
+   },
+   {
+    "label": "People who could read them",
+    "expr": "inst>0 ? readers : 0",
+    "dp": 0
+   },
+   {
+    "label": "Exposure score",
+    "expr": "exposure",
+    "dp": 0
+   },
+   {
+    "label": "Plan output",
+    "expr": "shown",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "inst > 0 && !enc",
+    "tone": "bad",
+    "text": "Plaintext secrets sit in a state file many people can read. Encrypt the backend, restrict access to a few, and avoid storing secrets in state at all."
+   },
+   {
+    "when": "inst > 0 && !sens",
+    "tone": "warn",
+    "text": "Secrets also print in plan output and CI logs. Mark them sensitive, knowing that this hides display only."
+   },
+   {
+    "when": "inst > 0",
+    "tone": "warn",
+    "text": "Controls limit who can read the state, but the secrets are still in there. Prefer fetching them at run time."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "No secrets live in state."
+   }
+  ],
+  "tries": [
+   "Store 12 secrets with no encryption and 25 readers.",
+   "Encrypt the state.",
+   "Fetch secrets at run time."
+  ]
+ }
+]

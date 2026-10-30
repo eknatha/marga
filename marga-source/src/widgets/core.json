@@ -1,0 +1,1852 @@
+[
+ {
+  "id": "token-bucket",
+  "module": "system-design",
+  "lesson": "system-design/rate-limiting-and-load-shedding",
+  "title": "Token bucket rate limiter",
+  "summary": "Tokens refill at a steady rate and each request spends one. See how the bucket size lets a burst through while the refill rate caps the long run.",
+  "inputs": [
+   {
+    "id": "rate",
+    "label": "Refill rate",
+    "min": 1,
+    "max": 100,
+    "value": 10,
+    "step": 1,
+    "unit": "tokens/s"
+   },
+   {
+    "id": "burst",
+    "label": "Bucket size",
+    "min": 1,
+    "max": 200,
+    "value": 20,
+    "step": 1,
+    "unit": "tokens"
+   },
+   {
+    "id": "load",
+    "label": "Steady request rate",
+    "min": 1,
+    "max": 200,
+    "value": 40,
+    "step": 1,
+    "unit": "req/s"
+   },
+   {
+    "id": "spike",
+    "label": "One sudden burst",
+    "min": 1,
+    "max": 300,
+    "value": 60,
+    "step": 1,
+    "unit": "requests"
+   }
+  ],
+  "vars": [
+   [
+    "allowed",
+    "min(load, rate)"
+   ],
+   [
+    "rej",
+    "max(0, load - rate)"
+   ],
+   [
+    "spikeok",
+    "min(spike, burst)"
+   ],
+   [
+    "spikerej",
+    "spike - min(spike, burst)"
+   ],
+   [
+    "refill",
+    "burst / rate"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Clients",
+    "x": 0,
+    "y": 0,
+    "state": "rej>0 ? 1 : 0",
+    "sub": "load + \" req/s\""
+   },
+   {
+    "id": "l",
+    "label": "Token bucket",
+    "x": 1,
+    "y": 0,
+    "state": "rej>0 ? 1 : 0",
+    "sub": "rate + \"/s refill, size \" + burst"
+   },
+   {
+    "id": "a",
+    "label": "Your API",
+    "x": 2,
+    "y": 0,
+    "state": "0",
+    "sub": "allowed + \" req/s admitted\""
+   },
+   {
+    "id": "x",
+    "label": "Rejected (429)",
+    "x": 2,
+    "y": 1,
+    "state": "rej>0 ? 2 : 0",
+    "sub": "rej + \" req/s turned away\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "l",
+    "flow": "min(1, load/200)",
+    "bad": "false"
+   },
+   {
+    "from": "l",
+    "to": "a",
+    "flow": "min(1, allowed/200)",
+    "bad": "false"
+   },
+   {
+    "from": "l",
+    "to": "x",
+    "flow": "min(1, rej/200)",
+    "bad": "rej>0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Admitted long run",
+    "expr": "allowed",
+    "dp": 0,
+    "unit": "req/s"
+   },
+   {
+    "label": "Turned away long run",
+    "expr": "rej",
+    "dp": 0,
+    "unit": "req/s"
+   },
+   {
+    "label": "Burst admitted at once",
+    "expr": "spikeok",
+    "dp": 0,
+    "unit": "requests"
+   },
+   {
+    "label": "Burst turned away",
+    "expr": "spikerej",
+    "dp": 0,
+    "unit": "requests"
+   },
+   {
+    "label": "Time to refill an empty bucket",
+    "expr": "refill",
+    "dp": 1,
+    "unit": "s"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "rej > 0",
+    "tone": "warn",
+    "text": "The steady rate is above the refill rate, so the bucket empties and the excess is rejected. Raising the bucket size does not fix a steady overload, only the refill rate does."
+   },
+   {
+    "when": "spikerej > 0",
+    "tone": "warn",
+    "text": "The long run is fine, but the burst is bigger than the bucket, so part of it is turned away. A bigger bucket would absorb it at the cost of a larger spike on your API."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The steady rate is under the refill rate and the burst fits in the bucket. Everyone is admitted."
+   }
+  ],
+  "tries": [
+   "Set the steady rate above the refill rate and watch the rejected stream appear.",
+   "Make the bucket tiny and send a big burst. The burst gets cut even though the long run is fine.",
+   "Make the bucket huge. It absorbs bursts, but notice how long it takes to refill."
+  ],
+  "chart": {
+   "x": "load",
+   "y": "allowed",
+   "y2": "rej",
+   "xlabel": "Steady request rate (req/s)",
+   "ylabel": "Admitted req/s",
+   "y2label": "Rejected req/s",
+   "title": "Admitted and rejected against load"
+  }
+ },
+ {
+  "id": "retry-storm",
+  "module": "system-design",
+  "lesson": "system-design/queues-retries-and-idempotency",
+  "title": "Retry storm",
+  "summary": "A service loses some capacity and every client retries. See how retries multiply the load and why a retry budget with backoff stops the spiral.",
+  "inputs": [
+   {
+    "id": "base",
+    "label": "Normal request rate",
+    "min": 100,
+    "max": 1000,
+    "value": 700,
+    "step": 10,
+    "unit": "req/s"
+   },
+   {
+    "id": "outage",
+    "label": "Capacity lost",
+    "min": 0,
+    "max": 80,
+    "value": 30,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "retries",
+    "label": "Retries per failed call",
+    "min": 0,
+    "max": 6,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "budget",
+    "label": "Retry budget and backoff",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "cap",
+    "1000 * (1 - outage/100)"
+   ],
+   [
+    "r",
+    "budget ? min(retries, 1) * 0.1 : retries"
+   ],
+   [
+    "f0",
+    "max(0, 1 - cap/base)"
+   ],
+   [
+    "o1",
+    "base * (1 + f0 * r)"
+   ],
+   [
+    "f1",
+    "max(0, 1 - cap/o1)"
+   ],
+   [
+    "o2",
+    "base * (1 + f1 * r)"
+   ],
+   [
+    "f2",
+    "max(0, 1 - cap/o2)"
+   ],
+   [
+    "o3",
+    "base * (1 + f2 * r)"
+   ],
+   [
+    "amp",
+    "o3 / base"
+   ],
+   [
+    "good",
+    "min(cap, o3)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Clients",
+    "x": 0,
+    "y": 0,
+    "state": "amp>1.5 ? 2 : (amp>1.05 ? 1 : 0)",
+    "sub": "\"asking \" + round(base) + \" req/s\""
+   },
+   {
+    "id": "rt",
+    "label": "Retry layer",
+    "x": 1,
+    "y": 0,
+    "state": "amp>1.05 ? 1 : 0",
+    "sub": "\"x\" + fmt(amp, 1) + \" load\""
+   },
+   {
+    "id": "s",
+    "label": "Service",
+    "x": 2,
+    "y": 0,
+    "state": "o3>cap ? 2 : 0",
+    "sub": "\"capacity \" + round(cap) + \" req/s\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "rt",
+    "flow": "min(1, base/1000)",
+    "bad": "false"
+   },
+   {
+    "from": "rt",
+    "to": "s",
+    "flow": "min(1, o3/1500)",
+    "bad": "o3>cap"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Load the service sees",
+    "expr": "o3",
+    "dp": 0,
+    "unit": "req/s"
+   },
+   {
+    "label": "Multiplier",
+    "expr": "amp",
+    "dp": 1,
+    "unit": "x"
+   },
+   {
+    "label": "Capacity left",
+    "expr": "cap",
+    "dp": 0,
+    "unit": "req/s"
+   },
+   {
+    "label": "Requests served",
+    "expr": "good",
+    "dp": 0,
+    "unit": "req/s"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "o3 > cap * 1.0 && !budget",
+    "tone": "bad",
+    "text": "Retries pile on top of the normal load. The service is past capacity, so more calls fail, which causes more retries. Turn on the retry budget and backoff to cap the extra load."
+   },
+   {
+    "when": "o3 > cap",
+    "tone": "bad",
+    "text": "Even with a retry budget the base load is above the remaining capacity. This needs load shedding or more capacity, not more retries."
+   },
+   {
+    "when": "amp > 1.05",
+    "tone": "warn",
+    "text": "Retries add load, but the service still copes."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The service has enough capacity and almost nothing fails, so retries are rare."
+   }
+  ],
+  "tries": [
+   "Lose 30 percent of capacity with 3 retries and no budget. The multiplier explodes.",
+   "Switch on the retry budget. The extra load is capped near 10 percent.",
+   "Lose 80 percent of capacity. Retries cannot rescue a service that is simply too small."
+  ],
+  "chart": {
+   "x": "outage",
+   "y": "o3",
+   "y2": "cap",
+   "xlabel": "Capacity lost (%)",
+   "ylabel": "Load the service sees (req/s)",
+   "y2label": "Capacity (req/s)",
+   "title": "Offered load against capacity"
+  }
+ },
+ {
+  "id": "quorum",
+  "module": "system-design",
+  "lesson": "system-design/quorum-leaders-and-split-brain",
+  "title": "Quorum reads and writes",
+  "summary": "Five replicas, a write quorum and a read quorum. Choose W and R, then select replicas to fail and see when reads and writes stop and when stale reads become possible.",
+  "inputs": [
+   {
+    "id": "w",
+    "label": "Write quorum W",
+    "min": 1,
+    "max": 5,
+    "value": 3,
+    "step": 1,
+    "unit": "replicas"
+   },
+   {
+    "id": "rd",
+    "label": "Read quorum R",
+    "min": 1,
+    "max": 5,
+    "value": 3,
+    "step": 1,
+    "unit": "replicas"
+   },
+   {
+    "id": "d1",
+    "label": "Replica 1 is down",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d2",
+    "label": "Replica 2 is down",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d3",
+    "label": "Replica 3 is down",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d4",
+    "label": "Replica 4 is down",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d5",
+    "label": "Replica 5 is down",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "up",
+    "5 - d1 - d2 - d3 - d4 - d5"
+   ],
+   [
+    "canw",
+    "up >= w"
+   ],
+   [
+    "canr",
+    "up >= rd"
+   ],
+   [
+    "overlap",
+    "w + rd > 5"
+   ],
+   [
+    "tol",
+    "min(5 - w, 5 - rd)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "cl",
+    "label": "Client",
+    "x": 0,
+    "y": 1.5,
+    "state": "canw && canr ? 0 : 2",
+    "sub": "\"W=\" + w + \" R=\" + rd"
+   },
+   {
+    "id": "r1",
+    "label": "Replica 1",
+    "x": 2,
+    "y": 0,
+    "state": "d1 ? 2 : 0",
+    "sub": "d1 ? \"down\" : \"up\"",
+    "toggle": "d1"
+   },
+   {
+    "id": "r2",
+    "label": "Replica 2",
+    "x": 2,
+    "y": 1,
+    "state": "d2 ? 2 : 0",
+    "sub": "d2 ? \"down\" : \"up\"",
+    "toggle": "d2"
+   },
+   {
+    "id": "r3",
+    "label": "Replica 3",
+    "x": 2,
+    "y": 2,
+    "state": "d3 ? 2 : 0",
+    "sub": "d3 ? \"down\" : \"up\"",
+    "toggle": "d3"
+   },
+   {
+    "id": "r4",
+    "label": "Replica 4",
+    "x": 2,
+    "y": 3,
+    "state": "d4 ? 2 : 0",
+    "sub": "d4 ? \"down\" : \"up\"",
+    "toggle": "d4"
+   },
+   {
+    "id": "r5",
+    "label": "Replica 5",
+    "x": 2,
+    "y": 4,
+    "state": "d5 ? 2 : 0",
+    "sub": "d5 ? \"down\" : \"up\"",
+    "toggle": "d5"
+   }
+  ],
+  "edges": [
+   {
+    "from": "cl",
+    "to": "r1",
+    "flow": "d1 ? 0 : 0.6",
+    "bad": "d1"
+   },
+   {
+    "from": "cl",
+    "to": "r2",
+    "flow": "d2 ? 0 : 0.6",
+    "bad": "d2"
+   },
+   {
+    "from": "cl",
+    "to": "r3",
+    "flow": "d3 ? 0 : 0.6",
+    "bad": "d3"
+   },
+   {
+    "from": "cl",
+    "to": "r4",
+    "flow": "d4 ? 0 : 0.6",
+    "bad": "d4"
+   },
+   {
+    "from": "cl",
+    "to": "r5",
+    "flow": "d5 ? 0 : 0.6",
+    "bad": "d5"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Replicas up",
+    "expr": "up",
+    "dp": 0
+   },
+   {
+    "label": "Writes can succeed",
+    "expr": "canw ? \"yes\" : \"no\"",
+    "dp": 0
+   },
+   {
+    "label": "Reads can succeed",
+    "expr": "canr ? \"yes\" : \"no\"",
+    "dp": 0
+   },
+   {
+    "label": "Read sees latest write",
+    "expr": "overlap ? \"guaranteed\" : \"not guaranteed\"",
+    "dp": 0
+   },
+   {
+    "label": "Failures both can survive",
+    "expr": "tol",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!canw && !canr",
+    "tone": "bad",
+    "text": "Neither reads nor writes can reach their quorum. The system is unavailable for both."
+   },
+   {
+    "when": "!canw",
+    "tone": "bad",
+    "text": "Writes cannot reach the write quorum, so they are refused. Reads may still work."
+   },
+   {
+    "when": "!canr",
+    "tone": "bad",
+    "text": "Reads cannot reach the read quorum, so they are refused. Writes may still work."
+   },
+   {
+    "when": "!overlap",
+    "tone": "warn",
+    "text": "W plus R is not more than 5, so a read can miss the replicas that took the latest write. You may read stale data."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "W plus R is more than 5, so every read quorum overlaps every write quorum and sees the latest write."
+   }
+  ],
+  "tries": [
+   "Set W=1 and R=1. Everything is fast and available, but the overlap line turns to not guaranteed.",
+   "Set W=5. One failed replica now blocks all writes.",
+   "Set W=3 and R=3, then fail two replicas, then a third."
+  ]
+ },
+ {
+  "id": "consistent-hashing",
+  "module": "system-design",
+  "lesson": "system-design/partitioning-sharding-and-consistent-hashing",
+  "title": "Consistent hashing",
+  "summary": "Keys are placed on a ring. Add virtual nodes to even out the load, and compare how many keys move when you add a server against plain modulo hashing.",
+  "inputs": [
+   {
+    "id": "n",
+    "label": "Servers",
+    "min": 2,
+    "max": 12,
+    "value": 4,
+    "step": 1
+   },
+   {
+    "id": "v",
+    "label": "Virtual nodes per server",
+    "min": 1,
+    "max": 200,
+    "value": 1,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "mx",
+    "ringMax(n, v)"
+   ],
+   [
+    "mn",
+    "ringMin(n, v)"
+   ],
+   [
+    "mv",
+    "ringMoved(n, v)"
+   ],
+   [
+    "md",
+    "modMoved(n)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "k",
+    "label": "Keys",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "\"4000 sample keys\""
+   },
+   {
+    "id": "rg",
+    "label": "Hash ring",
+    "x": 1,
+    "y": 0,
+    "state": "mx>1.5 ? 2 : (mx>1.2 ? 1 : 0)",
+    "sub": "n + \" servers x \" + v"
+   },
+   {
+    "id": "hi",
+    "label": "Busiest server",
+    "x": 2,
+    "y": 0,
+    "state": "mx>1.5 ? 2 : (mx>1.2 ? 1 : 0)",
+    "sub": "fmt(mx, 2) + \"x its fair share\""
+   },
+   {
+    "id": "lo",
+    "label": "Quietest server",
+    "x": 2,
+    "y": 1,
+    "state": "mn<0.5 ? 1 : 0",
+    "sub": "fmt(mn, 2) + \"x its fair share\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "k",
+    "to": "rg",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "rg",
+    "to": "hi",
+    "flow": "min(1, mx/2)",
+    "bad": "mx>1.5"
+   },
+   {
+    "from": "rg",
+    "to": "lo",
+    "flow": "max(0.1, mn/2)",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Busiest server",
+    "expr": "mx",
+    "dp": 2,
+    "unit": "x fair share"
+   },
+   {
+    "label": "Quietest server",
+    "expr": "mn",
+    "dp": 2,
+    "unit": "x fair share"
+   },
+   {
+    "label": "Keys that move when adding one server",
+    "expr": "pct(mv, 1)",
+    "dp": 0
+   },
+   {
+    "label": "Keys that move with modulo hashing",
+    "expr": "pct(md, 1)",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "mx > 1.5",
+    "tone": "warn",
+    "text": "With so few points on the ring the slices are uneven, so one server carries far more than its share. Add virtual nodes."
+   },
+   {
+    "when": "mx > 1.2",
+    "tone": "warn",
+    "text": "Better, but the busiest server still carries noticeably more than its share."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Load is close to even, and adding a server moves only about 1 in N plus 1 of the keys. Modulo hashing would move almost all of them."
+   }
+  ],
+  "tries": [
+   "Start with 1 virtual node and 4 servers. Notice the uneven shares.",
+   "Raise virtual nodes to 100 and watch the busiest server fall toward its fair share.",
+   "Compare the two moved rows. Modulo hashing reshuffles most keys when N changes."
+  ],
+  "chart": {
+   "x": "v",
+   "y": "mx",
+   "y2": "mn",
+   "xlabel": "Virtual nodes per server",
+   "ylabel": "Busiest server (x fair share)",
+   "y2label": "Quietest server (x fair share)",
+   "title": "Load balance against virtual nodes",
+   "min": 0
+  }
+ },
+ {
+  "id": "error-budget",
+  "module": "sre",
+  "lesson": "sre/slos-and-error-budgets",
+  "title": "Error budget and burn rate",
+  "summary": "Pick an SLO and an error rate. See the budget in minutes, how fast you are burning it and when it runs out.",
+  "inputs": [
+   {
+    "id": "slo",
+    "label": "SLO target",
+    "min": 99,
+    "max": 99.99,
+    "value": 99.9,
+    "step": 0.01,
+    "unit": "%"
+   },
+   {
+    "id": "err",
+    "label": "Current error rate",
+    "min": 0,
+    "max": 5,
+    "value": 0.3,
+    "step": 0.01,
+    "unit": "%"
+   },
+   {
+    "id": "spent",
+    "label": "Budget already spent this month",
+    "min": 0,
+    "max": 100,
+    "value": 20,
+    "step": 1,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "budget",
+    "(1 - slo/100) * 30 * 1440"
+   ],
+   [
+    "allowed",
+    "100 - slo"
+   ],
+   [
+    "burn",
+    "err / allowed"
+   ],
+   [
+    "rem",
+    "max(0, 1 - spent/100)"
+   ],
+   [
+    "days",
+    "burn > 0 ? rem * 30 / burn : 999"
+   ],
+   [
+    "hrs",
+    "days * 24"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "u",
+    "label": "Users",
+    "x": 0,
+    "y": 0,
+    "state": "err>allowed ? 1 : 0",
+    "sub": "fmt(err, 2) + \"% failing\""
+   },
+   {
+    "id": "s",
+    "label": "Service",
+    "x": 1,
+    "y": 0,
+    "state": "burn>=6 ? 2 : (burn>1 ? 1 : 0)",
+    "sub": "\"burn x\" + fmt(burn, 1)"
+   },
+   {
+    "id": "b",
+    "label": "Error budget",
+    "x": 2,
+    "y": 0,
+    "state": "rem<0.1 ? 2 : (rem<0.4 ? 1 : 0)",
+    "sub": "pct(rem, 0) + \" left\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "u",
+    "to": "s",
+    "flow": "min(1, 0.3 + err/2)",
+    "bad": "err>allowed"
+   },
+   {
+    "from": "s",
+    "to": "b",
+    "flow": "min(1, burn/10)",
+    "bad": "burn>1"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Total budget for 30 days",
+    "expr": "budget",
+    "dp": 0,
+    "unit": "minutes of full outage"
+   },
+   {
+    "label": "Burn rate",
+    "expr": "burn",
+    "dp": 1,
+    "unit": "x"
+   },
+   {
+    "label": "Budget left",
+    "expr": "pct(rem, 0)",
+    "dp": 0
+   },
+   {
+    "label": "Time until it runs out",
+    "expr": "days >= 999 ? \"not at this rate\" : fmt(hrs, 1) + \" hours\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "burn >= 14.4",
+    "tone": "bad",
+    "text": "A burn this fast would spend 2 percent of a month budget in an hour. This is the kind of burn that should page someone right now."
+   },
+   {
+    "when": "burn >= 6",
+    "tone": "bad",
+    "text": "A fast burn. It would spend 5 percent of the budget in six hours. Page or act soon."
+   },
+   {
+    "when": "burn > 1",
+    "tone": "warn",
+    "text": "You are spending faster than the SLO allows, so the budget runs out before the month ends. Open a ticket and fix it."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "At or under the allowed error rate. The budget lasts the whole window."
+   }
+  ],
+  "tries": [
+   "Set the SLO to 99.99 and see how small the budget in minutes is.",
+   "Raise the error rate until the burn rate passes 6.",
+   "Set spent to 90 percent with a burn of 1. There is little slack left."
+  ],
+  "chart": {
+   "x": "err",
+   "y": "days",
+   "xlabel": "Error rate (%)",
+   "ylabel": "Days until budget is gone",
+   "title": "Time to exhaustion",
+   "min": 0,
+   "max": 60
+  }
+ },
+ {
+  "id": "load-balancing",
+  "module": "networking",
+  "lesson": "networking/firewalls-and-load-balancing",
+  "title": "Load balancing algorithms",
+  "summary": "Three backends with one slow. Compare round robin with least connections, and see what health checks do when a backend dies.",
+  "inputs": [
+   {
+    "id": "algo",
+    "label": "Algorithm",
+    "type": "select",
+    "options": [
+     [
+      "rr",
+      "Round robin"
+     ],
+     [
+      "lc",
+      "Least connections"
+     ]
+    ],
+    "value": "rr"
+   },
+   {
+    "id": "rps",
+    "label": "Requests",
+    "min": 50,
+    "max": 280,
+    "value": 180,
+    "step": 5,
+    "unit": "req/s"
+   },
+   {
+    "id": "slow",
+    "label": "Backend 3 slowdown",
+    "min": 1,
+    "max": 8,
+    "value": 1,
+    "step": 1,
+    "unit": "x slower"
+   },
+   {
+    "id": "hc",
+    "label": "Health checks on",
+    "type": "toggle",
+    "value": true
+   },
+   {
+    "id": "dead",
+    "label": "Backend 2 has crashed",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "cap3",
+    "100 / slow"
+   ],
+   [
+    "live",
+    "hc && dead ? 2 : 3"
+   ],
+   [
+    "w1",
+    "algo==\"rr\" ? 1 : 100"
+   ],
+   [
+    "w2",
+    "dead && hc ? 0 : (algo==\"rr\" ? 1 : 100)"
+   ],
+   [
+    "w3",
+    "algo==\"rr\" ? 1 : cap3"
+   ],
+   [
+    "wt",
+    "w1 + w2 + w3"
+   ],
+   [
+    "l1",
+    "rps * w1/wt"
+   ],
+   [
+    "l2",
+    "rps * w2/wt"
+   ],
+   [
+    "l3",
+    "rps * w3/wt"
+   ],
+   [
+    "u1",
+    "l1/100"
+   ],
+   [
+    "u3",
+    "l3/cap3"
+   ],
+   [
+    "lost",
+    "dead && !hc ? l2 : 0"
+   ],
+   [
+    "worst",
+    "max(u1, u3)"
+   ],
+   [
+    "lat",
+    "20 / (1 - min(0.97, worst))"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Clients",
+    "x": 0,
+    "y": 1,
+    "state": "0",
+    "sub": "rps + \" req/s\""
+   },
+   {
+    "id": "lb",
+    "label": "Load balancer",
+    "x": 1,
+    "y": 1,
+    "state": "0",
+    "sub": "algo==\"rr\" ? \"round robin\" : \"least conn\""
+   },
+   {
+    "id": "b1",
+    "label": "Backend 1",
+    "x": 2,
+    "y": 0,
+    "state": "u1>1 ? 2 : (u1>0.8 ? 1 : 0)",
+    "sub": "round(l1) + \" req/s\""
+   },
+   {
+    "id": "b2",
+    "label": "Backend 2",
+    "x": 2,
+    "y": 1,
+    "state": "dead ? 2 : 0",
+    "sub": "dead ? (hc ? \"removed\" : round(l2) + \" lost\") : round(l2) + \" req/s\"",
+    "toggle": "dead"
+   },
+   {
+    "id": "b3",
+    "label": "Backend 3",
+    "x": 2,
+    "y": 2,
+    "state": "u3>1 ? 2 : (u3>0.8 ? 1 : 0)",
+    "sub": "round(l3) + \" req/s\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "lb",
+    "flow": "min(1, rps/280)",
+    "bad": "false"
+   },
+   {
+    "from": "lb",
+    "to": "b1",
+    "flow": "min(1, l1/100)",
+    "bad": "u1>1"
+   },
+   {
+    "from": "lb",
+    "to": "b2",
+    "flow": "min(1, l2/100)",
+    "bad": "dead"
+   },
+   {
+    "from": "lb",
+    "to": "b3",
+    "flow": "min(1, l3/100)",
+    "bad": "u3>1"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Backend 1 utilisation",
+    "expr": "pct(u1, 0)",
+    "dp": 0
+   },
+   {
+    "label": "Backend 3 utilisation",
+    "expr": "pct(u3, 0)",
+    "dp": 0
+   },
+   {
+    "label": "Requests sent to a dead backend",
+    "expr": "round(lost)",
+    "dp": 0,
+    "unit": "req/s"
+   },
+   {
+    "label": "Rough latency on the busiest backend",
+    "expr": "lat",
+    "dp": 0,
+    "unit": "ms"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "lost > 0",
+    "tone": "bad",
+    "text": "Without health checks the balancer keeps sending traffic to the crashed backend. Those requests fail until someone notices."
+   },
+   {
+    "when": "worst > 1",
+    "tone": "bad",
+    "text": "A backend is past its capacity. Requests queue and time out."
+   },
+   {
+    "when": "worst > 0.8",
+    "tone": "warn",
+    "text": "A backend is running hot. Latency climbs sharply near full utilisation."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Load is spread within what each backend can take."
+   }
+  ],
+  "tries": [
+   "Make backend 3 four times slower on round robin. It overloads while the others idle.",
+   "Switch to least connections. Traffic shifts toward the faster backends.",
+   "Crash backend 2, then turn health checks off."
+  ]
+ },
+ {
+  "id": "cache-stampede",
+  "module": "system-design",
+  "lesson": "system-design/caching-without-stampedes",
+  "title": "Cache stampede",
+  "summary": "A hot key expires and every request misses at once. Choose a protection and see how many queries reach the database.",
+  "inputs": [
+   {
+    "id": "rps",
+    "label": "Requests for the hot key",
+    "min": 100,
+    "max": 5000,
+    "value": 2000,
+    "step": 50,
+    "unit": "req/s"
+   },
+   {
+    "id": "ttl",
+    "label": "Cache TTL",
+    "min": 5,
+    "max": 300,
+    "value": 60,
+    "step": 5,
+    "unit": "s"
+   },
+   {
+    "id": "rebuild",
+    "label": "Time to rebuild the value",
+    "min": 50,
+    "max": 5000,
+    "value": 800,
+    "step": 50,
+    "unit": "ms"
+   },
+   {
+    "id": "prot",
+    "label": "Protection",
+    "type": "select",
+    "options": [
+     [
+      "none",
+      "None"
+     ],
+     [
+      "lock",
+      "Single flight (one rebuild, others wait)"
+     ],
+     [
+      "early",
+      "Early refresh with jitter"
+     ]
+    ],
+    "value": "none"
+   }
+  ],
+  "vars": [
+   [
+    "peak",
+    "prot==\"none\" ? rps * rebuild/1000 : 1"
+   ],
+   [
+    "dbcap",
+    "200"
+   ],
+   [
+    "hit",
+    "1 - rebuild/(ttl*1000)"
+   ],
+   [
+    "wait",
+    "prot==\"lock\" ? rebuild : 0"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Clients",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "rps + \" req/s\""
+   },
+   {
+    "id": "ca",
+    "label": "Cache",
+    "x": 1,
+    "y": 0,
+    "state": "prot==\"none\" ? 1 : 0",
+    "sub": "\"TTL \" + ttl + \" s\""
+   },
+   {
+    "id": "db",
+    "label": "Database",
+    "x": 2,
+    "y": 0,
+    "state": "peak>dbcap ? 2 : (peak>dbcap*0.5 ? 1 : 0)",
+    "sub": "round(peak) + \" queries at expiry\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "ca",
+    "flow": "min(1, rps/5000)",
+    "bad": "false"
+   },
+   {
+    "from": "ca",
+    "to": "db",
+    "flow": "min(1, peak/400)",
+    "bad": "peak>dbcap"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Queries hitting the database at expiry",
+    "expr": "peak",
+    "dp": 0
+   },
+   {
+    "label": "Database comfortable limit",
+    "expr": "dbcap",
+    "dp": 0
+   },
+   {
+    "label": "Hit ratio",
+    "expr": "pct(hit, 2)",
+    "dp": 0
+   },
+   {
+    "label": "Extra wait for requests during rebuild",
+    "expr": "wait",
+    "dp": 0,
+    "unit": "ms"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "peak > dbcap",
+    "tone": "bad",
+    "text": "Every request that arrives while the value is rebuilt goes to the database. It cannot take that many at once, so rebuilds slow down, more requests pile up and the stampede feeds itself."
+   },
+   {
+    "when": "prot != \"none\"",
+    "tone": "good",
+    "text": "Only one rebuild reaches the database. Single flight makes the others wait briefly. Early refresh avoids the wait by rebuilding before expiry."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The key is cool enough that the rebuild fits in the database limit, but a hotter key would break it."
+   }
+  ],
+  "tries": [
+   "Keep protection off and raise the rebuild time. The stampede grows with it.",
+   "Switch to single flight. One query, but waiting requests see extra latency.",
+   "Try early refresh. The value is rebuilt before it expires, so nobody waits."
+  ],
+  "chart": {
+   "x": "rebuild",
+   "y": "rps * rebuild/1000",
+   "y2": "dbcap",
+   "xlabel": "Rebuild time (ms)",
+   "ylabel": "Queries at expiry (no protection)",
+   "y2label": "Database limit",
+   "title": "Stampede size against rebuild time",
+   "min": 0
+  }
+ },
+ {
+  "id": "rolling-update",
+  "module": "kubernetes",
+  "lesson": "kubernetes/pods-and-deployments",
+  "title": "Rolling update",
+  "summary": "A Deployment replaces pods in waves. Set surge and unavailable limits and see capacity, rollout time and what happens when the new version is broken.",
+  "inputs": [
+   {
+    "id": "rep",
+    "label": "Replicas",
+    "min": 3,
+    "max": 30,
+    "value": 10,
+    "step": 1
+   },
+   {
+    "id": "surge",
+    "label": "maxSurge",
+    "min": 0,
+    "max": 10,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "unav",
+    "label": "maxUnavailable",
+    "min": 0,
+    "max": 10,
+    "value": 1,
+    "step": 1
+   },
+   {
+    "id": "ready",
+    "label": "Time for a new pod to be ready",
+    "min": 5,
+    "max": 120,
+    "value": 20,
+    "step": 5,
+    "unit": "s"
+   },
+   {
+    "id": "bad",
+    "label": "New version is broken",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "probe",
+    "label": "Readiness probe is set",
+    "type": "toggle",
+    "value": true
+   }
+  ],
+  "vars": [
+   [
+    "ueff",
+    "(surge == 0 && unav == 0) ? 1 : min(unav, rep)"
+   ],
+   [
+    "batch",
+    "max(1, surge + ueff)"
+   ],
+   [
+    "waves",
+    "ceil(rep / batch)"
+   ],
+   [
+    "time",
+    "waves * ready"
+   ],
+   [
+    "peak",
+    "rep + surge"
+   ],
+   [
+    "minav",
+    "rep - ueff"
+   ],
+   [
+    "stall",
+    "bad && probe"
+   ],
+   [
+    "oldleft",
+    "stall ? rep - ueff : 0"
+   ],
+   [
+    "newok",
+    "bad ? (probe ? 0 : rep) : rep"
+   ],
+   [
+    "errs",
+    "bad && !probe ? 1 : 0"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "o",
+    "label": "Old version",
+    "x": 0,
+    "y": 0,
+    "state": "stall ? 1 : 0",
+    "sub": "stall ? oldleft + \" still serving\" : \"replaced\""
+   },
+   {
+    "id": "sv",
+    "label": "Service",
+    "x": 1,
+    "y": 0,
+    "state": "errs ? 2 : (stall ? 1 : 0)",
+    "sub": "errs ? \"serving errors\" : \"serving\""
+   },
+   {
+    "id": "n",
+    "label": "New version",
+    "x": 2,
+    "y": 0,
+    "state": "bad ? 2 : 0",
+    "sub": "bad ? (probe ? \"not ready, held back\" : \"broken pods live\") : newok + \" ready\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "o",
+    "to": "sv",
+    "flow": "stall ? 0.8 : 0.2",
+    "bad": "false"
+   },
+   {
+    "from": "sv",
+    "to": "n",
+    "flow": "errs ? 1 : (stall ? 0.1 : 0.8)",
+    "bad": "bad"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Pods at the busiest moment",
+    "expr": "peak",
+    "dp": 0
+   },
+   {
+    "label": "Fewest pods serving",
+    "expr": "minav",
+    "dp": 0
+   },
+   {
+    "label": "Rollout time",
+    "expr": "time",
+    "dp": 0,
+    "unit": "s"
+   },
+   {
+    "label": "Old pods still serving",
+    "expr": "oldleft",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "bad && !probe",
+    "tone": "bad",
+    "text": "Without a readiness probe the broken pods are marked ready straight away, so traffic reaches them and the rollout carries on replacing healthy pods with broken ones."
+   },
+   {
+    "when": "bad && probe",
+    "tone": "good",
+    "text": "The readiness probe keeps broken pods out of rotation. The rollout stalls with the old pods still serving. You roll back and nobody noticed."
+   },
+   {
+    "when": "surge == 0 && unav == 0",
+    "tone": "warn",
+    "text": "Both limits cannot be zero. The model treats it as one unavailable pod so the rollout can move."
+   },
+   {
+    "when": "minav < rep * 0.5",
+    "tone": "warn",
+    "text": "More than half of the pods can be away at once, so capacity may fall short during the rollout."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Capacity stays high through the rollout and the new version is rolled in wave by wave."
+   }
+  ],
+  "tries": [
+   "Turn on a broken version with no readiness probe.",
+   "Turn the probe on and compare.",
+   "Set maxSurge 0 and maxUnavailable 5. The rollout is slow-ish but never exceeds replicas."
+  ],
+  "chart": {
+   "x": "surge",
+   "y": "time",
+   "xlabel": "maxSurge",
+   "ylabel": "Rollout time (s)",
+   "title": "Rollout time against maxSurge",
+   "min": 0
+  }
+ },
+ {
+  "id": "dns-ttl",
+  "module": "networking",
+  "lesson": "networking/dns",
+  "title": "DNS TTL and cutover",
+  "summary": "You change a DNS record. Resolvers keep the old answer until its TTL runs out. See how many users still go to the old address over time.",
+  "inputs": [
+   {
+    "id": "ttl",
+    "label": "TTL",
+    "min": 10,
+    "max": 3600,
+    "value": 300,
+    "step": 10,
+    "unit": "s"
+   },
+   {
+    "id": "t",
+    "label": "Time since the change",
+    "min": 0,
+    "max": 3600,
+    "value": 60,
+    "step": 10,
+    "unit": "s"
+   },
+   {
+    "id": "off",
+    "label": "Old server already switched off",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "old",
+    "max(0, 1 - t/ttl)"
+   ],
+   [
+    "qps",
+    "10000 / ttl"
+   ],
+   [
+    "errs",
+    "off ? old : 0"
+   ],
+   [
+    "full",
+    "ttl"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "u",
+    "label": "Users",
+    "x": 0,
+    "y": 0,
+    "state": "old>0.5 ? 1 : 0",
+    "sub": "pct(old, 0) + \" on old address\""
+   },
+   {
+    "id": "r",
+    "label": "Resolver caches",
+    "x": 1,
+    "y": 0,
+    "state": "old>0 ? 1 : 0",
+    "sub": "\"TTL \" + ttl + \" s\""
+   },
+   {
+    "id": "o",
+    "label": "Old server",
+    "x": 2,
+    "y": 0,
+    "state": "off ? 2 : 0",
+    "sub": "off ? \"off\" : \"running\"",
+    "toggle": "off"
+   },
+   {
+    "id": "nw",
+    "label": "New server",
+    "x": 2,
+    "y": 1,
+    "state": "0",
+    "sub": "pct(1 - old, 0) + \" of users\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "u",
+    "to": "r",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "r",
+    "to": "o",
+    "flow": "old",
+    "bad": "off"
+   },
+   {
+    "from": "r",
+    "to": "nw",
+    "flow": "1 - old",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Users still on the old address",
+    "expr": "pct(old, 0)",
+    "dp": 0
+   },
+   {
+    "label": "Time until everyone has moved",
+    "expr": "full",
+    "dp": 0,
+    "unit": "s"
+   },
+   {
+    "label": "Queries per second to your name servers, 10000 users",
+    "expr": "qps",
+    "dp": 1,
+    "unit": "q/s"
+   },
+   {
+    "label": "Users seeing errors",
+    "expr": "pct(errs, 0)",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "errs > 0",
+    "tone": "bad",
+    "text": "The old server is off but resolvers still hand out its address. Those users get errors until their cached answer expires. Keep the old server running for at least one TTL."
+   },
+   {
+    "when": "old > 0",
+    "tone": "warn",
+    "text": "Some users still use the old address. Both servers must work during the changeover."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "All cached answers have expired, so every user goes to the new address."
+   }
+  ],
+  "tries": [
+   "Set a 3600 second TTL and a time of 60. Almost everyone is still on the old address.",
+   "Switch off the old server too early and see the errors.",
+   "Lower the TTL and see the query load on your name servers go up."
+  ],
+  "chart": {
+   "x": "t",
+   "y": "100 * max(0, 1 - t/ttl)",
+   "y2": "100 * max(0, 1 - t/(ttl*4))",
+   "xlabel": "Time since the change (s)",
+   "ylabel": "Users on old address (%)",
+   "y2label": "Same, with four times the TTL",
+   "title": "Cutover over time",
+   "min": 0,
+   "max": 100
+  }
+ },
+ {
+  "id": "tcp-handshake",
+  "module": "networking",
+  "lesson": "networking/latency-mtu-and-network-performance",
+  "title": "TCP handshake and latency",
+  "summary": "Every new connection pays round trips before the first byte. See what TLS and loss do, and how much connection reuse saves.",
+  "inputs": [
+   {
+    "id": "rtt",
+    "label": "Round trip time",
+    "min": 1,
+    "max": 300,
+    "value": 80,
+    "step": 1,
+    "unit": "ms"
+   },
+   {
+    "id": "tls",
+    "label": "Encryption",
+    "type": "select",
+    "options": [
+     [
+      "0",
+      "None (plain HTTP)"
+     ],
+     [
+      "1",
+      "TLS 1.3"
+     ],
+     [
+      "2",
+      "TLS 1.2"
+     ]
+    ],
+    "value": "1"
+   },
+   {
+    "id": "reuse",
+    "label": "Reuse an open connection",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "loss",
+    "label": "Packet loss",
+    "min": 0,
+    "max": 5,
+    "value": 0,
+    "step": 0.1,
+    "unit": "%"
+   },
+   {
+    "id": "link",
+    "label": "Link speed",
+    "min": 10,
+    "max": 1000,
+    "value": 100,
+    "step": 10,
+    "unit": "Mbps"
+   }
+  ],
+  "vars": [
+   [
+    "tl",
+    "+tls"
+   ],
+   [
+    "setup",
+    "reuse ? 0 : (1 + tl) * rtt"
+   ],
+   [
+    "ttfb",
+    "setup + rtt"
+   ],
+   [
+    "mathis",
+    "loss > 0 ? 1.22 * 1460 * 8 / ((rtt/1000) * sqrt(loss/100)) / 1000000 : link"
+   ],
+   [
+    "rate",
+    "min(link, mathis)"
+   ],
+   [
+    "dl",
+    "8 / rate * 1000 + ttfb"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Client",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "rtt + \" ms round trip\""
+   },
+   {
+    "id": "s",
+    "label": "Server",
+    "x": 2,
+    "y": 0,
+    "state": "0",
+    "sub": "reuse ? \"connection open\" : \"new connection\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "s",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "s",
+    "to": "c",
+    "flow": "0.8",
+    "bad": "loss>1"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Round trips before the first byte",
+    "expr": "(reuse ? 0 : 1 + tl) + 1",
+    "dp": 0
+   },
+   {
+    "label": "Time to first byte",
+    "expr": "ttfb",
+    "dp": 0,
+    "unit": "ms"
+   },
+   {
+    "label": "Usable throughput",
+    "expr": "rate",
+    "dp": 1,
+    "unit": "Mbps"
+   },
+   {
+    "label": "Time to fetch 1 MB",
+    "expr": "dl",
+    "dp": 0,
+    "unit": "ms"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "loss > 1 && rate < link * 0.5",
+    "tone": "bad",
+    "text": "Loss makes TCP back off, so throughput falls well below the link speed. This is a rough estimate from a well-known approximation."
+   },
+   {
+    "when": "ttfb > 400",
+    "tone": "warn",
+    "text": "The first byte takes a long time because several round trips come before it. Reuse a connection, shorten the distance, or use TLS 1.3."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Few round trips and low delay. Setup cost is small."
+   }
+  ],
+  "tries": [
+   "Raise the round trip time to 250 ms with TLS 1.2. The wait before the first byte is large.",
+   "Turn on connection reuse. The setup trips disappear.",
+   "Add 2 percent packet loss and look at the throughput."
+  ],
+  "chart": {
+   "x": "rtt",
+   "y": "(1 + tl) * rtt + rtt",
+   "y2": "rtt",
+   "xlabel": "Round trip time (ms)",
+   "ylabel": "Time to first byte, new connection (ms)",
+   "y2label": "With a reused connection (ms)",
+   "title": "First byte against distance",
+   "min": 0
+  }
+ }
+]

@@ -1,0 +1,4248 @@
+[
+ {
+  "id": "ansible-idempotence",
+  "module": "ansible",
+  "lesson": "ansible/playbooks-tasks-and-idempotence",
+  "title": "Idempotence and repeat runs",
+  "summary": "A good playbook changes nothing on the second run. See how raw shell tasks report change every time and hide real drift.",
+  "inputs": [
+   {
+    "id": "hosts",
+    "label": "Hosts",
+    "min": 1,
+    "max": 500,
+    "value": 40,
+    "step": 1
+   },
+   {
+    "id": "tasks",
+    "label": "Tasks in the playbook",
+    "min": 1,
+    "max": 60,
+    "value": 20,
+    "step": 1
+   },
+   {
+    "id": "shellp",
+    "label": "Tasks that use shell or command",
+    "min": 0,
+    "max": 100,
+    "value": 30,
+    "step": 5,
+    "unit": "%"
+   },
+   {
+    "id": "guard",
+    "label": "Those tasks have creates or changed_when",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "sh",
+    "round(tasks * shellp/100)"
+   ],
+   [
+    "noisy",
+    "guard ? 0 : sh"
+   ],
+   [
+    "chg",
+    "noisy * hosts"
+   ],
+   [
+    "real",
+    "0"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "p",
+    "label": "Second run",
+    "x": 0,
+    "y": 0,
+    "state": "noisy>0 ? 1 : 0",
+    "sub": "tasks + ' tasks on ' + hosts + ' hosts'"
+   },
+   {
+    "id": "r",
+    "label": "Report",
+    "x": 1,
+    "y": 0,
+    "state": "noisy>0 ? 2 : 0",
+    "sub": "noisy + ' tasks say changed'"
+   },
+   {
+    "id": "d",
+    "label": "Real drift",
+    "x": 2,
+    "y": 0,
+    "state": "0",
+    "sub": "noisy>0 ? \"hidden among the noise\" : \"visible at once\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "p",
+    "to": "r",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "r",
+    "to": "d",
+    "flow": "0.6",
+    "bad": "noisy>0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Tasks that use shell or command",
+    "expr": "sh",
+    "dp": 0
+   },
+   {
+    "label": "Tasks reporting change on a repeat run",
+    "expr": "noisy",
+    "dp": 0
+   },
+   {
+    "label": "Changed task results across all hosts",
+    "expr": "chg",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "noisy > 0",
+    "tone": "bad",
+    "text": "Every run reports changes, so a real change is lost among the noise and you cannot trust check mode. Use modules, or add creates and changed_when."
+   },
+   {
+    "when": "sh > 0",
+    "tone": "good",
+    "text": "The shell tasks are guarded, so a repeat run reports no change unless something really drifted."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "All tasks use idempotent modules, so a clean second run is the proof."
+   }
+  ],
+  "tries": [
+   "Use 60 percent shell tasks with no guards.",
+   "Add guards.",
+   "Remember a second run showing zero changes is the test."
+  ]
+ },
+ {
+  "id": "ansible-forks-serial",
+  "module": "ansible",
+  "lesson": "ansible/ansible-at-scale",
+  "title": "Forks and serial rollouts",
+  "summary": "Forks set how many hosts run at once, serial sets how many are changed per batch. See runtime against how many hosts a bad change hits before you stop.",
+  "inputs": [
+   {
+    "id": "hosts",
+    "label": "Hosts",
+    "min": 10,
+    "max": 2000,
+    "value": 300,
+    "step": 10
+   },
+   {
+    "id": "forks",
+    "label": "Forks",
+    "min": 1,
+    "max": 200,
+    "value": 5,
+    "step": 1
+   },
+   {
+    "id": "tasks",
+    "label": "Tasks",
+    "min": 1,
+    "max": 60,
+    "value": 15,
+    "step": 1
+   },
+   {
+    "id": "secs",
+    "label": "Seconds per task per host",
+    "min": 1,
+    "max": 60,
+    "value": 6,
+    "step": 1,
+    "unit": "s"
+   },
+   {
+    "id": "serial",
+    "label": "Serial batch size (0 for all at once)",
+    "min": 0,
+    "max": 200,
+    "value": 0,
+    "step": 5,
+    "unit": "hosts"
+   }
+  ],
+  "vars": [
+   [
+    "batch",
+    "serial == 0 ? hosts : min(serial, hosts)"
+   ],
+   [
+    "par",
+    "min(forks, batch)"
+   ],
+   [
+    "rounds",
+    "ceil(batch / par)"
+   ],
+   [
+    "perbatch",
+    "rounds * tasks * secs"
+   ],
+   [
+    "batches",
+    "ceil(hosts / batch)"
+   ],
+   [
+    "total",
+    "batches * perbatch"
+   ],
+   [
+    "hit",
+    "batch"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Control node",
+    "x": 0,
+    "y": 0,
+    "state": "forks<10 && hosts>200 ? 1 : 0",
+    "sub": "forks + \" forks\""
+   },
+   {
+    "id": "b",
+    "label": "First batch",
+    "x": 1,
+    "y": 0,
+    "state": "hit>hosts*0.25 ? 2 : (hit>hosts*0.05 ? 1 : 0)",
+    "sub": "hit + ' hosts changed first'"
+   },
+   {
+    "id": "t",
+    "label": "Whole run",
+    "x": 2,
+    "y": 0,
+    "state": "total>3600 ? 2 : (total>900 ? 1 : 0)",
+    "sub": "fmt(total / 60, 1) + \" min\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "b",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "b",
+    "to": "t",
+    "flow": "0.7",
+    "bad": "hit>hosts*0.25"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Hosts hit before a failure stops the run",
+    "expr": "hit",
+    "dp": 0
+   },
+   {
+    "label": "Total runtime",
+    "expr": "total / 60",
+    "dp": 1,
+    "unit": "min"
+   },
+   {
+    "label": "Batches",
+    "expr": "batches",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "hit > hosts * 0.25",
+    "tone": "bad",
+    "text": "A bad change reaches a quarter or more of the fleet before anything can stop it. Use serial with a small first batch and max_fail_percentage."
+   },
+   {
+    "when": "total > 3600",
+    "tone": "warn",
+    "text": "Over an hour. Raise forks, or run in waves."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Small batches limit damage and the run finishes in reasonable time."
+   }
+  ],
+  "tries": [
+   "Run 300 hosts at once.",
+   "Set serial to 10. The blast radius drops.",
+   "Raise forks to cut the runtime."
+  ],
+  "chart": {
+   "x": "forks",
+   "y": "(ceil(hosts / (serial == 0 ? hosts : min(serial, hosts))) * ceil((serial == 0 ? hosts : min(serial, hosts)) / min(forks, (serial == 0 ? hosts : min(serial, hosts)))) * tasks * secs) / 60",
+   "xlabel": "Forks",
+   "ylabel": "Runtime (min)",
+   "title": "Runtime against forks",
+   "min": 0
+  }
+ },
+ {
+  "id": "ansible-var-precedence",
+  "module": "ansible",
+  "lesson": "ansible/variables-facts-and-templates",
+  "title": "Variable precedence",
+  "summary": "The same variable can be set in several places. See which one wins as you switch layers on and off.",
+  "inputs": [
+   {
+    "id": "rdef",
+    "label": "Role defaults (value 1)",
+    "type": "toggle",
+    "value": true
+   },
+   {
+    "id": "grp",
+    "label": "Inventory group_vars (value 2)",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "play",
+    "label": "Play vars (value 3)",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "extra",
+    "label": "Extra vars on the command line (value 4)",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "x",
+    "label": "Value you expect",
+    "min": 1,
+    "max": 4,
+    "value": 2,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "val",
+    "extra ? 4 : (play ? 3 : (grp ? 2 : (rdef ? 1 : 0)))"
+   ],
+   [
+    "src",
+    "extra ? \"extra vars\" : (play ? \"play vars\" : (grp ? \"group_vars\" : (rdef ? \"role defaults\" : \"nowhere\")))"
+   ],
+   [
+    "surprise",
+    "val != x"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "d",
+    "label": "Role defaults",
+    "x": 0,
+    "y": 0,
+    "state": "rdef ? 0 : 1",
+    "sub": "rdef ? '1' : 'unset'"
+   },
+   {
+    "id": "g",
+    "label": "Inventory and play",
+    "x": 1,
+    "y": 0,
+    "state": "play || grp ? 0 : 0",
+    "sub": "play ? 'play vars 3' : (grp ? 'group_vars 2' : 'none')"
+   },
+   {
+    "id": "e",
+    "label": "Extra vars",
+    "x": 2,
+    "y": 0,
+    "state": "extra ? 1 : 0",
+    "sub": "extra ? '4 overrides all' : 'none'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "d",
+    "to": "g",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "g",
+    "to": "e",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Value used",
+    "expr": "val",
+    "dp": 0
+   },
+   {
+    "label": "It came from",
+    "expr": "src",
+    "dp": 0
+   },
+   {
+    "label": "Matches what you expected",
+    "expr": "surprise ? \"no\" : \"yes\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "surprise && extra",
+    "tone": "warn",
+    "text": "Extra vars beat everything, which is easy to forget. Use them for one-off overrides only."
+   },
+   {
+    "when": "surprise",
+    "tone": "warn",
+    "text": "A different layer won than you expected. Role defaults are the lowest, so anything else overrides them."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The winning layer matches your expectation."
+   }
+  ],
+  "tries": [
+   "Turn on all layers and watch extra vars win.",
+   "Remove extra vars. Play vars win.",
+   "Set your expected value to 1 while group_vars is on."
+  ]
+ },
+ {
+  "id": "ansible-inventory-cache",
+  "module": "ansible",
+  "lesson": "ansible/dynamic-inventory-for-cloud",
+  "title": "Dynamic inventory cache",
+  "summary": "A cached inventory is fast but can list machines that no longer exist. See how many stale hosts a cache lets through as the fleet churns.",
+  "inputs": [
+   {
+    "id": "fleet",
+    "label": "Instances",
+    "min": 10,
+    "max": 2000,
+    "value": 300,
+    "step": 10
+   },
+   {
+    "id": "churn",
+    "label": "Instances replaced per hour",
+    "min": 0,
+    "max": 200,
+    "value": 30,
+    "step": 1
+   },
+   {
+    "id": "ttl",
+    "label": "Cache lifetime",
+    "min": 0,
+    "max": 240,
+    "value": 60,
+    "step": 5,
+    "unit": "min"
+   },
+   {
+    "id": "refresh",
+    "label": "Refresh the cache before every run",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "t",
+    "refresh ? 0 : ttl"
+   ],
+   [
+    "stale",
+    "min(fleet, churn * t / 60)"
+   ],
+   [
+    "frac",
+    "stale / fleet"
+   ],
+   [
+    "missed",
+    "min(fleet, churn * t / 60)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Cloud",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "churn + \" replaced an hour\""
+   },
+   {
+    "id": "i",
+    "label": "Cached inventory",
+    "x": 1,
+    "y": 0,
+    "state": "frac>0.1 ? 2 : (frac>0.02 ? 1 : 0)",
+    "sub": "refresh ? 'fresh each run' : 'up to ' + ttl + ' min old'"
+   },
+   {
+    "id": "r",
+    "label": "Playbook run",
+    "x": 2,
+    "y": 0,
+    "state": "frac>0.1 ? 2 : (frac>0.02 ? 1 : 0)",
+    "sub": "\"about \" + round(stale) + \" stale hosts\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "i",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "i",
+    "to": "r",
+    "flow": "0.7",
+    "bad": "frac>0.02"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Stale hosts in the list",
+    "expr": "stale",
+    "dp": 0
+   },
+   {
+    "label": "Share of the list that is stale",
+    "expr": "pct(frac, 1)",
+    "dp": 0
+   },
+   {
+    "label": "New hosts the run misses",
+    "expr": "missed",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "frac > 0.1",
+    "tone": "bad",
+    "text": "A tenth or more of the inventory is wrong. Runs fail on hosts that are gone and skip new ones, so new instances stay unconfigured."
+   },
+   {
+    "when": "frac > 0.02",
+    "tone": "warn",
+    "text": "Some stale entries. Expect unreachable host errors."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The list matches the cloud."
+   }
+  ],
+  "tries": [
+   "Set a 4 hour cache with heavy churn.",
+   "Refresh before every run.",
+   "Shorten the cache lifetime."
+  ],
+  "chart": {
+   "x": "ttl",
+   "y": "100 * min(fleet, churn * ttl / 60) / fleet",
+   "xlabel": "Cache lifetime (min)",
+   "ylabel": "Stale entries (%)",
+   "title": "Staleness against cache lifetime",
+   "min": 0
+  }
+ },
+ {
+  "id": "pipeline-speed",
+  "module": "cicd",
+  "lesson": "cicd/fast-pipelines-caching-parallelism-monorepos",
+  "title": "Pipeline speed",
+  "summary": "Split tests into shards and cache dependencies. See where adding shards stops paying because of fixed overhead.",
+  "inputs": [
+   {
+    "id": "tests",
+    "label": "Test time on one machine",
+    "min": 5,
+    "max": 120,
+    "value": 40,
+    "step": 1,
+    "unit": "min"
+   },
+   {
+    "id": "shards",
+    "label": "Parallel shards",
+    "min": 1,
+    "max": 20,
+    "value": 4,
+    "step": 1
+   },
+   {
+    "id": "over",
+    "label": "Overhead per shard",
+    "min": 0.5,
+    "max": 8,
+    "value": 2,
+    "step": 0.5,
+    "unit": "min"
+   },
+   {
+    "id": "inst",
+    "label": "Dependency install time",
+    "min": 0,
+    "max": 15,
+    "value": 5,
+    "step": 1,
+    "unit": "min"
+   },
+   {
+    "id": "cache",
+    "label": "Dependency cache is hit",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "per",
+    "tests / shards + over"
+   ],
+   [
+    "instt",
+    "cache ? 0.5 : inst"
+   ],
+   [
+    "total",
+    "instt + per + 2"
+   ],
+   [
+    "single",
+    "inst + tests + 2"
+   ],
+   [
+    "cost",
+    "shards * (instt + per)"
+   ],
+   [
+    "gain",
+    "single - total"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Checkout and cache",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "cache ? 'cache hit' : 'cold install'"
+   },
+   {
+    "id": "s",
+    "label": "Test shards",
+    "x": 1,
+    "y": 0,
+    "state": "over>per ? 2 : (shards>8 ? 1 : 0)",
+    "sub": "shards + ' shards x ' + fmt(per, 1) + ' min'"
+   },
+   {
+    "id": "d",
+    "label": "Pipeline",
+    "x": 2,
+    "y": 0,
+    "state": "total>20 ? 1 : 0",
+    "sub": "fmt(total, 0) + ' min'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "s",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "s",
+    "to": "d",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Pipeline time",
+    "expr": "total",
+    "dp": 1,
+    "unit": "min"
+   },
+   {
+    "label": "Time without sharding or cache",
+    "expr": "single",
+    "dp": 1,
+    "unit": "min"
+   },
+   {
+    "label": "Machine minutes billed",
+    "expr": "cost",
+    "dp": 0,
+    "unit": "min"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "over > tests / shards",
+    "tone": "warn",
+    "text": "Each shard spends more time on setup than on tests. More shards now cost money and save almost no time."
+   },
+   {
+    "when": "total > 20",
+    "tone": "warn",
+    "text": "Slow feedback. Cache dependencies and add shards while the speed-up is still large."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Fast feedback at a sensible cost."
+   }
+  ],
+  "tries": [
+   "Raise shards to 20.",
+   "Turn the cache on and off.",
+   "Compare machine minutes with wall time."
+  ],
+  "chart": {
+   "x": "shards",
+   "y": "inst + tests / shards + over + 2",
+   "xlabel": "Shards",
+   "ylabel": "Pipeline time (min)",
+   "title": "Time against shards",
+   "min": 0
+  }
+ },
+ {
+  "id": "canary-exposure",
+  "module": "cicd",
+  "lesson": "cicd/deployment-strategies",
+  "title": "Canary exposure",
+  "summary": "A canary sends a slice of traffic to the new version first. See how many users a bad release reaches before you stop it.",
+  "inputs": [
+   {
+    "id": "rps",
+    "label": "Traffic",
+    "min": 10,
+    "max": 5000,
+    "value": 500,
+    "step": 10,
+    "unit": "req/s"
+   },
+   {
+    "id": "canary",
+    "label": "Canary share of traffic",
+    "min": 1,
+    "max": 100,
+    "value": 5,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "bake",
+    "label": "Time before the check",
+    "min": 1,
+    "max": 60,
+    "value": 10,
+    "step": 1,
+    "unit": "min"
+   },
+   {
+    "id": "err",
+    "label": "Bad version error rate",
+    "min": 1,
+    "max": 100,
+    "value": 30,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "auto",
+    "label": "Automatic rollback on error rate",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "seen",
+    "rps * 60 * bake * canary/100"
+   ],
+   [
+    "failed",
+    "seen * err/100"
+   ],
+   [
+    "detect",
+    "auto ? min(bake, 2) : bake"
+   ],
+   [
+    "hit",
+    "rps * 60 * detect * canary/100 * err/100"
+   ],
+   [
+    "all",
+    "rps * 60 * bake * err/100"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "t",
+    "label": "Traffic",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "rps + ' req/s'"
+   },
+   {
+    "id": "c",
+    "label": "Canary",
+    "x": 1,
+    "y": 0,
+    "state": "canary>=50 ? 2 : (canary>10 ? 1 : 0)",
+    "sub": "canary + '% to the new version'"
+   },
+   {
+    "id": "f",
+    "label": "Failed requests",
+    "x": 2,
+    "y": 0,
+    "state": "hit>10000 ? 2 : (hit>1000 ? 1 : 0)",
+    "sub": "round(hit) + ' before rollback'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "t",
+    "to": "c",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "c",
+    "to": "f",
+    "flow": "min(1, canary/30 + 0.2)",
+    "bad": "err>10"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Requests failed by the bad version",
+    "expr": "hit",
+    "dp": 0
+   },
+   {
+    "label": "If it had gone to everyone for the same time",
+    "expr": "all",
+    "dp": 0
+   },
+   {
+    "label": "Time to notice",
+    "expr": "detect",
+    "dp": 0,
+    "unit": "min"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "hit > 10000",
+    "tone": "bad",
+    "text": "Even a canary fails a lot of requests if it is large and the check is slow. Start small and roll back automatically."
+   },
+   {
+    "when": "hit > 1000",
+    "tone": "warn",
+    "text": "Contained, but not small. A smaller slice or a faster check would cut it."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "A small slice and a quick check keep the damage small."
+   }
+  ],
+  "tries": [
+   "Use a 50 percent canary with a 30 minute bake.",
+   "Shrink the canary to 1 percent.",
+   "Turn on automatic rollback."
+  ],
+  "chart": {
+   "x": "canary",
+   "y": "rps * 60 * (auto ? min(bake, 2) : bake) * canary/100 * err/100",
+   "xlabel": "Canary share (%)",
+   "ylabel": "Failed requests",
+   "title": "Failed requests against canary size",
+   "min": 0
+  }
+ },
+ {
+  "id": "flaky-tests",
+  "module": "cicd",
+  "lesson": "cicd/testing-and-quality-gates",
+  "title": "Flaky tests and red pipelines",
+  "summary": "A small flake rate per test adds up across a big suite. See how often a correct change fails, and what retries do.",
+  "inputs": [
+   {
+    "id": "tests",
+    "label": "Tests in the suite",
+    "min": 10,
+    "max": 5000,
+    "value": 800,
+    "step": 10
+   },
+   {
+    "id": "flake",
+    "label": "Flake rate per test run",
+    "min": 0,
+    "max": 0.5,
+    "value": 0.05,
+    "step": 0.01,
+    "unit": "%"
+   },
+   {
+    "id": "retry",
+    "label": "Automatic retries of the whole run",
+    "min": 0,
+    "max": 3,
+    "value": 0,
+    "step": 1
+   },
+   {
+    "id": "perday",
+    "label": "Pipeline runs per day",
+    "min": 1,
+    "max": 500,
+    "value": 60,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "p",
+    "flake/100"
+   ],
+   [
+    "okrun",
+    "pow(1 - p, tests)"
+   ],
+   [
+    "fail1",
+    "1 - okrun"
+   ],
+   [
+    "failall",
+    "pow(fail1, retry + 1)"
+   ],
+   [
+    "redperday",
+    "perday * failall"
+   ],
+   [
+    "wasted",
+    "perday * fail1 * 15 / 60"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "s",
+    "label": "Suite",
+    "x": 0,
+    "y": 0,
+    "state": "tests>2000 ? 1 : 0",
+    "sub": "tests + ' tests'"
+   },
+   {
+    "id": "r",
+    "label": "Pipeline result",
+    "x": 1,
+    "y": 0,
+    "state": "failall>0.2 ? 2 : (failall>0.05 ? 1 : 0)",
+    "sub": "pct(failall, 0) + ' red for no reason'"
+   },
+   {
+    "id": "p",
+    "label": "People",
+    "x": 2,
+    "y": 0,
+    "state": "failall>0.2 ? 2 : 0",
+    "sub": "fmt(redperday, 1) + ' false reds a day'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "s",
+    "to": "r",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "r",
+    "to": "p",
+    "flow": "0.6",
+    "bad": "failall>0.2"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Runs that fail with no real bug",
+    "expr": "pct(fail1, 0)",
+    "dp": 0
+   },
+   {
+    "label": "After retries",
+    "expr": "pct(failall, 1)",
+    "dp": 0
+   },
+   {
+    "label": "False failures per day",
+    "expr": "redperday",
+    "dp": 1
+   },
+   {
+    "label": "Hours spent rerunning per day",
+    "expr": "wasted",
+    "dp": 1,
+    "unit": "h"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "failall > 0.2",
+    "tone": "bad",
+    "text": "One run in five fails for no reason, so people stop trusting red builds and start ignoring real failures. Quarantine and fix flaky tests."
+   },
+   {
+    "when": "failall > 0.05",
+    "tone": "warn",
+    "text": "Enough false failures that people rerun by habit. Retries hide it but cost time."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Failures mean something."
+   }
+  ],
+  "tries": [
+   "Use 2000 tests with 0.1 percent flake.",
+   "Add retries and see the false failures fall but time rise.",
+   "Lower the flake rate and watch the effect compound."
+  ],
+  "chart": {
+   "x": "flake",
+   "y": "100 * (1 - pow(1 - flake/100, tests))",
+   "xlabel": "Flake rate per test (%)",
+   "ylabel": "Runs that fail (%)",
+   "title": "False failures against flake rate",
+   "min": 0,
+   "max": 100
+  }
+ },
+ {
+  "id": "promotion-lead-time",
+  "module": "cicd",
+  "lesson": "cicd/environments-promotion-and-approvals",
+  "title": "Promotion lead time",
+  "summary": "A change moves through environments with soak times and approvals. See how waiting dominates lead time and pushes people toward bigger batches.",
+  "inputs": [
+   {
+    "id": "stages",
+    "label": "Environments before production",
+    "min": 1,
+    "max": 6,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "soak",
+    "label": "Soak time per environment",
+    "min": 0,
+    "max": 24,
+    "value": 2,
+    "step": 1,
+    "unit": "h"
+   },
+   {
+    "id": "appr",
+    "label": "Wait per manual approval",
+    "min": 0,
+    "max": 48,
+    "value": 8,
+    "step": 1,
+    "unit": "h"
+   },
+   {
+    "id": "gates",
+    "label": "Manual approvals",
+    "min": 0,
+    "max": 6,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "work",
+    "label": "Hands-on pipeline time per stage",
+    "min": 5,
+    "max": 60,
+    "value": 15,
+    "step": 5,
+    "unit": "min"
+   }
+  ],
+  "vars": [
+   [
+    "active",
+    "stages * work / 60"
+   ],
+   [
+    "wait",
+    "stages * soak + gates * appr"
+   ],
+   [
+    "lead",
+    "active + wait"
+   ],
+   [
+    "share",
+    "wait / lead"
+   ],
+   [
+    "perwk",
+    "168 / lead"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Commit",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "\"merged\""
+   },
+   {
+    "id": "e",
+    "label": "Environments",
+    "x": 1,
+    "y": 0,
+    "state": "share>0.9 ? 2 : (share>0.7 ? 1 : 0)",
+    "sub": "stages + ' stages, ' + gates + ' approvals'"
+   },
+   {
+    "id": "p",
+    "label": "Production",
+    "x": 2,
+    "y": 0,
+    "state": "lead>72 ? 2 : (lead>24 ? 1 : 0)",
+    "sub": "fmt(lead, 1) + ' h after commit'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "e",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "e",
+    "to": "p",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Lead time to production",
+    "expr": "lead",
+    "dp": 1,
+    "unit": "h"
+   },
+   {
+    "label": "Share of it spent waiting",
+    "expr": "pct(share, 0)",
+    "dp": 0
+   },
+   {
+    "label": "Changes per week one pipeline can ship in series",
+    "expr": "perwk",
+    "dp": 1
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "lead > 72",
+    "tone": "bad",
+    "text": "Several days to ship a change. People batch work to avoid the wait, which makes every release bigger and riskier."
+   },
+   {
+    "when": "share > 0.8",
+    "tone": "warn",
+    "text": "Most of the time is waiting, not work. Automate the approvals you can and shorten soak times with good checks."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "A short, mostly automated path."
+   }
+  ],
+  "tries": [
+   "Add 3 manual approvals of 24 hours.",
+   "Remove approvals and shorten soak.",
+   "Notice that active time is tiny compared with waiting."
+  ],
+  "chart": {
+   "x": "gates",
+   "y": "stages * work / 60 + stages * soak + gates * appr",
+   "xlabel": "Manual approvals",
+   "ylabel": "Lead time (h)",
+   "title": "Lead time against approvals",
+   "min": 0
+  }
+ },
+ {
+  "id": "skill-context-budget",
+  "module": "claude-skills",
+  "lesson": "claude-skills/progressive-disclosure-and-structure",
+  "title": "Skill context budget",
+  "summary": "Descriptions of installed skills sit in context all the time and bodies load only when used. See how many tokens that costs and how much room is left for the task.",
+  "inputs": [
+   {
+    "id": "skills",
+    "label": "Installed skills",
+    "min": 1,
+    "max": 200,
+    "value": 25,
+    "step": 1
+   },
+   {
+    "id": "desc",
+    "label": "Tokens per description",
+    "min": 20,
+    "max": 300,
+    "value": 60,
+    "step": 5
+   },
+   {
+    "id": "body",
+    "label": "Tokens per skill body",
+    "min": 300,
+    "max": 12000,
+    "value": 2500,
+    "step": 100
+   },
+   {
+    "id": "used",
+    "label": "Skills used in one task",
+    "min": 0,
+    "max": 6,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "window",
+    "label": "Context window",
+    "min": 50000,
+    "max": 1000000,
+    "value": 200000,
+    "step": 10000,
+    "unit": "tokens"
+   }
+  ],
+  "vars": [
+   [
+    "base",
+    "skills * desc"
+   ],
+   [
+    "load",
+    "used * body"
+   ],
+   [
+    "sum",
+    "base + load"
+   ],
+   [
+    "share",
+    "sum / window"
+   ],
+   [
+    "bloat",
+    "body > 5000"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "d",
+    "label": "Descriptions",
+    "x": 0,
+    "y": 0,
+    "state": "base>window*0.05 ? 2 : (base>window*0.02 ? 1 : 0)",
+    "sub": "skills + ' x ' + desc + ' = ' + round(base)"
+   },
+   {
+    "id": "b",
+    "label": "Bodies loaded",
+    "x": 1,
+    "y": 0,
+    "state": "load>window*0.1 ? 1 : 0",
+    "sub": "used + ' x ' + body + ' = ' + round(load)"
+   },
+   {
+    "id": "r",
+    "label": "Context used",
+    "x": 2,
+    "y": 0,
+    "state": "share>0.2 ? 2 : (share>0.1 ? 1 : 0)",
+    "sub": "pct(share, 1) + ' of the window'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "d",
+    "to": "b",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "b",
+    "to": "r",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Always loaded",
+    "expr": "base",
+    "dp": 0,
+    "unit": "tokens"
+   },
+   {
+    "label": "Loaded for this task",
+    "expr": "load",
+    "dp": 0,
+    "unit": "tokens"
+   },
+   {
+    "label": "Share of the window",
+    "expr": "pct(share, 1)",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "share > 0.2",
+    "tone": "bad",
+    "text": "Skills take a fifth of the window before the task has started. Cut descriptions, split big bodies into reference files, and remove skills you do not use."
+   },
+   {
+    "when": "base > window * 0.02 || bloat",
+    "tone": "warn",
+    "text": "Either many descriptions or very large bodies. Move detail into files that load only when needed."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Descriptions are cheap and bodies load on demand, which is the point of progressive disclosure."
+   }
+  ],
+  "tries": [
+   "Install 200 skills with long descriptions.",
+   "Shrink each body, moving detail to reference files.",
+   "Use more skills in one task and see the load grow."
+  ],
+  "chart": {
+   "x": "skills",
+   "y": "100 * (skills * desc + used * body) / window",
+   "xlabel": "Installed skills",
+   "ylabel": "Share of window (%)",
+   "title": "Context use against skills installed",
+   "min": 0
+  }
+ },
+ {
+  "id": "skill-trigger-eval",
+  "module": "claude-skills",
+  "lesson": "claude-skills/testing-and-evaluating-a-skill",
+  "title": "Trigger evaluation",
+  "summary": "Test prompts that should trigger a skill and prompts that should not. See precision and recall from your counts.",
+  "inputs": [
+   {
+    "id": "pos",
+    "label": "Prompts that should trigger it",
+    "min": 5,
+    "max": 60,
+    "value": 20,
+    "step": 1
+   },
+   {
+    "id": "tp",
+    "label": "Of those, it triggered",
+    "min": 0,
+    "max": 60,
+    "value": 16,
+    "step": 1
+   },
+   {
+    "id": "neg",
+    "label": "Prompts that should not trigger it",
+    "min": 5,
+    "max": 60,
+    "value": 20,
+    "step": 1
+   },
+   {
+    "id": "fp",
+    "label": "Of those, it triggered anyway",
+    "min": 0,
+    "max": 60,
+    "value": 3,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "t",
+    "min(tp, pos)"
+   ],
+   [
+    "f",
+    "min(fp, neg)"
+   ],
+   [
+    "recall",
+    "t / pos"
+   ],
+   [
+    "prec",
+    "t + f > 0 ? t / (t + f) : 0"
+   ],
+   [
+    "f1",
+    "recall + prec > 0 ? 2 * recall * prec / (recall + prec) : 0"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "p",
+    "label": "Should trigger",
+    "x": 0,
+    "y": 0,
+    "state": "recall<0.7 ? 2 : (recall<0.9 ? 1 : 0)",
+    "sub": "t + ' of ' + pos + ' triggered'"
+   },
+   {
+    "id": "s",
+    "label": "Skill description",
+    "x": 1,
+    "y": 0,
+    "state": "prec<0.8 || recall<0.8 ? 1 : 0",
+    "sub": "'F1 ' + fmt(f1, 2)"
+   },
+   {
+    "id": "n",
+    "label": "Should not trigger",
+    "x": 2,
+    "y": 0,
+    "state": "f>neg*0.2 ? 2 : (f>0 ? 1 : 0)",
+    "sub": "f + ' of ' + neg + ' triggered'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "p",
+    "to": "s",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "s",
+    "to": "n",
+    "flow": "0.5",
+    "bad": "f>neg*0.2"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Recall, triggers when it should",
+    "expr": "pct(recall, 0)",
+    "dp": 0
+   },
+   {
+    "label": "Precision, correct when it triggers",
+    "expr": "pct(prec, 0)",
+    "dp": 0
+   },
+   {
+    "label": "Balance of the two (F1)",
+    "expr": "f1",
+    "dp": 2
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "recall < 0.7",
+    "tone": "bad",
+    "text": "The skill often fails to trigger when needed. Make the description say what the user will ask for, in their words."
+   },
+   {
+    "when": "prec < 0.8",
+    "tone": "warn",
+    "text": "It triggers on unrelated prompts. Narrow the description and say when not to use it."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "It triggers when it should and mostly stays quiet otherwise."
+   }
+  ],
+  "tries": [
+   "Lower the triggered count of positive prompts.",
+   "Raise false triggers.",
+   "Find the point where both are high."
+  ]
+ },
+ {
+  "id": "skill-scripts-reliability",
+  "module": "claude-skills",
+  "lesson": "claude-skills/scripts-and-deterministic-steps",
+  "title": "Scripts versus model steps",
+  "summary": "Every step a model must get right multiplies the chance of error. See what moving steps into scripts does to end-to-end reliability.",
+  "inputs": [
+   {
+    "id": "steps",
+    "label": "Steps in the workflow",
+    "min": 2,
+    "max": 30,
+    "value": 10,
+    "step": 1
+   },
+   {
+    "id": "pm",
+    "label": "Chance a model step is right",
+    "min": 70,
+    "max": 99.9,
+    "value": 95,
+    "step": 0.1,
+    "unit": "%"
+   },
+   {
+    "id": "scripted",
+    "label": "Steps moved into scripts",
+    "min": 0,
+    "max": 30,
+    "value": 0,
+    "step": 1
+   },
+   {
+    "id": "ps",
+    "label": "Chance a script step is right",
+    "min": 95,
+    "max": 100,
+    "value": 99.9,
+    "step": 0.1,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "s",
+    "min(scripted, steps)"
+   ],
+   [
+    "m",
+    "steps - s"
+   ],
+   [
+    "all",
+    "pow(pm/100, m) * pow(ps/100, s)"
+   ],
+   [
+    "allmodel",
+    "pow(pm/100, steps)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "m",
+    "label": "Model steps",
+    "x": 0,
+    "y": 0,
+    "state": "m>6 ? 1 : 0",
+    "sub": "m + ' steps at ' + pm + '%'"
+   },
+   {
+    "id": "s",
+    "label": "Script steps",
+    "x": 1,
+    "y": 0,
+    "state": "0",
+    "sub": "s + ' steps at ' + ps + '%'"
+   },
+   {
+    "id": "r",
+    "label": "End to end",
+    "x": 2,
+    "y": 0,
+    "state": "all<0.7 ? 2 : (all<0.9 ? 1 : 0)",
+    "sub": "pct(all, 0) + \" correct\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "m",
+    "to": "s",
+    "flow": "0.6",
+    "bad": "false"
+   },
+   {
+    "from": "s",
+    "to": "r",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Chance the whole workflow is right",
+    "expr": "pct(all, 0)",
+    "dp": 0
+   },
+   {
+    "label": "With every step done by the model",
+    "expr": "pct(allmodel, 0)",
+    "dp": 0
+   },
+   {
+    "label": "Failures per 100 runs",
+    "expr": "100 * (1 - all)",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "all < 0.7",
+    "tone": "bad",
+    "text": "Errors compound across steps. Move the mechanical, checkable steps into scripts and keep the model for judgement."
+   },
+   {
+    "when": "all < 0.9",
+    "tone": "warn",
+    "text": "Better, but one run in ten still fails."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Scripts carry the deterministic steps, so most runs finish right."
+   }
+  ],
+  "tries": [
+   "Use 20 steps at 95 percent with no scripts.",
+   "Move 15 steps to scripts.",
+   "Raise model accuracy and see how little it helps over a long chain."
+  ],
+  "chart": {
+   "x": "scripted",
+   "y": "100 * pow(pm/100, steps - min(scripted, steps)) * pow(ps/100, min(scripted, steps))",
+   "xlabel": "Steps moved into scripts",
+   "ylabel": "Chance the workflow is right (%)",
+   "title": "Reliability against scripted steps",
+   "min": 0,
+   "max": 100
+  }
+ },
+ {
+  "id": "skill-supply-risk",
+  "module": "claude-skills",
+  "lesson": "claude-skills/sharing-versioning-and-skill-security",
+  "title": "Skill supply chain risk",
+  "summary": "Skills can run scripts and tell the model what to do. See how unreviewed skills from unknown sources raise the number of risky ones.",
+  "inputs": [
+   {
+    "id": "skills",
+    "label": "Skills installed",
+    "min": 1,
+    "max": 100,
+    "value": 20,
+    "step": 1
+   },
+   {
+    "id": "unknown",
+    "label": "From sources you do not know",
+    "min": 0,
+    "max": 100,
+    "value": 40,
+    "step": 5,
+    "unit": "%"
+   },
+   {
+    "id": "reviewed",
+    "label": "Of those, reviewed by you",
+    "min": 0,
+    "max": 100,
+    "value": 25,
+    "step": 5,
+    "unit": "%"
+   },
+   {
+    "id": "net",
+    "label": "Scripts can reach the network",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "pin",
+    "label": "Versions are pinned",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "unk",
+    "skills * unknown/100"
+   ],
+   [
+    "risky",
+    "unk * (1 - reviewed/100)"
+   ],
+   [
+    "drift",
+    "pin ? 0 : unk * 0.3"
+   ],
+   [
+    "danger",
+    "risky * (net ? 2 : 1)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "s",
+    "label": "Installed skills",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "skills + ' skills'"
+   },
+   {
+    "id": "u",
+    "label": "Unreviewed, unknown",
+    "x": 1,
+    "y": 0,
+    "state": "risky>5 ? 2 : (risky>1 ? 1 : 0)",
+    "sub": "fmt(risky, 1) + ' skills'"
+   },
+   {
+    "id": "a",
+    "label": "Can act on your data",
+    "x": 2,
+    "y": 0,
+    "state": "net && risky>0 ? 2 : (risky>0 ? 1 : 0)",
+    "sub": "net ? 'with network access' : 'no network'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "s",
+    "to": "u",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "u",
+    "to": "a",
+    "flow": "net && risky>0 ? 1 : 0.4",
+    "bad": "net && risky>1"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "From unknown sources",
+    "expr": "unk",
+    "dp": 1
+   },
+   {
+    "label": "Unreviewed from unknown sources",
+    "expr": "risky",
+    "dp": 1
+   },
+   {
+    "label": "Skills that can change without you knowing",
+    "expr": "drift",
+    "dp": 1
+   },
+   {
+    "label": "Risk score",
+    "expr": "danger",
+    "dp": 1
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "net && risky > 5",
+    "tone": "bad",
+    "text": "Many unreviewed skills can run code and reach the network. Review before installing, pin versions, and block outbound network where you can."
+   },
+   {
+    "when": "risky > 1",
+    "tone": "warn",
+    "text": "Several skills have not been read by anyone you trust."
+   },
+   {
+    "when": "drift > 1",
+    "tone": "warn",
+    "text": "Unpinned skills can change after you reviewed them."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Most skills are known and reviewed."
+   }
+  ],
+  "tries": [
+   "Install many skills from unknown sources with network access.",
+   "Review them and pin versions.",
+   "Turn off network access for scripts."
+  ]
+ },
+ {
+  "id": "dr-strategy",
+  "module": "cloud",
+  "lesson": "cloud/high-availability-and-disaster-recovery",
+  "title": "Disaster recovery strategies",
+  "summary": "Four common strategies trade cost against recovery time and data loss. Pick one and compare it with what the business needs.",
+  "inputs": [
+   {
+    "id": "strat",
+    "label": "Strategy",
+    "type": "select",
+    "options": [
+     [
+      "0",
+      "Backup and restore"
+     ],
+     [
+      "1",
+      "Pilot light"
+     ],
+     [
+      "2",
+      "Warm standby"
+     ],
+     [
+      "3",
+      "Active-active"
+     ]
+    ],
+    "value": "1"
+   },
+   {
+    "id": "needrto",
+    "label": "Business can accept downtime of",
+    "min": 1,
+    "max": 480,
+    "value": 30,
+    "step": 1,
+    "unit": "min"
+   },
+   {
+    "id": "needrpo",
+    "label": "Business can accept data loss of",
+    "min": 0,
+    "max": 360,
+    "value": 5,
+    "step": 1,
+    "unit": "min"
+   }
+  ],
+  "vars": [
+   [
+    "k",
+    "+strat"
+   ],
+   [
+    "rto",
+    "k==0 ? 240 : (k==1 ? 60 : (k==2 ? 15 : 1))"
+   ],
+   [
+    "rpo",
+    "k==0 ? 360 : (k==1 ? 15 : (k==2 ? 5 : 0))"
+   ],
+   [
+    "cost",
+    "k==0 ? 1 : (k==1 ? 1.3 : (k==2 ? 1.8 : 2.2))"
+   ],
+   [
+    "okr",
+    "rto <= needrto"
+   ],
+   [
+    "okp",
+    "rpo <= needrpo"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n",
+    "label": "Business need",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "needrto + ' min down, ' + needrpo + ' min loss'"
+   },
+   {
+    "id": "s",
+    "label": "Strategy",
+    "x": 1,
+    "y": 0,
+    "state": "okr && okp ? 0 : 2",
+    "sub": "'recovers in about ' + rto + ' min'"
+   },
+   {
+    "id": "c",
+    "label": "Relative cost",
+    "x": 2,
+    "y": 0,
+    "state": "cost>1.7 ? 1 : 0",
+    "sub": "\"about \" + fmt(cost, 1) + \"x of one region\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "n",
+    "to": "s",
+    "flow": "0.7",
+    "bad": "!(okr && okp)"
+   },
+   {
+    "from": "s",
+    "to": "c",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Typical recovery time",
+    "expr": "rto",
+    "dp": 0,
+    "unit": "min"
+   },
+   {
+    "label": "Typical data loss",
+    "expr": "rpo",
+    "dp": 0,
+    "unit": "min"
+   },
+   {
+    "label": "Relative cost",
+    "expr": "cost",
+    "dp": 1,
+    "unit": "x"
+   },
+   {
+    "label": "Meets the need",
+    "expr": "okr && okp ? \"yes\" : \"no\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!okr && !okp",
+    "tone": "bad",
+    "text": "Too slow to recover and too much data lost for this need. Choose a stronger strategy."
+   },
+   {
+    "when": "!okr",
+    "tone": "bad",
+    "text": "Recovery takes longer than the business can accept."
+   },
+   {
+    "when": "!okp",
+    "tone": "bad",
+    "text": "More data would be lost than the business can accept."
+   },
+   {
+    "when": "cost > 1.7",
+    "tone": "warn",
+    "text": "It meets the need, and it costs a lot. Check that the need justifies it."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "It meets the need at a modest cost. Test the recovery to prove it."
+   }
+  ],
+  "tries": [
+   "Pick backup and restore with a 30 minute need.",
+   "Pick warm standby.",
+   "Lower the accepted loss to zero."
+  ]
+ },
+ {
+  "id": "commitment-breakeven",
+  "module": "cloud",
+  "lesson": "cloud/managed-services-and-cost",
+  "title": "Commitment break-even",
+  "summary": "A commitment is cheaper per hour but paid whether you use it or not. See where it beats on-demand pricing.",
+  "inputs": [
+   {
+    "id": "use",
+    "label": "Share of the time the resource runs",
+    "min": 5,
+    "max": 100,
+    "value": 70,
+    "step": 5,
+    "unit": "%"
+   },
+   {
+    "id": "disc",
+    "label": "Commitment discount",
+    "min": 10,
+    "max": 70,
+    "value": 40,
+    "step": 5,
+    "unit": "%"
+   },
+   {
+    "id": "hourly",
+    "label": "On-demand price per hour",
+    "min": 0.05,
+    "max": 5,
+    "value": 0.5,
+    "step": 0.05,
+    "unit": "$"
+   }
+  ],
+  "vars": [
+   [
+    "od",
+    "hourly * 730 * use/100"
+   ],
+   [
+    "cm",
+    "hourly * 730 * (1 - disc/100)"
+   ],
+   [
+    "be",
+    "(1 - disc/100) * 100"
+   ],
+   [
+    "save",
+    "od - cm"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "u",
+    "label": "Usage",
+    "x": 0,
+    "y": 0,
+    "state": "use<be ? 1 : 0",
+    "sub": "use + '% of the month'"
+   },
+   {
+    "id": "o",
+    "label": "On demand",
+    "x": 1,
+    "y": 0,
+    "state": "0",
+    "sub": "'$' + fmt(od, 0) + ' a month'"
+   },
+   {
+    "id": "c",
+    "label": "Commitment",
+    "x": 2,
+    "y": 0,
+    "state": "use<be ? 2 : 0",
+    "sub": "'$' + fmt(cm, 0) + ' a month'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "u",
+    "to": "o",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "o",
+    "to": "c",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "On-demand monthly cost",
+    "expr": "od",
+    "dp": 0,
+    "unit": "$"
+   },
+   {
+    "label": "Committed monthly cost",
+    "expr": "cm",
+    "dp": 0,
+    "unit": "$"
+   },
+   {
+    "label": "Break-even usage",
+    "expr": "be",
+    "dp": 0,
+    "unit": "%"
+   },
+   {
+    "label": "Saving from committing",
+    "expr": "save",
+    "dp": 0,
+    "unit": "$"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "use < be",
+    "tone": "bad",
+    "text": "Below the break-even you pay for capacity you do not use. On-demand is cheaper."
+   },
+   {
+    "when": "use < be + 10",
+    "tone": "warn",
+    "text": "Close to the break-even. A small drop in usage turns the saving into a loss."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Steady usage well above the break-even makes the commitment worth it."
+   }
+  ],
+  "tries": [
+   "Set usage to 40 percent with a 40 percent discount.",
+   "Raise the discount.",
+   "Commit only to the steady base load."
+  ],
+  "chart": {
+   "x": "use",
+   "y": "hourly * 730 * use/100",
+   "y2": "hourly * 730 * (1 - disc/100)",
+   "xlabel": "Share of the month running (%)",
+   "ylabel": "On-demand cost ($)",
+   "y2label": "Committed cost ($)",
+   "title": "Cost against usage",
+   "min": 0
+  }
+ },
+ {
+  "id": "cdn-hit-ratio",
+  "module": "cloud",
+  "lesson": "cloud/dns-and-cdn",
+  "title": "CDN cache hit ratio",
+  "summary": "A CDN answers from the edge when it has the object. See how the hit ratio changes origin load and average latency.",
+  "inputs": [
+   {
+    "id": "rps",
+    "label": "Requests",
+    "min": 100,
+    "max": 50000,
+    "value": 5000,
+    "step": 100,
+    "unit": "req/s"
+   },
+   {
+    "id": "hit",
+    "label": "Cache hit ratio",
+    "min": 0,
+    "max": 100,
+    "value": 90,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "edge",
+    "label": "Edge latency",
+    "min": 5,
+    "max": 100,
+    "value": 20,
+    "step": 1,
+    "unit": "ms"
+   },
+   {
+    "id": "origin",
+    "label": "Origin latency",
+    "min": 50,
+    "max": 1500,
+    "value": 300,
+    "step": 10,
+    "unit": "ms"
+   },
+   {
+    "id": "purge",
+    "label": "A full cache purge just happened",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "h",
+    "purge ? hit * 0.1 : hit"
+   ],
+   [
+    "miss",
+    "rps * (1 - h/100)"
+   ],
+   [
+    "avg",
+    "h/100 * edge + (1 - h/100) * origin"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "u",
+    "label": "Users",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "rps + ' req/s'"
+   },
+   {
+    "id": "e",
+    "label": "Edge cache",
+    "x": 1,
+    "y": 0,
+    "state": "purge ? 1 : 0",
+    "sub": "fmt(h, 0) + '% hit'"
+   },
+   {
+    "id": "o",
+    "label": "Origin",
+    "x": 2,
+    "y": 0,
+    "state": "miss>2000 ? 2 : (miss>800 ? 1 : 0)",
+    "sub": "round(miss) + ' req/s reach it'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "u",
+    "to": "e",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "e",
+    "to": "o",
+    "flow": "min(1, miss/3000 + 0.1)",
+    "bad": "miss>2000"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Requests reaching the origin",
+    "expr": "miss",
+    "dp": 0,
+    "unit": "req/s"
+   },
+   {
+    "label": "Average latency",
+    "expr": "avg",
+    "dp": 0,
+    "unit": "ms"
+   },
+   {
+    "label": "Origin load multiplier",
+    "expr": "miss / (rps * 0.1)",
+    "dp": 1,
+    "unit": "x the 90 percent case"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "miss > 2000",
+    "tone": "bad",
+    "text": "The origin takes thousands of requests per second. A purge or a low hit ratio can overwhelm it. Warm the cache and shield the origin."
+   },
+   {
+    "when": "purge",
+    "tone": "warn",
+    "text": "After a purge the cache is cold and the origin takes the load until it refills."
+   },
+   {
+    "when": "h < 70",
+    "tone": "warn",
+    "text": "A low hit ratio. Check cache headers, query strings and cookies that split the cache."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The edge absorbs most requests."
+   }
+  ],
+  "tries": [
+   "Drop the hit ratio to 50 percent.",
+   "Purge the cache.",
+   "Raise hit ratio and see the origin load fall."
+  ],
+  "chart": {
+   "x": "hit",
+   "y": "rps * (1 - hit/100)",
+   "xlabel": "Hit ratio (%)",
+   "ylabel": "Requests reaching origin (req/s)",
+   "title": "Origin load against hit ratio",
+   "min": 0
+  }
+ },
+ {
+  "id": "serverless-cold-starts",
+  "module": "cloud",
+  "lesson": "cloud/serverless",
+  "title": "Serverless cold starts",
+  "summary": "A burst of requests needs more instances than are warm. See how many requests pay the cold start and what provisioned concurrency does.",
+  "inputs": [
+   {
+    "id": "rps",
+    "label": "Requests per second in the burst",
+    "min": 1,
+    "max": 3000,
+    "value": 400,
+    "step": 1,
+    "unit": "req/s"
+   },
+   {
+    "id": "dur",
+    "label": "Duration of one invocation",
+    "min": 10,
+    "max": 5000,
+    "value": 200,
+    "step": 10,
+    "unit": "ms"
+   },
+   {
+    "id": "cold",
+    "label": "Cold start time",
+    "min": 100,
+    "max": 5000,
+    "value": 900,
+    "step": 50,
+    "unit": "ms"
+   },
+   {
+    "id": "prov",
+    "label": "Provisioned warm instances",
+    "min": 0,
+    "max": 500,
+    "value": 0,
+    "step": 5
+   }
+  ],
+  "vars": [
+   [
+    "conc",
+    "rps * dur / 1000"
+   ],
+   [
+    "coldshare",
+    "conc > 0 ? max(0, conc - prov) / conc : 0"
+   ],
+   [
+    "extra",
+    "coldshare * cold"
+   ],
+   [
+    "p99",
+    "dur + (coldshare > 0.01 ? cold : 0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "r",
+    "label": "Burst",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "rps + ' req/s'"
+   },
+   {
+    "id": "w",
+    "label": "Warm instances",
+    "x": 1,
+    "y": 0,
+    "state": "coldshare>0.3 ? 2 : (coldshare>0.01 ? 1 : 0)",
+    "sub": "round(conc) + ' needed, ' + prov + ' provisioned'"
+   },
+   {
+    "id": "l",
+    "label": "Latency",
+    "x": 2,
+    "y": 0,
+    "state": "coldshare>0.3 ? 2 : (coldshare>0.01 ? 1 : 0)",
+    "sub": "'slowest ' + round(p99) + ' ms'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "r",
+    "to": "w",
+    "flow": "min(1, rps/1500 + 0.2)",
+    "bad": "false"
+   },
+   {
+    "from": "w",
+    "to": "l",
+    "flow": "0.7",
+    "bad": "coldshare>0.3"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Instances needed at once",
+    "expr": "conc",
+    "dp": 0
+   },
+   {
+    "label": "Requests that hit a cold start",
+    "expr": "pct(coldshare, 0)",
+    "dp": 0
+   },
+   {
+    "label": "Slowest request",
+    "expr": "p99",
+    "dp": 0,
+    "unit": "ms"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "coldshare > 0.3",
+    "tone": "bad",
+    "text": "Most of the burst lands on cold instances, so many users wait for a start. Provision warm capacity for the burst or shrink the start time."
+   },
+   {
+    "when": "coldshare > 0.01",
+    "tone": "warn",
+    "text": "Some requests are slow because there were not enough warm instances."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Provisioned instances cover the burst, so nobody waits for a cold start."
+   }
+  ],
+  "tries": [
+   "Start with a 400 req/s burst and no provisioned instances.",
+   "Add provisioned instances.",
+   "Make invocations shorter and see fewer instances needed."
+  ],
+  "chart": {
+   "x": "prov",
+   "y": "100 * max(0, rps * dur / 1000 - prov) / (rps * dur / 1000)",
+   "xlabel": "Provisioned instances",
+   "ylabel": "Requests that hit a cold start (%)",
+   "title": "Cold starts against provisioning",
+   "min": 0,
+   "max": 100
+  }
+ },
+ {
+  "id": "iam-evaluation",
+  "module": "cloud-iam",
+  "lesson": "cloud-iam/aws-iam-policies-roles-and-assume-role",
+  "title": "Permission evaluation",
+  "summary": "Several policies apply to one request. See how allow, deny and boundaries combine to decide the result.",
+  "inputs": [
+   {
+    "id": "ident",
+    "label": "An identity policy allows the action",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "res",
+    "label": "A resource policy also allows it",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "bound",
+    "label": "The permissions boundary or organisation limit allows it",
+    "type": "toggle",
+    "value": true
+   },
+   {
+    "id": "deny",
+    "label": "Some policy explicitly denies it",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "grant",
+    "ident || res"
+   ],
+   [
+    "allowed",
+    "grant && bound && !deny"
+   ],
+   [
+    "why",
+    "deny ? \"an explicit deny always wins\" : (!bound ? \"the boundary does not allow it\" : (!grant ? \"nothing allows it, so it is denied by default\" : \"an allow applies and nothing blocks it\"))"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "p",
+    "label": "Allows",
+    "x": 0,
+    "y": 0,
+    "state": "grant ? 0 : 1",
+    "sub": "ident ? 'identity' : (res ? 'resource' : 'none')"
+   },
+   {
+    "id": "g",
+    "label": "Limits and denies",
+    "x": 1,
+    "y": 0,
+    "state": "deny || !bound ? 2 : 0",
+    "sub": "deny ? 'explicit deny' : (bound ? 'within limits' : 'blocked by limit')"
+   },
+   {
+    "id": "r",
+    "label": "Request",
+    "x": 2,
+    "y": 0,
+    "state": "allowed ? 0 : 2",
+    "sub": "allowed ? 'allowed' : 'denied'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "p",
+    "to": "g",
+    "flow": "grant ? 0.8 : 0",
+    "bad": "false"
+   },
+   {
+    "from": "g",
+    "to": "r",
+    "flow": "allowed ? 0.8 : 0",
+    "bad": "!allowed"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Result",
+    "expr": "allowed ? \"allowed\" : \"denied\"",
+    "dp": 0
+   },
+   {
+    "label": "Reason",
+    "expr": "why",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "deny",
+    "tone": "bad",
+    "text": "An explicit deny beats every allow, so the request is denied however many policies allow it."
+   },
+   {
+    "when": "!bound",
+    "tone": "bad",
+    "text": "A boundary or organisation limit sets the maximum. An allow outside it does nothing."
+   },
+   {
+    "when": "!grant",
+    "tone": "bad",
+    "text": "Nothing allows the action. Access is denied by default."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "At least one allow applies and nothing blocks it."
+   }
+  ],
+  "tries": [
+   "Turn on allows and add an explicit deny.",
+   "Remove the boundary.",
+   "Remove all allows."
+  ]
+ },
+ {
+  "id": "permission-creep",
+  "module": "cloud-iam",
+  "lesson": "cloud-iam/least-privilege-and-access-reviews",
+  "title": "Permission creep and reviews",
+  "summary": "People gain access over time and rarely lose it. See how the gap between granted and used permissions grows between reviews.",
+  "inputs": [
+   {
+    "id": "base",
+    "label": "Permissions a person needs",
+    "min": 5,
+    "max": 100,
+    "value": 30,
+    "step": 1
+   },
+   {
+    "id": "creep",
+    "label": "New permissions added per month",
+    "min": 0,
+    "max": 10,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "review",
+    "label": "Months between reviews",
+    "min": 1,
+    "max": 24,
+    "value": 6,
+    "step": 1
+   },
+   {
+    "id": "cut",
+    "label": "Share of unused permissions removed at review",
+    "min": 0,
+    "max": 100,
+    "value": 80,
+    "step": 5,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "peak",
+    "creep * review"
+   ],
+   [
+    "after",
+    "peak * (1 - cut/100)"
+   ],
+   [
+    "avgx",
+    "(peak + after) / 2"
+   ],
+   [
+    "ratio",
+    "(base + peak) / base"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n",
+    "label": "Needed",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "base + ' permissions'"
+   },
+   {
+    "id": "g",
+    "label": "Granted before review",
+    "x": 1,
+    "y": 0,
+    "state": "ratio>2 ? 2 : (ratio>1.4 ? 1 : 0)",
+    "sub": "round(base + peak) + ' permissions'"
+   },
+   {
+    "id": "r",
+    "label": "After review",
+    "x": 2,
+    "y": 0,
+    "state": "after>base*0.2 ? 1 : 0",
+    "sub": "round(base + after) + ' permissions'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n",
+    "to": "g",
+    "flow": "0.7",
+    "bad": "ratio>2"
+   },
+   {
+    "from": "g",
+    "to": "r",
+    "flow": "0.6",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Extra permissions at the peak",
+    "expr": "peak",
+    "dp": 0
+   },
+   {
+    "label": "Granted compared with needed",
+    "expr": "ratio",
+    "dp": 1,
+    "unit": "x"
+   },
+   {
+    "label": "Left over after the review",
+    "expr": "after",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "ratio > 2",
+    "tone": "bad",
+    "text": "Granted access is more than twice what is used. Every extra permission widens what a stolen account can do. Review more often and remove unused access."
+   },
+   {
+    "when": "after > base * 0.2",
+    "tone": "warn",
+    "text": "Reviews leave a lot behind. Base removals on usage data, not on memory."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Frequent reviews keep granted access close to what is needed."
+   }
+  ],
+  "tries": [
+   "Set 24 months between reviews.",
+   "Review every month.",
+   "Lower the share removed."
+  ],
+  "chart": {
+   "x": "review",
+   "y": "creep * review",
+   "xlabel": "Months between reviews",
+   "ylabel": "Extra permissions at the peak",
+   "title": "Creep against review interval",
+   "min": 0
+  }
+ },
+ {
+  "id": "kms-throttling",
+  "module": "cloud-iam",
+  "lesson": "cloud-iam/secrets-and-encryption-with-kms-and-key-vaults",
+  "title": "Key service load and data key caching",
+  "summary": "Envelope encryption calls the key service to get data keys. See how caching keys keeps you under the service limit.",
+  "inputs": [
+   {
+    "id": "reads",
+    "label": "Decrypt operations",
+    "min": 10,
+    "max": 20000,
+    "value": 3000,
+    "step": 10,
+    "unit": "per s"
+   },
+   {
+    "id": "cache",
+    "label": "Operations served by a cached data key",
+    "min": 0,
+    "max": 99,
+    "value": 0,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "limit",
+    "label": "Key service limit",
+    "min": 100,
+    "max": 10000,
+    "value": 1000,
+    "step": 100,
+    "unit": "per s"
+   },
+   {
+    "id": "burst",
+    "label": "A traffic spike doubles the load",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "load",
+    "reads * (burst ? 2 : 1)"
+   ],
+   [
+    "calls",
+    "load * (1 - cache/100)"
+   ],
+   [
+    "use",
+    "calls / limit"
+   ],
+   [
+    "thr",
+    "max(0, calls - limit)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "label": "Application",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(load) + ' ops per s'"
+   },
+   {
+    "id": "c",
+    "label": "Data key cache",
+    "x": 1,
+    "y": 0,
+    "state": "cache>0 ? 0 : 1",
+    "sub": "cache + '% served locally'"
+   },
+   {
+    "id": "k",
+    "label": "Key service",
+    "x": 2,
+    "y": 0,
+    "state": "use>1 ? 2 : (use>0.7 ? 1 : 0)",
+    "sub": "round(calls) + ' calls per s'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "a",
+    "to": "c",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "c",
+    "to": "k",
+    "flow": "min(1, use + 0.1)",
+    "bad": "use>1"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Calls to the key service",
+    "expr": "calls",
+    "dp": 0,
+    "unit": "per s"
+   },
+   {
+    "label": "Share of the limit",
+    "expr": "pct(use, 0)",
+    "dp": 0
+   },
+   {
+    "label": "Calls throttled",
+    "expr": "thr",
+    "dp": 0,
+    "unit": "per s"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "use > 1",
+    "tone": "bad",
+    "text": "The key service throttles you, so decrypts fail or retry and the application slows down. Cache data keys for a short time and reuse them."
+   },
+   {
+    "when": "use > 0.7",
+    "tone": "warn",
+    "text": "Close to the limit. A spike will throttle you."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Cached keys keep calls well under the limit."
+   }
+  ],
+  "tries": [
+   "Turn off caching at 3000 operations per second.",
+   "Cache 90 percent.",
+   "Add the spike."
+  ],
+  "chart": {
+   "x": "cache",
+   "y": "load * (1 - cache/100)",
+   "y2": "limit",
+   "xlabel": "Cached share (%)",
+   "ylabel": "Key service calls per second",
+   "y2label": "Limit",
+   "title": "Key service calls against caching",
+   "min": 0
+  }
+ },
+ {
+  "id": "credential-exposure",
+  "module": "cloud-iam",
+  "lesson": "cloud-iam/identities-principals-and-permissions",
+  "title": "Credential lifetime and exposure",
+  "summary": "A leaked credential works until it expires or is revoked. See how short-lived tokens shrink the window compared with a static key.",
+  "inputs": [
+   {
+    "id": "life",
+    "label": "Credential lifetime",
+    "min": 0.25,
+    "max": 720,
+    "value": 12,
+    "step": 0.25,
+    "unit": "hours"
+   },
+   {
+    "id": "detect",
+    "label": "Time to notice a leak",
+    "min": 0.1,
+    "max": 240,
+    "value": 24,
+    "step": 0.1,
+    "unit": "hours"
+   },
+   {
+    "id": "fix",
+    "label": "Time to revoke after noticing",
+    "min": 0.1,
+    "max": 48,
+    "value": 2,
+    "step": 0.1,
+    "unit": "hours"
+   },
+   {
+    "id": "stat",
+    "label": "A static key that never expires",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "window",
+    "stat ? detect + fix : min(life, detect + fix)"
+   ],
+   [
+    "saved",
+    "detect + fix - window"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Credential",
+    "x": 0,
+    "y": 0,
+    "state": "stat ? 2 : (life>24 ? 1 : 0)",
+    "sub": "stat ? 'never expires' : 'valid ' + life + ' h'"
+   },
+   {
+    "id": "a",
+    "label": "Attacker window",
+    "x": 1,
+    "y": 0,
+    "state": "window>24 ? 2 : (window>4 ? 1 : 0)",
+    "sub": "fmt(window, 1) + ' h'"
+   },
+   {
+    "id": "d",
+    "label": "Detection and revoke",
+    "x": 2,
+    "y": 0,
+    "state": "0",
+    "sub": "fmt(detect + fix, 1) + ' h'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "a",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "a",
+    "to": "d",
+    "flow": "0.7",
+    "bad": "window>24"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "How long a leaked credential works",
+    "expr": "window",
+    "dp": 1,
+    "unit": "h"
+   },
+   {
+    "label": "Time saved by expiry",
+    "expr": "saved",
+    "dp": 1,
+    "unit": "h"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "window > 24",
+    "tone": "bad",
+    "text": "The attacker has a day or more to use it. Use short-lived credentials from a role or workload identity instead of static keys."
+   },
+   {
+    "when": "window > 4",
+    "tone": "warn",
+    "text": "Several hours of access. Shorten the lifetime and speed up detection."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Expiry closes the window quickly, even if nobody notices the leak."
+   }
+  ],
+  "tries": [
+   "Use a static key with a day to detect.",
+   "Switch to a 1 hour token.",
+   "Shorten detection time to see the other lever."
+  ],
+  "chart": {
+   "x": "life",
+   "y": "min(life, detect + fix)",
+   "y2": "detect + fix",
+   "xlabel": "Credential lifetime (hours)",
+   "ylabel": "Attacker window (hours)",
+   "y2label": "Without expiry",
+   "title": "Window against lifetime",
+   "min": 0
+  }
+ },
+ {
+  "id": "index-selectivity",
+  "module": "databases",
+  "lesson": "databases/indexes-and-query-plans",
+  "title": "Index or full scan",
+  "summary": "An index helps when a query picks few rows. See where the cost of an index scan passes a full scan.",
+  "inputs": [
+   {
+    "id": "rows",
+    "label": "Rows in the table",
+    "min": 10000,
+    "max": 100000000,
+    "value": 5000000,
+    "step": 10000
+   },
+   {
+    "id": "sel",
+    "label": "Share of rows the query returns",
+    "min": 0.001,
+    "max": 50,
+    "value": 0.5,
+    "step": 0.001,
+    "unit": "%"
+   },
+   {
+    "id": "idx",
+    "label": "An index exists on the column",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "seq",
+    "rows / 100"
+   ],
+   [
+    "ix",
+    "log(rows) / log(2) + rows * sel/100 * 0.04"
+   ],
+   [
+    "best",
+    "idx ? min(seq, ix) : seq"
+   ],
+   [
+    "useidx",
+    "idx && ix < seq"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "q",
+    "label": "Query",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "pct(sel/100, 3) + ' of rows'"
+   },
+   {
+    "id": "p",
+    "label": "Plan",
+    "x": 1,
+    "y": 0,
+    "state": "!idx && sel<1 ? 2 : 0",
+    "sub": "useidx ? 'index scan' : 'full table scan'"
+   },
+   {
+    "id": "c",
+    "label": "Cost",
+    "x": 2,
+    "y": 0,
+    "state": "best>seq*0.5 ? 1 : 0",
+    "sub": "round(best) + ' units'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "q",
+    "to": "p",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "p",
+    "to": "c",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Full scan cost",
+    "expr": "seq",
+    "dp": 0,
+    "unit": "units"
+   },
+   {
+    "label": "Index scan cost",
+    "expr": "ix",
+    "dp": 0,
+    "unit": "units"
+   },
+   {
+    "label": "Plan chosen",
+    "expr": "useidx ? \"index\" : \"full scan\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!idx && sel < 1",
+    "tone": "bad",
+    "text": "There is no index and the query wants very few rows, so the database reads the whole table to find them. Add an index."
+   },
+   {
+    "when": "idx && !useidx",
+    "tone": "warn",
+    "text": "The index exists, but the query returns so many rows that reading the table straight through is cheaper, so the planner ignores the index."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The plan matches the query."
+   }
+  ],
+  "tries": [
+   "Query 0.1 percent of 5 million rows with no index.",
+   "Add the index.",
+   "Raise the share to 30 percent."
+  ],
+  "chart": {
+   "x": "sel",
+   "y": "log(rows) / log(2) + rows * sel/100 * 0.04",
+   "y2": "rows / 100",
+   "xlabel": "Share of rows returned (%)",
+   "ylabel": "Index scan cost",
+   "y2label": "Full scan cost",
+   "title": "Index against full scan",
+   "min": 0
+  }
+ },
+ {
+  "id": "connection-pool-sizing",
+  "module": "databases",
+  "lesson": "databases/performance-and-connection-pooling",
+  "title": "Connection pool sizing",
+  "summary": "Many app instances each hold a pool. See when the total passes the database limit and how many connections the load really needs.",
+  "inputs": [
+   {
+    "id": "inst",
+    "label": "App instances",
+    "min": 1,
+    "max": 200,
+    "value": 30,
+    "step": 1
+   },
+   {
+    "id": "pool",
+    "label": "Pool size per instance",
+    "min": 1,
+    "max": 100,
+    "value": 20,
+    "step": 1
+   },
+   {
+    "id": "max",
+    "label": "Database connection limit",
+    "min": 50,
+    "max": 1000,
+    "value": 200,
+    "step": 10
+   },
+   {
+    "id": "qps",
+    "label": "Queries per second in total",
+    "min": 50,
+    "max": 20000,
+    "value": 3000,
+    "step": 50
+   },
+   {
+    "id": "ms",
+    "label": "Average query time",
+    "min": 1,
+    "max": 500,
+    "value": 15,
+    "step": 1,
+    "unit": "ms"
+   }
+  ],
+  "vars": [
+   [
+    "total",
+    "inst * pool"
+   ],
+   [
+    "need",
+    "ceil(qps * ms / 1000)"
+   ],
+   [
+    "over",
+    "total > max"
+   ],
+   [
+    "useful",
+    "need / total"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "label": "App instances",
+    "x": 0,
+    "y": 0,
+    "state": "over ? 1 : 0",
+    "sub": "inst + ' x pool of ' + pool"
+   },
+   {
+    "id": "d",
+    "label": "Database",
+    "x": 1,
+    "y": 0,
+    "state": "over ? 2 : (total>max*0.8 ? 1 : 0)",
+    "sub": "total + ' of ' + max + ' connections'"
+   },
+   {
+    "id": "n",
+    "label": "Really needed",
+    "x": 2,
+    "y": 0,
+    "state": "need>max ? 2 : 0",
+    "sub": "need + ' busy at once'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "a",
+    "to": "d",
+    "flow": "min(1, total/max)",
+    "bad": "over"
+   },
+   {
+    "from": "d",
+    "to": "n",
+    "flow": "0.6",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Connections held in total",
+    "expr": "total",
+    "dp": 0
+   },
+   {
+    "label": "Connections busy at once",
+    "expr": "need",
+    "dp": 0
+   },
+   {
+    "label": "Share of pooled connections in use",
+    "expr": "pct(useful, 0)",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "over",
+    "tone": "bad",
+    "text": "The pools together hold more connections than the database allows, so new connections are refused when instances scale out. Lower the pool per instance or add a pooler in front."
+   },
+   {
+    "when": "need > max",
+    "tone": "bad",
+    "text": "Even perfectly shared, the load needs more connections than the limit allows. Speed up queries or add replicas."
+   },
+   {
+    "when": "useful < 0.1",
+    "tone": "warn",
+    "text": "Most connections sit idle yet still cost memory on the database. Shrink the pools."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The pools fit under the limit and match the load."
+   }
+  ],
+  "tries": [
+   "Scale instances to 100 with a pool of 20.",
+   "Shrink the pool.",
+   "Slow the queries down and see the needed connections rise."
+  ],
+  "chart": {
+   "x": "inst",
+   "y": "inst * pool",
+   "y2": "max",
+   "xlabel": "App instances",
+   "ylabel": "Connections held",
+   "y2label": "Database limit",
+   "title": "Connections against instances",
+   "min": 0
+  }
+ },
+ {
+  "id": "replication-lag-loss",
+  "module": "databases",
+  "lesson": "databases/replication-and-failover",
+  "title": "Replication lag and data loss",
+  "summary": "The primary fails and a replica takes over. See how much committed data is lost with asynchronous replication, and what synchronous costs.",
+  "inputs": [
+   {
+    "id": "tps",
+    "label": "Writes per second",
+    "min": 10,
+    "max": 5000,
+    "value": 500,
+    "step": 10,
+    "unit": "tx/s"
+   },
+   {
+    "id": "lag",
+    "label": "Replica lag",
+    "min": 0,
+    "max": 30,
+    "value": 2,
+    "step": 0.5,
+    "unit": "s"
+   },
+   {
+    "id": "rtt",
+    "label": "Round trip to the replica",
+    "min": 0.5,
+    "max": 100,
+    "value": 5,
+    "step": 0.5,
+    "unit": "ms"
+   },
+   {
+    "id": "sync",
+    "label": "Synchronous replication",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "lost",
+    "sync ? 0 : tps * lag"
+   ],
+   [
+    "commit",
+    "sync ? 1 + rtt : 1"
+   ],
+   [
+    "slow",
+    "sync ? commit : 1"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "p",
+    "label": "Primary fails",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "tps + ' tx/s'"
+   },
+   {
+    "id": "r",
+    "label": "Replica",
+    "x": 1,
+    "y": 0,
+    "state": "lost>0 ? 1 : 0",
+    "sub": "sync ? 'always caught up' : fmt(lag, 1) + ' s behind'"
+   },
+   {
+    "id": "d",
+    "label": "Data",
+    "x": 2,
+    "y": 0,
+    "state": "lost>1000 ? 2 : (lost>0 ? 1 : 0)",
+    "sub": "round(lost) + ' transactions lost'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "p",
+    "to": "r",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "r",
+    "to": "d",
+    "flow": "0.6",
+    "bad": "lost>0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Committed transactions lost at failover",
+    "expr": "lost",
+    "dp": 0
+   },
+   {
+    "label": "Commit time",
+    "expr": "commit",
+    "dp": 1,
+    "unit": "ms"
+   },
+   {
+    "label": "Slower commits than without a replica wait",
+    "expr": "slow",
+    "dp": 1,
+    "unit": "x"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "lost > 1000",
+    "tone": "bad",
+    "text": "Thousands of acknowledged transactions vanish at failover. If that is not acceptable, use synchronous replication or a quorum commit."
+   },
+   {
+    "when": "lost > 0",
+    "tone": "warn",
+    "text": "Some acknowledged writes are lost. Know your lag and decide whether that is acceptable."
+   },
+   {
+    "when": "sync",
+    "tone": "good",
+    "text": "No acknowledged write is lost. The price is that every commit waits for the replica."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The replica keeps up."
+   }
+  ],
+  "tries": [
+   "Fail over with 5 seconds of lag at 1000 writes per second.",
+   "Turn on synchronous replication.",
+   "Raise the round trip time and watch commit time grow."
+  ],
+  "chart": {
+   "x": "lag",
+   "y": "tps * lag",
+   "xlabel": "Replica lag (s)",
+   "ylabel": "Transactions lost",
+   "title": "Loss against lag (asynchronous)",
+   "min": 0
+  }
+ },
+ {
+  "id": "vacuum-bloat",
+  "module": "databases",
+  "lesson": "databases/postgres-vacuum-bloat-and-maintenance",
+  "title": "Dead rows and long transactions",
+  "summary": "Updates leave dead rows that vacuum cleans up. See how one long open transaction stops the cleanup and the table swells.",
+  "inputs": [
+   {
+    "id": "rows",
+    "label": "Live rows",
+    "min": 100000,
+    "max": 100000000,
+    "value": 5000000,
+    "step": 100000
+   },
+   {
+    "id": "upd",
+    "label": "Updates per hour",
+    "min": 1000,
+    "max": 5000000,
+    "value": 200000,
+    "step": 1000
+   },
+   {
+    "id": "open",
+    "label": "Longest open transaction",
+    "min": 0,
+    "max": 48,
+    "value": 0,
+    "step": 1,
+    "unit": "hours"
+   },
+   {
+    "id": "scale",
+    "label": "Vacuum trigger",
+    "min": 1,
+    "max": 50,
+    "value": 20,
+    "step": 1,
+    "unit": "% of rows dead"
+   }
+  ],
+  "vars": [
+   [
+    "blocked",
+    "open > 0"
+   ],
+   [
+    "dead",
+    "blocked ? upd * open : min(rows * scale/100, upd)"
+   ],
+   [
+    "bloat",
+    "dead / rows"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "t",
+    "label": "Updates",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(upd) + ' per hour'"
+   },
+   {
+    "id": "v",
+    "label": "Vacuum",
+    "x": 1,
+    "y": 0,
+    "state": "blocked ? 2 : 0",
+    "sub": "blocked ? \"held back by open transaction\" : \"cleans as it goes\""
+   },
+   {
+    "id": "b",
+    "label": "Dead rows",
+    "x": 2,
+    "y": 0,
+    "state": "bloat>0.5 ? 2 : (bloat>0.2 ? 1 : 0)",
+    "sub": "round(dead) + ' = ' + pct(bloat, 0) + ' of the table'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "t",
+    "to": "v",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "v",
+    "to": "b",
+    "flow": "blocked ? 0.2 : 0.7",
+    "bad": "blocked"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Dead rows waiting",
+    "expr": "dead",
+    "dp": 0
+   },
+   {
+    "label": "Table bloat",
+    "expr": "pct(bloat, 0)",
+    "dp": 0
+   },
+   {
+    "label": "Cleanup blocked",
+    "expr": "blocked ? \"yes, by an open transaction\" : \"no\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "bloat > 0.5",
+    "tone": "bad",
+    "text": "Half the table is dead rows. Scans read far more than they need and indexes swell. Find and end the long transaction, then vacuum."
+   },
+   {
+    "when": "blocked",
+    "tone": "warn",
+    "text": "An open transaction holds back cleanup. The bloat grows for as long as it stays open."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Vacuum keeps up with the updates."
+   }
+  ],
+  "tries": [
+   "Open a transaction for 12 hours.",
+   "Close it by setting the open time to zero.",
+   "Raise the update rate."
+  ],
+  "chart": {
+   "x": "open",
+   "y": "100 * (open > 0 ? upd * open : min(rows * scale/100, upd)) / rows",
+   "xlabel": "Hours the transaction stays open",
+   "ylabel": "Dead rows (% of table)",
+   "title": "Bloat against open transaction time",
+   "min": 0
+  }
+ },
+ {
+  "id": "goroutine-leak",
+  "module": "go",
+  "lesson": "go/goroutines-channels-and-sync",
+  "title": "Goroutine leaks",
+  "summary": "A goroutine waiting on a channel that nobody closes lives forever. See how a small leak per request becomes a memory problem.",
+  "inputs": [
+   {
+    "id": "rps",
+    "label": "Requests per second",
+    "min": 1,
+    "max": 2000,
+    "value": 200,
+    "step": 1
+   },
+   {
+    "id": "leak",
+    "label": "Requests that leak a goroutine",
+    "min": 0,
+    "max": 20,
+    "value": 1,
+    "step": 0.5,
+    "unit": "%"
+   },
+   {
+    "id": "hours",
+    "label": "Hours running",
+    "min": 1,
+    "max": 168,
+    "value": 24,
+    "step": 1
+   },
+   {
+    "id": "kb",
+    "label": "Memory per leaked goroutine",
+    "min": 2,
+    "max": 64,
+    "value": 8,
+    "step": 1,
+    "unit": "KB"
+   },
+   {
+    "id": "ctx",
+    "label": "Goroutines stop on context cancel",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "n",
+    "ctx ? 0 : rps * 3600 * hours * leak/100"
+   ],
+   [
+    "mb",
+    "n * kb / 1024"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "r",
+    "label": "Requests",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "rps + ' req/s'"
+   },
+   {
+    "id": "g",
+    "label": "Goroutines that never exit",
+    "x": 1,
+    "y": 0,
+    "state": "n>1000000 ? 2 : (n>10000 ? 1 : 0)",
+    "sub": "round(n) + ' leaked'"
+   },
+   {
+    "id": "m",
+    "label": "Memory",
+    "x": 2,
+    "y": 0,
+    "state": "mb>2000 ? 2 : (mb>200 ? 1 : 0)",
+    "sub": "round(mb) + ' MB'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "r",
+    "to": "g",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "g",
+    "to": "m",
+    "flow": "min(1, mb/2000 + 0.1)",
+    "bad": "n>10000"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Leaked goroutines",
+    "expr": "n",
+    "dp": 0
+   },
+   {
+    "label": "Memory held",
+    "expr": "mb",
+    "dp": 0,
+    "unit": "MB"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "mb > 2000",
+    "tone": "bad",
+    "text": "Gigabytes are held by goroutines that do nothing. The process grows until it is killed. Give every goroutine a way to stop, usually a context."
+   },
+   {
+    "when": "n > 10000",
+    "tone": "warn",
+    "text": "A steady climb in goroutine count. It looks like a leak, so watch it before it hurts."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Goroutines stop when their work is cancelled."
+   }
+  ],
+  "tries": [
+   "Leak 2 percent of requests for a week.",
+   "Turn on context cancellation.",
+   "Reduce the rate and see the slope."
+  ],
+  "chart": {
+   "x": "hours",
+   "y": "ctx ? 0 : rps * 3600 * hours * leak/100 * kb / 1024",
+   "xlabel": "Hours running",
+   "ylabel": "Memory leaked (MB)",
+   "title": "Leaked memory over time",
+   "min": 0
+  }
+ },
+ {
+  "id": "context-deadline",
+  "module": "go",
+  "lesson": "go/context-timeouts-and-cancellation",
+  "title": "Deadlines and wasted work",
+  "summary": "A request calls three services in turn. See what happens when the last one is slow, and how passing the context stops wasted downstream work.",
+  "inputs": [
+   {
+    "id": "deadline",
+    "label": "Caller deadline",
+    "min": 100,
+    "max": 5000,
+    "value": 1000,
+    "step": 50,
+    "unit": "ms"
+   },
+   {
+    "id": "a",
+    "label": "Service A",
+    "min": 10,
+    "max": 1500,
+    "value": 100,
+    "step": 10,
+    "unit": "ms"
+   },
+   {
+    "id": "b",
+    "label": "Service B",
+    "min": 10,
+    "max": 1500,
+    "value": 150,
+    "step": 10,
+    "unit": "ms"
+   },
+   {
+    "id": "c",
+    "label": "Service C when slow",
+    "min": 10,
+    "max": 5000,
+    "value": 1200,
+    "step": 10,
+    "unit": "ms"
+   },
+   {
+    "id": "prop",
+    "label": "The context is passed to every call",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "toa",
+    "a"
+   ],
+   [
+    "tob",
+    "a + b"
+   ],
+   [
+    "toc",
+    "a + b + c"
+   ],
+   [
+    "late",
+    "toc > deadline"
+   ],
+   [
+    "waste",
+    "late && !prop ? c : 0"
+   ],
+   [
+    "left",
+    "max(0, deadline - tob)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "u",
+    "label": "Caller",
+    "x": 0,
+    "y": 0,
+    "state": "late ? 2 : 0",
+    "sub": "'gives up after ' + deadline + ' ms'"
+   },
+   {
+    "id": "s",
+    "label": "Services A, B",
+    "x": 1,
+    "y": 0,
+    "state": "0",
+    "sub": "'done by ' + tob + ' ms'"
+   },
+   {
+    "id": "d",
+    "label": "Service C",
+    "x": 2,
+    "y": 0,
+    "state": "late ? (prop ? 1 : 2) : 0",
+    "sub": "late ? (prop ? 'cancelled at the deadline' : 'keeps working for nothing') : 'finishes in time'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "u",
+    "to": "s",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "s",
+    "to": "d",
+    "flow": "0.7",
+    "bad": "late && !prop"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Total time needed",
+    "expr": "toc",
+    "dp": 0,
+    "unit": "ms"
+   },
+   {
+    "label": "Time left when C starts",
+    "expr": "left",
+    "dp": 0,
+    "unit": "ms"
+   },
+   {
+    "label": "Work done for a caller who left",
+    "expr": "waste",
+    "dp": 0,
+    "unit": "ms"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "late && !prop",
+    "tone": "bad",
+    "text": "The caller gave up, but service C keeps running a request nobody wants. Under load these pile up. Pass the context so cancellation propagates."
+   },
+   {
+    "when": "late",
+    "tone": "warn",
+    "text": "The call is too slow for the deadline, but cancellation stops the wasted work."
+   },
+   {
+    "when": "left < c",
+    "tone": "warn",
+    "text": "Service C is called with less time left than it needs. Fail early instead of starting."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Every call finishes within the deadline."
+   }
+  ],
+  "tries": [
+   "Make service C take 1200 ms with no context passed.",
+   "Pass the context.",
+   "Lengthen the deadline."
+  ]
+ },
+ {
+  "id": "channel-backpressure",
+  "module": "go",
+  "lesson": "go/goroutines-channels-and-sync",
+  "title": "Worker pools and backpressure",
+  "summary": "Producers send work into a buffered channel and workers drain it. See when the buffer fills and what happens next.",
+  "inputs": [
+   {
+    "id": "rate",
+    "label": "Incoming work",
+    "min": 10,
+    "max": 5000,
+    "value": 800,
+    "step": 10,
+    "unit": "items/s"
+   },
+   {
+    "id": "workers",
+    "label": "Workers",
+    "min": 1,
+    "max": 100,
+    "value": 8,
+    "step": 1
+   },
+   {
+    "id": "ms",
+    "label": "Time per item",
+    "min": 1,
+    "max": 500,
+    "value": 20,
+    "step": 1,
+    "unit": "ms"
+   },
+   {
+    "id": "buf",
+    "label": "Channel buffer",
+    "min": 1,
+    "max": 10000,
+    "value": 500,
+    "step": 10
+   }
+  ],
+  "vars": [
+   [
+    "cap",
+    "workers * 1000 / ms"
+   ],
+   [
+    "gap",
+    "rate - cap"
+   ],
+   [
+    "fill",
+    "gap > 0 ? buf / gap : 9999"
+   ],
+   [
+    "blocked",
+    "gap > 0"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "p",
+    "label": "Producers",
+    "x": 0,
+    "y": 0,
+    "state": "blocked ? 1 : 0",
+    "sub": "rate + ' items/s'"
+   },
+   {
+    "id": "c",
+    "label": "Channel",
+    "x": 1,
+    "y": 0,
+    "state": "blocked ? 2 : 0",
+    "sub": "blocked ? 'full in ' + fmt(fill, 1) + ' s' : 'keeps up'"
+   },
+   {
+    "id": "w",
+    "label": "Workers",
+    "x": 2,
+    "y": 0,
+    "state": "blocked ? 1 : 0",
+    "sub": "round(cap) + ' items/s capacity'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "p",
+    "to": "c",
+    "flow": "min(1, rate/3000 + 0.2)",
+    "bad": "blocked"
+   },
+   {
+    "from": "c",
+    "to": "w",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Worker capacity",
+    "expr": "cap",
+    "dp": 0,
+    "unit": "items/s"
+   },
+   {
+    "label": "Backlog growth",
+    "expr": "max(0, gap)",
+    "dp": 0,
+    "unit": "items/s"
+   },
+   {
+    "label": "Buffer full after",
+    "expr": "blocked ? fill : 0",
+    "dp": 1,
+    "unit": "s"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "blocked && fill < 10",
+    "tone": "bad",
+    "text": "The buffer fills in seconds, and then producers block or you drop work. A bigger buffer only delays the problem. Add workers, slow producers, or shed load."
+   },
+   {
+    "when": "blocked",
+    "tone": "warn",
+    "text": "The buffer fills eventually. Decide now what happens when it does: block, drop or reject."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Workers keep up with the producers."
+   }
+  ],
+  "tries": [
+   "Send 800 items per second with 8 workers of 20 ms.",
+   "Add workers.",
+   "Raise the buffer and see how little it changes the outcome."
+  ],
+  "chart": {
+   "x": "workers",
+   "y": "workers * 1000 / ms",
+   "y2": "rate",
+   "xlabel": "Workers",
+   "ylabel": "Capacity (items/s)",
+   "y2label": "Incoming work",
+   "title": "Capacity against workers",
+   "min": 0
+  }
+ },
+ {
+  "id": "graceful-shutdown",
+  "module": "go",
+  "lesson": "go/http-services-and-json",
+  "title": "Graceful shutdown",
+  "summary": "On deploy the server stops accepting work and waits for requests in flight. See how many requests are cut off for a given grace period.",
+  "inputs": [
+   {
+    "id": "rps",
+    "label": "Requests per second",
+    "min": 10,
+    "max": 2000,
+    "value": 300,
+    "step": 10
+   },
+   {
+    "id": "long",
+    "label": "Duration of a long request",
+    "min": 0.1,
+    "max": 60,
+    "value": 8,
+    "step": 0.1,
+    "unit": "s"
+   },
+   {
+    "id": "share",
+    "label": "Share of requests that are long",
+    "min": 0,
+    "max": 20,
+    "value": 2,
+    "step": 0.5,
+    "unit": "%"
+   },
+   {
+    "id": "grace",
+    "label": "Shutdown grace period",
+    "min": 0,
+    "max": 60,
+    "value": 5,
+    "step": 1,
+    "unit": "s"
+   },
+   {
+    "id": "pods",
+    "label": "Pods restarted in the rollout",
+    "min": 1,
+    "max": 50,
+    "value": 6,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "inflight",
+    "rps * (long * share/100 + 0.05 * (1 - share/100))"
+   ],
+   [
+    "cut",
+    "grace < long ? rps * share/100 * long : 0"
+   ],
+   [
+    "total",
+    "cut * pods"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "r",
+    "label": "Rollout",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "pods + ' pods restarted'"
+   },
+   {
+    "id": "s",
+    "label": "Server",
+    "x": 1,
+    "y": 0,
+    "state": "cut>0 ? 2 : 0",
+    "sub": "'waits ' + grace + ' s for ' + round(inflight) + ' in flight'"
+   },
+   {
+    "id": "d",
+    "label": "Cut off",
+    "x": 2,
+    "y": 0,
+    "state": "cut>0 ? 2 : 0",
+    "sub": "round(cut) + ' per pod, ' + round(total) + ' in all'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "r",
+    "to": "s",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "s",
+    "to": "d",
+    "flow": "cut>0 ? 0.8 : 0.3",
+    "bad": "cut>0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Requests in flight at shutdown",
+    "expr": "inflight",
+    "dp": 0
+   },
+   {
+    "label": "Requests cut off per pod",
+    "expr": "cut",
+    "dp": 0
+   },
+   {
+    "label": "Cut off across the rollout",
+    "expr": "total",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "cut > 0",
+    "tone": "bad",
+    "text": "The grace period is shorter than a long request, so those requests are killed mid-flight on every deploy. Set the grace period above your longest request, and check the load balancer drains first."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "All requests finish before the process exits, so deploys are invisible to users."
+   }
+  ],
+  "tries": [
+   "Set the grace period to 1 second with 8 second requests.",
+   "Raise it above the long request time.",
+   "Raise the share of long requests."
+  ],
+  "chart": {
+   "x": "grace",
+   "y": "grace < long ? rps * share/100 * long : 0",
+   "xlabel": "Grace period (s)",
+   "ylabel": "Requests cut off per pod",
+   "title": "Cut off against grace period",
+   "min": 0
+  }
+ }
+]

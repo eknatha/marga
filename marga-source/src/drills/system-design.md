@@ -113,3 +113,89 @@ quota: 0   used: 0   status: LIMIT_REACHED   auth requests failing
 - More replicas
 - Shorter DNS TTLs
 why: Automated limits are a dependency and need floors and staged changes.
+
+## The table that stopped accepting inserts
+level: mid
+A write fails on one big table while the rest of the database works.
+
+```text
+ERROR 1114 (HY000): The table 'bookmarks' is full
+file size: 2.0T   limit: 2.0T
+```
+? What design habit was missing?
++ Tracking the distance to a single-node limit and partitioning or archiving early
+- Adding more read replicas
+- A longer connection timeout
+- Disabling the query log
+why: A hard limit is reached abruptly; partition or archive while there is room to copy.
+
+## The backup that took three hours
+level: mid
+A restore test is timed for the first time.
+
+```text
+pg_restore: 2h 41m elapsed    RTO target: 60 minutes
+```
+? What should change?
++ Add snapshots or a warm standby for fast recovery and keep point-in-time recovery
+- Run the backup more often only
+- Delete the old backups
+- Raise the RTO silently
+why: Backup frequency sets RPO; restore speed sets RTO, and only a timed test shows it.
+
+## One hot key
+level: senior
+One cache node is at 100 percent while the others are idle.
+
+```text
+node-3: 98% cpu, key "item:viral" 41% of requests
+node-1, node-2: 6% cpu
+```
+? What helps most?
++ Replicate or edge-cache the hot key and add per-key limits
+- Add more cache nodes without changes
+- Shorten all TTLs
+- Disable the cache
+why: Hashing spreads keys, not the traffic to a single key.
+
+## Alerts that never fired
+level: mid
+The error-rate alert stayed green during a total outage.
+
+```text
+error_rate: 0%   requests: 0   service: crash loop at start-up
+```
+? What is the gap?
++ The signal came from the service itself; measure at the edge and alert on missing traffic
+- The threshold was too high
+- The dashboard colours were wrong
+- Logs were too long
+why: A crashed service cannot report its own failure.
+
+## A role that reads everything
+level: senior
+A service needs one bucket and has a broad storage role. A flaw is found in the service.
+
+```text
+role: storage-full-access   resources: *   credentials: long-lived
+```
+? What limits the blast radius?
++ Scope the role to the one bucket, use short-lived credentials and add access alerts
+- Rename the role
+- Add a second broad role
+- Rotate the key yearly
+why: The permission set is the blast radius of a compromise.
+
+## Zones at 80 percent
+level: mid
+Three zones each run at 80 percent of capacity and one is lost.
+
+```text
+zone-a: down   zone-b: 120%   zone-c: 120%
+```
+? What was the design mistake?
++ No zone-loss headroom; run near 66 percent or shed low priority work
+- Too many zones
+- Too few dashboards
+- A short TTL
+why: Redundancy is real only if the survivors can carry the lost share.

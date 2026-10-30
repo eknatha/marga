@@ -1,0 +1,3135 @@
+[
+ {
+  "id": "availability-math",
+  "module": "sre",
+  "lesson": "sre/reliability-patterns",
+  "title": "Availability: serial and parallel",
+  "summary": "Chain components in series and availability drops. Add redundant copies in parallel and it rises. See the numbers for your design.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Each component is up",
+    "min": 99,
+    "max": 99.99,
+    "value": 99.9,
+    "step": 0.01,
+    "unit": "%"
+   },
+   {
+    "id": "serial",
+    "label": "Components every request must pass",
+    "min": 1,
+    "max": 12,
+    "value": 4,
+    "step": 1
+   },
+   {
+    "id": "copies",
+    "label": "Redundant copies of each",
+    "min": 1,
+    "max": 4,
+    "value": 1,
+    "step": 1
+   },
+   {
+    "id": "shared",
+    "label": "Copies share one failure domain",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "p",
+    "a/100"
+   ],
+   [
+    "unit",
+    "shared ? p : 1 - pow(1 - p, copies)"
+   ],
+   [
+    "total",
+    "pow(unit, serial)"
+   ],
+   [
+    "downmin",
+    "(1 - total) * 525600"
+   ],
+   [
+    "nines",
+    "total >= 1 ? 9 : -log(1 - total) / log(10)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Client",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "serial + \" steps in a row\""
+   },
+   {
+    "id": "s",
+    "label": "Chain of components",
+    "x": 1,
+    "y": 0,
+    "state": "total<0.999 ? 2 : (total<0.9995 ? 1 : 0)",
+    "sub": "copies + \" copies each\""
+   },
+   {
+    "id": "r",
+    "label": "Result",
+    "x": 2,
+    "y": 0,
+    "state": "total<0.999 ? 2 : (total<0.9999 ? 1 : 0)",
+    "sub": "pct(total, 3)"
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "s",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "s",
+    "to": "r",
+    "flow": "min(1, total)",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "End-to-end availability",
+    "expr": "pct(total, 3)",
+    "dp": 0
+   },
+   {
+    "label": "Downtime per year",
+    "expr": "downmin / 60",
+    "dp": 1,
+    "unit": "hours"
+   },
+   {
+    "label": "About this many nines",
+    "expr": "nines",
+    "dp": 1
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "shared",
+    "tone": "warn",
+    "text": "Copies in the same failure domain fail together, so they add almost nothing. Spread them across zones or hosts for the parallel maths to hold."
+   },
+   {
+    "when": "total < 0.999",
+    "tone": "bad",
+    "text": "Dependencies in series multiply. Several components at the same availability give a much lower total than any one of them."
+   },
+   {
+    "when": "total < 0.9999",
+    "tone": "warn",
+    "text": "Good, but each extra serial dependency costs you."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Redundant copies in independent domains lift the whole chain."
+   }
+  ],
+  "tries": [
+   "Chain 8 components at 99.9 percent with one copy each.",
+   "Add a second copy to each. The total improves a lot.",
+   "Tick the shared failure domain. The extra copies stop helping."
+  ],
+  "chart": {
+   "x": "serial",
+   "y": "100 * pow(unit, serial)",
+   "xlabel": "Components in series",
+   "ylabel": "End-to-end availability (%)",
+   "title": "Availability falls as the chain grows",
+   "min": 95,
+   "max": 100
+  }
+ },
+ {
+  "id": "oncall-load",
+  "module": "sre",
+  "lesson": "sre/on-call",
+  "title": "On-call load",
+  "summary": "Pages, handling time and team size decide whether on-call is sustainable. See pages per shift, time spent and the load on each person.",
+  "inputs": [
+   {
+    "id": "pages",
+    "label": "Pages per day",
+    "min": 0,
+    "max": 20,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "mins",
+    "label": "Minutes to handle one page",
+    "min": 5,
+    "max": 120,
+    "value": 30,
+    "step": 5
+   },
+   {
+    "id": "team",
+    "label": "People in the rotation",
+    "min": 2,
+    "max": 12,
+    "value": 6,
+    "step": 1
+   },
+   {
+    "id": "night",
+    "label": "Pages that wake someone",
+    "min": 0,
+    "max": 100,
+    "value": 30,
+    "step": 5,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "shift",
+    "pages / 2"
+   ],
+   [
+    "week",
+    "pages * 7 * mins / 60"
+   ],
+   [
+    "nights",
+    "pages * 7 * night/100"
+   ],
+   [
+    "weeks",
+    "team"
+   ],
+   [
+    "per",
+    "week / team"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "p",
+    "label": "Pages",
+    "x": 0,
+    "y": 0,
+    "state": "shift>2 ? 2 : (shift>1 ? 1 : 0)",
+    "sub": "pages + \" a day\""
+   },
+   {
+    "id": "r",
+    "label": "On-call person",
+    "x": 1,
+    "y": 0,
+    "state": "week>10 ? 2 : (week>5 ? 1 : 0)",
+    "sub": "fmt(week, 1) + ' h in their week'"
+   },
+   {
+    "id": "t",
+    "label": "Rotation",
+    "x": 2,
+    "y": 0,
+    "state": "team<4 ? 1 : 0",
+    "sub": "\"on call once every \" + team + \" weeks\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "p",
+    "to": "r",
+    "flow": "min(1, pages/10 + 0.2)",
+    "bad": "shift>2"
+   },
+   {
+    "from": "r",
+    "to": "t",
+    "flow": "0.6",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Pages per 12-hour shift",
+    "expr": "shift",
+    "dp": 1
+   },
+   {
+    "label": "Hours handling pages in an on-call week",
+    "expr": "week",
+    "dp": 1,
+    "unit": "h"
+   },
+   {
+    "label": "Night pages in an on-call week",
+    "expr": "nights",
+    "dp": 1
+   },
+   {
+    "label": "Weeks between turns",
+    "expr": "weeks",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "shift > 2",
+    "tone": "bad",
+    "text": "More than about two incidents per shift leaves no time to fix causes and people burn out. Reduce pages at the source before adding people."
+   },
+   {
+    "when": "team < 4",
+    "tone": "warn",
+    "text": "A small rotation means being on call too often, and any absence is felt."
+   },
+   {
+    "when": "nights > 5",
+    "tone": "warn",
+    "text": "Many pages wake people at night. Move non-urgent alerts to tickets."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "A sustainable load."
+   }
+  ],
+  "tries": [
+   "Set 8 pages a day.",
+   "Lower night pages by turning noisy alerts into tickets.",
+   "Shrink the team to 3 and watch the frequency."
+  ],
+  "chart": {
+   "x": "pages",
+   "y": "pages * 7 * mins / 60",
+   "xlabel": "Pages per day",
+   "ylabel": "Hours handling pages per week",
+   "title": "Weekly time spent on pages",
+   "min": 0
+  }
+ },
+ {
+  "id": "capacity-runway",
+  "module": "sre",
+  "lesson": "sre/capacity-planning",
+  "title": "Capacity runway",
+  "summary": "Usage grows each month and new capacity takes time to arrive. See how many months you have and whether you order early enough.",
+  "inputs": [
+   {
+    "id": "util",
+    "label": "Current utilisation",
+    "min": 10,
+    "max": 95,
+    "value": 55,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "growth",
+    "label": "Growth per month",
+    "min": 0,
+    "max": 30,
+    "value": 8,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "lead",
+    "label": "Lead time to add capacity",
+    "min": 0,
+    "max": 9,
+    "value": 3,
+    "step": 1,
+    "unit": "months"
+   },
+   {
+    "id": "limit",
+    "label": "Safe ceiling",
+    "min": 60,
+    "max": 95,
+    "value": 80,
+    "step": 5,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "g",
+    "growth/100"
+   ],
+   [
+    "months",
+    "g > 0 ? log(limit/util) / log(1 + g) : 99"
+   ],
+   [
+    "slack",
+    "months - lead"
+   ],
+   [
+    "late",
+    "slack < 0"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "u",
+    "label": "Usage today",
+    "x": 0,
+    "y": 0,
+    "state": "util>limit ? 2 : 0",
+    "sub": "util + '% used'"
+   },
+   {
+    "id": "r",
+    "label": "Runway",
+    "x": 1,
+    "y": 0,
+    "state": "late ? 2 : (slack<1 ? 1 : 0)",
+    "sub": "fmt(max(0, months), 1) + \" months to the ceiling\""
+   },
+   {
+    "id": "o",
+    "label": "Order capacity",
+    "x": 2,
+    "y": 0,
+    "state": "late ? 2 : 0",
+    "sub": "\"takes \" + lead + \" months\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "u",
+    "to": "r",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "r",
+    "to": "o",
+    "flow": "0.7",
+    "bad": "late"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Months until the ceiling",
+    "expr": "max(0, months)",
+    "dp": 1
+   },
+   {
+    "label": "Months of spare time after lead time",
+    "expr": "slack",
+    "dp": 1
+   },
+   {
+    "label": "Order by",
+    "expr": "late ? \"already late\" : \"in \" + fmt(slack, 1) + \" months\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "util > limit",
+    "tone": "bad",
+    "text": "You are already above the safe ceiling."
+   },
+   {
+    "when": "late",
+    "tone": "bad",
+    "text": "Capacity takes longer to arrive than you have left. You will hit the ceiling first. Order now, or shed load."
+   },
+   {
+    "when": "slack < 1",
+    "tone": "warn",
+    "text": "Almost no slack. Any delay in delivery causes a shortage."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "There is time to order before the ceiling."
+   }
+  ],
+  "tries": [
+   "Set 8 percent growth with a 6 month lead time.",
+   "Lower the ceiling and see the runway shrink.",
+   "Remember that growth compounds."
+  ],
+  "chart": {
+   "x": "growth",
+   "y": "max(0, log(limit/util) / log(1 + growth/100 + 0.0001))",
+   "xlabel": "Growth per month (%)",
+   "ylabel": "Months until the ceiling",
+   "title": "Runway against growth",
+   "min": 0,
+   "max": 36
+  }
+ },
+ {
+  "id": "mttr-breakdown",
+  "module": "sre",
+  "lesson": "sre/incident-response",
+  "title": "Where incident time goes",
+  "summary": "An outage is the sum of detecting, responding, diagnosing and fixing. See which stage to improve and what that does to a year of availability.",
+  "inputs": [
+   {
+    "id": "detect",
+    "label": "Time to detect",
+    "min": 1,
+    "max": 60,
+    "value": 10,
+    "step": 1,
+    "unit": "min"
+   },
+   {
+    "id": "ack",
+    "label": "Time to acknowledge and assemble",
+    "min": 1,
+    "max": 60,
+    "value": 8,
+    "step": 1,
+    "unit": "min"
+   },
+   {
+    "id": "diag",
+    "label": "Time to diagnose",
+    "min": 1,
+    "max": 240,
+    "value": 40,
+    "step": 5,
+    "unit": "min"
+   },
+   {
+    "id": "fix",
+    "label": "Time to mitigate",
+    "min": 1,
+    "max": 120,
+    "value": 15,
+    "step": 5,
+    "unit": "min"
+   },
+   {
+    "id": "per",
+    "label": "Incidents per year",
+    "min": 1,
+    "max": 60,
+    "value": 12,
+    "step": 1
+   },
+   {
+    "id": "runbook",
+    "label": "Runbooks and rollback ready",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "dg",
+    "runbook ? diag * 0.5 : diag"
+   ],
+   [
+    "fx",
+    "runbook ? fix * 0.5 : fix"
+   ],
+   [
+    "mttr",
+    "detect + ack + dg + fx"
+   ],
+   [
+    "down",
+    "mttr * per"
+   ],
+   [
+    "avail",
+    "1 - down / 525600"
+   ],
+   [
+    "biggest",
+    "dg >= max(detect, ack, fx) ? \"diagnosing\" : (fx >= max(detect, ack) ? \"mitigating\" : (detect >= ack ? \"detecting\" : \"responding\"))"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "d",
+    "label": "Detect and respond",
+    "x": 0,
+    "y": 0,
+    "state": "detect+ack>30 ? 1 : 0",
+    "sub": "detect + ack + ' min'"
+   },
+   {
+    "id": "g",
+    "label": "Diagnose and fix",
+    "x": 1,
+    "y": 0,
+    "state": "dg+fx>60 ? 2 : (dg+fx>30 ? 1 : 0)",
+    "sub": "dg + fx + ' min'"
+   },
+   {
+    "id": "a",
+    "label": "Year of availability",
+    "x": 2,
+    "y": 0,
+    "state": "avail<0.999 ? 2 : (avail<0.9995 ? 1 : 0)",
+    "sub": "pct(avail, 3)"
+   }
+  ],
+  "edges": [
+   {
+    "from": "d",
+    "to": "g",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "g",
+    "to": "a",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Time to restore",
+    "expr": "mttr",
+    "dp": 0,
+    "unit": "min"
+   },
+   {
+    "label": "Downtime per year",
+    "expr": "down / 60",
+    "dp": 1,
+    "unit": "hours"
+   },
+   {
+    "label": "Availability for the year",
+    "expr": "pct(avail, 3)",
+    "dp": 0
+   },
+   {
+    "label": "Biggest stage",
+    "expr": "biggest",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "avail < 0.999",
+    "tone": "bad",
+    "text": "Under three nines. Look at the biggest stage first. Shaving the longest stage is worth more than polishing a short one."
+   },
+   {
+    "when": "avail < 0.9995",
+    "tone": "warn",
+    "text": "Reasonable, but there is room. Runbooks and quick rollback cut diagnosis and fixing the most."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Quick detection and recovery keep the year well within a high target."
+   }
+  ],
+  "tries": [
+   "Set diagnosis to 120 minutes.",
+   "Turn on runbooks and rollback. Both long stages halve.",
+   "Cut incidents per year and compare with cutting time per incident."
+  ],
+  "chart": {
+   "x": "per",
+   "y": "100 * (1 - mttr * per / 525600)",
+   "xlabel": "Incidents per year",
+   "ylabel": "Availability (%)",
+   "title": "Availability against incident count",
+   "min": 98,
+   "max": 100
+  }
+ },
+ {
+  "id": "nat-port-exhaustion",
+  "module": "networking",
+  "lesson": "networking/routing-and-nat",
+  "title": "NAT port exhaustion",
+  "summary": "Many clients share a few public addresses. See when connections to one destination run out of source ports and new connections fail.",
+  "inputs": [
+   {
+    "id": "clients",
+    "label": "Clients behind NAT",
+    "min": 10,
+    "max": 2000,
+    "value": 300,
+    "step": 10
+   },
+   {
+    "id": "conns",
+    "label": "Concurrent connections to one destination per client",
+    "min": 1,
+    "max": 200,
+    "value": 40,
+    "step": 1
+   },
+   {
+    "id": "ips",
+    "label": "Public addresses on the gateway",
+    "min": 1,
+    "max": 8,
+    "value": 1,
+    "step": 1
+   },
+   {
+    "id": "ports",
+    "label": "Usable ports per address and destination",
+    "min": 1000,
+    "max": 64000,
+    "value": 55000,
+    "step": 1000
+   }
+  ],
+  "vars": [
+   [
+    "need",
+    "clients * conns"
+   ],
+   [
+    "have",
+    "ips * ports"
+   ],
+   [
+    "use",
+    "need / have"
+   ],
+   [
+    "fail",
+    "max(0, need - have)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Clients",
+    "x": 0,
+    "y": 0,
+    "state": "use>1 ? 1 : 0",
+    "sub": "round(need) + \" connections wanted\""
+   },
+   {
+    "id": "n",
+    "label": "NAT gateway",
+    "x": 1,
+    "y": 0,
+    "state": "use>1 ? 2 : (use>0.8 ? 1 : 0)",
+    "sub": "round(have) + \" ports available\""
+   },
+   {
+    "id": "d",
+    "label": "Destination",
+    "x": 2,
+    "y": 0,
+    "state": "use>1 ? 1 : 0",
+    "sub": "\"one address and port\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "n",
+    "flow": "min(1, use/1.2)",
+    "bad": "use>1"
+   },
+   {
+    "from": "n",
+    "to": "d",
+    "flow": "min(1, 0.2 + min(use, 1)/1.5)",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Connections wanted",
+    "expr": "need",
+    "dp": 0
+   },
+   {
+    "label": "Ports available",
+    "expr": "have",
+    "dp": 0
+   },
+   {
+    "label": "Connections that fail",
+    "expr": "fail",
+    "dp": 0
+   },
+   {
+    "label": "Port use",
+    "expr": "pct(use, 0)",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "use > 1",
+    "tone": "bad",
+    "text": "Not enough source ports for this destination. New connections time out or reset while old ones are open. Add addresses, reuse connections, or spread across destinations."
+   },
+   {
+    "when": "use > 0.8",
+    "tone": "warn",
+    "text": "Close to exhaustion. A traffic spike or slow-closing connections tips it over."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Plenty of ports."
+   }
+  ],
+  "tries": [
+   "Raise clients to 2000.",
+   "Add public addresses to the gateway.",
+   "Reduce connections per client with keep-alive and pooling."
+  ],
+  "chart": {
+   "x": "clients",
+   "y": "100 * clients * conns / (ips * ports)",
+   "xlabel": "Clients",
+   "ylabel": "Port use (%)",
+   "title": "Port use against clients",
+   "min": 0,
+   "max": 200
+  }
+ },
+ {
+  "id": "hpa-scaling",
+  "module": "kubernetes",
+  "lesson": "kubernetes/autoscaling",
+  "title": "Horizontal pod autoscaling",
+  "summary": "The autoscaler adds pods when utilisation passes a target. See how many pods you need, and what happens when the maximum is too low.",
+  "inputs": [
+   {
+    "id": "rps",
+    "label": "Incoming requests",
+    "min": 50,
+    "max": 5000,
+    "value": 1200,
+    "step": 50,
+    "unit": "req/s"
+   },
+   {
+    "id": "cap",
+    "label": "Capacity of one pod",
+    "min": 20,
+    "max": 500,
+    "value": 100,
+    "step": 10,
+    "unit": "req/s"
+   },
+   {
+    "id": "target",
+    "label": "Target utilisation",
+    "min": 30,
+    "max": 90,
+    "value": 60,
+    "step": 5,
+    "unit": "%"
+   },
+   {
+    "id": "maxr",
+    "label": "Maximum pods",
+    "min": 1,
+    "max": 60,
+    "value": 10,
+    "step": 1
+   },
+   {
+    "id": "minr",
+    "label": "Minimum pods",
+    "min": 1,
+    "max": 10,
+    "value": 2,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "want",
+    "ceil(rps / (cap * target/100))"
+   ],
+   [
+    "pods",
+    "clamp(want, minr, maxr)"
+   ],
+   [
+    "util",
+    "rps / (pods * cap)"
+   ],
+   [
+    "over",
+    "util > 1"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "l",
+    "label": "Traffic",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "rps + \" req/s\""
+   },
+   {
+    "id": "h",
+    "label": "Autoscaler",
+    "x": 1,
+    "y": 0,
+    "state": "want>maxr ? 2 : 0",
+    "sub": "\"wants \" + want + \" pods\""
+   },
+   {
+    "id": "p",
+    "label": "Pods",
+    "x": 2,
+    "y": 0,
+    "state": "over ? 2 : (util>0.85 ? 1 : 0)",
+    "sub": "pods + \" pods at \" + pct(util, 0)"
+   }
+  ],
+  "edges": [
+   {
+    "from": "l",
+    "to": "h",
+    "flow": "min(1, rps/3000 + 0.2)",
+    "bad": "false"
+   },
+   {
+    "from": "h",
+    "to": "p",
+    "flow": "0.7",
+    "bad": "over"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Pods wanted",
+    "expr": "want",
+    "dp": 0
+   },
+   {
+    "label": "Pods running",
+    "expr": "pods",
+    "dp": 0
+   },
+   {
+    "label": "Utilisation",
+    "expr": "pct(util, 0)",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "over",
+    "tone": "bad",
+    "text": "The maximum is too low. All pods are past their capacity, so requests queue and fail. Raise the maximum or reduce load per request."
+   },
+   {
+    "when": "util > 0.85",
+    "tone": "warn",
+    "text": "Pods run hot. Scale-up takes time, so a spike now would hurt."
+   },
+   {
+    "when": "want < minr",
+    "tone": "warn",
+    "text": "The minimum keeps more pods than needed, which costs money but gives headroom."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Pods follow the load and stay under the target."
+   }
+  ],
+  "tries": [
+   "Raise requests to 5000 with a maximum of 10.",
+   "Raise the maximum.",
+   "Lower the target for more headroom, at higher cost."
+  ],
+  "chart": {
+   "x": "rps",
+   "y": "clamp(ceil(rps / (cap * target/100)), minr, maxr)",
+   "y2": "maxr",
+   "xlabel": "Requests per second",
+   "ylabel": "Pods running",
+   "y2label": "Maximum pods",
+   "title": "Pods against load",
+   "min": 0
+  }
+ },
+ {
+  "id": "liveness-cascade",
+  "module": "kubernetes",
+  "lesson": "kubernetes/probes-metrics-and-logging",
+  "title": "Liveness probes under load",
+  "summary": "Under heavy load responses slow down. If the liveness probe times out, healthy pods are killed and the rest get more load. See when that cascade starts.",
+  "inputs": [
+   {
+    "id": "lat",
+    "label": "Response time under load",
+    "min": 10,
+    "max": 5000,
+    "value": 400,
+    "step": 10,
+    "unit": "ms"
+   },
+   {
+    "id": "tmo",
+    "label": "Probe timeout",
+    "min": 100,
+    "max": 5000,
+    "value": 1000,
+    "step": 100,
+    "unit": "ms"
+   },
+   {
+    "id": "fails",
+    "label": "Failures before restart",
+    "min": 1,
+    "max": 10,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "pods",
+    "label": "Pods",
+    "min": 3,
+    "max": 30,
+    "value": 8,
+    "step": 1
+   },
+   {
+    "id": "ready",
+    "label": "Use readiness for slowness, liveness for deadlocks only",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "slow",
+    "lat > tmo"
+   ],
+   [
+    "liveness",
+    "!ready && slow"
+   ],
+   [
+    "killed",
+    "liveness ? ceil(pods * 0.5) : 0"
+   ],
+   [
+    "left",
+    "pods - killed"
+   ],
+   [
+    "extra",
+    "pods / max(1, left)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "l",
+    "label": "Load spike",
+    "x": 0,
+    "y": 0,
+    "state": "slow ? 1 : 0",
+    "sub": "\"responses take \" + lat + \" ms\""
+   },
+   {
+    "id": "p",
+    "label": "Probe",
+    "x": 1,
+    "y": 0,
+    "state": "liveness ? 2 : (slow ? 1 : 0)",
+    "sub": "\"timeout \" + tmo + \" ms\""
+   },
+   {
+    "id": "r",
+    "label": "Pods",
+    "x": 2,
+    "y": 0,
+    "state": "liveness ? 2 : 0",
+    "sub": "left + \" of \" + pods + \" left, x\" + fmt(extra, 1) + \" load each\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "l",
+    "to": "p",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "p",
+    "to": "r",
+    "flow": "liveness ? 1 : 0.4",
+    "bad": "liveness"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Pods restarted",
+    "expr": "killed",
+    "dp": 0
+   },
+   {
+    "label": "Pods left serving",
+    "expr": "left",
+    "dp": 0
+   },
+   {
+    "label": "Load on each remaining pod",
+    "expr": "extra",
+    "dp": 1,
+    "unit": "x"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "liveness",
+    "tone": "bad",
+    "text": "Slow answers fail the liveness probe, so Kubernetes kills busy but healthy pods. The rest take more load, slow down and fail too. A small overload becomes an outage."
+   },
+   {
+    "when": "slow && ready",
+    "tone": "good",
+    "text": "A readiness probe takes slow pods out of rotation without restarting them, so they can recover."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Responses stay inside the probe timeout."
+   }
+  ],
+  "tries": [
+   "Raise the latency above the timeout with readiness mode off.",
+   "Switch to readiness for slowness.",
+   "Lengthen the timeout and see the margin."
+  ],
+  "chart": {
+   "x": "lat",
+   "y": "(lat > tmo && !ready) ? ceil(pods * 0.5) : 0",
+   "xlabel": "Response time (ms)",
+   "ylabel": "Pods killed",
+   "title": "Pods killed as latency rises",
+   "min": 0
+  }
+ },
+ {
+  "id": "requests-bin-packing",
+  "module": "kubernetes",
+  "lesson": "kubernetes/resources-and-quotas",
+  "title": "Requests and scheduling",
+  "summary": "The scheduler places pods by what they request, not what they use. See how inflated requests leave pods pending on a mostly idle cluster.",
+  "inputs": [
+   {
+    "id": "nodes",
+    "label": "Nodes",
+    "min": 1,
+    "max": 20,
+    "value": 4,
+    "step": 1
+   },
+   {
+    "id": "cores",
+    "label": "Cores per node",
+    "min": 2,
+    "max": 64,
+    "value": 8,
+    "step": 1
+   },
+   {
+    "id": "req",
+    "label": "CPU request per pod",
+    "min": 0.1,
+    "max": 4,
+    "value": 1,
+    "step": 0.1,
+    "unit": "cores"
+   },
+   {
+    "id": "use",
+    "label": "CPU a pod really uses",
+    "min": 0.05,
+    "max": 4,
+    "value": 0.3,
+    "step": 0.05,
+    "unit": "cores"
+   },
+   {
+    "id": "want",
+    "label": "Pods to run",
+    "min": 1,
+    "max": 150,
+    "value": 30,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "per",
+    "floor(cores / req)"
+   ],
+   [
+    "fit",
+    "nodes * per"
+   ],
+   [
+    "sched",
+    "min(want, fit)"
+   ],
+   [
+    "pend",
+    "want - sched"
+   ],
+   [
+    "real",
+    "sched * use / (nodes * cores)"
+   ],
+   [
+    "reserved",
+    "sched * req / (nodes * cores)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "p",
+    "label": "Pods wanted",
+    "x": 0,
+    "y": 0,
+    "state": "pend>0 ? 1 : 0",
+    "sub": "want + \" pods\""
+   },
+   {
+    "id": "s",
+    "label": "Scheduler",
+    "x": 1,
+    "y": 0,
+    "state": "pend>0 ? 2 : 0",
+    "sub": "fit + \" slots by request\""
+   },
+   {
+    "id": "c",
+    "label": "Cluster",
+    "x": 2,
+    "y": 0,
+    "state": "real<0.3 && pend>0 ? 2 : 0",
+    "sub": "\"reserved \" + pct(reserved, 0) + \", used \" + pct(real, 0)"
+   }
+  ],
+  "edges": [
+   {
+    "from": "p",
+    "to": "s",
+    "flow": "min(1, want/100 + 0.2)",
+    "bad": "false"
+   },
+   {
+    "from": "s",
+    "to": "c",
+    "flow": "0.6",
+    "bad": "pend>0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Pods that fit",
+    "expr": "fit",
+    "dp": 0
+   },
+   {
+    "label": "Pods stuck pending",
+    "expr": "pend",
+    "dp": 0
+   },
+   {
+    "label": "CPU reserved by requests",
+    "expr": "pct(reserved, 0)",
+    "dp": 0
+   },
+   {
+    "label": "CPU actually used",
+    "expr": "pct(real, 0)",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "pend > 0 && real < 0.4",
+    "tone": "bad",
+    "text": "Pods are pending while the cluster sits mostly idle. Requests are far above real use. Right-size requests from measured usage."
+   },
+   {
+    "when": "pend > 0",
+    "tone": "warn",
+    "text": "Some pods cannot be placed. Add nodes or reduce requests."
+   },
+   {
+    "when": "use > req",
+    "tone": "warn",
+    "text": "Pods use more than they request, so nodes can be overcommitted and throttled or evicted."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Everything is scheduled."
+   }
+  ],
+  "tries": [
+   "Request 2 cores per pod while using 0.3.",
+   "Lower the request toward real use.",
+   "Raise real use above the request and see the risk."
+  ],
+  "chart": {
+   "x": "req",
+   "y": "min(want, nodes * floor(cores / req))",
+   "xlabel": "CPU request per pod (cores)",
+   "ylabel": "Pods that fit",
+   "title": "Pods that fit against request size",
+   "min": 0
+  }
+ },
+ {
+  "id": "etcd-quorum",
+  "module": "k8s-ops",
+  "lesson": "k8s-ops/etcd-backup-and-restore",
+  "title": "etcd quorum and backups",
+  "summary": "etcd needs a majority of members. See how many failures a cluster survives and how much data a restore loses.",
+  "inputs": [
+   {
+    "id": "members",
+    "label": "Members",
+    "type": "select",
+    "options": [
+     [
+      "1",
+      "1"
+     ],
+     [
+      "3",
+      "3"
+     ],
+     [
+      "5",
+      "5"
+     ],
+     [
+      "7",
+      "7"
+     ]
+    ],
+    "value": "3"
+   },
+   {
+    "id": "failed",
+    "label": "Members down",
+    "min": 0,
+    "max": 7,
+    "value": 0,
+    "step": 1
+   },
+   {
+    "id": "backup",
+    "label": "Hours between backups",
+    "min": 0.25,
+    "max": 48,
+    "value": 6,
+    "step": 0.25,
+    "unit": "hours"
+   }
+  ],
+  "vars": [
+   [
+    "m",
+    "+members"
+   ],
+   [
+    "down",
+    "min(failed, m)"
+   ],
+   [
+    "up",
+    "m - down"
+   ],
+   [
+    "q",
+    "floor(m/2) + 1"
+   ],
+   [
+    "hasq",
+    "up >= q"
+   ],
+   [
+    "tol",
+    "m - q"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "m",
+    "label": "Members",
+    "x": 0,
+    "y": 0,
+    "state": "down>0 ? 1 : 0",
+    "sub": "up + \" of \" + m + \" up\""
+   },
+   {
+    "id": "q",
+    "label": "Quorum",
+    "x": 1,
+    "y": 0,
+    "state": "hasq ? 0 : 2",
+    "sub": "\"needs \" + q"
+   },
+   {
+    "id": "c",
+    "label": "Cluster API",
+    "x": 2,
+    "y": 0,
+    "state": "hasq ? 0 : 2",
+    "sub": "hasq ? 'accepts writes' : 'read only or down'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "m",
+    "to": "q",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "q",
+    "to": "c",
+    "flow": "hasq ? 0.7 : 0",
+    "bad": "!hasq"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Quorum needed",
+    "expr": "q",
+    "dp": 0
+   },
+   {
+    "label": "Failures survived",
+    "expr": "tol",
+    "dp": 0
+   },
+   {
+    "label": "Writes accepted",
+    "expr": "hasq ? \"yes\" : \"no\"",
+    "dp": 0
+   },
+   {
+    "label": "Data lost if you restore from backup",
+    "expr": "backup",
+    "dp": 2,
+    "unit": "hours at worst"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!hasq",
+    "tone": "bad",
+    "text": "Quorum is lost, so the cluster cannot commit writes. Running pods keep running, but nothing can change. Restore members or restore from a snapshot."
+   },
+   {
+    "when": "down > 0",
+    "tone": "warn",
+    "text": "Still has quorum, but one more failure could break it. Replace the member now."
+   },
+   {
+    "when": "m == 1 || m == 2",
+    "tone": "warn",
+    "text": "A single member has no failure tolerance. Use three or five."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "All members are up."
+   }
+  ],
+  "tries": [
+   "Use 3 members and take 2 down.",
+   "Use 5 members and take 2 down. Quorum holds.",
+   "Lengthen the backup interval and see the worst-case loss grow."
+  ]
+ },
+ {
+  "id": "rolling-node-upgrade",
+  "module": "k8s-ops",
+  "lesson": "k8s-ops/upgrading-clusters-safely",
+  "title": "Node upgrade pace",
+  "summary": "Upgrade nodes in batches. See how batch size changes duration and spare capacity, and when a disruption budget makes the upgrade wait.",
+  "inputs": [
+   {
+    "id": "nodes",
+    "label": "Nodes",
+    "min": 3,
+    "max": 100,
+    "value": 12,
+    "step": 1
+   },
+   {
+    "id": "batch",
+    "label": "Nodes upgraded at once",
+    "min": 1,
+    "max": 20,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "mins",
+    "label": "Minutes per node",
+    "min": 2,
+    "max": 30,
+    "value": 8,
+    "step": 1
+   },
+   {
+    "id": "load",
+    "label": "Cluster utilisation before the upgrade",
+    "min": 20,
+    "max": 95,
+    "value": 60,
+    "step": 5,
+    "unit": "%"
+   },
+   {
+    "id": "pdb",
+    "label": "A tight disruption budget protects the app",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "b",
+    "min(batch, nodes - 1)"
+   ],
+   [
+    "rounds",
+    "ceil(nodes / b)"
+   ],
+   [
+    "total",
+    "rounds * mins"
+   ],
+   [
+    "left",
+    "(nodes - b) / nodes"
+   ],
+   [
+    "util",
+    "load / 100 / left"
+   ],
+   [
+    "over",
+    "util > 1"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n",
+    "label": "Nodes",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "nodes + ' nodes'"
+   },
+   {
+    "id": "b",
+    "label": "Batch",
+    "x": 1,
+    "y": 0,
+    "state": "over ? 2 : (util>0.85 ? 1 : 0)",
+    "sub": "b + \" at a time, \" + rounds + \" rounds\""
+   },
+   {
+    "id": "d",
+    "label": "Duration",
+    "x": 2,
+    "y": 0,
+    "state": "pdb && b>1 ? 1 : 0",
+    "sub": "fmt(total, 0) + \" min\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "n",
+    "to": "b",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "b",
+    "to": "d",
+    "flow": "0.7",
+    "bad": "over"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Total time",
+    "expr": "total",
+    "dp": 0,
+    "unit": "min"
+   },
+   {
+    "label": "Capacity during a batch",
+    "expr": "pct(left, 0)",
+    "dp": 0
+   },
+   {
+    "label": "Utilisation during a batch",
+    "expr": "pct(util, 0)",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "over",
+    "tone": "bad",
+    "text": "The remaining nodes cannot carry the load while a batch is out. Pods go pending. Use a smaller batch or add temporary nodes."
+   },
+   {
+    "when": "pdb && b > 1",
+    "tone": "warn",
+    "text": "A tight disruption budget will pause drains until pods are rescheduled elsewhere, so bigger batches may stall."
+   },
+   {
+    "when": "util > 0.85",
+    "tone": "warn",
+    "text": "Little spare capacity during batches."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Batches finish quickly with capacity to spare."
+   }
+  ],
+  "tries": [
+   "Upgrade 6 of 12 nodes at once at 60 percent load.",
+   "Drop to one at a time. Safe but slow.",
+   "Raise cluster load and see the safe batch size shrink."
+  ],
+  "chart": {
+   "x": "batch",
+   "y": "100 * load / 100 / ((nodes - min(batch, nodes - 1)) / nodes)",
+   "xlabel": "Nodes at once",
+   "ylabel": "Utilisation during a batch (%)",
+   "title": "Capacity pressure from bigger batches",
+   "min": 0,
+   "max": 150
+  }
+ },
+ {
+  "id": "node-loss-headroom",
+  "module": "k8s-ops",
+  "lesson": "k8s-ops/nodes-draining-taints-and-capacity",
+  "title": "Node loss and headroom",
+  "summary": "When nodes drain or fail, their pods move to the rest. See how much spare capacity you need to survive N lost nodes.",
+  "inputs": [
+   {
+    "id": "nodes",
+    "label": "Nodes",
+    "min": 2,
+    "max": 60,
+    "value": 10,
+    "step": 1
+   },
+   {
+    "id": "util",
+    "label": "Average utilisation",
+    "min": 10,
+    "max": 95,
+    "value": 65,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "lost",
+    "label": "Nodes lost or drained",
+    "min": 0,
+    "max": 10,
+    "value": 1,
+    "step": 1
+   },
+   {
+    "id": "zones",
+    "label": "Failure zones",
+    "min": 1,
+    "max": 4,
+    "value": 3,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "k",
+    "min(lost, nodes - 1)"
+   ],
+   [
+    "after",
+    "util / 100 * nodes / (nodes - k)"
+   ],
+   [
+    "over",
+    "after > 1"
+   ],
+   [
+    "pending",
+    "over ? round((after - 1) * (nodes - k)) : 0"
+   ],
+   [
+    "safe",
+    "(1 - lost / nodes) * 100"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n",
+    "label": "Nodes up",
+    "x": 0,
+    "y": 0,
+    "state": "k>0 ? 1 : 0",
+    "sub": "(nodes - k) + ' of ' + nodes"
+   },
+   {
+    "id": "r",
+    "label": "Rescheduled pods",
+    "x": 1,
+    "y": 0,
+    "state": "over ? 2 : (after>0.85 ? 1 : 0)",
+    "sub": "pct(after, 0) + \" busy afterwards\""
+   },
+   {
+    "id": "p",
+    "label": "Pods pending",
+    "x": 2,
+    "y": 0,
+    "state": "over ? 2 : 0",
+    "sub": "pending + ' nodes worth'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n",
+    "to": "r",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "r",
+    "to": "p",
+    "flow": "over ? 1 : 0.4",
+    "bad": "over"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Utilisation after the loss",
+    "expr": "pct(after, 0)",
+    "dp": 0
+   },
+   {
+    "label": "Nodes worth of pods left pending",
+    "expr": "pending",
+    "dp": 0
+   },
+   {
+    "label": "Highest safe utilisation for this loss",
+    "expr": "safe",
+    "dp": 0,
+    "unit": "%"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "over",
+    "tone": "bad",
+    "text": "After the loss the survivors cannot hold everything. Pods stay pending and the app loses capacity. Keep utilisation below the safe level, or add nodes."
+   },
+   {
+    "when": "after > 0.85",
+    "tone": "warn",
+    "text": "The pods fit, but the nodes are nearly full, so little room for spikes."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The remaining nodes absorb the loss with room to spare."
+   }
+  ],
+  "tries": [
+   "Run 90 percent busy and lose one node of 10.",
+   "Lower utilisation to the safe figure.",
+   "Lose a third of the nodes to simulate a zone."
+  ],
+  "chart": {
+   "x": "lost",
+   "y": "util * nodes / (nodes - min(lost, nodes - 1))",
+   "y2": "100",
+   "xlabel": "Nodes lost",
+   "ylabel": "Utilisation after the loss (%)",
+   "y2label": "Full",
+   "title": "Utilisation as nodes are lost",
+   "min": 0,
+   "max": 200
+  }
+ },
+ {
+  "id": "rbac-blast-radius",
+  "module": "k8s-ops",
+  "lesson": "k8s-ops/rbac-and-service-accounts",
+  "title": "RBAC blast radius",
+  "summary": "If a pod token is stolen, what can the attacker reach? See how role scope and wildcard verbs change the damage.",
+  "inputs": [
+   {
+    "id": "ns",
+    "label": "Namespaces",
+    "min": 1,
+    "max": 50,
+    "value": 10,
+    "step": 1
+   },
+   {
+    "id": "secrets",
+    "label": "Secrets per namespace",
+    "min": 1,
+    "max": 100,
+    "value": 12,
+    "step": 1
+   },
+   {
+    "id": "scope",
+    "label": "Binding scope",
+    "type": "select",
+    "options": [
+     [
+      "ns",
+      "One namespace"
+     ],
+     [
+      "cluster",
+      "Whole cluster"
+     ]
+    ],
+    "value": "ns"
+   },
+   {
+    "id": "wild",
+    "label": "Role allows all verbs (*)",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "mount",
+    "label": "Token is mounted in pods that do not need it",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "reach",
+    "scope==\"cluster\" ? ns * secrets : secrets"
+   ],
+   [
+    "verbs",
+    "wild ? \"read, change and delete\" : \"read only\""
+   ],
+   [
+    "tok",
+    "mount ? 1 : 0.1"
+   ],
+   [
+    "score",
+    "reach * (wild ? 3 : 1) * tok"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "p",
+    "label": "Compromised pod",
+    "x": 0,
+    "y": 0,
+    "state": "mount ? 1 : 0",
+    "sub": "mount ? \"token present\" : \"no token\""
+   },
+   {
+    "id": "r",
+    "label": "Role",
+    "x": 1,
+    "y": 0,
+    "state": "scope==\"cluster\" || wild ? 2 : 0",
+    "sub": "scope==\"cluster\" ? \"cluster wide\" : \"one namespace\""
+   },
+   {
+    "id": "s",
+    "label": "Secrets reachable",
+    "x": 2,
+    "y": 0,
+    "state": "reach>200 ? 2 : (reach>20 ? 1 : 0)",
+    "sub": "reach + \", \" + verbs"
+   }
+  ],
+  "edges": [
+   {
+    "from": "p",
+    "to": "r",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "r",
+    "to": "s",
+    "flow": "min(1, reach/300 + 0.2)",
+    "bad": "scope==\"cluster\""
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Secrets an attacker can reach",
+    "expr": "reach",
+    "dp": 0
+   },
+   {
+    "label": "What they can do to them",
+    "expr": "verbs",
+    "dp": 0
+   },
+   {
+    "label": "Relative damage score",
+    "expr": "score",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "scope==\"cluster\" && wild",
+    "tone": "bad",
+    "text": "A cluster-wide role with every verb makes one stolen token a full compromise. Scope roles to a namespace and list only the verbs needed."
+   },
+   {
+    "when": "scope==\"cluster\"",
+    "tone": "warn",
+    "text": "Every secret in the cluster is within reach. Prefer a namespace role."
+   },
+   {
+    "when": "wild",
+    "tone": "warn",
+    "text": "Wildcard verbs let a thief change and delete, not only read."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Narrow scope and narrow verbs keep the damage small. Unmount tokens that pods do not need."
+   }
+  ],
+  "tries": [
+   "Bind cluster-wide with wildcard verbs.",
+   "Change to namespace scope.",
+   "Untick the mounted token and see how the exposure drops."
+  ]
+ },
+ {
+  "id": "helm-atomic-upgrade",
+  "module": "helm",
+  "lesson": "helm/upgrade-rollback-and-release-history",
+  "title": "Atomic upgrades and rollback",
+  "summary": "A bad upgrade can leave a release half-broken. See how --atomic and waiting for readiness turn a failure into an automatic rollback.",
+  "inputs": [
+   {
+    "id": "rev",
+    "label": "Current revision",
+    "min": 1,
+    "max": 20,
+    "value": 5,
+    "step": 1
+   },
+   {
+    "id": "timeout",
+    "label": "Wait timeout",
+    "min": 30,
+    "max": 600,
+    "value": 300,
+    "step": 30,
+    "unit": "s"
+   },
+   {
+    "id": "ready",
+    "label": "Time for the new pods to become ready",
+    "min": 10,
+    "max": 900,
+    "value": 60,
+    "step": 10,
+    "unit": "s"
+   },
+   {
+    "id": "broken",
+    "label": "The new version is broken",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "atomic",
+    "label": "Use --atomic (implies --wait)",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "wait",
+    "label": "Use --wait only",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "waits",
+    "atomic || wait"
+   ],
+   [
+    "ok",
+    "!broken && (ready <= timeout || !waits)"
+   ],
+   [
+    "failed",
+    "!ok"
+   ],
+   [
+    "rolled",
+    "failed && atomic"
+   ],
+   [
+    "newrev",
+    "rev + 1"
+   ],
+   [
+    "serving",
+    "ok ? \"new version\" : (rolled ? \"previous revision\" : \"a broken release\")"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "u",
+    "label": "helm upgrade",
+    "x": 0,
+    "y": 0,
+    "state": "failed ? 1 : 0",
+    "sub": "\"to revision \" + newrev"
+   },
+   {
+    "id": "w",
+    "label": "Wait for ready",
+    "x": 1,
+    "y": 0,
+    "state": "failed ? 2 : 0",
+    "sub": "waits ? 'up to ' + timeout + ' s' : 'not waiting'"
+   },
+   {
+    "id": "r",
+    "label": "Release",
+    "x": 2,
+    "y": 0,
+    "state": "failed && !rolled ? 2 : 0",
+    "sub": "\"serving \" + serving"
+   }
+  ],
+  "edges": [
+   {
+    "from": "u",
+    "to": "w",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "w",
+    "to": "r",
+    "flow": "failed ? 0.3 : 0.8",
+    "bad": "failed"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Revision after the command",
+    "expr": "rolled ? newrev + 1 : newrev",
+    "dp": 0
+   },
+   {
+    "label": "Release is serving",
+    "expr": "serving",
+    "dp": 0
+   },
+   {
+    "label": "Command result",
+    "expr": "!waits ? \"reports success without waiting\" : (failed ? \"fails\" : \"succeeds\")",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!waits && broken",
+    "tone": "bad",
+    "text": "Without --wait the command reports success as soon as the manifests are applied. The broken pods roll out and nobody is told."
+   },
+   {
+    "when": "failed && !rolled",
+    "tone": "bad",
+    "text": "The command failed but the broken revision stays. Roll back by hand to the last good revision."
+   },
+   {
+    "when": "rolled",
+    "tone": "good",
+    "text": "The failure triggered an automatic rollback, so the previous revision is serving again and the history shows it."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The upgrade succeeded and the new version is serving."
+   }
+  ],
+  "tries": [
+   "Break the new version with neither flag.",
+   "Use --atomic.",
+   "Make pods ready later than the timeout."
+  ]
+ },
+ {
+  "id": "helm-values-precedence",
+  "module": "helm",
+  "lesson": "helm/installing-charts-and-values",
+  "title": "Values precedence",
+  "summary": "The same setting can come from the chart, a values file, or the command line. See which value wins as layers are added.",
+  "inputs": [
+   {
+    "id": "chart",
+    "label": "Chart default (replicas 1) always applies",
+    "type": "toggle",
+    "value": true
+   },
+   {
+    "id": "f1",
+    "label": "First values file sets replicas 3",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "f2",
+    "label": "Second values file sets replicas 4",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "set",
+    "label": "--set replicas=5 on the command line",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "rev",
+    "label": "Release revision",
+    "min": 1,
+    "max": 10,
+    "value": 1,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "val",
+    "set ? 5 : (f2 ? 4 : (f1 ? 3 : 1))"
+   ],
+   [
+    "from",
+    "set ? \"--set\" : (f2 ? \"second values file\" : (f1 ? \"first values file\" : \"chart default\"))"
+   ],
+   [
+    "layers",
+    "(chart ? 1 : 0) + (f1 ? 1 : 0) + (f2 ? 1 : 0) + (set ? 1 : 0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Chart default",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "\"1 replica\""
+   },
+   {
+    "id": "f",
+    "label": "Values files",
+    "x": 1,
+    "y": 0,
+    "state": "f1||f2 ? 1 : 0",
+    "sub": "f2 ? 'later file wins' : (f1 ? '3 replicas' : 'none')"
+   },
+   {
+    "id": "s",
+    "label": "Command line",
+    "x": 2,
+    "y": 0,
+    "state": "set ? 1 : 0",
+    "sub": "set ? 'replicas=5' : 'none'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "f",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "f",
+    "to": "s",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Replicas rendered",
+    "expr": "val",
+    "dp": 0
+   },
+   {
+    "label": "Value came from",
+    "expr": "from",
+    "dp": 0
+   },
+   {
+    "label": "Layers applied",
+    "expr": "layers",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "set",
+    "tone": "warn",
+    "text": "--set beats every file. It is easy to forget, and it only lives in a shell history. Prefer values files in version control."
+   },
+   {
+    "when": "f1 && f2",
+    "tone": "good",
+    "text": "Later files override earlier ones, so the second file wins."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Only chart defaults or one file apply."
+   }
+  ],
+  "tries": [
+   "Turn on both files, then add --set.",
+   "Remove --set. The later file wins.",
+   "Remove everything but the chart default."
+  ]
+ },
+ {
+  "id": "helm-dependency-versions",
+  "module": "helm",
+  "lesson": "helm/dependencies-subcharts-and-registries",
+  "title": "Subchart version constraints",
+  "summary": "A chart depends on a subchart at 1.2.0. See which version each constraint pulls in once newer releases appear, and how a lock file stops surprises.",
+  "inputs": [
+   {
+    "id": "rule",
+    "label": "Constraint",
+    "type": "select",
+    "options": [
+     [
+      "exact",
+      "1.2.0 (exact)"
+     ],
+     [
+      "tilde",
+      "~1.2.0 (patch updates)"
+     ],
+     [
+      "caret",
+      "^1.2.0 (minor and patch updates)"
+     ]
+    ],
+    "value": "caret"
+   },
+   {
+    "id": "minor",
+    "label": "Newest 1.x minor",
+    "min": 2,
+    "max": 9,
+    "value": 5,
+    "step": 1
+   },
+   {
+    "id": "patch",
+    "label": "Newest patch of 1.2",
+    "min": 0,
+    "max": 9,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "major",
+    "label": "A 2.0.0 release exists",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "lock",
+    "label": "Chart.lock is committed and used",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "v",
+    "lock ? \"1.2.0\" : (rule==\"exact\" ? \"1.2.0\" : (rule==\"tilde\" ? \"1.2.\" + patch : \"1.\" + minor + \".0\"))"
+   ],
+   [
+    "moved",
+    "v != \"1.2.0\""
+   ],
+   [
+    "jump",
+    "rule==\"caret\" && !lock ? minor - 2 : 0"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Constraint",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "rule=='exact' ? '1.2.0' : (rule=='tilde' ? '~1.2.0' : '^1.2.0')"
+   },
+   {
+    "id": "l",
+    "label": "Resolution",
+    "x": 1,
+    "y": 0,
+    "state": "moved ? 1 : 0",
+    "sub": "lock ? 'locked' : 'floating'"
+   },
+   {
+    "id": "r",
+    "label": "You deploy",
+    "x": 2,
+    "y": 0,
+    "state": "moved ? 1 : 0",
+    "sub": "'subchart ' + v"
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "l",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "l",
+    "to": "r",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Version installed",
+    "expr": "v",
+    "dp": 0
+   },
+   {
+    "label": "Changed from what you tested",
+    "expr": "moved ? \"yes\" : \"no\"",
+    "dp": 0
+   },
+   {
+    "label": "Minor versions skipped over",
+    "expr": "jump",
+    "dp": 0
+   },
+   {
+    "label": "2.0.0 pulled in",
+    "expr": "\"no, constraints stop before a major\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "moved && !lock && rule==\"caret\"",
+    "tone": "warn",
+    "text": "Caret takes new minors. A rebuild next month can deploy a different subchart than you tested. Commit the lock file."
+   },
+   {
+    "when": "moved",
+    "tone": "warn",
+    "text": "Patch updates float in. They are usually safe, but you did not test them."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The version is pinned, so every build deploys what you tested."
+   }
+  ],
+  "tries": [
+   "Use caret with newer minors and no lock.",
+   "Commit the lock file.",
+   "Use an exact constraint."
+  ]
+ },
+ {
+  "id": "helm-three-way-merge",
+  "module": "helm",
+  "lesson": "helm/upgrade-rollback-and-release-history",
+  "title": "Helm upgrade and manual edits",
+  "summary": "Someone edits a live resource with kubectl. See which changes a later helm upgrade keeps and which it overwrites.",
+  "inputs": [
+   {
+    "id": "edit",
+    "label": "Someone changed replicas with kubectl",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "chart",
+    "label": "The chart now sets a different replicas value",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "same",
+    "label": "The chart sets replicas, but the same as last revision",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "old",
+    "label": "Replicas in the last revision",
+    "min": 1,
+    "max": 10,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "live",
+    "label": "Replicas set by hand",
+    "min": 1,
+    "max": 20,
+    "value": 6,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "nw",
+    "chart ? old + 3 : old"
+   ],
+   [
+    "result",
+    "chart ? nw : (edit ? live : old)"
+   ],
+   [
+    "drift",
+    "edit && !chart"
+   ],
+   [
+    "over",
+    "edit && chart"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "o",
+    "label": "Last revision",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "old + ' replicas'"
+   },
+   {
+    "id": "l",
+    "label": "Live cluster",
+    "x": 1,
+    "y": 0,
+    "state": "edit ? 1 : 0",
+    "sub": "edit ? live + ' by hand' : 'as installed'"
+   },
+   {
+    "id": "u",
+    "label": "After helm upgrade",
+    "x": 2,
+    "y": 0,
+    "state": "drift ? 1 : (over ? 1 : 0)",
+    "sub": "result + \" replicas\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "o",
+    "to": "l",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "l",
+    "to": "u",
+    "flow": "0.7",
+    "bad": "drift"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Replicas after the upgrade",
+    "expr": "result",
+    "dp": 0
+   },
+   {
+    "label": "Hand edit kept silently",
+    "expr": "drift ? \"yes, and now it differs from the chart\" : \"no\"",
+    "dp": 0
+   },
+   {
+    "label": "Hand edit overwritten",
+    "expr": "over ? \"yes\" : \"no\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "drift",
+    "tone": "warn",
+    "text": "The chart did not change this field between revisions, so the live edit survives. The cluster now differs from what the chart says. Change values in version control instead."
+   },
+   {
+    "when": "over",
+    "tone": "warn",
+    "text": "The chart changed the field, so the hand edit is overwritten, and anyone who relied on it is surprised."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Nothing was edited by hand. The release matches the chart."
+   }
+  ],
+  "tries": [
+   "Edit by hand and upgrade without changing the field.",
+   "Change the field in the chart too.",
+   "Leave both off."
+  ]
+ },
+ {
+  "id": "argocd-sync-policy",
+  "module": "argocd",
+  "lesson": "argocd/sync-health-and-drift",
+  "title": "Sync, self-heal and prune",
+  "summary": "Git says one thing and the cluster another. See what Argo CD does about a hand edit and a deleted manifest under each sync policy.",
+  "inputs": [
+   {
+    "id": "auto",
+    "label": "Automated sync",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "heal",
+    "label": "Self-heal",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "prune",
+    "label": "Prune",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "edit",
+    "label": "Someone edited a live resource",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "removed",
+    "label": "A manifest was removed from git",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "drifted",
+    "edit"
+   ],
+   [
+    "fixed",
+    "edit && auto && heal"
+   ],
+   [
+    "stale",
+    "removed && !(auto && prune)"
+   ],
+   [
+    "gone",
+    "removed && auto && prune"
+   ],
+   [
+    "outofsync",
+    "(edit && !fixed) || stale"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "g",
+    "label": "Git",
+    "x": 0,
+    "y": 0,
+    "state": "removed ? 1 : 0",
+    "sub": "removed ? 'manifest removed' : 'unchanged'"
+   },
+   {
+    "id": "a",
+    "label": "Argo CD",
+    "x": 1,
+    "y": 0,
+    "state": "outofsync ? 1 : 0",
+    "sub": "auto ? (heal ? 'auto sync, self-heal' : 'auto sync') : 'manual sync'"
+   },
+   {
+    "id": "c",
+    "label": "Cluster",
+    "x": 2,
+    "y": 0,
+    "state": "outofsync ? 2 : 0",
+    "sub": "outofsync ? 'differs from git' : 'matches git'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "g",
+    "to": "a",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "a",
+    "to": "c",
+    "flow": "fixed || gone ? 0.9 : 0.3",
+    "bad": "outofsync"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Hand edit",
+    "expr": "edit ? (fixed ? \"reverted to git\" : \"stays, shown as out of sync\") : \"none\"",
+    "dp": 0
+   },
+   {
+    "label": "Removed manifest",
+    "expr": "removed ? (gone ? \"deleted from the cluster\" : \"left running as an orphan\") : \"none\"",
+    "dp": 0
+   },
+   {
+    "label": "Application status",
+    "expr": "outofsync ? \"OutOfSync\" : \"Synced\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "stale",
+    "tone": "warn",
+    "text": "The resource was removed from git but pruning is off, so it keeps running and costs money. Turn on prune, or delete it by hand."
+   },
+   {
+    "when": "edit && !fixed",
+    "tone": "warn",
+    "text": "The edit stays until someone syncs. With self-heal on, it would be reverted."
+   },
+   {
+    "when": "fixed",
+    "tone": "good",
+    "text": "Self-heal put the cluster back to what git says."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The cluster matches git."
+   }
+  ],
+  "tries": [
+   "Edit a live resource with auto sync and self-heal on.",
+   "Turn self-heal off.",
+   "Remove a manifest with prune off."
+  ]
+ },
+ {
+  "id": "argocd-sync-waves",
+  "module": "argocd",
+  "lesson": "argocd/hooks-sync-waves-and-progressive-delivery",
+  "title": "Sync waves and ordering",
+  "summary": "Resources sync wave by wave, and each wave must be healthy before the next starts. See total time and what a slow resource costs.",
+  "inputs": [
+   {
+    "id": "waves",
+    "label": "Number of waves",
+    "min": 1,
+    "max": 6,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "each",
+    "label": "Time for a typical resource to be healthy",
+    "min": 5,
+    "max": 120,
+    "value": 30,
+    "step": 5,
+    "unit": "s"
+   },
+   {
+    "id": "slow",
+    "label": "Time for the slowest resource",
+    "min": 5,
+    "max": 900,
+    "value": 60,
+    "step": 5,
+    "unit": "s"
+   },
+   {
+    "id": "where",
+    "label": "Wave that holds the slowest resource",
+    "min": 1,
+    "max": 6,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "wait",
+    "label": "Pause between waves",
+    "min": 0,
+    "max": 30,
+    "value": 2,
+    "step": 1,
+    "unit": "s"
+   }
+  ],
+  "vars": [
+   [
+    "w",
+    "waves"
+   ],
+   [
+    "sw",
+    "min(where, w)"
+   ],
+   [
+    "total",
+    "(w - 1) * max(each, 0) + slow + (w - 1) * wait"
+   ],
+   [
+    "flat",
+    "max(each, slow)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "label": "Early waves",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "w + ' waves'"
+   },
+   {
+    "id": "s",
+    "label": "Slowest wave",
+    "x": 1,
+    "y": 0,
+    "state": "slow>each*4 ? 2 : (slow>each*2 ? 1 : 0)",
+    "sub": "'wave ' + sw + ': ' + slow + ' s'"
+   },
+   {
+    "id": "t",
+    "label": "Total sync time",
+    "x": 2,
+    "y": 0,
+    "state": "total>300 ? 2 : (total>120 ? 1 : 0)",
+    "sub": "fmt(total, 0) + \" s\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "a",
+    "to": "s",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "s",
+    "to": "t",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Total sync time",
+    "expr": "total",
+    "dp": 0,
+    "unit": "s"
+   },
+   {
+    "label": "If everything synced at once",
+    "expr": "flat",
+    "dp": 0,
+    "unit": "s"
+   },
+   {
+    "label": "Cost of ordering",
+    "expr": "total - flat",
+    "dp": 0,
+    "unit": "s"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "total > 300",
+    "tone": "bad",
+    "text": "Ordered waves with a slow resource make syncs take minutes. Use waves only where order truly matters."
+   },
+   {
+    "when": "total - flat > 60",
+    "tone": "warn",
+    "text": "Ordering costs a minute or more per sync."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Ordering is cheap here."
+   }
+  ],
+  "tries": [
+   "Add 6 waves with a slow resource.",
+   "Cut waves to 1.",
+   "Make the slow resource slower."
+  ],
+  "chart": {
+   "x": "waves",
+   "y": "(waves - 1) * each + slow + (waves - 1) * wait",
+   "xlabel": "Waves",
+   "ylabel": "Total sync time (s)",
+   "title": "Sync time grows with waves",
+   "min": 0
+  }
+ },
+ {
+  "id": "argocd-poll-latency",
+  "module": "argocd",
+  "lesson": "argocd/pull-based-delivery-and-the-repository-as-source-of-truth",
+  "title": "Git to cluster delay",
+  "summary": "Argo CD polls git. See how long a merged change waits before it reaches the cluster, and how a webhook shortens that.",
+  "inputs": [
+   {
+    "id": "poll",
+    "label": "Polling interval",
+    "min": 30,
+    "max": 900,
+    "value": 180,
+    "step": 30,
+    "unit": "s"
+   },
+   {
+    "id": "sync",
+    "label": "Time to render and apply",
+    "min": 5,
+    "max": 300,
+    "value": 30,
+    "step": 5,
+    "unit": "s"
+   },
+   {
+    "id": "hook",
+    "label": "Webhook from the git host",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "wait",
+    "hook ? 2 : poll / 2"
+   ],
+   [
+    "worst",
+    "hook ? 2 : poll"
+   ],
+   [
+    "avg",
+    "wait + sync"
+   ],
+   [
+    "mx",
+    "worst + sync"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "g",
+    "label": "Merge to git",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "\"change merged\""
+   },
+   {
+    "id": "p",
+    "label": "Argo CD",
+    "x": 1,
+    "y": 0,
+    "state": "poll>600 && !hook ? 1 : 0",
+    "sub": "hook ? 'notified at once' : 'polls every ' + poll + ' s'"
+   },
+   {
+    "id": "c",
+    "label": "Cluster",
+    "x": 2,
+    "y": 0,
+    "state": "avg>120 ? 1 : 0",
+    "sub": "\"live in about \" + fmt(avg, 0) + \" s\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "g",
+    "to": "p",
+    "flow": "0.7",
+    "bad": "false"
+   },
+   {
+    "from": "p",
+    "to": "c",
+    "flow": "0.7",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Average delay",
+    "expr": "avg",
+    "dp": 0,
+    "unit": "s"
+   },
+   {
+    "label": "Worst case delay",
+    "expr": "mx",
+    "dp": 0,
+    "unit": "s"
+   },
+   {
+    "label": "Load on the git host",
+    "expr": "hook ? \"low\" : fmt(60 / poll, 2) + \" fetches per minute per app\"",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "mx > 600",
+    "tone": "warn",
+    "text": "A change can wait ten minutes before it starts. Add a webhook, or shorten the interval."
+   },
+   {
+    "when": "!hook",
+    "tone": "warn",
+    "text": "Polling is simple and robust. A webhook cuts the delay, and polling remains as a fallback."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Changes reach the cluster in seconds."
+   }
+  ],
+  "tries": [
+   "Set the polling interval to 15 minutes.",
+   "Turn on the webhook.",
+   "Shorten polling and see the git load grow."
+  ],
+  "chart": {
+   "x": "poll",
+   "y": "poll / 2 + sync",
+   "y2": "poll + sync",
+   "xlabel": "Polling interval (s)",
+   "ylabel": "Average delay (s)",
+   "y2label": "Worst case (s)",
+   "title": "Delay against polling interval",
+   "min": 0
+  }
+ },
+ {
+  "id": "applicationset-fanout",
+  "module": "argocd",
+  "lesson": "argocd/environments-app-of-apps-and-applicationsets",
+  "title": "ApplicationSet fan-out",
+  "summary": "One template generates an application for each cluster and service. See how the count grows and what that means for refresh load.",
+  "inputs": [
+   {
+    "id": "clusters",
+    "label": "Clusters",
+    "min": 1,
+    "max": 50,
+    "value": 6,
+    "step": 1
+   },
+   {
+    "id": "services",
+    "label": "Services per cluster",
+    "min": 1,
+    "max": 100,
+    "value": 15,
+    "step": 1
+   },
+   {
+    "id": "envs",
+    "label": "Environments",
+    "min": 1,
+    "max": 5,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "refresh",
+    "label": "Refresh interval",
+    "min": 60,
+    "max": 900,
+    "value": 180,
+    "step": 30,
+    "unit": "s"
+   }
+  ],
+  "vars": [
+   [
+    "apps",
+    "clusters * services"
+   ],
+   [
+    "all",
+    "apps * envs"
+   ],
+   [
+    "rps",
+    "all / refresh"
+   ],
+   [
+    "perday",
+    "rps * 86400"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "t",
+    "label": "One template",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "\"1 ApplicationSet\""
+   },
+   {
+    "id": "g",
+    "label": "Generated apps",
+    "x": 1,
+    "y": 0,
+    "state": "all>1000 ? 2 : (all>300 ? 1 : 0)",
+    "sub": "all + \" applications\""
+   },
+   {
+    "id": "c",
+    "label": "Controller",
+    "x": 2,
+    "y": 0,
+    "state": "rps>5 ? 2 : (rps>2 ? 1 : 0)",
+    "sub": "fmt(rps, 1) + \" refreshes/s\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "t",
+    "to": "g",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "g",
+    "to": "c",
+    "flow": "min(1, rps/8 + 0.2)",
+    "bad": "rps>5"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Applications generated",
+    "expr": "all",
+    "dp": 0
+   },
+   {
+    "label": "Refreshes per second",
+    "expr": "rps",
+    "dp": 2
+   },
+   {
+    "label": "Refreshes per day",
+    "expr": "perday",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "rps > 5",
+    "tone": "bad",
+    "text": "Thousands of apps refreshing often put real load on the repo server and the git host. Lengthen the interval, use webhooks, or shard controllers."
+   },
+   {
+    "when": "all > 300",
+    "tone": "warn",
+    "text": "Large fan-out. A bad template change now touches hundreds of applications at once, so roll it out gradually."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Manageable scale."
+   }
+  ],
+  "tries": [
+   "Raise clusters and services to the top.",
+   "Lengthen the refresh interval.",
+   "Note how one template mistake multiplies."
+  ],
+  "chart": {
+   "x": "clusters",
+   "y": "clusters * services * envs / refresh",
+   "xlabel": "Clusters",
+   "ylabel": "Refreshes per second",
+   "title": "Refresh load against clusters",
+   "min": 0
+  }
+ }
+]

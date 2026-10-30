@@ -1179,3 +1179,43 @@ def: Recovery point objective is the maximum acceptable data loss measured in ti
 module: system-design
 plain: Turning some work away to keep the rest healthy.
 def: Deliberately rejecting low priority or late requests when over capacity so useful work still completes.
+
+## Partition key
+module: system-design
+plain: The field that decides where a row lives.
+def: The attribute used to assign each record to a partition; a poor choice causes hot spots and cross-partition queries.
+
+## Consistent hashing
+module: system-design
+plain: Spreading keys so adding a node moves few of them.
+def: A scheme that maps nodes and keys onto a ring so adding or removing a node moves only about 1/N of the keys.
+
+## Compaction
+module: system-design
+plain: Tidying sorted files in the background.
+def: Background merging of sorted files in a log-structured store to limit read cost and reclaim space.
+
+## Point-in-time recovery
+module: system-design
+plain: Restoring to a chosen moment.
+def: Restoring from a base backup plus a log of changes to a specific time, such as just before a mistake.
+
+## Metric cardinality
+module: system-design
+plain: How many different label values exist.
+def: The count of distinct label combinations in a metric, which drives storage cost and can overload a metrics system.
+
+## Workload identity
+module: system-design
+plain: A credential given to a running service.
+def: A short-lived identity issued to a workload by the platform, replacing long-lived keys copied into configuration.
+
+## Headroom
+module: system-design
+plain: Spare capacity kept on purpose.
+def: Capacity above expected peak that absorbs spikes, failures and scale-up delay.
+
+## Anycast
+module: system-design
+plain: One address, many places.
+def: Announcing the same IP address from many sites so routing sends clients to a nearby healthy one.
