@@ -14,8 +14,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=157f9796">
-<script src="../assets/a11y.js?v=157f9796"></script>
+<link rel="stylesheet" href="../assets/app.css?v=ad2df03b">
+<script src="../assets/a11y.js?v=ad2df03b"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -113,6 +113,34 @@ psql -h NODE -Atc <span class="hljs-string">&quot;select pg_is_in_recovery()&quo
 psql -Atc <span class="hljs-string">&quot;select extract(epoch from now()-pg_last_xact_replay_timestamp())&quot;</span></code></pre></div>
 <aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Never promote a node without fencing the old primary first, or two writers will diverge.</p>
 </aside>
+<h2 id="data">Data</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="partition key   many values, even load, keeps related data together; check the biggest value
+range           cheap scans, hot end for sequential keys
+hash            even load, scans hit all partitions
+consistent hash ring + virtual nodes: adding a node moves ~1/N keys
+storage engines B-tree: in-place pages, watch vacuum and bloat | LSM: append and compact, watch compaction debt
+replication     leader/follower | multi-leader (conflicts) | leaderless (R + W &gt; N)
+backup          RPO sets frequency, RTO sets restore speed; independent copy; timed restore test" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">partition key   many values, even load, keeps related data together; check the biggest value
+range           cheap scans, hot end for sequential keys
+hash            even load, scans hit all partitions
+consistent hash ring + virtual nodes: adding a node moves ~1/N keys
+storage engines B-tree: in-place pages, watch vacuum and bloat | LSM: append and compact, watch compaction debt
+replication     leader/follower | multi-leader (conflicts) | leaderless (R + W &gt; N)
+backup          RPO sets frequency, RTO sets restore speed; independent copy; timed restore test</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Replicas copy deletes. A backup you have not restored is a hope.</p>
+</aside>
+<h2 id="by-design-observability-security-cost">By design: observability, security, cost</h2>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="observability  SLI at the edge | golden signals | per-version and per-cell labels | trace id in logs
+               independent probe and paging path | dead-man's switch | cap cardinality
+security       trust boundaries | least privilege | short-lived workload credentials | default-deny network
+               separate accounts and keys | audit logs | secret rotation runbook
+cost/capacity  measure unit throughput at the SLO | N+1 and zone loss (3 zones: run under ~66%)
+               list non-CPU limits | scale on leading signals | write down savings that cut redundancy" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">observability  SLI at the edge | golden signals | per-version and per-cell labels | trace id in logs
+               independent probe and paging path | dead-man&#x27;s switch | cap cardinality
+security       trust boundaries | least privilege | short-lived workload credentials | default-deny network
+               separate accounts and keys | audit logs | secret rotation runbook
+cost/capacity  measure unit throughput at the SLO | N+1 and zone loss (3 zones: run under ~66%)
+               list non-CPU limits | scale on leading signals | write down savings that cut redundancy</code></pre></div>
 <h2 id="change-safety-checklist">Change safety checklist</h2>
 <ol>
 <li>Can it be previewed on real data?</li>
@@ -131,8 +159,8 @@ psql -Atc <span class="hljs-string">&quot;select extract(epoch from now()-pg_las
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://aws.amazon.com/builders-library/" target="_blank" rel="noopener">Amazon Builders' Library</a><span class="host">aws.amazon.com</span></li><li><a href="https://sre.google/sre-book/addressing-cascading-failures/" target="_blank" rel="noopener">SRE book: Addressing cascading failures</a><span class="host">sre.google</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=157f9796"></script>
-<script src="../assets/counter.js?v=157f9796"></script>
+<script src="../assets/voice.js?v=ad2df03b"></script>
+<script src="../assets/counter.js?v=ad2df03b"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
