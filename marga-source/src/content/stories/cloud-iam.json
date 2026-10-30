@@ -1,0 +1,34 @@
+{
+"identities-principals-and-permissions": {
+"r": "A script ran with a person's credentials, and when they left the company, the script stopped. A dedicated workload identity with its own limited permissions removed the dependency on a person.",
+"x": "Separate who is acting, what they can do and on which resources. Prefer workload identities for software and tie human access to a central identity with multi-factor authentication."
+},
+"aws-iam-policies-roles-and-assume-role": {
+"r": "A policy used a wildcard for actions and resources and allowed far more than intended. Writing the exact actions and resource names, and testing with the policy simulator, tightened it.",
+"x": "Evaluation logic combines identity policies, resource policies, boundaries and organisation controls, and an explicit deny wins. Know it well enough to predict outcomes, not just try things."
+},
+"azure-entra-id-rbac-and-managed-identities": {
+"r": "An app stored a client secret that expired during a holiday and caused an outage. A managed identity removed the secret entirely, so there was nothing to expire or leak.",
+"x": "Understand the separation of directory roles and resource roles, the scope hierarchy and how assignments inherit. Use managed identities and conditional access, and review privileged assignments regularly."
+},
+"least-privilege-and-access-reviews": {
+"r": "A quarterly review found dozens of roles unused for ninety days. Removing them reduced exposure, and no one noticed a thing. The next quarter, the review took an hour because unused rights were listed by the tooling, not found by hand.",
+"x": "Start narrow, grant by need, expire elevated access and review on a schedule using real usage data. Make the safe path the easy one, or people will route around it."
+},
+"secrets-and-encryption-with-kms-and-key-vaults": {
+"r": "Application secrets lived in environment variables in plain text, visible to anyone who could read the task definition. Moving them to a managed secret store with fine-grained access and audit fixed that.",
+"x": "Separate who can use a key from who can manage it. Rotate, audit key use, plan recovery and remember that deleting a key can make data unrecoverable."
+},
+"network-boundaries-and-private-access": {
+"r": "A storage account was reachable from the internet because its default network rule allowed it. Private endpoints and a deny by default rule limited access to the company's network.",
+"x": "Combine identity and network controls so one mistake is not enough. Prefer private endpoints, restrict egress, and check DNS for private names to avoid falling back to public paths."
+},
+"logging-detection-and-audit-trails": {
+"r": "An unusual role assumption from a new country was caught by an alert on the audit log within minutes, and the session was ended before anything was changed.",
+"x": "Log control-plane and data access, centralise in a protected account and alert on high-risk actions. Test your detections and keep logs long enough for investigations."
+},
+"debugging-access-denied-and-cloud-security-incidents": {
+"r": "A job failed with access denied. The audit log showed which action and resource were refused and which policy layer denied it, so the fix was one precise permission rather than an admin role.",
+"x": "Read the exact denial, identify the layer that said no and grant the minimum. During a suspected incident, preserve logs, revoke sessions, rotate credentials and review what the identity did."
+}
+}

@@ -1,0 +1,34 @@
+{
+"what-a-claude-skill-is": {
+"r": "A team kept pasting the same long instructions into chats to produce their weekly report. Packaging them as a skill meant Claude loaded the procedure itself whenever someone asked for the report.",
+"x": "A skill packages procedure and resources so the model uses them when relevant. Decide what belongs in a skill versus a prompt or a tool, and be clear about what it can and cannot guarantee."
+},
+"anatomy-of-a-skill-folder": {
+"r": "A skill had everything in one huge file, which loaded on every use. Splitting reference material into separate files kept the main instructions short and cheap.",
+"x": "Structure for loading cost and clarity: a short main file, references loaded on demand, scripts for exact work. Keep file names clear so the model can find what it needs."
+},
+"writing-descriptions-that-trigger": {
+"r": "A skill never ran because its description was vague. Rewriting it to say what it does and when to use it, with the words users actually say, made it trigger reliably.",
+"x": "The description is the trigger. Include the task, the situations and the phrases users use, and test both for missing triggers and for false ones. Overlapping skills compete."
+},
+"progressive-disclosure-and-structure": {
+"r": "A skill with thirty pages of rules loaded all of them for a simple question. Loading only the relevant section when needed kept answers faster and less cluttered.",
+"x": "Give the model the minimum needed at each stage and point to deeper material. Long context is not free and can dilute attention."
+},
+"scripts-and-deterministic-steps": {
+"r": "A skill asked the model to calculate totals itself and sometimes got them wrong. A bundled script did the calculation and the model explained the result, which made it exact.",
+"x": "Use code where exactness matters and language where judgement matters. Make scripts safe to run, with clear inputs, outputs and errors, and avoid scripts that can do harm unprompted."
+},
+"testing-and-evaluating-a-skill": {
+"r": "A skill seemed to work in a demo but failed on real requests. A set of twenty realistic prompts, run before each change, showed where it triggered wrongly and where output quality dropped.",
+"x": "Test triggering, output quality and cost with a fixed set, and compare versions. Include negative cases that should not trigger the skill."
+},
+"sharing-versioning-and-skill-security": {
+"r": "A shared skill included a script that sent data to an external address. Reviewing scripts before adoption and limiting what skills may do prevented the risk.",
+"x": "A skill can run code and shape behaviour, so treat adoption like adding a dependency: review, pin versions, restrict permissions and watch for changes from updates."
+},
+"debugging-skills-that-do-not-trigger-or-misbehave": {
+"r": "A skill triggered on unrelated requests. Narrowing its description and adding a clear statement of when not to use it stopped the false triggers. A short list of test prompts, some that should trigger the skill and some that should not, proved it.",
+"x": "Check the description, the file layout and conflicts with other skills first. Reproduce with a fixed prompt, change one thing and keep the failing case in the test set."
+}
+}

@@ -1,0 +1,42 @@
+{
+"why-go-and-your-first-program": {
+"r": "A team needed a small tool that ran on any server with no runtime installed. Go produced one static binary they could copy anywhere, which made rollout simple.",
+"x": "Go trades expressiveness for simplicity and fast builds. It suits network tools and services; be honest about where another language fits better, and about what the standard library already gives you."
+},
+"types-structs-slices-and-maps": {
+"r": "A function appended to a slice and the caller did not see the change, because the slice header was passed by value. Understanding how slices share arrays explained both the bug and the fix.",
+"x": "Know zero values, slice capacity, aliasing and that maps are not safe for concurrent writes. These facts cause most early Go bugs and many production ones."
+},
+"functions-errors-and-defer": {
+"r": "An error was ignored in a cleanup path and a file was left half written. Checking every error and wrapping it with context made the real cause visible in the logs.",
+"x": "Errors are values and part of your API. Wrap with context, return early, use defer for cleanup and be careful about what defer captures and when it runs."
+},
+"interfaces-and-packages": {
+"r": "Code that talked to a real database directly was hard to test. Defining a small interface for what it needed allowed a simple fake in tests. The tests then ran in milliseconds, with no network or database needed.",
+"x": "Accept interfaces, return structs, and keep interfaces small and defined where they are used. Package boundaries are design decisions, so avoid cycles and giant utility packages."
+},
+"goroutines-channels-and-sync": {
+"r": "A service leaked goroutines that waited forever on a channel nobody closed, and memory slowly grew until it was restarted. Giving every goroutine a clear way to stop fixed the leak.",
+"x": "Every goroutine needs an owner and an exit. Prefer simple designs, use the race detector in tests and be careful with shared state, unbounded fan-out and blocking sends."
+},
+"context-timeouts-and-cancellation": {
+"r": "When a client gave up, the server kept running an expensive query for another minute. Passing the request context to the database call cancelled the work as soon as the client left.",
+"x": "Context is how deadlines and cancellation travel. Pass it as the first parameter, respect it in every blocking call and set timeouts at every boundary, including shutdown."
+},
+"http-services-and-json": {
+"r": "A service had no timeouts on its HTTP server or client, and one slow client held connections until the process ran out. Setting read, write and idle timeouts protected it.",
+"x": "Production HTTP needs timeouts, limits on body size, health endpoints and graceful shutdown. Decode JSON strictly where possible and never trust input shape."
+},
+"testing-benchmarks-and-tooling": {
+"r": "A function looked fast but a benchmark showed it allocated heavily in a hot path. Reducing allocations cut latency noticeably, and the benchmark stayed to guard against regressions.",
+"x": "Table-driven tests, the race detector and benchmarks give strong confidence cheaply. Measure before optimising and watch for benchmarks that the compiler optimises away."
+},
+"building-containers-and-cli-tools": {
+"r": "A Go service shipped in a tiny image with just the binary started in under a second and had almost nothing for an attacker to use. Debugging it needed an ephemeral debug container, which the team prepared in advance.",
+"x": "Static binaries and small images are a strength with trade-offs: no shell for debugging, certificates and time zone data to include. Version your tools and embed build information."
+},
+"debugging-go-programs": {
+"r": "A service slowly used more memory. A heap profile showed a cache that never evicted, and a goroutine dump found the workers that were stuck. Profiling pointed directly at the code.",
+"x": "Learn to read stack traces, goroutine dumps and profiles. Expose profiling safely, use the race detector, and reproduce under load before deciding on a cause."
+}
+}

@@ -1,0 +1,42 @@
+{
+"basics-and-environments": {
+"r": "A script ran fine on one laptop and failed on another because of different library versions. A virtual environment with a pinned requirements file made the setup the same everywhere.",
+"x": "Reproducibility is the foundation. Pin direct and transitive dependencies, record the Python version, isolate environments per project and rebuild them from scratch regularly to catch drift."
+},
+"files-and-processes": {
+"r": "A script wrote results to a file and crashed halfway, leaving a partial file that a later job treated as complete. Writing to a temporary name and renaming at the end, plus explicit error handling, fixed it.",
+"x": "Treat every external call as failing: files, processes and networks. Use timeouts, check return codes, avoid shell=True with untrusted input and log enough to reconstruct what happened."
+},
+"http-apis-and-json": {
+"r": "A job called an API without a timeout, and when the service hung, the job hung forever and blocked the queue. Adding a timeout and a limited retry with backoff made it fail fast and recover.",
+"x": "Every request needs a timeout, bounded retries with jitter, idempotency thought and rate-limit respect. Validate responses instead of trusting their shape, and never log tokens."
+},
+"cloud-sdks": {
+"r": "A script held a long-lived access key in its source, which later appeared in a screenshot. Using the platform's role-based credentials meant there was no key to leak.",
+"x": "Prefer identity from the environment over stored keys, handle pagination and throttling, and design operations to be safe on retry. Be careful with scripts that can delete resources: dry-run first."
+},
+"testing-and-packaging": {
+"r": "A small command-line tool grew popular inside the company, then broke when a dependency changed. Tests with mocks for the network and a lock file let the team update with confidence.",
+"x": "Tests are what let you change code safely. Test behaviour at the edges, keep side effects behind small interfaces, and package tools so installation is a single repeatable command."
+},
+"concurrency-for-operations": {
+"r": "A script checked two hundred servers one after another and took an hour. Using a thread pool with a limit of twenty and a per-host timeout finished in three minutes without overwhelming the network.",
+"x": "Concurrency multiplies both speed and blast radius. Cap parallelism, set timeouts, collect errors instead of stopping silently, and choose threads, processes or async based on whether the work waits on I/O or uses CPU."
+},
+"writing-command-line-tools": {
+"r": "An internal tool returned exit code 0 even when it failed, so the pipeline kept going on bad data. Returning meaningful exit codes and clear messages made the pipeline stop where it should.",
+"x": "A command-line tool is an API for humans and scripts. Keep output stable, offer machine-readable formats, document exit codes and never change behaviour without a version bump."
+},
+"logging-for-scripts-and-services": {
+"r": "A job failed overnight and the only output was a print saying 'done'. After switching to structured logging with levels and context, the next failure showed the exact input and step.",
+"x": "Logs are for the future reader at the worst moment. Log decisions and identifiers, not secrets, use levels sensibly, and make sure logs are shipped and searchable."
+},
+"yaml-csv-and-config-files": {
+"r": "A YAML value written as no was read as a boolean, and a setting silently flipped. Quoting values and validating against a schema caught the problem before deploy.",
+"x": "Config formats have traps: type coercion, anchors, encoding and delimiters. Validate against a schema, load with safe loaders only and treat configuration changes as code changes."
+},
+"debugging-python": {
+"r": "A script seemed to hang. Sending it a signal to dump the stack showed it waiting on a network call without a timeout, which was the actual cause. The fix was a two-line timeout, found in minutes because the stack showed where it waited.",
+"x": "Read tracebacks from the bottom, reproduce with the smallest input, and use the debugger or tracing for state you cannot guess. For long-running services, build in the ability to inspect them safely in production."
+}
+}

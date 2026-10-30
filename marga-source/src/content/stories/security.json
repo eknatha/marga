@@ -1,0 +1,70 @@
+{
+"security-mindset-and-threat-modeling": {
+"r": "A team asked four simple questions about a new feature: what are we building, what can go wrong, what will we do about it, did we do a good job. In an hour they found an unauthenticated admin endpoint before it shipped.",
+"x": "Threat modeling is cheapest at design time. Focus on assets, trust boundaries and realistic attackers, record decisions and revisit when the design changes."
+},
+"secrets-management": {
+"r": "A database password stored in an environment file was copied into a support ticket. Moving to a secrets manager with short-lived credentials meant the leaked value was already expired.",
+"x": "Aim for secrets that are short-lived, scoped, audited and rotated automatically. Remove secrets from images, logs and tickets, and plan rotation as a routine, not an emergency."
+},
+"securing-the-pipeline": {
+"r": "A pipeline job with broad credentials ran code from a pull request opened by a stranger. Restricting secrets to trusted branches and requiring review stopped untrusted code from reaching them.",
+"x": "A pipeline can deploy to production, so treat it as production. Isolate runners, scope tokens per job, pin actions and dependencies, and watch for changes to pipeline definitions."
+},
+"container-and-image-security": {
+"r": "A scan found a serious flaw in a base image used by twenty services. A minimal base image and automatic rebuilds meant most services were patched the same day.",
+"x": "Scan continuously, rebuild often and keep images small. Do not rely on scanners alone; look at what the container is allowed to do at runtime."
+},
+"kubernetes-security": {
+"r": "A Pod running as root with a mounted host path was used to read files from the node. Pod security settings and policies that block privileged Pods would have rejected it at admission.",
+"x": "Layer controls: RBAC, admission policy, network policy, secrets handling and runtime detection. Assume a Pod will be compromised and ask what it can reach."
+},
+"cloud-security-and-iam": {
+"r": "A role allowed all actions on all resources 'for now' and was later used by an attacker. Narrow permissions from access analysis, and a review of unused rights, shrank the blast radius.",
+"x": "Least privilege is a process, not a state. Generate policies from usage, require multi-factor for sensitive actions, encrypt by default and scan infrastructure code before deploy."
+},
+"vulnerability-management-and-security-incidents": {
+"r": "A scanner reported four thousand findings and the team did not know where to start. Ranking by exposure to the internet, known exploitation and importance of the system gave a list of twelve to fix first.",
+"x": "Prioritise by real risk, not score alone. Set remediation times, track them, have an incident plan with roles and practise it, and keep evidence for later review."
+},
+"identity-authentication-and-zero-trust": {
+"r": "An attacker used a stolen password to enter a system that trusted anything inside the network. Strong multi-factor authentication and checks on every request would have made the stolen password far less useful.",
+"x": "Verify explicitly, use least privilege and assume breach. Prefer phishing-resistant authentication, short token lifetimes and device and context checks, and plan how users recover access safely."
+},
+"application-security-for-devops": {
+"r": "An API returned any invoice if the caller changed the number in the URL. A simple ownership check on the server closed a flaw that scanners had missed.",
+"x": "Know the common classes of web and API flaws, validate inputs and authorisation on the server and include security tests in CI. Many serious bugs are logic errors that tools do not find."
+},
+"policy-as-code-and-compliance": {
+"r": "An auditor asked for proof that every database was encrypted. Because the rule was written as code and checked on each change, the evidence was a report, not a month of screenshots.",
+"x": "Turn rules into automated checks with clear ownership and an exception process. Keep policy readable, version it, and test it as you would any code."
+},
+"network-and-edge-security": {
+"r": "A service was attacked by a flood of requests and slowed to a crawl. Rate limits at the edge, a web application firewall and cached responses absorbed most of the load.",
+"x": "Defend in layers: segment, restrict outbound traffic, terminate TLS carefully and protect DNS. Plan for denial of service before it happens and know who to call at your provider."
+},
+"ransomware-resilience-and-recovery": {
+"r": "Attackers encrypted production data and also deleted online backups. Immutable copies stored in a separate account allowed recovery without paying. The restore took a day, which the team had measured in a drill beforehand.",
+"x": "Assume attackers will look for your backups. Keep immutable, isolated copies, protect backup credentials, rehearse restores and know the time it really takes."
+},
+"detection-and-security-logging": {
+"r": "A compromised account was used for weeks before anyone noticed because audit logs were not collected. After centralising logs and alerting on unusual sign-ins, the next case was caught within hours.",
+"x": "Log what you need to answer who, what, when and from where. Protect the logs from tampering, write detections for real attacker behaviour and test them."
+},
+"encryption-and-key-management": {
+"r": "Data was encrypted, but the key sat next to it in the same bucket, so the encryption protected nothing. Separating keys into a managed service with access control and audit made the encryption meaningful.",
+"x": "Encryption moves the problem to key management. Decide who can use and who can administer keys, rotate on a schedule, plan recovery of keys and know which threats encryption does not address."
+},
+"supply-chain-sboms-and-provenance": {
+"r": "When a widely used library had a critical flaw, a team with an inventory of components found all affected services in an hour, while others spent days searching.",
+"x": "Know what you ship, where it came from and who built it. Sign artifacts, verify on deploy and keep an inventory that you can query during an emergency."
+},
+"cloud-incident-playbooks": {
+"r": "A leaked access key was noticed late on a Friday. A short playbook told the on-call engineer to disable the key, check recent activity, rotate related secrets and tell the security lead, in that order.",
+"x": "Playbooks should be short, specific and practised. Include who decides, how to preserve evidence, how to contain without destroying data and how to communicate."
+},
+"debugging-and-investigating-security-issues": {
+"r": "An alert fired for an odd login. By preserving logs first, then tracing the session, the team confirmed a test account was misused and closed the gap without wiping evidence.",
+"x": "Triage calmly: confirm, contain, preserve, investigate, recover and learn. Keep changes minimal until evidence is collected, and treat each failed control as a design problem."
+}
+}

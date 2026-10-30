@@ -1,0 +1,34 @@
+{
+"the-control-plane-in-depth": {
+"r": "A cluster became unresponsive after a burst of requests from a misbehaving controller. Knowing the request path through the API server, and its priority and fairness settings, pointed to the cause and the limit.",
+"x": "The API server and etcd are the critical path. Understand request flow, watch caches, admission and rate limiting, and protect them from noisy clients."
+},
+"etcd-backup-and-restore": {
+"r": "A mistaken deletion removed a namespace. Because snapshots were taken and tested, the team restored the cluster state to a test cluster, extracted the objects they needed and recovered the service.",
+"x": "Snapshots are only useful if verified and restorable. Practise restore, protect snapshots, keep etcd on fast disks and know the quorum rules for your cluster."
+},
+"upgrading-clusters-safely": {
+"r": "A control plane was upgraded before checking deprecated APIs, and several manifests stopped working. Scanning for removed APIs first and upgrading one minor version at a time avoided it the next time.",
+"x": "Plan upgrades like releases: read notes, check APIs and add-on compatibility, upgrade a staging cluster first, drain nodes with disruption budgets in place, and keep a rollback path."
+},
+"rbac-and-service-accounts": {
+"r": "A CI service account had cluster-admin because nobody knew which permissions it needed. Auditing with can-i and replacing it with a namespace role gave it only what it used.",
+"x": "Review bindings regularly, avoid wildcards, disable token auto-mounting where not needed and use short-lived tokens. Treat permission to create Pods as close to admin."
+},
+"nodes-draining-taints-and-capacity": {
+"r": "Draining a node for maintenance took down a service because all its replicas were on that node and there was no disruption budget. Spreading Pods and setting a budget made maintenance safe.",
+"x": "Node maintenance is a regular event. Use disruption budgets, topology spread and enough spare capacity, and automate cordon, drain and replace with checks."
+},
+"resource-quotas-limits-and-autoscaling": {
+"r": "One team's runaway deployment consumed most of the cluster and starved others. Namespace quotas and default limits prevented a single team from taking everything.",
+"x": "Shared clusters need fairness controls and visibility into cost per team. Tune requests from real data, revisit them often and watch for waste from overly large requests."
+},
+"network-policies-and-pod-security": {
+"r": "A compromised Pod scanned the internal network and reached other services freely. Default deny policies and pod security standards confined it. The attack stopped at the first Pod, and the alert fired within a minute because the blocked connections were logged.",
+"x": "Policies enforce intent only when the plugin supports them and they are tested. Begin with namespaces that matter, observe traffic before enforcing and treat exceptions as debt."
+},
+"debugging-cluster-and-node-problems": {
+"r": "A node became NotReady. The kubelet logs showed the disk was full of container images and logs. Cleaning up and setting garbage collection thresholds restored it, and an alert on disk usage was added.",
+"x": "Check the node, kubelet, container runtime and resources in order. Compare with healthy nodes, look at events and kernel messages, and fix the class of failure with alerts and limits."
+}
+}
