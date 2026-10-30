@@ -601,6 +601,8 @@ function moduleView(id) {
       var pm = (D.arch || []).filter(function (a) { return a.modules && a.modules.indexOf(m.id) >= 0; }).length, bits = [];
       var exl = window.MargaExLinks ? MargaExLinks.module(m.id) : '';
       if (exl) bits.push(exl);
+      var wgl = window.MargaWidgetLinks ? MargaWidgetLinks.module(m.id) : '';
+      if (wgl) bits.push(wgl);
       if (pm) bits.push('<a href="#/architecture">' + plural(pm, 'architecture post-mortem') + '</a>');
       return bits.length ? '<p class="small">Watch and study: ' + bits.join(', ') + '.</p>' : '';
     })() +
@@ -651,6 +653,7 @@ function lessonView(mid, slug) {
     (window.MargaFeatures ? MargaFeatures.levelsHtml(l) : '') +
     '<div class="lesson-grid"><div class="prose" id="prose">' + l.html + refsHtml(l.refs) + '</div>' + toc + '</div>' +
     (window.MargaExLinks ? MargaExLinks.lesson(id) : '') +
+    (window.MargaWidgetLinks ? MargaWidgetLinks.lesson(id) : '') +
     '<section class="check" id="check" aria-labelledby="check-h"><h2 id="check-h">Lesson check</h2><div id="quiz"></div></section>' +
     '<section class="cardsec" id="cards" aria-labelledby="cards-h"><h2 id="cards-h">Flashcards</h2><div id="deck"></div></section>' +
     '<nav class="pager" aria-label="Lesson navigation">' +
@@ -1219,6 +1222,7 @@ if (typeof window.MargaChoose === 'function') window.MargaChoose(api);
 if (typeof window.MargaSkillLabPage === 'function') window.MargaSkillLabPage(api);
 if (typeof window.MargaCaseFile === 'function') window.MargaCaseFile(api);
 if (typeof window.MargaSDLab === 'function') window.MargaSDLab(api);
+if (typeof window.MargaWidgets === 'function') window.MargaWidgets(api);
 
 /* ---------- accessibility panel ---------- */
 (function () {
