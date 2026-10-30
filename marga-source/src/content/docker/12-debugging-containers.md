@@ -70,7 +70,7 @@ The image was built for a different CPU architecture, such as arm64 on an amd64 
 
 ```diagram
 title: From a dead container to a cause
-node: status | Exit code and state | 0 | 1 | docker ps -a and inspect give the code and whether it was OOM killed. | Looking only at the restart count hides why it exits.
+node: status | Exit code and state | 0 | 1 | docker ps -a and inspect give the code and whether it was OOM killed. | Looking only at the restart count hides why it exits. | process
 node: logs | Logs | 1 | 0 | docker logs shows the last output with timestamps. | Applications that log to files inside the container leave nothing here.
 node: cfg | Effective config | 1 | 2 | inspect shows env, mounts, user, limits and command. | Assuming the image defaults still apply misses overrides.
 node: shell | Shell inside | 2 | 1 | exec or run --entrypoint sh lets you test files and commands. | Minimal images lack a shell; use a debug container.
