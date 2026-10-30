@@ -1,0 +1,1929 @@
+[
+ {
+  "id": "sre-30",
+  "title": "SRE in 30 days",
+  "summary": "Telemetry first, then service level objectives, incidents, on-call and capacity, with a widget or practice task every day.",
+  "level": "Intermediate",
+  "who": "Engineers who run production systems, or want to, and are comfortable on a Linux server.",
+  "needs": [
+   "linux"
+  ],
+  "outcomes": [
+   "Instrument a service and read its metrics, logs and traces.",
+   "Set an SLO, work out the error budget and explain burn rate to your team.",
+   "Run an incident, write a blameless postmortem and design on-call that people can sustain."
+  ],
+  "days": [
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/observability-fundamentals"
+     },
+     {
+      "t": "widget",
+      "id": "metric-cardinality"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/metrics-and-prometheus"
+     },
+     {
+      "t": "widget",
+      "id": "alert-window"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/logs-and-traces"
+     },
+     {
+      "t": "widget",
+      "id": "trace-sampling"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/log-pipelines"
+     },
+     {
+      "t": "widget",
+      "id": "log-volume"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/opentelemetry"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/synthetic-and-blackbox-monitoring"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: telemetry",
+    "items": [
+     {
+      "t": "drills",
+      "module": "observability"
+     },
+     {
+      "t": "cases",
+      "module": "observability"
+     },
+     {
+      "t": "link",
+      "href": "#/games",
+      "text": "Play an incident game",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/alerting-and-dashboards"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/red-use-and-golden-signals"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/telemetry-cost-and-cardinality"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/structured-logging-and-log-design"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/runbooks-and-dashboards-for-on-call"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/debugging-with-telemetry"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: telemetry and alerts",
+    "items": [
+     {
+      "t": "drills",
+      "module": "observability"
+     },
+     {
+      "t": "link",
+      "href": "#/widgets?skill=observability",
+      "text": "Try the observability widgets",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/slos-and-error-budgets"
+     },
+     {
+      "t": "widget",
+      "id": "error-budget"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "widget",
+      "id": "availability-math"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/incident-response"
+     },
+     {
+      "t": "widget",
+      "id": "mttr-breakdown"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/postmortems-and-toil"
+     },
+     {
+      "t": "widget",
+      "id": "oncall-load"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/reliability-patterns"
+     },
+     {
+      "t": "widget",
+      "id": "capacity-runway"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/on-call"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: reliability",
+    "items": [
+     {
+      "t": "drills",
+      "module": "sre"
+     },
+     {
+      "t": "cases",
+      "module": "sre"
+     },
+     {
+      "t": "link",
+      "href": "#/calculators",
+      "text": "Run the trade-off calculators for error budgets and redundancy",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/capacity-planning"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/chaos-engineering-and-game-days"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/change-management-and-releases"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/production-readiness-reviews"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/incident-communication-and-stakeholders"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/dependencies-and-third-party-risk"
+     }
+    ]
+   },
+   {
+    "title": "Final review and mock interview",
+    "items": [
+     {
+      "t": "drills",
+      "module": "sre"
+     },
+     {
+      "t": "cases",
+      "module": "sre"
+     },
+     {
+      "t": "link",
+      "href": "#/interview/mock",
+      "text": "Take a mock interview",
+      "min": 30
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/disaster-recovery-exercises"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/debugging-under-pressure"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "system-design-30",
+  "title": "System design in 30 days",
+  "summary": "From estimation and caching to quorums, cells and worked designs, with the lab and mock interview on the practice days.",
+  "level": "Advanced",
+  "who": "Engineers who already operate services and want to design them, or prepare for design interviews.",
+  "needs": [
+   "sre",
+   "networking",
+   "databases"
+  ],
+  "outcomes": [
+   "Estimate load and storage, then pick the right building blocks.",
+   "Reason about consistency, failure domains and blast radius.",
+   "Walk through a worked design in an interview, with trade-offs."
+  ],
+  "days": [
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/the-design-method-and-estimation"
+     },
+     {
+      "t": "lesson",
+      "id": "system-design/caching-without-stampedes"
+     },
+     {
+      "t": "widget",
+      "id": "cache-stampede"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/queues-retries-and-idempotency"
+     },
+     {
+      "t": "widget",
+      "id": "retry-storm"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/consistency-and-availability-in-practice"
+     },
+     {
+      "t": "widget",
+      "id": "token-bucket"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/quorum-leaders-and-split-brain"
+     },
+     {
+      "t": "widget",
+      "id": "quorum"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/clocks-time-and-ordering"
+     },
+     {
+      "t": "widget",
+      "id": "consistent-hashing"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/partitioning-sharding-and-consistent-hashing"
+     }
+    ]
+   },
+   {
+    "title": "Practice: estimate and break a design",
+    "items": [
+     {
+      "t": "drills",
+      "module": "system-design"
+     },
+     {
+      "t": "cases",
+      "module": "system-design"
+     },
+     {
+      "t": "link",
+      "href": "#/system-design-lab",
+      "text": "Use the System design lab",
+      "min": 25
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/storage-engines-and-replication-topologies"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/backup-restore-and-object-storage-design"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/failure-domains-cells-and-bulkheads"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/blast-radius-and-shuffle-sharding"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/graceful-degradation-and-circuit-breakers"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/rate-limiting-and-load-shedding"
+     }
+    ]
+   },
+   {
+    "title": "Practice: fail a design on purpose",
+    "items": [
+     {
+      "t": "drills",
+      "module": "system-design"
+     },
+     {
+      "t": "link",
+      "href": "#/system-design-lab",
+      "text": "Break a design against its error budget",
+      "min": 25
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/multi-region-and-global-traffic"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/config-and-control-plane-change-safety"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/hidden-dependencies-and-single-points"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/observability-by-design"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/security-and-identity-by-design"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/capacity-planning-and-cost-trade-offs"
+     }
+    ]
+   },
+   {
+    "title": "Practice: outages as design lessons",
+    "items": [
+     {
+      "t": "cases",
+      "module": "system-design"
+     },
+     {
+      "t": "link",
+      "href": "#/games",
+      "text": "Play an incident game",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/worked-design-global-api-at-four-nines"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/worked-design-the-status-page-that-survives"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/worked-design-a-url-shortener"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/worked-design-a-rate-limiter-service"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/worked-design-a-notification-fan-out-system"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/worked-design-a-metrics-and-log-pipeline"
+     }
+    ]
+   },
+   {
+    "title": "Mock design interview",
+    "items": [
+     {
+      "t": "link",
+      "href": "#/design-interview",
+      "text": "Run a timed mock design interview",
+      "min": 45
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/worked-design-a-multi-tenant-kubernetes-platform"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/worked-design-an-authoritative-dns-service"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "kubernetes-30",
+  "title": "Kubernetes operator in 30 days",
+  "summary": "Workloads, networking, storage and security, then upgrades, etcd, RBAC and cluster debugging.",
+  "level": "Intermediate",
+  "who": "Engineers who can use containers and want to run clusters in production.",
+  "needs": [
+   "docker",
+   "networking"
+  ],
+  "outcomes": [
+   "Deploy, scale and debug workloads with the right probes and resources.",
+   "Explain how traffic, storage and policy work inside a cluster.",
+   "Back up etcd, upgrade a cluster safely and handle a node loss."
+  ],
+  "days": [
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/architecture"
+     },
+     {
+      "t": "lesson",
+      "id": "kubernetes/pods-and-deployments"
+     },
+     {
+      "t": "widget",
+      "id": "rolling-update"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/services-and-ingress"
+     },
+     {
+      "t": "lesson",
+      "id": "kubernetes/config-and-secrets"
+     },
+     {
+      "t": "widget",
+      "id": "hpa-scaling"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/storage"
+     },
+     {
+      "t": "widget",
+      "id": "liveness-cascade"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/jobs-cronjobs-daemonsets"
+     },
+     {
+      "t": "widget",
+      "id": "requests-bin-packing"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/resources-and-quotas"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/autoscaling"
+     }
+    ]
+   },
+   {
+    "title": "Practice: workloads",
+    "items": [
+     {
+      "t": "drills",
+      "module": "kubernetes"
+     },
+     {
+      "t": "cases",
+      "module": "kubernetes"
+     },
+     {
+      "t": "link",
+      "href": "#/terminal-labs",
+      "text": "Open a terminal lab",
+      "min": 20
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/rbac-and-security"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/scheduling-and-troubleshooting"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/helm-and-kustomize"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/crds-and-operators"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/cni-and-cluster-networking"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/cluster-install-upgrade-etcd"
+     }
+    ]
+   },
+   {
+    "title": "Practice: networking and storage",
+    "items": [
+     {
+      "t": "drills",
+      "module": "kubernetes"
+     },
+     {
+      "t": "link",
+      "href": "#/games",
+      "text": "Play an incident game",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/cka-cks-exam-strategy"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/probes-metrics-and-logging"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/service-mesh-and-mtls"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/network-policies-in-practice"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/statefulsets-and-running-databases"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/debugging-kubernetes-workloads"
+     }
+    ]
+   },
+   {
+    "title": "Practice: operating clusters",
+    "items": [
+     {
+      "t": "drills",
+      "module": "k8s-ops"
+     },
+     {
+      "t": "cases",
+      "module": "k8s-ops"
+     },
+     {
+      "t": "link",
+      "href": "#/widgets?skill=k8s-ops",
+      "text": "Try the cluster operations widgets",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "k8s-ops/the-control-plane-in-depth"
+     },
+     {
+      "t": "widget",
+      "id": "etcd-quorum"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "k8s-ops/etcd-backup-and-restore"
+     },
+     {
+      "t": "widget",
+      "id": "rolling-node-upgrade"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "k8s-ops/upgrading-clusters-safely"
+     },
+     {
+      "t": "widget",
+      "id": "node-loss-headroom"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "k8s-ops/rbac-and-service-accounts"
+     },
+     {
+      "t": "widget",
+      "id": "rbac-blast-radius"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "k8s-ops/nodes-draining-taints-and-capacity"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "k8s-ops/resource-quotas-limits-and-autoscaling"
+     }
+    ]
+   },
+   {
+    "title": "Final review",
+    "items": [
+     {
+      "t": "drills",
+      "module": "kubernetes"
+     },
+     {
+      "t": "link",
+      "href": "#/interview/mock",
+      "text": "Take a mock interview",
+      "min": 30
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "k8s-ops/network-policies-and-pod-security"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "k8s-ops/debugging-cluster-and-node-problems"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "linux-bash-30",
+  "title": "Linux and shell in 30 days",
+  "summary": "Files, users, processes, disks, services and troubleshooting, then the shell scripting to automate them.",
+  "level": "Beginner",
+  "who": "People starting out in DevOps, or developers who want to be at ease on a server.",
+  "needs": [],
+  "outcomes": [
+   "Work confidently on a Linux server, from permissions to systemd to performance triage.",
+   "Find out why a server is slow, full or unreachable.",
+   "Write safe shell scripts that check their own work."
+  ],
+  "days": [
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/filesystem-and-navigation"
+     },
+     {
+      "t": "lesson",
+      "id": "linux/users-groups-permissions"
+     },
+     {
+      "t": "widget",
+      "id": "oom-killer"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/processes-and-services"
+     },
+     {
+      "t": "lesson",
+      "id": "linux/disks-and-filesystems"
+     },
+     {
+      "t": "widget",
+      "id": "load-average"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/lvm-and-raid"
+     },
+     {
+      "t": "widget",
+      "id": "page-cache"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/package-management"
+     },
+     {
+      "t": "widget",
+      "id": "clock-drift"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/ssh-and-remote-access"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/cron-and-timers"
+     }
+    ]
+   },
+   {
+    "title": "Practice: files, users and processes",
+    "items": [
+     {
+      "t": "drills",
+      "module": "linux"
+     },
+     {
+      "t": "link",
+      "href": "#/terminal-labs/linux",
+      "text": "Open a Linux terminal lab",
+      "min": 20
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/logs-and-troubleshooting"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/performance-triage"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/boot-and-kernel"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/security-hardening"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/namespaces-and-cgroups"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/working-efficiently-in-the-terminal"
+     }
+    ]
+   },
+   {
+    "title": "Practice: disks, services and logs",
+    "items": [
+     {
+      "t": "drills",
+      "module": "linux"
+     },
+     {
+      "t": "cases",
+      "module": "linux"
+     },
+     {
+      "t": "link",
+      "href": "#/terminal-labs/linux",
+      "text": "Open a Linux terminal lab",
+      "min": 20
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/time-ntp-and-timezones"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/systemd-overrides-targets-and-dependencies"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/kernel-modules-sysctl-and-boot-parameters"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/processes-memory-and-the-oom-killer"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/system-calls-strace-and-perf"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/filesystems-page-cache-and-io"
+     }
+    ]
+   },
+   {
+    "title": "Practice: troubleshooting a sick server",
+    "items": [
+     {
+      "t": "drills",
+      "module": "linux"
+     },
+     {
+      "t": "link",
+      "href": "#/games",
+      "text": "Play an incident game",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/networking-in-the-kernel-sockets-and-conntrack"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/debugging-a-sick-server"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "bash/script-basics"
+     },
+     {
+      "t": "widget",
+      "id": "shell-exit-codes"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "bash/control-flow-and-functions"
+     },
+     {
+      "t": "widget",
+      "id": "quoting-words"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "bash/text-processing"
+     },
+     {
+      "t": "widget",
+      "id": "atomic-write"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "bash/advanced-patterns"
+     },
+     {
+      "t": "widget",
+      "id": "parallel-jobs"
+     }
+    ]
+   },
+   {
+    "title": "Final review",
+    "items": [
+     {
+      "t": "drills",
+      "module": "bash"
+     },
+     {
+      "t": "link",
+      "href": "#/terminal-labs/bash",
+      "text": "Open a Bash terminal lab",
+      "min": 20
+     },
+     {
+      "t": "link",
+      "href": "#/placement",
+      "text": "Take the placement check",
+      "min": 20
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "bash/apis-and-json"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "bash/safe-automation"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cloud-iac-30",
+  "title": "Cloud and infrastructure as code in 30 days",
+  "summary": "Cloud building blocks, access control and Terraform, from first resources to drift and state.",
+  "level": "Intermediate",
+  "who": "Engineers who know the basics and want to build and secure cloud infrastructure as code.",
+  "needs": [
+   "networking",
+   "linux"
+  ],
+  "outcomes": [
+   "Design a network, compute and storage layout across availability zones.",
+   "Write least-privilege access and keep secrets out of code and state.",
+   "Manage Terraform state, modules and drift on a team."
+  ],
+  "days": [
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud/cloud-fundamentals"
+     },
+     {
+      "t": "lesson",
+      "id": "cloud/identity-and-access"
+     },
+     {
+      "t": "widget",
+      "id": "dr-strategy"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud/virtual-networks"
+     },
+     {
+      "t": "widget",
+      "id": "commitment-breakeven"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud/compute-and-storage"
+     },
+     {
+      "t": "widget",
+      "id": "cdn-hit-ratio"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud/dns-and-cdn"
+     },
+     {
+      "t": "widget",
+      "id": "serverless-cold-starts"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud/serverless"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud/kubernetes-on-cloud"
+     }
+    ]
+   },
+   {
+    "title": "Practice: cloud",
+    "items": [
+     {
+      "t": "drills",
+      "module": "cloud"
+     },
+     {
+      "t": "cases",
+      "module": "cloud"
+     },
+     {
+      "t": "link",
+      "href": "#/calculators",
+      "text": "Run the cost and redundancy calculators",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud/monitoring-and-logging"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud/security-and-governance"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud/managed-services-and-cost"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud/high-availability-and-disaster-recovery"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud/landing-zones-and-multi-account-strategy"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud/object-storage-and-data-lifecycle"
+     }
+    ]
+   },
+   {
+    "title": "Practice: access control",
+    "items": [
+     {
+      "t": "drills",
+      "module": "cloud-iam"
+     },
+     {
+      "t": "cases",
+      "module": "cloud-iam"
+     },
+     {
+      "t": "link",
+      "href": "#/widgets?skill=cloud-iam",
+      "text": "Try the access widgets",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud/hybrid-connectivity-and-peering"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud/debugging-cloud-outages"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud-iam/identities-principals-and-permissions"
+     },
+     {
+      "t": "widget",
+      "id": "credential-exposure"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud-iam/aws-iam-policies-roles-and-assume-role"
+     },
+     {
+      "t": "widget",
+      "id": "iam-evaluation"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud-iam/azure-entra-id-rbac-and-managed-identities"
+     },
+     {
+      "t": "widget",
+      "id": "permission-creep"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud-iam/least-privilege-and-access-reviews"
+     },
+     {
+      "t": "widget",
+      "id": "kms-throttling"
+     }
+    ]
+   },
+   {
+    "title": "Practice: Terraform",
+    "items": [
+     {
+      "t": "drills",
+      "module": "terraform"
+     },
+     {
+      "t": "link",
+      "href": "#/playground/hcl",
+      "text": "Solve a Terraform exercise",
+      "min": 20
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "terraform/iac-and-hcl-basics"
+     },
+     {
+      "t": "widget",
+      "id": "tf-drift-window"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "terraform/providers-and-resources"
+     },
+     {
+      "t": "widget",
+      "id": "count-vs-for-each"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "terraform/variables-and-outputs"
+     },
+     {
+      "t": "widget",
+      "id": "tf-plan-time"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "terraform/expressions-and-dynamic-blocks"
+     },
+     {
+      "t": "widget",
+      "id": "tf-state-exposure"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "terraform/state"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "terraform/modules"
+     }
+    ]
+   },
+   {
+    "title": "Final review",
+    "items": [
+     {
+      "t": "drills",
+      "module": "cloud"
+     },
+     {
+      "t": "cases",
+      "module": "cloud"
+     },
+     {
+      "t": "link",
+      "href": "#/interview/mock",
+      "text": "Take a mock interview",
+      "min": 30
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "terraform/secrets-and-sensitive-data"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "terraform/aws-and-azure-end-to-end"
+     }
+    ]
+   }
+  ]
+ }
+]
