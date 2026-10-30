@@ -17,7 +17,7 @@ This is a teaching design that shows common patterns. It is not the internal des
 
 ```diagram
 title: Multi-team Kubernetes platform reference design
-node: team | Application teams | 0 | 1 | Own their services and ship through the delivery pipeline. | Teams who bypass the platform create hidden risk.
+node: team | Application teams | 0 | 1 | Own their services and ship through the delivery pipeline. | Teams who bypass the platform create hidden risk. | client
 node: iac | Infrastructure as code | 1 | 0 | Creates clusters, networks and node pools from reviewed code. | Manual changes make clusters drift apart.
 node: api | Cluster API server | 1 | 1 | Receives every change, checks identity and policy. | If it is overloaded, nobody can deploy or scale.
 node: policy | Policy and admission | 2 | 1 | Rejects unsafe workloads such as privileged pods or missing limits. | Strict policy added late breaks existing apps.
