@@ -455,7 +455,7 @@ function checkLinks() {
       if ((mm = h.match(/^#\/lesson\/([^/]+)\/([^/]+)$/))) ok = !!lessons[`${mm[1]}/${mm[2]}`];
       else if ((mm = h.match(/^#\/module\/([^/]+)$/))) ok = !!modById[mm[1]];
       else if ((mm = h.match(/^#\/cheatsheet\/([^/]+)$/))) ok = !!sheets[mm[1]];
-      else if (/^#\/(paths|cheatsheets|review|labs|progress|skill-lab|system-design-lab)$/.test(h)) ok = true;
+      else if (/^#\/(paths|cheatsheets|review|labs|progress|skill-lab|system-design-lab|design-interview)$/.test(h)) ok = true;
       if (!ok) err('links', `lesson ${id}: broken app link ${h}`);
       allowedHash.push(h);
     }
@@ -893,6 +893,63 @@ function checkCaseFiles() {
   if (!n) err('casefile', 'no case files');
 }
 
+function checkWidgets() {
+  const dir = path.join(SRC, 'widgets');
+  if (!fs.existsSync(dir)) return;
+  const modules = new Set(JSON.parse(read(path.join(SRC, 'content/modules.json'))).map((m) => m.id));
+  const lessonIds = new Set(); for (const m of modules) { const d = path.join(SRC, 'content', m); if (fs.existsSync(d)) for (const f of fs.readdirSync(d).filter((x) => x.endsWith('.md'))) lessonIds.add(m + '/' + f.replace(/^\d+-/, '').replace(/\.md$/, '')); }
+  const WE = (() => { const sandbox = { window: {}, document: {}, Math, console }; vm.createContext(sandbox); vm.runInContext(read(path.join(SRC, 'app/widgets.js')), sandbox); return sandbox.window.MargaWE; })();
+  const bad = /\bgit(hub|lab|ops|leaks|ea)/i; const glyph = /[←-⇿☀-➿\u{1F300}-\u{1FAFF}]/u; const junk = /\bundefined\b|\bNaN\b|\[object Object\]|\bTODO\b|\bFIXME\b|lorem ipsum/;
+  const ids = new Set(); const perModule = {}; let n = 0;
+  for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.json')).sort()) {
+    let list; try { list = JSON.parse(read(path.join(dir, f))); } catch (x) { err('widgets', f + ': bad JSON'); continue; }
+    for (const w of list) {
+      n++; const E = (m) => err('widgets', `${w.id || '?'}: ${m}`);
+      if (!/^[a-z0-9-]+$/.test(w.id || '')) { E('bad id'); continue; }
+      if (ids.has(w.id)) E('duplicate id'); ids.add(w.id);
+      if (!modules.has(w.module)) E('unknown module ' + w.module); perModule[w.module] = (perModule[w.module] || 0) + 1;
+      if (w.lesson && !lessonIds.has(w.lesson)) E('unknown lesson ' + w.lesson);
+      if (w.lesson && w.lesson.split('/')[0] !== w.module) E('lesson is in a different skill');
+      for (const k of ['title', 'summary']) if (!w[k] || w[k].length < (k === 'summary' ? 40 : 6)) E(k + ' missing or short');
+      if (!w.inputs || w.inputs.length < 2) E('needs at least 2 inputs');
+      if (!(w.tries || []).length || w.tries.length < 3) E('needs at least 3 things to try');
+      if (!(w.verdicts || []).length || w.verdicts[w.verdicts.length - 1].when !== 'true') E('last verdict must be "true"');
+      if ((w.readouts || []).length < 2) E('needs at least 2 readouts');
+      if (!(w.nodes || []).length || !(w.edges || []).length) E('needs nodes and edges');
+      const raw = JSON.stringify(w);
+      if (junk.test(raw)) E('contains undefined, NaN, TODO or similar'); if (glyph.test(raw)) E('emoji or arrow glyph'); if (bad.test(raw)) E('banned word');
+      const iid = new Set(); for (const i of w.inputs || []) { if (iid.has(i.id)) E('duplicate input ' + i.id); iid.add(i.id); if (!i.type || i.type === 'range') { if (!(i.min < i.max) || i.value < i.min || i.value > i.max || !(i.step > 0)) E('bad range ' + i.id); } }
+      const nid = new Set(); for (const nd of w.nodes || []) { if (nid.has(nd.id)) E('duplicate node ' + nd.id); nid.add(nd.id); if (nd.toggle && !(w.inputs || []).some((i) => i.id === nd.toggle && i.type === 'toggle')) E('node toggle is not a toggle input ' + nd.toggle); if (!Number.isInteger(nd.x * 2) || !Number.isInteger(nd.y * 2)) E('node position'); }
+      for (const ed of w.edges || []) if (!nid.has(ed.from) || !nid.has(ed.to)) E('edge to unknown node');
+      if (w.chart && !iid.has(w.chart.x)) E('chart x is not an input');
+      // evaluate at defaults and at every combination of min/max for range inputs
+      const combos = [WE.defaults(w)]; const rng = (w.inputs || []).filter((i) => !i.type || i.type === 'range');
+      for (let m = 0; m < Math.min(1 << rng.length, 64); m++) { const v = WE.defaults(w); rng.forEach((i, k) => { v[i.id] = (m >> k) & 1 ? i.max : i.min; }); combos.push(v); }
+      const tgs = (w.inputs || []).filter((x) => x.type === 'toggle');
+      if (tgs.length <= 6) { for (let m = 0; m < (1 << tgs.length); m++) { const v = WE.defaults(w); tgs.forEach((i, k) => { v[i.id] = !!((m >> k) & 1); }); combos.push(v); } }
+      else for (const i of tgs) { const v = WE.defaults(w); v[i.id] = !v[i.id]; combos.push(v); }
+      for (const i of (w.inputs || []).filter((x) => x.type === 'select')) for (const o of i.options) { const v = WE.defaults(w); v[i.id] = isNaN(+o[0]) ? o[0] : +o[0]; combos.push(v); }
+      let seen = false;
+      for (const v of combos) {
+        try {
+          const r = WE.run(w, v);
+          for (const q of r.readouts) { if (/NaN|undefined|Infinity|object/.test(q.text)) { E('readout "' + q.label + '" gives ' + q.text + ' at ' + JSON.stringify(v)); break; } }
+          for (const q of r.nodes) { if (!isFinite(q.state)) { E('node state not a number'); break; } if (/NaN|undefined/.test(q.sub)) { E('node text gives ' + q.sub); break; } }
+          for (const q of r.edges) if (!isFinite(q.flow)) { E('edge flow not a number'); break; }
+          if (!r.verdict) E('no verdict at ' + JSON.stringify(v)); else if (r.verdict.when !== 'true') seen = true;
+          if (w.chart) { const pts = WE.sweep(w, v, 10); if (pts.some((p) => !isFinite(p[1]) || (p[2] !== null && !isFinite(p[2])))) { E('chart gives a non-number'); break; } }
+        } catch (x) { E('expression error: ' + x.message); break; }
+      }
+      if (!seen) E('no warning or failure verdict can be reached');
+    }
+  }
+  for (const m of modules) if ((perModule[m] || 0) < 4) err('widgets', `skill ${m} has ${perModule[m] || 0} widgets, needs at least 4`);
+  count('widgets', n);
+  for (const [k, v] of Object.entries(perModule)) count('widgets in ' + k, v);
+  const html = read(path.join(DIST, 'index.html'));
+  if (!/assets\/widgets\.js/.test(html)) err('widgets', 'widgets.js is not loaded by the page');
+}
+
 const steps = [
   ['content schema', checkSchema],
   ['role paths', checkPaths],
@@ -905,7 +962,8 @@ const steps = [
   ['case studies, architecture, drills, accessibility, counter', checkPractice],
   ['glossary, explainers, search, subnet, playgrounds', checkMore],
   ['terminal labs', checkTermLabs],
-  ['case files', checkCaseFiles]
+  ['case files', checkCaseFiles],
+  ['interactive widgets', checkWidgets]
 ];
 for (const [name, fn] of steps) {
   const before = errors.length;

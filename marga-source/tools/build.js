@@ -18,7 +18,7 @@ const SRC = path.join(ROOT, 'src');
 const DIST = path.join(ROOT, 'dist');
 const DOMAIN = 'marga.eknathalabs.com';
 // GoatCounter site code for the visitor count (https://CODE.goatcounter.com). Empty string disables it.
-const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js', 'choose.js', 'skilllab.js', 'casefile.js', 'sdlab.js'];
+const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js', 'choose.js', 'skilllab.js', 'casefile.js', 'sdlab.js', 'widgets.js'];
 // terminal lab engine: loaded only when a terminal lab is opened, but cached for offline use
 const ENGINE = ['term-fs.js', 'term-parse.js', 'term-exec.js', 'term-cmds.js', 'term-text.js', 'term-awk.js', 'term-jq.js', 'term-sys.js', 'term-net.js', 'term-labs.js'];
 const COUNTER = process.env.MARGA_COUNTER !== undefined ? process.env.MARGA_COUNTER : 'marga-eknathalabs';
@@ -450,7 +450,16 @@ function loadContent() {
       casefiles.push(j);
     }
   }
-  return { modules, paths, lessons, sheets, interview, cases, casefiles, capstones, walkthroughs, reading, games, arch, drills, glossary, labs, termlabs, predicts: PREDICTS };
+  // Interactive widgets: src/widgets/*.json, each file an array of widget definitions
+  const widgets = [];
+  const widDir = path.join(SRC, 'widgets');
+  if (fs.existsSync(widDir)) {
+    for (const f of fs.readdirSync(widDir).filter((x) => x.endsWith('.json')).sort()) {
+      let j; try { j = JSON.parse(fs.readFileSync(path.join(widDir, f), 'utf8')); } catch (x) { throw new Error(`widgets/${f}: invalid JSON (${x.message})`); }
+      for (const w of j) widgets.push(w);
+    }
+  }
+  return { modules, paths, lessons, sheets, interview, cases, casefiles, widgets, capstones, walkthroughs, reading, games, arch, drills, glossary, labs, termlabs, predicts: PREDICTS };
 
 }
 

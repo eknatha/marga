@@ -1267,7 +1267,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const links = await page.locator('#topnav a').allInnerTexts();
     eq(links.join('|'), 'Skills|Skill trees|Cheat sheets|Case studies|Practice|Certifications|Progress|InterviewHub|About', 'nav order');
     await nav(page, '/practice');
-    eq(await page.locator('.prac li').count(), 26, 'hub cards');
+    eq(await page.locator('.prac li').count(), 28, 'hub cards');
     for (const href of ['#/drills', '#/interview/mock', '#/flashcards', '#/cases', '#/architecture', '#/calculators', '#/review', '#/terminal-labs']) ok(await page.locator(`.prac a[href="${href}"]`).count() === 1, 'hub links to ' + href);
     await nav(page, '/module/kubernetes');
     ok(await page.locator('a[href="#/drills/kubernetes"]').count() === 1 && await page.locator('a[href="#/cases/kubernetes"]').count() === 1, 'module page links to practice');
@@ -1391,6 +1391,51 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     eq(n.summarize(['10.0.1.0/24', '10.0.2.0/24']).join(' '), '10.0.1.0/24 10.0.2.0/24', 'unaligned neighbours stay separate'); eq(n.summarize(['x']), null, 'bad input');
   });
 
+  await test('interactive widgets: every widget renders and responds, reset works, Try it on lessons, hub entry, phone width, axe in both themes', async () => {
+    const { ctx, page, issues } = await open();
+    await go(page, '/widgets'); await page.waitForSelector('.ex-list a');
+    const WL = await page.evaluate(() => window.ACADEMY.widgets.map((w) => ({ id: w.id, module: w.module, lesson: w.lesson })));
+    ok(WL.length >= 10, 'widgets exist');
+    eq(await page.locator('.ex-list a').count(), WL.length, 'index lists every widget');
+    for (const w of WL) {
+      await go(page, '/practice'); await go(page, '/widget/' + w.id); await page.waitForSelector('#wd-dia svg.wd');
+      const txt = await page.textContent('#main'); ok(!/NaN|undefined|Infinity|\[object/.test(txt), w.id + ' no bad numbers');
+      ok(await page.locator('#wd-read .calc-row').count() >= 2, w.id + ' readouts');
+      ok(await page.locator('#wd-verdict .sd-res').count() === 1, w.id + ' verdict');
+      const before = await page.textContent('#wd-read');
+      const moved = await page.evaluate(() => { const r = document.querySelector('#wd-in input[type=range]'); if (!r) return false; r.value = r.max; r.dispatchEvent(new Event('input', { bubbles: true })); return true; });
+      if (moved) { await page.click('#wd-reset'); eq(await page.textContent('#wd-read'), before, w.id + ' reset restores the readouts'); }
+      const tg = page.locator('.wdn.ctl').first();
+      if (await tg.count()) { const a = await page.textContent('#wd-read'); await tg.focus(); await page.keyboard.press('Enter'); ok(await page.locator('#wd-dia svg.wd').count() === 1, w.id + ' node toggle keeps the diagram'); }
+    }
+    const tried = await page.evaluate(() => Object.keys((JSON.parse(localStorage.getItem('ea.progress.v1') || '{}')).wgt || {}).length);
+    ok(tried >= 1, 'tried widgets are remembered');
+    const first = WL.find((w) => w.lesson);
+    { const prog = emptyProgress(); prog.lessons = doneMap(Object.keys(data.lessons)); prog.wgt = (await progress(page) || {}).wgt || {}; await setProgress(page, prog); }
+    await go(page, '/practice'); await go(page, '/lesson/' + first.lesson); await page.waitForSelector('#try-it');
+    ok(await page.locator('#try-it a[href="#/widget/' + first.id + '"]').count() === 1, 'lesson shows its widget under Try it');
+    await page.click('#try-it a[href="#/widget/' + first.id + '"]'); await page.waitForSelector('#wd-dia svg.wd');
+    const other = await page.evaluate(() => { const L = Object.keys(window.ACADEMY.lessons); const with_ = new Set(window.ACADEMY.widgets.map((w) => w.lesson)); return L.find((id) => !with_.has(id) && window.ACADEMY.widgets.some((w) => w.module === window.ACADEMY.lessons[id].module)); });
+    if (other) { await go(page, '/practice'); await go(page, '/lesson/' + other); await page.waitForSelector('#try-it'); ok(/same skill/.test(await page.textContent('#try-it')), 'nearest widgets are offered for other lessons in the skill'); }
+    await go(page, '/practice'); ok(await page.locator('a[href="#/widgets"]').count() >= 1, 'hub links to the widgets');
+    eq(issues.length, 0, 'console: ' + issues.join(' | '));
+    await ctx.close();
+    const sample = WL.filter((w, i) => i % 7 === 0 || i < 10).map((w) => w.id);
+    for (const dark of [false, true]) {
+      const c = await open({ dark }); const pg = c.page;
+      for (const id of sample) {
+        await go(pg, '/practice'); await go(pg, '/widget/' + id); await pg.waitForSelector('#wd-dia svg.wd');
+        await pg.addScriptTag({ content: AXE });
+        const res = await pg.evaluate(async () => (await window.axe.run(document, { resultTypes: ['violations'] })).violations.filter((v) => v.impact === 'serious' || v.impact === 'critical').map((v) => v.id + ' ' + v.nodes.length).slice(0, 4));
+        eq(res.length, 0, 'axe ' + id + ' ' + (dark ? 'dark' : 'light') + ' ' + res.join(' | '));
+      }
+      await pg.setViewportSize({ width: 390, height: 800 });
+      for (const id of sample.slice(0, 6)) { await go(pg, '/practice'); await go(pg, '/widget/' + id); await pg.waitForSelector('#wd-dia svg.wd'); ok(await pg.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), id + ' no sideways scroll at 390px'); }
+      eq(c.issues.length, 0, 'console: ' + c.issues.join(' | '));
+      await c.ctx.close();
+    }
+  });
+
   await test('system design lab: estimator, break-it simulator with fix toggle, case challenges, phone width, axe in both themes', async () => {
     const SD = await (async () => { const { ctx, page } = await open(); await go(page, '/system-design-lab'); await page.waitForSelector('#es-out .calc-row'); const r = await page.evaluate(() => { const e = window.MargaSD.estimate({ users: 20000000, perUser: 15, readPct: 70, respKb: 5, writeKb: 1, peak: 3, copies: 3, cap: 500, slo: 99.9 }); return { avg: Math.round(e.avg), peak: Math.round(e.peak), budget: e.budget, bad: window.MargaSD.estimate({ users: -1, perUser: 1, readPct: 1, respKb: 1, writeKb: 1, peak: 1, copies: 1, cap: 1, slo: 99 }).error }; }); await ctx.close(); return r; })();
     eq(SD.avg, 3472, 'average rps'); eq(SD.peak, 10417, 'peak rps'); ok(Math.abs(SD.budget - 43.2) < 0.01, 'budget minutes'); ok(/zero or more/.test(SD.bad), 'rejects negative input');
@@ -1414,6 +1459,30 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       eq(issues.length, 0, 'console: ' + issues.join(' | '));
       await ctx.close();
     }
+  });
+
+  await test('mock design interview: set up, six timed phases with notes, self-score, weak-phase links, history, phone width and axe', async () => {
+    const { ctx, page, issues } = await open();
+    await go(page, '/design-interview'); await page.waitForSelector('#sdi-go');
+    await page.selectOption('#sdi-p', 'url-shortener'); await page.click('#sdi-go');
+    await page.waitForSelector('#sdi-clock'); ok(/^\d+:\d\d$/.test(await page.textContent('#sdi-clock')), 'clock shows');
+    for (let i = 0; i < 6; i++) { await page.fill('#sdi-n', 'notes ' + i); await page.click('#sdi-next'); }
+    await page.waitForSelector('#sdi-score');
+    eq(await page.locator('input[data-k]').count(), 18, 'eighteen checklist items');
+    const boxes = await page.locator('input[data-k]').all(); for (let i = 0; i < 12; i++) await boxes[i].check();
+    await page.click('#sdi-score'); await page.waitForSelector('#sdi-res');
+    ok(/12 of 18 \(67 percent\)/.test(await page.textContent('#sdi-res')), 'score text');
+    ok(await page.locator('#sdi-res a[href^="#/lesson/system-design/"]').count() >= 3, 'weak phase links and worked design link');
+    ok(!/NaN|undefined/.test(await page.textContent('#main')), 'no bad text');
+    await nav(page, '/practice'); await nav(page, '/design-interview'); await page.waitForSelector('#sdi-go');
+    ok(/67 percent/.test(await page.textContent('#sdi')), 'history shows the last session');
+    await page.setViewportSize({ width: 390, height: 800 }); await page.waitForTimeout(150);
+    ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'no sideways scroll at 390px');
+    await page.addScriptTag({ content: AXE });
+    const res = await page.evaluate(async () => (await window.axe.run(document, { resultTypes: ['violations'] })).violations.filter((v) => v.impact === 'serious' || v.impact === 'critical').map((v) => v.id + ': ' + v.nodes[0].target.join(' ')));
+    eq(res.length, 0, 'axe ' + res.join(' | '));
+    eq(issues.length, 0, 'console: ' + issues.join(' | '));
+    await ctx.close();
   });
 
   await test('subnet playground: live results, errors, VLSM table, cloud reserve, summary', async () => {
@@ -1559,10 +1628,10 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await ctx.close();
   });
 
-  await test('failure and recovery explainers: one filter, 50 stories, every skill has two, each linked to a lesson and its paths', async () => {
+  await test('failure and recovery explainers: one filter, 51 stories, every skill has two, each linked to a lesson and its paths', async () => {
     const { ctx, page, issues } = await open();
     await go(page, '/explainers?kind=failure'); await page.waitForSelector('.exf-chip');
-    eq(await page.locator('#exf-list li:not([hidden])').count(), 50, 'failure stories shown');
+    eq(await page.locator('#exf-list li:not([hidden])').count(), 51, 'failure stories shown');
     eq(await page.isChecked('#exf-fail'), true, 'filter checked from the URL');
     eq(await page.locator('#exf-list .exf-g:not([hidden])').count(), 25, 'every skill has failure stories');
     for (const g of await page.locator('#exf-list .exf-g:not([hidden])').all()) ok((await g.locator('li:not([hidden])').count()) >= 2, 'two or more per skill');
@@ -1956,7 +2025,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const { ctx, page, issues } = await open(); await go(page, '/practice'); await page.waitForSelector('.pr-cmd');
     eq(await page.locator('.pr-feat .prac a').count(), 3, 'three featured tools');
     for (const h of ['#/explainers', '#/architecture', '#/drills']) eq(await page.locator(`.prac a[href="${h}"]`).count(), 1, h + ' appears once');
-    eq(await page.locator('.pr-li').count(), 26, '26 tools');
+    eq(await page.locator('.pr-li').count(), 28, '28 tools');
     eq(await page.locator('.pr-node').count(), 5, 'five groups');
     eq(await page.locator('.pr-week li').count(), 7, 'week strip');
     const t1 = await page.textContent('.pr-cmd h2');
@@ -1965,13 +2034,13 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     ok((await page.textContent('.pr-cmd h2')) !== t1, 'skip shows another suggestion');
     await page.click('[data-act="pr-why"]'); eq(await page.locator('#pr-whyt').isVisible(), true, 'why text');
     await page.click('[data-flag="labs"]');
-    eq(await page.locator('.pr-li:not([hidden])').count(), 11, 'labs flag shows 8 labs and 3 featured');
+    eq(await page.locator('.pr-li:not([hidden])').count(), 12, 'labs flag shows 9 labs and 3 featured');
     eq(await page.getAttribute('[data-flag="labs"]', 'aria-pressed'), 'true', 'flag pressed');
     await page.click('[data-flag="all"]');
     await page.fill('#pr-q', 'terraform');
     ok((await page.locator('.pr-li:not([hidden])').count()) >= 1 && (await page.locator('.pr-li:not([hidden])').count()) < 6, 'search narrows');
     await page.fill('#pr-q', 'zzzqqq'); eq(await page.locator('#pr-empty').isVisible(), true, 'empty state');
-    await page.click('#pr-empty [data-act="pr-clear"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 26, 'clear shows all');
+    await page.click('#pr-empty [data-act="pr-clear"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 28, 'clear shows all');
     await page.click('[data-flag="starred"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 0, 'no favourites yet');
     await page.click('[data-flag="all"]');
     await page.click('.pr-li[data-id="yaml"] .pr-star'); eq(await page.getAttribute('.pr-li[data-id="yaml"] .pr-star', 'aria-pressed'), 'true', 'starred');
@@ -2772,7 +2841,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await page.click('.tl-filter a[href="#/terminal-labs/networking"]');
     await page.waitForFunction(() => document.querySelectorAll('.tl-item').length === 18);
     await nav(page, '/practice');
-    eq(await page.locator('.prac li').count(), 26, 'hub cards');
+    eq(await page.locator('.prac li').count(), 28, 'hub cards');
     ok(await page.locator('.prac a[href="#/terminal-labs"]').count() === 1, 'hub link');
     ok(await page.locator('footer a[href="#/terminal-labs"]').count() === 1, 'footer link');
     for (const m of ['linux', 'bash', 'networking', 'python']) { await nav(page, '/module/' + m); ok(await page.locator(`a[href="#/terminal-labs/${m}"]`).count() >= 1, 'stage page links to labs: ' + m); }

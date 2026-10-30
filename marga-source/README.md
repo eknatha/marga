@@ -47,7 +47,7 @@ See DEPLOY.md for hosting, DNS and the visitor counter.
 
 ## Round 18
 
-- 50 failure-and-recovery explainers, two for each of the 25 skills. Each one runs from a healthy start, through the change and the failure, to the symptom, the diagnosis, the fix and the check that proves recovery. They carry `kind: "failure"` in `src/app/explainers.js` and a title that starts with "Failure and recovery:". A "Failure and recovery only" checkbox on the explainers page filters them (`#/explainers?kind=failure`).
+- 51 failure-and-recovery explainers, two for each of the 25 skills. Each one runs from a healthy start, through the change and the failure, to the symptom, the diagnosis, the fix and the check that proves recovery. They carry `kind: "failure"` in `src/app/explainers.js` and a title that starts with "Failure and recovery:". A "Failure and recovery only" checkbox on the explainers page filters them (`#/explainers?kind=failure`).
 - Every explainer now has a `lesson` field (`module/slug`). It is shown as "Related lesson" on the explainer page, together with the learning paths that include the skill. Lesson pages get a "Watch it" section, skill pages list their explainers and failure stories, and path pages have a "Watch along this path" row. The validator checks that every link resolves to a lesson in the same skill, that ids are unique and that each skill has at least two failure explainers.
 - Lesson links for the 394 older explainers were matched automatically by keywords and then corrected by hand where the match was clearly off. A few may still be the second-best lesson in the skill. 63 lessons have no tied explainer; their "Watch it" section shows two from the same skill and says so.
 - Three older explainers shared an id with another one. They were renamed so every id is unique.
@@ -89,3 +89,18 @@ New skill: **System design for platform and SRE** (`system-design`, Advanced, re
 - **Estimator:** users, requests, read share, response size, peak factor, copies, per-instance capacity and an availability target give requests per second, peak writes, egress, storage growth, instance count and the monthly error budget, with rule-based notes on which number crosses a limit.
 - **Break it:** six fixed designs (one region, two regions, configuration push, status page, retry chain, queue pipeline). Select a component to fail it; a "fix" switch shows the same fault with the design improved. Cost is the share of users affected times minutes to recover, compared with the monthly budget. It is a labelled model: the numbers are written in `DESIGNS` in `sdlab.js` as teaching assumptions, not measurements.
 - **Case challenges:** eight multiple-choice challenges from real case files; the reveal shows what the organisation changed (`afterChanges`) and links to the case file and a lesson.
+
+### System design round 2 (Round 22c)
+
+- 12 new lessons in `system-design` (27 in total): partitioning and consistent hashing; storage engines and replication topologies; backup, restore and object storage; observability, security and cost and capacity by design; and six worked designs (URL shortener, rate limiter service, notification fan-out, metrics and log pipeline, multi-tenant Kubernetes platform, authoritative DNS).
+- Mock design interview at `#/design-interview`: twelve prompts, six timed phases with notes, an 18-item self-score, links to the lesson for each weak phase and to the worked design, and the last five scores. Listed in the Practice hub under Study.
+- Also added: 7 interview answers, 6 drills, 8 glossary terms, 4 explainers (1 failure and recovery), and cheat sheet sections. Console blocks that are not quotations are labelled as simulated illustrations; case claims were checked against the case file summaries.
+- The mock interview is self-scored; nothing grades the notes.
+
+### Interactive widgets (Round 23)
+
+- 102 small simulations, at least 4 in each of the 25 skills, at `#/widgets` and `#/widget/<id>`. Each is plain data in `src/widgets/*.json`: inputs, derived values, a diagram of nodes and edges with animated request dots, readouts, a chart with a data table, a verdict, and things to try. The engine and pages are in `src/app/widgets.js`; `window.MargaWE` is the pure part.
+- Every lesson now has a "Try it" panel: its own widget when one is tied to it, otherwise the nearest ones from the same skill. Skill pages link to their widgets and the Practice hub lists the set under Labs. Tried widgets are remembered in the browser.
+- Motion stops under reduced-motion settings. Nodes marked as controls (a replica, a server) can be toggled with the keyboard.
+- `tools/validate.js` loads the engine and evaluates every expression at the defaults, at every min/max combination of the sliders and with every toggle combination, and fails on bad numbers, unknown lessons, missing verdicts or a skill with fewer than 4 widgets.
+- These are simplified models made for intuition. Some use round illustrative numbers (typical recovery times, relative costs, a goroutine stack size); they are labelled as such on the page and are not measurements.

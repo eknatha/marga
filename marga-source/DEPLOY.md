@@ -193,3 +193,6 @@ Round 21: case files for all 81 cases. New data folder `src/casefiles`, new scri
 
 Round 22: new module system-design (lessons, cheat sheet, interview, drills, game, glossary, explainers) added to the SRE path. No new settings or scripts.
 Round 22b: System design lab page (src/app/sdlab.js, loaded from shell.html and listed in build.js EXTRA). No new settings.
+
+Round 22c: 12 more system-design lessons, mock design interview page (in src/app/sdlab.js). No new settings.
+Round 23: 102 interactive widgets (src/widgets/*.json, src/app/widgets.js) and a Try it panel on every lesson. No new settings.
