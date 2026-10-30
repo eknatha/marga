@@ -3703,6 +3703,126 @@
     "Postmortem culture (SRE workbook)",
     "https://sre.google/workbook/postmortem-culture/"
    ]
+  ],
+  "system-design/partitioning-sharding-and-consistent-hashing": [
+   [
+    "Workload isolation using shuffle sharding",
+    "https://aws.amazon.com/builders-library/workload-isolation-using-shuffle-sharding/"
+   ],
+   [
+    "Sharding pattern",
+    "https://learn.microsoft.com/en-us/azure/architecture/patterns/sharding"
+   ]
+  ],
+  "system-design/storage-engines-and-replication-topologies": [
+   [
+    "PostgreSQL routine vacuuming",
+    "https://www.postgresql.org/docs/current/routine-vacuuming.html"
+   ],
+   [
+    "Managing critical state",
+    "https://sre.google/sre-book/managing-critical-state/"
+   ]
+  ],
+  "system-design/backup-restore-and-object-storage-design": [
+   [
+    "Reliability pillar: back up data",
+    "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/back-up-data.html"
+   ],
+   [
+    "Disaster recovery options in the cloud",
+    "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html"
+   ]
+  ],
+  "system-design/observability-by-design": [
+   [
+    "Monitoring distributed systems",
+    "https://sre.google/sre-book/monitoring-distributed-systems/"
+   ],
+   [
+    "OpenTelemetry signals",
+    "https://opentelemetry.io/docs/concepts/signals/"
+   ]
+  ],
+  "system-design/security-and-identity-by-design": [
+   [
+    "Security pillar",
+    "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html"
+   ],
+   [
+    "Azure Well-Architected security",
+    "https://learn.microsoft.com/en-us/azure/well-architected/security/"
+   ]
+  ],
+  "system-design/capacity-planning-and-cost-trade-offs": [
+   [
+    "Software engineering in SRE (capacity planning)",
+    "https://sre.google/sre-book/software-engineering-in-sre/"
+   ],
+   [
+    "Cost optimization pillar",
+    "https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html"
+   ]
+  ],
+  "system-design/worked-design-a-url-shortener": [
+   [
+    "Caching challenges and strategies",
+    "https://aws.amazon.com/builders-library/caching-challenges-and-strategies/"
+   ],
+   [
+    "Cache-aside pattern",
+    "https://learn.microsoft.com/en-us/azure/architecture/patterns/cache-aside"
+   ]
+  ],
+  "system-design/worked-design-a-rate-limiter-service": [
+   [
+    "Using load shedding to avoid overload",
+    "https://aws.amazon.com/builders-library/using-load-shedding-to-avoid-overload/"
+   ],
+   [
+    "Rate limiting pattern",
+    "https://learn.microsoft.com/en-us/azure/architecture/patterns/rate-limiting-pattern"
+   ]
+  ],
+  "system-design/worked-design-a-notification-fan-out-system": [
+   [
+    "Timeouts, retries and backoff with jitter",
+    "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/"
+   ],
+   [
+    "Making retries safe with idempotent APIs",
+    "https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/"
+   ]
+  ],
+  "system-design/worked-design-a-metrics-and-log-pipeline": [
+   [
+    "Monitoring distributed systems",
+    "https://sre.google/sre-book/monitoring-distributed-systems/"
+   ],
+   [
+    "OpenTelemetry signals",
+    "https://opentelemetry.io/docs/concepts/signals/"
+   ]
+  ],
+  "system-design/worked-design-a-multi-tenant-kubernetes-platform": [
+   [
+    "Multi-tenancy",
+    "https://kubernetes.io/docs/concepts/security/multi-tenancy/"
+   ],
+   [
+    "Resource quotas",
+    "https://kubernetes.io/docs/concepts/policy/resource-quotas/"
+   ]
+  ],
+  "system-design/worked-design-an-authoritative-dns-service": [
+   [
+    "RFC 1034 Domain names: concepts",
+    "https://www.rfc-editor.org/rfc/rfc1034"
+   ],
+   [
+    "RFC 1035 Domain names: implementation",
+    "https://www.rfc-editor.org/rfc/rfc1035"
+   ]
   ]
  },
  "sheets": {
