@@ -1158,5 +1158,53 @@
  "system-design/worked-design-the-status-page-that-survives": {
   "s": "The fire alarm must not run on the same wire as the fire.",
   "i": "I design an independent communication path and run a before and after design review of an outage."
+ },
+ "system-design/partitioning-sharding-and-consistent-hashing": {
+  "s": "Cutting a library into rooms: each book belongs to one room, and adding a room should not make you move every book.",
+  "i": "I choose partition keys, avoid hot keys and use consistent hashing so growth moves little data."
+ },
+ "system-design/storage-engines-and-replication-topologies": {
+  "s": "A notebook you rewrite in place versus a diary you only append to and tidy later; each needs a different kind of housekeeping.",
+  "i": "I compare B-tree and LSM engines, choose a replication topology and watch background cleanup and metadata growth."
+ },
+ "system-design/backup-restore-and-object-storage-design": {
+  "s": "A spare key kept in the same drawer as the first key is not a spare; you only know it works when you have opened the door with it.",
+  "i": "I design backups from RPO and RTO, keep copies independent, test timed restores and use object storage features properly."
+ },
+ "system-design/observability-by-design": {
+  "s": "Fitting a car with gauges at the factory beats guessing what is wrong from the noise it makes on the motorway.",
+  "i": "I design SLIs, signals and traces into a system and keep monitoring independent of what it watches."
+ },
+ "system-design/security-and-identity-by-design": {
+  "s": "A building with a master key for every door means one lost key opens everything; separate keys limit what a thief gets.",
+  "i": "I design trust boundaries, least privilege and short-lived credentials so one compromise reaches little."
+ },
+ "system-design/capacity-planning-and-cost-trade-offs": {
+  "s": "Keeping spare seats on the train is a cost you pay so that one broken carriage does not strand the passengers.",
+  "i": "I plan capacity from measurements with zone-loss headroom and make cost trade-offs explicit."
+ },
+ "system-design/worked-design-a-url-shortener": {
+  "s": "A phone book where most people only ever look up the same few numbers; cache those and make the rest cheap.",
+  "i": "I design a read-heavy shortener with key generation, caching, hot links and abuse controls."
+ },
+ "system-design/worked-design-a-rate-limiter-service": {
+  "s": "A doorman who must never lock the building because his notebook is lost.",
+  "i": "I design a gateway rate limiter with local allowances, safe failure behaviour and a client contract."
+ },
+ "system-design/worked-design-a-notification-fan-out-system": {
+  "s": "A post office sorts urgent mail into its own fast lane so a mass mailing cannot delay a telegram.",
+  "i": "I design fan-out with priority lanes, provider limits, deduplication and retry budgets."
+ },
+ "system-design/worked-design-a-metrics-and-log-pipeline": {
+  "s": "A river with a reservoir: it takes the flood so the town downstream stays dry, and it must never be the thing that floods.",
+  "i": "I design a telemetry pipeline with buffering, cardinality limits, tiered retention and independent alerting."
+ },
+ "system-design/worked-design-a-multi-tenant-kubernetes-platform": {
+  "s": "An apartment block: shared plumbing needs rules and fuses so one tenant's flood does not reach the others.",
+  "i": "I design a multi-tenant platform with tenancy tiers, quotas, staged upgrades and add-on dependency reviews."
+ },
+ "system-design/worked-design-an-authoritative-dns-service": {
+  "s": "The directory every other directory depends on must keep a printed copy so it can answer when its own office is shut.",
+  "i": "I design an authoritative DNS service with anycast, static stability, safe zone change and independent providers."
  }
 }
