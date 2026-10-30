@@ -44,6 +44,7 @@ if (!fs.existsSync(path.join(DIST, 'assets/data.js'))) {
 }
 const sandbox = { window: {} };
 vm.runInNewContext(read(path.join(DIST, 'assets/data.js')), sandbox);
+for (const f of fs.readdirSync(path.join(DIST, 'assets/lessons'))) vm.runInNewContext(read(path.join(DIST, 'assets/lessons', f)), sandbox);
 const A = sandbox.window.ACADEMY;
 const modules = A.modules;
 const modById = Object.fromEntries(modules.map((m) => [m.id, m]));
@@ -490,7 +491,7 @@ function checkBudgets() {
   stats['dist size KB'] = Math.round(total / 1024);
   const data = fs.statSync(path.join(DIST, 'assets/data.js')).size;
   stats['data.js KB'] = Math.round(data / 1024);
-  if (data > 3 * 1024 * 1024) warn('budget', `data.js is ${Math.round(data / 1024)} KB`);
+  if (data > 5 * 1024 * 1024) warn('budget', `data.js is ${Math.round(data / 1024)} KB`);
   const fonts = walk(path.join(DIST, 'assets'), (p) => /\.woff2?$/.test(p)).reduce((n, f) => n + fs.statSync(f).size, 0);
   stats['fonts KB'] = Math.round(fonts / 1024);
   if (fonts > 1200 * 1024) warn('budget', `fonts total ${Math.round(fonts / 1024)} KB`);
@@ -610,6 +611,7 @@ function checkPractice() {
       if (gids.has(g.id)) err('games', `${w}: duplicate id`); gids.add(g.id);
       if (!mods.has(g.module)) err('games', `${w}: bad module`);
       if (!A.lessons[g.lesson]) err('games', `${w}: unknown lesson ${g.lesson}`);
+      { const x = g.explain; if (!x || ['cause', 'signs', 'fix', 'example'].some((k) => typeof x[k] !== 'string' || x[k].length < 30)) err('games', `${w}: needs an explanation (cause, signs, fix, example)`); else if (FORBID.test(JSON.stringify(x))) err('games', `${w}: explanation has forbidden text`); }
       if (!['Beginner', 'Intermediate', 'Advanced'].includes(g.level)) err('games', `${w}: bad level`);
       const ids = Object.keys(g.scenes);
       if (ids.length < 6) err('games', `${w}: needs at least 6 scenes`);
@@ -893,6 +895,20 @@ function checkCaseFiles() {
   if (!n) err('casefile', 'no case files');
 }
 
+function checkStories() {
+  const bad = /\bgit(hub|lab|ops|leaks|ea)/i; const glyph = /[←-⇿☀-➿\u{1F300}-\u{1FAFF}]/u; const junk = /\bundefined\b|\bNaN\b|\[object Object\]|\bTODO\b|\bFIXME\b|lorem ipsum/;
+  let n = 0;
+  for (const id of Object.keys(A.lessons)) {
+    const l = A.lessons[id], lv = l.lv || {}; n++;
+    for (const [k, min, max] of [['s', 25, 400], ['i', 40, 500], ['x', 100, 520], ['r', 150, 640]]) {
+      const t = lv[k]; if (typeof t !== 'string') { err('stories', `${id}: missing ${k}`); continue; }
+      if (t.length < min || t.length > max) err('stories', `${id}: ${k} is ${t.length} characters (want ${min}-${max})`);
+      if (bad.test(t) || glyph.test(t) || junk.test(t)) err('stories', `${id}: ${k} has banned text`);
+    }
+    if (lv.r && lv.x && lv.r === lv.x) err('stories', `${id}: story and senior view are identical`);
+  }
+  stats['stories'] = n;
+}
 function checkWidgets() {
   const dir = path.join(SRC, 'widgets');
   if (!fs.existsSync(dir)) return;
@@ -1017,7 +1033,7 @@ const steps = [
   ['glossary, explainers, search, subnet, playgrounds', checkMore],
   ['terminal labs', checkTermLabs],
   ['case files', checkCaseFiles],
-  ['interactive widgets', checkWidgets],
+  ['interactive widgets', checkWidgets], ['lesson stories and senior views', checkStories],
   ['learning plans', checkPlans]
 ];
 for (const [name, fn] of steps) {

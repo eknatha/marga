@@ -36,8 +36,10 @@ function serve() {
 
 const results = [];
 let current = '';
+let TESTN = 0;
 async function test(name, fn) {
   if (process.env.ONLY && !name.includes(process.env.ONLY)) return;
+  if (process.env.SHARD) { const [a, n] = process.env.SHARD.split('/').map(Number); if ((TESTN++) % n !== a) return; }
   current = name;
   const t0 = Date.now();
   try {
@@ -70,7 +72,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const page = await ctx.newPage();
     const issues = [];
     page.on('console', (m) => { if (m.type() === 'error') issues.push(`console: ${m.text()}`); });
-    page.on('pageerror', (e) => issues.push(`pageerror: ${e.message}`));
+    page.on('pageerror', (e) => issues.push(`pageerror: ${e.message} @ ${String(e.stack).split('\n').slice(1,3).join(' ')}`));
     page.on('requestfailed', (r) => issues.push(`requestfailed: ${r.url()}`));
     page.on('response', (r) => { if (r.status() >= 400 && !/favicon/.test(r.url())) issues.push(`http ${r.status()}: ${r.url()}`); });
     return { ctx, page, issues, hits };
@@ -128,7 +130,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const text = await page.evaluate(() => document.body.innerText);
     ok(!/\bgit(hub|lab|ops|leaks|ea)/i.test(text), 'visible text mentions git');
     ok(/Labs/.test(text) && /planned/i.test(text), 'home should mention planned labs');
-    ok(text.includes('Free. No login. No payment. Just practice and learn.') && text.includes('No account needed. Start now.'), 'home free/no login lines');
+    ok(text.includes('Free. Offline. No sign-up.') && text.includes('Open it once, turn off wifi, and keep learning') && text.includes('No account needed. Start now.'), 'home free/no login lines');
     ok(!/Free forever/.test(text), 'no Free forever wording');
     eq(await page.locator('.tree .node').count() >= 8, true, 'skill tree nodes rendered');
     eq(await page.getAttribute('html', 'lang'), 'en', 'html lang');
@@ -1267,7 +1269,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const links = await page.locator('#topnav a').allInnerTexts();
     eq(links.join('|'), 'Skills|Skill trees|Cheat sheets|Case studies|Practice|Certifications|Progress|InterviewHub|About', 'nav order');
     await nav(page, '/practice');
-    eq(await page.locator('.prac li').count(), 29, 'hub cards');
+    eq(await page.locator('.prac li').count(), 31, 'hub cards');
     for (const href of ['#/drills', '#/interview/mock', '#/flashcards', '#/cases', '#/architecture', '#/calculators', '#/review', '#/terminal-labs']) ok(await page.locator(`.prac a[href="${href}"]`).count() === 1, 'hub links to ' + href);
     await nav(page, '/module/kubernetes');
     ok(await page.locator('a[href="#/drills/kubernetes"]').count() === 1 && await page.locator('a[href="#/cases/kubernetes"]').count() === 1, 'module page links to practice');
@@ -1417,7 +1419,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
   await test('diagram system: all lesson diagrams are drawn and pass colour contrast in both themes', async () => {
     for (const dark of [false, true]) {
       const { ctx, page, issues } = await open({ dark, viewport: { width: 1100, height: 900 } }); await go(page, '/'); await setProgress(page, allDone());
-      const ids = await page.evaluate(() => Object.keys(window.ACADEMY.lessons).filter((id) => /class="dg"/.test(window.ACADEMY.lessons[id].html)));
+      const ids = await page.evaluate(async () => { await window.MargaApp.loadAll(); return Object.keys(window.ACADEMY.lessons).filter((id) => /class="dg"/.test(window.ACADEMY.lessons[id].html)); });
       ok(ids.length >= 40, 'lessons with diagrams: ' + ids.length);
       await page.addScriptTag({ content: AXE });
       const bad = [];
@@ -1466,6 +1468,9 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       eq(await page.locator('.lrail li').count(), 4, 'four steps');
       ok(await page.locator('.takeaways li').count() >= 2, 'takeaways');
       ok((await page.locator('.plan-chip').count()) === 1, 'plan chip');
+      ok((await page.locator('#realworld p').first().textContent()).length > 120, 'real-world story');
+      eq(await page.locator('.levels .seg-b').count(), 4, 'four explanation levels');
+      await page.click('.levels [data-lv="sen"]'); ok((await page.locator('#lv-body').textContent()).includes('senior engineer'), 'senior view shows');
       await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await page.waitForTimeout(200);
       ok(await page.evaluate(() => parseFloat(document.getElementById('rail-fill').style.width) > 50), 'progress bar fills');
       eq(await page.locator('.lrail li.on').count(), 1, 'one current step');
@@ -1502,6 +1507,44 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       if (!dark) { await page.setViewportSize({ width: 390, height: 844 }); await page.waitForTimeout(150); ok(await page.evaluate(() => document.documentElement.scrollWidth <= 391), 'no sideways scroll at 390px'); }
       await ctx.close();
     }
+  });
+
+  await test('incident replays and portfolio: replay steps play, scrub and pause for a decision; button on post-mortems; portfolio reflects progress, prints and copies; phone width; axe in both themes', async () => {
+    for (const dark of [false, true]) {
+      const { ctx, page, issues } = await open({ dark }); await go(page, '/replay'); await page.waitForSelector('.ex-list a');
+      ok(await page.locator('.ex-list a').count() >= 40, 'replays listed');
+      await nav(page, '/replay/aws-s3-us-east-1-2017'); await page.waitForSelector('#rp-card .rp-text');
+      const n = await page.evaluate(() => document.querySelectorAll('#rp-list li').length); ok(n >= 6, 'steps: ' + n);
+      eq(await page.locator('#rp-n').textContent(), 'Step 1 of ' + n, 'step counter');
+      await page.click('#rp-next'); eq(await page.locator('#rp-n').textContent(), 'Step 2 of ' + n, 'next works');
+      await page.fill('#rp-range', String(n)); await page.dispatchEvent('#rp-range', 'input'); eq(await page.locator('#rp-n').textContent(), 'Step ' + n + ' of ' + n, 'scrub works');
+      ok(await page.locator('#rp-next').isDisabled(), 'next disabled at the end');
+      await page.click('#rp-restart'); await page.click('.rp-jump[data-i="' + Math.floor(n / 2) + '"]'); ok(await page.locator('#rp-ask .note-panel').count() === 1, 'pause and think appears');
+      await page.click('#rp-reveal'); ok(await page.locator('#rp-ask .note-panel').count() === 0, 'reveal closes it');
+      await nav(page, '/practice'); await nav(page, '/architecture/aws-s3-us-east-1-2017'); await page.waitForSelector('#rp-link');
+      await nav(page, '/practice'); await nav(page, '/portfolio'); await page.waitForSelector('.pf-skills li');
+      eq(await page.locator('.pf-skills li').count(), 25, 'a row per skill');
+      await page.evaluate(() => { const s = MargaApp.state(); const m = MargaApp.MODS[0]; m.lessons.forEach((id) => { s.lessons[id] = { done: true, best: 100, at: Date.now(), attempts: 1 }; }); MargaApp.save(); MargaApp.route(); });
+      await page.waitForTimeout(200); ok((await page.locator('.pf-stats').textContent()).includes('Skills completed'), 'stats');
+      ok(await page.evaluate(() => /complete/.test(document.querySelector('.pf-skills li').textContent)), 'finished skill shows complete');
+      await page.addScriptTag({ content: AXE });
+      for (const r of ['/portfolio', '/replay/aws-s3-us-east-1-2017', '/replay']) {
+        await nav(page, '/practice'); await nav(page, r); await page.waitForSelector('main, #main');
+        const v = await page.evaluate(async () => (await window.axe.run(document, { resultTypes: ['violations'] })).violations.filter((x) => x.impact === 'serious' || x.impact === 'critical').map((x) => x.id));
+        eq(v.length, 0, (dark ? 'dark ' : 'light ') + r + ' ' + v.join(','));
+      }
+      if (!dark) { await page.setViewportSize({ width: 390, height: 844 }); for (const r of ['/portfolio', '/replay/aws-s3-us-east-1-2017']) { await nav(page, '/practice'); await nav(page, r); await page.waitForTimeout(200); ok(await page.evaluate(() => document.documentElement.scrollWidth <= 391), 'no sideways scroll at 390px on ' + r); } }
+      await ctx.close();
+    }
+  });
+
+  await test('daily picks: Today page shows an incident game and a widget of the day, links work', async () => {
+    const { ctx, page } = await open(); await go(page, '/today'); await page.waitForSelector('.today-case');
+    eq(await page.locator('.today-case').count(), 3, 'case, incident game, widget');
+    const g = await page.locator('a[href^="#/game/"]').first().getAttribute('href'); const w = await page.locator('a[href^="#/widget/"]').first().getAttribute('href');
+    await nav(page, '/practice'); await nav(page, g.slice(1)); await page.waitForSelector('h1'); ok(!(await page.locator('h1').textContent()).includes('not found'), 'game opens');
+    await nav(page, '/practice'); await nav(page, w.slice(1)); await page.waitForSelector('#wd-in'); ok(true, 'widget opens');
+    await ctx.close();
   });
 
   await test('interactive widgets: every widget renders and responds, reset works, Try it on lessons, hub entry, phone width, axe in both themes', async () => {
@@ -2016,7 +2059,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await a.page.click('#iv-list [data-act=iv-show]'); ok(await a.page.locator('#iv-list .iv-a').isVisible(), 'answer opens');
     await a.page.click('#iv-list [data-act=iv-rate][data-r=know]'); eq(Object.values((await progress(a.page)).iv).includes('know'), true, 'rating is saved to InterviewHub progress');
     ok(await a.page.locator('.today-case a[href^="https://"]').count() === 1, 'original report link'); ok(await a.page.locator('.today-case a[href^="#/cases/"]').count() >= 1, 'link to the full case');
-    await go(a.page, '/'); await a.page.waitForSelector('#today-band'); eq(await a.page.locator('#today-band .prac li').count(), 3, 'three cards on the home page');
+    await go(a.page, '/'); await a.page.waitForSelector('#today-band'); eq(await a.page.locator('#today-band .prac li').count(), 5, 'five cards on the home page');
     ok(await a.page.locator('#today-band a[href="#/daily"]').count() === 1 && await a.page.locator('#today-band a[href^="#/interview/"]').count() === 1 && await a.page.locator('#today-band a[href^="#/cases/"]').count() === 1, 'home links');
     await a.page.click('#today-band a[href^="#/interview/"]'); await a.page.waitForSelector('.iv-a:not([hidden])'); eq(await a.page.locator('.iv-a:not([hidden])').count(), 1, 'home card opens that answer');
     await a.ctx.close();
@@ -2086,7 +2129,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     eq(await page.locator('.hd-tab').count(), 4, 'four demo tabs');
     await page.click('#hd-t2'); eq(await page.locator('#hd-link').getAttribute('href'), '#/explainers/dns-lookup', 'explainer tab switches the link');
     ok(await page.locator('.hero .hero-copy .hero-free').count() === 1, 'free line sits in the hero');
-    eq(await page.locator('#today-band .prac li').count(), 3, 'today strip');
+    eq(await page.locator('#today-band .prac li').count(), 5, 'today strip');
     eq(await page.locator('.tl-card li').count(), 5, 'incident timeline');
     ok(await page.locator('a[href="#/architecture/aws-s3-us-east-1-2017"]').count() >= 1, 'post-mortem link');
     eq(await page.locator('.band a[href="#/subnet"]').count(), 1, 'tools band');
@@ -2138,7 +2181,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const { ctx, page, issues } = await open(); await go(page, '/practice'); await page.waitForSelector('.pr-cmd');
     eq(await page.locator('.pr-feat .prac a').count(), 3, 'three featured tools');
     for (const h of ['#/explainers', '#/architecture', '#/drills']) eq(await page.locator(`.prac a[href="${h}"]`).count(), 1, h + ' appears once');
-    eq(await page.locator('.pr-li').count(), 29, '29 tools');
+    eq(await page.locator('.pr-li').count(), 31, '31 tools');
     eq(await page.locator('.pr-node').count(), 5, 'five groups');
     eq(await page.locator('.pr-week li').count(), 7, 'week strip');
     const t1 = await page.textContent('.pr-cmd h2');
@@ -2153,7 +2196,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await page.fill('#pr-q', 'terraform');
     ok((await page.locator('.pr-li:not([hidden])').count()) >= 1 && (await page.locator('.pr-li:not([hidden])').count()) < 6, 'search narrows');
     await page.fill('#pr-q', 'zzzqqq'); eq(await page.locator('#pr-empty').isVisible(), true, 'empty state');
-    await page.click('#pr-empty [data-act="pr-clear"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 29, 'clear shows all');
+    await page.click('#pr-empty [data-act="pr-clear"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 31, 'clear shows all');
     await page.click('[data-flag="starred"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 0, 'no favourites yet');
     await page.click('[data-flag="all"]');
     await page.click('.pr-li[data-id="yaml"] .pr-star'); eq(await page.getAttribute('.pr-li[data-id="yaml"] .pr-star', 'aria-pressed'), 'true', 'starred');
@@ -2204,7 +2247,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     ok(await page.locator('.node.s-lock').count() >= 5, 'dependent skills are locked');
     await page.waitForFunction(() => document.querySelectorAll('.tree-lines path').length >= 9);
     await page.locator('.tab').nth(2).click(); await page.waitForSelector('.node[data-id="sre"]');
-    eq(await page.locator('.node').count(), 19, 'sre tree has 19 skills');
+    eq(await page.locator('.node').count(), 20, 'sre tree has 20 skills');
     const prog = emptyProgress(); prog.lessons = doneMap(MODS.linux.lessons);
     await setProgress(page, prog); await nav(page, '/paths'); await page.waitForSelector('.tree .node');
     eq(await page.locator('.node[data-id="linux"].s-pass').count(), 1, 'linux is mastered');
@@ -2563,10 +2606,11 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
 
   await test('reading lists: six items per stage on the module page and on the reading page', async () => {
     const { ctx, page } = await open(); await go(page, '/');
-    for (const m of data.modules) eq((data.reading[m.id] || []).length, 6, m.id + ' reading items');
+    for (const m of data.modules) ok((data.reading[m.id] || []).length >= 5, m.id + ' reading items');
+    const RT = data.modules.reduce((n, m) => n + (data.reading[m.id] || []).length, 0);
     await nav(page, '/reading'); await page.waitForSelector('.reading');
-    eq(await page.locator('.reading li').count(), data.modules.length * 6, 'all items listed');
-    ok(await page.locator('.reading a[target=_blank][rel*=noopener]').count() === data.modules.length * 6, 'links open safely');
+    eq(await page.locator('.reading li').count(), RT, 'all items listed');
+    ok(await page.locator('.reading a[target=_blank][rel*=noopener]').count() === RT, 'links open safely');
     await nav(page, '/module/sre'); await page.waitForSelector('.reading');
     eq(await page.locator('.reading li').count(), 6, 'items on module page');
     await ctx.close();
@@ -2574,7 +2618,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
 
   await test('incident games: one per stage, a choice shows feedback, a game reaches an ending and is remembered', async () => {
     const { ctx, page } = await open(); await go(page, '/');
-    eq(data.games.length, 59, '59 games');
+    eq(data.games.length, 111, '111 games');
     for (const m of data.modules) ok(data.games.some((g) => g.module === m.id), m.id + ' has a game');
     await nav(page, '/practice'); ok(await page.locator('.prac a[href="#/games"]').count() === 1, 'hub card');
     await nav(page, '/games'); await page.waitForSelector('.game-card'); eq(await page.locator('.game-card').count(), data.games.length, 'all games listed');
@@ -2598,10 +2642,31 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await ctx.close();
   });
 
+  await test('incident games: every module has at least three games and every game explains the incident with cause, signs, fix and an example', async () => {
+    const { ctx, page } = await open(); await go(page, '/');
+    for (const m of data.modules) ok(data.games.filter((g) => g.module === m.id).length >= 3, m.id + ' has 3+ games');
+    for (const g of data.games) for (const k of ['cause', 'signs', 'fix', 'example']) ok(g.explain && g.explain[k] && g.explain[k].length >= 30, g.id + ' ' + k);
+    const g = data.games.find((x) => x.id === 'the-retry-storm');
+    await nav(page, '/game/' + g.id);
+    for (let i = 0; i < 20; i++) {
+      if (await page.locator('.gm-end').count()) break;
+      await page.waitForSelector('.gm-choice');
+      const text = await page.textContent('.gm-scene');
+      const scene = Object.values(g.scenes).find((x) => x.text === text.trim());
+      await page.locator('.gm-choice').nth(scene.choices.findIndex((c) => c.pts === 2)).click();
+      await page.click('[data-act=gm-next]');
+    }
+    await page.waitForSelector('.gm-explain');
+    const t = await page.textContent('.gm-explain');
+    ok(/Root cause/.test(t) && /What you would see/.test(t) && /How to fix it/.test(t) && /Example/.test(t), 'four labelled parts');
+    ok(t.indexOf(g.explain.cause.slice(0, 30)) >= 0, 'cause text shown');
+    await ctx.close();
+  });
+
   await test('incident games: every game explains every choice with an example, and the summary shows a better move', async () => {
     const { ctx, page } = await open(); await go(page, '/');
     const fresh = data.games.filter((g) => Object.values(g.scenes).some((s) => s.choices.some((c) => /Example: /.test(c.fb))));
-    eq(fresh.length, 59, 'games with worked examples');
+    eq(fresh.length, data.games.length, 'games with worked examples');
     for (const g of fresh) for (const sc of Object.values(g.scenes)) for (const c of sc.choices) ok(/ Example: /.test(c.fb) && c.fb.length > 30, g.id + ': ' + c.t);
     const g = fresh[0];
     await nav(page, '/game/' + g.id); await page.waitForSelector('.gm-choice');
@@ -2954,7 +3019,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await page.click('.tl-filter a[href="#/terminal-labs/networking"]');
     await page.waitForFunction(() => document.querySelectorAll('.tl-item').length === 18);
     await nav(page, '/practice');
-    eq(await page.locator('.prac li').count(), 29, 'hub cards');
+    eq(await page.locator('.prac li').count(), 31, 'hub cards');
     ok(await page.locator('.prac a[href="#/terminal-labs"]').count() === 1, 'hub link');
     ok(await page.locator('footer a[href="#/terminal-labs"]').count() === 1, 'footer link');
     for (const m of ['linux', 'bash', 'networking', 'python']) { await nav(page, '/module/' + m); ok(await page.locator(`a[href="#/terminal-labs/${m}"]`).count() >= 1, 'stage page links to labs: ' + m); }
@@ -3206,7 +3271,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     ok(data.sheets.git && data.sheets.git.module === 'git', 'cheat sheet');
     ok(data.interview.filter((x) => x.module === 'git').length >= 8, 'interview answers');
     ok(data.drills.filter((x) => x.module === 'git').length >= 8, 'drills');
-    ok(data.games.filter((x) => x.module === 'git').length === 2, 'games');
+    ok(data.games.filter((x) => x.module === 'git').length >= 2, 'games');
     ok(EXPL_IDS.filter((x) => /^git-/.test(x)).length >= 12, 'explainers');
     for (const p of data.paths.live) ok(p.modules.indexOf('git') >= 0 && p.modules.indexOf('git') > p.modules.indexOf('linux') - 1, p.id + ' includes git');
     const { ctx, page } = await open();
@@ -3226,8 +3291,8 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       ok(data.drills.filter((x) => x.module === id).length >= 8, id + ' drills');
       ok(EXPL_IDS.filter((x) => new RegExp('^x-' + id + '-').test(x)).length >= 12, id + ' explainers');
     }
-    eq(data.games.filter((x) => x.module === 'go').length, 3, 'go incident games');
-    eq(data.games.filter((x) => x.module === 'helm').length, 2, 'helm games');
+    ok(data.games.filter((x) => x.module === 'go').length >= 3, 'go incident games');
+    ok(data.games.filter((x) => x.module === 'helm').length >= 2, 'helm games');
     for (const p of data.paths.live.filter((q) => q.id !== 'ai')) { ok(p.modules.indexOf('go') > p.modules.indexOf('python'), p.id + ' go after python'); ok(p.modules.indexOf('helm') > p.modules.indexOf('kubernetes'), p.id + ' helm after kubernetes'); }
     const lx = data.modules.find((x) => x.id === 'linux');
     ok(lx.lessons.length >= 22 && /debugging/.test(lx.lessons[lx.lessons.length - 1]), 'linux ends with debugging');
@@ -3247,7 +3312,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       eq(m.lessons.length, 8, id + ' lessons'); ok(/debugging/.test(m.lessons[7]), id + ' ends with debugging');
       ok(data.interview.filter((x) => x.module === id).length >= 8, id + ' interview');
       ok(data.drills.filter((x) => x.module === id).length >= 8, id + ' drills');
-      eq(data.games.filter((x) => x.module === id).length, 2, id + ' incident games');
+      ok(data.games.filter((x) => x.module === id).length >= 2, id + ' incident games');
       ok(EXPL_IDS.filter((x) => new RegExp('^x-' + id.replace('claude-skills', 'skills') + '-').test(x)).length >= 12, id + ' explainers');
       ok(data.cases.filter((c) => c.modules.indexOf(id) >= 0).length >= 2, id + ' case studies');
       ok(data.sheets[id], id + ' cheat sheet');

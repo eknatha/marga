@@ -18,7 +18,7 @@ const SRC = path.join(ROOT, 'src');
 const DIST = path.join(ROOT, 'dist');
 const DOMAIN = 'marga.eknathalabs.com';
 // GoatCounter site code for the visitor count (https://CODE.goatcounter.com). Empty string disables it.
-const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js', 'choose.js', 'skilllab.js', 'casefile.js', 'sdlab.js', 'widgets.js', 'diagrams.js', 'plans.js'];
+const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js', 'choose.js', 'skilllab.js', 'casefile.js', 'sdlab.js', 'widgets.js', 'diagrams.js', 'plans.js', 'replay.js', 'portfolio.js'];
 // terminal lab engine: loaded only when a terminal lab is opened, but cached for offline use
 const ENGINE = ['term-fs.js', 'term-parse.js', 'term-exec.js', 'term-cmds.js', 'term-text.js', 'term-awk.js', 'term-jq.js', 'term-sys.js', 'term-net.js', 'term-labs.js'];
 const COUNTER = process.env.MARGA_COUNTER !== undefined ? process.env.MARGA_COUNTER : 'marga-eknathalabs';
@@ -245,7 +245,16 @@ function renderDiagram(code) {
 
 /* ---------- load content ---------- */
 const PREDICTS = [];
-const LEVELS = (() => { try { return JSON.parse(fs.readFileSync(path.join(SRC, 'content', 'levels.json'), 'utf8')); } catch (x) { return {}; } })();
+const LEVELS = (() => {
+  let o = {}; try { o = JSON.parse(fs.readFileSync(path.join(SRC, 'content', 'levels.json'), 'utf8')); } catch (x) { o = {}; }
+  // real-world stories (r) and the senior view (x), one file per skill: src/content/stories/<skill>.json
+  const sd = path.join(SRC, 'content', 'stories');
+  if (fs.existsSync(sd)) for (const f of fs.readdirSync(sd).filter((n) => n.endsWith('.json'))) {
+    const mod = f.replace(/\.json$/, ''); let j; try { j = JSON.parse(fs.readFileSync(path.join(sd, f), 'utf8')); } catch (x) { throw new Error(`stories/${f}: invalid JSON (${x.message})`); }
+    for (const [slug, v] of Object.entries(j)) { const id = `${mod}/${slug}`; o[id] = { ...(o[id] || {}), r: v.r, x: v.x }; }
+  }
+  return o;
+})();
 function loadContent() {
   const modules = JSON.parse(fs.readFileSync(path.join(SRC, 'content', 'modules.json'), 'utf8'));
   const paths = JSON.parse(fs.readFileSync(path.join(SRC, 'content', 'paths.json'), 'utf8'));
@@ -400,7 +409,8 @@ function loadContent() {
           if (scenes[id]) throw new Error(`games/${f}: "${title}" has a duplicate scene ${id}`);
           scenes[id] = o; order.push(id);
         }
-        games.push({ id: slug(title), title, module: kv.module, level: kv.level, minutes: Number(kv.minutes), lesson: kv.lesson, summary: kv.summary, intro: kv.intro, start: order[0], scenes });
+        const EXPL_ = (globalThis.__EXPL = globalThis.__EXPL || (fs.existsSync(path.join(gdir, 'explain.json')) ? JSON.parse(fs.readFileSync(path.join(gdir, 'explain.json'), 'utf8')) : {}));
+        games.push({ id: slug(title), explain: EXPL_[slug(title)] || null, title, module: kv.module, level: kv.level, minutes: Number(kv.minutes), lesson: kv.lesson, summary: kv.summary, intro: kv.intro, start: order[0], scenes });
       }
     }
   }
@@ -550,8 +560,16 @@ function main() {
 
   const css = fontCss() + read('app/app.css');
   const js = read('app/app.js');
-  const dataJs = 'window.ACADEMY=' + JSON.stringify({ domain: DOMAIN, counter: COUNTER, ...data }).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029') + ';';
-  const ver = crypto.createHash('sha1').update(css + js + dataJs + EXTRA.concat(ENGINE).map((f) => read('app/' + f)).join('')).digest('hex').slice(0, 8);
+  // lesson bodies (html, toc, references, search text) are about half the data: they ship as one small file per skill and load when needed
+  const chunks = {}; const slim = {};
+  for (const [id, l] of Object.entries(data.lessons)) {
+    (chunks[l.module] = chunks[l.module] || {})[id] = { html: l.html, toc: l.toc, refs: l.refs, text: l.text };
+    slim[id] = { ...l, html: '', toc: [], refs: [], text: '' };
+  }
+  const esc = (o) => JSON.stringify(o).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+  const chunkJs = {}; for (const [m, c] of Object.entries(chunks)) chunkJs[m] = '(function(m,c){var L=window.ACADEMY.lessons;for(var id in c){Object.assign(L[id],c[id]);}(window.ACADEMY_LOADED=window.ACADEMY_LOADED||{})[m]=1;})(' + JSON.stringify(m) + ',' + esc(c) + ');';
+  const dataJs = 'window.ACADEMY=' + JSON.stringify({ domain: DOMAIN, counter: COUNTER, ...data, lessons: slim }).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029') + ';';
+  const ver = crypto.createHash('sha1').update(css + js + dataJs + Object.values(chunkJs).join('') + EXTRA.concat(ENGINE).map((f) => read('app/' + f)).join('')).digest('hex').slice(0, 8);
 
   write('assets/app.css', css);
   write('assets/app.js', js);
@@ -560,6 +578,7 @@ function main() {
   write('assets/sql-wasm.js', fs.readFileSync(path.join(ROOT, 'node_modules/sql.js/dist/sql-wasm-browser.js'), 'utf8').split('\n').map((ln) => (/^\s*\/\//.test(ln) && /(\bgi\w+\.com|\bTO\w+:)/.test(ln) ? '// (comment removed)' : ln)).join('\n'));
   fs.copyFileSync(path.join(ROOT, 'node_modules/sql.js/dist/sql-wasm-browser.wasm'), path.join(DIST, 'assets/sql-wasm.wasm'));
   write('assets/data.js', dataJs);
+  for (const [m, c] of Object.entries(chunkJs)) write('assets/lessons/' + m + '.js', c);
 
   const shell = read('app/shell.html').replace(/{{VER}}/g, ver).replace(/{{SITE}}/g, SITE).replace(/{{DOMAIN}}/g, DOMAIN);
   write('index.html', shell);
@@ -592,7 +611,7 @@ function main() {
   }, null, 2));
   write('icon.svg', read('app/icon.svg'));
 
-  const precache = ['./', 'index.html', 'assets/app.css', 'assets/app.js', 'assets/data.js', ...EXTRA.concat(ENGINE).map((f) => 'assets/' + f), 'icon.svg', 'manifest.webmanifest', 'cheatsheets/']
+  const precache = ['./', 'index.html', 'assets/app.css', 'assets/app.js', 'assets/data.js', ...Object.keys(chunkJs).map((m) => 'assets/lessons/' + m + '.js'), ...EXTRA.concat(ENGINE).map((f) => 'assets/' + f), 'icon.svg', 'manifest.webmanifest', 'cheatsheets/']
     .concat(Object.keys(fonts).map((f) => 'assets/fonts/' + f))
     .concat(list.map((s) => `cheatsheets/${s.id}.html`));
   write('sw.js', read('app/sw.js').replace('{{VER}}', ver).replace('{{FILES}}', JSON.stringify(precache)));
