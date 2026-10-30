@@ -66,6 +66,7 @@ function prTools() {
   add('scenarios', 'calculators', '#/calculators', 'Trade-off calculators', 'Error budgets, redundancy, cost, recovery time and capacity.', '7 calculators', '10 min', 'mid', 'SRE, Cloud', null);
   add('scenarios', 'mix', '#/mix', 'Mixed practice', 'Twelve questions and drills from different stages, shuffled.', 'Uses lessons you passed', '12 min', 'mid', 'Passed lessons', null);
   add('scenarios', 'weak', '#/weak', 'Weak-spot review', 'Items you missed come back until you get them right.', (F.weakCount ? F.weakCount() : 0) + ' to review', '8 min', '', 'What you missed', null);
+  add('study', 'plans', '#/plans', 'Learning plans', 'Day-by-day routes of about 30 days for SRE, system design, Kubernetes, DevOps and cloud. Lessons and widgets tick themselves.', (D.plans || []).length + ' plans', '30 min a day', 'starter', 'Every skill', null);
   add('study', 'dmock', '#/design-interview', 'Mock design interview', 'A timed system design session with notes per phase and a self-score.', 'Runs in your browser', '45 min', 'senior', 'System design', null);
   add('study', 'mock', '#/interview/mock', 'Mock interview', 'A timed run of questions for your role, then score yourself.', mock.length ? 'Best score ' + best + '%' : 'Not tried yet', '30 min', '', '', null);
   add('study', 'flashcards', '#/flashcards', 'Interactive flashcards', 'Flip, shuffle and sort cards from every lesson.', known + ' cards marked known', '', '', '', null);
