@@ -163,7 +163,33 @@
    "y2label": "Swap in use (GB)",
    "title": "RAM and swap against demand",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "There is no memory left.",
+    "tone": "bad",
+    "values": {
+     "ram": 2,
+     "demand": 6,
+     "swap": 2,
+     "cg": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Everything fits in RAM.",
+    "tone": "good",
+    "values": {
+     "ram": 2,
+     "demand": 2,
+     "swap": 2,
+     "cg": false
+    }
+   }
+  ]
  },
  {
   "id": "load-average",
@@ -303,7 +329,31 @@
    "ylabel": "Load per core",
    "title": "Load per core",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "More than one and a half runnable tasks per core.",
+    "tone": "bad",
+    "values": {
+     "load": 12,
+     "cpus": 6,
+     "dwait": 0
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Plenty of room.",
+    "tone": "good",
+    "values": {
+     "load": 5,
+     "cpus": 8,
+     "dwait": 0
+    }
+   }
+  ]
  },
  {
   "id": "page-cache",
@@ -470,7 +520,33 @@
    "ylabel": "Average read time (ms)",
    "title": "Read latency against working set",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Most reads go to disk.",
+    "tone": "bad",
+    "values": {
+     "ram": 16,
+     "apps": 1,
+     "ws": 58,
+     "disk": "0.2"
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The hot data fits in the page cache, so reads are served from memory.",
+    "tone": "good",
+    "values": {
+     "ram": 26,
+     "apps": 1,
+     "ws": 18,
+     "disk": "0.2"
+    }
+   }
+  ]
  },
  {
   "id": "clock-drift",
@@ -624,7 +700,31 @@
    "ylabel": "Worst-case error (ms)",
    "title": "Drift error against interval",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The clock can drift further than the system tolerates before the next sync.",
+    "tone": "bad",
+    "values": {
+     "ppm": 45,
+     "hrs": 1,
+     "tol": "100"
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Comfortably inside tolerance.",
+    "tone": "good",
+    "values": {
+     "ppm": 49,
+     "hrs": 0.1,
+     "tol": "100"
+    }
+   }
+  ]
  },
  {
   "id": "shell-exit-codes",
@@ -758,6 +858,32 @@
    "Fail step 3 with set -e off and no check.",
    "Turn on set -e. The script stops at the failure.",
    "Remember that set -e has gaps, such as commands in conditions, so explicit checks still matter."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The script carried on after the failure, so later steps ran against missing or half-built data and the exit status may say success.",
+    "tone": "bad",
+    "values": {
+     "steps": 8,
+     "failat": 3,
+     "sete": false,
+     "check": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "No step failed.",
+    "tone": "good",
+    "values": {
+     "steps": 8,
+     "failat": 0,
+     "sete": false,
+     "check": false
+    }
+   }
   ]
  },
  {
@@ -890,6 +1016,32 @@
    "Set 10 percent of names to contain spaces and leave quoting off.",
    "Turn quoting on and watch the wrong count drop to zero.",
    "Add words per name to see how the arguments multiply."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Each name with a space becomes several arguments, so the command acts on files that do not exist, or on the wrong ones.",
+    "tone": "bad",
+    "values": {
+     "files": 200,
+     "pct": 1,
+     "words": 2,
+     "quoted": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Quoted variables arrive as one argument each, spaces and all.",
+    "tone": "good",
+    "values": {
+     "files": 200,
+     "pct": 0,
+     "words": 2,
+     "quoted": false
+    }
+   }
   ]
  },
  {
@@ -1043,7 +1195,35 @@
    "title": "Partial read risk (no atomic write)",
    "min": 0,
    "max": 100
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Readers often catch the file mid-write and parse truncated data.",
+    "tone": "bad",
+    "values": {
+     "size": 430,
+     "speed": 80,
+     "every": 31,
+     "reads": 1,
+     "atomic": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A rename is atomic on the same filesystem, so readers see the old file or the new one, never half of it.",
+    "tone": "good",
+    "values": {
+     "size": 333,
+     "speed": 80,
+     "every": 1,
+     "reads": 1,
+     "atomic": true
+    }
+   }
+  ]
  },
  {
   "id": "parallel-jobs",
@@ -1210,7 +1390,37 @@
    "ylabel": "Total time (min)",
    "title": "Time against workers",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "CPU-bound work does not speed up beyond the number of cores.",
+    "tone": "warn",
+    "values": {
+     "items": 10200,
+     "per": 0.49,
+     "p": 9,
+     "cores": 1,
+     "io": false,
+     "cap": 77
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "More workers still help.",
+    "tone": "good",
+    "values": {
+     "items": 100,
+     "per": 0.6,
+     "p": 3,
+     "cores": 10,
+     "io": false,
+     "cap": 85
+    }
+   }
+  ]
  },
  {
   "id": "git-rebase-merge",
@@ -1352,6 +1562,32 @@
    "Make the branch long with high overlap and no squash.",
    "Squash first. Rebase now costs the same as merge.",
    "Remember the trade-off is history shape against effort."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Rebase replays each commit, so the same conflict can come back again and again.",
+    "tone": "warn",
+    "values": {
+     "commits": 15,
+     "files": 2,
+     "overlap": 40,
+     "squash": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Same effort either way.",
+    "tone": "good",
+    "values": {
+     "commits": 1,
+     "files": 2,
+     "overlap": 40,
+     "squash": false
+    }
+   }
   ]
  },
  {
@@ -1498,7 +1734,31 @@
    "ylabel": "Test runs needed",
    "title": "Bisect steps grow slowly",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A flaky test lies often enough that bisect probably lands on the wrong commit.",
+    "tone": "bad",
+    "values": {
+     "n": 270,
+     "mins": 5,
+     "flaky": 4
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The search is quick and reliable.",
+    "tone": "good",
+    "values": {
+     "n": 100,
+     "mins": 5,
+     "flaky": 0
+    }
+   }
+  ]
  },
  {
   "id": "secret-in-history",
@@ -1638,6 +1898,34 @@
    "Rewrite history but do not rotate. The key stays live.",
    "Rotate the key. The risk goes away even with copies left.",
    "Make the repository public and see the exposure change."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The key still works and other copies exist.",
+    "tone": "bad",
+    "values": {
+     "clones": 19,
+     "days": 4,
+     "public": false,
+     "rewrite": false,
+     "rotate": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Nothing was exposed and the key is no longer live.",
+    "tone": "good",
+    "values": {
+     "clones": 1,
+     "days": 4,
+     "public": false,
+     "rewrite": false,
+     "rotate": false
+    }
+   }
   ]
  },
  {
@@ -1793,7 +2081,33 @@
    "ylabel": "Clone time (min)",
    "title": "Clone time for the chosen type",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Over ten minutes per clone.",
+    "tone": "bad",
+    "values": {
+     "hist": 2,
+     "bin": 40,
+     "mbps": 10,
+     "mode": "full"
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Fast enough.",
+    "tone": "good",
+    "values": {
+     "hist": 0.1,
+     "bin": 40,
+     "mbps": 10,
+     "mode": "full"
+    }
+   }
+  ]
  },
  {
   "id": "docker-layer-cache",
@@ -1945,7 +2259,33 @@
    "ylabel": "Build time for a code edit (min)",
    "title": "Code edit build time",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A code edit invalidates the dependency install because source was copied first.",
+    "tone": "warn",
+    "values": {
+     "install": 6,
+     "compile": 2,
+     "change": "code",
+     "good": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Only the code layer rebuilds.",
+    "tone": "good",
+    "values": {
+     "install": 6,
+     "compile": 2,
+     "change": "code",
+     "good": true
+    }
+   }
+  ]
  },
  {
   "id": "image-pull-time",
@@ -2088,7 +2428,33 @@
    "ylabel": "Pull time (s)",
    "title": "Pull time against image size",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nodes wait minutes just to download.",
+    "tone": "bad",
+    "values": {
+     "size": 400,
+     "nodes": 39,
+     "mbps": 100,
+     "cached": 0
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The pull is quick.",
+    "tone": "good",
+    "values": {
+     "size": 10,
+     "nodes": 30,
+     "mbps": 100,
+     "cached": 0
+    }
+   }
+  ]
  },
  {
   "id": "container-limits",
@@ -2252,6 +2618,34 @@
    "Raise the spike above the headroom.",
    "Lower the CPU limit below what the work needs.",
    "Compare how the two limits fail differently."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Memory crosses the limit and the kernel kills the container.",
+    "tone": "bad",
+    "values": {
+     "memlimit": 384,
+     "use": 576,
+     "spike": 0,
+     "cpulim": 1,
+     "need": 0.4
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Both limits leave room.",
+    "tone": "good",
+    "values": {
+     "memlimit": 1024,
+     "use": 672,
+     "spike": 32,
+     "cpulim": 1.1,
+     "need": 0.2
+    }
+   }
   ]
  },
  {
@@ -2407,6 +2801,32 @@
    "ylabel": "Time to notice a failure (s)",
    "title": "Detection time",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The checks start before the app is ready, fail enough times, and the container is killed during startup, again and again.",
+    "tone": "bad",
+    "values": {
+     "interval": 30,
+     "retries": 3,
+     "start": 0,
+     "boot": 110
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Checks do not fire before the app is ready, and failures are noticed quickly.",
+    "tone": "good",
+    "values": {
+     "interval": 35,
+     "retries": 3,
+     "start": 10,
+     "boot": 5
+    }
+   }
+  ]
  }
 ]

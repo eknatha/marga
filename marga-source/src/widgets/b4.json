@@ -161,7 +161,35 @@
    "y2label": "Usable window",
    "title": "Conversation size against the window",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The conversation no longer fits.",
+    "tone": "bad",
+    "values": {
+     "window": 65000,
+     "sys": 3900,
+     "turn": 750,
+     "turns": 79,
+     "reserve": 4400
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Plenty of room.",
+    "tone": "good",
+    "values": {
+     "window": 82000,
+     "sys": 4100,
+     "turn": 100,
+     "turns": 35,
+     "reserve": 4500
+    }
+   }
+  ]
  },
  {
   "id": "sampling-temperature",
@@ -340,7 +368,29 @@
    "title": "Top token probability against temperature",
    "min": 0,
    "max": 100
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "At a high temperature unlikely tokens get real probability.",
+    "tone": "warn",
+    "values": {
+     "t": 1.6,
+     "topp": 1
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A balanced spread.",
+    "tone": "good",
+    "values": {
+     "t": 1.5000000000000002,
+     "topp": 1
+    }
+   }
+  ]
  },
  {
   "id": "llm-cost-cache",
@@ -527,7 +577,39 @@
    "ylabel": "Cost per day ($)",
    "title": "Daily cost against caching",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Output dominates.",
+    "tone": "warn",
+    "values": {
+     "reqs": 100,
+     "inp": 100,
+     "out": 300,
+     "pin": 2.1,
+     "pout": 36,
+     "cached": 10,
+     "disc": 10
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Input and output costs are balanced.",
+    "tone": "good",
+    "values": {
+     "reqs": 85400,
+     "inp": 17600,
+     "out": 1210,
+     "pin": 3.8000000000000003,
+     "pout": 15,
+     "cached": 30,
+     "disc": 20
+    }
+   }
+  ]
  },
  {
   "id": "eval-sample-size",
@@ -674,7 +756,31 @@
    "y2label": "Gap (points)",
    "title": "Noise margin against test size",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The gap is inside the noise.",
+    "tone": "warn",
+    "values": {
+     "a": 81,
+     "b": 86,
+     "n": 370
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The gap is larger than the sampling noise, so it is probably real.",
+    "tone": "good",
+    "values": {
+     "a": 74,
+     "b": 86,
+     "n": 230
+    }
+   }
+  ]
  },
  {
   "id": "tool-loop-tokens",
@@ -823,7 +929,33 @@
    "ylabel": "Input tokens processed",
    "title": "Input grows faster than the number of steps",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Total input grows with the square of the number of steps.",
+    "tone": "bad",
+    "values": {
+     "steps": 24,
+     "base": 1500,
+     "res": 1800,
+     "cached": 0
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A short loop with compact results.",
+    "tone": "good",
+    "values": {
+     "steps": 23,
+     "base": 500,
+     "res": 700,
+     "cached": 5
+    }
+   }
+  ]
  },
  {
   "id": "tool-args-validity",
@@ -966,7 +1098,33 @@
    "title": "First-try validity against arguments",
    "min": 0,
    "max": 100
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Even with retries, one call in ten ends in an error.",
+    "tone": "bad",
+    "values": {
+     "fields": 7,
+     "err": 6.5,
+     "tries": 1,
+     "strict": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Most calls are valid on the first try.",
+    "tone": "good",
+    "values": {
+     "fields": 7,
+     "err": 0.5,
+     "tries": 1,
+     "strict": false
+    }
+   }
+  ]
  },
  {
   "id": "lethal-trifecta",
@@ -1106,6 +1264,32 @@
    "Switch on all three.",
    "Add human approval.",
    "Remove the outbound channel."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Hidden instructions in the content can tell the agent to read private data and send it out, and nothing stops it.",
+    "tone": "bad",
+    "values": {
+     "priv": true,
+     "untrusted": true,
+     "out": true,
+     "approve": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "At most one of the three is present, so there is no complete path.",
+    "tone": "good",
+    "values": {
+     "priv": false,
+     "untrusted": true,
+     "out": false,
+     "approve": false
+    }
+   }
   ]
  },
  {
@@ -1255,7 +1439,33 @@
    "title": "Timeouts against the limit",
    "min": 0,
    "max": 100
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "One task in five fails because a call in it timed out.",
+    "tone": "bad",
+    "values": {
+     "mean": 850,
+     "tmo": 100,
+     "retries": 1,
+     "calls": 12
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Timeouts are rare.",
+    "tone": "good",
+    "values": {
+     "mean": 1000,
+     "tmo": 4900,
+     "retries": 1,
+     "calls": 13
+    }
+   }
+  ]
  },
  {
   "id": "metric-cardinality",
@@ -1422,7 +1632,39 @@
    "ylabel": "Time series",
    "title": "Series against users (user label on)",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Millions of series.",
+    "tone": "bad",
+    "values": {
+     "metrics": 134,
+     "endpoints": 144,
+     "codes": 5,
+     "inst": 184,
+     "user": false,
+     "users": 19600,
+     "kb": 4
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Bounded labels keep the series count under control.",
+    "tone": "good",
+    "values": {
+     "metrics": 1,
+     "endpoints": 169,
+     "codes": 6,
+     "inst": 88,
+     "user": false,
+     "users": 100,
+     "kb": 5
+    }
+   }
+  ]
  },
  {
   "id": "alert-window",
@@ -1582,7 +1824,33 @@
    "y2label": "Threshold",
    "title": "Window average against window length",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The spike is short or small enough that the window average never reaches the threshold, so users hurt while nobody is told.",
+    "tone": "bad",
+    "values": {
+     "spike": 20,
+     "dur": 1,
+     "win": 30,
+     "thr": 4
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The alert fires quickly for this spike.",
+    "tone": "good",
+    "values": {
+     "spike": 25,
+     "dur": 1,
+     "win": 16,
+     "thr": 1
+    }
+   }
+  ]
  },
  {
   "id": "trace-sampling",
@@ -1742,7 +2010,35 @@
    "ylabel": "Traces stored per second",
    "title": "Stored traces against sampling rate",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Head sampling decides before it knows which requests fail, so most error traces are discarded.",
+    "tone": "warn",
+    "values": {
+     "rps": 1490,
+     "err": 0.1,
+     "head": 7.6,
+     "tail": false,
+     "kb": 19
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Errors are kept and storage is bounded.",
+    "tone": "good",
+    "values": {
+     "rps": 2540,
+     "err": 0.1,
+     "head": 14.5,
+     "tail": false,
+     "kb": 3
+    }
+   }
+  ]
  },
  {
   "id": "log-volume",
@@ -1923,7 +2219,39 @@
    "ylabel": "Relative cost",
    "title": "Cost against searchable retention",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Most of the bill is debug noise you rarely read.",
+    "tone": "bad",
+    "values": {
+     "svc": 50,
+     "lps": 1112,
+     "bytes": 120,
+     "debug": 60,
+     "dropdebug": false,
+     "hot": 33,
+     "cold": 50
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Volume and retention are in proportion.",
+    "tone": "good",
+    "values": {
+     "svc": 3,
+     "lps": 1105,
+     "bytes": 250,
+     "debug": 60,
+     "dropdebug": false,
+     "hot": 17,
+     "cold": 0
+    }
+   }
+  ]
  },
  {
   "id": "fewshot-cost",
@@ -2090,7 +2418,37 @@
    "ylabel": "Extra cost per month ($)",
    "title": "Monthly cost against examples",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Examples crowd the context.",
+    "tone": "warn",
+    "values": {
+     "k": 6,
+     "tok": 540,
+     "reqs": 100,
+     "price": 5.4,
+     "cached": 10,
+     "disc": 15
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A small, affordable overhead.",
+    "tone": "good",
+    "values": {
+     "k": 2,
+     "tok": 560,
+     "reqs": 6900,
+     "price": 0.1,
+     "cached": 0,
+     "disc": 15
+    }
+   }
+  ]
  },
  {
   "id": "output-retries",
@@ -2241,7 +2599,33 @@
    "title": "Success against retries",
    "min": 50,
    "max": 100
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "One in twenty items still fails.",
+    "tone": "bad",
+    "values": {
+     "p": 76,
+     "retries": 1,
+     "rp": 93,
+     "repair": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Retries with feedback keep failures rare, at the cost of a few extra calls.",
+    "tone": "good",
+    "values": {
+     "p": 81,
+     "retries": 2,
+     "rp": 92,
+     "repair": false
+    }
+   }
+  ]
  },
  {
   "id": "prompt-regression",
@@ -2402,6 +2786,34 @@
    "Fix 20 cases and break 12.",
    "Set a tolerance of zero.",
    "Read the list of broken cases before shipping."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The new prompt is worse overall.",
+    "tone": "bad",
+    "values": {
+     "n": 240,
+     "pass0": 65,
+     "fixed": 3,
+     "broke": 5,
+     "tol": 3
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Gains outweigh breaks and breaks are within what you accept.",
+    "tone": "good",
+    "values": {
+     "n": 220,
+     "pass0": 0,
+     "fixed": 0,
+     "broke": 0,
+     "tol": 4
+    }
+   }
   ]
  },
  {
@@ -2574,7 +2986,37 @@
    "y2label": "Window",
    "title": "Tokens needed against passages",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Everything does not fit.",
+    "tone": "bad",
+    "values": {
+     "window": 18000,
+     "sys": 1400,
+     "k": 4,
+     "chunk": 700,
+     "hist": 14500,
+     "out": 1800
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "There is room for the answer.",
+    "tone": "good",
+    "values": {
+     "window": 41000,
+     "sys": 1200,
+     "k": 8,
+     "chunk": 800,
+     "hist": 13500,
+     "out": 700
+    }
+   }
+  ]
  },
  {
   "id": "threads-gil",
@@ -2732,7 +3174,37 @@
    "ylabel": "Time (s)",
    "title": "Time against workers",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "CPU-bound threads take turns holding the interpreter lock, so extra threads add overhead and no speed.",
+    "tone": "bad",
+    "values": {
+     "n": 200,
+     "sec": 0.2,
+     "w": 15,
+     "cores": 3,
+     "cpu": true,
+     "procs": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The workers genuinely run in parallel here.",
+    "tone": "good",
+    "values": {
+     "n": 180,
+     "sec": 0.05,
+     "w": 1,
+     "cores": 4,
+     "cpu": true,
+     "procs": false
+    }
+   }
+  ]
  },
  {
   "id": "log-disk-fill",
@@ -2893,7 +3365,35 @@
    "title": "Time to full disk",
    "min": 0,
    "max": 60
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The disk fills in days and the service falls over when it does, usually on a weekend.",
+    "tone": "bad",
+    "values": {
+     "rps": 45,
+     "lines": 9,
+     "bytes": 240,
+     "disk": 1,
+     "rotate": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Rotation keeps logs bounded.",
+    "tone": "good",
+    "values": {
+     "rps": 1,
+     "lines": 8,
+     "bytes": 220,
+     "disk": 1,
+     "rotate": true
+    }
+   }
+  ]
  },
  {
   "id": "stream-vs-load",
@@ -3036,7 +3536,33 @@
    "y2label": "Free memory",
    "title": "Peak memory against file size",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The program asks for more memory than exists and is killed, often hours into a job.",
+    "tone": "bad",
+    "values": {
+     "size": 5.86,
+     "ram": 2,
+     "chunk": 101,
+     "stream": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Memory use is small and does not grow with the file.",
+    "tone": "good",
+    "values": {
+     "size": 2.02,
+     "ram": 6,
+     "chunk": 68,
+     "stream": false
+    }
+   }
+  ]
  },
  {
   "id": "test-feedback-time",
@@ -3226,6 +3752,40 @@
    "Catch the bug in a unit test with fast-first off.",
    "Turn on fast-first.",
    "Add more end-to-end tests."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "You wait ten minutes or more to learn about a failure.",
+    "tone": "bad",
+    "values": {
+     "unit": 1490,
+     "unitms": 17,
+     "integ": 61,
+     "integs": 3.3000000000000003,
+     "e2e": 48,
+     "e2es": 16,
+     "where": "i",
+     "fast": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Feedback arrives quickly.",
+    "tone": "good",
+    "values": {
+     "unit": 1740,
+     "unitms": 1,
+     "integ": 21,
+     "integs": 0.1,
+     "e2e": 35,
+     "e2es": 1,
+     "where": "i",
+     "fast": false
+    }
+   }
   ]
  },
  {
@@ -3382,6 +3942,36 @@
    "Tick the shared weakness.",
    "Raise the weakest layer.",
    "Untick it."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "When layers share one weakness they fall together, so you get only the best layer, not the product.",
+    "tone": "bad",
+    "values": {
+     "l1": 62,
+     "l2": 81,
+     "l3": 66,
+     "l4": 43,
+     "att": 10,
+     "shared": true
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Independent layers multiply, so a good set leaves very little.",
+    "tone": "good",
+    "values": {
+     "l1": 67,
+     "l2": 99,
+     "l3": 69,
+     "l4": 31,
+     "att": 2700,
+     "shared": false
+    }
+   }
   ]
  },
  {
@@ -3531,7 +4121,35 @@
    "ylabel": "Hours to rotate",
    "title": "Rotation time against applications",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Hours of work while the old secret still works, and some copies will be missed.",
+    "tone": "bad",
+    "values": {
+     "apps": 20,
+     "envs": 3,
+     "places": 2,
+     "mins": 6,
+     "central": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "One place to change, and everything picks it up.",
+    "tone": "good",
+    "values": {
+     "apps": 1,
+     "envs": 3,
+     "places": 2,
+     "mins": 1,
+     "central": false
+    }
+   }
+  ]
  },
  {
   "id": "vuln-backlog",
@@ -3681,7 +4299,33 @@
    "ylabel": "Backlog after a year",
    "title": "Backlog against fix rate",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Findings arrive faster than they are fixed, so the backlog grows without end.",
+    "tone": "bad",
+    "values": {
+     "found": 75,
+     "fixed": 45,
+     "start": 0,
+     "sla": 6
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The team keeps pace with new findings.",
+    "tone": "good",
+    "values": {
+     "found": 65,
+     "fixed": 115,
+     "start": 0,
+     "sla": 1
+    }
+   }
+  ]
  },
  {
   "id": "ransomware-recovery",
@@ -3852,7 +4496,37 @@
    "ylabel": "Restore time (h)",
    "title": "Restore time against speed",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The attacker was inside longer than you keep backups, so every backup may be tainted.",
+    "tone": "bad",
+    "values": {
+     "dwell": 35,
+     "keep": 1,
+     "tb": 0.1,
+     "gbps": 0.1,
+     "immut": false,
+     "tested": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A clean copy exists and the restore is quick enough.",
+    "tone": "good",
+    "values": {
+     "dwell": 25,
+     "keep": 122,
+     "tb": 0.1,
+     "gbps": 0.1,
+     "immut": false,
+     "tested": true
+    }
+   }
+  ]
  },
  {
   "id": "tf-drift-window",
@@ -3983,7 +4657,31 @@
    "ylabel": "Drifted resources",
    "title": "Drift against plan interval",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Many resources differ from code by the time you plan.",
+    "tone": "bad",
+    "values": {
+     "hand": 10,
+     "interval": 24,
+     "res": 370
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Frequent plans catch drift while it is small.",
+    "tone": "good",
+    "values": {
+     "hand": 0,
+     "interval": 24,
+     "res": 330
+    }
+   }
+  ]
  },
  {
   "id": "count-vs-for-each",
@@ -4110,7 +4808,31 @@
    "ylabel": "Resources replaced",
    "title": "Impact against position",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Count identifies resources by position, so removing one early shifts all the others and Terraform replaces them.",
+    "tone": "bad",
+    "values": {
+     "n": 10,
+     "pos": 3,
+     "fe": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Only the removed item changes.",
+    "tone": "good",
+    "values": {
+     "n": 10,
+     "pos": 10,
+     "fe": false
+    }
+   }
+  ]
  },
  {
   "id": "tf-plan-time",
@@ -4255,7 +4977,33 @@
    "ylabel": "Plan time (s)",
    "title": "Plan time against splitting",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Plans take ten minutes or more, so people skip them or run them rarely.",
+    "tone": "bad",
+    "values": {
+     "res": 8300,
+     "lat": 240,
+     "par": 1,
+     "states": 2
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Plans stay quick.",
+    "tone": "good",
+    "values": {
+     "res": 7900,
+     "lat": 230,
+     "par": 8,
+     "states": 6
+    }
+   }
+  ]
  },
  {
   "id": "tf-state-exposure",
@@ -4405,6 +5153,34 @@
    "Store 12 secrets with no encryption and 25 readers.",
    "Encrypt the state.",
    "Fetch secrets at run time."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Plaintext secrets sit in a state file many people can read.",
+    "tone": "bad",
+    "values": {
+     "people": 30,
+     "secrets": 6,
+     "sens": false,
+     "enc": false,
+     "ext": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "No secrets live in state.",
+    "tone": "good",
+    "values": {
+     "people": 32,
+     "secrets": 0,
+     "sens": false,
+     "enc": false,
+     "ext": false
+    }
+   }
   ]
  }
 ]

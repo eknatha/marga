@@ -181,7 +181,33 @@
    "ylabel": "Admitted req/s",
    "y2label": "Rejected req/s",
    "title": "Admitted and rejected against load"
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The steady rate is above the refill rate, so the bucket empties and the excess is rejected.",
+    "tone": "warn",
+    "values": {
+     "rate": 12,
+     "burst": 26,
+     "load": 48,
+     "spike": 67
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The steady rate is under the refill rate and the burst fits in the bucket.",
+    "tone": "good",
+    "values": {
+     "rate": 10,
+     "burst": 65,
+     "load": 1,
+     "spike": 63
+    }
+   }
+  ]
  },
  {
   "id": "retry-storm",
@@ -366,7 +392,33 @@
    "ylabel": "Load the service sees (req/s)",
    "y2label": "Capacity (req/s)",
    "title": "Offered load against capacity"
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Retries pile on top of the normal load.",
+    "tone": "bad",
+    "values": {
+     "base": 770,
+     "outage": 31,
+     "retries": 3,
+     "budget": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The service has enough capacity and almost nothing fails, so retries are rare.",
+    "tone": "good",
+    "values": {
+     "base": 750,
+     "outage": 25,
+     "retries": 3,
+     "budget": false
+    }
+   }
+  ]
  },
  {
   "id": "quorum",
@@ -591,6 +643,38 @@
    "Set W=1 and R=1. Everything is fast and available, but the overlap line turns to not guaranteed.",
    "Set W=5. One failed replica now blocks all writes.",
    "Set W=3 and R=3, then fail two replicas, then a third."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Writes cannot reach the write quorum, so they are refused.",
+    "tone": "bad",
+    "values": {
+     "w": 5,
+     "rd": 3,
+     "d1": true,
+     "d2": false,
+     "d3": false,
+     "d4": false,
+     "d5": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "W plus R is more than 5, so every read quorum overlaps every write quorum and sees the latest write.",
+    "tone": "good",
+    "values": {
+     "w": 4,
+     "rd": 3,
+     "d1": true,
+     "d2": false,
+     "d3": false,
+     "d4": false,
+     "d5": false
+    }
+   }
   ]
  },
  {
@@ -744,7 +828,29 @@
    "y2label": "Quietest server (x fair share)",
    "title": "Load balance against virtual nodes",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "With so few points on the ring the slices are uneven, so one server carries far more than its share.",
+    "tone": "warn",
+    "values": {
+     "n": 4,
+     "v": 1
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Load is close to even, and adding a server moves only about 1 in N plus 1 of the keys.",
+    "tone": "good",
+    "values": {
+     "n": 4,
+     "v": 10
+    }
+   }
+  ]
  },
  {
   "id": "error-budget",
@@ -906,7 +1012,31 @@
    "title": "Time to exhaustion",
    "min": 0,
    "max": 60
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A burn this fast would spend 2 percent of a month budget in an hour.",
+    "tone": "bad",
+    "values": {
+     "slo": 99.99,
+     "err": 0.27,
+     "spent": 22
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "At or under the allowed error rate.",
+    "tone": "good",
+    "values": {
+     "slo": 99.99,
+     "err": 0,
+     "spent": 28
+    }
+   }
+  ]
  },
  {
   "id": "load-balancing",
@@ -1139,6 +1269,34 @@
    "Make backend 3 four times slower on round robin. It overloads while the others idle.",
    "Switch to least connections. Traffic shifts toward the faster backends.",
    "Crash backend 2, then turn health checks off."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A backend is past its capacity.",
+    "tone": "bad",
+    "values": {
+     "algo": "rr",
+     "rps": 180,
+     "slow": 2,
+     "hc": true,
+     "dead": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Load is spread within what each backend can take.",
+    "tone": "good",
+    "values": {
+     "algo": "rr",
+     "rps": 180,
+     "slow": 1,
+     "hc": true,
+     "dead": false
+    }
+   }
   ]
  },
  {
@@ -1308,7 +1466,33 @@
    "y2label": "Database limit",
    "title": "Stampede size against rebuild time",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Every request that arrives while the value is rebuilt goes to the database.",
+    "tone": "bad",
+    "values": {
+     "rps": 1700,
+     "ttl": 65,
+     "rebuild": 800,
+     "prot": "none"
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The key is cool enough that the rebuild fits in the database limit, but a hotter key would break it.",
+    "tone": "good",
+    "values": {
+     "rps": 1750,
+     "ttl": 80,
+     "rebuild": 50,
+     "prot": "none"
+    }
+   }
+  ]
  },
  {
   "id": "rolling-update",
@@ -1507,7 +1691,37 @@
    "ylabel": "Rollout time (s)",
    "title": "Rollout time against maxSurge",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Without a readiness probe the broken pods are marked ready straight away, so traffic reaches them and the rollout carries on replacing healthy pods with broken ones.",
+    "tone": "bad",
+    "values": {
+     "rep": 11,
+     "surge": 2,
+     "unav": 0,
+     "ready": 10,
+     "bad": true,
+     "probe": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Capacity stays high through the rollout and the new version is rolled in wave by wave.",
+    "tone": "good",
+    "values": {
+     "rep": 15,
+     "surge": 2,
+     "unav": 0,
+     "ready": 5,
+     "bad": false,
+     "probe": false
+    }
+   }
+  ]
  },
  {
   "id": "dns-ttl",
@@ -1670,7 +1884,31 @@
    "title": "Cutover over time",
    "min": 0,
    "max": 100
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The old server is off but resolvers still hand out its address.",
+    "tone": "bad",
+    "values": {
+     "ttl": 270,
+     "t": 60,
+     "off": true
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All cached answers have expired, so every user goes to the new address.",
+    "tone": "good",
+    "values": {
+     "ttl": 190,
+     "t": 250,
+     "off": true
+    }
+   }
+  ]
  },
  {
   "id": "tcp-handshake",
@@ -1847,6 +2085,34 @@
    "y2label": "With a reused connection (ms)",
    "title": "First byte against distance",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Loss makes TCP back off, so throughput falls well below the link speed.",
+    "tone": "bad",
+    "values": {
+     "rtt": 60,
+     "tls": "1",
+     "reuse": false,
+     "loss": 1.2000000000000002,
+     "link": 140
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Few round trips and low delay.",
+    "tone": "good",
+    "values": {
+     "rtt": 67,
+     "tls": "1",
+     "reuse": false,
+     "loss": 1,
+     "link": 200
+    }
+   }
+  ]
  }
 ]

@@ -134,6 +134,32 @@
    "Use 60 percent shell tasks with no guards.",
    "Add guards.",
    "Remember a second run showing zero changes is the test."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Every run reports changes, so a real change is lost among the noise and you cannot trust check mode.",
+    "tone": "bad",
+    "values": {
+     "hosts": 41,
+     "tasks": 15,
+     "shellp": 30,
+     "guard": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All tasks use idempotent modules, so a clean second run is the proof.",
+    "tone": "good",
+    "values": {
+     "hosts": 30,
+     "tasks": 1,
+     "shellp": 35,
+     "guard": false
+    }
+   }
   ]
  },
  {
@@ -303,7 +329,35 @@
    "ylabel": "Runtime (min)",
    "title": "Runtime against forks",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A bad change reaches a quarter or more of the fleet before anything can stop it.",
+    "tone": "bad",
+    "values": {
+     "hosts": 340,
+     "forks": 2,
+     "tasks": 20,
+     "secs": 1,
+     "serial": 0
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Small batches limit damage and the run finishes in reasonable time.",
+    "tone": "good",
+    "values": {
+     "hosts": 300,
+     "forks": 57,
+     "tasks": 22,
+     "secs": 1,
+     "serial": 5
+    }
+   }
+  ]
  },
  {
   "id": "ansible-var-precedence",
@@ -437,6 +491,34 @@
    "Turn on all layers and watch extra vars win.",
    "Remove extra vars. Play vars win.",
    "Set your expected value to 1 while group_vars is on."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A different layer won than you expected.",
+    "tone": "warn",
+    "values": {
+     "rdef": true,
+     "grp": false,
+     "play": false,
+     "extra": false,
+     "x": 2
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The winning layer matches your expectation.",
+    "tone": "good",
+    "values": {
+     "rdef": true,
+     "grp": false,
+     "play": false,
+     "extra": false,
+     "x": 1
+    }
+   }
   ]
  },
  {
@@ -582,7 +664,33 @@
    "ylabel": "Stale entries (%)",
    "title": "Staleness against cache lifetime",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A tenth or more of the inventory is wrong.",
+    "tone": "bad",
+    "values": {
+     "fleet": 50,
+     "churn": 27,
+     "ttl": 60,
+     "refresh": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The list matches the cloud.",
+    "tone": "good",
+    "values": {
+     "fleet": 110,
+     "churn": 0,
+     "ttl": 60,
+     "refresh": false
+    }
+   }
+  ]
  },
  {
   "id": "pipeline-speed",
@@ -748,7 +856,35 @@
    "ylabel": "Pipeline time (min)",
    "title": "Time against shards",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Slow feedback.",
+    "tone": "warn",
+    "values": {
+     "tests": 40,
+     "shards": 3,
+     "over": 2,
+     "inst": 4,
+     "cache": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Fast feedback at a sensible cost.",
+    "tone": "good",
+    "values": {
+     "tests": 15,
+     "shards": 2,
+     "over": 1.5,
+     "inst": 4,
+     "cache": false
+    }
+   }
+  ]
  },
  {
   "id": "canary-exposure",
@@ -909,7 +1045,35 @@
    "ylabel": "Failed requests",
    "title": "Failed requests against canary size",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Even a canary fails a lot of requests if it is large and the check is slow.",
+    "tone": "bad",
+    "values": {
+     "rps": 760,
+     "canary": 9,
+     "bake": 13,
+     "err": 20,
+     "auto": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A small slice and a quick check keep the damage small.",
+    "tone": "good",
+    "values": {
+     "rps": 160,
+     "canary": 1,
+     "bake": 13,
+     "err": 22,
+     "auto": false
+    }
+   }
+  ]
  },
  {
   "id": "flaky-tests",
@@ -1071,7 +1235,33 @@
    "title": "False failures against flake rate",
    "min": 0,
    "max": 100
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "One run in five fails for no reason, so people stop trusting red builds and start ignoring real failures.",
+    "tone": "bad",
+    "values": {
+     "tests": 910,
+     "flake": 0.05,
+     "retry": 0,
+     "perday": 71
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Failures mean something.",
+    "tone": "good",
+    "values": {
+     "tests": 930,
+     "flake": 0,
+     "retry": 0,
+     "perday": 29
+    }
+   }
+  ]
  },
  {
   "id": "promotion-lead-time",
@@ -1233,7 +1423,35 @@
    "ylabel": "Lead time (h)",
    "title": "Lead time against approvals",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Several days to ship a change.",
+    "tone": "bad",
+    "values": {
+     "stages": 3,
+     "soak": 5,
+     "appr": 21,
+     "gates": 3,
+     "work": 10
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A short, mostly automated path.",
+    "tone": "good",
+    "values": {
+     "stages": 3,
+     "soak": 0,
+     "appr": 15,
+     "gates": 0,
+     "work": 15
+    }
+   }
+  ]
  },
  {
   "id": "skill-context-budget",
@@ -1394,7 +1612,35 @@
    "ylabel": "Share of window (%)",
    "title": "Context use against skills installed",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Skills take a fifth of the window before the task has started.",
+    "tone": "bad",
+    "values": {
+     "skills": 61,
+     "desc": 120,
+     "body": 2400,
+     "used": 2,
+     "window": 50000
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Descriptions are cheap and bodies load on demand, which is the point of progressive disclosure.",
+    "tone": "good",
+    "values": {
+     "skills": 34,
+     "desc": 100,
+     "body": 2400,
+     "used": 3,
+     "window": 210000
+    }
+   }
+  ]
  },
  {
   "id": "skill-trigger-eval",
@@ -1536,6 +1782,32 @@
    "Lower the triggered count of positive prompts.",
    "Raise false triggers.",
    "Find the point where both are high."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The skill often fails to trigger when needed.",
+    "tone": "bad",
+    "values": {
+     "pos": 26,
+     "tp": 11,
+     "neg": 20,
+     "fp": 0
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "It triggers when it should and mostly stays quiet otherwise.",
+    "tone": "good",
+    "values": {
+     "pos": 13,
+     "tp": 13,
+     "neg": 22,
+     "fp": 0
+    }
+   }
   ]
  },
  {
@@ -1685,7 +1957,33 @@
    "title": "Reliability against scripted steps",
    "min": 0,
    "max": 100
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Errors compound across steps.",
+    "tone": "bad",
+    "values": {
+     "steps": 10,
+     "pm": 91,
+     "scripted": 2,
+     "ps": 100
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Scripts carry the deterministic steps, so most runs finish right.",
+    "tone": "good",
+    "values": {
+     "steps": 3,
+     "pm": 91.1,
+     "scripted": 3,
+     "ps": 100
+    }
+   }
+  ]
  },
  {
   "id": "skill-supply-risk",
@@ -1839,6 +2137,34 @@
    "Install many skills from unknown sources with network access.",
    "Review them and pin versions.",
    "Turn off network access for scripts."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Many unreviewed skills can run code and reach the network.",
+    "tone": "bad",
+    "values": {
+     "skills": 24,
+     "unknown": 40,
+     "reviewed": 25,
+     "net": true,
+     "pin": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Most skills are known and reviewed.",
+    "tone": "good",
+    "values": {
+     "skills": 1,
+     "unknown": 35,
+     "reviewed": 30,
+     "net": true,
+     "pin": false
+    }
+   }
   ]
  },
  {
@@ -2013,6 +2339,30 @@
    "Pick backup and restore with a 30 minute need.",
    "Pick warm standby.",
    "Lower the accepted loss to zero."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Too slow to recover and too much data lost for this need.",
+    "tone": "bad",
+    "values": {
+     "strat": "1",
+     "needrto": 27,
+     "needrpo": 2
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "It meets the need at a modest cost.",
+    "tone": "good",
+    "values": {
+     "strat": "1",
+     "needrto": 69,
+     "needrpo": 16
+    }
+   }
   ]
  },
  {
@@ -2165,7 +2515,31 @@
    "y2label": "Committed cost ($)",
    "title": "Cost against usage",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Below the break-even you pay for capacity you do not use.",
+    "tone": "bad",
+    "values": {
+     "use": 55,
+     "disc": 40,
+     "hourly": 0.45
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Steady usage well above the break-even makes the commitment worth it.",
+    "tone": "good",
+    "values": {
+     "use": 70,
+     "disc": 40,
+     "hourly": 0.35000000000000003
+    }
+   }
+  ]
  },
  {
   "id": "cdn-hit-ratio",
@@ -2325,7 +2699,35 @@
    "ylabel": "Requests reaching origin (req/s)",
    "title": "Origin load against hit ratio",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The origin takes thousands of requests per second.",
+    "tone": "bad",
+    "values": {
+     "rps": 11900,
+     "hit": 83,
+     "edge": 5,
+     "origin": 200,
+     "purge": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The edge absorbs most requests.",
+    "tone": "good",
+    "values": {
+     "rps": 5800,
+     "hit": 89,
+     "edge": 5,
+     "origin": 270,
+     "purge": false
+    }
+   }
+  ]
  },
  {
   "id": "serverless-cold-starts",
@@ -2476,7 +2878,33 @@
    "title": "Cold starts against provisioning",
    "min": 0,
    "max": 100
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Most of the burst lands on cold instances, so many users wait for a start.",
+    "tone": "bad",
+    "values": {
+     "rps": 484,
+     "dur": 10,
+     "cold": 650,
+     "prov": 0
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Provisioned instances cover the burst, so nobody waits for a cold start.",
+    "tone": "good",
+    "values": {
+     "rps": 802,
+     "dur": 10,
+     "cold": 550,
+     "prov": 40
+    }
+   }
+  ]
  },
  {
   "id": "iam-evaluation",
@@ -2602,6 +3030,32 @@
    "Turn on allows and add an explicit deny.",
    "Remove the boundary.",
    "Remove all allows."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing allows the action.",
+    "tone": "bad",
+    "values": {
+     "ident": false,
+     "res": false,
+     "bound": true,
+     "deny": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "At least one allow applies and nothing blocks it.",
+    "tone": "good",
+    "values": {
+     "ident": true,
+     "res": false,
+     "bound": true,
+     "deny": false
+    }
+   }
   ]
  },
  {
@@ -2750,7 +3204,33 @@
    "ylabel": "Extra permissions at the peak",
    "title": "Creep against review interval",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Granted access is more than twice what is used.",
+    "tone": "bad",
+    "values": {
+     "base": 27,
+     "creep": 5,
+     "review": 7,
+     "cut": 75
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Frequent reviews keep granted access close to what is needed.",
+    "tone": "good",
+    "values": {
+     "base": 27,
+     "creep": 5,
+     "review": 1,
+     "cut": 75
+    }
+   }
+  ]
  },
  {
   "id": "kms-throttling",
@@ -2901,7 +3381,33 @@
    "y2label": "Limit",
    "title": "Key service calls against caching",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The key service throttles you, so decrypts fail or retry and the application slows down.",
+    "tone": "bad",
+    "values": {
+     "reads": 2510,
+     "cache": 0,
+     "limit": 700,
+     "burst": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Cached keys keep calls well under the limit.",
+    "tone": "good",
+    "values": {
+     "reads": 10,
+     "cache": 0,
+     "limit": 400,
+     "burst": false
+    }
+   }
+  ]
  },
  {
   "id": "credential-exposure",
@@ -3039,7 +3545,33 @@
    "y2label": "Without expiry",
    "title": "Window against lifetime",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The attacker has a day or more to use it.",
+    "tone": "bad",
+    "values": {
+     "life": 49.75,
+     "detect": 28.800000000000004,
+     "fix": 1.5000000000000002,
+     "stat": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Expiry closes the window quickly, even if nobody notices the leak.",
+    "tone": "good",
+    "values": {
+     "life": 0.25,
+     "detect": 33.2,
+     "fix": 2.3000000000000003,
+     "stat": false
+    }
+   }
+  ]
  },
  {
   "id": "index-selectivity",
@@ -3180,7 +3712,31 @@
    "y2label": "Full scan cost",
    "title": "Index against full scan",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "There is no index and the query wants very few rows, so the database reads the whole table to find them.",
+    "tone": "bad",
+    "values": {
+     "rows": 4800000,
+     "sel": 0.133,
+     "idx": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The plan matches the query.",
+    "tone": "good",
+    "values": {
+     "rows": 4080000,
+     "sel": 1.138,
+     "idx": false
+    }
+   }
+  ]
  },
  {
   "id": "connection-pool-sizing",
@@ -3342,7 +3898,35 @@
    "y2label": "Database limit",
    "title": "Connections against instances",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The pools together hold more connections than the database allows, so new connections are refused when instances scale out.",
+    "tone": "bad",
+    "values": {
+     "inst": 43,
+     "pool": 31,
+     "max": 70,
+     "qps": 2050,
+     "ms": 1
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The pools fit under the limit and match the load.",
+    "tone": "good",
+    "values": {
+     "inst": 1,
+     "pool": 1,
+     "max": 50,
+     "qps": 1900,
+     "ms": 1
+    }
+   }
+  ]
  },
  {
   "id": "replication-lag-loss",
@@ -3492,7 +4076,33 @@
    "ylabel": "Transactions lost",
    "title": "Loss against lag (asynchronous)",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Thousands of acknowledged transactions vanish at failover.",
+    "tone": "bad",
+    "values": {
+     "tps": 620,
+     "lag": 2,
+     "rtt": 0.5,
+     "sync": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The replica keeps up.",
+    "tone": "good",
+    "values": {
+     "tps": 590,
+     "lag": 0,
+     "rtt": 2,
+     "sync": false
+    }
+   }
+  ]
  },
  {
   "id": "vacuum-bloat",
@@ -3636,7 +4246,33 @@
    "ylabel": "Dead rows (% of table)",
    "title": "Bloat against open transaction time",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Half the table is dead rows.",
+    "tone": "bad",
+    "values": {
+     "rows": 100000,
+     "upd": 872000,
+     "open": 1,
+     "scale": 19
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Vacuum keeps up with the updates.",
+    "tone": "good",
+    "values": {
+     "rows": 4900000,
+     "upd": 1136000,
+     "open": 0,
+     "scale": 18
+    }
+   }
+  ]
  },
  {
   "id": "goroutine-leak",
@@ -3778,7 +4414,35 @@
    "ylabel": "Memory leaked (MB)",
    "title": "Leaked memory over time",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Gigabytes are held by goroutines that do nothing.",
+    "tone": "bad",
+    "values": {
+     "rps": 154,
+     "leak": 3,
+     "hours": 33,
+     "kb": 9,
+     "ctx": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Goroutines stop when their work is cancelled.",
+    "tone": "good",
+    "values": {
+     "rps": 1,
+     "leak": 5.5,
+     "hours": 29,
+     "kb": 12,
+     "ctx": false
+    }
+   }
+  ]
  },
  {
   "id": "context-deadline",
@@ -3942,6 +4606,34 @@
    "Make service C take 1200 ms with no context passed.",
    "Pass the context.",
    "Lengthen the deadline."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The caller gave up, but service C keeps running a request nobody wants.",
+    "tone": "bad",
+    "values": {
+     "deadline": 1200,
+     "a": 10,
+     "b": 110,
+     "c": 1540,
+     "prop": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Every call finishes within the deadline.",
+    "tone": "good",
+    "values": {
+     "deadline": 1200,
+     "a": 190,
+     "b": 60,
+     "c": 780,
+     "prop": false
+    }
+   }
   ]
  },
  {
@@ -4095,7 +4787,33 @@
    "y2label": "Incoming work",
    "title": "Capacity against workers",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The buffer fills in seconds, and then producers block or you drop work.",
+    "tone": "bad",
+    "values": {
+     "rate": 900,
+     "workers": 7,
+     "ms": 33,
+     "buf": 1
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Workers keep up with the producers.",
+    "tone": "good",
+    "values": {
+     "rate": 640,
+     "workers": 6,
+     "ms": 1,
+     "buf": 431
+    }
+   }
+  ]
  },
  {
   "id": "graceful-shutdown",
@@ -4243,6 +4961,34 @@
    "ylabel": "Requests cut off per pod",
    "title": "Cut off against grace period",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The grace period is shorter than a long request, so those requests are killed mid-flight on every deploy.",
+    "tone": "bad",
+    "values": {
+     "rps": 160,
+     "long": 7.1,
+     "share": 1.5,
+     "grace": 0,
+     "pods": 7
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All requests finish before the process exits, so deploys are invisible to users.",
+    "tone": "good",
+    "values": {
+     "rps": 10,
+     "long": 9.9,
+     "share": 0,
+     "grace": 3,
+     "pods": 5
+    }
+   }
+  ]
  }
 ]

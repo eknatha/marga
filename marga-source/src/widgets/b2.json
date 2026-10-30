@@ -153,7 +153,33 @@
    "title": "Availability falls as the chain grows",
    "min": 95,
    "max": 100
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Dependencies in series multiply.",
+    "tone": "bad",
+    "values": {
+     "a": 99.89,
+     "serial": 4,
+     "copies": 1,
+     "shared": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Redundant copies in independent domains lift the whole chain.",
+    "tone": "good",
+    "values": {
+     "a": 99.89,
+     "serial": 4,
+     "copies": 2,
+     "shared": false
+    }
+   }
+  ]
  },
  {
   "id": "oncall-load",
@@ -315,7 +341,33 @@
    "ylabel": "Hours handling pages per week",
    "title": "Weekly time spent on pages",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "More than about two incidents per shift leaves no time to fix causes and people burn out.",
+    "tone": "bad",
+    "values": {
+     "pages": 6,
+     "mins": 15,
+     "team": 6,
+     "night": 35
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A sustainable load.",
+    "tone": "good",
+    "values": {
+     "pages": 2,
+     "mins": 10,
+     "team": 6,
+     "night": 30
+    }
+   }
+  ]
  },
  {
   "id": "capacity-runway",
@@ -471,7 +523,33 @@
    "title": "Runway against growth",
    "min": 0,
    "max": 36
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Capacity takes longer to arrive than you have left.",
+    "tone": "bad",
+    "values": {
+     "util": 70,
+     "growth": 8,
+     "lead": 3,
+     "limit": 80
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "There is time to order before the ceiling.",
+    "tone": "good",
+    "values": {
+     "util": 62,
+     "growth": 8,
+     "lead": 2,
+     "limit": 80
+    }
+   }
+  ]
  },
  {
   "id": "mttr-breakdown",
@@ -651,7 +729,37 @@
    "title": "Availability against incident count",
    "min": 98,
    "max": 100
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Under three nines.",
+    "tone": "bad",
+    "values": {
+     "detect": 15,
+     "ack": 1,
+     "diag": 21,
+     "fix": 21,
+     "per": 13,
+     "runbook": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Quick detection and recovery keep the year well within a high target.",
+    "tone": "good",
+    "values": {
+     "detect": 1,
+     "ack": 4,
+     "diag": 26,
+     "fix": 16,
+     "per": 5,
+     "runbook": false
+    }
+   }
+  ]
  },
  {
   "id": "nat-port-exhaustion",
@@ -803,7 +911,33 @@
    "title": "Port use against clients",
    "min": 0,
    "max": 200
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Not enough source ports for this destination.",
+    "tone": "bad",
+    "values": {
+     "clients": 930,
+     "conns": 70,
+     "ips": 1,
+     "ports": 55000
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Plenty of ports.",
+    "tone": "good",
+    "values": {
+     "clients": 830,
+     "conns": 42,
+     "ips": 1,
+     "ports": 55000
+    }
+   }
+  ]
  },
  {
   "id": "hpa-scaling",
@@ -967,7 +1101,35 @@
    "y2label": "Maximum pods",
    "title": "Pods against load",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The maximum is too low.",
+    "tone": "bad",
+    "values": {
+     "rps": 1550,
+     "cap": 130,
+     "target": 60,
+     "maxr": 4,
+     "minr": 2
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Pods follow the load and stay under the target.",
+    "tone": "good",
+    "values": {
+     "rps": 1200,
+     "cap": 160,
+     "target": 55,
+     "maxr": 10,
+     "minr": 1
+    }
+   }
+  ]
  },
  {
   "id": "liveness-cascade",
@@ -1126,7 +1288,35 @@
    "ylabel": "Pods killed",
    "title": "Pods killed as latency rises",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Slow answers fail the liveness probe, so Kubernetes kills busy but healthy pods.",
+    "tone": "bad",
+    "values": {
+     "lat": 1060,
+     "tmo": 1000,
+     "fails": 4,
+     "pods": 9,
+     "ready": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Responses stay inside the probe timeout.",
+    "tone": "good",
+    "values": {
+     "lat": 940,
+     "tmo": 1500,
+     "fails": 4,
+     "pods": 8,
+     "ready": false
+    }
+   }
+  ]
  },
  {
   "id": "requests-bin-packing",
@@ -1300,7 +1490,35 @@
    "ylabel": "Pods that fit",
    "title": "Pods that fit against request size",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Pods are pending while the cluster sits mostly idle.",
+    "tone": "bad",
+    "values": {
+     "nodes": 2,
+     "cores": 2,
+     "req": 1,
+     "use": 0.1,
+     "want": 12
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Everything is scheduled.",
+    "tone": "good",
+    "values": {
+     "nodes": 3,
+     "cores": 4,
+     "req": 1.1,
+     "use": 0.3,
+     "want": 1
+    }
+   }
+  ]
  },
  {
   "id": "etcd-quorum",
@@ -1466,6 +1684,30 @@
    "Use 3 members and take 2 down.",
    "Use 5 members and take 2 down. Quorum holds.",
    "Lengthen the backup interval and see the worst-case loss grow."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Quorum is lost, so the cluster cannot commit writes.",
+    "tone": "bad",
+    "values": {
+     "members": "3",
+     "failed": 2,
+     "backup": 6
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All members are up.",
+    "tone": "good",
+    "values": {
+     "members": "3",
+     "failed": 0,
+     "backup": 6
+    }
+   }
   ]
  },
  {
@@ -1634,7 +1876,35 @@
    "title": "Capacity pressure from bigger batches",
    "min": 0,
    "max": 150
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The remaining nodes cannot carry the load while a batch is out.",
+    "tone": "bad",
+    "values": {
+     "nodes": 8,
+     "batch": 3,
+     "mins": 10,
+     "load": 65,
+     "pdb": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Batches finish quickly with capacity to spare.",
+    "tone": "good",
+    "values": {
+     "nodes": 8,
+     "batch": 1,
+     "mins": 9,
+     "load": 65,
+     "pdb": false
+    }
+   }
+  ]
  },
  {
   "id": "node-loss-headroom",
@@ -1789,7 +2059,33 @@
    "title": "Utilisation as nodes are lost",
    "min": 0,
    "max": 200
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "After the loss the survivors cannot hold everything.",
+    "tone": "bad",
+    "values": {
+     "nodes": 5,
+     "util": 65,
+     "lost": 2,
+     "zones": 3
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The remaining nodes absorb the loss with room to spare.",
+    "tone": "good",
+    "values": {
+     "nodes": 8,
+     "util": 63,
+     "lost": 2,
+     "zones": 3
+    }
+   }
+  ]
  },
  {
   "id": "rbac-blast-radius",
@@ -1944,6 +2240,34 @@
    "Bind cluster-wide with wildcard verbs.",
    "Change to namespace scope.",
    "Untick the mounted token and see how the exposure drops."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A cluster-wide role with every verb makes one stolen token a full compromise.",
+    "tone": "bad",
+    "values": {
+     "ns": 12,
+     "secrets": 14,
+     "scope": "cluster",
+     "wild": true,
+     "mount": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Narrow scope and narrow verbs keep the damage small.",
+    "tone": "good",
+    "values": {
+     "ns": 12,
+     "secrets": 15,
+     "scope": "ns",
+     "wild": false,
+     "mount": false
+    }
+   }
   ]
  },
  {
@@ -2107,6 +2431,36 @@
    "Break the new version with neither flag.",
    "Use --atomic.",
    "Make pods ready later than the timeout."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Without --wait the command reports success as soon as the manifests are applied.",
+    "tone": "bad",
+    "values": {
+     "rev": 5,
+     "timeout": 330,
+     "ready": 80,
+     "broken": true,
+     "atomic": false,
+     "wait": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The failure triggered an automatic rollback, so the previous revision is serving again and the history shows it.",
+    "tone": "good",
+    "values": {
+     "rev": 5,
+     "timeout": 330,
+     "ready": 100,
+     "broken": true,
+     "atomic": true,
+     "wait": false
+    }
+   }
   ]
  },
  {
@@ -2241,6 +2595,34 @@
    "Turn on both files, then add --set.",
    "Remove --set. The later file wins.",
    "Remove everything but the chart default."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "--set beats every file.",
+    "tone": "warn",
+    "values": {
+     "chart": true,
+     "f1": false,
+     "f2": false,
+     "set": true,
+     "rev": 1
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Only chart defaults or one file apply.",
+    "tone": "good",
+    "values": {
+     "chart": true,
+     "f1": false,
+     "f2": false,
+     "set": false,
+     "rev": 1
+    }
+   }
   ]
  },
  {
@@ -2396,6 +2778,34 @@
    "Use caret with newer minors and no lock.",
    "Commit the lock file.",
    "Use an exact constraint."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Caret takes new minors.",
+    "tone": "warn",
+    "values": {
+     "rule": "caret",
+     "minor": 5,
+     "patch": 3,
+     "major": false,
+     "lock": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The version is pinned, so every build deploys what you tested.",
+    "tone": "good",
+    "values": {
+     "rule": "caret",
+     "minor": 2,
+     "patch": 3,
+     "major": false,
+     "lock": false
+    }
+   }
   ]
  },
  {
@@ -2536,6 +2946,34 @@
    "Edit by hand and upgrade without changing the field.",
    "Change the field in the chart too.",
    "Leave both off."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The chart did not change this field between revisions, so the live edit survives.",
+    "tone": "warn",
+    "values": {
+     "edit": true,
+     "chart": false,
+     "same": false,
+     "old": 2,
+     "live": 6
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Nothing was edited by hand.",
+    "tone": "good",
+    "values": {
+     "edit": false,
+     "chart": false,
+     "same": false,
+     "old": 2,
+     "live": 6
+    }
+   }
   ]
  },
  {
@@ -2681,6 +3119,34 @@
    "Edit a live resource with auto sync and self-heal on.",
    "Turn self-heal off.",
    "Remove a manifest with prune off."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The resource was removed from git but pruning is off, so it keeps running and costs money.",
+    "tone": "warn",
+    "values": {
+     "auto": false,
+     "heal": false,
+     "prune": false,
+     "edit": false,
+     "removed": true
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The cluster matches git.",
+    "tone": "good",
+    "values": {
+     "auto": false,
+     "heal": false,
+     "prune": false,
+     "edit": false,
+     "removed": false
+    }
+   }
   ]
  },
  {
@@ -2841,7 +3307,35 @@
    "ylabel": "Total sync time (s)",
    "title": "Sync time grows with waves",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Ordered waves with a slow resource make syncs take minutes.",
+    "tone": "bad",
+    "values": {
+     "waves": 3,
+     "each": 30,
+     "slow": 250,
+     "where": 2,
+     "wait": 2
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Ordering is cheap here.",
+    "tone": "good",
+    "values": {
+     "waves": 3,
+     "each": 25,
+     "slow": 240,
+     "where": 3,
+     "wait": 1
+    }
+   }
+  ]
  },
  {
   "id": "argocd-poll-latency",
@@ -2983,7 +3477,31 @@
    "y2label": "Worst case (s)",
    "title": "Delay against polling interval",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Polling is simple and robust.",
+    "tone": "warn",
+    "values": {
+     "poll": 180,
+     "sync": 30,
+     "hook": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Changes reach the cluster in seconds.",
+    "tone": "good",
+    "values": {
+     "poll": 180,
+     "sync": 30,
+     "hook": true
+    }
+   }
+  ]
  },
  {
   "id": "applicationset-fanout",
@@ -3130,6 +3648,32 @@
    "ylabel": "Refreshes per second",
    "title": "Refresh load against clusters",
    "min": 0
-  }
+  },
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Thousands of apps refreshing often put real load on the repo server and the git host.",
+    "tone": "bad",
+    "values": {
+     "clusters": 11,
+     "services": 23,
+     "envs": 2,
+     "refresh": 90
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Manageable scale.",
+    "tone": "good",
+    "values": {
+     "clusters": 10,
+     "services": 11,
+     "envs": 2,
+     "refresh": 60
+    }
+   }
+  ]
  }
 ]
