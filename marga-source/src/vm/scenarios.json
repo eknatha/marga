@@ -1,0 +1,220 @@
+[
+ {
+  "id": "disk-full",
+  "title": "The log folder that filled up",
+  "level": "Beginner",
+  "minutes": 8,
+  "lesson": "linux/disks-and-filesystems",
+  "story": "A small log volume is mounted at /var/log/app. It is full, so the app cannot write. A background process called app-writer must keep running and keep writing heartbeat.log.",
+  "goals": [
+   "Free the log volume so it is under 50 percent full.",
+   "Keep app-writer running.",
+   "Keep heartbeat.log and leave the volume mounted."
+  ],
+  "hints": [
+   "Run df -h to see which volume is full.",
+   "Run ls -lh /var/log/app and see which files are large.",
+   "You may delete or empty the big log. Emptying with : > file keeps the file in place."
+  ],
+  "solution": "ls -lh /var/log/app\nrm /var/log/app/debug.trace\n: > /var/log/app/app.log\ndf -h /var/log/app"
+ },
+ {
+  "id": "deleted-open-file",
+  "title": "Full disk with nothing to delete",
+  "level": "Advanced",
+  "minutes": 12,
+  "lesson": "linux/filesystems-page-cache-and-io",
+  "story": "The volume at /var/data is almost full, but ls shows no big file. A process called ingest deleted its queue file while still holding it open, so the space is not returned.",
+  "goals": [
+   "Get /var/data under 60 percent full.",
+   "Keep the ingest process running (restart it if you must)."
+  ],
+  "hints": [
+   "du -sh /var/data shows little, but df -h shows it is full. Why would they differ?",
+   "A deleted file stays on disk while a process keeps it open. Look in /proc/PID/fd.",
+   "Run ls -l /proc/*/fd 2>/dev/null | grep deleted.",
+   "You can truncate through the descriptor, or stop the process and start it again."
+  ],
+  "solution": "ps | grep ingest\nls -l /proc/<pid>/fd | grep deleted\n: > /proc/<pid>/fd/3\n# or: kill <pid> and run /usr/local/bin/ingest again\ndf -h /var/data"
+ },
+ {
+  "id": "permission-denied",
+  "title": "The deploy user cannot run the release script",
+  "level": "Beginner",
+  "minutes": 8,
+  "lesson": "linux/users-groups-permissions",
+  "story": "The user deploy must run /srv/app/run.sh, but it fails. The directory and the file are both owned by root.",
+  "goals": [
+   "Let the deploy user run /srv/app/run.sh.",
+   "Do not make the file or the folder writable by everyone."
+  ],
+  "hints": [
+   "Try it: su -s /bin/sh deploy -c /srv/app/run.sh",
+   "ls -ld /srv/app and ls -l /srv/app/run.sh show owner, group and mode.",
+   "A user needs execute on the directory to enter it, and execute plus read on a script to run it."
+  ],
+  "solution": "chmod 755 /srv/app\nchmod 755 /srv/app/run.sh\nsu -s /bin/sh deploy -c /srv/app/run.sh"
+ },
+ {
+  "id": "cpu-hog",
+  "title": "The job that eats the CPU",
+  "level": "Beginner",
+  "minutes": 8,
+  "lesson": "linux/processes-and-services",
+  "story": "The machine feels slow. A runaway job started by report-job is burning CPU. A server called api-server must stay up.",
+  "goals": [
+   "Stop report-job and everything it started.",
+   "Keep api-server running."
+  ],
+  "hints": [
+   "Run top or ps to see the busy process.",
+   "Killing the busy process may not help if its parent starts it again.",
+   "Find the parent script, stop it first, then stop the child."
+  ],
+  "solution": "ps\nkill $(pidof report-job)   # the parent loop first\nkill $(pidof yes)\nps"
+ },
+ {
+  "id": "service-wont-start",
+  "title": "The web server that will not start",
+  "level": "Intermediate",
+  "minutes": 10,
+  "lesson": "linux/logs-and-troubleshooting",
+  "story": "start-web refuses to start the site. The settings file is /etc/web/web.conf and the site should answer on port 8080.",
+  "goals": [
+   "Fix /etc/web/web.conf so PORT is 8080 and ROOT points to the real folder.",
+   "Start the server so http://127.0.0.1:8080/ answers."
+  ],
+  "hints": [
+   "Run start-web and read the error message.",
+   "Compare PORT with a number: can you spot a letter?",
+   "ls /srv shows which folder really exists."
+  ],
+  "solution": "cat /etc/web/web.conf\nsed -i \"s/^PORT=.*/PORT=8080/;s#^ROOT=.*#ROOT=/srv/www#\" /etc/web/web.conf\nstart-web\nwget -qO- http://127.0.0.1:8080/"
+ },
+ {
+  "id": "port-in-use",
+  "title": "Port 8080 is taken",
+  "level": "Intermediate",
+  "minutes": 10,
+  "lesson": "networking/troubleshooting-toolkit",
+  "story": "The new site must listen on port 8080, but an old web server still holds it. start-web starts the new one.",
+  "goals": [
+   "Find and stop whatever holds port 8080.",
+   "Start the new site with start-web so port 8080 serves \"MARGA web v2\"."
+  ],
+  "hints": [
+   "netstat -tln lists the ports that are listening. Is 8080 one of them?",
+   "ps shows every process with its command line. Look for the one started with port 8080.",
+   "Stop that process, then run start-web."
+  ],
+  "solution": "netstat -tln | grep 8080\nps | grep httpd\nkill <pid>\nstart-web\nwget -qO- http://127.0.0.1:8080/"
+ },
+ {
+  "id": "stale-pidfile",
+  "title": "The pidfile that lies",
+  "level": "Intermediate",
+  "minutes": 8,
+  "lesson": "linux/processes-and-services",
+  "story": "start-web says the server is already running, but nothing answers on port 8080.",
+  "goals": [
+   "Find out whether the process in the pidfile is really alive.",
+   "Start the server so it answers on port 8080 and leaves a valid pidfile."
+  ],
+  "hints": [
+   "cat /run/web.pid shows the pid it remembers.",
+   "ls /proc/4242 or ps tells you if that pid is alive.",
+   "A pidfile for a dead process is stale and safe to remove."
+  ],
+  "solution": "cat /run/web.pid\nps | grep 4242\nrm /run/web.pid\nstart-web\nwget -qO- http://127.0.0.1:8080/"
+ },
+ {
+  "id": "bad-hosts",
+  "title": "The host name that does not resolve",
+  "level": "Beginner",
+  "minutes": 6,
+  "lesson": "networking/dns",
+  "story": "The tool db-check must find the address of db.internal. Name lookups use /etc/hosts here. The database is reachable at 127.0.0.2 in this lab.",
+  "goals": [
+   "Make db-check report db.internal as 127.0.0.2.",
+   "Keep the localhost entry in /etc/hosts."
+  ],
+  "hints": [
+   "Run db-check and read the message.",
+   "cat /etc/hosts shows what names are known. Compare the spelling with db.internal.",
+   "Add a line: address, then the name."
+  ],
+  "solution": "cat /etc/hosts\necho \"127.0.0.2 db.internal\" >> /etc/hosts\ndb-check"
+ },
+ {
+  "id": "broken-symlink",
+  "title": "The release that points nowhere",
+  "level": "Beginner",
+  "minutes": 6,
+  "lesson": "linux/filesystem-and-navigation",
+  "story": "/opt/app/current is a symlink to the active release, and it is broken. The newest release folder is under /opt/app/releases.",
+  "goals": [
+   "Point /opt/app/current to the 2024-09 release.",
+   "Keep current as a symlink."
+  ],
+  "hints": [
+   "ls -l /opt/app shows where current points.",
+   "ls /opt/app/releases shows which releases exist.",
+   "ln -sfn replaces a symlink in one step."
+  ],
+  "solution": "ls -l /opt/app\nls /opt/app/releases\nln -sfn releases/2024-09 /opt/app/current\napp-status"
+ },
+ {
+  "id": "find-error-spike",
+  "title": "Who is causing the 502 errors?",
+  "level": "Intermediate",
+  "minutes": 12,
+  "lesson": "bash/text-processing",
+  "story": "/var/log/web/access.log is a web access log. Field 1 is the client address and field 9 is the status code. Find how many 502 responses there are and which client has the most.",
+  "goals": [
+   "Write two lines to /root/answer.txt: count=NUMBER and ip=ADDRESS.",
+   "count is the number of lines with status 502. ip is the client with the most 502 lines."
+  ],
+  "hints": [
+   "head -3 /var/log/web/access.log shows the fields.",
+   "awk '$9==502' keeps only the 502 lines.",
+   "Count with wc -l. For the busiest client use awk, sort, uniq -c and sort -rn."
+  ],
+  "solution": "awk '$9==502' /var/log/web/access.log | wc -l\nawk '$9==502{print $1}' /var/log/web/access.log | sort | uniq -c | sort -rn | head -1\nprintf 'count=N\\nip=ADDRESS\\n' > /root/answer.txt"
+ },
+ {
+  "id": "shell-script-bug",
+  "title": "The backup script that lies",
+  "level": "Intermediate",
+  "minutes": 12,
+  "lesson": "bash/safe-automation",
+  "story": "/usr/local/bin/backup.sh copies a folder to /backup. It breaks on folder names with a space, and it prints \"backup finished OK\" even when the source is missing.",
+  "goals": [
+   "backup.sh \"/srv/my data\" must copy the folder and exit 0.",
+   "backup.sh /srv/missing must exit non-zero and must not print \"finished OK\"."
+  ],
+  "hints": [
+   "Quote your variables: \"$SRC\".",
+   "Stop on errors: set -e, or check the result of cp.",
+   "Print the success message only after cp has worked."
+  ],
+  "solution": "cat > /usr/local/bin/backup.sh <<'X'\n#!/bin/sh\nset -eu\nSRC=$1\ncp -r \"$SRC\" /backup/\necho \"backup finished OK\"\nX"
+ },
+ {
+  "id": "path-and-env",
+  "title": "The tool a new shell cannot find",
+  "level": "Beginner",
+  "minutes": 8,
+  "lesson": "linux/working-efficiently-in-the-terminal",
+  "story": "The command deploytool lives in /opt/tools/bin and needs APP_ENV=staging. A new login shell must be able to run it with no extra typing.",
+  "goals": [
+   "Make `sh -lc deploytool` work.",
+   "Do it in a startup file, not by copying the tool."
+  ],
+  "hints": [
+   "A login shell reads /etc/profile and then ~/.profile.",
+   "Put an export PATH line and an export APP_ENV line in /root/.profile.",
+   "Test with a new login shell: sh -lc deploytool"
+  ],
+  "solution": "cat >> /root/.profile <<'X'\nexport PATH=$PATH:/opt/tools/bin\nexport APP_ENV=staging\nX\nsh -lc deploytool"
+ }
+]

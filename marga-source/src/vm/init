@@ -1,0 +1,34 @@
+#!/bin/busybox sh
+/bin/busybox --install -s /bin 2>/dev/null
+export PATH=/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin
+mount -t proc proc /proc
+mount -t sysfs sys /sys
+mount -t devtmpfs dev /dev 2>/dev/null
+mkdir -p /dev/pts /tmp /run /var/log /var/run /root /home /etc
+mount -t devpts devpts /dev/pts 2>/dev/null
+mount -t tmpfs tmpfs /tmp
+mount -t tmpfs tmpfs /run
+echo 1 > /proc/sys/kernel/printk 2>/dev/null
+hostname marga-lab
+ifconfig lo 127.0.0.1 up 2>/dev/null
+ifconfig lo:2 127.0.0.2 up 2>/dev/null
+[ -f /etc/passwd ] || printf 'root:x:0:0:root:/root:/bin/sh\n' > /etc/passwd
+[ -f /etc/group ] || printf 'root:x:0:\n' > /etc/group
+[ -f /etc/hosts ] || printf '127.0.0.1 localhost\n127.0.1.1 marga-lab\n' > /etc/hosts
+SC=$(sed -n 's/.*marga=\([a-z0-9-]*\).*/\1/p' /proc/cmdline)
+[ -d "/scen/$SC" ] || SC=none
+export SC
+if [ -f /scen/$SC/setup.sh ]; then . /scen/$SC/setup.sh; fi
+cat > /etc/profile <<'X'
+export PATH=/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin
+export PS1='\u@marga-lab:\w\$ '
+alias ll='ls -l'
+[ -f /root/.profile ] && . /root/.profile
+X
+stty -F /dev/ttyS1 raw -echo 2>/dev/null
+setsid sh -c 'exec </dev/ttyS1 >/dev/ttyS1 2>&1; while read c; do case "$c" in CHECK) sh /scen/$SC/check.sh; echo "@@DONE";; PING) echo "@@PONG";; esac; done' &
+clear
+echo "MARGA lab: a real Linux kernel running in your browser."
+[ -f /scen/$SC/task ] && cat /scen/$SC/task
+echo
+exec setsid sh -c 'exec </dev/ttyS0 >/dev/ttyS0 2>&1; exec cttyhack /bin/sh -l'
