@@ -1754,3 +1754,26 @@ body.embed #main{padding-top:.5rem}
 .ws-pick{grid-template-columns:minmax(0,1fr)}
 .field{min-width:0}
 .field select{max-width:100%;min-width:0}
+
+.vm-browse{margin:1rem 0 .5rem}
+.vm-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:.6rem}
+.vm-tabs .btn{min-height:44px}
+.vm-tabs .btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.vm-tabs .btn[aria-pressed="true"] .small{color:inherit}
+.vm-filter{display:grid;grid-template-columns:1fr 12rem;gap:12px;align-items:end}
+@media (max-width:560px){.vm-filter{grid-template-columns:1fr}}
+
+/* ===== real Linux lab: diagnose box, why prompt, saved machines ===== */
+.vm-saves { margin: 16px 0; border: 1px solid var(--line, #c9d3e0); border-radius: 8px; padding: 10px 14px; }
+.vm-saves summary { cursor: pointer; font-weight: 600; }
+.vm-saves .field { margin-top: 10px; }
+.vm-ask { margin: 18px 0; padding: 14px; border: 1px solid var(--line, #c9d3e0); border-left-width: 6px; border-radius: 8px; }
+.vm-why { margin: 18px 0; }
+.vm-why fieldset { border: 1px solid var(--line, #c9d3e0); border-radius: 8px; padding: 10px 14px; margin: 0 0 10px; }
+.vm-why legend { font-weight: 600; padding: 0 6px; }
+.vm-opt { display: flex; gap: 8px; align-items: flex-start; padding: 6px 0; cursor: pointer; }
+.vm-opt input { margin-top: 5px; }
+.vm-filter select { max-width: 100%; }
+@media print { .vm-saves, .vm-ask input { display: none; } }
+.sp-form{display:flex;gap:.5rem;margin:1rem 0;flex-wrap:wrap}.sp-form input{flex:1 1 16rem;min-width:0;padding:.6rem .8rem;font:inherit;border:1px solid var(--line,#8886);border-radius:6px;background:var(--bg,#fff);color:inherit}
+.sp-list{list-style:none;padding:0;margin:1rem 0;display:grid;gap:.9rem;max-width:46rem}.sp-item a{font-weight:600}.sp-item .small{margin-top:.15rem}

@@ -453,6 +453,11 @@ var HD = [
     ['cmd', 'ls -l ~/.ssh/id_ed25519'], ['out bad', '-rw-r--r-- 1 user user 411 Jan  5 id_ed25519'], ['out warn', "Permissions 0644 for 'id_ed25519' are too open."],
     ['cmd', 'chmod 600 ~/.ssh/id_ed25519'], ['cmd', 'ls -l ~/.ssh/id_ed25519'], ['out ok', '-rw------- 1 user user 411 Jan  5 id_ed25519'],
     ['note', '<b>Check passed.</b> A private key must be readable only by its owner. Labs like this run in your browser.']] },
+  { tab: 'Real Linux', title: 'real Linux: the log folder that filled up', cap: 'Real Linux lab: a real kernel in your browser, fixed and checked', href: '#/linux/disk-full', go: 'Try the real lab', items: [
+    ['cmd', 'df -h /var/log/app'], ['out bad', 'tmpfs  8.0M  7.7M  292K  96% /var/log/app'], ['cmd', 'ls -lh /var/log/app'], ['out', '7.0M app.log    700K debug.trace'],
+    ['cmd', 'rm /var/log/app/debug.trace'], ['cmd', ': > /var/log/app/app.log'], ['cmd', 'df -h /var/log/app'], ['out ok', 'tmpfs  8.0M  4.0K  8.0M  0% /var/log/app'],
+    ['out ok', 'PASS  /var/log/app is under 50 percent full'], ['out ok', 'PASS  app-writer is still running'],
+    ['note', '<b>Check passed.</b> This is a real Linux kernel that boots in your browser in about 8 seconds, with ' + ((D.vmlabs || []).length || 130) + ' scenarios from beginner to advanced. Free, offline, nothing to install.']] },
   { tab: 'Incident game', title: 'game: Healthy Pods, no traffic', cap: 'Incident game: choose, then see why', href: '#/game/healthy-pods-no-traffic', go: 'Play this game', items: [
     ['out dim', 'The shop returns 503 after a rollout.'], ['out', 'All 3 new Pods are Running, but READY shows 0/1.'], ['out warn', 'What do you do first?'],
     ['choice', 'Delete the Pods so they are recreated'], ['choice pick', 'Describe a Pod and read the readiness events'], ['choice', 'Scale the Deployment to ten replicas'],
@@ -479,7 +484,7 @@ function heroDemoHtml() {
     '<div class="hd-tabs" role="tablist" aria-label="Demos">' + tabs + '</div>' +
     '<div class="tbar"><i></i><i></i><i></i><span id="hd-title">' + e(HD[0].title) + '</span></div>' +
     '<div class="tb hd-stage" id="hd-stage" role="tabpanel" tabindex="0" aria-labelledby="hd-t0">' + hdItems(HD[0], true) + '</div>' +
-    '<p class="hd-sr">Four short demos that play in turn: ' + e(sr) + '.</p>' +
+    '<p class="hd-sr">Five short demos that play in turn: ' + e(sr) + '.</p>' +
     '<div class="tcap"><span id="hd-cap">' + e(HD[0].cap) + '</span><span class="hd-ctl"><button type="button" class="hd-pause" id="hd-pause" aria-pressed="false">Pause</button><a id="hd-link" href="' + HD[0].href + '">' + e(HD[0].go) + '</a></span></div></div>';
 }
 function hdItems(sc, shown) {
@@ -1085,7 +1090,7 @@ function route() {
 }
 
 /* ---------- search (ranking in search.js) ---------- */
-var INDEX = null, GROUPS = ['Lessons', 'Cases', 'Cheat sheets', 'Interview', 'Glossary', 'Practice'];
+var INDEX = null, GROUPS = ['Lessons', 'Cases', 'Cheat sheets', 'Interview', 'Glossary', 'Practice', 'Labs', 'More'];
 function addIdx(kind, group, title, sub, href, body, extra, lesson, mod) { INDEX.push({ kind: kind, group: group, title: title, sub: sub || '', href: href, body: body || '', extra: extra || '', lesson: lesson, module: mod || '' }); }
 function buildIndex() {
   INDEX = [];
@@ -1117,6 +1122,18 @@ function buildIndex() {
    ['Skill-writing lab', 'Write a SKILL.md and check it in the browser', '#/skill-lab', 'claude skill skill.md description lab check'],
    ['Daily challenge', 'One question a day with a streak', '#/daily', 'quiz question streak'],
    ['Today: interview and case of the day', 'A fresh question and incident every day', '#/today', 'interview of the day case of the day']].forEach(function (x) { addIdx('Tool', 'Practice', x[0], x[1], x[2], x[1], x[3]); });
+
+  (D.vmlabs || []).forEach(function (v) { addIdx('Linux lab', 'Labs', v.title, v.level + ' real Linux lab', '#/linux/' + v.id, (v.story || '') + ' ' + (v.goals || []).join(' '), 'real linux vm lab scenario ' + (v.tag || '') + ' ' + (v.faults ? 'multi-fault' : '') + ' ' + (v.ask ? 'diagnose' : '') + ' ' + (v.net ? 'network' : ''), v.lesson, (v.lesson || '').split('/')[0]); });
+  (D.termlabs || []).forEach(function (t) { addIdx('Terminal lab', 'Labs', t.title, t.level + ' terminal lab', '#/terminal-lab/' + t.id, (t.summary || '') + ' ' + (t.story || '') + ' ' + (t.goals || []).join(' '), 'terminal lab simulated shell', t.lesson, t.module); });
+  (D.challenges || []).forEach(function (c) { addIdx('Challenge', 'Labs', c.title, 'Do it yourself challenge', c.lesson ? hrefLesson(c.lesson) : '#/challenges', c.prompt || '', 'challenge diy practice', c.lesson, c.lesson ? c.lesson.split('/')[0] : ''); });
+  (D.games || []).forEach(function (g) { addIdx('Game', 'Labs', g.title, g.level + ' incident game', '#/game/' + g.id, (g.summary || '') + ' ' + (g.intro || '') + ' ' + ((g.explain && (g.explain.cause + ' ' + g.explain.signs + ' ' + g.explain.fix)) || ''), 'incident game scenario', g.lesson, g.module); });
+  (D.widgets || []).forEach(function (w) { addIdx('Widget', 'More', w.title, 'Interactive widget', '#/widget/' + w.id, w.summary || '', 'simulation widget', w.lesson, w.module); });
+  (D.plans || []).forEach(function (p) { addIdx('Plan', 'More', p.title, p.level + ' learning plan', '#/plan/' + p.id, (p.summary || '') + ' ' + (p.who || '') + ' ' + (p.outcomes || []).join(' '), 'plan study days'); });
+  (D.capstones || []).forEach(function (c) { addIdx('Capstone', 'More', c.title, c.level + ' capstone project', '#/capstone/' + c.id, (c.summary || '') + ' ' + (c.goal || ''), 'capstone project portfolio', null, (c.modules || [])[0]); });
+  (D.casefiles || []).forEach(function (c) { var cs = (D.cases || []).filter(function (x) { return x.id === c.id; })[0]; addIdx('Case file', 'Cases', (cs ? cs.title : c.id.replace(/-/g, ' ')) + ' (case file)', 'Checked ' + (c.checked || ''), '#/case-file/' + c.id, (c.summary || '') + ' ' + (c.rootCause || ''), 'case file incident'); });
+  Object.keys(D.reading || {}).forEach(function (k) { (D.reading[k] || []).forEach(function (r) { addIdx('Reading', 'More', r.t, r.by + ', ' + r.kind, '#/reading', r.why || '', k + ' reading documentation'); }); });
+  ((D.paths && D.paths.live) || []).forEach(function (p) { addIdx('Roadmap', 'More', p.title, 'Role roadmap', '#/roadmap/' + p.id, p.summary || '', 'roadmap role career path you are here'); });
+  MODS.forEach(function (m) { addIdx('Handbook', 'More', m.title + ' handbook', 'Whole skill as one document', '#/handbook/' + m.id, m.summary, 'handbook pdf print', null, m.id); });
   if (window.MargaSearch) MargaSearch.build(INDEX);
 }
 function searchResults(q) {
@@ -1139,7 +1156,7 @@ function openSearch() {
     '<input id="sq" type="search" placeholder="Search lessons, commands, incidents, terms" autocomplete="off">' +
     '<div class="sfilters" id="sfilters" role="group" aria-label="Filter results"></div>' +
     '<label class="sstage"><span>Stage</span><select id="sstage"><option value="">All stages</option>' + MODS.map(function (m) { return '<option value="' + e(m.id) + '">' + e(m.title) + '</option>'; }).join('') + '</select></label>' +
-    '<ul id="sres" role="listbox" aria-label="Results"></ul><p class="small" id="shint">Type to search. Use the arrow keys and Enter. Press Escape to close.</p></div></div>';
+    '<ul id="sres" role="listbox" aria-label="Results"></ul><p class="small" id="shint">Type to search. Use the arrow keys and Enter. Shift and Enter shows every result. Press Escape to close.</p></div></div>';
   var inp = $('#sq'); inp.focus();
   paintResults('');
   inp.addEventListener('input', function () { results = searchResults(inp.value); sel = 0; paintResults(inp.value); });
@@ -1147,6 +1164,7 @@ function openSearch() {
   inp.addEventListener('keydown', function (ev) {
     if (ev.key === 'ArrowDown') { ev.preventDefault(); sel = Math.min(sel + 1, results.length - 1); paintResults(inp.value); }
     else if (ev.key === 'ArrowUp') { ev.preventDefault(); sel = Math.max(sel - 1, 0); paintResults(inp.value); }
+    else if (ev.key === 'Enter' && ev.shiftKey && inp.value.trim()) { ev.preventDefault(); pushRecent(inp.value); closeSearch(true); location.hash = '/search?q=' + encodeURIComponent(inp.value.trim()); }
     else if (ev.key === 'Enter' && results[sel]) { ev.preventDefault(); pushRecent(inp.value); go(results[sel]); }
   });
 }
@@ -1270,6 +1288,7 @@ var api = {
   $: $, $$: $$, e: e, plural: plural, shuffle: shuffle, hours: hours,
   state: function () { return S; }, save: save, markActive: markActive, renderChrome: renderChrome, setNav: setNav,
   view: view, toast: toast, printBar: printBar, voiceSlot: voiceSlot, wireSay: wireSay, refsHtml: refsHtml,
+  searchAll: function (q, group, stage, limit) { return loadAll().then(function () { INDEX = null; buildIndex(); return { groups: GROUPS, counts: MargaSearch.counts(q, stage || ''), hits: MargaSearch.query(q, { kind: group || '', module: stage || '', limit: limit || 60 }) }; }); },
   hrefLesson: hrefLesson, isDone: isDone, route: route, loadAll: loadAll, loadModule: loadModule,
   addRoute: function (re, fn) { routes.push([re, fn]); },
   afterRoute: function (fn) { afterHooks.push(fn); }, ivListHtml: ivListHtml,
@@ -1300,6 +1319,7 @@ if (typeof window.MargaChallenge === 'function') window.MargaChallenge(api);
 if (typeof window.MargaWorkshop === 'function') window.MargaWorkshop(api);
 if (typeof window.MargaInterviewLab === 'function') window.MargaInterviewLab(api);
 if (typeof window.MargaRoadmap === 'function') window.MargaRoadmap(api);
+if (typeof window.MargaSearchPage === 'function') window.MargaSearchPage(api);
 
 /* ---------- accessibility panel ---------- */
 (function () {

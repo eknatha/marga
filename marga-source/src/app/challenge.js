@@ -65,7 +65,8 @@ A.afterRoute(function (h) {
   var host = $('#cards') || $('#check'); if (!host) return;
   var labs = '';
   if (vm.length || tl.length) {
-    labs = '<h3>Practise on a machine</h3><ul class="diy-labs">' + vm.map(function (x) { return '<li><a href="#/linux/' + e(x.id) + '">' + e(x.title) + '</a> <span class="small">real Linux in your browser, ' + x.minutes + ' min' + (A.vmLabs && A.vmLabs.done(x.id) ? ', solved' : '') + '</span></li>'; }).join('') +
+    labs = '<h3>Practise on a machine</h3><ul class="diy-labs">' + vm.slice(0, 4).map(function (x) { return '<li><a href="#/linux/' + e(x.id) + '">' + e(x.title) + '</a> <span class="small">real Linux in your browser, ' + e(x.level) + ', ' + x.minutes + ' min' + (A.vmLabs && A.vmLabs.done(x.id) ? ', solved' : '') + '</span></li>'; }).join('') +
+      (vm.length > 4 ? '<li><a href="#/linux?q=' + encodeURIComponent(id) + '">All ' + vm.length + ' real Linux labs for this lesson</a></li>' : '') +
       tl.map(function (x) { return '<li><a href="#/terminal-lab/' + e(x.id) + '">' + e(x.title) + '</a> <span class="small">simulated terminal, ' + x.minutes + ' min</span></li>'; }).join('') + '</ul>';
   }
   host.insertAdjacentHTML('afterend', '<section class="diy" id="diy" aria-labelledby="diy-h"><h2 id="diy-h">Do it yourself</h2>' +
