@@ -1,0 +1,42 @@
+{
+ "disk-full": [
+  "rm /var/log/app/debug.trace",
+  ": > /var/log/app/app.log"
+ ],
+ "deleted-open-file": [
+  "p=$(pidof ingest); : > /proc/$p/fd/3"
+ ],
+ "permission-denied": [
+  "chmod 755 /srv/app /srv/app/run.sh"
+ ],
+ "cpu-hog": [
+  "kill $(pidof report-job); kill $(pidof yes)"
+ ],
+ "service-wont-start": [
+  "sed -i \"s/^PORT=.*/PORT=8080/;s#^ROOT=.*#ROOT=/srv/www#\" /etc/web/web.conf",
+  "start-web"
+ ],
+ "port-in-use": [
+  "kill $(pidof httpd)",
+  "sleep 1; start-web"
+ ],
+ "stale-pidfile": [
+  "rm /run/web.pid",
+  "start-web"
+ ],
+ "bad-hosts": [
+  "echo \"127.0.0.2 db.internal\" >> /etc/hosts"
+ ],
+ "broken-symlink": [
+  "ln -sfn releases/2024-09 /opt/app/current"
+ ],
+ "find-error-spike": [
+  "n=$(awk '$9==502' /var/log/web/access.log | wc -l); ip=$(awk '$9==502{print $1}' /var/log/web/access.log | sort | uniq -c | sort -rn | head -1 | awk '{print $2}'); printf 'count=%s\\nip=%s\\n' $n $ip > /root/answer.txt"
+ ],
+ "shell-script-bug": [
+  "printf '#!/bin/sh\\nset -eu\\nSRC=$1\\ncp -r \"$SRC\" /backup/\\necho \"backup finished OK\"\\n' > /usr/local/bin/backup.sh"
+ ],
+ "path-and-env": [
+  "printf 'export PATH=$PATH:/opt/tools/bin\\nexport APP_ENV=staging\\n' > /root/.profile"
+ ]
+}

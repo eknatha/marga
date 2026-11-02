@@ -1,0 +1,341 @@
+cat names.txt
+cat -n names.txt
+head -n 2 names.txt
+head -2 names.txt
+tail -n 2 names.txt
+tail -n +3 names.txt
+head -n -2 names.txt
+wc -l names.txt
+wc names.txt
+wc -w words.txt
+wc -c names.txt
+cat names.txt | wc -l
+sort names.txt
+sort -r names.txt
+sort -u names.txt
+sort -n nums.txt
+sort -nr nums.txt
+sort nums.txt
+sort -n -u nums.txt
+sort -t, -k3 -n data.csv
+sort -t, -k2,2 -k3,3nr data.csv
+sort -k2 words.txt
+sort -f words.txt
+sort names.txt | uniq
+sort names.txt | uniq -c
+sort names.txt | uniq -c | sort -nr
+sort names.txt | uniq -d
+sort names.txt | uniq -u
+uniq names.txt
+cut -d, -f1 data.csv
+cut -d, -f2,3 data.csv
+cut -d, -f2- data.csv
+cut -c1-3 names.txt
+cut -d" " -f1 log.txt
+cut -d" " -f3 log.txt | sort | uniq -c
+tr a-z A-Z < names.txt
+tr -d a < names.txt
+tr -s " " < words.txt
+echo hello | tr "el" "ip"
+tr -cd "0-9@@NL@@" < log.txt
+echo "a b c" | tr " " "@@NL@@"
+tr "[:lower:]" "[:upper:]" < words.txt
+grep alice names.txt
+grep -c alice names.txt
+grep -v alice names.txt
+grep -n bob names.txt
+grep -i the words.txt
+grep -w the words.txt
+grep -o "[0-9]*s" log.txt
+grep -E "ERROR|WARN" log.txt
+grep -E "^2026.*(INFO|WARN)" log.txt
+grep "db timeout" log.txt | wc -l
+grep -x alice names.txt
+grep -F "." log.txt
+grep -e alice -e bob names.txt
+grep -l alice names.txt nums.txt
+grep nothing names.txt
+grep -q alice names.txt; echo $?
+grep -h alice names.txt names.txt
+grep alice names.txt words.txt
+grep -A1 ERROR log.txt
+grep -B1 WARN log.txt
+grep -m1 ERROR log.txt
+grep "(a)lice" names.txt
+grep "al.*e" names.txt
+grep -E "[[:digit:]]{3}" log.txt
+grep "^$" words.txt | wc -l
+grep -c "" names.txt
+grep -E "a+l" names.txt
+echo $((2+3*4))
+x=7; echo $((x/2)) $((x%3)) $((x<<2))
+echo "a  b" | wc -w
+x=hello; echo ${x:1:3} ${#x} ${x^^} ${x/l/L} ${x//l/L}
+f=file.tar.gz; echo ${f%.gz} ${f%%.*} ${f#*.} ${f##*.}
+echo ${undef:-default} ${undef-x}
+x=; echo ${x:-d} ${x-d}
+for f in names.txt nums.txt; do echo $f; done
+for i in 1 2 3; do echo $i; done | tac
+i=0; while [ $i -lt 3 ]; do echo $i; i=$((i+1)); done
+for ((i=0;i<3;i++)); do echo $i; done
+case foo in f*) echo yes;; *) echo no;; esac
+a=(1 2 3); echo ${a[@]} ${#a[@]} ${a[1]}
+declare -A m; m[x]=1; m[y]=2; echo ${m[x]} ${!m[@]} | tr " " "@@NL@@" | sort | tr "@@NL@@" " "
+f() { echo "args: $#"; for a in "$@"; do echo "[$a]"; done; }; f a "b c" d
+f() { local x=1; echo $x; }; x=5; f; echo $x
+f() { return 3; }; f; echo $?
+if grep -q bob names.txt; then echo found; fi
+true && echo a || echo b
+false && echo a || echo b
+! false && echo ok
+echo a; echo b >&2
+echo $(echo a b | wc -w)
+echo "$(printf "x@@NL@@@@NL@@")y"
+echo `echo bt`
+echo {1..5}
+echo {a,b,c}x
+echo a{1,2}b{3,4}
+printf "%s-%s@@NL@@" a b c d
+printf "%05d|%5s|%-5s|@@NL@@" 42 ab cd
+printf "%x %o %c@@NL@@" 255 8 A
+echo -e "a	b"
+echo -n hi; echo
+echo "a   b"; echo a   b
+x="a b c"; for w in $x; do echo $w; done
+x="a b c"; for w in "$x"; do echo $w; done
+set -- a b c; echo $# $1 $3; shift; echo $1
+cat <<EOF@@NL@@line $((1+1))@@NL@@EOF
+cat <<"EOF"@@NL@@line $((1+1))@@NL@@EOF
+cat <<< "here string"
+while read a b; do echo "$b-$a"; done < <(printf "1 2@@NL@@3 4@@NL@@") 2>/dev/null; true
+printf "1 2@@NL@@3 4@@NL@@" | while read a b; do echo "$b-$a"; done
+x=3; [ $x -gt 2 ] && echo big
+[ -f names.txt ] && echo file
+[ -d . ] && echo dir
+[[ abc == a* ]] && echo glob
+[[ abc =~ ^a.c$ ]] && echo re
+[ "a" = "a" ] && echo eq
+[ -z "" ] && echo empty
+test 5 -lt 10 && echo lt
+set -e; false; echo no
+set -e; false || true; echo yes
+set -eu; echo ${undefinedvar}; echo no
+set -o pipefail; false | true; echo $?
+false | true; echo $?
+echo hi > o.txt; cat o.txt; echo more >> o.txt; cat o.txt
+ls nonexist 2>/dev/null; echo $?
+ls -1
+ls *.txt
+ls -d */ 2>/dev/null; echo $?
+mkdir -p a/b/c; ls a/b
+mkdir d; touch d/x d/y; ls d; rm -r d; ls | head -2
+cp names.txt n2.txt; cmp -s names.txt n2.txt; echo $?
+mv names.txt zz.txt; ls zz.txt
+chmod 600 names.txt; stat -c "%a" names.txt
+chmod u+x,g-r names.txt; stat -c "%a" names.txt
+chmod 755 names.txt; ls -l names.txt | cut -c1-10
+find . -name "*.txt" | sort
+find . -type f -name "n*" | sort
+find . -maxdepth 1 -type f | sort | head -3
+mkdir -p x/y; touch x/y/f; find x | sort
+basename /a/b/c.txt .txt
+dirname /a/b/c.txt
+echo a b c | xargs -n1
+echo a b c | xargs echo x
+seq 3
+seq 2 4
+seq 1 2 7
+echo x | tee t.txt; cat t.txt
+x=5; ((x++)); echo $x
+x=5; let y=x*2; echo $y
+echo "${PWD##*/}" | wc -l
+cd /; pwd; cd - >/dev/null; pwd | wc -l
+echo "a:b:c" | IFS=: read x y z; echo "$x"
+IFS=: read x y z <<< "a:b:c"; echo "$y"
+echo $0
+echo "$@" | wc -c
+f(){ echo $1; }; f "a b"
+echo "nested $(echo "in $(echo deep)")"
+a=1; b=$((a+1)); echo "$a$b"
+x=abc; echo "${x:0:1}"; echo ${x: -2}
+read -r line < names.txt; echo "$line"
+echo "x" | grep -c x
+echo one two | awk "{print \$2}"
+trap "echo bye" EXIT; echo run
+echo "a,b" | sed "s/,/\n/"
+exit 3
+bash -c "exit 4"; echo $?
+bash -c "echo \$1" x y
+(cd /tmp; pwd); pwd | wc -l
+{ echo a; echo b; } | wc -l
+echo $((10#7 + 1))
+echo $(( 1 << 3 | 1 ))
+x=1; { x=2; }; echo $x
+x=1; (x=2); echo $x
+for i in $(seq 3); do [ $i -eq 2 ] && continue; echo $i; done
+for i in 1 2 3; do [ $i -eq 2 ] && break; echo $i; done
+until [ ${i:-0} -ge 2 ]; do i=$((${i:-0}+1)); echo $i; done
+echo "$((3 > 2)) $((3 == 2))"
+tail -n 1 log.txt | cut -d" " -f3-
+sort -t" " -k3,3 log.txt | head -2
+tac names.txt | head -2
+rev <<< "abc"
+nl names.txt | head -2
+awk '{print $1}' names.txt
+awk '{print NR, $0}' names.txt
+awk 'END{print NR}' names.txt
+awk -F, '{print $1}' data.csv
+awk -F, 'NR>1{s+=$3} END{print s}' data.csv
+awk -F, 'NR>1{print $2}' data.csv | sort | uniq -c
+awk '{print $3}' log.txt
+awk '$3=="ERROR"' log.txt
+awk '$3 == "ERROR" {c++} END {print c}' log.txt
+awk '/ERROR/ {print $1, $2}' log.txt
+awk '{print NF}' words.txt
+awk '{n[$1]++} END{for(k in n) print k, n[k]}' names.txt | sort
+awk 'length($0) > 4' names.txt
+awk '{print toupper($1)}' names.txt
+awk 'BEGIN{print 1+2*3}'
+awk 'BEGIN{printf "%5.2f|%-5s|%d\n", 3.14159, "ab", 42}'
+awk -F, 'NR>1 && $3>8' data.csv
+awk -F, -v t=blue '$2==t{print $1}' data.csv
+awk '{s+=$1} END{print s/NR}' nums.txt
+awk '{ if ($1 > 9) print $1, "big"; else print $1, "small" }' nums.txt
+awk 'NR==2,NR==4' names.txt
+awk '{sub(/a/,"A"); print}' names.txt
+awk '{gsub(/a/,"A"); print}' names.txt
+awk 'BEGIN{OFS="-"} {print $1,$2}' log.txt
+awk '{print substr($0,2,3)}' names.txt
+awk '{print index($0,"l")}' names.txt
+awk 'BEGIN{n=split("a,b,c",x,","); print n, x[1], x[3]}'
+awk '{ $2="X"; print }' words.txt
+awk '!seen[$0]++' names.txt
+awk '{a[NR]=$0} END{for(i=NR;i>0;i--) print a[i]}' names.txt
+awk 'BEGIN{x="abc"; print length(x), x "d"}'
+awk 'max<$1{max=$1} END{print max}' nums.txt
+awk '/ERROR/{e++} /INFO/{i++} END{print e, i}' log.txt
+awk '{print $NF}' log.txt
+awk 'NR%2==0' names.txt
+awk 'BEGIN{printf "%s %s\n", "a", "b"}'
+awk '{printf "%-8s %3d\n", $1, NR}' names.txt
+awk 'BEGIN { print (1==1) ? "y" : "n" }'
+awk 'BEGIN{print 7/2, int(7/2), 7%3, 2^10}'
+awk -F'[ :]' '{print $2}' log.txt
+awk '{ total += $1 } END { printf "%.1f\n", total }' nums.txt
+awk -F, 'NR>1 {sum[$2]+=$3; cnt[$2]++} END {for (t in sum) printf "%s %.1f\n", t, sum[t]/cnt[t]}' data.csv | sort
+awk '$1 ~ /^a/' names.txt
+awk '$1 !~ /^a/' names.txt
+awk 'function dbl(x) { return x*2 } {print dbl($1)}' nums.txt
+awk '{ while (i < 2) { i++; print i } }' names.txt | head -3
+awk 'BEGIN { for (i=1;i<=3;i++) s = s i; print s }'
+awk '{print > "/dev/stderr"}' names.txt 2>/dev/null; echo done
+awk 'NR==1{next} {print}' names.txt | head -2
+awk '{print; exit}' names.txt
+awk 'END{print $0}' names.txt
+awk 'BEGIN{print substr("hello",2), substr("hello",2,3), substr("hello",4,10)}'
+awk 'BEGIN{print 1e3, 0.1+0.2, 100000*100000, 1/3}'
+awk '{print ($1 > 5)}' nums.txt
+awk '{ if ($1 == 2) print "two" }' nums.txt
+awk '{print length}' names.txt
+awk -F: '{print $1}' /etc/passwd 2>/dev/null | head -1; true
+sed 's/alice/ALICE/' names.txt
+sed 's/a/A/g' names.txt
+sed -n '2,3p' names.txt
+sed -n '$p' names.txt
+sed '2d' names.txt
+sed '/bob/d' names.txt
+sed -n '/ERROR/p' log.txt
+sed -E 's/([a-z]+)@([a-z]+)/\2 at \1/' <<< "me@host"
+sed 's/[0-9]\+/N/g' log.txt
+sed -e 's/INFO/I/' -e 's/ERROR/E/' log.txt
+sed 's/\(.*\) \(.*\)/\2 \1/' words.txt
+sed 's/a/X/2' names.txt
+sed '/alice/,/carol/d' names.txt
+sed '2q' names.txt
+sed -n '2{p;p}' names.txt
+sed 's/^/> /' names.txt
+sed 's/$/;/' names.txt
+sed 'y/abc/xyz/' names.txt
+sed 's#/#_#g' <<< "a/b/c"
+sed '3i inserted' names.txt
+sed '2a appended' names.txt
+sed '2c changed' names.txt
+sed = names.txt | head -4
+sed -n '/bob/{=;p}' names.txt
+sed 's/.*/\U&/' names.txt
+sed -n '1!G;h;$p' names.txt
+sed 's/\s\+/ /g' words.txt
+sed -E 's/^([^=]+)=(.*)$/\1: \2/' cfg.ini
+sed '/^#/d;/^$/d' cfg.ini
+sed -n 's/.*port=\([0-9]*\).*/\1/p' cfg.ini
+sed 's/[aeiou]//g' names.txt
+sed -i 's/alice/ZED/' names.txt; cat names.txt
+sed -i.bak 's/bob/BOB/' names.txt; cat names.txt names.txt.bak | wc -l
+sed '1d;$d' names.txt
+sed 's/\bthe\b/THE/Ig' words.txt
+sed -n '3,$p' names.txt
+sed '$!d' names.txt
+sed 's/\./,/g' <<< "1.2.3"
+sed 's/a\|b/X/g' <<< "abc"
+sed 's/(/[/' <<< "f(x)"
+sed -E 's/(a|b)+/X/' <<< "abba c"
+sed -E 's/[0-9]{2,}/N/g' <<< "1 22 333"
+sed -n '/start/,/end/p' <<< $'x\nstart\ny\nend\nz'
+sed '0~2d' names.txt
+sed 's/a*/X/g' <<< "baaac"
+jq . json.json
+jq -c . json.json
+jq .env json.json
+jq -r .env json.json
+jq '.items[].name' json.json
+jq -r '.items[].name' json.json
+jq '.items | length' json.json
+jq '.items[0]' json.json
+jq '.items[-1].name' json.json
+jq '.items[] | select(.ok == false) | .name' json.json
+jq -r '.items[] | select(.n > 2) | .name' json.json
+jq '[.items[] | .n] | add' json.json
+jq '.items | map(.n)' json.json
+jq -c '.items | map(select(.ok)) | map(.name)' json.json
+jq -r '.items[] | "\(.name): \(.n)"' json.json
+jq -r '.items[] | [.name, .n] | @csv' json.json
+jq -r '.items[] | [.name, .n] | @tsv' json.json
+jq 'keys' json.json
+jq -c '.items | sort_by(.n) | map(.name)' json.json
+jq -c '.items | group_by(.ok) | map(length)' json.json
+jq -c '{env, count: (.items | length)}' json.json
+jq '.missing' json.json
+jq '.items[] | .name | ascii_upcase' json.json
+jq -c '.items | map({(.name): .n}) | add' json.json
+jq -r '.items | map(.name) | join(",")' json.json
+jq '.items | any(.ok)' json.json
+jq '.items | all(.ok)' json.json
+jq -c 'to_entries | map(.key)' json.json
+jq '.items[] | select(.name | test("^c"))' json.json
+jq -n '1 + 2'
+jq -n '[1,2,3] | map(. * 2)'
+jq -c -n '[range(3)]'
+jq -n --arg x hi '$x'
+jq -c '.items | map(.name) | unique' json.json
+jq -c '.items | min_by(.n) | .name' json.json
+jq '.items | first | .name' json.json
+jq -r '.items[] | select(.ok | not) | .name' json.json
+jq 'has("env")' json.json
+jq -e '.env == "prod"' json.json > /dev/null; echo $?
+jq -e '.nothing' json.json > /dev/null; echo $?
+echo '{"a":1}{"a":2}' | jq .a
+echo '[1,2,3]' | jq -c 'map(select(. > 1))'
+echo '"x"' | jq -r .
+echo '{"a":{"b":[1,2]}}' | jq -c '.a.b[]'
+echo '{"a":null}' | jq '.a // "dflt"'
+echo '{"s":"a-b"}' | jq -r '.s | split("-") | .[1]'
+echo '[3,1,2]' | jq -c 'sort | reverse'
+echo '{"a":1,"b":2}' | jq -c 'with_entries(.value += 1)' ; true
+echo '{"a":1,"b":2}' | jq -c 'del(.a)'
+echo '{"a":1,"b":2}' | jq -c 'map_values(. + 1)' 2>/dev/null; true
+jq -s 'length' json.json
+jq -c '.items[0].n += 5 | .items[0]' json.json
+jq -c '.items |= map(.n)' json.json
+jq -c '.items[].n |= . * 2 | [.items[].n]' json.json
+jq -c '.env = "dev" | .env' json.json
+jq -c '(.items[] | select(.name == "db") | .ok) = true | [.items[].ok]' json.json
