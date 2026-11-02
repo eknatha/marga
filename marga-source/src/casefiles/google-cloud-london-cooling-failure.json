@@ -1,0 +1,428 @@
+{
+ "id": "google-cloud-london-cooling-failure",
+ "checked": "29 October 2026",
+ "summary": "On 19 July 2022 multiple redundant cooling systems in one London data center failed during a record heat wave. Google powered it down to protect hardware and services in europe-west2 were disrupted for many hours.",
+ "overview": {
+  "background": "Zone europe-west2-a in London ran in a data center whose cooling could not keep it at a safe temperature. A legacy placement algorithm let one data center issue affect three storage clusters.",
+  "systems": [
+   "One data center in europe-west2-a",
+   "Compute Engine, Persistent Disk, VPC",
+   "Cloud Storage, Cloud SQL, Bigtable, BigQuery",
+   "GKE, Memorystore, Filestore and many more",
+   "Internal traffic routing"
+  ],
+  "impact": "Google lists 18 hours 23 minutes of total cloud service impact and a long tail to 21:20 on 20 July. About 35 percent of VMs in zone a were terminated and about 38 percent of Persistent Disk volumes in zone a were unavailable.",
+  "severity": "A regional event. Google called the quality level not what it strives for.",
+  "gaps": "The page's engineer-engagement time differs between reports (06:40 and 07:02)."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Cooling fails, services fail across layers",
+   "caption": "Temperature rose, Google powered services down, and a routing change plus an old placement algorithm let the failure reach beyond one zone.",
+   "nodes": [
+    {
+     "id": "heat",
+     "label": "Record outside heat",
+     "row": 0,
+     "col": 0
+    },
+    {
+     "id": "cool",
+     "label": "Redundant cooling systems fail together",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "dc",
+     "label": "Data center powered down to protect hardware",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "zone",
+     "label": "Zone a: VMs, disks, SQL, Bigtable, GKE",
+     "row": 3,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "reg",
+     "label": "Region: traffic routing change, Cloud Storage clusters",
+     "row": 3,
+     "col": 2,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "heat",
+     "t": "cool"
+    },
+    {
+     "f": "cool",
+     "t": "dc",
+     "state": "fail"
+    },
+    {
+     "f": "dc",
+     "t": "zone",
+     "state": "hit"
+    },
+    {
+     "f": "dc",
+     "t": "reg",
+     "label": "legacy placement",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Thermal failover and load reduction (conceptual)",
+   "caption": "Google planned to repair failover automation, reduce thermal load progressively and audit cooling worldwide. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "heat",
+     "label": "Rising temperature",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "shed",
+     "label": "Progressive load shedding",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "fo",
+     "label": "Tested zonal failover",
+     "row": 2,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "place",
+     "label": "Storage placement across failure domains",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "cust",
+     "label": "Customers deployed in several zones",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "heat",
+     "t": "shed",
+     "state": "new"
+    },
+    {
+     "f": "shed",
+     "t": "fo",
+     "state": "new"
+    },
+    {
+     "f": "shed",
+     "t": "place",
+     "state": "new"
+    },
+    {
+     "f": "fo",
+     "t": "cust",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Load is reduced step by step instead of powering off the whole room.",
+  "A zone failure stays in its zone.",
+  "Customers can move to other zones."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "04:30 PDT, 19 Jul",
+   "phase": "trigger",
+   "e": "Cooling impairment begins per the preliminary report."
+  },
+  {
+   "t": "06:33",
+   "phase": "detect",
+   "e": "Automated monitoring alerts engineers to two cooling systems."
+  },
+  {
+   "t": "08:06",
+   "phase": "impact",
+   "e": "Compute Engine terminates 42 percent of preemptible VMs in the region."
+  },
+  {
+   "t": "09:13",
+   "phase": "impact",
+   "e": "About 38 percent of Persistent Disk volumes in zone a are unavailable."
+  },
+  {
+   "t": "10:05",
+   "phase": "mitigate",
+   "e": "The impacted data center is powered down and its VMs are terminated."
+  },
+  {
+   "t": "12:35",
+   "phase": "mitigate",
+   "e": "Internal traffic routing is corrected."
+  },
+  {
+   "t": "14:13",
+   "phase": "recover",
+   "e": "The cooling system is repaired and restoration begins."
+  },
+  {
+   "t": "20:18",
+   "phase": "recover",
+   "e": "A majority of Compute Engine VMs are back online."
+  },
+  {
+   "t": "20 Jul 04:28",
+   "phase": "recover",
+   "e": "Cloud services are restored."
+  },
+  {
+   "t": "20 Jul 21:20",
+   "phase": "recover",
+   "e": "The incident is fully mitigated and closed."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Extreme outside temperature combined with a simultaneous failure of multiple redundant cooling systems.",
+  "underlying": "The data center could not stay at a safe temperature and had to be powered down.",
+  "contributing": [
+   "Failover automation did not work as intended",
+   "Traffic routing was changed to avoid all three zones, not just zone a",
+   "A legacy placement algorithm let one data center affect three storage clusters",
+   "Recovery needed manual reconciliation"
+  ],
+  "propagation": [
+   "Temperature rises.",
+   "Hardware is powered down.",
+   "VMs, disks and databases fail.",
+   "Regional services are affected."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The cause",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "a simultaneous failure of multiple, redundant cooling systems in one of the data centers",
+   "note": "From Google's report."
+  },
+  {
+   "label": "The acknowledgement",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "This is not the level of quality and reliability we strive to offer you",
+   "note": "From Google's report."
+  },
+  {
+   "label": "A simulated temperature alert",
+   "kind": "simulated",
+   "lang": "yaml",
+   "body": "alert: RoomTemperatureHigh\nexpr: avg(room_temp_c) > 32\nfor: 5m\nactions: [page-facilities, begin-load-shed]",
+   "note": "Shows a rule that starts progressive load reduction. Invented values."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check temperature sensors and cooling unit status.",
+    "why": "Cooling alerts started the investigation."
+   },
+   {
+    "step": "Map which zones and storage clusters share the data center.",
+    "why": "Placement decided the blast radius."
+   },
+   {
+    "step": "Check traffic routing changes.",
+    "why": "A routing change hit all zones."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Shed load progressively and power down in a controlled order.",
+    "why": "Prevents hardware damage."
+   },
+   {
+    "step": "Correct the traffic routing.",
+    "why": "Google fixed it at 12:35."
+   },
+   {
+    "step": "Restore cooling then bring services up in steps.",
+    "why": "Cooling was repaired at 14:13."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check disks, VMs and databases for consistency.",
+    "why": "About 96 percent of disks recovered automatically and the rest later."
+   },
+   {
+    "step": "Resolve control plane leftovers manually.",
+    "why": "Google did this on 21 July."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Audit cooling equipment and standards.",
+    "why": "Google's stated action."
+   },
+   {
+    "step": "Repair and test zonal failover automation.",
+    "why": "Google's stated action."
+   },
+   {
+    "step": "Spread storage across failure domains.",
+    "why": "The placement issue was fixed."
+   }
+  ],
+  "safety": "Powering down servers early protects hardware but causes an outage. Practise the order so recovery is quick and data is safe."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Room temperature is rising and two cooling units are down on the hottest day of the year. Services in the zone are slowing.",
+   "clues": [
+    "Outside temperature is a record",
+    "Failover automation is untested",
+    "Storage clusters share the room"
+   ],
+   "question": "What do you do and in what order?",
+   "hints": [
+    "What protects hardware?",
+    "What reduces load first?",
+    "What do customers do?"
+   ],
+   "answer": "Reduce load progressively, shed non-critical workloads, fail over what you can to other zones, power down in order if needed, repair cooling, then restore in stages."
+  },
+  "rootcause": {
+   "q": "What happened to cooling?",
+   "options": [
+    "Multiple redundant systems failed simultaneously",
+    "One chiller was serviced",
+    "Power was cut",
+    "A fire"
+   ],
+   "answer": 0,
+   "why": "Google's quoted cause."
+  },
+  "remediation": [
+   {
+    "task": "Write a thermal runbook.",
+    "answer": "Thresholds, who is paged, which load goes first, and when to power down."
+   },
+   {
+    "task": "Design placement.",
+    "answer": "No more than one storage cluster per data center for a region replica set."
+   },
+   {
+    "task": "Test failover.",
+    "answer": "Run a zone drain quarterly."
+   }
+  ],
+  "design": {
+   "prompt": "Design a regional service that survives the loss of one data center in heat.",
+   "constraints": [
+    "Three zones",
+    "Stateful data",
+    "Hot weather"
+   ],
+   "answer": "Spread replicas across data centers, test failover, set thermal thresholds, and keep capacity in other zones."
+  },
+  "checks": [
+   {
+    "q": "What share of zone a VMs were terminated?",
+    "options": [
+     "About 35 percent",
+     "100 percent",
+     "1 percent",
+     "None"
+    ],
+    "answer": 0,
+    "why": "Google gives about 35 percent."
+   },
+   {
+    "q": "Which problem widened the impact?",
+    "options": [
+     "A legacy placement algorithm",
+     "A new feature",
+     "A DDoS",
+     "A fire"
+    ],
+    "answer": 0,
+    "why": "Three storage clusters were affected by one data center."
+   },
+   {
+    "q": "When was cooling repaired?",
+    "options": [
+     "14:13",
+     "04:30",
+     "06:33",
+     "20 July"
+    ],
+    "answer": 0,
+    "why": "Google lists 14:13."
+   },
+   {
+    "q": "What should customers use?",
+    "options": [
+     "Multiple zones",
+     "One zone",
+     "More snapshots only",
+     "Longer timeouts"
+    ],
+    "answer": 0,
+    "why": "Multiple zones limit exposure."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Audit cooling",
+   "Progressive thermal load reduction",
+   "Distribute placement"
+  ],
+  "monitoring": [
+   "Room temperature and chiller status"
+  ],
+  "recovery": [
+   "Controlled power-down order",
+   "Staged restoration"
+  ],
+  "practices": [
+   "Test zonal failover",
+   "Deploy across zones"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Google Cloud incident report, 19 July 2022 (europe-west2-a)",
+   "url": "https://status.cloud.google.com/incidents/fmEL9i2fArADKawkZAa2",
+   "used": "timeline, cause, impact, remediation"
+  }
+ ],
+ "verification": "Facts were read from Google's incident page on 29 October 2026; the last 7 KB of the page were not read. The alert rule is Simulated."
+}

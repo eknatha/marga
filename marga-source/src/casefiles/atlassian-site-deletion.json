@@ -1,0 +1,428 @@
+{
+ "id": "atlassian-site-deletion",
+ "checked": "29 October 2026",
+ "summary": "On 5 April 2022 a script meant to delete a legacy app from customer sites was given site IDs instead of app IDs. It deleted 883 sites for 775 customers, and full restoration took until 18 April.",
+ "overview": {
+  "background": "Atlassian had acquired the standalone app Insight - Asset Management and needed to delete the legacy app from customer sites. A script used a deletion API that accepted both site IDs and app IDs.",
+  "systems": [
+   "Deletion script and API",
+   "Customer sites (Jira, Confluence, Access, Opsgenie, Statuspage)",
+   "Backups and restore process",
+   "Support tooling and customer contact data"
+  ],
+  "impact": "775 customers lost access to products, some for up to 14 days. No customer lost more than five minutes of data, though 57 had some databases restored to a point more than five minutes earlier.",
+  "severity": "Atlassian triggered its major incident process at 08:17 UTC and assigned the highest severity at 12:38.",
+  "gaps": "The review gives no revenue impact."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "The wrong kind of ID reaches a destructive API",
+   "caption": "The requesting team supplied site IDs. The API accepted either type without confirming, and staging could not catch the error because the IDs did not exist there.",
+   "nodes": [
+    {
+     "id": "req",
+     "label": "Team requests deletion, gives site IDs",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "scr",
+     "label": "Script runs in production",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "api",
+     "label": "Deletion API accepts site or app ID without checking type",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "sites",
+     "label": "883 sites deleted, 775 customers",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "sup",
+     "label": "Support contacts deleted, customers cannot file tickets",
+     "row": 4,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "req",
+     "t": "scr",
+     "label": "wrong ID type"
+    },
+    {
+     "f": "scr",
+     "t": "api",
+     "state": "fail"
+    },
+    {
+     "f": "api",
+     "t": "sites",
+     "label": "permanent deletion",
+     "state": "fail"
+    },
+    {
+     "f": "sites",
+     "t": "sup",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Soft delete and verified targets (conceptual)",
+   "caption": "Atlassian said permanent deletion must pass a soft delete first, with staged rollouts and rollback plans. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "req",
+     "label": "Deletion request names the target type",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "api",
+     "label": "API validates ID type and scope",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "soft",
+     "label": "Soft delete with retention",
+     "row": 2,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "stage",
+     "label": "Staged rollout with rollback",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "dr",
+     "label": "Tested bulk restore",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "req",
+     "t": "api",
+     "state": "new"
+    },
+    {
+     "f": "api",
+     "t": "soft",
+     "state": "new"
+    },
+    {
+     "f": "api",
+     "t": "stage",
+     "state": "new"
+    },
+    {
+     "f": "soft",
+     "t": "dr",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "A wrong ID type is rejected.",
+  "A deletion can be undone for a period.",
+  "Restores are practised at scale."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "07:38 UTC, 5 Apr",
+   "phase": "trigger",
+   "e": "The deletion script begins running. Sites are deleted one after another."
+  },
+  {
+   "t": "07:46",
+   "phase": "detect",
+   "e": "The first support ticket from an affected customer is created."
+  },
+  {
+   "t": "08:01",
+   "phase": "impact",
+   "e": "The script finishes. 883 sites for 775 customers have been deleted."
+  },
+  {
+   "t": "08:17",
+   "phase": "investigate",
+   "e": "Atlassian triggers its major incident process."
+  },
+  {
+   "t": "08:53",
+   "phase": "investigate",
+   "e": "Teams confirm the tickets and the script run are related."
+  },
+  {
+   "t": "12:38",
+   "phase": "mitigate",
+   "e": "The incident is assigned the highest severity."
+  },
+  {
+   "t": "8 Apr",
+   "phase": "recover",
+   "e": "The first customers are restored."
+  },
+  {
+   "t": "14 to 17 Apr",
+   "phase": "recover",
+   "e": "A second restoration process reuses original identifiers and restores the remaining sites."
+  },
+  {
+   "t": "18 Apr",
+   "phase": "recover",
+   "e": "All customer sites are restored."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A deletion script was run with site IDs where it expected app IDs.",
+  "underlying": "The API accepted both ID types without confirming which was being deleted. Peer review focused on the endpoint, not on validating IDs, and staging could not catch it.",
+  "contributing": [
+   "A communication gap between the requesting team and the runner",
+   "No soft delete: data was permanently deleted",
+   "Restoring many sites at once had not been practised",
+   "Customer contact data lived in the deleted sites, so customers could not raise tickets"
+  ],
+  "propagation": [
+   "Wrong IDs supplied.",
+   "API deletes sites.",
+   "Customers lose access.",
+   "Recovery takes days because restores are per site."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Blameless framing",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "people don’t cause incidents. Rather, systems allow for mistakes to be made.",
+   "note": "From Atlassian's review."
+  },
+  {
+   "label": "Accountability",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "The buck stops with us. Full stop.",
+   "note": "From Atlassian's review."
+  },
+  {
+   "label": "A simulated validation",
+   "kind": "simulated",
+   "lang": "python",
+   "body": "def delete(target_id, kind):\n    if kind not in ('app', 'site'):\n        raise ValueError('kind required')\n    if kind == 'site' and not approved_site_delete(target_id):\n        raise PermissionError('site deletion needs approval')",
+   "note": "Shows an API that requires the target type and extra approval for sites. Not Atlassian code."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Confirm which action ran and with what input.",
+    "why": "The script run and IDs matched the deletions."
+   },
+   {
+    "step": "Count what was deleted against what was intended.",
+    "why": "883 sites against an intended small set."
+   },
+   {
+    "step": "Check backups and restore capability.",
+    "why": "Defines the recovery time."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Stop the script and block bulk deletions.",
+    "why": "Atlassian blocked them at once."
+   },
+   {
+    "step": "Restore sites in batches, with new identifiers if needed.",
+    "why": "Restoration 1 created new sites."
+   },
+   {
+    "step": "Restore with the original identifiers for the rest.",
+    "why": "Restoration 2."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check each site's data against its backup point.",
+    "why": "Atlassian reported meeting RPO."
+   },
+   {
+    "step": "Contact customers with outside channels.",
+    "why": "Customer contact data was lost with the sites."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Make destructive actions soft-delete first.",
+    "why": "Atlassian's action."
+   },
+   {
+    "step": "Require staged rollout and rollback plans for deletes.",
+    "why": "Atlassian's action."
+   },
+   {
+    "step": "Practise large-scale restore.",
+    "why": "Atlassian's action."
+   },
+   {
+    "step": "Back up contact data outside product instances.",
+    "why": "Atlassian's action."
+   }
+  ],
+  "safety": "Never run a destructive script on production without a dry run that prints what will be deleted, and confirm the count with a second person."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A cleanup script deleted far more than intended. Customers cannot raise tickets because contact data was in the deleted sites.",
+   "clues": [
+    "IDs came from another team",
+    "No soft delete",
+    "Restores take hours per site"
+   ],
+   "question": "What do you do first?",
+   "hints": [
+    "Stop the cause",
+    "How do you contact customers?",
+    "How do you restore at scale?"
+   ],
+   "answer": "Stop the script, block bulk deletes, open the major incident, restore in batches, use outside channels for customers and plan better safeguards."
+  },
+  "rootcause": {
+   "q": "What was wrong with the input?",
+   "options": [
+    "Site IDs were given where app IDs were expected",
+    "A typo in a password",
+    "A missing certificate",
+    "A wrong date"
+   ],
+   "answer": 0,
+   "why": "Atlassian states this."
+  },
+  "remediation": [
+   {
+    "task": "Write a dry-run output.",
+    "answer": "List counts and names of the objects to delete and require a second person to approve."
+   },
+   {
+    "task": "Design soft delete.",
+    "answer": "Mark deleted, keep for N days, purge by schedule."
+   },
+   {
+    "task": "Plan restore drills.",
+    "answer": "Quarterly restore of a batch of sites with timing."
+   }
+  ],
+  "design": {
+   "prompt": "Design a deletion workflow for customer sites that cannot cause bulk loss.",
+   "constraints": [
+    "Many sites",
+    "Legacy app removal",
+    "Scripts"
+   ],
+   "answer": "Validate IDs by type, require dry runs, soft delete with retention, staged rollout, and rate-limit deletion."
+  },
+  "checks": [
+   {
+    "q": "How many sites were deleted?",
+    "options": [
+     "883",
+     "5",
+     "50000",
+     "1"
+    ],
+    "answer": 0,
+    "why": "Atlassian says 883 sites."
+   },
+   {
+    "q": "When were all sites restored?",
+    "options": [
+     "18 April",
+     "6 April",
+     "30 April",
+     "Never"
+    ],
+    "answer": 0,
+    "why": "Per the review."
+   },
+   {
+    "q": "What happened to contact data?",
+    "options": [
+     "It was deleted with the sites",
+     "It was safe",
+     "It was encrypted",
+     "It was moved"
+    ],
+    "answer": 0,
+    "why": "That blocked tickets."
+   },
+   {
+    "q": "What will deletion require?",
+    "options": [
+     "Soft delete first",
+     "Nothing",
+     "A password",
+     "A holiday"
+    ],
+    "answer": 0,
+    "why": "Atlassian's action."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Soft delete",
+   "Type-checked destructive APIs",
+   "Dry runs with counts"
+  ],
+  "monitoring": [
+   "Count of objects deleted per run"
+  ],
+  "recovery": [
+   "Batch restore",
+   "Outside-channel customer contact"
+  ],
+  "practices": [
+   "Practise bulk restore",
+   "Blameless reviews"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Atlassian: Post-Incident Review on the Atlassian April 2022 outage",
+   "url": "https://www.atlassian.com/blog/atlassian-engineering/post-incident-review-april-2022-outage",
+   "used": "timeline, cause, impact, recovery, corrective actions"
+  }
+ ],
+ "verification": "Facts were read from Atlassian's review on 29 October 2026. The code is Simulated."
+}

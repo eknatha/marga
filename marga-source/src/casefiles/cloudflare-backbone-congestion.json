@@ -1,0 +1,402 @@
+{
+ "id": "cloudflare-backbone-congestion",
+ "checked": "29 October 2026",
+ "summary": "On 17 July 2020 engineers responding to backbone congestion near Atlanta made a one-line router change that leaked all BGP routes into the backbone with a higher preference. Traffic across Cloudflare's network fell by about 50 percent for 27 minutes.",
+ "overview": {
+  "background": "Cloudflare's backbone links its data centers. Routers use BGP local-preference to choose paths, and local compute nodes had a preference of 100.",
+  "systems": [
+   "Backbone links EWR to ORD and ATL to IAD",
+   "Atlanta backbone router",
+   "Data centers across North America, Europe, South America and Russia",
+   "Logs and metrics pipeline"
+  ],
+  "impact": "Traffic across the network dropped about 50 percent. About 19 locations were affected, listed in the post, from 21:12 to 21:39 UTC. Logs and metrics were partly dropped from 21:47 to 22:10.",
+  "severity": "Global in effect, 27 minutes. Cloudflare says it was a configuration error, not an attack.",
+  "gaps": "The post does not give customer counts."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Atlanta attracts the backbone's traffic",
+   "caption": "A change meant to withdraw routes leaked all BGP routes with local-preference 200. Other locations sent traffic to Atlanta, which could not handle it.",
+   "nodes": [
+    {
+     "id": "cong",
+     "label": "Backbone congestion near Atlanta",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "chg",
+     "label": "One-line change leaks all BGP routes, local-pref 200",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "atl",
+     "label": "Atlanta router overloaded",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "loc",
+     "label": "Connected locations fail",
+     "row": 3,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "log",
+     "label": "Logs and metrics partly dropped",
+     "row": 3,
+     "col": 2,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "cong",
+     "t": "chg",
+     "label": "engineers act"
+    },
+    {
+     "f": "chg",
+     "t": "atl",
+     "label": "traffic pulled in",
+     "state": "fail"
+    },
+    {
+     "f": "atl",
+     "t": "loc",
+     "state": "hit"
+    },
+    {
+     "f": "atl",
+     "t": "log",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Prefix limits and safer preference (conceptual)",
+   "caption": "Cloudflare planned a maximum-prefix limit on backbone BGP sessions and a change to local-preference so one location cannot attract others' traffic. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "chg",
+     "label": "Change deactivates the term",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "lim",
+     "label": "Maximum-prefix limit on BGP sessions",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "pref",
+     "label": "Local routes preferred over backbone routes",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "loc",
+     "label": "Locations keep serving local traffic",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "chg",
+     "t": "lim",
+     "state": "new"
+    },
+    {
+     "f": "lim",
+     "t": "pref",
+     "state": "new"
+    },
+    {
+     "f": "pref",
+     "t": "loc",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "A leak is dropped at the session boundary.",
+  "One location cannot pull the network onto itself.",
+  "A mistaken edit is bounded."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "20:25 UTC, 17 Jul",
+   "phase": "trigger",
+   "e": "The backbone link EWR to ORD is lost and ATL to IAD becomes congested."
+  },
+  {
+   "t": "20:25 onward",
+   "phase": "mitigate",
+   "e": "Engineers make a change on the Atlanta router to remove some traffic."
+  },
+  {
+   "t": "21:12",
+   "phase": "impact",
+   "e": "Atlanta attracts traffic from across the backbone. The outage window starts."
+  },
+  {
+   "t": "21:39",
+   "phase": "mitigate",
+   "e": "Atlanta is dropped from the backbone. Traffic is restored."
+  },
+  {
+   "t": "21:47",
+   "phase": "recover",
+   "e": "Service is restored. Congestion at a core data center drops some logs until 22:10."
+  },
+  {
+   "t": "22:10",
+   "phase": "recover",
+   "e": "Full recovery, including logs and metrics."
+  },
+  {
+   "t": "20 Jul",
+   "phase": "change",
+   "e": "A maximum-prefix limit on backbone BGP sessions is scheduled for deployment."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A one-line change on the Atlanta router leaked all BGP routes into the backbone.",
+  "underlying": "The routes carried local-preference 200 against 100 for local compute nodes, so other locations preferred Atlanta for traffic that was not Atlanta's.",
+  "contributing": [
+   "The correct change was to deactivate the term, not the prefix list",
+   "No maximum-prefix limit on backbone sessions",
+   "Local preference allowed one location to attract others' traffic"
+  ],
+  "propagation": [
+   "Routes leak.",
+   "Traffic goes to Atlanta.",
+   "The router overloads.",
+   "Connected locations fail."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The change",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "a one line change started leaking all BGP routes into the backbone",
+   "note": "From Cloudflare's post."
+  },
+  {
+   "label": "The correct change",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "The correct change would have been to deactivate the term instead of the prefix-list.",
+   "note": "From Cloudflare's post."
+  },
+  {
+   "label": "A simulated prefix limit",
+   "kind": "simulated",
+   "lang": "text",
+   "body": "neighbor backbone-peer maximum-prefix 5000 warning-only 80\nneighbor backbone-peer maximum-prefix 5000 teardown",
+   "note": "Generic syntax showing a prefix limit that tears down a session if exceeded. Invented, not a vendor's exact syntax."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Look at traffic by location and where it flows.",
+    "why": "Atlanta attracted traffic from across the backbone."
+   },
+   {
+    "step": "Compare route preferences for local and backbone routes.",
+    "why": "200 against 100 explained it."
+   },
+   {
+    "step": "Review the last router change.",
+    "why": "The change was the trigger."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Remove the affected location from the backbone and disable the router.",
+    "why": "Cloudflare did this at 21:39."
+   },
+   {
+    "step": "Revert the bad term.",
+    "why": "Restores normal preference."
+   },
+   {
+    "step": "Apply a global change to prevent recurrence.",
+    "why": "Cloudflare made one."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Watch traffic return in each location.",
+    "why": "Confirm each site recovers."
+   },
+   {
+    "step": "Check logs and metrics catch up.",
+    "why": "They were lost for a short time."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Set maximum-prefix limits on backbone sessions.",
+    "why": "Cloudflare's action."
+   },
+   {
+    "step": "Make local routes win over remote ones.",
+    "why": "Cloudflare's action."
+   },
+   {
+    "step": "Use commit-confirm and peer review on router changes.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Removing a location from the backbone reduces capacity. Do it only when the location is the problem and traffic can be served elsewhere."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Traffic halves and one router is overloaded. A change was made to it ten minutes ago to relieve congestion.",
+   "clues": [
+    "Routes have preference 200",
+    "Other sites send traffic to it",
+    "Logs are dropping"
+   ],
+   "question": "How do you contain it?",
+   "hints": [
+    "What did the change do?",
+    "How do you take the router out?",
+    "What limit would have helped?"
+   ],
+   "answer": "Remove the router from the backbone, revert the term, confirm traffic recovers, then add prefix limits and change local preference."
+  },
+  "rootcause": {
+   "q": "What was the correct change?",
+   "options": [
+    "Deactivate the term, not the prefix-list",
+    "Reboot the router",
+    "Add servers",
+    "Change DNS"
+   ],
+   "answer": 0,
+   "why": "Cloudflare's quoted explanation."
+  },
+  "remediation": [
+   {
+    "task": "Write a prefix limit.",
+    "answer": "Set a limit above normal route counts and tear down above it."
+   },
+   {
+    "task": "Design preference rules.",
+    "answer": "Local routes get higher preference than routes learned from the backbone."
+   },
+   {
+    "task": "Plan reviews.",
+    "answer": "Require a second person and commit-confirm for router edits."
+   }
+  ],
+  "design": {
+   "prompt": "Design a backbone that survives a leaked route.",
+   "constraints": [
+    "Many sites",
+    "BGP",
+    "Human edits"
+   ],
+   "answer": "Use prefix limits, route filters, local-first preference, staged changes and automatic rollback."
+  },
+  "checks": [
+   {
+    "q": "How long was the outage window?",
+    "options": [
+     "27 minutes",
+     "5 hours",
+     "1 day",
+     "1 minute"
+    ],
+    "answer": 0,
+    "why": "21:12 to 21:39 UTC."
+   },
+   {
+    "q": "What local preference was leaked?",
+    "options": [
+     "200",
+     "50",
+     "0",
+     "1000"
+    ],
+    "answer": 0,
+    "why": "Against 100 for local routes."
+   },
+   {
+    "q": "Which was not the cause?",
+    "options": [
+     "An attack",
+     "A configuration error",
+     "A BGP leak",
+     "A one-line change"
+    ],
+    "answer": 0,
+    "why": "Cloudflare says it was not an attack."
+   },
+   {
+    "q": "What was scheduled for 20 July?",
+    "options": [
+     "A maximum-prefix limit",
+     "A price change",
+     "A holiday",
+     "A migration"
+    ],
+    "answer": 0,
+    "why": "Cloudflare's follow-up."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Maximum-prefix limits",
+   "Local-first preference",
+   "Peer review of router changes"
+  ],
+  "monitoring": [
+   "Backbone utilisation",
+   "Route counts per session"
+  ],
+  "recovery": [
+   "Drop the faulty location",
+   "Revert the term"
+  ],
+  "practices": [
+   "Use commit-confirm",
+   "Test with a lab"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Cloudflare: Cloudflare outage on July 17, 2020",
+   "url": "https://blog.cloudflare.com/cloudflare-outage-on-july-17-2020/",
+   "used": "timeline, cause, impact, fix"
+  }
+ ],
+ "verification": "Facts were read from Cloudflare's post on 29 October 2026. The prefix-limit snippet is Simulated."
+}

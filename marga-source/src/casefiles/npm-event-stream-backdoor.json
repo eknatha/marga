@@ -1,0 +1,376 @@
+{
+ "id": "npm-event-stream-backdoor",
+ "checked": "29 October 2026",
+ "summary": "In September 2018 a new maintainer who had taken over the event-stream npm package added a dependency, flatmap-stream, that contained code targeting the Copay wallet. npm was told on 26 November 2018 and removed the packages.",
+ "overview": {
+  "background": "event-stream is a widely used npm package. flatmap-stream 0.1.1 was added as a dependency in event-stream 3.3.6.",
+  "systems": [
+   "event-stream npm package",
+   "flatmap-stream 0.1.1",
+   "Copay wallet builds (versions 5.0.2 to 5.1.0)",
+   "npm registry"
+  ],
+  "impact": "Malicious code was deployed in Copay 5.0.2 to 5.1.0 and could harvest keys for accounts holding more than 100 Bitcoin or 1000 Bitcoin Cash.",
+  "severity": "A targeted supply chain attack with a very broad delivery route.",
+  "gaps": "npm's post does not say how the malware was first identified."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A trusted maintainer, an added dependency, a targeted payload",
+   "caption": "Per npm, the attacker posed as a maintainer and took over, then added flatmap-stream, whose code altered the Copay release build.",
+   "nodes": [
+    {
+     "id": "take",
+     "label": "Attacker takes over maintainership by social engineering",
+     "row": 0,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "dep",
+     "label": "flatmap-stream added in event-stream 3.3.6",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "bld",
+     "label": "Copay release build altered",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "key",
+     "label": "Targets accounts with large balances",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "take",
+     "t": "dep",
+     "state": "fail"
+    },
+    {
+     "f": "dep",
+     "t": "bld",
+     "state": "fail"
+    },
+    {
+     "f": "bld",
+     "t": "key",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Dependency review and handover controls (conceptual)",
+   "caption": "General controls, not npm's stated changes.",
+   "nodes": [
+    {
+     "id": "lock",
+     "label": "Lockfiles and pinned versions",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "rev",
+     "label": "Review new transitive dependencies",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "own",
+     "label": "Maintainer handover checks",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "aud",
+     "label": "npm audit in CI",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "lock",
+     "t": "rev",
+     "state": "new"
+    },
+    {
+     "f": "lock",
+     "t": "own",
+     "state": "new"
+    },
+    {
+     "f": "rev",
+     "t": "aud",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Dependencies are reviewed.",
+  "Ownership changes are visible.",
+  "Audit runs in CI."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "9 Sep 2018",
+   "phase": "trigger",
+   "e": "flatmap-stream is added as a direct dependency in event-stream 3.3.6."
+  },
+  {
+   "t": "Following weeks",
+   "phase": "impact",
+   "e": "Copay builds 5.0.2 to 5.1.0 include the malicious code."
+  },
+  {
+   "t": "26 Nov 2018",
+   "phase": "detect",
+   "e": "npm's security team is notified of a malicious package in event-stream."
+  },
+  {
+   "t": "26 Nov 2018",
+   "phase": "investigate",
+   "e": "npm triages the malware."
+  },
+  {
+   "t": "26 to 27 Nov 2018",
+   "phase": "mitigate",
+   "e": "npm removes flatmap-stream and event-stream 3.3.6 and takes ownership of event-stream."
+  },
+  {
+   "t": "27 Nov 2018",
+   "phase": "recover",
+   "e": "npm publishes its incident analysis and advises users to run npm audit."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Social engineering gave the attacker maintainership of event-stream.",
+  "underlying": "The attacker added a dependency whose code was designed to run only in a specific build environment.",
+  "contributing": [
+   "Handover of an unmaintained popular package",
+   "Payload decrypted only in the target environment",
+   "Wide use of the package spread the exposure"
+  ],
+  "propagation": [
+   "Takeover.",
+   "Malicious dependency.",
+   "Targeted build change.",
+   "Removal."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The takeover",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "posing as a maintainer, took over maintainership of the event-stream module",
+   "note": "From npm's incident analysis as read."
+  },
+  {
+   "label": "The targeted design",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "running the payload in any other environment has no effect",
+   "note": "From the same analysis."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check the dependency tree for flatmap-stream.",
+    "why": "npm ls."
+   },
+   {
+    "step": "Check lockfile history.",
+    "why": "When it entered."
+   },
+   {
+    "step": "Check which products used the version.",
+    "why": "Copay 5.0.2 to 5.1.0."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Remove the package and update.",
+    "why": "npm's advice."
+   },
+   {
+    "step": "Run npm audit.",
+    "why": "npm's advice."
+   },
+   {
+    "step": "Rotate keys if a build ran it.",
+    "why": "General practice."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check builds are clean.",
+    "why": "Rebuild from clean."
+   },
+   {
+    "step": "Check users informed.",
+    "why": "Copay advised users."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Pin versions with lockfiles.",
+    "why": "General practice."
+   },
+   {
+    "step": "Review new dependencies.",
+    "why": "General practice."
+   },
+   {
+    "step": "Watch ownership changes.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Do not rebuild signed releases without a clean environment and key rotation."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "An advisory says a package you depend on includes a malicious dependency that targets your product.",
+   "clues": [
+    "Used in build scripts",
+    "Lockfile includes it",
+    "Release signed"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "How do you confirm exposure?",
+    "What do you rotate?",
+    "How do you inform users?"
+   ],
+   "answer": "Search lockfiles and builds, rebuild clean, rotate release keys and secrets, and tell users what versions are affected."
+  },
+  "rootcause": {
+   "q": "Which version of event-stream added flatmap-stream?",
+   "options": [
+    "3.3.6",
+    "1.0",
+    "9.0",
+    "0.1"
+   ],
+   "answer": 0,
+   "why": "Per npm."
+  },
+  "remediation": [
+   {
+    "task": "Write a dependency review rule.",
+    "answer": "New transitive dependencies need review."
+   },
+   {
+    "task": "Plan lockfile policy.",
+    "answer": "Commit lockfiles and review diffs."
+   },
+   {
+    "task": "Plan CI audit.",
+    "answer": "Fail on known malicious packages."
+   }
+  ],
+  "design": {
+   "prompt": "Design supply-chain checks for a wallet app.",
+   "constraints": [
+    "Open source dependencies",
+    "Release builds",
+    "High-value users"
+   ],
+   "answer": "Lockfiles, review, isolated reproducible builds and signing in a clean environment."
+  },
+  "checks": [
+   {
+    "q": "Which wallet was targeted?",
+    "options": [
+     "Copay",
+     "Ledger",
+     "Electrum",
+     "MetaMask"
+    ],
+    "answer": 0,
+    "why": "Per npm."
+   },
+   {
+    "q": "What did npm do?",
+    "options": [
+     "Removed the packages and took ownership of event-stream",
+     "Nothing",
+     "Banned Node",
+     "Sued"
+    ],
+    "answer": 0,
+    "why": "Per npm."
+   },
+   {
+    "q": "What advice did npm give?",
+    "options": [
+     "Run npm audit and update",
+     "Reinstall Windows",
+     "Disable Bitcoin",
+     "Rename packages"
+    ],
+    "answer": 0,
+    "why": "Per npm."
+   },
+   {
+    "q": "How did the attacker gain control?",
+    "options": [
+     "Posing as a maintainer",
+     "By hacking npm",
+     "By buying npm",
+     "By DNS"
+    ],
+    "answer": 0,
+    "why": "Per npm."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Lockfiles",
+   "Dependency review",
+   "Clean builds"
+  ],
+  "monitoring": [
+   "npm audit in CI"
+  ],
+  "recovery": [
+   "Remove the package",
+   "Rebuild clean"
+  ],
+  "practices": [
+   "Watch ownership changes"
+  ]
+ },
+ "sources": [
+  {
+   "title": "npm: Details about the event-stream incident",
+   "url": "https://blog.npmjs.org/post/180565383195/details-about-the-event-stream-incident",
+   "used": "timeline, mechanism, payload, response"
+  }
+ ],
+ "verification": "Facts were read from npm's analysis on 29 October 2026."
+}

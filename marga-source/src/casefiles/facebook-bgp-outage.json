@@ -1,0 +1,383 @@
+{
+ "id": "facebook-bgp-outage",
+ "checked": "29 October 2026",
+ "summary": "On 4 October 2021 Facebook, Instagram and WhatsApp disappeared from the internet for about six hours. Cloudflare saw Facebook's routes to its DNS servers withdrawn after a configuration change on its internal backbone. This case file uses Cloudflare's outside view because Meta's own pages could not be read.",
+ "overview": {
+  "background": "Facebook's authoritative DNS servers are reachable only if Facebook announces their prefixes through BGP. Cloudflare observed from the outside through BGP updates and DNS resolver behaviour.",
+  "systems": [
+   "Facebook's BGP announcements for DNS prefixes",
+   "Facebook's authoritative DNS servers",
+   "Public resolvers such as 1.1.1.1 and 8.8.8.8",
+   "Facebook, Instagram, WhatsApp"
+  ],
+  "impact": "Facebook, WhatsApp and Instagram were unreachable. Resolvers worldwide returned SERVFAIL, and query volume to 1.1.1.1 rose about 30 times as apps and users retried.",
+  "severity": "A global outage of about six hours (from about 15:40 to about 21:28 UTC as seen by Cloudflare).",
+  "gaps": "Cloudflare did not see Facebook's internal systems. Details inside Facebook are not covered here."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Routes withdrawn, DNS unreachable (outside view)",
+   "caption": "Cloudflare says the problem began with a configuration change that affected the entire internal backbone. From outside, Facebook stopped announcing routes to its DNS prefixes.",
+   "nodes": [
+    {
+     "id": "chg",
+     "label": "Configuration change on the internal backbone",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "bgp",
+     "label": "BGP routes to DNS prefixes withdrawn",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "dns",
+     "label": "Authoritative DNS servers unreachable",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "res",
+     "label": "Public resolvers return SERVFAIL and retry",
+     "row": 3,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "apps",
+     "label": "Facebook, Instagram, WhatsApp unreachable",
+     "row": 3,
+     "col": 2,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "chg",
+     "t": "bgp",
+     "state": "fail"
+    },
+    {
+     "f": "bgp",
+     "t": "dns",
+     "state": "fail"
+    },
+    {
+     "f": "dns",
+     "t": "res",
+     "state": "hit"
+    },
+    {
+     "f": "dns",
+     "t": "apps",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "DNS and recovery paths independent of the backbone (conceptual)",
+   "caption": "A general design idea, not Facebook's stated design: keep authoritative DNS reachable if the backbone changes, and keep a recovery path that does not depend on the network being repaired.",
+   "nodes": [
+    {
+     "id": "chg",
+     "label": "Change with staged validation",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "dns",
+     "label": "DNS announced from several independent paths",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "oob",
+     "label": "Out-of-band access to repair the network",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "mon",
+     "label": "Alert when announcements disappear",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "chg",
+     "t": "dns",
+     "state": "new"
+    },
+    {
+     "f": "chg",
+     "t": "oob",
+     "state": "new"
+    },
+    {
+     "f": "dns",
+     "t": "mon",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "A bad change cannot remove every route to DNS.",
+  "Engineers can fix the network without using it.",
+  "Withdrawal of routes pages someone at once."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "About 15:40 UTC, 4 Oct",
+   "phase": "trigger",
+   "e": "Cloudflare sees a peak in routing changes from Facebook's network."
+  },
+  {
+   "t": "15:51",
+   "phase": "detect",
+   "e": "Cloudflare opens an internal incident for SERVFAIL on Facebook DNS lookups."
+  },
+  {
+   "t": "15:58",
+   "phase": "investigate",
+   "e": "Cloudflare notices Facebook has stopped announcing routes to its DNS prefixes."
+  },
+  {
+   "t": "About 15:50 to 21:20",
+   "phase": "impact",
+   "e": "facebook.com is unavailable through 1.1.1.1."
+  },
+  {
+   "t": "About 21:00 to 21:17",
+   "phase": "mitigate",
+   "e": "Facebook's network shows renewed BGP activity, peaking at 21:17."
+  },
+  {
+   "t": "21:28",
+   "phase": "recover",
+   "e": "Facebook appears reconnected to the global internet and DNS works again."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A configuration change affected Facebook's entire internal backbone.",
+  "underlying": "Facebook's routes to its DNS prefixes were withdrawn, so its DNS servers could not be reached from the internet. (Per Cloudflare's outside view.)",
+  "contributing": [
+   "Resolvers cached SERVFAIL and users and apps retried, raising load by about 30 times",
+   "Facebook's own recovery was slowed by what Cloudflare describes as the difficulty of reaching its systems (not detailed in the post)"
+  ],
+  "propagation": [
+   "Backbone change.",
+   "Routes withdrawn.",
+   "DNS unreachable.",
+   "All services unreachable."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Where it started",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "the problem actually began with a configuration change that affected the entire internal backbone",
+   "note": "From Cloudflare's post."
+  },
+  {
+   "label": "A simulated check of announcements",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ whois -h whois.radb.net -- '-i origin AS32934' | grep route: | head -3\n$ dig +short ns facebook.com\n$ dig +short facebook.com @1.1.1.1",
+   "note": "Shows how to check routes and DNS. Output omitted because the post gives none and the facts are old."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check whether DNS names resolve from several resolvers.",
+    "why": "SERVFAIL everywhere points to authoritative servers."
+   },
+   {
+    "step": "Check whether routes to the DNS prefixes are announced.",
+    "why": "Cloudflare saw them stop."
+   },
+   {
+    "step": "Check what changed on the backbone.",
+    "why": "A configuration change was the start."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Restore announcements for the DNS prefixes.",
+    "why": "Facebook re-announced routes."
+   },
+   {
+    "step": "Bring back services in steps.",
+    "why": "The post says full return takes time."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check DNS resolution from outside.",
+    "why": "Confirm from public resolvers."
+   },
+   {
+    "step": "Check load on resolvers and caches.",
+    "why": "Retries had raised load."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Keep DNS reachable even if the backbone changes.",
+    "why": "General design."
+   },
+   {
+    "step": "Monitor route announcements for your own prefixes.",
+    "why": "General practice."
+   },
+   {
+    "step": "Keep an out-of-band recovery path.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "A network change that removes your own routes may cut you off from the tools needed to fix it. Always test out-of-band access first."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Your site and your DNS names stop resolving worldwide. Public resolvers return SERVFAIL. You can no longer reach internal tools.",
+   "clues": [
+    "Routes to DNS prefixes are gone",
+    "A backbone change was made earlier",
+    "VPN needs the same network"
+   ],
+   "question": "How do you recover?",
+   "hints": [
+    "What is your out-of-band path?",
+    "What do you re-announce first?",
+    "What do others see meanwhile?"
+   ],
+   "answer": "Use out-of-band access to undo the change, re-announce the DNS prefixes, bring services back in stages and watch resolver load."
+  },
+  "rootcause": {
+   "q": "What did Cloudflare observe?",
+   "options": [
+    "Facebook stopped announcing routes to its DNS prefixes",
+    "A DDoS",
+    "A disk failure",
+    "A power cut"
+   ],
+   "answer": 0,
+   "why": "Cloudflare's post."
+  },
+  "remediation": [
+   {
+    "task": "Write a route monitor.",
+    "answer": "Alert if any critical prefix is not seen by external route collectors for two minutes."
+   },
+   {
+    "task": "Design DNS resilience.",
+    "answer": "Use several providers or paths for authoritative DNS."
+   },
+   {
+    "task": "Plan out-of-band access.",
+    "answer": "A separate network and physical access procedure."
+   }
+  ],
+  "design": {
+   "prompt": "Design a backbone change process that cannot sever DNS.",
+   "constraints": [
+    "Global backbone",
+    "Self-hosted DNS",
+    "Remote engineers"
+   ],
+   "answer": "Validate changes in a model, apply in stages, keep independent DNS paths, alert on withdrawals and keep out-of-band access."
+  },
+  "checks": [
+   {
+    "q": "When did Cloudflare see the change?",
+    "options": [
+     "About 15:40 UTC",
+     "Midnight",
+     "21:28",
+     "16:30 local"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   },
+   {
+    "q": "What did resolvers return?",
+    "options": [
+     "SERVFAIL",
+     "NXDOMAIN",
+     "OK",
+     "Refused"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   },
+   {
+    "q": "How much did queries to 1.1.1.1 rise?",
+    "options": [
+     "About 30 times",
+     "None",
+     "10 percent",
+     "2 times"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   },
+   {
+    "q": "Why is this case file limited?",
+    "options": [
+     "Meta's own pages could not be read",
+     "No incident occurred",
+     "Cloudflare is unreliable",
+     "No data"
+    ],
+    "answer": 0,
+    "why": "See the verification note."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Independent DNS paths",
+   "Staged backbone changes",
+   "Out-of-band access"
+  ],
+  "monitoring": [
+   "Route announcement monitoring"
+  ],
+  "recovery": [
+   "Re-announce DNS prefixes first",
+   "Staged service return"
+  ],
+  "practices": [
+   "Test recovery without the network",
+   "Track resolver load during outages"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Cloudflare: Understanding how Facebook disappeared from the Internet",
+   "url": "https://blog.cloudflare.com/october-2021-facebook-outage/",
+   "used": "outside view, timeline, resolver impact"
+  }
+ ],
+ "verification": "Facts were read from Cloudflare's post on 29 October 2026. The case card cites Meta's engineering post, which could not be read, so this file does not claim Meta's internal details. The command example is Simulated."
+}

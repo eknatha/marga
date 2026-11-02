@@ -1,0 +1,426 @@
+{
+ "id": "sentry-postgres-transaction-id-wraparound",
+ "checked": "29 October 2026",
+ "summary": "On 20 July 2015 Sentry's PostgreSQL database stopped accepting writes because it was running out of transaction IDs. Autovacuum had not kept up, and recovery took most of a working day.",
+ "overview": {
+  "background": "PostgreSQL numbers transactions with a 32-bit counter. To avoid wraparound, a process called vacuum must freeze old rows. If it falls behind and fewer than one million transactions remain, PostgreSQL stops accepting commands to protect data.",
+  "systems": [
+   "Sentry's primary PostgreSQL database",
+   "Read replicas",
+   "Autovacuum workers",
+   "A large events-to-rollups table"
+  ],
+  "impact": "Sentry was down for most of the US working day on Monday 20 July 2015.",
+  "severity": "Full outage for writes, with reads served by replicas for part of the time. Sentry accepted data loss for one table to recover.",
+  "gaps": "The post does not quote the exact PostgreSQL error text, hardware before the incident or customer numbers."
+ },
+ "archNote": "The primary, replicas and table are described in the post. The picture is simplified.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Autovacuum falls behind",
+   "caption": "Writes advanced the transaction counter faster than autovacuum froze old rows, so the primary refused commands.",
+   "nodes": [
+    {
+     "id": "app",
+     "label": "Sentry application writes",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "pg",
+     "label": "PostgreSQL primary: under one million IDs left",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "av",
+     "label": "Autovacuum: too few workers, slow cost delay",
+     "row": 2,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "tbl",
+     "label": "Large events-to-rollups table unfinished",
+     "row": 2,
+     "col": 2,
+     "state": "fail"
+    },
+    {
+     "id": "rep",
+     "label": "Replicas serve reads",
+     "row": 3,
+     "col": 1
+    }
+   ],
+   "edges": [
+    {
+     "f": "app",
+     "t": "pg",
+     "label": "writes consume IDs"
+    },
+    {
+     "f": "av",
+     "t": "pg",
+     "label": "freezing too slow",
+     "state": "fail"
+    },
+    {
+     "f": "tbl",
+     "t": "av",
+     "state": "fail"
+    },
+    {
+     "f": "pg",
+     "t": "rep"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Tuned vacuum and headroom (conceptual)",
+   "caption": "Sentry changed autovacuum settings, moved to larger hardware and planned to split relations across databases. This view shows the idea.",
+   "nodes": [
+    {
+     "id": "app",
+     "label": "Application writes",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "pg",
+     "label": "Primary on larger hardware",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "av",
+     "label": "Six autovacuum workers, no cost delay",
+     "row": 2,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "mon",
+     "label": "Alert on transaction age",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "split",
+     "label": "Relations split across databases",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "app",
+     "t": "pg",
+     "state": "new"
+    },
+    {
+     "f": "av",
+     "t": "pg",
+     "state": "new"
+    },
+    {
+     "f": "mon",
+     "t": "pg",
+     "state": "new"
+    },
+    {
+     "f": "pg",
+     "t": "split",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Vacuum keeps pace with writes.",
+  "Warning comes long before a stop.",
+  "A problem in one table does not halt everything."
+ ],
+ "afterNote": "Alerting on transaction age is our suggestion; the other changes were stated by Sentry.",
+ "timelineNote": "The post gives the day and durations but no clock times.",
+ "timeline": [
+  {
+   "t": "Before the incident",
+   "phase": "change",
+   "e": "Autovacuum settings were left at values too slow for the write load, and autovacuum logging was not verbose."
+  },
+  {
+   "t": "Monday 20 July 2015",
+   "phase": "trigger",
+   "e": "PostgreSQL stops accepting commands because fewer than one million transaction IDs remain."
+  },
+  {
+   "t": "Early in the outage",
+   "phase": "mitigate",
+   "e": "Writes are stopped and replicas serve reads. A failover to new hardware is prepared."
+  },
+  {
+   "t": "About 3 hours",
+   "phase": "investigate",
+   "e": "The team waits on autovacuum and then finds that one large table has not finished."
+  },
+  {
+   "t": "Decision",
+   "phase": "mitigate",
+   "e": "The unfinished table is truncated, accepting data loss for that table."
+  },
+  {
+   "t": "About 5 minutes later",
+   "phase": "recover",
+   "e": "The database recovers."
+  },
+  {
+   "t": "After recovery",
+   "phase": "change",
+   "e": "New autovacuum settings are applied on new hardware with 256 GB memory and 24 cores."
+  }
+ ],
+ "rootCause": {
+  "trigger": "The database consumed transaction IDs until fewer than one million remained.",
+  "underlying": "Autovacuum could not freeze old rows fast enough because its limits were conservative for the workload.",
+  "contributing": [
+   "autovacuum_freeze_max_age was set too high",
+   "Only the default three workers ran",
+   "Vacuum cost delay throttled progress",
+   "One vacuum failed or did not work and nobody was alerted",
+   "Autovacuum logging was not verbose enough to see it"
+  ],
+  "propagation": [
+   "Vacuum falls behind.",
+   "The ID counter nears its limit.",
+   "PostgreSQL refuses commands.",
+   "The application cannot write."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The new configuration Sentry published",
+   "kind": "quoted",
+   "lang": "ini",
+   "body": "autovacuum_freeze_max_age = 500000000\nautovacuum_max_workers = 6\nautovacuum_naptime = '15s'\nautovacuum_vacuum_cost_delay = 0\nvacuum_freeze_min_age = 10000000",
+   "note": "Settings as listed in Sentry's post."
+  },
+  {
+   "label": "Simulated warning query",
+   "kind": "simulated",
+   "lang": "sql",
+   "body": "SELECT datname, age(datfrozenxid) AS xid_age,\n       2147483647 - age(datfrozenxid) AS remaining\nFROM pg_database ORDER BY xid_age DESC;",
+   "note": "A standard check to catch the problem early. Output not shown because the post does not provide it."
+  },
+  {
+   "label": "Simulated per-table check",
+   "kind": "simulated",
+   "lang": "sql",
+   "body": "SELECT relname, age(relfrozenxid) AS xid_age\nFROM pg_class WHERE relkind = 'r'\nORDER BY age(relfrozenxid) DESC LIMIT 10;",
+   "note": "Finds the table that holds back freezing."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check how close each database is to the limit.",
+    "why": "Remaining IDs show urgency.",
+    "cmd": "SELECT datname, age(datfrozenxid) FROM pg_database ORDER BY 2 DESC;",
+    "lang": "sql"
+   },
+   {
+    "step": "Find the oldest tables.",
+    "why": "Vacuum must finish these first.",
+    "cmd": "SELECT relname, age(relfrozenxid) FROM pg_class WHERE relkind='r' ORDER BY 2 DESC LIMIT 10;",
+    "lang": "sql"
+   },
+   {
+    "step": "See whether autovacuum is running or stuck.",
+    "why": "Sentry found one vacuum had failed or not worked.",
+    "cmd": "SELECT pid, query, now() - query_start AS running FROM pg_stat_activity WHERE query LIKE 'autovacuum%';",
+    "lang": "sql"
+   }
+  ],
+  "correct": [
+   {
+    "step": "Stop writes and let vacuum work.",
+    "why": "No new transactions use IDs while vacuum catches up."
+   },
+   {
+    "step": "Run a manual freeze vacuum on the oldest tables, with cost delay disabled.",
+    "why": "Speeds up freezing.",
+    "cmd": "VACUUM (FREEZE, VERBOSE) big_table;",
+    "lang": "sql"
+   },
+   {
+    "step": "As a last resort, drop or truncate a table that cannot finish and can be rebuilt.",
+    "why": "Sentry truncated one table and recovered in about five minutes. This loses data."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Confirm transaction age is falling.",
+    "why": "It proves vacuum is winning."
+   },
+   {
+    "step": "Run a test write.",
+    "why": "Confirms the database accepts commands."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Raise the number of workers, shorten the wait and lower cost delay.",
+    "why": "Sentry's new settings did this."
+   },
+   {
+    "step": "Alert when transaction age passes a threshold such as half the limit.",
+    "why": "Warn weeks before a stop."
+   },
+   {
+    "step": "Log autovacuum activity.",
+    "why": "Failed workers become visible."
+   },
+   {
+    "step": "Split very large relations across databases.",
+    "why": "Sentry planned this."
+   }
+  ],
+  "safety": "Truncating a table is destructive. Take a backup first if possible and confirm the data can be rebuilt. Changing vacuum settings raises disk and CPU use, so watch load."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Your database refuses writes. Reads still work from replicas. The logs say the database must be vacuumed.",
+   "clues": [
+    "Transaction age is near its maximum",
+    "Autovacuum has three workers",
+    "One big table is oldest"
+   ],
+   "question": "What is your step by step plan?",
+   "hints": [
+    "Stop new IDs being used",
+    "Which tables are oldest?",
+    "What is the last resort?"
+   ],
+   "answer": "Stop writes, keep reads on replicas, check transaction age per table, run manual freeze vacuum on the oldest tables with no cost delay, and if one table cannot finish and is rebuildable, consider truncating it."
+  },
+  "rootcause": {
+   "q": "Why did the database stop?",
+   "options": [
+    "The disk filled",
+    "Fewer than one million transaction IDs remained because vacuum fell behind",
+    "A bad index",
+    "A network failure"
+   ],
+   "answer": 1,
+   "why": "Sentry explains the wraparound protection."
+  },
+  "remediation": [
+   {
+    "task": "Write an alert for transaction ID age.",
+    "answer": "Alert when age(datfrozenxid) passes about half of autovacuum_freeze_max_age margin, and page when it reaches a few hundred million below the hard limit."
+   },
+   {
+    "task": "Choose settings for a write-heavy server.",
+    "answer": "More workers, short naptime, no cost delay on large servers, large maintenance memory within limits, and verbose logging."
+   },
+   {
+    "task": "Plan the data-loss decision.",
+    "answer": "Document what table, why the loss is acceptable, how to rebuild it, and who approves."
+   }
+  ],
+  "design": {
+   "prompt": "Design a Postgres setup that avoids wraparound surprises as writes grow.",
+   "constraints": [
+    "One huge table",
+    "Limited downtime",
+    "Small team"
+   ],
+   "answer": "Partition or split large tables, tune autovacuum per table, alert on age, log vacuum, rehearse a freeze, and keep replicas and backups tested."
+  },
+  "checks": [
+   {
+    "q": "When does PostgreSQL stop accepting commands per Sentry?",
+    "options": [
+     "At 50 percent disk",
+     "When fewer than one million transactions are left",
+     "At midnight",
+     "Never"
+    ],
+    "answer": 1,
+    "why": "Sentry explains this protection."
+   },
+   {
+    "q": "What did Sentry do to the stuck table?",
+    "options": [
+     "Deleted the database",
+     "Truncated it",
+     "Ignored it",
+     "Renamed it"
+    ],
+    "answer": 1,
+    "why": "They truncated and accepted data loss."
+   },
+   {
+    "q": "What is the note about maintenance_work_mem?",
+    "options": [
+     "10GB works fully",
+     "There is a hard 1GB internal limit",
+     "It is unused",
+     "It must be zero"
+    ],
+    "answer": 1,
+    "why": "The post corrected its own setting: the internal limit is 1GB."
+   },
+   {
+    "q": "Which early warning is missing before the outage?",
+    "options": [
+     "Alert on transaction age",
+     "More emails",
+     "A bigger screen",
+     "A longer timeout"
+    ],
+    "answer": 0,
+    "why": "Visibility of autovacuum and transaction age was lacking."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Tune autovacuum for your write rate",
+   "Split very large relations",
+   "Rehearse emergency vacuum"
+  ],
+  "monitoring": [
+   "Alert on transaction ID age",
+   "Log autovacuum"
+  ],
+  "recovery": [
+   "Stop writes, serve reads",
+   "Freeze oldest tables first",
+   "Know your last resort"
+  ],
+  "practices": [
+   "Read the database's safety limits",
+   "Record what data you can afford to lose"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Sentry: Transaction ID Wraparound in Postgres",
+   "url": "https://blog.sentry.io/transaction-id-wraparound-in-postgres",
+   "used": "timeline, cause, settings, recovery"
+  }
+ ],
+ "verification": "Facts were read from Sentry's post on 29 October 2026. The settings block is quoted. The exact error text and any logs are not in the post, so queries are Simulated."
+}

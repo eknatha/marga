@@ -1,0 +1,362 @@
+{
+ "id": "preply-kubernetes-dns-and-conntrack",
+ "checked": "29 October 2026",
+ "summary": "On 28 February 2020 a production Kubernetes cluster at Preply had a partial DNS failure for about 26 minutes, dropping about 15,000 events. The cluster DNS autoscaler had reduced CoreDNS pods from three to two, and kube-proxy failed to remove a stale connection tracking entry, so some traffic kept going to a pod that no longer existed.",
+ "overview": {
+  "background": "Kubernetes services resolve names through CoreDNS. kube-proxy and the kernel connection tracking table (conntrack) route UDP traffic to pods.",
+  "systems": [
+   "CoreDNS pods and their autoscaler",
+   "kube-proxy and the conntrack table",
+   "Services A, B and C",
+   "Prometheus alerting and on-call"
+  ],
+  "impact": "About 15,000 events were dropped for services A, B and C.",
+  "severity": "A partial outage of about 26 minutes. Detection took 4 minutes and engagement 21 minutes.",
+  "gaps": "Preply says the underlying cause is unclear and may be a conntrack bug."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Scale-down leaves a stale route",
+   "caption": "Per Preply, the autoscaler reduced CoreDNS from 3 to 2 pods. kube-proxy failed to delete an old conntrack entry, so some services kept sending DNS to a pod that no longer existed.",
+   "nodes": [
+    {
+     "id": "as",
+     "label": "Autoscaler reduces CoreDNS from 3 to 2 pods",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "ct",
+     "label": "Stale conntrack entry not deleted",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "dns",
+     "label": "DNS queries to a missing pod",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "svc",
+     "label": "Some services fail; 15,000 events dropped",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "as",
+     "t": "ct",
+     "state": "fail"
+    },
+    {
+     "f": "ct",
+     "t": "dns",
+     "state": "fail"
+    },
+    {
+     "f": "dns",
+     "t": "svc",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Fixed DNS capacity and a node-local cache (conceptual)",
+   "caption": "Preply's actions were to disable the CoreDNS autoscaler, deploy a DNS cache and monitor conntrack. This picture shows those pieces.",
+   "nodes": [
+    {
+     "id": "fix",
+     "label": "CoreDNS at fixed replica count",
+     "row": 0,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "cache",
+     "label": "Node-local DNS cache",
+     "row": 0,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "mon",
+     "label": "Conntrack usage monitoring",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "fix",
+     "t": "mon",
+     "state": "new"
+    },
+    {
+     "f": "cache",
+     "t": "mon",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "DNS does not scale down under load swings.",
+  "Caches absorb pod changes.",
+  "Conntrack health is visible."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "28 Feb 2020, 22:13 EET",
+   "phase": "trigger",
+   "e": "Low load makes the autoscaler cut CoreDNS from 3 pods to 2; DNS starts failing for some services."
+  },
+  {
+   "t": "About 22:17",
+   "phase": "detect",
+   "e": "Prometheus flags a high 5xx rate and pages on-call (detected in 4 minutes)."
+  },
+  {
+   "t": "About 22:25",
+   "phase": "investigate",
+   "e": "On-call engineers begin troubleshooting."
+  },
+  {
+   "t": "22:39",
+   "phase": "mitigate",
+   "e": "On-call reverts the latest service release."
+  },
+  {
+   "t": "Around 22:40",
+   "phase": "recover",
+   "e": "The system is stable. A regular deploy had added nodes and CoreDNS pods, which rebuilt the conntrack table."
+  },
+  {
+   "t": "After the incident",
+   "phase": "change",
+   "e": "Actions: disable the CoreDNS autoscaler, deploy a DNS cache, monitor conntrack usage."
+  }
+ ],
+ "rootCause": {
+  "trigger": "The autoscaler reduced CoreDNS pods and a stale conntrack entry kept sending traffic to a pod that was gone.",
+  "underlying": "Preply says this seems to be a specific conntrack bug but did not confirm it.",
+  "contributing": [
+   "The team knew about possible DNS risks but had not prioritised them",
+   "Action items addressed symptoms, not root cause",
+   "Only some services were affected, which made it look intermittent"
+  ],
+  "propagation": [
+   "Scale down.",
+   "Stale entry.",
+   "DNS to nowhere.",
+   "Errors."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "On the cause",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "it seems to be a specific bug with conntrack",
+   "note": "From Preply's postmortem."
+  },
+  {
+   "label": "A simulated conntrack check",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ conntrack -L -p udp --dport 53 | head\n$ conntrack -S",
+   "note": "Commands to view DNS entries and statistics. Output omitted."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check 5xx rates by service.",
+    "why": "Prometheus alert."
+   },
+   {
+    "step": "Check DNS resolution from affected pods.",
+    "why": "Some failed."
+   },
+   {
+    "step": "Check CoreDNS pod count changes.",
+    "why": "Autoscaler."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Revert the latest release.",
+    "why": "Done at 22:39."
+   },
+   {
+    "step": "Rebuild conntrack by adding nodes or flush stale entries.",
+    "why": "Happened by chance."
+   },
+   {
+    "step": "Disable the autoscaler.",
+    "why": "Action item."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check DNS errors stop.",
+    "why": "Confirm."
+   },
+   {
+    "step": "Check events resume.",
+    "why": "Confirm."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Deploy a node-local DNS cache.",
+    "why": "Action item."
+   },
+   {
+    "step": "Monitor conntrack.",
+    "why": "Action item."
+   },
+   {
+    "step": "Prioritise known DNS risks.",
+    "why": "Lesson."
+   }
+  ],
+  "safety": "Flushing conntrack entries can break active connections. Do it narrowly."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Some pods fail DNS lookups after load drops overnight. CoreDNS has fewer pods than before.",
+   "clues": [
+    "Autoscaler active",
+    "Only some services affected",
+    "Deploy in progress"
+   ],
+   "question": "How do you investigate?",
+   "hints": [
+    "What do you check first?",
+    "How do you fix quickly?",
+    "What do you change afterwards?"
+   ],
+   "answer": "Check DNS from affected pods, look at CoreDNS scale events and conntrack, restore capacity, then fix autoscaling and add a cache."
+  },
+  "rootcause": {
+   "q": "How long was the partial DNS failure?",
+   "options": [
+    "About 26 minutes",
+    "4 hours",
+    "1 second",
+    "1 day"
+   ],
+   "answer": 0,
+   "why": "Per the postmortem."
+  },
+  "remediation": [
+   {
+    "task": "Write a DNS SLO.",
+    "answer": "Success rate and latency."
+   },
+   {
+    "task": "Plan a DNS cache.",
+    "answer": "Node-local cache per node."
+   },
+   {
+    "task": "Plan conntrack monitoring.",
+    "answer": "Table usage and drops."
+   }
+  ],
+  "design": {
+   "prompt": "Design cluster DNS that survives scaling events.",
+   "constraints": [
+    "Autoscaling",
+    "UDP traffic",
+    "Many services"
+   ],
+   "answer": "Fixed minimum replicas, node-local caches, conntrack monitoring and tests of scale-down."
+  },
+  "checks": [
+   {
+    "q": "How many pods did the autoscaler leave?",
+    "options": [
+     "Two",
+     "Three",
+     "Zero",
+     "Ten"
+    ],
+    "answer": 0,
+    "why": "Per the postmortem."
+   },
+   {
+    "q": "Who or what detected it?",
+    "options": [
+     "Prometheus alert paging on-call",
+     "A customer",
+     "A manager",
+     "Luck"
+    ],
+    "answer": 0,
+    "why": "Per the postmortem."
+   },
+   {
+    "q": "How many events were dropped?",
+    "options": [
+     "About 15,000",
+     "5",
+     "5 million",
+     "None"
+    ],
+    "answer": 0,
+    "why": "Per the postmortem."
+   },
+   {
+    "q": "What reverted at 22:39?",
+    "options": [
+     "The latest service release",
+     "The cluster",
+     "DNS",
+     "The autoscaler"
+    ],
+    "answer": 0,
+    "why": "Per the postmortem."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Fixed DNS minimums",
+   "Node-local cache"
+  ],
+  "monitoring": [
+   "Conntrack usage"
+  ],
+  "recovery": [
+   "Revert",
+   "Restore capacity"
+  ],
+  "practices": [
+   "Prioritise DNS risks"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Preply Engineering: DNS issues in Kubernetes. Public postmortem #1",
+   "url": "https://medium.com/preply-engineering/dns-postmortem-e169efd45afd",
+   "used": "times, impact, cause, actions"
+  }
+ ],
+ "verification": "Facts were read from Preply's postmortem on 29 October 2026. Clock times are as in the post (EET); intermediate times in the timeline are computed from the post's detect and engage durations and are approximate. The commands are Simulated."
+}

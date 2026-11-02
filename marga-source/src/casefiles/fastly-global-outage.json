@@ -1,0 +1,420 @@
+{
+ "id": "fastly-global-outage",
+ "checked": "29 October 2026",
+ "summary": "On 8 June 2021 one customer's valid configuration change triggered a latent bug in Fastly's software and 85 percent of its network returned errors. Fastly detected it within a minute and most of the network was back in under an hour.",
+ "overview": {
+  "background": "Fastly runs a global edge network that caches and serves content for many large sites. A software release on 12 May 2021 contained a bug that stayed hidden until a specific customer configuration setting was used.",
+  "systems": [
+   "Fastly edge network (points of presence)",
+   "Customer service configuration pipeline",
+   "Sites that rely on Fastly for delivery"
+  ],
+  "impact": "Fastly says 85 percent of its network returned errors. About 95 percent of the network was operating normally within 49 minutes.",
+  "severity": "Global, short and very visible. Fastly gives no formal severity label.",
+  "gaps": "The post does not give the bug's exact code, the customer or the number of affected sites. Times in the original are given in Central European Summer Time, converted to UTC here."
+ },
+ "archNote": "Fastly describes an edge network and a configuration push. The picture below is a simplified conceptual view, not Fastly's internal architecture.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "conceptual",
+   "title": "A valid change meets a latent bug (conceptual)",
+   "caption": "A customer's valid change was accepted and sent to edge nodes that ran the 12 May software. The bug made nodes return errors.",
+   "nodes": [
+    {
+     "id": "cust",
+     "label": "Customer applies a valid configuration change",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "ctl",
+     "label": "Configuration distribution",
+     "row": 1,
+     "col": 1
+    },
+    {
+     "id": "edge",
+     "label": "Edge nodes running software from 12 May",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "sites",
+     "label": "Many sites served through Fastly",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "users",
+     "label": "Visitors see errors",
+     "row": 4,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "cust",
+     "t": "ctl"
+    },
+    {
+     "f": "ctl",
+     "t": "edge",
+     "label": "config reaches nodes",
+     "state": "fail"
+    },
+    {
+     "f": "edge",
+     "t": "sites",
+     "state": "fail"
+    },
+    {
+     "f": "sites",
+     "t": "users",
+     "state": "fail"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Smaller blast radius (conceptual)",
+   "caption": "Fastly said it would deploy a fix, find why testing missed the bug, speed up bug fixes and look at isolating customer code. This diagram shows the general idea of staged rollout and isolation.",
+   "nodes": [
+    {
+     "id": "chg",
+     "label": "Configuration change",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "can",
+     "label": "Canary group of nodes",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "gate",
+     "label": "Automatic health gate",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "rest",
+     "label": "Remaining regions in waves",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "roll",
+     "label": "Fast revert path",
+     "row": 3,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "chg",
+     "t": "can",
+     "state": "new"
+    },
+    {
+     "f": "can",
+     "t": "gate",
+     "state": "new"
+    },
+    {
+     "f": "gate",
+     "t": "rest",
+     "label": "healthy",
+     "state": "new"
+    },
+    {
+     "f": "gate",
+     "t": "roll",
+     "label": "errors",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Bad input hits a small group first.",
+  "A gate stops spread automatically.",
+  "A known revert path shortens recovery."
+ ],
+ "afterNote": "Fastly's own next steps are listed in its post; the staged-rollout picture is our conceptual illustration.",
+ "timelineNote": "Times were published in CEST. UTC values are our conversion (minus two hours).",
+ "timeline": [
+  {
+   "t": "12 May 2021",
+   "phase": "change",
+   "e": "A software release containing the bug is deployed."
+  },
+  {
+   "t": "8 June 11:47 CEST (09:47 UTC)",
+   "phase": "trigger",
+   "e": "A customer's valid configuration change triggers the bug and the disruption begins."
+  },
+  {
+   "t": "11:48 CEST",
+   "phase": "detect",
+   "e": "Fastly detects the disruption within a minute."
+  },
+  {
+   "t": "11:58 CEST",
+   "phase": "mitigate",
+   "e": "A status notice is posted."
+  },
+  {
+   "t": "12:27 CEST (10:27 UTC)",
+   "phase": "investigate",
+   "e": "The customer configuration is identified as the trigger, about 40 minutes in."
+  },
+  {
+   "t": "12:36 CEST",
+   "phase": "recover",
+   "e": "Services begin returning gradually."
+  },
+  {
+   "t": "13:00 CEST",
+   "phase": "recover",
+   "e": "The majority of the network is back."
+  },
+  {
+   "t": "14:35 CEST (12:35 UTC)",
+   "phase": "recover",
+   "e": "The incident is resolved."
+  },
+  {
+   "t": "19:25 CEST",
+   "phase": "change",
+   "e": "Deployment of a permanent fix begins."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A valid customer configuration change used a path that Fastly's code had never exercised.",
+  "underlying": "A bug introduced in the 12 May software release lay dormant until that exact combination of settings was used.",
+  "contributing": [
+   "Testing did not cover the setting combination",
+   "A single change reached a large part of a global network",
+   "Customers share the same underlying software"
+  ],
+  "propagation": [
+   "The change is accepted.",
+   "Nodes with the buggy software fail on it.",
+   "85 percent of the network returns errors.",
+   "Sites that depend on the network fail."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Detection speed",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Wir erkannten die Störung innerhalb einer Minute",
+   "note": "German original from Fastly's blog; it means that the disturbance was detected within one minute."
+  },
+  {
+   "label": "Simulated edge error spike",
+   "kind": "simulated",
+   "lang": "text",
+   "body": "edge-fra-12  5xx_rate=0.88  req/s=41200\nedge-lhr-03  5xx_rate=0.91  req/s=38700\nedge-sin-07  5xx_rate=0.12  req/s=22100",
+   "note": "Illustrative only. Fastly does not publish node-level metrics in the post."
+  },
+  {
+   "label": "Simulated canary gate",
+   "kind": "simulated",
+   "lang": "yaml",
+   "body": "rollout:\n  stages: [1pct, 5pct, 25pct, 100pct]\n  hold_minutes: 10\n  abort_if:\n    error_rate_over: 0.02\n    compared_to: control_group",
+   "note": "A teaching example of a staged rollout rule; not Fastly's configuration."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Look for the first change that matches the start of the errors.",
+    "why": "Matching the first error time with change events finds a trigger fast.",
+    "cmd": "grep -E 'config_push|deploy' change.log | tail"
+   },
+   {
+    "step": "Compare healthy and failing nodes.",
+    "why": "Differences in version or setting show the trigger."
+   },
+   {
+    "step": "Identify the customer or setting involved.",
+    "why": "Fastly did this about 40 minutes in."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Revert or disable the triggering configuration.",
+    "why": "This stopped the errors and services returned."
+   },
+   {
+    "step": "Deploy a permanent software fix.",
+    "why": "Fastly began this later the same day."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Confirm error rates and cache hit rates return to baseline.",
+    "why": "Healthy output proves the fix."
+   },
+   {
+    "step": "Test the setting combination on a canary.",
+    "why": "Confirms the bug is fixed rather than hidden."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Roll out software and configuration in stages with automatic abort.",
+    "why": "A bug then affects few users."
+   },
+   {
+    "step": "Add tests for rare setting combinations.",
+    "why": "Fastly's post says it will review why testing missed the bug."
+   },
+   {
+    "step": "Isolate customer code and settings.",
+    "why": "Fastly names WebAssembly isolation as a direction."
+   }
+  ],
+  "safety": "Reverting a customer's configuration affects that customer, so tell them. Never disable safety gates to speed up a rollout during an incident."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Error rates jump to 85 percent in one minute across regions. No deployment happened today.",
+   "clues": [
+    "Software changed weeks ago",
+    "A customer config was pushed minutes before",
+    "Nodes are all on the same version"
+   ],
+   "question": "What do you look for, and in what order?",
+   "hints": [
+    "What changed right before?",
+    "Does config count as a change?",
+    "What reverts fastest?"
+   ],
+   "answer": "Treat configuration pushes as changes, find the one just before the spike, identify the setting, revert it, then investigate the underlying bug."
+  },
+  "rootcause": {
+   "q": "What best describes the cause?",
+   "options": [
+    "A cable cut",
+    "A dormant software bug triggered by a valid customer change",
+    "A DDoS attack",
+    "A certificate expiry"
+   ],
+   "answer": 1,
+   "why": "Fastly says a May release contained a bug that a valid configuration change triggered."
+  },
+  "remediation": [
+   {
+    "task": "Write a canary policy for configuration changes.",
+    "answer": "Apply to 1 percent of nodes, hold ten minutes, compare error rates to a control group, abort automatically on a rise, then widen in stages."
+   },
+   {
+    "task": "Explain why detection speed was not enough.",
+    "answer": "Detection took a minute but the impact was global at once, so the blast radius, not detection time, set the damage."
+   },
+   {
+    "task": "Define a communication plan.",
+    "answer": "Post a status notice early, update regularly, name the trigger when confirmed, and publish a summary afterwards."
+   }
+  ],
+  "design": {
+   "prompt": "Design a configuration pipeline for a global network that makes one bad change affect under 1 percent of traffic.",
+   "constraints": [
+    "Changes should reach users within minutes",
+    "Automatic rollback",
+    "Independent health signals"
+   ],
+   "answer": "Stage changes by region and share, gate each step on independent health metrics, keep the previous version ready, and limit shared fate between customers through isolation."
+  },
+  "checks": [
+   {
+    "q": "When was the bug-carrying software released?",
+    "options": [
+     "8 June",
+     "12 May",
+     "1 January",
+     "It was never released"
+    ],
+    "answer": 1,
+    "why": "Fastly says the release was on 12 May 2021."
+   },
+   {
+    "q": "What share of the network returned errors?",
+    "options": [
+     "5 percent",
+     "50 percent",
+     "85 percent",
+     "100 percent"
+    ],
+    "answer": 2,
+    "why": "Fastly states 85 percent."
+   },
+   {
+    "q": "How long to reach 95 percent normal?",
+    "options": [
+     "49 minutes",
+     "5 minutes",
+     "6 hours",
+     "2 days"
+    ],
+    "answer": 0,
+    "why": "Fastly says 95 percent operated normally within 49 minutes."
+   },
+   {
+    "q": "Which prevents one change from reaching all nodes at once?",
+    "options": [
+     "Staged rollout with a health gate",
+     "A bigger server",
+     "More logging",
+     "A longer timeout"
+    ],
+    "answer": 0,
+    "why": "Staging limits the blast radius."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Staged rollout for software and configuration",
+   "Test rare setting combinations",
+   "Isolate customers from each other"
+  ],
+  "monitoring": [
+   "Alert on error rate within a minute",
+   "Compare canary and control groups"
+  ],
+  "recovery": [
+   "Revert the trigger first",
+   "Post early status updates"
+  ],
+  "practices": [
+   "Treat configuration as code",
+   "Publish a clear summary after the incident"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Fastly: Summary of June 8 outage",
+   "url": "https://www.fastly.com/blog/summary-of-june-8-outage",
+   "used": "timeline, cause, impact, next steps"
+  }
+ ],
+ "verification": "Facts were read from Fastly's blog (German edition) on 29 October 2026. UTC times are our conversion. The architecture is Conceptual because Fastly did not publish internals; edge metrics and rollout configuration are Simulated."
+}

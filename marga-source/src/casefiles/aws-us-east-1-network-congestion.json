@@ -1,0 +1,426 @@
+{
+ "id": "aws-us-east-1-network-congestion",
+ "checked": "29 October 2026",
+ "summary": "On 7 December 2021 an automated scaling activity made clients on AWS's internal network flood the devices linking it to the main network. Clients did not back off, congestion lasted hours and control-plane APIs failed across US-EAST-1.",
+ "overview": {
+  "background": "AWS runs an internal network that hosts foundational services such as monitoring, internal DNS and parts of EC2's control plane, connected to the main AWS network by networking devices.",
+  "systems": [
+   "Devices linking the internal and main AWS networks",
+   "EC2 control plane APIs",
+   "Route 53 record-change APIs",
+   "STS, API Gateway, EventBridge, Fargate, ECS, EKS, Amazon Connect",
+   "Service Health Dashboard and support case system"
+  ],
+  "impact": "EC2 launches, Route 53 changes, console logins, container restarts and several other control-plane functions failed or were slow between 7:30 AM and about 5:00 PM PST. Running EC2 instances and direct S3 and DynamoDB access were not affected.",
+  "severity": "A region-wide, multi-service event. AWS publishes no severity number.",
+  "gaps": "The post does not name the scaled service or the internal clients, and gives no device metrics."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A surge of connections overwhelms the linking devices",
+   "caption": "An automated scaling activity triggered unexpected behaviour in internal clients. Retries sustained the congestion because clients failed to back off.",
+   "nodes": [
+    {
+     "id": "scale",
+     "label": "Automated scaling of an AWS service",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "clients",
+     "label": "Internal clients: connection surge, no back-off",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "dev",
+     "label": "Devices linking internal and main networks",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "cp",
+     "label": "EC2, Route 53, STS, API Gateway control planes",
+     "row": 3,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "mon",
+     "label": "Monitoring and health dashboard",
+     "row": 3,
+     "col": 2,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "scale",
+     "t": "clients",
+     "label": "unexpected behaviour"
+    },
+    {
+     "f": "clients",
+     "t": "dev",
+     "label": "connection surge, retries",
+     "state": "fail"
+    },
+    {
+     "f": "dev",
+     "t": "cp",
+     "label": "latency and errors",
+     "state": "fail"
+    },
+    {
+     "f": "dev",
+     "t": "mon",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Protected linking devices and back-off (conceptual)",
+   "caption": "AWS disabled the scaling activity, was fixing the back-off defect and added configuration to protect the linking devices. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "scale",
+     "label": "Scaling activity paused until safe",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "clients",
+     "label": "Clients with exponential back-off",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "dev",
+     "label": "Linking devices with protective limits",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "cp",
+     "label": "Control planes",
+     "row": 3,
+     "col": 0
+    },
+    {
+     "id": "hel",
+     "label": "Status page on independent path",
+     "row": 3,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "scale",
+     "t": "clients",
+     "state": "new"
+    },
+    {
+     "f": "clients",
+     "t": "dev",
+     "label": "bounded retries",
+     "state": "new"
+    },
+    {
+     "f": "dev",
+     "t": "cp",
+     "state": "new"
+    },
+    {
+     "f": "dev",
+     "t": "hel",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Retries slow down instead of piling on.",
+  "The linking devices shed load safely.",
+  "Status updates do not depend on the affected network."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "7:30 AM PST",
+   "phase": "trigger",
+   "e": "The scaling activity triggers congestion. Route 53 APIs are impaired until 2:30 PM."
+  },
+  {
+   "t": "7:33 AM",
+   "phase": "impact",
+   "e": "EC2 API errors and latency begin."
+  },
+  {
+   "t": "8:22 AM",
+   "phase": "mitigate",
+   "e": "Service Health Dashboard updates resume."
+  },
+  {
+   "t": "9:28 AM",
+   "phase": "mitigate",
+   "e": "Internal DNS traffic is moved off the congested paths and DNS errors recover. The congestion remains."
+  },
+  {
+   "t": "12:35 PM",
+   "phase": "mitigate",
+   "e": "EventBridge event delivery is disabled to reduce network load."
+  },
+  {
+   "t": "1:34 PM",
+   "phase": "recover",
+   "e": "Congestion improves significantly."
+  },
+  {
+   "t": "2:22 PM",
+   "phase": "recover",
+   "e": "All network devices recover and console access returns."
+  },
+  {
+   "t": "2:40 PM",
+   "phase": "recover",
+   "e": "EC2 instance launches recover."
+  },
+  {
+   "t": "5:00 PM",
+   "phase": "recover",
+   "e": "Fargate API error rates return to normal."
+  }
+ ],
+ "rootCause": {
+  "trigger": "An automated scaling activity in the main network changed the behaviour of many internal clients.",
+  "underlying": "The surge of connections overwhelmed the devices between the internal and main networks. A latent issue stopped clients backing off properly.",
+  "contributing": [
+   "Retries from clients sustained the congestion",
+   "Monitoring and support tools were affected, so visibility was poor",
+   "Updates were given on a global banner that customers found hard to see"
+  ],
+  "propagation": [
+   "Scaling triggers a connection surge.",
+   "Linking devices saturate.",
+   "Latency causes retries.",
+   "Control-plane calls fail across many services."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The back-off defect",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "a latent issue prevented these clients from adequately backing off during this event.",
+   "note": "From AWS's summary."
+  },
+  {
+   "label": "How AWS communicated",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "we opted to provide updates via a global banner on the Service Health Dashboard.",
+   "note": "From AWS's summary."
+  },
+  {
+   "label": "A simulated retry policy",
+   "kind": "simulated",
+   "lang": "python",
+   "body": "delay = min(cap, base * 2 ** attempt)\ntime.sleep(random.uniform(0, delay))",
+   "note": "Exponential back-off with full jitter. A teaching example, not AWS code."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check latency and loss between the internal and main networks.",
+    "why": "Congestion on the link explains slow control planes."
+   },
+   {
+    "step": "Look for a sudden rise in connection attempts.",
+    "why": "A retry storm looks like a spike with no matching traffic growth."
+   },
+   {
+    "step": "Check what automation ran just before the first error.",
+    "why": "AWS tied it to a scaling activity."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Disable the automation that caused the surge.",
+    "why": "AWS disabled the scaling activities."
+   },
+   {
+    "step": "Move critical traffic such as DNS onto uncongested paths.",
+    "why": "This fixed DNS errors at 9:28 AM."
+   },
+   {
+    "step": "Turn off non-critical traffic.",
+    "why": "AWS paused EventBridge delivery."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Watch device saturation and error rates.",
+    "why": "Confirm the link is clear, not just APIs responding."
+   },
+   {
+    "step": "Re-enable paused services in order.",
+    "why": "EventBridge was re-enabled at 2:35 PM."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Make every client back off with jitter.",
+    "why": "This was the latent defect."
+   },
+   {
+    "step": "Protect shared links with limits.",
+    "why": "AWS deployed extra network configuration."
+   },
+   {
+    "step": "Keep status communication independent.",
+    "why": "AWS planned a new dashboard and multi-region support system."
+   }
+  ],
+  "safety": "Pausing a dependency like event delivery can lose or delay messages for customers. Re-enable it as soon as the network can take the load."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Control-plane calls are timing out while workloads already running are fine. Retries from internal clients are rising.",
+   "clues": [
+    "Link between two networks is saturated",
+    "Clients retry immediately",
+    "A scaling job ran an hour ago"
+   ],
+   "question": "How do you stop the congestion?",
+   "hints": [
+    "What feeds the retries?",
+    "Which traffic can wait?",
+    "What do you tell customers?"
+   ],
+   "answer": "Stop the scaling job, move critical traffic away from the saturated link, pause optional traffic, and fix client back-off. Communicate on a status page that does not depend on the affected network."
+  },
+  "rootcause": {
+   "q": "What sustained the congestion?",
+   "options": [
+    "A power failure",
+    "Clients that did not back off and kept retrying",
+    "A cut cable",
+    "A failed disk"
+   ],
+   "answer": 1,
+   "why": "AWS names a latent issue that stopped clients backing off."
+  },
+  "remediation": [
+   {
+    "task": "Define a retry policy.",
+    "answer": "Use capped exponential back-off with jitter and a retry budget."
+   },
+   {
+    "task": "Plan a status page.",
+    "answer": "Host it separately, publish per-service updates and avoid a single global banner."
+   },
+   {
+    "task": "Protect the link.",
+    "answer": "Add rate limits and priority classes so critical traffic keeps flowing."
+   }
+  ],
+  "design": {
+   "prompt": "Design links between internal and main networks that fail safely.",
+   "constraints": [
+    "Many clients",
+    "Critical DNS",
+    "Automated scaling"
+   ],
+   "answer": "Use rate limits, traffic priorities, separate paths for critical traffic, client back-off and automation that checks network health before scaling."
+  },
+  "checks": [
+   {
+    "q": "When did the congestion begin?",
+    "options": [
+     "7:30 AM PST",
+     "Midnight",
+     "5 PM",
+     "Noon"
+    ],
+    "answer": 0,
+    "why": "AWS lists 7:30 AM."
+   },
+   {
+    "q": "What was not affected?",
+    "options": [
+     "Running EC2 instances",
+     "Route 53 changes",
+     "EC2 launches",
+     "Console login"
+    ],
+    "answer": 0,
+    "why": "AWS says running instances were not impacted."
+   },
+   {
+    "q": "What did AWS do to cut load?",
+    "options": [
+     "Disabled EventBridge delivery for a time",
+     "Deleted logs",
+     "Rebooted every server",
+     "Closed the region"
+    ],
+    "answer": 0,
+    "why": "It disabled delivery at 12:35 PM."
+   },
+   {
+    "q": "Why did DNS recover early?",
+    "options": [
+     "Internal DNS traffic was moved off congested paths",
+     "It was never affected",
+     "The network was repaired",
+     "Customers stopped using it"
+    ],
+    "answer": 0,
+    "why": "AWS did this at 9:28 AM."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Client back-off with jitter",
+   "Protect shared links",
+   "Disable risky automation until fixed"
+  ],
+  "monitoring": [
+   "Device saturation",
+   "Retry rate"
+  ],
+  "recovery": [
+   "Move critical traffic first",
+   "Pause optional services"
+  ],
+  "practices": [
+   "Independent status communication",
+   "Test scaling against network limits"
+  ]
+ },
+ "sources": [
+  {
+   "title": "AWS: Summary of the AWS Service Event in the Northern Virginia (US-EAST-1) Region",
+   "url": "https://aws.amazon.com/message/12721/",
+   "used": "timeline, cause, corrective actions"
+  }
+ ],
+ "verification": "Facts were read from AWS's summary on 29 October 2026. No logs or device metrics are published, so the code example is Simulated."
+}

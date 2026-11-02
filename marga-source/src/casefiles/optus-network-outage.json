@@ -1,0 +1,374 @@
+{
+ "id": "optus-network-outage",
+ "checked": "29 October 2026",
+ "summary": "At about 4:05 am on 8 November 2023 Optus's network in Australia failed after it received changes to routing information from an international peering network following a routine software upgrade. Routers hit preset safety limits and disconnected from the core, and technicians had to visit sites to restore them. Service came back progressively through the afternoon.",
+ "overview": {
+  "background": "Optus connects to international peers over BGP. Core routers have safety limits on how much routing information they accept.",
+  "systems": [
+   "Optus IP Core network",
+   "Key routers with preset safety limits",
+   "An international peering network",
+   "Technicians dispatched to sites"
+  ],
+  "impact": "A near-full-day outage. The iTnews article does not give customer numbers or say anything about emergency calls.",
+  "severity": "Severe. Optus described the cause on 13 November 2023.",
+  "gaps": "This file uses a news report of Optus's explanation. Optus's own statement could not be read."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Routing information over the limit makes routers disconnect",
+   "caption": "Per Optus, changes to routing information propagated through multiple network layers and exceeded safety levels, so routers disconnected from the core.",
+   "nodes": [
+    {
+     "id": "peer",
+     "label": "International peer sends changed routing information",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "lim",
+     "label": "Exceeds preset safety levels on key routers",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "dis",
+     "label": "Routers disconnect from the IP Core",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "out",
+     "label": "Nationwide outage",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "peer",
+     "t": "lim",
+     "state": "fail"
+    },
+    {
+     "f": "lim",
+     "t": "dis",
+     "state": "fail"
+    },
+    {
+     "f": "dis",
+     "t": "out",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Route filtering and out-of-band recovery (conceptual)",
+   "caption": "General guards for the failure mode Optus described.",
+   "nodes": [
+    {
+     "id": "fl",
+     "label": "Inbound filters and prefix limits on peers",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "ob",
+     "label": "Out-of-band access to routers",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "stg",
+     "label": "Staged software upgrades",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "pl",
+     "label": "Plan for total outage incl. emergency calls",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "fl",
+     "t": "ob",
+     "state": "new"
+    },
+    {
+     "f": "fl",
+     "t": "stg",
+     "state": "new"
+    },
+    {
+     "f": "ob",
+     "t": "pl",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Peers cannot flood core routers.",
+  "Routers can be reached when the network is down.",
+  "Emergency services have a plan."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Before 8 Nov",
+   "phase": "change",
+   "e": "A routine software upgrade is performed, per Optus."
+  },
+  {
+   "t": "About 4:05 am, 8 Nov 2023",
+   "phase": "trigger",
+   "e": "Changes to routing information arrive from an international peering network."
+  },
+  {
+   "t": "Within minutes",
+   "phase": "impact",
+   "e": "Routers exceed safety levels and disconnect from the IP Core."
+  },
+  {
+   "t": "During the morning",
+   "phase": "investigate",
+   "e": "Optus identifies routers that have disconnected."
+  },
+  {
+   "t": "During the day",
+   "phase": "mitigate",
+   "e": "Technicians attend routers across a number of sites to reboot or reconnect them."
+  },
+  {
+   "t": "Afternoon of 8 Nov",
+   "phase": "recover",
+   "e": "Service is restored progressively."
+  },
+  {
+   "t": "13 Nov",
+   "phase": "change",
+   "e": "Optus describes the cause publicly."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A software upgrade was followed by changes to routing information from an international peer.",
+  "underlying": "The routing changes exceeded preset safety levels on key routers.",
+  "contributing": [
+   "Routers disconnected themselves rather than limiting inputs",
+   "Recovery needed on-site visits"
+  ],
+  "propagation": [
+   "Peer changes.",
+   "Safety limits hit.",
+   "Routers disconnect.",
+   "Physical recovery."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Cause statement",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "following a routine software upgrade",
+   "note": "Phrase from Optus's explanation as reported by iTnews."
+  },
+  {
+   "label": "A simulated prefix limit",
+   "kind": "simulated",
+   "lang": "text",
+   "body": "neighbor 203.0.113.1 maximum-prefix 100000 warning-only 85",
+   "note": "A general router setting that caps accepted prefixes. Not Optus configuration."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check which routers are disconnected.",
+    "why": "Routers had left the core."
+   },
+   {
+    "step": "Check routing table sizes and limits.",
+    "why": "Safety levels exceeded."
+   },
+   {
+    "step": "Check recent upgrades.",
+    "why": "A routine upgrade preceded it."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Reboot or reconnect routers at sites.",
+    "why": "Technicians travelled."
+   },
+   {
+    "step": "Restore in stages.",
+    "why": "Progressive restoration."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check services return across regions.",
+    "why": "Test."
+   },
+   {
+    "step": "Review filters and limits.",
+    "why": "Stop recurrence."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Apply prefix limits that reject, not disconnect.",
+    "why": "General practice."
+   },
+   {
+    "step": "Provide out-of-band access.",
+    "why": "General practice."
+   },
+   {
+    "step": "Plan for emergency calls.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Reconnecting all routers at once could cause a second overload. Restore in stages."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Core routers have dropped off the network after a peer change. You have no remote access.",
+   "clues": [
+    "Safety limit reached",
+    "Need on-site access",
+    "Customers affected nationwide"
+   ],
+   "question": "How do you recover?",
+   "hints": [
+    "What do you restore first?",
+    "How do you avoid a repeat overload?",
+    "What do you tell customers?"
+   ],
+   "answer": "Dispatch technicians, reconnect routers in stages with filters in place, restore services progressively and communicate."
+  },
+  "rootcause": {
+   "q": "When did it start?",
+   "options": [
+    "About 4:05 am on 8 November 2023",
+    "Midnight",
+    "Noon",
+    "Unknown"
+   ],
+   "answer": 0,
+   "why": "Per the article."
+  },
+  "remediation": [
+   {
+    "task": "Write a peer limit policy.",
+    "answer": "Max prefixes with reject and alert."
+   },
+   {
+    "task": "Plan out-of-band.",
+    "answer": "Separate management network."
+   },
+   {
+    "task": "Plan emergency calls.",
+    "answer": "Roaming or alternative path."
+   }
+  ],
+  "design": {
+   "prompt": "Design a telecom core that survives a bad peer update.",
+   "constraints": [
+    "National network",
+    "Many peers",
+    "Emergency calls"
+   ],
+   "answer": "Filters, limits, staged upgrades, out-of-band management and cross-network emergency call path."
+  },
+  "checks": [
+   {
+    "q": "What did routers do when limits were exceeded?",
+    "options": [
+     "Disconnected from the IP Core to protect themselves",
+     "Rebooted all",
+     "Ignored",
+     "Dropped DNS"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   },
+   {
+    "q": "How was service restored?",
+    "options": [
+     "Technicians attended sites to reboot or reconnect routers",
+     "Remotely in seconds",
+     "By a patch",
+     "By a vendor"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   },
+   {
+    "q": "Does the article give customer numbers?",
+    "options": [
+     "No",
+     "Yes",
+     "Partly",
+     "Always"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   },
+   {
+    "q": "What preceded the routing changes?",
+    "options": [
+     "A routine software upgrade",
+     "A fire",
+     "A DDoS",
+     "A power cut"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Prefix limits",
+   "Out-of-band management"
+  ],
+  "monitoring": [
+   "Peer routing volumes"
+  ],
+  "recovery": [
+   "On-site restoration",
+   "Staged reconnection"
+  ],
+  "practices": [
+   "Emergency call plan"
+  ]
+ },
+ "sources": [
+  {
+   "title": "iTnews: Optus attributes outage to bad router data from peer",
+   "url": "https://www.itnews.com.au/news/optus-attributes-outage-to-bad-router-data-from-peer-602305",
+   "used": "time, cause, restoration"
+  }
+ ],
+ "verification": "Facts were read from iTnews's report on 29 October 2026. Optus's own statement (the card source) could not be read. The router setting is Simulated."
+}

@@ -1,0 +1,412 @@
+{
+ "id": "reddit-pi-day-outage",
+ "checked": "29 October 2026",
+ "summary": "On 14 March 2023 Reddit upgraded its older Kubernetes cluster from 1.23 to 1.24. A node label that Calico route reflectors depended on was removed, cluster networking broke and the site was down for about 314 minutes.",
+ "overview": {
+  "background": "Reddit's older cluster served Old Reddit. Calico route reflectors selected nodes by the label node-role.kubernetes.io/master. That setup was undocumented and not stored in version control.",
+  "systems": [
+   "Legacy Kubernetes cluster (1.23 to 1.24)",
+   "Calico route reflectors and node labels",
+   "Cluster DNS and pod networking",
+   "OPA admission webhooks",
+   "Backups and restore procedure"
+  ],
+  "impact": "Reddit was down for about 314 minutes. Cluster DNS failed, pods were slow to start and API writes timed out on admission webhooks.",
+  "severity": "Total site outage in the afternoon of US hours. No formal severity is stated.",
+  "gaps": "The post was read through a mirror, not on Reddit's own host."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A label disappears, routes disappear",
+   "caption": "The 1.24 upgrade removed the master label. Route reflectors that matched on it lost their nodes and routes dropped for all nodes.",
+   "nodes": [
+    {
+     "id": "up",
+     "label": "Upgrade 1.23 to 1.24",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "lab",
+     "label": "master label removed from control plane nodes",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "rr",
+     "label": "Calico route reflectors match nothing",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "net",
+     "label": "Routes drop: DNS, pod networking, webhooks fail",
+     "row": 3,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "site",
+     "label": "Old Reddit down",
+     "row": 4,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "up",
+     "t": "lab"
+    },
+    {
+     "f": "lab",
+     "t": "rr",
+     "label": "undocumented dependency",
+     "state": "fail"
+    },
+    {
+     "f": "rr",
+     "t": "net",
+     "state": "fail"
+    },
+    {
+     "f": "net",
+     "t": "site",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Codified config and rehearsed upgrades (conceptual)",
+   "caption": "Reddit moved to standardise clusters and codify their configuration. This picture shows the idea together with tested restore and upgrades.",
+   "nodes": [
+    {
+     "id": "git",
+     "label": "Cluster configuration in version control",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "up",
+     "label": "Upgrade rehearsed on a clone",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "res",
+     "label": "Restore procedure tested regularly",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "own",
+     "label": "Every component has an owner",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "git",
+     "t": "up",
+     "state": "new"
+    },
+    {
+     "f": "git",
+     "t": "res",
+     "state": "new"
+    },
+    {
+     "f": "up",
+     "t": "own",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Routing depends on documented, versioned settings.",
+  "Rollback is a rehearsed restore.",
+  "Legacy parts have owners."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Just after 19:00 UTC, 14 Mar",
+   "phase": "trigger",
+   "e": "The upgrade of the legacy cluster from 1.23 to 1.24 starts."
+  },
+  {
+   "t": "About two minutes later",
+   "phase": "impact",
+   "e": "The site goes down."
+  },
+  {
+   "t": "19:04:49",
+   "phase": "detect",
+   "e": "API server logs spike."
+  },
+  {
+   "t": "During the first hours",
+   "phase": "investigate",
+   "e": "Cluster DNS cannot resolve internal records and Calico networking is broken. Deleting the OPA webhook configurations does not restore the cluster."
+  },
+  {
+   "t": "After more than two hours",
+   "phase": "mitigate",
+   "e": "The team restores from backup, since Kubernetes has no supported downgrade."
+  },
+  {
+   "t": "During restore",
+   "phase": "mitigate",
+   "e": "A hostname mismatch breaks control plane TLS and certificates are regenerated."
+  },
+  {
+   "t": "After restore",
+   "phase": "recover",
+   "e": "Traffic is ramped from 1 percent up to 100 percent in steps."
+  },
+  {
+   "t": "About 314 minutes",
+   "phase": "recover",
+   "e": "The outage ends."
+  }
+ ],
+ "rootCause": {
+  "trigger": "The upgrade removed the node-role.kubernetes.io/master label that Calico route reflectors used to select nodes.",
+  "underlying": "When the label stopped matching, routes for all nodes dropped. The route reflector configuration was undocumented, not in version control, and the engineers who knew about it had left.",
+  "contributing": [
+   "Kubernetes has no supported downgrade",
+   "The restore procedure was written for Docker and an end-of-life version",
+   "A hostname mismatch broke control plane TLS during restore",
+   "Legacy components had no owner"
+  ],
+  "propagation": [
+   "Label removed.",
+   "Route reflectors empty.",
+   "Routes lost.",
+   "DNS and pods fail."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Cause from the post",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "node-role.kubernetes.io/master",
+   "note": "The label name the route reflectors relied on, as given in Reddit's post."
+  },
+  {
+   "label": "A simulated check",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ kubectl get nodes --show-labels | grep -c 'node-role.kubernetes.io/master'\n0\n$ calicoctl get bgppeer -o yaml | grep nodeSelector",
+   "note": "Shows how to check a selector against labels before an upgrade. Output invented."
+  },
+  {
+   "label": "A simulated selector",
+   "kind": "simulated",
+   "lang": "yaml",
+   "body": "nodeSelector: has(node-role.kubernetes.io/control-plane)",
+   "note": "Shows the renamed label. Illustrative."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Look at API server logs for the first spike.",
+    "why": "It matched the upgrade start."
+   },
+   {
+    "step": "Check DNS and CNI health.",
+    "why": "Both were failing."
+   },
+   {
+    "step": "Check labels used by networking selectors.",
+    "why": "The master label was gone.",
+    "cmd": "kubectl get nodes --show-labels"
+   }
+  ],
+  "correct": [
+   {
+    "step": "Try the least risky fix first, such as removing a blocking webhook.",
+    "why": "Reddit tried this; it did not help."
+   },
+   {
+    "step": "Restore from backup when no downgrade exists.",
+    "why": "Reddit did after two hours."
+   },
+   {
+    "step": "Regenerate certificates for a hostname mismatch.",
+    "why": "Reddit's fix."
+   },
+   {
+    "step": "Ramp traffic in steps.",
+    "why": "1 percent to 100 percent."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check DNS, routes and pod startup.",
+    "why": "All must work."
+   },
+   {
+    "step": "Watch error rates while ramping.",
+    "why": "Reddit increased gradually."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Keep all cluster configuration in version control.",
+    "why": "Reddit's action."
+   },
+   {
+    "step": "Test restore regularly and update it.",
+    "why": "Lesson from the post."
+   },
+   {
+    "step": "Assign owners to legacy components.",
+    "why": "Lesson from the post."
+   }
+  ],
+  "safety": "Restoring from backup loses changes since the backup. Know the backup age before choosing it."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "After a Kubernetes minor upgrade nodes cannot route to each other. DNS fails. No downgrade is possible.",
+   "clues": [
+    "Label selectors in the CNI config",
+    "A restore guide for an old version",
+    "Admission webhooks timing out"
+   ],
+   "question": "What do you check and what is your fallback?",
+   "hints": [
+    "What does the CNI select on?",
+    "Which workarounds are safe?",
+    "How old is the backup?"
+   ],
+   "answer": "Compare CNI selectors with new labels, try safe workarounds, and if they fail restore from backup with a refreshed procedure, ramping traffic slowly."
+  },
+  "rootcause": {
+   "q": "What was removed in 1.24 that mattered?",
+   "options": [
+    "The master node label",
+    "The API server",
+    "DNS",
+    "Docker"
+   ],
+   "answer": 0,
+   "why": "Reddit's explanation."
+  },
+  "remediation": [
+   {
+    "task": "Write a pre-upgrade checklist.",
+    "answer": "Search configs for selectors that use removed labels, run the upgrade on a clone, and test restore."
+   },
+   {
+    "task": "Update the restore guide.",
+    "answer": "Rewrite for your current runtime and version, then test."
+   },
+   {
+    "task": "Assign an owner.",
+    "answer": "Name an owner for every cluster component."
+   }
+  ],
+  "design": {
+   "prompt": "Design upgrade safety for a cluster without a downgrade path.",
+   "constraints": [
+    "One legacy cluster",
+    "Undocumented parts",
+    "High traffic"
+   ],
+   "answer": "Clone and rehearse, codify config, blue-green clusters, tested restore and gradual traffic shifts."
+  },
+  "checks": [
+   {
+    "q": "How long was the outage?",
+    "options": [
+     "About 314 minutes",
+     "5 minutes",
+     "2 days",
+     "1 minute"
+    ],
+    "answer": 0,
+    "why": "The post says 314 minutes."
+   },
+   {
+    "q": "Which Kubernetes versions?",
+    "options": [
+     "1.23 to 1.24",
+     "1.9 to 1.10",
+     "2 to 3",
+     "1.0 to 1.1"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   },
+   {
+    "q": "Why restore from backup?",
+    "options": [
+     "No supported downgrade",
+     "It was faster",
+     "It was cheaper",
+     "It was required by law"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   },
+   {
+    "q": "What was undocumented?",
+    "options": [
+     "Route reflector configuration",
+     "The website",
+     "The logo",
+     "The pricing"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Version-control all cluster config",
+   "Rehearse upgrades",
+   "Own every component"
+  ],
+  "monitoring": [
+   "Route and DNS health"
+  ],
+  "recovery": [
+   "Restore from backup",
+   "Ramp traffic gradually"
+  ],
+  "practices": [
+   "Test and refresh restore procedures",
+   "Remove undocumented parts"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Reddit engineering post: You Broke Reddit, The Pi-Day Outage (read via a mirror of r/RedditEng)",
+   "url": "https://www.reddit.com/r/RedditEng/comments/11xx5o0/you_broke_reddit_the_piday_outage/",
+   "used": "date, cause, recovery, lessons"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from a mirror of Reddit's engineering post. The kubectl and selector examples are Simulated."
+}

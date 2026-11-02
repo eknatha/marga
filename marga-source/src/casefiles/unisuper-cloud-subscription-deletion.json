@@ -1,0 +1,395 @@
+{
+ "id": "unisuper-cloud-subscription-deletion",
+ "checked": "29 October 2026",
+ "summary": "In May 2024 an inadvertent misconfiguration during provisioning at Google Cloud led to the deletion of UniSuper's Private Cloud subscription. Because the deletion spanned both of UniSuper's geographies, restoration took days, and backups with another provider helped.",
+ "overview": {
+  "background": "UniSuper, an Australian pension fund, ran a Google Cloud VMware Engine private cloud. It duplicated the service in two geographies to protect against outages and also kept backups with another provider.",
+  "systems": [
+   "UniSuper Private Cloud subscription (VMware Engine)",
+   "Two geographies hosting the same service",
+   "Backups held with an additional provider",
+   "Hundreds of virtual machines, databases and applications"
+  ],
+  "impact": "UniSuper's online services were disrupted until the Private Cloud instance, including hundreds of VMs, databases and applications, was restored. The statement does not give the length of the outage.",
+  "severity": "A rare provider-side deletion that spanned both locations. Both companies called it unprecedented.",
+  "gaps": "The statement does not give times, counts of members or exact steps."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Duplication in two places did not help",
+   "caption": "The subscription was deleted, which covered both geographies. Backups with another provider limited data loss.",
+   "nodes": [
+    {
+     "id": "prov",
+     "label": "Misconfiguration during provisioning",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "sub",
+     "label": "Private Cloud subscription deleted",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "g1",
+     "label": "Geography 1 copy gone",
+     "row": 2,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "g2",
+     "label": "Geography 2 copy gone",
+     "row": 2,
+     "col": 2,
+     "state": "fail"
+    },
+    {
+     "id": "bak",
+     "label": "Backups with another provider",
+     "row": 3,
+     "col": 1
+    }
+   ],
+   "edges": [
+    {
+     "f": "prov",
+     "t": "sub",
+     "state": "fail"
+    },
+    {
+     "f": "sub",
+     "t": "g1",
+     "state": "fail"
+    },
+    {
+     "f": "sub",
+     "t": "g2",
+     "state": "fail"
+    },
+    {
+     "f": "bak",
+     "t": "sub",
+     "label": "restore"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Independent failure domains (conceptual)",
+   "caption": "A picture of why backups must live in a different account and provider. The statement credits the extra provider backups for limiting loss.",
+   "nodes": [
+    {
+     "id": "prod",
+     "label": "Production in one account",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "rep",
+     "label": "Replica in a second geography, same account",
+     "row": 1,
+     "col": 0
+    },
+    {
+     "id": "bak",
+     "label": "Backups in a different provider and account",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "res",
+     "label": "Tested restore runbook",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "prod",
+     "t": "rep"
+    },
+    {
+     "f": "prod",
+     "t": "bak",
+     "state": "new"
+    },
+    {
+     "f": "bak",
+     "t": "res",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Backups survive deletion of the primary account.",
+  "Restore is rehearsed.",
+  "One control-plane error cannot remove every copy."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Before the incident",
+   "phase": "change",
+   "e": "UniSuper keeps its service in two geographies and holds backups with another provider."
+  },
+  {
+   "t": "During provisioning",
+   "phase": "trigger",
+   "e": "An inadvertent misconfiguration during provisioning leads to deletion of the Private Cloud subscription."
+  },
+  {
+   "t": "After the deletion",
+   "phase": "impact",
+   "e": "The deletion affects both geographies. UniSuper's services are disrupted."
+  },
+  {
+   "t": "During recovery",
+   "phase": "mitigate",
+   "e": "Backups with the additional provider are used to minimise data loss and speed restoration."
+  },
+  {
+   "t": "Following days",
+   "phase": "recover",
+   "e": "Google Cloud and UniSuper restore the Private Cloud instance including VMs, databases and applications."
+  },
+  {
+   "t": "8 May 2024",
+   "phase": "change",
+   "e": "A joint statement is published by UniSuper and Google Cloud."
+  },
+  {
+   "t": "25 May 2024",
+   "phase": "change",
+   "e": "Google Cloud publishes additional technical information."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A misconfiguration during provisioning led to the deletion of UniSuper's Private Cloud subscription.",
+  "underlying": "Both geographies belonged to the same subscription, so duplication across them did not protect against the deletion.",
+  "contributing": [
+   "Two copies shared one control plane and one subscription",
+   "Restoring hundreds of VMs, databases and applications takes time"
+  ],
+  "propagation": [
+   "Subscription deleted.",
+   "Both copies lost.",
+   "Services down.",
+   "Restore from other-provider backups."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The verdict",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "This should not have happened.",
+   "note": "From the joint statement."
+  },
+  {
+   "label": "The nature",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "one-of-a-kind occurrence",
+   "note": "Google Cloud's description in the statement."
+  },
+  {
+   "label": "A simulated backup test",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ restore-test --source offsite-backup --target scratch-env --check db,vm\nRESULT: restored 412 VMs in 36h, 2 databases verified",
+   "note": "Shows a recovery test report. Numbers are invented."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Confirm what exists in the account and what is gone.",
+    "why": "The whole subscription was deleted."
+   },
+   {
+    "step": "Check which copies exist outside the account.",
+    "why": "Other-provider backups mattered."
+   },
+   {
+    "step": "Check the provider's records of the change.",
+    "why": "Google ran a root cause analysis."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Restore the subscription with the provider.",
+    "why": "Google restored the Private Cloud instance."
+   },
+   {
+    "step": "Use independent backups to fill gaps.",
+    "why": "Backups minimised data loss."
+   },
+   {
+    "step": "Bring services up in order.",
+    "why": "Databases first, then applications."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Verify data against backups and records.",
+    "why": "Confirm members' data is intact."
+   },
+   {
+    "step": "Test applications end to end.",
+    "why": "VMs alone are not recovery."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Hold backups outside the provider and account.",
+    "why": "UniSuper's backups helped."
+   },
+   {
+    "step": "Rehearse restore of the whole environment.",
+    "why": "General practice."
+   },
+   {
+    "step": "Understand provider control-plane failure modes.",
+    "why": "Statement calls this rare."
+   }
+  ],
+  "safety": "Restoring in the wrong order can corrupt data. Plan the order and verify each layer."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Your whole cloud account is gone, including the replica in the second region. You have backups with another provider.",
+   "clues": [
+    "Both copies shared one subscription",
+    "Hundreds of VMs",
+    "Members cannot log in"
+   ],
+   "question": "How do you recover and what must you have prepared?",
+   "hints": [
+    "What restores first?",
+    "How do you verify?",
+    "Who do you call?"
+   ],
+   "answer": "Engage the provider, restore from independent backups, rebuild in dependency order, verify data and communicate with members. Prepare by testing the restore."
+  },
+  "rootcause": {
+   "q": "Why did duplication in two geographies not help?",
+   "options": [
+    "Both copies were in the deleted subscription",
+    "One was unreachable",
+    "They were encrypted",
+    "They were old"
+   ],
+   "answer": 0,
+   "why": "Per the statement."
+  },
+  "remediation": [
+   {
+    "task": "Define backup independence.",
+    "answer": "Different provider, account and credentials from production."
+   },
+   {
+    "task": "Write a restore test.",
+    "answer": "Restore a copy to a scratch environment quarterly."
+   },
+   {
+    "task": "Plan communication.",
+    "answer": "Statements within hours, daily updates."
+   }
+  ],
+  "design": {
+   "prompt": "Design a pension platform that survives deletion of its cloud account.",
+   "constraints": [
+    "Regulated data",
+    "Hundreds of VMs",
+    "Short recovery time"
+   ],
+   "answer": "Separate accounts, offsite backups, infrastructure as code for rebuild, tested restore and provider escalation contacts."
+  },
+  "checks": [
+   {
+    "q": "What was deleted?",
+    "options": [
+     "The Private Cloud subscription",
+     "The internet",
+     "A database table",
+     "A VM"
+    ],
+    "answer": 0,
+    "why": "Per the statement."
+   },
+   {
+    "q": "What limited data loss?",
+    "options": [
+     "Backups with an additional service provider",
+     "A second geography",
+     "A firewall",
+     "Luck"
+    ],
+    "answer": 0,
+    "why": "Per the statement."
+   },
+   {
+    "q": "Who published the statement?",
+    "options": [
+     "UniSuper and Google Cloud jointly",
+     "A newspaper",
+     "A regulator",
+     "A vendor"
+    ],
+    "answer": 0,
+    "why": "Per the page."
+   },
+   {
+    "q": "When was the joint statement?",
+    "options": [
+     "8 May 2024",
+     "1 January",
+     "25 December",
+     "Not known"
+    ],
+    "answer": 0,
+    "why": "Per the page."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Independent offsite backups",
+   "Separate accounts",
+   "Infrastructure as code for rebuild"
+  ],
+  "monitoring": [
+   "Backup freshness and test results"
+  ],
+  "recovery": [
+   "Restore in dependency order",
+   "Verify end to end"
+  ],
+  "practices": [
+   "Rehearse total loss",
+   "Hold provider escalation contacts"
+  ]
+ },
+ "sources": [
+  {
+   "title": "UniSuper and Google Cloud: A joint statement",
+   "url": "https://www.unisuper.com.au/about-us/media-centre/2024/a-joint-statement-from-unisuper-and-google-cloud",
+   "used": "cause, scope, backups, restoration"
+  }
+ ],
+ "verification": "Facts were read from the joint statement on 29 October 2026. It gives no clock times or outage length, so the timeline is by sequence only. The restore test output is Simulated."
+}

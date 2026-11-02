@@ -1,0 +1,373 @@
+{
+ "id": "ingress-nginx-ingressnightmare",
+ "checked": "29 October 2026",
+ "summary": "In March 2025 the Kubernetes project announced patches in ingress-nginx v1.12.1 and v1.11.5 for a batch of critical vulnerabilities that could make it easy for attackers to take over a cluster. The announcement is short on technical detail, so this file is mostly about response.",
+ "overview": {
+  "background": "ingress-nginx is a widely used Kubernetes ingress controller. The announcement says over 40 percent of Kubernetes administrators use it.",
+  "systems": [
+   "ingress-nginx controller",
+   "Its admission webhook (per the card, not read on the page)",
+   "Kubernetes clusters running it"
+  ],
+  "impact": "A vulnerable controller could let attackers take over the cluster, according to the blog.",
+  "severity": "Critical (the blog's own wording).",
+  "gaps": "The blog excerpt read does not give technical details. The card describes the admission controller path; this file treats that as the card's claim."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "conceptual",
+   "title": "Why an exposed controller is high risk (conceptual)",
+   "caption": "A general picture of an ingress controller with wide privileges. Not taken from the blog, which does not give details.",
+   "nodes": [
+    {
+     "id": "net",
+     "label": "Network that can reach the controller",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "ctl",
+     "label": "ingress-nginx controller, vulnerable",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "sec",
+     "label": "Cluster secrets and API access",
+     "row": 2,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "take",
+     "label": "Cluster takeover",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "net",
+     "t": "ctl",
+     "state": "fail"
+    },
+    {
+     "f": "ctl",
+     "t": "sec",
+     "state": "hit"
+    },
+    {
+     "f": "sec",
+     "t": "take",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Patched and restricted (conceptual)",
+   "caption": "Upgrade to a fixed version and limit exposure.",
+   "nodes": [
+    {
+     "id": "up",
+     "label": "Upgrade to v1.12.1 or v1.11.5",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "np",
+     "label": "Network policy limits access",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "rbac",
+     "label": "Least privilege for the controller",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "mon",
+     "label": "Audit and alerts",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "up",
+     "t": "np",
+     "state": "new"
+    },
+    {
+     "f": "up",
+     "t": "rbac",
+     "state": "new"
+    },
+    {
+     "f": "np",
+     "t": "mon",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Controller is on a fixed version.",
+  "It is reachable only from where needed.",
+  "Its privileges are limited."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Before the announcement",
+   "phase": "change",
+   "e": "Vulnerabilities are found and reported in ingress-nginx."
+  },
+  {
+   "t": "24 Mar 2025",
+   "phase": "trigger",
+   "e": "The Kubernetes project publishes patches v1.12.1 and v1.11.5 and a blog post."
+  },
+  {
+   "t": "Following days",
+   "phase": "detect",
+   "e": "Cluster owners learn they run an affected version."
+  },
+  {
+   "t": "Following days",
+   "phase": "investigate",
+   "e": "Teams check version, exposure and logs."
+  },
+  {
+   "t": "Following days",
+   "phase": "mitigate",
+   "e": "Teams upgrade to a fixed version."
+  },
+  {
+   "t": "After upgrade",
+   "phase": "recover",
+   "e": "Teams confirm the fixed version runs and review for compromise."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A batch of critical vulnerabilities in ingress-nginx.",
+  "underlying": "The blog says they could make it easy for attackers to take over a cluster; details are not in the excerpt read.",
+  "contributing": [
+   "Very wide use of the component",
+   "Controller privileges inside the cluster"
+  ],
+  "propagation": [
+   "Flaw found.",
+   "Patch published.",
+   "Clusters must upgrade."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The headline",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "a batch of critical vulnerabilities that could make it easy for attackers to take over your Kubernetes cluster",
+   "note": "From the Kubernetes blog."
+  },
+  {
+   "label": "A simulated version check",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ kubectl get pods -A -l app.kubernetes.io/name=ingress-nginx -o jsonpath='{..image}' | tr ' ' '\\n' | sort -u",
+   "note": "Lists controller images so you can see the version. Output omitted."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Find every ingress-nginx deployment.",
+    "why": "Clusters, namespaces."
+   },
+   {
+    "step": "Read image versions.",
+    "why": "Compare with v1.12.1 and v1.11.5."
+   },
+   {
+    "step": "Check how the controller is exposed.",
+    "why": "Network reachability."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Upgrade to a fixed version.",
+    "why": "The blog's remedy."
+   },
+   {
+    "step": "Restrict network access to the controller.",
+    "why": "General hardening."
+   },
+   {
+    "step": "Rotate secrets if compromise is possible.",
+    "why": "General practice."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check the running version.",
+    "why": "Confirms."
+   },
+   {
+    "step": "Review logs for odd requests.",
+    "why": "Looks for abuse."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Track versions of cluster add-ons.",
+    "why": "General practice."
+   },
+   {
+    "step": "Apply network policies.",
+    "why": "General practice."
+   },
+   {
+    "step": "Subscribe to security announcements.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Rotating secrets can break workloads. Do it in order with a test plan."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "You run ingress-nginx in many clusters. A critical advisory arrives.",
+   "clues": [
+    "Many teams",
+    "Unknown versions",
+    "Some clusters public"
+   ],
+   "question": "What is your plan?",
+   "hints": [
+    "How do you find versions?",
+    "What do you upgrade first?",
+    "How do you check for abuse?"
+   ],
+   "answer": "Inventory versions, upgrade internet-facing clusters first, restrict access, review logs and rotate secrets as needed."
+  },
+  "rootcause": {
+   "q": "Which fixed versions did the blog name?",
+   "options": [
+    "v1.12.1 and v1.11.5",
+    "v0.1",
+    "v2.0",
+    "v9"
+   ],
+   "answer": 0,
+   "why": "Per the blog."
+  },
+  "remediation": [
+   {
+    "task": "Build an add-on inventory.",
+    "answer": "Query all clusters for controller images."
+   },
+   {
+    "task": "Write a patch SLO.",
+    "answer": "Critical issues patched in days."
+   },
+   {
+    "task": "Design a network policy.",
+    "answer": "Allow only the load balancer."
+   }
+  ],
+  "design": {
+   "prompt": "Design add-on patching for 50 clusters.",
+   "constraints": [
+    "Declarative rollout",
+    "Mixed versions",
+    "Public ingress"
+   ],
+   "answer": "Version inventory, automated upgrades by ring, policies, scanning and alerts."
+  },
+  "checks": [
+   {
+    "q": "What share of administrators used it, per the blog?",
+    "options": [
+     "Over 40 percent",
+     "1 percent",
+     "None",
+     "All"
+    ],
+    "answer": 0,
+    "why": "Per the blog."
+   },
+   {
+    "q": "What is the remedy?",
+    "options": [
+     "Upgrade",
+     "Ignore",
+     "Disable DNS",
+     "Delete the cluster"
+    ],
+    "answer": 0,
+    "why": "Per the blog."
+   },
+   {
+    "q": "Does this file give exploit details?",
+    "options": [
+     "No",
+     "Yes",
+     "Partly",
+     "Always"
+    ],
+    "answer": 0,
+    "why": "See verification."
+   },
+   {
+    "q": "What is the date of the announcement?",
+    "options": [
+     "24 March 2025",
+     "1 Jan 2020",
+     "5 May 2022",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "From the URL."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Version inventory",
+   "Network policy",
+   "Least privilege"
+  ],
+  "monitoring": [
+   "Add-on version tracking"
+  ],
+  "recovery": [
+   "Upgrade",
+   "Restrict exposure"
+  ],
+  "practices": [
+   "Subscribe to advisories",
+   "Patch SLOs"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Kubernetes blog: ingress-nginx CVE-2025-1974",
+   "url": "https://kubernetes.io/blog/2025/03/24/ingress-nginx-cve-2025-1974/",
+   "used": "versions, severity, usage share"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from the Kubernetes blog excerpt. It gave no technical details, so the diagrams are Conceptual and the case focuses on response. Commands are Simulated."
+}

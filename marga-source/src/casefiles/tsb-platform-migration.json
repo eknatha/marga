@@ -1,0 +1,379 @@
+{
+ "id": "tsb-platform-migration",
+ "checked": "29 October 2026",
+ "summary": "In April 2018 TSB moved about five million customer records to a new platform, Proteo4UK, in a single weekend. Customers could not access accounts for days. An independent review by Slaughter and May, published in November 2019, found weak testing, poor supplier oversight and an unassessed big-bang approach.",
+ "overview": {
+  "background": "TSB left Lloyds Banking Group's systems and moved to a platform from its owner. The migration involved over 70 suppliers and more than 1,400 people.",
+  "systems": [
+   "Proteo4UK platform",
+   "Five million customer records",
+   "Two data centres (TSB's view)",
+   "70+ suppliers"
+  ],
+  "impact": "Customers had trouble accessing services and contacting the bank. Branches had major problems. Attempted fraud peaked at 70 times usual levels.",
+  "severity": "Severe. Disruption lasted into the spring and summer of 2018.",
+  "gaps": "TSB disputed parts of the report and pointed to inconsistent data centre configuration."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "One weekend, little testing, inconsistent sites",
+   "caption": "Per the review, TSB did not assess a phased approach, and testing was weak. TSB says two data centres were configured inconsistently.",
+   "nodes": [
+    {
+     "id": "big",
+     "label": "Big-bang migration in one weekend",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "test",
+     "label": "Weak testing before go-live",
+     "row": 1,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "dc",
+     "label": "Two data centres configured inconsistently (TSB's view)",
+     "row": 1,
+     "col": 2,
+     "state": "fail"
+    },
+    {
+     "id": "out",
+     "label": "Customers locked out; fraud peaks",
+     "row": 2,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "big",
+     "t": "test",
+     "state": "fail"
+    },
+    {
+     "f": "big",
+     "t": "dc",
+     "state": "fail"
+    },
+    {
+     "f": "test",
+     "t": "out",
+     "state": "hit"
+    },
+    {
+     "f": "dc",
+     "t": "out",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Phased migration with rollback (conceptual)",
+   "caption": "A general alternative to a single-weekend move.",
+   "nodes": [
+    {
+     "id": "ph",
+     "label": "Phased waves of customers",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "tst",
+     "label": "Proven testing at load",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "rb",
+     "label": "Rollback plan",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "ov",
+     "label": "Supplier oversight",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "ph",
+     "t": "tst",
+     "state": "new"
+    },
+    {
+     "f": "ph",
+     "t": "rb",
+     "state": "new"
+    },
+    {
+     "f": "tst",
+     "t": "ov",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Migration risk is spread out.",
+  "Testing matches production.",
+  "There is a path back."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Late April 2018",
+   "phase": "trigger",
+   "e": "TSB migrates five million customer records in a single weekend."
+  },
+  {
+   "t": "Following days",
+   "phase": "impact",
+   "e": "Customers cannot access accounts or reach the bank; branches struggle."
+  },
+  {
+   "t": "Following days",
+   "phase": "impact",
+   "e": "Attempted fraud peaks at 70 times usual levels."
+  },
+  {
+   "t": "Spring and summer 2018",
+   "phase": "mitigate",
+   "e": "TSB works through technical issues over several days and months."
+  },
+  {
+   "t": "20 Nov 2019",
+   "phase": "change",
+   "e": "The independent review is reported."
+  },
+  {
+   "t": "After the review",
+   "phase": "recover",
+   "e": "TSB says it changed its leadership structure and took direct control of IT operations."
+  }
+ ],
+ "rootCause": {
+  "trigger": "TSB moved all records in one weekend without assessing alternatives.",
+  "underlying": "The review found weak testing, gaps in the board's understanding and poor supplier oversight.",
+  "contributing": [
+   "No assessment of the big-bang approach",
+   "70+ suppliers and complex dependencies",
+   "Inconsistent data centre configuration (TSB's view)"
+  ],
+  "propagation": [
+   "Big-bang move.",
+   "Weak testing.",
+   "Customer lockout.",
+   "Fraud and complaints."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The testing finding",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "lack of robust testing with regards to the new system",
+   "note": "As quoted in ITPro's report on the review."
+  },
+  {
+   "label": "The fraud measure",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "70 times higher than usual levels",
+   "note": "As quoted in the same report."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check test coverage against production behaviour.",
+    "why": "The review found it lacking."
+   },
+   {
+    "step": "Check configuration parity between sites.",
+    "why": "TSB's explanation."
+   },
+   {
+    "step": "Check supplier readiness.",
+    "why": "Oversight gaps."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Phase future migrations.",
+    "why": "Reduces blast radius."
+   },
+   {
+    "step": "Test at production scale.",
+    "why": "Review finding."
+   },
+   {
+    "step": "Take direct control of IT operations.",
+    "why": "TSB's change."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Run rehearsals and dry runs.",
+    "why": "Verify."
+   },
+   {
+    "step": "Check key customer journeys.",
+    "why": "Test."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Assess migration approaches formally.",
+    "why": "Review finding."
+   },
+   {
+    "step": "Oversee suppliers.",
+    "why": "Review finding."
+   },
+   {
+    "step": "Seek external advice.",
+    "why": "Review finding."
+   }
+  ],
+  "safety": "Moving financial records is irreversible without a tested rollback. Do not proceed without one."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "You plan to migrate millions of customers in a weekend. Testing is incomplete and two data centres are not identical.",
+   "clues": [
+    "Many suppliers",
+    "Board unsure",
+    "Deadline fixed"
+   ],
+   "question": "What do you advise?",
+   "hints": [
+    "What approach lowers risk?",
+    "What must be tested?",
+    "What is the rollback?"
+   ],
+   "answer": "Phase the migration, test at scale and across both sites, keep rollback and delay if gates are not met."
+  },
+  "rootcause": {
+   "q": "How many suppliers were involved?",
+   "options": [
+    "Over 70",
+    "3",
+    "10",
+    "700"
+   ],
+   "answer": 0,
+   "why": "Per the report."
+  },
+  "remediation": [
+   {
+    "task": "Define go/no-go gates.",
+    "answer": "Tests passed, rollback proven."
+   },
+   {
+    "task": "Plan waves.",
+    "answer": "Employees first, then small groups."
+   },
+   {
+    "task": "Plan supplier governance.",
+    "answer": "Single accountable owner."
+   }
+  ],
+  "design": {
+   "prompt": "Design a bank platform migration.",
+   "constraints": [
+    "Millions of customers",
+    "Regulated",
+    "Many suppliers"
+   ],
+   "answer": "Phased waves, parallel run, parity checks, rollback and strong oversight."
+  },
+  "checks": [
+   {
+    "q": "When did the independent review get reported?",
+    "options": [
+     "20 November 2019",
+     "April 2018",
+     "June 2017",
+     "2020"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   },
+   {
+    "q": "What approach did the review criticise?",
+    "options": [
+     "A big-bang migration",
+     "A phased migration",
+     "A cloud migration",
+     "None"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   },
+   {
+    "q": "What did TSB blame in part?",
+    "options": [
+     "Inconsistent data centre configuration",
+     "Weather",
+     "Staff",
+     "Customers"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   },
+   {
+    "q": "How many records moved?",
+    "options": [
+     "Five million",
+     "Five thousand",
+     "Fifty",
+     "Five billion"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Phased migration",
+   "Production-scale testing"
+  ],
+  "monitoring": [
+   "Customer journey health"
+  ],
+  "recovery": [
+   "Rollback"
+  ],
+  "practices": [
+   "Supplier oversight",
+   "External advice"
+  ]
+ },
+ "sources": [
+  {
+   "title": "ITPro: TSB's IT disaster pinned on big bang approach to migration",
+   "url": "https://itpro.com/business-strategy/digital-transformation/354155/tsbs-it-disaster-pinned-on-big-bang-approach-to",
+   "used": "dates, findings, impact, TSB response"
+  }
+ ],
+ "verification": "Facts were read from ITPro's report on 29 October 2026, not the review itself. The mention that TSB left Lloyds Banking Group is background knowledge and is not in the report."
+}

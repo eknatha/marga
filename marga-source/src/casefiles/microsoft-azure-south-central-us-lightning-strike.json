@@ -1,0 +1,407 @@
+{
+ "id": "microsoft-azure-south-central-us-lightning-strike",
+ "checked": "29 October 2026",
+ "summary": "In early September 2018 storms in Texas caused power swells that affected the cooling systems of Azure's South Central US data center. Temperatures rose, automated shutdown began and some hardware was damaged. Services including Visual Studio Team Services were down for many hours.",
+ "overview": {
+  "background": "The South Central US data center in San Antonio switched from utility to generator power during storms. Surge suppressors were in place, but the power swells still affected mechanical cooling.",
+  "systems": [
+   "South Central US data center cooling and power",
+   "Azure compute and storage in the region",
+   "Visual Studio Team Services (now Azure DevOps)",
+   "Geo-redundant storage and SQL backups in a second region"
+  ],
+  "impact": "One South Central US data center went offline. Visual Studio Team Services had its longest outage in seven years, and teams globally lost a day or more of productivity.",
+  "severity": "A multi-hour regional event with global effects on one service.",
+  "gaps": "The report used here is a news article about Microsoft's blog post. It gives no exact times."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Power swells defeat cooling, hardware shuts down",
+   "caption": "Lightning-related power swells hit the mechanical cooling systems. Temperatures climbed faster than shutdown could protect all hardware.",
+   "nodes": [
+    {
+     "id": "storm",
+     "label": "Storms and lightning in Texas",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "pwr",
+     "label": "Power swells and switch to generator",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "cool",
+     "label": "Mechanical cooling affected",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "dc",
+     "label": "Automated shutdown, some hardware damaged",
+     "row": 3,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "vsts",
+     "label": "VSTS and other services in the region down",
+     "row": 4,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "storm",
+     "t": "pwr"
+    },
+    {
+     "f": "pwr",
+     "t": "cool",
+     "label": "despite surge suppressors",
+     "state": "fail"
+    },
+    {
+     "f": "cool",
+     "t": "dc",
+     "label": "temperature rises",
+     "state": "fail"
+    },
+    {
+     "f": "dc",
+     "t": "vsts",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Zones and rehearsed failover (conceptual)",
+   "caption": "Microsoft said it would move services into regions with Availability Zones, exercise cross-region failover, add redundancy to internal tooling and review circuit breakers. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "az1",
+     "label": "Availability Zone 1",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "az2",
+     "label": "Availability Zone 2",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "rep",
+     "label": "Asynchronous replication to a second region",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "drill",
+     "label": "Regular failover exercises",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "svc",
+     "label": "Service survives a data center loss",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "svc",
+     "t": "az1",
+     "state": "new"
+    },
+    {
+     "f": "svc",
+     "t": "az2",
+     "state": "new"
+    },
+    {
+     "f": "az1",
+     "t": "rep",
+     "state": "new"
+    },
+    {
+     "f": "az2",
+     "t": "rep",
+     "state": "new"
+    },
+    {
+     "f": "rep",
+     "t": "drill",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Losing a data center no longer takes down a service.",
+  "Failover is practised.",
+  "Tooling has more than one home."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Early September 2018",
+   "phase": "trigger",
+   "e": "Storms produce lightning and power swells in the Texas area."
+  },
+  {
+   "t": "During the storm",
+   "phase": "impact",
+   "e": "The data center switches from utility to generator power. Mechanical cooling is affected by the swells."
+  },
+  {
+   "t": "Following hours",
+   "phase": "impact",
+   "e": "Temperatures rise past safe thresholds and an automated shutdown begins. Some hardware is damaged."
+  },
+  {
+   "t": "During recovery",
+   "phase": "investigate",
+   "e": "Microsoft weighs failover to read-only secondary copies or restored backups against data loss, and waits for the region to recover."
+  },
+  {
+   "t": "After recovery",
+   "phase": "recover",
+   "e": "Services in the region are restored."
+  },
+  {
+   "t": "11 Sep 2018",
+   "phase": "change",
+   "e": "A Microsoft DevOps engineering post describes the incident and next steps."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Lightning-related power swells affected the data center's mechanical cooling systems.",
+  "underlying": "The data center kept running while temperatures rose until an automated shutdown, and temperatures rose so quickly that some hardware was damaged before shutdown.",
+  "contributing": [
+   "Services were concentrated in one region",
+   "A regression made Dashboards unavailable when a Marketplace call failed",
+   "Service-to-service circuit breakers were scoped too widely, including calls to the user service",
+   "Failing over would have caused degraded service or data loss"
+  ],
+  "propagation": [
+   "Power swell.",
+   "Cooling fails.",
+   "Shutdown.",
+   "Service outage and slow recovery."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Impact",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "lost a day or more of productivity",
+   "note": "Short phrase reported from Microsoft's DevOps post."
+  },
+  {
+   "label": "A simulated cooling alarm chain",
+   "kind": "simulated",
+   "lang": "yaml",
+   "body": "alert: ChillerFault\nfor: 2m\nactions: [page-facilities, shed-noncritical-load, prepare-failover]",
+   "note": "Invented example of an early action list."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check power quality and cooling status at the facility.",
+    "why": "Cooling was the failing system."
+   },
+   {
+    "step": "Check temperatures against shutdown thresholds.",
+    "why": "Shutdown protects hardware."
+   },
+   {
+    "step": "Check what your service replicates to other regions.",
+    "why": "It decides your failover options."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Shed non-critical load early.",
+    "why": "Slows temperature rise."
+   },
+   {
+    "step": "Decide failover versus waiting using data loss risk.",
+    "why": "Microsoft waited because failover risked data loss."
+   },
+   {
+    "step": "Restore in order: power, cooling, hardware, services.",
+    "why": "Prevents repeat shutdowns."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check hardware health after restart.",
+    "why": "Some hardware was damaged."
+   },
+   {
+    "step": "Check data consistency.",
+    "why": "Verify before opening to users."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Use zones and cross-region replication.",
+    "why": "Microsoft's next steps."
+   },
+   {
+    "step": "Rehearse failover with your own organization first.",
+    "why": "Microsoft's next step."
+   },
+   {
+    "step": "Review circuit breaker scope.",
+    "why": "Microsoft's next step."
+   }
+  ],
+  "safety": "Failing over to an older copy can lose recent data. Decide the acceptable loss in advance."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Cooling units trip after lightning and the room is heating. Your service has one region plus backups in another.",
+   "clues": [
+    "Replication is geo-redundant but read-only",
+    "Failing over loses recent data",
+    "The status page may be slow"
+   ],
+   "question": "How do you decide?",
+   "hints": [
+    "What data would be lost?",
+    "How long will recovery take?",
+    "What can you shed?"
+   ],
+   "answer": "Shed load, estimate recovery time against the data loss from failover, communicate regularly and choose by agreed recovery objectives."
+  },
+  "rootcause": {
+   "q": "What affected the cooling?",
+   "options": [
+    "Lightning-related power swells",
+    "A fire",
+    "A flood",
+    "A cyber attack"
+   ],
+   "answer": 0,
+   "why": "The report says swells affected mechanical cooling."
+  },
+  "remediation": [
+   {
+    "task": "Define RPO and RTO.",
+    "answer": "Write acceptable data loss and recovery time per service."
+   },
+   {
+    "task": "Design a failover drill.",
+    "answer": "Fail the service over in a test organisation first, then in production."
+   },
+   {
+    "task": "Scope circuit breakers.",
+    "answer": "Break per dependency, not per call chain."
+   }
+  ],
+  "design": {
+   "prompt": "Design a service that survives a data center loss without losing data.",
+   "constraints": [
+    "Two regions",
+    "Synchronous replication is costly",
+    "Tooling must stay up"
+   ],
+   "answer": "Use zones, synchronous replication within a region, asynchronous across regions, rehearsed failover and tooling in two regions."
+  },
+  "checks": [
+   {
+    "q": "Which service had its longest outage?",
+    "options": [
+     "Visual Studio Team Services",
+     "Bing",
+     "Xbox",
+     "Outlook"
+    ],
+    "answer": 0,
+    "why": "The report says so."
+   },
+   {
+    "q": "Why not fail over at once?",
+    "options": [
+     "It would degrade services or lose data",
+     "It was impossible",
+     "It was too cheap",
+     "Nobody knew how"
+    ],
+    "answer": 0,
+    "why": "Microsoft explained the trade-off."
+   },
+   {
+    "q": "What did surge suppressors do?",
+    "options": [
+     "They did not prevent the effect on cooling",
+     "They prevented all damage",
+     "They were absent",
+     "They caused it"
+    ],
+    "answer": 0,
+    "why": "The report says swells affected cooling despite them."
+   },
+   {
+    "q": "What is a next step?",
+    "options": [
+     "Move to Availability Zones",
+     "Move to one data center",
+     "Remove tests",
+     "Stop backups"
+    ],
+    "answer": 0,
+    "why": "Microsoft's next step."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Zones and cross-region replication",
+   "Redundant tooling",
+   "Circuit breaker scope"
+  ],
+  "monitoring": [
+   "Cooling and temperature alarms"
+  ],
+  "recovery": [
+   "Decide failover with recovery objectives",
+   "Restore power and cooling first"
+  ],
+  "practices": [
+   "Practise failover",
+   "Know your acceptable data loss"
+  ]
+ },
+ "sources": [
+  {
+   "title": "DatacentreNews UK: Azure outage postmortem (report of a Microsoft DevOps blog post)",
+   "url": "https://datacentrenews.uk/story/azure-outage-postmortem-microsoft-reveals-what-happened-and-why",
+   "used": "events, cause, impact, next steps"
+  }
+ ],
+ "verification": "This case file was built from a news report of Microsoft's blog post, because the Azure status history page named on the case card could not be read. No clock times are available. The quotes are marked as paraphrase or short phrases from that report. Commands are Simulated."
+}

@@ -1,0 +1,448 @@
+{
+ "id": "knight-capital-deployment",
+ "checked": "29 October 2026",
+ "summary": "On 1 August 2012 Knight Capital's trading system sent millions of unintended orders in about 45 minutes after new code reached only seven of eight servers. The firm lost over $460 million.",
+ "overview": {
+  "background": "Knight Capital was a market maker that routed orders through its SMARS system, which ran on eight servers. In July 2012 it deployed new code for the NYSE Retail Liquidity Program (RLP). The new code reused a flag that years earlier had switched on an old function called Power Peg.",
+  "systems": [
+   "SMARS order router (eight servers)",
+   "Retail Liquidity Program (RLP) code",
+   "Old Power Peg code left in the system",
+   "BNET order system and its automated email alerts"
+  ],
+  "impact": "The SEC order says SMARS sent 212 parent orders that became millions of child orders, giving about 4 million executions in 154 stocks for more than 397 million shares in roughly 45 minutes. Knight lost over $460 million.",
+  "severity": "A firm-threatening loss. The SEC found violations of the Market Access Rule (Rule 15c3-5) and set a $12,000,000 penalty.",
+  "gaps": "The SEC order does not give exact stop times, the full text of the alert emails or the internal server logs."
+ },
+ "archNote": "The server count, the repurposed flag and the missing deployment on one server come from the SEC order. Box layout is ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Seven servers new, one server old",
+   "caption": "Eight SMARS servers received orders. One missed the new code, so the flag meant something different there.",
+   "nodes": [
+    {
+     "id": "rlp",
+     "label": "RLP orders flagged on",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "smars",
+     "label": "SMARS routers, eight servers",
+     "row": 1,
+     "col": 1
+    },
+    {
+     "id": "new",
+     "label": "Seven servers: new RLP code",
+     "row": 2,
+     "col": 0
+    },
+    {
+     "id": "old",
+     "label": "One server: old code, flag runs Power Peg",
+     "row": 2,
+     "col": 2,
+     "state": "fail"
+    },
+    {
+     "id": "mkt",
+     "label": "Exchanges: millions of child orders",
+     "row": 3,
+     "col": 2,
+     "state": "hit"
+    },
+    {
+     "id": "mail",
+     "label": "BNET reject emails, 97 before open",
+     "row": 3,
+     "col": 0,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "rlp",
+     "t": "smars"
+    },
+    {
+     "f": "smars",
+     "t": "new"
+    },
+    {
+     "f": "smars",
+     "t": "old",
+     "label": "same flag",
+     "state": "fail"
+    },
+    {
+     "f": "old",
+     "t": "mkt",
+     "state": "fail"
+    },
+    {
+     "f": "new",
+     "t": "mail",
+     "label": "alerts nobody acted on",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "A deployment with checks (conceptual)",
+   "caption": "The SEC found Knight had no written procedure for review and no second technician check. This picture shows controls that would address that. It is our design, not Knight's.",
+   "nodes": [
+    {
+     "id": "art",
+     "label": "One versioned release artifact",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "dep",
+     "label": "Automated deploy to all servers",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "chk",
+     "label": "Verify version on every server",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "kill",
+     "label": "Per-strategy kill switch and limits",
+     "row": 3,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "alert",
+     "label": "Alerts routed to a person with authority",
+     "row": 3,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "art",
+     "t": "dep",
+     "state": "new"
+    },
+    {
+     "f": "dep",
+     "t": "chk",
+     "state": "new"
+    },
+    {
+     "f": "chk",
+     "t": "kill",
+     "state": "new"
+    },
+    {
+     "f": "chk",
+     "t": "alert",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "A mismatch between servers is caught before trading opens.",
+  "Dead code is removed, so a reused flag cannot revive it.",
+  "A kill switch and exposure limits stop runaway orders in seconds."
+ ],
+ "afterNote": "The lesson is layered: remove dead code, verify deployments, and cap damage when the first two fail.",
+ "timelineNote": "The SEC order gives only some clock times. Dates and sequence are reported; missing times are left out.",
+ "timeline": [
+  {
+   "t": "2003",
+   "phase": "change",
+   "e": "Power Peg is discontinued in practice but its code remains in SMARS."
+  },
+  {
+   "t": "2005",
+   "phase": "change",
+   "e": "A function that counted cumulative quantity is moved, and Power Peg is not retested."
+  },
+  {
+   "t": "From 27 July 2012",
+   "phase": "change",
+   "e": "The new RLP code is deployed in stages. One technician does not copy it to one of eight servers."
+  },
+  {
+   "t": "1 August, about 8:01 AM ET",
+   "phase": "detect",
+   "e": "Automated BNET emails with the text Power Peg disabled begin. 97 arrive before the 9:30 AM open."
+  },
+  {
+   "t": "9:30 AM ET",
+   "phase": "trigger",
+   "e": "The market opens and the old server starts sending orders as Power Peg."
+  },
+  {
+   "t": "During the session",
+   "phase": "investigate",
+   "e": "Knight staff look for the cause and roll back the code on the seven servers that had it, which makes the problem worse."
+  },
+  {
+   "t": "About 45 minutes later",
+   "phase": "impact",
+   "e": "About 4 million executions in 154 stocks for more than 397 million shares have occurred."
+  },
+  {
+   "t": "After the incident",
+   "phase": "recover",
+   "e": "The old behaviour is stopped. Knight reports a loss of over $460 million."
+  }
+ ],
+ "rootCause": {
+  "trigger": "At market open the one server without the new code interpreted the reused flag as an instruction to run Power Peg.",
+  "underlying": "Old, unused code remained in production and a new feature reused its activation flag. The deployment was manual, one server was skipped and nobody checked that all eight matched.",
+  "contributing": [
+   "No written procedure required a review of the deployment",
+   "No second technician reviewed the deployment",
+   "The earlier alert emails were not treated as urgent",
+   "Rolling back removed new code from seven servers, so more of the system ran Power Peg",
+   "Controls on total orders and exposure did not stop the flood"
+  ],
+  "propagation": [
+   "One server runs old logic.",
+   "Each parent order is split into endless child orders.",
+   "The orders execute across 154 stocks.",
+   "Positions grow faster than staff can understand the cause."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The missing review",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Knight did not require a second technician to review code deployment in SMARS.",
+   "note": "From the SEC order."
+  },
+  {
+   "label": "No written procedure",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Knight had no written procedures that required such a review.",
+   "note": "From the SEC order."
+  },
+  {
+   "label": "The scale of the orders",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "4 million executions in 154 stocks for more than 397 million shares in approximately 45 minutes",
+   "note": "From the SEC order."
+  },
+  {
+   "label": "Simulated deployment check",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ for h in smars1 smars2 smars3 smars4 smars5 smars6 smars7 smars8; do ssh $h 'sha256sum /opt/smars/bin/smars'; done | sort | uniq -c\n      7 9f2c...e1  /opt/smars/bin/smars\n      1 41ab...07  /opt/smars/bin/smars",
+   "note": "Shows how a one-line hash comparison would reveal a server that did not get the release. Values are invented."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Compare the running version on every server.",
+    "why": "A mixed fleet is the first thing to rule out after a deploy.",
+    "cmd": "for h in $(cat servers.txt); do ssh $h 'sha256sum /opt/smars/bin/smars'; done | sort | uniq -c"
+   },
+   {
+    "step": "Check which orders each server is producing.",
+    "why": "One outlier server points to a deployment gap, not a market event."
+   },
+   {
+    "step": "Read alert emails that arrived before the incident.",
+    "why": "Early warnings often name the failing component."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Stop the trading strategy with a kill switch before touching code.",
+    "why": "Stopping the flow of orders limits loss while you investigate."
+   },
+   {
+    "step": "Do not roll back the new release to servers that are fine without first understanding the flag.",
+    "why": "In this case the rollback spread the old behaviour to more servers."
+   },
+   {
+    "step": "Redeploy the intended release to every server, then confirm all hashes match.",
+    "why": "A uniform fleet removes the mismatch."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Confirm the order rate and open positions are back to expected levels.",
+    "why": "Check the outcome in the market, not only in the code."
+   },
+   {
+    "step": "Confirm every server reports the same version.",
+    "why": "This closes the cause."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Delete code for retired features.",
+    "why": "Dead code can be revived by a reused flag."
+   },
+   {
+    "step": "Automate deployment and verify versions on every host.",
+    "why": "Manual copying by one person is a single point of failure."
+   },
+   {
+    "step": "Require a second person to review a release and write the procedure down.",
+    "why": "The SEC singled out this absence."
+   },
+   {
+    "step": "Add per-strategy exposure limits and a kill switch with clear authority.",
+    "why": "Limits cap the damage when other controls fail."
+   },
+   {
+    "step": "Page a human with authority when a critical alert text appears.",
+    "why": "97 emails went unactioned."
+   }
+  ],
+  "safety": "In a live trading or payment system, stopping the flow is usually safer than debugging while it runs. Do not make a rollback without first understanding what the old and new code do with the same flag."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "At 8:30 AM you see dozens of automated emails saying a function is disabled. The market opens in an hour. A new release went out last week.",
+   "clues": [
+    "Emails name an old feature",
+    "Eight servers share the release",
+    "One technician did the copy by hand"
+   ],
+   "question": "What do you check before the market opens?",
+   "hints": [
+    "Is every server identical?",
+    "Why would an old feature be mentioned?",
+    "Who should be paged?"
+   ],
+   "answer": "Compare release hashes on all eight servers, find the one that differs, take it out of service or stop the strategy, and page the owner. Treat the email text as a symptom of old code running."
+  },
+  "rootcause": {
+   "q": "Which statement best describes the underlying cause?",
+   "options": [
+    "An exchange outage",
+    "New code reused a flag that old code on one unupdated server still acted on",
+    "A network cable failure",
+    "A market data error"
+   ],
+   "answer": 1,
+   "why": "The SEC order describes the unupdated server and the reused flag."
+  },
+  "remediation": [
+   {
+    "task": "Write the checks a release pipeline must pass before trading starts.",
+    "answer": "Single release artifact, automated deployment, version verification on all hosts, smoke test of order flow in a test mode, and sign-off by a second person."
+   },
+   {
+    "task": "Explain why deleting dead code matters.",
+    "answer": "Code that is not used can still run when a flag changes meaning. Removing it removes that path and the need to retest it."
+   },
+   {
+    "task": "Design the kill switch.",
+    "answer": "A single control, available to authorised staff, that stops new orders from a strategy or server within seconds and is tested regularly."
+   }
+  ],
+  "design": {
+   "prompt": "Design a safe release process for a system that can lose millions in minutes.",
+   "constraints": [
+    "Eight identical servers",
+    "Release must be reversible",
+    "Operators must be able to stop it in seconds"
+   ],
+   "answer": "Build one artifact, deploy automatically with version checks, release to a small share first, monitor order rate and exposure, keep hard limits at the gateway, and have a tested kill switch plus a clear escalation path."
+  },
+  "checks": [
+   {
+    "q": "How many of the eight servers lacked the new code?",
+    "options": [
+     "None",
+     "One",
+     "Four",
+     "All"
+    ],
+    "answer": 1,
+    "why": "The SEC order says a technician did not copy the code to one server."
+   },
+   {
+    "q": "What was the old function called?",
+    "options": [
+     "Power Peg",
+     "Fast Lane",
+     "Retail Boost",
+     "Stop Loss"
+    ],
+    "answer": 0,
+    "why": "Power Peg was discontinued in 2003 but its code remained."
+   },
+   {
+    "q": "Why did rolling back not help?",
+    "options": [
+     "It was too slow",
+     "It removed the new code from servers, so more ran the old behaviour",
+     "It was blocked",
+     "It changed the market"
+    ],
+    "answer": 1,
+    "why": "The reused flag meant old code on more servers acted as Power Peg."
+   },
+   {
+    "q": "Which control would most directly limit loss?",
+    "options": [
+     "Exposure limits and a kill switch",
+     "A faster server",
+     "More emails",
+     "A bigger log file"
+    ],
+    "answer": 0,
+    "why": "Limits cap damage when other defences fail."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Remove retired code",
+   "Never reuse an old flag for a new meaning",
+   "Automate deployment and verify versions",
+   "Require two-person review"
+  ],
+  "monitoring": [
+   "Alert on order rate and exposure per strategy",
+   "Treat repeated errors before the open as a stop signal"
+  ],
+  "recovery": [
+   "Kill switch first, debug later",
+   "Understand a rollback before doing it"
+  ],
+  "practices": [
+   "Write deployment procedures",
+   "Practise stopping a runaway system",
+   "Make alert recipients accountable"
+  ]
+ },
+ "sources": [
+  {
+   "title": "SEC administrative order 34-70694, Knight Capital Americas LLC",
+   "url": "https://www.sec.gov/files/litigation/admin/2013/34-70694.pdf",
+   "used": "all verified facts and quotes"
+  }
+ ],
+ "verification": "Facts were read from the SEC order text (via the SEC 8-K exhibit copy) on 29 October 2026. Exact stop times and the server logs are not in the order. The hash check is Simulated."
+}

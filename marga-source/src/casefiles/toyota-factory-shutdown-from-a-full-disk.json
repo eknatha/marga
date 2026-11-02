@@ -1,0 +1,384 @@
+{
+ "id": "toyota-factory-shutdown-from-a-full-disk",
+ "checked": "29 October 2026",
+ "summary": "In August 2023 Toyota halted 28 production lines at all 14 of its Japanese plants after maintenance on its parts-ordering system hit a disk space error. The backup system failed too, so there was no automatic switchover.",
+ "overview": {
+  "background": "Toyota's production schedule depends on a parts ordering system. Database maintenance on 28 August 2023 involved cleanup and reorganisation of data.",
+  "systems": [
+   "Parts ordering system database",
+   "Backup (failover) function",
+   "Production lines at 14 plants"
+  ],
+  "impact": "Production stopped on 29 August 2023 on 28 lines at all 14 plants, according to the report.",
+  "severity": "A stop of the entire domestic production for about a day.",
+  "gaps": "This file is based on a news report and gives no hours or volume figures."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Maintenance fills the disk and failover fails",
+   "caption": "Both primary and backup failed, so ordering stopped and lines halted.",
+   "nodes": [
+    {
+     "id": "mnt",
+     "label": "Database cleanup and reorganisation",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "disk",
+     "label": "Insufficient disk space error",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "bak",
+     "label": "Backup function also fails",
+     "row": 2,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "ord",
+     "label": "Parts ordering stopped",
+     "row": 2,
+     "col": 2,
+     "state": "hit"
+    },
+    {
+     "id": "line",
+     "label": "28 lines at 14 plants halted",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "mnt",
+     "t": "disk",
+     "state": "fail"
+    },
+    {
+     "f": "disk",
+     "t": "bak",
+     "state": "fail"
+    },
+    {
+     "f": "disk",
+     "t": "ord",
+     "state": "hit"
+    },
+    {
+     "f": "ord",
+     "t": "line",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Capacity and failover that match (conceptual)",
+   "caption": "General guards: capacity checks before maintenance and a failover with its own headroom.",
+   "nodes": [
+    {
+     "id": "cap",
+     "label": "Capacity check before maintenance",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "sec",
+     "label": "Secondary with equal storage",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "ro",
+     "label": "Read-only fallback mode",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "drill",
+     "label": "Failover drills",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "cap",
+     "t": "sec",
+     "state": "new"
+    },
+    {
+     "f": "cap",
+     "t": "ro",
+     "state": "new"
+    },
+    {
+     "f": "sec",
+     "t": "drill",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Maintenance cannot exhaust storage.",
+  "Failover is proven.",
+  "A fallback keeps lines moving."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "28 Aug 2023",
+   "phase": "trigger",
+   "e": "Maintenance begins on the parts ordering database to clean up and reorganise data."
+  },
+  {
+   "t": "28 Aug evening shift",
+   "phase": "impact",
+   "e": "An error occurs due to insufficient disk space."
+  },
+  {
+   "t": "28 Aug evening shift",
+   "phase": "impact",
+   "e": "The backup function also fails, so there is no automatic switchover."
+  },
+  {
+   "t": "28 Aug evening shift",
+   "phase": "impact",
+   "e": "28 lines at all 14 plants halt."
+  },
+  {
+   "t": "29 Aug",
+   "phase": "detect",
+   "e": "Toyota reports production halted."
+  },
+  {
+   "t": "After the move",
+   "phase": "recover",
+   "e": "Data is moved to a server with more storage and operations resume."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A database cleanup and reorganisation caused an error from insufficient disk space.",
+  "underlying": "The system stopped after an error due to insufficient disk space.",
+  "contributing": [
+   "The backup function failed too, so no automatic switchover",
+   "Storage headroom was not enough for the work"
+  ],
+  "propagation": [
+   "Disk full.",
+   "Primary fails.",
+   "Backup fails.",
+   "Ordering stops."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "What stopped the system",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "the system stopped after an error occurred due to insufficient disk space",
+   "note": "From the news report."
+  },
+  {
+   "label": "A simulated capacity check",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ df -h /var/lib/db\nFilesystem  Size  Used Avail Use%\n/dev/sdb1   2.0T  1.9T  80G  96%",
+   "note": "A sample check. Numbers are invented."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check disk usage and free space.",
+    "why": "The error was insufficient space."
+   },
+   {
+    "step": "Check why the standby did not take over.",
+    "why": "It failed too."
+   },
+   {
+    "step": "Check what the maintenance changed.",
+    "why": "Cleanup and reorganisation used space."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Move data to a server with more storage.",
+    "why": "Toyota's fix."
+   },
+   {
+    "step": "Restart the ordering system.",
+    "why": "Resumes operations."
+   },
+   {
+    "step": "Resume lines in steps.",
+    "why": "Parts must flow."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check orders flow and lines run.",
+    "why": "Confirms recovery."
+   },
+   {
+    "step": "Check the new server has headroom.",
+    "why": "Avoid repeat."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Alert at 70 and 85 percent of disk.",
+    "why": "General practice."
+   },
+   {
+    "step": "Size standby equal to primary.",
+    "why": "General practice."
+   },
+   {
+    "step": "Rehearse failover.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Moving data under pressure risks loss. Take a backup copy first and verify after."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Disk is full during maintenance and the standby also failed. Production depends on this system.",
+   "clues": [
+    "Maintenance running",
+    "Standby unhealthy",
+    "Lines stopping"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "How do you get capacity?",
+    "How do you move data?",
+    "How do you resume?"
+   ],
+   "answer": "Stop the maintenance, move the data to a larger server, restart ordering and bring lines back."
+  },
+  "rootcause": {
+   "q": "What caused the error?",
+   "options": [
+    "Insufficient disk space",
+    "A cyberattack",
+    "A fire",
+    "A power cut"
+   ],
+   "answer": 0,
+   "why": "Per the report."
+  },
+  "remediation": [
+   {
+    "task": "Write a capacity alert.",
+    "answer": "Alert at 80 percent and predict time to full."
+   },
+   {
+    "task": "Plan a failover test.",
+    "answer": "Quarterly, in production-like conditions."
+   },
+   {
+    "task": "Define a fallback.",
+    "answer": "Allow manual ordering for a day."
+   }
+  ],
+  "design": {
+   "prompt": "Design a production ordering system that survives a full disk.",
+   "constraints": [
+    "Just in time",
+    "14 plants",
+    "Strict uptime"
+   ],
+   "answer": "Capacity headroom, equal standby, tested failover, read-only fallback, maintenance runbooks with checks."
+  },
+  "checks": [
+   {
+    "q": "How many plants were hit?",
+    "options": [
+     "All 14",
+     "1",
+     "5",
+     "None"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "How many lines stopped?",
+    "options": [
+     "28",
+     "2",
+     "100",
+     "0"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "Was it a cyberattack?",
+    "options": [
+     "The report says it was a disk space error",
+     "Yes",
+     "Unknown",
+     "Sometimes"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "What fixed it?",
+    "options": [
+     "Moving data to a server with more storage",
+     "A reboot",
+     "A patch",
+     "Nothing"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Capacity headroom",
+   "Equal standby"
+  ],
+  "monitoring": [
+   "Disk alerts"
+  ],
+  "recovery": [
+   "Move data to larger storage"
+  ],
+  "practices": [
+   "Failover drills",
+   "Maintenance preflight checks"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Motor1: Toyota factory shutdown report",
+   "url": "https://www.motor1.com/news/685348/toyota-insufficient-disk-space-servers/",
+   "used": "date, cause, effect, fix"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from a news report. It gives no hours or output figures. The disk output is Simulated. The URL is the news report cited on the case card."
+}

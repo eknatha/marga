@@ -1,0 +1,431 @@
+{
+ "id": "aws-ebs-re-mirroring-storm",
+ "checked": "29 October 2026",
+ "summary": "On 21 April 2011 an incorrectly executed network change in one Availability Zone left many EBS nodes unable to find replicas. They tried to re-mirror all at once, used up the cluster's free space and a stuck-volume event followed for days.",
+ "overview": {
+  "background": "Amazon EBS replicates each volume between nodes. Each AZ has a primary and a lower-capacity secondary network, and a control plane that works across the region.",
+  "systems": [
+   "EBS clusters in one US East Availability Zone",
+   "Primary and secondary EBS networks",
+   "EBS control plane (region-wide API)",
+   "EC2 instances using EBS",
+   "RDS single-AZ and multi-AZ databases"
+  ],
+  "impact": "About 13 percent of volumes in the affected AZ became stuck, and 0.07 percent could not be restored consistently. EBS API calls had errors across the region during two periods on 21 April. At peak 45 percent of single-AZ RDS instances in the AZ had stuck I/O.",
+  "severity": "A multi-day event with data loss for a small share of volumes. AWS gave a 10-day credit for usage in the affected AZ.",
+  "gaps": "The post does not give the number of nodes or the exact change tool."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Isolated nodes search for space at the same time",
+   "caption": "A traffic shift sent traffic onto the low-capacity secondary network, then disconnected both networks. Nodes started mass re-mirroring and exhausted free capacity.",
+   "nodes": [
+    {
+     "id": "chg",
+     "label": "Network change: traffic shifted incorrectly",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "net",
+     "label": "Primary and secondary EBS networks both cut off nodes",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "nodes",
+     "label": "EBS nodes search for free space to re-mirror",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "cp",
+     "label": "EBS control plane threads exhausted by timeouts",
+     "row": 3,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "vol",
+     "label": "Stuck volumes, EC2, RDS",
+     "row": 3,
+     "col": 2,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "chg",
+     "t": "net",
+     "label": "executed incorrectly"
+    },
+    {
+     "f": "net",
+     "t": "nodes",
+     "label": "lost replicas",
+     "state": "fail"
+    },
+    {
+     "f": "nodes",
+     "t": "cp",
+     "label": "long timeouts",
+     "state": "fail"
+    },
+    {
+     "f": "nodes",
+     "t": "vol",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Limits on recovery work (conceptual)",
+   "caption": "AWS planned stronger back-off, more spare capacity, load shedding in the control plane and better tools. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "chg",
+     "label": "Automated, audited network change",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "nodes",
+     "label": "Nodes with back-off and re-mirroring limits",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "space",
+     "label": "Extra capacity for recovery",
+     "row": 2,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "cp",
+     "label": "Control plane with AZ-aware load shedding",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "multi",
+     "label": "Customers use multiple AZs",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "chg",
+     "t": "nodes",
+     "state": "new"
+    },
+    {
+     "f": "nodes",
+     "t": "space",
+     "state": "new"
+    },
+    {
+     "f": "nodes",
+     "t": "cp",
+     "state": "new"
+    },
+    {
+     "f": "cp",
+     "t": "multi",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Nodes retry slowly and cannot all flood the cluster.",
+  "A failure in one AZ stays in that AZ's control plane.",
+  "Customers can spread across AZs."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "21 Apr 12:47 AM PDT",
+   "phase": "trigger",
+   "e": "A network change meant to upgrade capacity is executed incorrectly and shifts traffic onto the lower-capacity network."
+  },
+  {
+   "t": "2:40 AM",
+   "phase": "mitigate",
+   "e": "New Create Volume requests are disabled in the affected AZ. Other EBS API errors recover by 2:50 AM."
+  },
+  {
+   "t": "5:30 AM",
+   "phase": "impact",
+   "e": "Error rates rise again across the region and the control plane browns out."
+  },
+  {
+   "t": "8:20 AM",
+   "phase": "mitigate",
+   "e": "Communication between the degraded cluster and the control plane is disabled."
+  },
+  {
+   "t": "12:04 PM",
+   "phase": "mitigate",
+   "e": "The event is contained to the affected AZ."
+  },
+  {
+   "t": "22 Apr about 2:00 AM",
+   "phase": "recover",
+   "e": "New capacity begins coming online."
+  },
+  {
+   "t": "22 Apr 12:30 PM",
+   "phase": "recover",
+   "e": "All but about 2.2 percent of affected volumes are restored."
+  },
+  {
+   "t": "23 Apr 6:15 PM",
+   "phase": "recover",
+   "e": "EBS API access is restored in the affected AZ."
+  },
+  {
+   "t": "24 Apr 12:30 PM",
+   "phase": "recover",
+   "e": "All but 1.04 percent of affected volumes are recovered."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A network configuration change disconnected both EBS networks for many nodes.",
+  "underlying": "Nodes began re-mirroring and searched for free space together, exhausting capacity. Weak retry back-off, a race condition in node code and long control-plane timeouts made it worse.",
+  "contributing": [
+   "Insufficient retry back-off",
+   "A race condition that crashed nodes",
+   "Long control-plane timeouts caused thread exhaustion",
+   "Communication to customers was weak"
+  ],
+  "propagation": [
+   "Nodes lose replicas.",
+   "All search for space.",
+   "The cluster fills.",
+   "Volumes stick and the control plane browns out."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The incorrect change",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "The traffic shift was executed incorrectly",
+   "note": "From AWS's summary."
+  },
+  {
+   "label": "The commitment",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Preventing this from reoccurring is a top priority.",
+   "note": "From AWS's summary."
+  },
+  {
+   "label": "A simulated backoff for re-mirroring",
+   "kind": "simulated",
+   "lang": "python",
+   "body": "wait = min(600, 2 ** attempt) + random.random()\nif cluster_free_space < reserve: defer_remirror()",
+   "note": "Illustrates a limit on recovery work. Not AWS code."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Look at recent network changes in the affected zone.",
+    "why": "The first clue was a change at 12:47 AM."
+   },
+   {
+    "step": "Check free capacity and re-mirroring activity.",
+    "why": "A storm shows as high activity and zero free space."
+   },
+   {
+    "step": "Check control-plane thread use and timeouts.",
+    "why": "Region-wide errors came from thread exhaustion."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Stop new work in the affected zone.",
+    "why": "AWS disabled Create Volume."
+   },
+   {
+    "step": "Isolate the degraded cluster from the control plane.",
+    "why": "This stopped region-wide brownouts."
+   },
+   {
+    "step": "Add capacity and restore volumes in stages.",
+    "why": "Capacity arrived on 22 April."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check volumes are consistent before returning them.",
+    "why": "A stuck volume must not be handed back in a bad state."
+   },
+   {
+    "step": "Confirm API errors across the region have returned to normal.",
+    "why": "Shows the blast radius is closed."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Automate and audit network changes.",
+    "why": "Manual execution caused the error."
+   },
+   {
+    "step": "Add back-off and limits to recovery work.",
+    "why": "AWS changed retry logic."
+   },
+   {
+    "step": "Keep spare capacity for large recoveries.",
+    "why": "AWS planned more."
+   },
+   {
+    "step": "Use multiple zones.",
+    "why": "Customers using one zone were affected."
+   }
+  ],
+  "safety": "Restoring volumes quickly can return inconsistent data. Check consistency first, even if recovery takes longer."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "After a network change, many storage nodes lose partners and your cluster fills. APIs in other zones start to fail.",
+   "clues": [
+    "Free space is zero",
+    "Nodes keep retrying",
+    "Control-plane calls time out slowly"
+   ],
+   "question": "What do you do first?",
+   "hints": [
+    "What creates new work?",
+    "What can you isolate?",
+    "What gives you capacity?"
+   ],
+   "answer": "Stop creation of new volumes in the zone, cut the degraded cluster off from the shared control plane, add capacity and recover in controlled steps."
+  },
+  "rootcause": {
+   "q": "What is a re-mirroring storm?",
+   "options": [
+    "Nodes all searching for free space to re-replicate at once",
+    "A cooling fault",
+    "A DNS loop",
+    "A billing bug"
+   ],
+   "answer": 0,
+   "why": "AWS describes this as the cause of the cluster running out of capacity."
+  },
+  "remediation": [
+   {
+    "task": "Add a reserve rule.",
+    "answer": "Never allow re-mirroring to use the last portion of free space."
+   },
+   {
+    "task": "Add timeouts.",
+    "answer": "Shorten control-plane timeouts and add load shedding per AZ."
+   },
+   {
+    "task": "Plan customer messaging.",
+    "answer": "Share impairment in the API and update regularly."
+   }
+  ],
+  "design": {
+   "prompt": "Design block storage that survives a lost network without a storm.",
+   "constraints": [
+    "Replicated volumes",
+    "Shared control plane",
+    "Limited spare space"
+   ],
+   "answer": "Use back-off, a recovery budget, per-cell control planes, spare capacity and clear degraded modes."
+  },
+  "checks": [
+   {
+    "q": "What was affected region-wide?",
+    "options": [
+     "The EBS control plane API",
+     "All data",
+     "Billing",
+     "DNS"
+    ],
+    "answer": 0,
+    "why": "AWS says the API had errors across the region."
+   },
+   {
+    "q": "What share of volumes in the AZ got stuck?",
+    "options": [
+     "About 13 percent",
+     "1 percent",
+     "50 percent",
+     "All"
+    ],
+    "answer": 0,
+    "why": "AWS gives about 13 percent."
+   },
+   {
+    "q": "What did AWS offer?",
+    "options": [
+     "A 10-day credit for usage in the zone",
+     "Nothing",
+     "A new region",
+     "Free hardware"
+    ],
+    "answer": 0,
+    "why": "AWS gave a 100 percent usage credit for 10 days."
+   },
+   {
+    "q": "Which helps customers survive?",
+    "options": [
+     "Using multiple Availability Zones",
+     "Using one zone",
+     "Longer timeouts",
+     "More snapshots only"
+    ],
+    "answer": 0,
+    "why": "AWS planned better multi-AZ tools."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Audit and automate network changes",
+   "Back off aggressively",
+   "Keep recovery capacity"
+  ],
+  "monitoring": [
+   "Free space per cluster",
+   "Control-plane thread use"
+  ],
+  "recovery": [
+   "Isolate the degraded cluster",
+   "Verify volume consistency"
+  ],
+  "practices": [
+   "Use multiple zones",
+   "Communicate with API-visible status"
+  ]
+ },
+ "sources": [
+  {
+   "title": "AWS: Summary of the Amazon EC2 and Amazon RDS Service Disruption in the US East Region",
+   "url": "https://aws.amazon.com/message/65648/",
+   "used": "timeline, cause, impact, corrective actions"
+  }
+ ],
+ "verification": "Facts were read from AWS's April 2011 summary on 29 October 2026. The summary has no logs, so code is Simulated."
+}

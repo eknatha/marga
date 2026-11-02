@@ -1,0 +1,384 @@
+{
+ "id": "air-canada-chatbot-gives-wrong-refund-rules",
+ "checked": "29 October 2026",
+ "summary": "In November 2022 an Air Canada website chatbot told a customer he could book a full-price ticket and claim a bereavement fare refund within 90 days. Air Canada refused the refund, and in February 2024 a British Columbia tribunal held the airline responsible for what its chatbot said and ordered a partial refund of C$650.88.",
+ "overview": {
+  "background": "Air Canada's website had a chatbot that answered questions about fares. The customer asked about bereavement fares after his grandmother died.",
+  "systems": [
+   "Website chatbot",
+   "Bereavement fare policy page",
+   "Air Canada employees handling refunds",
+   "British Columbia Civil Resolution Tribunal"
+  ],
+  "impact": "A customer paid full price and was denied a partial refund the chatbot had said he could claim. The tribunal ordered Air Canada to pay a partial refund of C$650.88 plus interest and fees.",
+  "severity": "A single-customer dispute with wide precedent for AI chatbots.",
+  "gaps": "This file uses a law firm summary (Manatt). The Guardian page (the card source) was not read."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A chatbot answer contradicts the policy",
+   "caption": "Per the summary, the chatbot said to book a regular ticket and request a partial refund within 90 days. Employees then said retroactive requests were not allowed.",
+   "nodes": [
+    {
+     "id": "ask",
+     "label": "Customer asks about bereavement fares",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "bot",
+     "label": "Chatbot gives wrong refund guidance",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "buy",
+     "label": "Customer buys full-price ticket",
+     "row": 2,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "deny",
+     "label": "Refund denied by staff",
+     "row": 2,
+     "col": 2,
+     "state": "fail"
+    },
+    {
+     "id": "trib",
+     "label": "Tribunal finds negligent misrepresentation",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "ask",
+     "t": "bot"
+    },
+    {
+     "f": "bot",
+     "t": "buy",
+     "state": "hit"
+    },
+    {
+     "f": "bot",
+     "t": "deny",
+     "state": "fail"
+    },
+    {
+     "f": "deny",
+     "t": "trib",
+     "state": "new"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Grounded answers with citations and handoff (conceptual)",
+   "caption": "General controls for support chatbots. Not described in the tribunal summary.",
+   "nodes": [
+    {
+     "id": "pol",
+     "label": "Policy source of truth",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "rag",
+     "label": "Answers cite the policy text",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "hand",
+     "label": "Handoff to a human for money questions",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "log",
+     "label": "Review of conversations",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "pol",
+     "t": "rag",
+     "state": "new"
+    },
+    {
+     "f": "pol",
+     "t": "hand",
+     "state": "new"
+    },
+    {
+     "f": "rag",
+     "t": "log",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "The bot repeats the real policy.",
+  "Money questions go to a person.",
+  "Answers are reviewed."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Nov 2022",
+   "phase": "trigger",
+   "e": "The customer asks the chatbot about bereavement fares and is told to request a refund within 90 days."
+  },
+  {
+   "t": "Nov 2022",
+   "phase": "impact",
+   "e": "He buys a full-price ticket from Vancouver to Toronto."
+  },
+  {
+   "t": "After travel",
+   "phase": "impact",
+   "e": "Air Canada employees tell him retroactive applications are not allowed."
+  },
+  {
+   "t": "Later",
+   "phase": "investigate",
+   "e": "He brings a claim to the Civil Resolution Tribunal."
+  },
+  {
+   "t": "Feb 2024",
+   "phase": "change",
+   "e": "The tribunal rules for the customer and the decision is reported on 28 February 2024."
+  },
+  {
+   "t": "After the ruling",
+   "phase": "recover",
+   "e": "Air Canada owes the partial refund of C$650.88 plus interest and fees."
+  }
+ ],
+ "rootCause": {
+  "trigger": "The chatbot gave guidance that contradicted the airline's policy.",
+  "underlying": "Air Canada did not take reasonable care to ensure its chatbot was accurate.",
+  "contributing": [
+   "The airline argued the chatbot was a separate legal entity, which the tribunal rejected",
+   "Customers were expected to check the policy page themselves"
+  ],
+  "propagation": [
+   "Wrong answer.",
+   "Customer relies on it.",
+   "Refund denied.",
+   "Tribunal rules against airline."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The defence rejected",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "one of its agents, servants, or representatives – including a chatbot",
+   "note": "Air Canada's argument as quoted in the Manatt summary."
+  },
+  {
+   "label": "The chatbot's advice",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "kindly do so within 90 days of the date your ticket was issued",
+   "note": "Text shown in the customer's screenshots, as quoted in the summary."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Compare the chatbot's answer with the policy text.",
+    "why": "They disagreed."
+   },
+   {
+    "step": "Check what employees will honour.",
+    "why": "They refused."
+   },
+   {
+    "step": "Keep conversation logs.",
+    "why": "Screenshots were evidence."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Honour what the chatbot promised in this case.",
+    "why": "Ordered by the tribunal."
+   },
+   {
+    "step": "Ground the bot in the policy.",
+    "why": "General practice."
+   },
+   {
+    "step": "Escalate refund questions to a person.",
+    "why": "General practice."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Test the bot on policy questions.",
+    "why": "Regression set."
+   },
+   {
+    "step": "Review conversations on money topics.",
+    "why": "Sampling."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Treat the bot as the company's voice.",
+    "why": "Tribunal's view."
+   },
+   {
+    "step": "Test for accuracy.",
+    "why": "Duty of care."
+   },
+   {
+    "step": "Label limits clearly.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "A chatbot's statements may bind the company. Legal and support should review the bot's scope."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Your support chatbot tells customers about refunds. A customer shows a screenshot that contradicts your policy page.",
+   "clues": [
+    "Bot said 90 days",
+    "Policy says no retroactive",
+    "Customer relied on it"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "What do you honour?",
+    "What do you fix?",
+    "How do you test?"
+   ],
+   "answer": "Honour the stated commitment where reasonable, correct the bot, add a policy test set and route money questions to a person."
+  },
+  "rootcause": {
+   "q": "What did the tribunal order?",
+   "options": [
+    "A partial refund of C$650.88 plus interest and fees",
+    "Nothing",
+    "A fine of C$1 million",
+    "A new chatbot"
+   ],
+   "answer": 0,
+   "why": "Per the summary."
+  },
+  "remediation": [
+   {
+    "task": "Write a policy test set.",
+    "answer": "Questions with expected answers."
+   },
+   {
+    "task": "Define escalation triggers.",
+    "answer": "Refunds, legal, safety."
+   },
+   {
+    "task": "Plan review sampling.",
+    "answer": "Review a sample daily."
+   }
+  ],
+  "design": {
+   "prompt": "Design a customer chatbot for a regulated service.",
+   "constraints": [
+    "Policies change",
+    "Money decisions",
+    "Legal exposure"
+   ],
+   "answer": "Retrieval grounded in current policy, citations, guardrails, handoffs, logging and review."
+  },
+  "checks": [
+   {
+    "q": "What did the airline argue about the chatbot?",
+    "options": [
+     "That it was a separate legal entity",
+     "That it was perfect",
+     "That it was a person",
+     "Nothing"
+    ],
+    "answer": 0,
+    "why": "Per the summary."
+   },
+   {
+    "q": "Within how many days did the chatbot say to claim?",
+    "options": [
+     "90",
+     "30",
+     "7",
+     "365"
+    ],
+    "answer": 0,
+    "why": "Per the summary."
+   },
+   {
+    "q": "What did the tribunal find?",
+    "options": [
+     "Negligent misrepresentation",
+     "Fraud",
+     "Breach of data law",
+     "Nothing"
+    ],
+    "answer": 0,
+    "why": "Per the summary."
+   },
+   {
+    "q": "Is the tribunal case name given in the summary?",
+    "options": [
+     "Moffatt v. Air Canada, 2024 BCCRT 149",
+     "Smith v. Air Canada",
+     "None",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the summary."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Grounded answers",
+   "Human handoff"
+  ],
+  "monitoring": [
+   "Conversation review"
+  ],
+  "recovery": [
+   "Honour the commitment"
+  ],
+  "practices": [
+   "Policy test sets",
+   "Legal review of bot scope"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Manatt: AI Gone Wild: Airline Has to Honor a Refund Policy Its Chatbot Fabricated",
+   "url": "https://manatt.com/insights/newsletters/advertising-law/ai-gone-wild-airline-has-to-honor-a-refund-policy",
+   "used": "facts, ruling, reasoning"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from a law firm summary. The Guardian article (the card source) was not read. Legal reasoning is as summarised, not from the decision itself."
+}

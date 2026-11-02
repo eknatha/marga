@@ -1,0 +1,376 @@
+{
+ "id": "codecov-bash-uploader",
+ "checked": "29 October 2026",
+ "summary": "From 31 January to 1 April 2021 an attacker periodically altered Codecov's Bash Uploader script so that it sent the environment variables of customers' CI runs to an outside server. A customer noticed a checksum mismatch and reported it on 1 April.",
+ "overview": {
+  "background": "Many CI pipelines download and run Codecov's Bash Uploader to send coverage reports. It runs inside the CI environment where secrets are available as environment variables.",
+  "systems": [
+   "Codecov Bash Uploader script",
+   "Codecov's Docker image creation process",
+   "A Google Cloud Storage key",
+   "Customers' CI environments"
+  ],
+  "impact": "Environment variables in CI, which may include credentials, tokens or keys, and repository remote information were sent out.",
+  "severity": "Serious supply chain compromise. There were 108 windows of time when the malicious uploader was in use.",
+  "gaps": "The page does not list how many customers were affected."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A modified script reads CI secrets",
+   "caption": "Per Codecov, an error in its Docker image creation process let the actor extract a credential and alter the script. The injected line sent the environment to an external IP.",
+   "nodes": [
+    {
+     "id": "err",
+     "label": "Error in Docker image creation exposes a key",
+     "row": 0,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "mod",
+     "label": "Bash Uploader altered",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "ci",
+     "label": "Customers' CI runs the script",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "out",
+     "label": "Environment variables sent to external servers",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "err",
+     "t": "mod",
+     "state": "fail"
+    },
+    {
+     "f": "mod",
+     "t": "ci",
+     "state": "fail"
+    },
+    {
+     "f": "ci",
+     "t": "out",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Verified scripts and short-lived secrets (conceptual)",
+   "caption": "Controls for downloaded CI tools. Codecov also rotated credentials and added monitoring.",
+   "nodes": [
+    {
+     "id": "pin",
+     "label": "Pin and checksum downloaded tools",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "eph",
+     "label": "Short-lived, scoped CI credentials",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "egr",
+     "label": "Egress limits on CI runners",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "mon",
+     "label": "Monitoring of tool integrity",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "pin",
+     "t": "eph",
+     "state": "new"
+    },
+    {
+     "f": "pin",
+     "t": "egr",
+     "state": "new"
+    },
+    {
+     "f": "eph",
+     "t": "mon",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Downloaded scripts are verified.",
+  "CI secrets expire quickly.",
+  "CI cannot send data anywhere."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "31 Jan 2021",
+   "phase": "trigger",
+   "e": "Periodic unauthorised alterations of the Bash Uploader begin."
+  },
+  {
+   "t": "Feb to Mar 2021",
+   "phase": "impact",
+   "e": "The malicious script runs in customers' CI jobs in 108 windows."
+  },
+  {
+   "t": "1 Apr 2021 (morning)",
+   "phase": "detect",
+   "e": "A customer notices the shasum does not match and reports it."
+  },
+  {
+   "t": "1 Apr 2021",
+   "phase": "mitigate",
+   "e": "Codecov secures and remediates the script."
+  },
+  {
+   "t": "15 Apr 2021",
+   "phase": "change",
+   "e": "Codecov emails affected users and posts the update."
+  },
+  {
+   "t": "29 Apr 2021",
+   "phase": "recover",
+   "e": "Codecov publishes more detail on exposed variables and customers re-roll credentials."
+  }
+ ],
+ "rootCause": {
+  "trigger": "An attacker obtained a credential through an error in Codecov's Docker image creation process.",
+  "underlying": "The attacker used it to alter the Bash Uploader.",
+  "contributing": [
+   "Customers ran the script without checksum checks",
+   "CI secrets were present in the environment",
+   "Outbound traffic from CI was not restricted"
+  ],
+  "propagation": [
+   "Credential exposed.",
+   "Script altered.",
+   "CI runs it.",
+   "Secrets exfiltrated."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The unauthorised alteration",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "beginning January 31, 2021, there were periodic, unauthorized alterations of our Bash Uploader script",
+   "note": "From Codecov's page."
+  },
+  {
+   "label": "The advice",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "we would suggest you re-roll all of your credentials, tokens, or keys located in the environment variables in your CI process",
+   "note": "From the same page."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Run env in a CI job to list exposed secrets.",
+    "why": "Codecov's suggestion."
+   },
+   {
+    "step": "Check any stored copy of the uploader for the injected line.",
+    "why": "Codecov's suggestion."
+   },
+   {
+    "step": "Compare the script's checksum with the published one.",
+    "why": "How it was found."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Re-roll all credentials in CI environments.",
+    "why": "Codecov's advice."
+   },
+   {
+    "step": "Replace the script with the current version.",
+    "why": "Codecov's advice."
+   },
+   {
+    "step": "Audit use of exposed tokens.",
+    "why": "Codecov's advice."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check logs for use of exposed tokens.",
+    "why": "Audit."
+   },
+   {
+    "step": "Check CI no longer contacts unknown IPs.",
+    "why": "Egress monitoring."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Verify the checksum before running downloaded scripts.",
+    "why": "How the customer found it."
+   },
+   {
+    "step": "Limit CI secrets.",
+    "why": "General practice."
+   },
+   {
+    "step": "Restrict CI egress.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Rotating secrets can break pipelines. Rotate in a planned order."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A coverage tool your CI downloads may have been altered. Your CI jobs hold deploy keys in environment variables.",
+   "clues": [
+    "Script downloaded each run",
+    "No checksum",
+    "Broad egress"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "How do you find exposure?",
+    "What do you rotate?",
+    "How do you prevent a repeat?"
+   ],
+   "answer": "List secrets in CI, rotate them, audit their use, pin and verify downloaded tools, and restrict egress."
+  },
+  "rootcause": {
+   "q": "How was the problem found?",
+   "options": [
+    "A customer saw a shasum mismatch",
+    "A scanner",
+    "A regulator",
+    "By accident in logs"
+   ],
+   "answer": 0,
+   "why": "Per Codecov."
+  },
+  "remediation": [
+   {
+    "task": "Write a CI secret inventory.",
+    "answer": "Every variable and its scope."
+   },
+   {
+    "task": "Plan tool verification.",
+    "answer": "Pin versions and verify hashes."
+   },
+   {
+    "task": "Plan egress rules.",
+    "answer": "Allow only needed hosts."
+   }
+  ],
+  "design": {
+   "prompt": "Design CI that cannot leak secrets through a tool.",
+   "constraints": [
+    "Many third-party tools",
+    "Cloud deploy keys",
+    "Compliance"
+   ],
+   "answer": "OIDC short-lived credentials, isolated steps, egress allowlist and verified tools."
+  },
+  "checks": [
+   {
+    "q": "When did the alterations begin?",
+    "options": [
+     "31 January 2021",
+     "1 April 2021",
+     "15 April 2021",
+     "29 April 2021"
+    ],
+    "answer": 0,
+    "why": "Per Codecov."
+   },
+   {
+    "q": "How many windows had the malicious script in use?",
+    "options": [
+     "108",
+     "2",
+     "1000",
+     "0"
+    ],
+    "answer": 0,
+    "why": "Per Codecov."
+   },
+   {
+    "q": "What data did the line send?",
+    "options": [
+     "Environment variables and repository remote information",
+     "Source code",
+     "Photos",
+     "Only logs"
+    ],
+    "answer": 0,
+    "why": "Per Codecov."
+   },
+   {
+    "q": "Did checksum comparison help?",
+    "options": [
+     "Yes, it may mean you were not affected",
+     "No",
+     "Never",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per Codecov."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Checksum verification",
+   "Short-lived secrets",
+   "Egress allowlists"
+  ],
+  "monitoring": [
+   "Tool integrity checks"
+  ],
+  "recovery": [
+   "Re-roll credentials"
+  ],
+  "practices": [
+   "Limit CI secrets",
+   "Audit token use"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Codecov: Bash Uploader Security Update",
+   "url": "https://about.codecov.io/security-update/",
+   "used": "dates, mechanism, data, response"
+  }
+ ],
+ "verification": "Facts were read from Codecov's page on 29 October 2026. Indicator IP addresses are on the page and not copied."
+}

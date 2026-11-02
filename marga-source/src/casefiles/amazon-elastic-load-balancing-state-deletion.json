@@ -1,0 +1,413 @@
+{
+ "id": "amazon-elastic-load-balancing-state-deletion",
+ "checked": "29 October 2026",
+ "summary": "On 24 December 2012 a developer ran a maintenance process against production ELB state data. Part of the state was deleted, and for about 20 hours some load balancers misbehaved or could not be changed.",
+ "overview": {
+  "background": "Amazon ELB keeps configuration state for each load balancer. A control plane reads that state to create, scale and modify load balancers.",
+  "systems": [
+   "ELB state data in US-East",
+   "ELB control plane and APIs",
+   "A fraction of customer load balancers"
+  ],
+  "impact": "At peak 6.8 percent of running load balancers were impacted. The rest could not be scaled or modified but kept working. Request handling was not initially affected.",
+  "severity": "Customer-visible on Christmas Eve. AWS gives no formal severity.",
+  "gaps": "The post does not name the process or the developer."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Maintenance process hits production state",
+   "caption": "A maintenance process was run against production data by mistake, deleting part of the ELB state that the control plane relies on.",
+   "nodes": [
+    {
+     "id": "dev",
+     "label": "Developer with persistent access",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "proc",
+     "label": "Maintenance process run on production",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "state",
+     "label": "ELB state data partly deleted",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "cp",
+     "label": "ELB control plane errors",
+     "row": 3,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "lb",
+     "label": "6.8 percent of load balancers misconfigured after changes",
+     "row": 3,
+     "col": 2,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "dev",
+     "t": "proc",
+     "label": "wrong environment"
+    },
+    {
+     "f": "proc",
+     "t": "state",
+     "label": "logical deletion",
+     "state": "fail"
+    },
+    {
+     "f": "state",
+     "t": "cp",
+     "label": "missing state",
+     "state": "fail"
+    },
+    {
+     "f": "cp",
+     "t": "lb",
+     "label": "bad changes",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Approval and self-healing (conceptual)",
+   "caption": "AWS required per-incident approval for production access and planned a control plane that reconciles state automatically. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "dev",
+     "label": "Access only with change approval",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "state",
+     "label": "Production state data",
+     "row": 1,
+     "col": 1
+    },
+    {
+     "id": "snap",
+     "label": "Fast restore from snapshot",
+     "row": 2,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "rec",
+     "label": "Control plane reconciles state with live load balancers",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "dev",
+     "t": "state",
+     "label": "approved",
+     "state": "new"
+    },
+    {
+     "f": "state",
+     "t": "snap",
+     "state": "new"
+    },
+    {
+     "f": "state",
+     "t": "rec",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Persistent production access is removed.",
+  "A bad deletion can be repaired automatically.",
+  "Recovery is much faster."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "24 Dec 12:24 PM PST",
+   "phase": "trigger",
+   "e": "A portion of the ELB state data is logically deleted."
+  },
+  {
+   "t": "Following hours",
+   "phase": "investigate",
+   "e": "Teams investigate API errors and latency. Some customers see problems after changing load balancers."
+  },
+  {
+   "t": "5:02 PM",
+   "phase": "mitigate",
+   "e": "Several control plane workflows, including scaling, are disabled."
+  },
+  {
+   "t": "24 Dec night",
+   "phase": "mitigate",
+   "e": "Some affected load balancers are recovered manually."
+  },
+  {
+   "t": "25 Dec 2:45 AM",
+   "phase": "mitigate",
+   "e": "A snapshot of the state from just before the deletion is restored."
+  },
+  {
+   "t": "5:40 AM",
+   "phase": "recover",
+   "e": "The data merge is completed and verified."
+  },
+  {
+   "t": "8:15 AM",
+   "phase": "recover",
+   "e": "Most APIs and workflows are re-enabled."
+  },
+  {
+   "t": "10:30 AM",
+   "phase": "recover",
+   "e": "Almost all affected load balancers are restored."
+  },
+  {
+   "t": "12:05 PM",
+   "phase": "recover",
+   "e": "AWS states the service is operating normally."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A maintenance process was run against production ELB state data by mistake.",
+  "underlying": "A developer had persistent access to production that should have needed approval each time, and the deletion was not noticed at once.",
+  "contributing": [
+   "Access was persistent instead of per incident",
+   "The control plane could not rebuild missing state by itself",
+   "Recovery from snapshot took a long time"
+  ],
+  "propagation": [
+   "State is deleted.",
+   "The control plane lacks data.",
+   "Modified load balancers are misconfigured.",
+   "Customer applications show errors."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "What deleted the data",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "The data was deleted by a maintenance process that was inadvertently run against the production ELB state data.",
+   "note": "From AWS's summary."
+  },
+  {
+   "label": "The recovery claim",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "We are confident that we could recover ELB state data in a similar event significantly faster",
+   "note": "From AWS's summary."
+  },
+  {
+   "label": "A simulated guard",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ ./maint.sh --env prod\nREFUSED: production access needs an approved change id (use --change CM-1234)",
+   "note": "Shows a tool that refuses production without approval. Invented."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "List what changed in the state store and when.",
+    "why": "The first deletion time anchors the investigation."
+   },
+   {
+    "step": "Compare control plane state with live load balancers.",
+    "why": "Gaps show which are at risk."
+   },
+   {
+    "step": "Check who has production access and how.",
+    "why": "Persistent access was the process gap."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Disable workflows that act on incomplete state.",
+    "why": "AWS disabled scaling and similar workflows."
+   },
+   {
+    "step": "Restore a snapshot taken just before the deletion and merge it.",
+    "why": "AWS did this and verified the merge."
+   },
+   {
+    "step": "Recover important load balancers by hand while waiting.",
+    "why": "AWS did this overnight."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check the merged data against live load balancers.",
+    "why": "AWS verified the merge before enabling workflows."
+   },
+   {
+    "step": "Re-enable workflows in steps.",
+    "why": "Most were re-enabled at 8:15 AM."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Require approval per production access.",
+    "why": "AWS made access need change approval."
+   },
+   {
+    "step": "Practise restores.",
+    "why": "AWS cut the recovery time."
+   },
+   {
+    "step": "Make control planes reconcile with reality.",
+    "why": "It lets the service heal from logical data loss."
+   }
+  ],
+  "safety": "Restoring a snapshot overwrites newer changes. Merge carefully and verify before re-enabling workflows."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A maintenance script deleted part of a configuration store. Load balancers that change are now misconfigured.",
+   "clues": [
+    "Existing traffic works",
+    "Change APIs error",
+    "Recent snapshot exists"
+   ],
+   "question": "What is your recovery plan?",
+   "hints": [
+    "What do you stop first?",
+    "What restores state?",
+    "How do you check the merge?"
+   ],
+   "answer": "Stop workflows that write using the missing state, restore the latest snapshot into a side copy, merge with changes since, verify against live objects, then re-enable in order."
+  },
+  "rootcause": {
+   "q": "How was production access set up?",
+   "options": [
+    "Persistent instead of per-access approval",
+    "Never granted",
+    "Only for managers",
+    "Read only"
+   ],
+   "answer": 0,
+   "why": "AWS identified persistent access as the incorrect configuration."
+  },
+  "remediation": [
+   {
+    "task": "Design an approval flow.",
+    "answer": "Time-limited access tied to a change ticket, logged and reviewed."
+   },
+   {
+    "task": "Write a restore drill.",
+    "answer": "Quarterly, restore the state store to a test copy and time it."
+   },
+   {
+    "task": "Add reconciliation.",
+    "answer": "A job compares desired state to actual load balancers and fixes drift."
+   }
+  ],
+  "design": {
+   "prompt": "Design a control plane that can recover from deleted configuration.",
+   "constraints": [
+    "Millions of objects",
+    "Live traffic",
+    "Human error expected"
+   ],
+   "answer": "Keep versioned backups, soft delete, a reconciliation loop, approval for production access and a tested restore path."
+  },
+  "checks": [
+   {
+    "q": "When was the data deleted?",
+    "options": [
+     "12:24 PM PST on 24 December",
+     "Midnight",
+     "5 PM",
+     "25 December"
+    ],
+    "answer": 0,
+    "why": "AWS lists 12:24 PM."
+   },
+   {
+    "q": "What share of load balancers peaked impacted?",
+    "options": [
+     "6.8 percent",
+     "50 percent",
+     "All",
+     "0.1 percent"
+    ],
+    "answer": 0,
+    "why": "AWS says 6.8 percent."
+   },
+   {
+    "q": "What was restored?",
+    "options": [
+     "A snapshot of the state from just before deletion",
+     "The whole region",
+     "The traffic",
+     "Customer data"
+    ],
+    "answer": 0,
+    "why": "AWS restored a snapshot and merged data."
+   },
+   {
+    "q": "What new rule applies?",
+    "options": [
+     "Production state access needs per-incident approval",
+     "No one may access it",
+     "Anyone may access it",
+     "Access is by shared password"
+    ],
+    "answer": 0,
+    "why": "That is AWS's stated change."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Per-incident approval for production data",
+   "Soft delete and versioned backups",
+   "Reconciling control planes"
+  ],
+  "monitoring": [
+   "Audit of production access",
+   "Drift between state and live objects"
+  ],
+  "recovery": [
+   "Disable workflows on bad state",
+   "Restore and verify before re-enabling"
+  ],
+  "practices": [
+   "Practise restores",
+   "Treat maintenance scripts as production changes"
+  ]
+ },
+ "sources": [
+  {
+   "title": "AWS: Summary of the December 24, 2012 Amazon ELB Service Event in the US-East Region",
+   "url": "https://aws.amazon.com/message/680587/",
+   "used": "timeline, cause, impact, corrective actions"
+  }
+ ],
+ "verification": "Facts were read from AWS's summary on 29 October 2026. No logs are published, so the guard example is Simulated."
+}

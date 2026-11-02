@@ -1,0 +1,381 @@
+{
+ "id": "okta-support-system-breach",
+ "checked": "29 October 2026",
+ "summary": "Between 28 September and 17 October 2023 an attacker used a service account credential to access Okta's customer support system and download files, including HAR files with session tokens. 134 customers had files accessed and 5 had sessions hijacked.",
+ "overview": {
+  "background": "Okta's support system holds customer support cases and attached files. HAR files record browser traffic and can contain session tokens.",
+  "systems": [
+   "Customer support case management system",
+   "A service account with view and update permissions",
+   "HAR files attached to cases",
+   "An employee's Okta-managed laptop and personal Google account"
+  ],
+  "impact": "134 customers (less than 1 percent) had files accessed. The attacker used tokens to hijack sessions at 5 customers, and Cloudflare was the fifth.",
+  "severity": "Significant for a security vendor. Access lasted from 28 September to 17 October 2023.",
+  "gaps": "Okta says the likely exposure was a personal account or device compromise; it did not prove the exact path."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A saved credential opens the support system",
+   "caption": "Per Okta, the service account's username and password were saved in an employee's personal Google account via Chrome sign-in on an Okta-managed laptop.",
+   "nodes": [
+    {
+     "id": "pw",
+     "label": "Service account credential saved in personal profile",
+     "row": 0,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "sys",
+     "label": "Support case system accessed",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "har",
+     "label": "HAR files with session tokens downloaded",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "hij",
+     "label": "Sessions hijacked at 5 customers",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "pw",
+     "t": "sys",
+     "state": "fail"
+    },
+    {
+     "f": "sys",
+     "t": "har",
+     "state": "fail"
+    },
+    {
+     "f": "har",
+     "t": "hij",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Remediation Okta described (as a picture)",
+   "caption": "Block personal profiles, add detection and bind tokens to network location.",
+   "nodes": [
+    {
+     "id": "blk",
+     "label": "Personal Google profiles blocked in Chrome on managed laptops",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "det",
+     "label": "Detection rules for the support system",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "bind",
+     "label": "Token binding to network location",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "rev",
+     "label": "Tokens in files revoked",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "blk",
+     "t": "det",
+     "state": "new"
+    },
+    {
+     "f": "blk",
+     "t": "bind",
+     "state": "new"
+    },
+    {
+     "f": "det",
+     "t": "rev",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Service credentials are not in personal profiles.",
+  "File downloads are logged consistently.",
+  "Stolen tokens are not usable elsewhere."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "28 Sep 2023",
+   "phase": "trigger",
+   "e": "Unauthorized access begins."
+  },
+  {
+   "t": "29 Sep",
+   "phase": "detect",
+   "e": "1Password reports suspicious activity."
+  },
+  {
+   "t": "2 Oct",
+   "phase": "detect",
+   "e": "BeyondTrust reports suspicious activity."
+  },
+  {
+   "t": "13 Oct",
+   "phase": "investigate",
+   "e": "BeyondTrust provides a suspicious IP; Okta traces to the service account by 16 Oct."
+  },
+  {
+   "t": "17 Oct",
+   "phase": "mitigate",
+   "e": "Okta disables the service account."
+  },
+  {
+   "t": "19 Oct",
+   "phase": "change",
+   "e": "Okta notifies customers."
+  },
+  {
+   "t": "3 Nov",
+   "phase": "recover",
+   "e": "Okta publishes root cause and remediation, and revokes tokens in the affected HAR files."
+  }
+ ],
+ "rootCause": {
+  "trigger": "An attacker obtained a service account credential saved in a personal Google account.",
+  "underlying": "The account could view and update customer support cases.",
+  "contributing": [
+   "File downloads from the Files tab produced a different log event that was not flagged",
+   "A log gap hid the final hours",
+   "HAR files with live session tokens were attached to cases"
+  ],
+  "propagation": [
+   "Credential exposed.",
+   "Support system accessed.",
+   "Files downloaded.",
+   "Sessions hijacked."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The exposure path",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "The username and password of the service account had been saved into the employee's personal Google account.",
+   "note": "From Okta's root cause report."
+  },
+  {
+   "label": "Token risk",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "contained session tokens which could in turn be used for session hijacking attacks",
+   "note": "From the same report."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Trace suspicious IPs to accounts.",
+    "why": "Okta found the service account."
+   },
+   {
+    "step": "Check logs for all download paths.",
+    "why": "Different events for each path."
+   },
+   {
+    "step": "Check for log gaps.",
+    "why": "Found 18 Oct."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Disable the account.",
+    "why": "17 Oct."
+   },
+   {
+    "step": "Revoke tokens in exposed files.",
+    "why": "Done."
+   },
+   {
+    "step": "Notify customers.",
+    "why": "19 Oct."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check no further access from the actor.",
+    "why": "Monitor."
+   },
+   {
+    "step": "Check detection rules work.",
+    "why": "Test."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Block personal profiles on managed devices.",
+    "why": "Okta's change."
+   },
+   {
+    "step": "Bind session tokens to network location.",
+    "why": "Okta's feature."
+   },
+   {
+    "step": "Do not attach HAR files with live tokens.",
+    "why": "General practice; sanitise them."
+   }
+  ],
+  "safety": "Revoking tokens will sign users out. Communicate first."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A customer reports suspicious sessions that trace back to a support case upload. Your logs show no downloads.",
+   "clues": [
+    "Files tab used",
+    "Different log event",
+    "Service account"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "How do you find the access?",
+    "What do you revoke?",
+    "How do you prevent it?"
+   ],
+   "answer": "Search all download event types, disable the account, revoke tokens in exposed files, notify customers and fix logging."
+  },
+  "rootcause": {
+   "q": "How many customers had files accessed?",
+   "options": [
+    "134",
+    "5",
+    "1000",
+    "1"
+   ],
+   "answer": 0,
+   "why": "Per Okta."
+  },
+  "remediation": [
+   {
+    "task": "Define HAR hygiene.",
+    "answer": "Sanitise tokens before upload."
+   },
+   {
+    "task": "Define log coverage.",
+    "answer": "Alert on every file access path."
+   },
+   {
+    "task": "Plan service account policy.",
+    "answer": "Vault storage, short lived."
+   }
+  ],
+  "design": {
+   "prompt": "Design a support portal that avoids token leakage.",
+   "constraints": [
+    "Customer files",
+    "Third-party reports",
+    "Service accounts"
+   ],
+   "answer": "Sanitisation on upload, scoped service accounts, complete logging and session binding."
+  },
+  "checks": [
+   {
+    "q": "When was the account disabled?",
+    "options": [
+     "17 October 2023",
+     "28 September",
+     "3 November",
+     "1 January"
+    ],
+    "answer": 0,
+    "why": "Per Okta."
+   },
+   {
+    "q": "How many customers had sessions hijacked?",
+    "options": [
+     "5",
+     "134",
+     "0",
+     "50"
+    ],
+    "answer": 0,
+    "why": "Per Okta."
+   },
+   {
+    "q": "Who reported suspicious activity on 29 September?",
+    "options": [
+     "1Password",
+     "BeyondTrust",
+     "Cloudflare",
+     "A regulator"
+    ],
+    "answer": 0,
+    "why": "Per Okta."
+   },
+   {
+    "q": "What did Okta block on managed laptops?",
+    "options": [
+     "Personal Google profiles in Chrome",
+     "All browsers",
+     "Email",
+     "VPN"
+    ],
+    "answer": 0,
+    "why": "Per Okta."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Vaulted service accounts",
+   "Token binding"
+  ],
+  "monitoring": [
+   "Complete download logging"
+  ],
+  "recovery": [
+   "Disable account",
+   "Revoke tokens"
+  ],
+  "practices": [
+   "Block personal profiles",
+   "Sanitise HAR files"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Okta: Unauthorized Access to Okta's Support Case Management System: Root Cause and Remediation",
+   "url": "https://sec.okta.com/articles/2023/11/unauthorized-access-oktas-support-case-management-system-root-cause/",
+   "used": "dates, path, impact, remediation"
+  }
+ ],
+ "verification": "Facts were read from Okta's report on 29 October 2026. Okta says the exposure path was likely, not proven, and this file keeps that wording."
+}

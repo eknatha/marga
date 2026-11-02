@@ -1,0 +1,428 @@
+{
+ "id": "google-cloud-authentication-quota-outage",
+ "checked": "29 October 2026",
+ "summary": "On 14 December 2020 an automated quota system cut the quota of Google's User ID Service to zero because an old system reported its usage as zero. Authentication failed for almost every Google service for about 50 minutes.",
+ "overview": {
+  "background": "Google's User ID Service stores account identifiers and credentials used for OAuth tokens and cookies. It was being moved to a new quota management system.",
+  "systems": [
+   "User ID Service and its account database",
+   "Google Cloud Console, BigQuery, Cloud Storage",
+   "GKE, networking control plane, Cloud Monitoring",
+   "Google Workspace (Gmail, Calendar, Docs)",
+   "Cloud Support tooling"
+  ],
+  "impact": "From 03:46 to 04:33 PST credential issuance and account lookups failed for all Google user accounts, and nearly all authenticated traffic returned 5xx errors. BigQuery streaming saw about 75 percent errors and Cloud Storage about 15 percent of authenticated requests failed.",
+  "severity": "A global authentication outage of about 47 to 50 minutes. Google does not give a formal severity.",
+  "gaps": "The page's own times differ slightly (header 04:07 to 06:23, summary 47 minutes, preliminary 50 minutes)."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A quota of zero blocks the account database",
+   "caption": "The User ID Service was registered with a new quota system, but an old system kept reporting its usage as zero. When the grace period ended, the automated system cut its quota.",
+   "nodes": [
+    {
+     "id": "old",
+     "label": "Old quota system reports usage 0",
+     "row": 0,
+     "col": 0
+    },
+    {
+     "id": "new",
+     "label": "New quota system enforces after grace period",
+     "row": 0,
+     "col": 2
+    },
+    {
+     "id": "uid",
+     "label": "User ID Service quota reduced",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "db",
+     "label": "Account database: Paxos leader cannot write, reads go stale",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "auth",
+     "label": "Authentication lookups fail",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "svc",
+     "label": "Gmail, Cloud Console, BigQuery, GKE, Storage",
+     "row": 4,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "old",
+     "t": "new",
+     "label": "usage 0"
+    },
+    {
+     "f": "new",
+     "t": "uid",
+     "label": "quota cut",
+     "state": "fail"
+    },
+    {
+     "f": "uid",
+     "t": "db",
+     "label": "writes blocked",
+     "state": "fail"
+    },
+    {
+     "f": "db",
+     "t": "auth",
+     "label": "outdated data rejected",
+     "state": "fail"
+    },
+    {
+     "f": "auth",
+     "t": "svc",
+     "label": "5xx errors",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Safer quota automation (conceptual)",
+   "caption": "Google planned to review quota automation to stop fast global changes and to improve resilience of the account database writes. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "chk",
+     "label": "Check for zero reported load on a critical service",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "roll",
+     "label": "Staged quota change, not global at once",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "uid",
+     "label": "User ID Service with write-failure resilience",
+     "row": 2,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "stat",
+     "label": "External status tooling on its own path",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "chk",
+     "t": "roll",
+     "state": "new"
+    },
+    {
+     "f": "roll",
+     "t": "uid",
+     "state": "new"
+    },
+    {
+     "f": "roll",
+     "t": "stat",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "A zero reading triggers a human check, not a quota cut.",
+  "Changes roll out in stages.",
+  "Reads and writes survive short quota faults."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "October",
+   "phase": "change",
+   "e": "The User ID Service is registered with the new quota system. Parts of the old system keep reporting usage as 0."
+  },
+  {
+   "t": "03:43 PST, 14 Dec",
+   "phase": "detect",
+   "e": "Automated capacity alerts fire."
+  },
+  {
+   "t": "03:46",
+   "phase": "trigger",
+   "e": "User ID Service errors begin."
+  },
+  {
+   "t": "03:48",
+   "phase": "detect",
+   "e": "Google engineers are paged."
+  },
+  {
+   "t": "04:08",
+   "phase": "investigate",
+   "e": "The root cause and a potential fix are identified."
+  },
+  {
+   "t": "04:22",
+   "phase": "mitigate",
+   "e": "Quota enforcement is disabled in one datacenter."
+  },
+  {
+   "t": "04:27",
+   "phase": "mitigate",
+   "e": "The same mitigation is applied to all datacenters."
+  },
+  {
+   "t": "04:33",
+   "phase": "recover",
+   "e": "Error rates return to normal."
+  },
+  {
+   "t": "05:00",
+   "phase": "recover",
+   "e": "Most Google Workspace services are fully recovered."
+  },
+  {
+   "t": "05:21",
+   "phase": "recover",
+   "e": "The networking control plane is fully recovered."
+  }
+ ],
+ "rootCause": {
+  "trigger": "The grace period on quota enforcement ended and the automated system reduced the User ID Service's quota.",
+  "underlying": "The old system still reported that service's usage as 0, and the quota for the account database fell so the Paxos leader could not write. Reads became outdated and the service rejects requests with outdated data.",
+  "contributing": [
+   "Safety checks did not cover zero load reported for a single service",
+   "The quota change applied globally and quickly",
+   "Internal support tooling was also affected, delaying updates"
+  ],
+  "propagation": [
+   "Quota is cut.",
+   "The database cannot write.",
+   "Authentication lookups fail.",
+   "Every authenticated service returns errors."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The security design",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "For security reasons, this service will reject requests when it detects outdated data.",
+   "note": "From Google's incident report."
+  },
+  {
+   "label": "What kept working",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Cloud Service accounts used by GCP workloads were not impacted and continued to function.",
+   "note": "From Google's incident report."
+  },
+  {
+   "label": "A simulated safety check",
+   "kind": "simulated",
+   "lang": "python",
+   "body": "if reported_usage == 0 and historical_usage > 0:\n    raise NeedsHumanReview('zero usage on a service with traffic')",
+   "note": "A teaching example of the missing check. Not Google code."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check which dependency failed first.",
+    "why": "Authentication was the shared dependency."
+   },
+   {
+    "step": "Compare reported usage against real traffic for critical services.",
+    "why": "A zero against real traffic is the clue."
+   },
+   {
+    "step": "Look at quota changes and grace periods.",
+    "why": "A grace period expiry matched the start time."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Disable quota enforcement for the affected service.",
+    "why": "Google disabled enforcement at 04:22 in one datacenter, then everywhere."
+   },
+   {
+    "step": "Use an alternative channel for updates.",
+    "why": "Google's own tooling was affected."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Watch error rates return to normal.",
+    "why": "Errors ended at 04:33."
+   },
+   {
+    "step": "Check downstream systems.",
+    "why": "Workspace, networking and Calendar recovered later."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Review quota automation to prevent fast global changes.",
+    "why": "Google's stated action."
+   },
+   {
+    "step": "Alert on incorrect configurations.",
+    "why": "Google's stated action."
+   },
+   {
+    "step": "Make external communication reliable.",
+    "why": "Google's stated action."
+   }
+  ],
+  "safety": "Disabling quota enforcement removes a protection. Use a time limit and a plan to turn it back on."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Every login on your platform fails at 03:46. The identity database cannot write and the quota for it was cut an hour ago.",
+   "clues": [
+    "Quota automation ran last night",
+    "Another system reports zero usage",
+    "Engineers paged within two minutes"
+   ],
+   "question": "What do you do first and what permanent fix would you propose?",
+   "hints": [
+    "Is it security or capacity?",
+    "What can you turn off?",
+    "What check was missing?"
+   ],
+   "answer": "Disable quota enforcement for the identity service, confirm writes and reads recover, then add checks for zero reported usage and staged quota changes."
+  },
+  "rootcause": {
+   "q": "What caused the quota reduction?",
+   "options": [
+    "A grace period ended while the old system reported usage as zero",
+    "A bad certificate",
+    "A cable cut",
+    "A DDoS attack"
+   ],
+   "answer": 0,
+   "why": "Google explains the migration between quota systems."
+  },
+  "remediation": [
+   {
+    "task": "Write the guard.",
+    "answer": "Block automated quota cuts if reported usage is zero but traffic was above zero in the last day."
+   },
+   {
+    "task": "Design staged rollout.",
+    "answer": "Apply quota changes to one location first and bake before the rest."
+   },
+   {
+    "task": "Plan communications.",
+    "answer": "Keep a status channel independent of the affected identity system."
+   }
+  ],
+  "design": {
+   "prompt": "Design quota changes that cannot take down a core dependency.",
+   "constraints": [
+    "Global service",
+    "Two quota systems during migration",
+    "Security rules reject stale data"
+   ],
+   "answer": "Dual-read usage and compare, alert on mismatch, stage changes, keep floors for critical services and test the cutover."
+  },
+  "checks": [
+   {
+    "q": "How long did the main issue last?",
+    "options": [
+     "About 47 to 50 minutes",
+     "2 days",
+     "5 seconds",
+     "A week"
+    ],
+    "answer": 0,
+    "why": "Google's page gives 47 or 50 minutes."
+   },
+   {
+    "q": "What did Google disable?",
+    "options": [
+     "Quota enforcement",
+     "Authentication",
+     "Gmail",
+     "Logging"
+    ],
+    "answer": 0,
+    "why": "At 04:22 it disabled enforcement."
+   },
+   {
+    "q": "Why did the database reject requests?",
+    "options": [
+     "It detects outdated data and rejects requests for security",
+     "It was full",
+     "It had no network",
+     "It was shut down"
+    ],
+    "answer": 0,
+    "why": "That is Google's quoted design."
+   },
+   {
+    "q": "Which was not affected?",
+    "options": [
+     "Cloud service accounts used by GCP workloads",
+     "Gmail",
+     "Cloud Console login",
+     "Calendar"
+    ],
+    "answer": 0,
+    "why": "Google says those continued to function."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Check zero-usage readings",
+   "Stage global quota changes",
+   "Resilient writes in the identity database"
+  ],
+  "monitoring": [
+   "Authentication error rate",
+   "Quota changes"
+  ],
+  "recovery": [
+   "Disable enforcement",
+   "Use an independent status channel"
+  ],
+  "practices": [
+   "Test migrations between control systems",
+   "Do not let a single dependency block everything"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Google Cloud incident report 20013, 14 December 2020 (authentication)",
+   "url": "https://status.cloud.google.com/incident/zall/20013",
+   "used": "timeline, cause, impact, remediation"
+  }
+ ],
+ "verification": "Facts were read from Google's incident page on 29 October 2026. The page is internally inconsistent on some times, which is noted. The code example is Simulated."
+}

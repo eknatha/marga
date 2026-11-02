@@ -1,0 +1,500 @@
+{
+ "id": "cloudflare-bot-management-feature-file",
+ "checked": "29 October 2026",
+ "summary": "On 18 November 2025 a database permissions change made a query return duplicate rows. The bot-management feature file doubled in size, passed a hard limit in the core proxy, and the proxy crashed on every machine that loaded it.",
+ "overview": {
+  "background": "Cloudflare's Bot Management uses a feature file, regenerated every few minutes from a ClickHouse query and pushed to the network. The core proxy loads it into memory with a fixed limit of 200 features, against about 60 in normal use.",
+  "systems": [
+   "ClickHouse database that generates the feature file",
+   "Bot Management feature file distribution",
+   "Core proxy (HTTP and HTTPS traffic)",
+   "Workers KV and Access",
+   "Turnstile and the dashboard login",
+   "Email Security (small effects)"
+  ],
+  "impact": "Core CDN and security services returned HTTP 5xx errors. Turnstile failed to load. Workers KV had elevated 5xx errors. Most dashboard users could not log in because Turnstile was down on the login page. Access had widespread authentication failures until 13:05 UTC.",
+  "severity": "Global for core traffic. Cloudflare resolved the main impact at 14:30 UTC and all services at 17:06 UTC.",
+  "gaps": "The post does not publish the exact size of the bad file or the exact feature count at the crash beyond the limit of 200. The Rust code is shown as an image, so its text is not quoted here."
+ },
+ "archNote": "Components and the data path come from Cloudflare's post. The layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "From a database permission to a crashed proxy",
+   "caption": "A query that did not filter by database began returning rows for both the default database and the underlying tables, so the feature file contained duplicates and exceeded the proxy's limit.",
+   "nodes": [
+    {
+     "id": "perm",
+     "label": "11:05 UTC: ClickHouse permissions change",
+     "row": 0,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "q",
+     "label": "Feature query returns duplicate rows",
+     "row": 1,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "file",
+     "label": "Feature file grows past 200 features",
+     "row": 2,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "dist",
+     "label": "File pushed to the whole network",
+     "row": 3,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "proxy",
+     "label": "Core proxy panics on load",
+     "row": 3,
+     "col": 2,
+     "state": "fail"
+    },
+    {
+     "id": "kv",
+     "label": "Workers KV and Access",
+     "row": 2,
+     "col": 2,
+     "state": "hit"
+    },
+    {
+     "id": "ts",
+     "label": "Turnstile and dashboard login",
+     "row": 2,
+     "col": 3.2,
+     "state": "hit"
+    },
+    {
+     "id": "cdn",
+     "label": "Customer traffic: HTTP 5xx",
+     "row": 4,
+     "col": 2,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "perm",
+     "t": "q",
+     "state": "fail"
+    },
+    {
+     "f": "q",
+     "t": "file",
+     "state": "fail"
+    },
+    {
+     "f": "file",
+     "t": "dist",
+     "state": "fail"
+    },
+    {
+     "f": "dist",
+     "t": "proxy",
+     "label": "loads file",
+     "state": "fail"
+    },
+    {
+     "f": "proxy",
+     "t": "cdn",
+     "state": "fail"
+    },
+    {
+     "f": "proxy",
+     "t": "kv",
+     "label": "gateway fails",
+     "state": "fail"
+    },
+    {
+     "f": "proxy",
+     "t": "ts",
+     "state": "fail"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Treat generated config as untrusted input (conceptual)",
+   "caption": "Cloudflare said it would harden ingestion of its own generated files, add global kill switches and review failure modes in the core proxy. This sketch is our illustration of those ideas.",
+   "nodes": [
+    {
+     "id": "q",
+     "label": "Query with explicit database filter",
+     "row": 0,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "gate",
+     "label": "Validation gate: size, duplicates, schema",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "canary",
+     "label": "Canary machines load the file first",
+     "row": 2,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "fleet",
+     "label": "Network",
+     "row": 3,
+     "col": 0
+    },
+    {
+     "id": "last",
+     "label": "Last known good file kept on every machine",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "kill",
+     "label": "Kill switch for the feature",
+     "row": 3,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "q",
+     "t": "gate",
+     "state": "new"
+    },
+    {
+     "f": "gate",
+     "t": "canary",
+     "label": "pass",
+     "state": "new"
+    },
+    {
+     "f": "canary",
+     "t": "fleet",
+     "state": "new"
+    },
+    {
+     "f": "last",
+     "t": "fleet",
+     "label": "fallback on error",
+     "state": "new"
+    },
+    {
+     "f": "kill",
+     "t": "fleet",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "A file that is too large or has duplicate names is rejected before it ships.",
+  "A machine that cannot load a new file keeps running on the last known good one instead of crashing.",
+  "An operator can switch the feature off globally in seconds.",
+  "Failure of an optional module no longer takes down serving."
+ ],
+ "afterNote": "The central lesson: a file you generate yourself is still input, and a crash on bad input in a core path is an outage.",
+ "timelineNote": "All times are UTC on 18 November 2025 as given in the Cloudflare post.",
+ "timeline": [
+  {
+   "t": "11:05",
+   "phase": "trigger",
+   "e": "A database access-control change is deployed. Access to the underlying tables becomes explicit for users of the distributed tables."
+  },
+  {
+   "t": "11:20",
+   "phase": "impact",
+   "e": "The network begins failing to deliver core traffic."
+  },
+  {
+   "t": "11:28",
+   "phase": "impact",
+   "e": "Impact begins as the change reaches customer environments."
+  },
+  {
+   "t": "11:31 to 11:35",
+   "phase": "detect",
+   "e": "An automated test detects the issue, manual investigation starts and an incident call is created."
+  },
+  {
+   "t": "11:32 to 13:05",
+   "phase": "investigate",
+   "e": "The team first treats the problem as degraded Workers KV responses and tries traffic manipulation and account limiting."
+  },
+  {
+   "t": "13:05",
+   "phase": "mitigate",
+   "e": "Internal bypasses for Workers KV and Access reduce impact by falling back to a prior version of the core proxy."
+  },
+  {
+   "t": "13:37",
+   "phase": "investigate",
+   "e": "The team focuses on rolling back the Bot Management configuration file to a last known good version."
+  },
+  {
+   "t": "14:24",
+   "phase": "mitigate",
+   "e": "Creation and propagation of new Bot Management files is stopped."
+  },
+  {
+   "t": "14:30",
+   "phase": "recover",
+   "e": "A correct file is deployed globally and the main impact is resolved."
+  },
+  {
+   "t": "17:06",
+   "phase": "recover",
+   "e": "All services are resolved."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A permissions change on the ClickHouse cluster, deployed at 11:05 UTC, changed what a metadata query could see.",
+  "underlying": "The query that builds the feature file did not filter by database name. After the change it also returned columns from the underlying tables, so features appeared twice and the file grew past the proxy's limit of 200 features. The proxy treated that as an unrecoverable error and panicked.",
+  "contributing": [
+   "A past assumption that the query would only return columns from the default database",
+   "A hard limit in the proxy with an error path that panics",
+   "The file is regenerated and distributed every few minutes, so a bad file spreads quickly",
+   "The team first treated the problem as degraded Workers KV responses, which delayed finding the feature file",
+   "Several products depend on the core proxy"
+  ],
+  "propagation": [
+   "The permissions change alters the query result.",
+   "The generated feature file contains duplicates and exceeds 200 features.",
+   "Every machine that loads the file hits the limit and the proxy panics.",
+   "HTTP 5xx errors, failing Workers KV, Access and Turnstile follow, and the dashboard login fails because it relies on Turnstile."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The query that was missing a filter",
+   "kind": "quoted",
+   "lang": "sql",
+   "body": "SELECT\n  name,\n  type\nFROM system.columns\nWHERE\n  table = 'http_requests_features'\norder by name;",
+   "note": "From Cloudflare's post. Note that it does not filter by database name."
+  },
+  {
+   "label": "The crash message",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "thread fl2_worker_thread panicked: called Result::unwrap() on an Err value",
+   "note": "From the same post."
+  },
+  {
+   "label": "A simulated check for duplicates",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ jq -r '.features[].name' features.json | sort | uniq -d | head\nhttp_bot_score_v1\nhttp_ja3_hash\n$ jq '.features | length' features.json\n118",
+   "note": "Teaching example showing how to detect duplicates and size. The real file format and counts are not published."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Notice that errors started with a data change, not with traffic.",
+    "why": "Traffic looked normal. A change in generated data was the only thing that moved.",
+    "cmd": "config-pipeline history --service bot-features --since 3h"
+   },
+   {
+    "step": "Look at errors from the failing process.",
+    "why": "A panic message with a clear location is the fastest lead.",
+    "cmd": "journalctl -u core-proxy --since '-30min' | grep -i panic"
+   },
+   {
+    "step": "Diff the new generated file against the last known good one.",
+    "why": "A doubled file size and repeated names make the cause obvious.",
+    "cmd": "diff <(jq -r '.features[].name' good.json | sort) <(jq -r '.features[].name' bad.json | sort) | head"
+   }
+  ],
+  "correct": [
+   {
+    "step": "Stop generating and distributing new files.",
+    "why": "Every few minutes another bad file would keep re-breaking recovered machines.",
+    "cmd": "pipeline pause bot-features"
+   },
+   {
+    "step": "Put the last known good file into the distribution queue.",
+    "why": "Machines need a file they can load."
+   },
+   {
+    "step": "Restart the proxy on affected machines and restart services left in a bad state.",
+    "why": "Some processes stay broken after the data is fixed."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Watch 5xx rate, proxy restarts and login success until they are flat.",
+    "why": "Partial recovery is common after a global push."
+   },
+   {
+    "step": "Confirm the generating query returns each feature once.",
+    "why": "The data bug must be fixed, not only hidden by an older file.",
+    "cmd": "clickhouse-client -q \"SELECT name, count() c FROM system.columns WHERE database='default' AND table='http_requests_features' GROUP BY name HAVING c>1\""
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Always filter by database and table in metadata queries.",
+    "why": "Permission and schema changes alter what an unfiltered query sees."
+   },
+   {
+    "step": "Validate generated config before publishing: size, duplicates, schema.",
+    "why": "Treat files you generate like user input.",
+    "cmd": "test \"$(jq '.features | length' f.json)\" -le 200 && test -z \"$(jq -r '.features[].name' f.json | sort | uniq -d)\""
+   },
+   {
+    "step": "Keep a last known good file and fall back to it on any load error.",
+    "why": "A bad file should degrade the feature, not crash the proxy."
+   },
+   {
+    "step": "Roll generated files out to a canary first, with a global kill switch.",
+    "why": "You get a signal before the whole network has the file."
+   }
+  ],
+  "safety": "Pausing a pipeline and restarting processes in production can drop traffic. Do it in a defined order, one region at a time if you can, and tell the incident channel before each step."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "At 11:30 you see HTTP 5xx rates climbing globally. Request volume is flat. The error rate rises and falls in waves. Your Workers KV gateway is also failing, and the dashboard login is broken.",
+   "clues": [
+    "A database permissions change went out 25 minutes ago",
+    "The proxy logs a panic on loading a configuration file",
+    "The configuration file is much bigger than usual",
+    "A new file is generated every few minutes"
+   ],
+   "question": "What do you do, in order?",
+   "hints": [
+    "Why do the errors come in waves?",
+    "What stops new bad files from arriving?",
+    "Which file do machines need to recover?"
+   ],
+   "answer": "Stop generation and distribution of the file, because each new file can break machines again. Deploy a last known good file, restart the proxy and anything stuck, then fix the query and add validation before turning the pipeline back on. Use fallbacks for dependent products, such as bypassing the proxy for a gateway, while you recover."
+  },
+  "rootcause": {
+   "q": "What was the root cause?",
+   "options": [
+    "A DDoS attack",
+    "A permissions change made an unfiltered query return duplicate rows, producing an oversized feature file that crashed the proxy",
+    "A bad certificate",
+    "A DNS misconfiguration"
+   ],
+   "answer": 1,
+   "why": "Cloudflare states that the file doubled in size and exceeded the 200 feature limit, causing the proxy to panic."
+  },
+  "remediation": [
+   {
+    "task": "Rewrite the feature query so it cannot be affected by new table visibility.",
+    "answer": "Add an explicit database filter and a distinct on the feature name, and check the row count against an expected range in the pipeline."
+   },
+   {
+    "task": "Decide what the proxy should do when a feature file fails to load.",
+    "answer": "Log an error, report a metric, keep using the previous file, and continue serving traffic. Never panic on external input in a core serving path."
+   },
+   {
+    "task": "List the kill switches you would want for a feature like this.",
+    "answer": "One to stop file generation, one to freeze the file in use, one to disable the feature in the proxy, and one per customer-facing product that depends on it."
+   }
+  ],
+  "design": {
+   "prompt": "Design the delivery of a machine-learning feature file to a global proxy fleet so a bad file cannot cause an outage.",
+   "constraints": [
+    "New files every few minutes",
+    "Proxy must never crash on a bad file",
+    "Operators must be able to roll back in under a minute"
+   ],
+   "answer": "Build the file in a pipeline with schema, size and duplicate checks. Sign it and publish it to a canary slice, wait for health signals, then fan out. On each machine, load it into a separate structure and swap it in only if it validates. Keep the previous file for rollback, expose a kill switch and a pinned version, and alert when machines fall back."
+  },
+  "checks": [
+   {
+    "q": "What was the limit that the oversized file passed?",
+    "options": [
+     "60 features",
+     "200 features",
+     "1000 features",
+     "10 features"
+    ],
+    "answer": 1,
+    "why": "The proxy preallocates memory for 200 features, against about 60 normally in use."
+   },
+   {
+    "q": "What made the generated file grow?",
+    "options": [
+     "More customers",
+     "A query without a database filter returned extra rows after a permissions change",
+     "A new feature launched",
+     "A full disk"
+    ],
+    "answer": 1,
+    "why": "The unfiltered query began to include rows from the underlying tables as well as the default database."
+   },
+   {
+    "q": "Why is it important to stop propagation of new files at 14:24?",
+    "options": [
+     "To save bandwidth",
+     "Because new bad files would keep breaking machines that had recovered",
+     "To help marketing",
+     "To rotate keys"
+    ],
+    "answer": 1,
+    "why": "A new file is generated every few minutes, so recovery required stopping the source and deploying a good file."
+   },
+   {
+    "q": "What principle does the remediation list reflect?",
+    "options": [
+     "Trust internal files",
+     "Treat internal configuration files like user-generated input",
+     "Never use databases",
+     "Use bigger limits only"
+    ],
+    "answer": 1,
+    "why": "Cloudflare lists hardening ingestion of its own generated files as something to treat like user input."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Filter metadata queries by database and table",
+   "Validate generated files before publishing",
+   "Never panic on external input in a serving path",
+   "Canary and stage generated configuration"
+  ],
+  "monitoring": [
+   "Alert on file size and feature count",
+   "Alert on proxy panics and restarts",
+   "Watch the age and version of the file on every machine"
+  ],
+  "recovery": [
+   "Keep a last known good file and a one-step rollback",
+   "Build bypasses for dependent products",
+   "Know how to stop the generator"
+  ],
+  "practices": [
+   "Review failure modes of every module in the core proxy",
+   "Provide global kill switches for features",
+   "Do not assume the first guess, such as an attack, is the cause"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Cloudflare: Cloudflare outage on November 18, 2025",
+   "url": "https://blog.cloudflare.com/18-november-2025-outage/",
+   "used": "timeline, query text, panic message, services affected, remediation list"
+  }
+ ],
+ "verification": "Facts marked Reported or Verified were read from Cloudflare's post on 29 October 2026. The post shows the Rust code only as an image, so no code is quoted. Evidence marked Simulated is written for teaching."
+}

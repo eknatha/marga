@@ -1,0 +1,470 @@
+{
+ "id": "cloudflare-regular-expression-outage",
+ "postmortem": "cloudflare-regex-2019",
+ "checked": "29 October 2026",
+ "summary": "On 2 July 2019 one new firewall rule with a badly written regular expression pushed CPU to the limit on every Cloudflare edge server at once. Customers saw 502 error pages for about 27 minutes.",
+ "overview": {
+  "background": "Cloudflare runs a web application firewall (WAF) at every edge location. Managed Rules are updated many times a week so new attacks can be blocked fast, so these updates do not go through the staged rollout used for other software.",
+  "systems": [
+   "WAF Managed Rules on every edge server",
+   "HTTP and HTTPS serving on the edge (CPU shared with the WAF)",
+   "Cloudflare build and test pipeline",
+   "Status page and customer dashboard"
+  ],
+  "impact": "Customers and their visitors saw a 502 error page when visiting any Cloudflare-proxied domain. Cloudflare reports that the outage lasted 27 minutes.",
+  "severity": "Global. Every Cloudflare edge location was affected. Cloudflare does not publish a numeric severity rating.",
+  "gaps": "The post does not give the exact time the outage ended, the exact time of the first page, or when each status update was made. The WAF rule text is only shown in simplified form."
+ },
+ "archNote": "Components and the rule-deployment path are described in Cloudflare's post. The layout and arrow labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A WAF rule change reaches every edge at once",
+   "caption": "Managed Rules bypass the staged rollout used for normal software, so one bad rule reached all edge servers within minutes and used up the CPU that serves traffic.",
+   "nodes": [
+    {
+     "id": "eng",
+     "label": "Engineer merges a WAF rule change",
+     "row": 0,
+     "col": 0.5
+    },
+    {
+     "id": "ci",
+     "label": "Build and tests pass (no CPU profile test)",
+     "row": 1,
+     "col": 0.5
+    },
+    {
+     "id": "qs",
+     "label": "Global config distribution",
+     "row": 2,
+     "col": 0.5,
+     "state": "hit"
+    },
+    {
+     "id": "edge",
+     "label": "Edge servers in every location",
+     "row": 3,
+     "col": 0.5,
+     "state": "fail"
+    },
+    {
+     "id": "waf",
+     "label": "WAF rule with the slow regular expression",
+     "row": 3,
+     "col": 2.5,
+     "state": "fail"
+    },
+    {
+     "id": "cpu",
+     "label": "CPU exhausted on HTTP serving",
+     "row": 2,
+     "col": 2.5,
+     "state": "fail"
+    },
+    {
+     "id": "vis",
+     "label": "Visitors see 502 errors",
+     "row": 1,
+     "col": 2.5,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "eng",
+     "t": "ci"
+    },
+    {
+     "f": "ci",
+     "t": "qs",
+     "label": "no staged rollout",
+     "state": "fail"
+    },
+    {
+     "f": "qs",
+     "t": "edge",
+     "label": "rule everywhere",
+     "state": "fail"
+    },
+    {
+     "f": "edge",
+     "t": "waf",
+     "label": "runs rule",
+     "state": "fail"
+    },
+    {
+     "f": "waf",
+     "t": "cpu",
+     "label": "backtracking",
+     "state": "fail"
+    },
+    {
+     "f": "cpu",
+     "t": "vis",
+     "state": "fail"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Staged rule rollout with CPU protection (conceptual)",
+   "caption": "Cloudflare said it would add performance profiling to its tests, use a regex engine without this behaviour, stage WAF rules like other software, and restore the CPU protection. This picture is our illustration of those steps.",
+   "nodes": [
+    {
+     "id": "eng",
+     "label": "Engineer merges a WAF rule change",
+     "row": 0,
+     "col": 0.5
+    },
+    {
+     "id": "ci",
+     "label": "Tests plus rule performance profile",
+     "row": 1,
+     "col": 0.5,
+     "state": "new"
+    },
+    {
+     "id": "canary",
+     "label": "Small canary group of edges",
+     "row": 2,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "wide",
+     "label": "Wider stages once healthy",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "guard",
+     "label": "CPU protection and linear-time regex engine",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "eng",
+     "t": "ci"
+    },
+    {
+     "f": "ci",
+     "t": "canary",
+     "state": "new"
+    },
+    {
+     "f": "canary",
+     "t": "wide",
+     "label": "if CPU healthy",
+     "state": "new"
+    },
+    {
+     "f": "canary",
+     "t": "guard",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "A slow rule is caught by a performance test before it ships.",
+  "If one gets through, it reaches a small canary first, not the whole world.",
+  "A regex engine with guaranteed linear time cannot backtrack catastrophically.",
+  "Per-request CPU protection limits the harm of any single rule."
+ ],
+ "afterNote": "The change is about blast radius and early detection, not only about writing better expressions.",
+ "timelineNote": "All times are UTC on 2 July 2019, as written in the Cloudflare post. The first-page time is derived from the post saying the page went out three minutes after the deployment.",
+ "timeline": [
+  {
+   "t": "13:31",
+   "phase": "trigger",
+   "e": "An engineer merges a pull request containing the WAF change after it is approved."
+  },
+  {
+   "t": "13:37",
+   "phase": "trigger",
+   "e": "The build system builds the rules and runs the tests, which pass."
+  },
+  {
+   "t": "13:42",
+   "phase": "trigger",
+   "e": "An engineer on the firewall team deploys the change. The rule reaches all edge servers."
+  },
+  {
+   "t": "About 13:45",
+   "phase": "detect",
+   "derived": true,
+   "e": "The first PagerDuty page goes out, three minutes after the deployment."
+  },
+  {
+   "t": "14:00",
+   "phase": "investigate",
+   "e": "The WAF is identified as the component causing the problem."
+  },
+  {
+   "t": "14:02",
+   "phase": "investigate",
+   "e": "The team discusses a global terminate of the WAF, a step normally avoided."
+  },
+  {
+   "t": "14:07",
+   "phase": "mitigate",
+   "e": "A team member executes the global WAF termination."
+  },
+  {
+   "t": "14:09",
+   "phase": "recover",
+   "e": "Traffic levels and CPU are back to expected levels worldwide."
+  },
+  {
+   "t": "14:52",
+   "phase": "recover",
+   "e": "Cloudflare is satisfied that it understands the cause and has a fix in place."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A new WAF Managed Rule containing a poorly written regular expression was deployed globally.",
+  "underlying": "The expression backtracked enormously on some input and used up the CPU that serves HTTP and HTTPS traffic. The rule was run by a regex engine that can take time that grows very fast with input length.",
+  "contributing": [
+   "The standard procedure let a non-emergency rule change go to production worldwide without a staged rollout",
+   "Tests did not check the rule's CPU cost",
+   "An earlier change had removed a protection that limited CPU use by regular expressions",
+   "Using the global WAF kill switch was a step the team had to stop and discuss before taking",
+   "The status page was not updated quickly enough"
+  ],
+  "propagation": [
+   "The rule reaches every edge server within minutes.",
+   "Each request that touches the rule burns CPU.",
+   "Serving capacity falls, and the front-line web servers that still have cores available return 502 errors.",
+   "Customers and their visitors see errors on any Cloudflare domain."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "What exhausted the CPU",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "a regular expression that backtracked enormously and exhausted CPU used for HTTP/HTTPS serving",
+   "note": "From Cloudflare's post. The post's appendix reduces the critical part of the pattern to .*.*=.*"
+  },
+  {
+   "label": "What visitors saw",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "seeing a 502 error page when visiting any Cloudflare domain",
+   "note": "From the same post."
+  },
+  {
+   "label": "Why the pattern is dangerous",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "python3 - <<'EOF'\nimport re, time\nfor n in (500, 1000, 2000):\n    s = 'x' * n          # no '=' anywhere, so the match must fail\n    t = time.time(); re.search(r'.*.*=.*', s)\n    print(n, round(time.time() - t, 3), 'seconds')\nEOF",
+   "note": "A teaching experiment, not Cloudflare output. In our run with Python's re module, each doubling of input made the match roughly eight times slower. Other regex engines behave differently, which is the point of the fix."
+  },
+  {
+   "label": "What a CPU alert might show",
+   "kind": "simulated",
+   "lang": "text",
+   "body": "ALERT edge-cpu-high  region=all  value=99%  for=2m\nALERT http-5xx-rate  region=all  value=82%  for=2m",
+   "note": "Illustrative alert text. The post does not publish alert definitions."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Compare the timing of the CPU rise with the last deployment.",
+    "why": "A rise that starts minutes after a deploy points at the deploy, not at traffic.",
+    "cmd": "deploy-log --since 30m\nmetrics query 'avg(cpu_usage) by (service)' --since 1h"
+   },
+   {
+    "step": "Find which component uses the CPU.",
+    "why": "Profile the busy processes to find the hot function.",
+    "cmd": "perf top -p $(pgrep -f edge-proxy) --sort symbol"
+   },
+   {
+    "step": "Isolate the component with a feature switch rather than guessing.",
+    "why": "Turning off one suspect and watching CPU fall is stronger evidence than any theory."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Disable the suspect component globally using the kill switch.",
+    "why": "Restoring service first is the priority. You can lose some protection for a short time and repair it after.",
+    "cmd": "feature-flag set waf-managed-rules off --scope global"
+   },
+   {
+    "step": "Confirm CPU and error rates fall.",
+    "why": "Recovery should be visible within minutes if the diagnosis is right."
+   },
+   {
+    "step": "Fix or remove the bad rule, then re-enable in stages.",
+    "why": "Re-enabling everywhere at once would repeat the outage if the fix is wrong."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Replay recent traffic against the fixed rule in a test environment and record CPU.",
+    "why": "A rule must prove it is cheap on real inputs, not only correct on examples.",
+    "cmd": "replay --rule waf-fix.json --traffic sample-1h.pcap --report cpu"
+   },
+   {
+    "step": "Watch 5xx rate and CPU across all regions after each stage.",
+    "why": "Stages catch what a test cannot."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Add a performance profile to the rule tests with a hard CPU budget.",
+    "why": "A rule that works but is slow still causes an outage.",
+    "cmd": "rule-test --budget-ms 5 --inputs fuzz/long-strings.txt"
+   },
+   {
+    "step": "Use a regular expression engine with linear running time, or put a per-request time limit around matching.",
+    "why": "Catastrophic backtracking becomes impossible or bounded."
+   },
+   {
+    "step": "Roll rule changes out in stages like any other software, with a faster lane for real emergencies.",
+    "why": "Speed matters for attacks, but a bad rule is also an emergency."
+   }
+  ],
+  "safety": "A global kill switch removes protection for every customer. Agree in advance who may use it and how it is announced, then practise it so nobody hesitates when it matters."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Five minutes after a deploy, CPU on every edge server climbs to 100 percent. Traffic is normal, 502 errors spike worldwide, and engineers cannot reach internal systems that sit behind the same edge.",
+   "clues": [
+    "The deploy was a firewall rule update",
+    "CPU is high on every server, in every region",
+    "Request volume has not changed",
+    "The firewall process is the largest user of CPU in a profile"
+   ],
+   "question": "What is your first action and why?",
+   "hints": [
+    "Think about which change coincides with the start of the problem.",
+    "What is the fastest safe way to stop the CPU burn everywhere?",
+    "Can you reach the dashboard or API if they also run behind the same edge?"
+   ],
+   "answer": "Disable the firewall rules globally with the kill switch, because the profile and timing both point at it and every minute of delay is a minute of outage. Then check that CPU and 502s fall, investigate the rule offline, and re-enable in stages. Also make sure you have a way into your own tools when the edge is down."
+  },
+  "rootcause": {
+   "q": "What is the best one-sentence root cause?",
+   "options": [
+    "A DDoS attack overloaded the network",
+    "A new WAF rule with a backtracking regular expression was deployed to all edges without a staged rollout",
+    "A routing leak sent traffic to the wrong place",
+    "A hardware fault in a data centre"
+   ],
+   "answer": 1,
+   "why": "Cloudflare says a single rule with a poorly written regular expression exhausted CPU, and the procedure allowed it to go global without staging."
+  },
+  "remediation": [
+   {
+    "task": "Write a CPU-budget test for a new firewall rule.",
+    "answer": "Run the rule against a set of long, hostile and typical inputs and fail the build if any input takes longer than a small budget, for example a few milliseconds. Include inputs with no match, because those force the engine to try every path."
+   },
+   {
+    "task": "Define a staged rollout for rules that still allows an emergency lane.",
+    "answer": "Stage 1: a few internal or low-traffic edges. Stage 2: a small percentage. Stage 3: everywhere. Each stage waits a few minutes and checks CPU and errors. An emergency lane skips waiting but not the canary stage, and needs approval from two people."
+   },
+   {
+    "task": "Decide how customers will learn about the outage when your status page depends on you.",
+    "answer": "Publish status from a system outside your own network, update it automatically from health checks, and keep a social account or email list as a second channel."
+   }
+  ],
+  "design": {
+   "prompt": "Design the delivery path for security rules so new rules protect customers quickly but can never take down serving.",
+   "constraints": [
+    "Rules must reach most edges within minutes in an attack",
+    "A rule must not be able to use more than a small share of CPU",
+    "Operators must be able to disable one rule or all rules fast"
+   ],
+   "answer": "Use a linear-time matching engine and per-request CPU limits so no single rule can starve serving. Run every rule through a CPU-profile test in the pipeline. Deploy first to a canary group, watch CPU and error rate for a few minutes, then fan out. Keep per-rule and global kill switches with clear ownership, and make the control plane reachable independently of the edge."
+  },
+  "checks": [
+   {
+    "q": "What made this change reach every server so fast?",
+    "options": [
+     "A cable cut",
+     "WAF Managed Rules were deployed globally without the staged rollout used for other software",
+     "A DNS change",
+     "A certificate update"
+    ],
+    "answer": 1,
+    "why": "The post says the procedure allowed a non-emergency rule change to go to production worldwide without a staged rollout."
+   },
+   {
+    "q": "Why is a regex that fails to match often more dangerous than one that matches?",
+    "options": [
+     "Matching is always slower",
+     "The engine may try a huge number of paths before giving up",
+     "Failures write to disk",
+     "It changes the DNS"
+    ],
+    "answer": 1,
+    "why": "With backtracking engines, a failed match can explore many combinations before concluding there is no match."
+   },
+   {
+    "q": "Which fix changes the blast radius?",
+    "options": [
+     "Rewriting the pattern only",
+     "Staged rollout of rules",
+     "Adding a comment to the rule",
+     "Sending a customer email"
+    ],
+    "answer": 1,
+    "why": "Staged rollout limits how many servers see a bad rule before CPU alarms stop the rollout."
+   },
+   {
+    "q": "What is a sensible use of a global kill switch during an incident?",
+    "options": [
+     "Never use it",
+     "Use it when diagnosis points at a component and restoring service matters more than temporary loss of that feature",
+     "Use it only after a full root-cause report",
+     "Use it every release"
+    ],
+    "answer": 1,
+    "why": "Cloudflare restored traffic within two minutes of disabling the WAF globally. The cost of the delay before the decision was extra minutes of outage."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Stage every production change, including security rules",
+   "Test the performance cost of rules, not only their correctness",
+   "Use matching engines with bounded running time",
+   "Keep CPU protection that limits any single rule"
+  ],
+  "monitoring": [
+   "Alert on a fleet-wide CPU jump after a deploy",
+   "Correlate alerts with the deploy log automatically",
+   "Update the status page automatically from health checks"
+  ],
+  "recovery": [
+   "Practise using the global kill switch",
+   "Keep a path into your own control plane that does not depend on the edge",
+   "Re-enable disabled features in stages"
+  ],
+  "practices": [
+   "Fast changes still need guard rails",
+   "A tool that must respond to attacks quickly is also a tool that can break everything quickly",
+   "Write regular expressions with worst-case inputs in mind"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Cloudflare: Details of the Cloudflare outage on July 2, 2019",
+   "url": "https://blog.cloudflare.com/details-of-the-cloudflare-outage-on-july-2-2019/",
+   "used": "timeline, cause, deployment procedure, remediation list"
+  }
+ ],
+ "verification": "Facts marked Reported or Verified were read from Cloudflare's post on 29 October 2026. The post does not publish alert text or full rule text, so evidence marked Simulated is written for teaching. The timing experiment was run for this lesson with Python's re module."
+}

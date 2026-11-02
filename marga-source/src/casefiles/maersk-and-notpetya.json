@@ -1,0 +1,375 @@
+{
+ "id": "maersk-and-notpetya",
+ "checked": "29 October 2026",
+ "summary": "In June 2017 the NotPetya malware wiped Maersk's computers worldwide. The company rebuilt its infrastructure in about 10 days, reinstalling 4,000 servers, 45,000 PCs and 2,500 applications, and ran manually in the meantime. This file uses iTnews's report of the chairman's remarks.",
+ "overview": {
+  "background": "Maersk ships about a fifth of the world's containers. NotPetya encrypted machines and spread through networks.",
+  "systems": [
+   "4,000 servers",
+   "45,000 PCs",
+   "2,500 applications",
+   "Manual processes at ports and offices"
+  ],
+  "impact": "Maersk had no IT systems worldwide and reverted to manual processes for 10 days. Volumes dropped only 20 percent. Damage was reported as US$250 million to US$300 million.",
+  "severity": "Severe. The chairman called it a significant wake-up call.",
+  "gaps": "The report does not mention domain controllers or give a detailed timeline."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "Everything had to be rebuilt",
+   "caption": "Per the chairman, Maersk had to reinstall an entire infrastructure.",
+   "nodes": [
+    {
+     "id": "npet",
+     "label": "NotPetya infection",
+     "row": 0,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "sys",
+     "label": "4,000 servers and 45,000 PCs unusable",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "man",
+     "label": "Manual processes for 10 days",
+     "row": 2,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "reb",
+     "label": "Rebuild of infrastructure and 2,500 applications",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "npet",
+     "t": "sys",
+     "state": "fail"
+    },
+    {
+     "f": "sys",
+     "t": "man",
+     "state": "hit"
+    },
+    {
+     "f": "sys",
+     "t": "reb",
+     "label": "recovery"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Segmentation, offline backups and a rebuild plan (conceptual)",
+   "caption": "General defences for destructive malware.",
+   "nodes": [
+    {
+     "id": "seg",
+     "label": "Segmented networks",
+     "row": 0,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "bak",
+     "label": "Offline, tested backups of core services",
+     "row": 0,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "play",
+     "label": "Rebuild playbook rehearsed",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "man",
+     "label": "Documented manual operations",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "seg",
+     "t": "play",
+     "state": "new"
+    },
+    {
+     "f": "bak",
+     "t": "play",
+     "state": "new"
+    },
+    {
+     "f": "play",
+     "t": "man",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Malware cannot spread everywhere.",
+  "A clean copy exists.",
+  "Manual operation is ready."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "June 2017",
+   "phase": "trigger",
+   "e": "NotPetya infects Maersk's systems."
+  },
+  {
+   "t": "June 2017",
+   "phase": "impact",
+   "e": "Maersk has no working IT worldwide."
+  },
+  {
+   "t": "June 2017",
+   "phase": "mitigate",
+   "e": "Staff switch to manual processes; customers help."
+  },
+  {
+   "t": "Over 10 days",
+   "phase": "mitigate",
+   "e": "Maersk reinstalls 4,000 servers, 45,000 PCs and 2,500 applications."
+  },
+  {
+   "t": "After 10 days",
+   "phase": "recover",
+   "e": "The infrastructure is rebuilt; the chairman calls it a heroic effort."
+  },
+  {
+   "t": "Jan 2018",
+   "phase": "change",
+   "e": "The chairman discloses details at the World Economic Forum."
+  }
+ ],
+ "rootCause": {
+  "trigger": "NotPetya destroyed data on infected machines.",
+  "underlying": "The report says the malware was suspected to target Ukraine but spread to Maersk.",
+  "contributing": [
+   "Maersk says it was basically average in cyber security",
+   "Reliance on IT for all operations"
+  ],
+  "propagation": [
+   "Infection.",
+   "Systems down.",
+   "Manual operation.",
+   "Rebuild."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The scale of the work",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "We basically found that we had to reinstall an entire infrastructure.",
+   "note": "Chairman Jim Hagemann Snabe, as quoted by iTnews."
+  },
+  {
+   "label": "A simulated inventory",
+   "kind": "simulated",
+   "lang": "text",
+   "body": "rebuild-plan: tier0 identity -> tier1 core apps -> tier2 business apps -> endpoints",
+   "note": "A plan outline. Not Maersk's plan."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Find which systems are still clean.",
+    "why": "Everything was affected."
+   },
+   {
+    "step": "Check backups and their age.",
+    "why": "Needed to rebuild."
+   },
+   {
+    "step": "Decide the order to rebuild.",
+    "why": "Identity, core, apps, endpoints."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Switch to manual processes.",
+    "why": "Done for 10 days."
+   },
+   {
+    "step": "Rebuild in dependency order.",
+    "why": "4,000 servers."
+   },
+   {
+    "step": "Reinstall endpoints and applications.",
+    "why": "45,000 PCs, 2,500 apps."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check each tier before the next.",
+    "why": "Avoid reinfection."
+   },
+   {
+    "step": "Check operations run normally.",
+    "why": "Measure volumes."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Segment the network.",
+    "why": "General practice."
+   },
+   {
+    "step": "Keep offline backups.",
+    "why": "General practice."
+   },
+   {
+    "step": "Rehearse rebuilds.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Reconnect rebuilt systems to the network only after the malware path is closed."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Destructive malware has wiped most of your servers and PCs. Staff are idle.",
+   "clues": [
+    "Backups partly intact",
+    "Customers waiting",
+    "No IT"
+   ],
+   "question": "What is your plan?",
+   "hints": [
+    "How do you keep business going?",
+    "In what order do you rebuild?",
+    "How do you prevent reinfection?"
+   ],
+   "answer": "Run manual processes, rebuild identity first then core apps then endpoints, and close the infection path before reconnecting."
+  },
+  "rootcause": {
+   "q": "How many servers were reinstalled?",
+   "options": [
+    "4,000",
+    "40",
+    "400",
+    "40,000"
+   ],
+   "answer": 0,
+   "why": "Per the report."
+  },
+  "remediation": [
+   {
+    "task": "Write a manual process pack.",
+    "answer": "Paper and spreadsheet fallbacks."
+   },
+   {
+    "task": "Plan a rebuild order.",
+    "answer": "Dependencies first."
+   },
+   {
+    "task": "Plan offline backups.",
+    "answer": "Immutable copies."
+   }
+  ],
+  "design": {
+   "prompt": "Design resilience for a global logistics company against wipers.",
+   "constraints": [
+    "Global network",
+    "Many apps",
+    "Tight deadlines"
+   ],
+   "answer": "Segmentation, immutable backups, rebuild automation, tested manual operations."
+  },
+  "checks": [
+   {
+    "q": "How long did the rebuild take?",
+    "options": [
+     "About 10 days",
+     "6 months",
+     "1 day",
+     "1 year"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "How many PCs?",
+    "options": [
+     "45,000",
+     "4,500",
+     "450",
+     "450,000"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "What drop in volumes was reported?",
+    "options": [
+     "20 percent",
+     "80 percent",
+     "100 percent",
+     "0"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   },
+   {
+    "q": "What did the chairman say about Maersk's cyber security before?",
+    "options": [
+     "Basically average",
+     "World class",
+     "Poor",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the report."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Segmentation",
+   "Immutable backups"
+  ],
+  "monitoring": [
+   "Detection of wiper behaviour"
+  ],
+  "recovery": [
+   "Manual operation",
+   "Ordered rebuild"
+  ],
+  "practices": [
+   "Rebuild rehearsals",
+   "Manual process packs"
+  ]
+ },
+ "sources": [
+  {
+   "title": "iTnews: Maersk had to reinstall all IT systems after NotPetya infection",
+   "url": "https://www.itnews.com.au/news/maersk-had-to-reinstall-all-it-systems-after-notpetya-infection-481815",
+   "used": "numbers, duration, cost, quotes"
+  }
+ ],
+ "verification": "Facts were read from iTnews on 29 October 2026. The report does not mention domain controllers, so none are claimed. The plan outline is Simulated."
+}

@@ -1,0 +1,411 @@
+{
+ "id": "datadog-multi-region-outage",
+ "checked": "29 October 2026",
+ "summary": "On 8 March 2023 a systemd security update applied automatically to Datadog's VMs. A restart of systemd-networkd deleted routes managed by the Cilium CNI, taking tens of thousands of nodes offline in several regions at once.",
+ "overview": {
+  "background": "Datadog runs Kubernetes on VMs in several cloud providers and regions. Ubuntu 22.04 images had a legacy security update channel that applied updates automatically in a window between 06:00 and 07:00 UTC.",
+  "systems": [
+   "VM base image with legacy update channel",
+   "systemd and systemd-networkd on Ubuntu 22.04",
+   "Cilium CNI routes",
+   "Regions US1, EU1, US3, US4, US5",
+   "Datadog platform: ingestion, monitors, web and API"
+  ],
+  "impact": "Users could not access the platform or APIs, monitors did not alert and some data ingestion was affected. Tens of thousands of nodes went offline.",
+  "severity": "A multi-region outage of about a day. All services were operational by 08:58 UTC on 9 March and fully resolved on 10 March.",
+  "gaps": "The post gives no customer counts."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "An automatic update erases CNI routes",
+   "caption": "systemd-networkd restarted during an update and deleted routes managed by Cilium. The nodes lost container networking.",
+   "nodes": [
+    {
+     "id": "upd",
+     "label": "Automatic systemd security update, legacy channel",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "snd",
+     "label": "systemd-networkd restarts and deletes Cilium routes",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "node",
+     "label": "Tens of thousands of nodes offline",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "regions",
+     "label": "US1, EU1, US3, US4, US5 down together",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    },
+    {
+     "id": "cust",
+     "label": "Web, API, ingestion and monitors affected",
+     "row": 4,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "upd",
+     "t": "snd",
+     "label": "same time window in every region"
+    },
+    {
+     "f": "snd",
+     "t": "node",
+     "state": "fail"
+    },
+    {
+     "f": "node",
+     "t": "regions",
+     "state": "hit"
+    },
+    {
+     "f": "regions",
+     "t": "cust",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Controlled updates and independent regions (conceptual)",
+   "caption": "Datadog disabled the legacy update channel, changed systemd-networkd to leave the routing table unchanged, audited for similar channels and planned degraded-mode tests. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "img",
+     "label": "Immutable images, updates by pipeline",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "cfg",
+     "label": "networkd leaves routes unchanged",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "stag",
+     "label": "Updates staged per region",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "dm",
+     "label": "Degraded-mode tests at scale",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "img",
+     "t": "cfg",
+     "state": "new"
+    },
+    {
+     "f": "img",
+     "t": "stag",
+     "state": "new"
+    },
+    {
+     "f": "stag",
+     "t": "dm",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "No region updates itself unattended in the same window.",
+  "Routes survive a service restart.",
+  "Failure drills match real scale."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "06:00 UTC, 8 Mar",
+   "phase": "trigger",
+   "e": "A systemd security update is applied automatically to VMs."
+  },
+  {
+   "t": "06:03",
+   "phase": "impact",
+   "e": "The outage begins in US1, EU1, US3, US4 and US5. Tens of thousands of nodes go offline in the next hour."
+  },
+  {
+   "t": "06:31",
+   "phase": "detect",
+   "e": "The first status page update goes out."
+  },
+  {
+   "t": "07:23",
+   "phase": "investigate",
+   "e": "An update confirms impact to ingestion and monitors."
+  },
+  {
+   "t": "09:13",
+   "phase": "recover",
+   "e": "Initial signs of recovery. Web access is restored."
+  },
+  {
+   "t": "16:44",
+   "phase": "recover",
+   "e": "The first major service is declared operational."
+  },
+  {
+   "t": "9 Mar 08:58",
+   "phase": "recover",
+   "e": "All services are declared operational in all regions."
+  },
+  {
+   "t": "10 Mar 06:25",
+   "phase": "recover",
+   "e": "The incident is fully resolved after historical data is backfilled."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A systemd security update was applied automatically to a number of VMs.",
+  "underlying": "On Ubuntu 22.04 with systemd v249, restarting systemd-networkd deleted routes managed by Cilium. Fresh nodes did not show this because networkd starts before the CNI installs routes.",
+  "contributing": [
+   "A legacy security update channel on the base image",
+   "A default update window that hit every region at once",
+   "Recovery needed compute, then control planes, then clusters, then services"
+  ],
+  "propagation": [
+   "Update applies.",
+   "Routes deleted.",
+   "Nodes lose network.",
+   "Platform unavailable."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The trigger",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "a security update to systemd was automatically applied to a number of VMs",
+   "note": "From Datadog's post."
+  },
+  {
+   "label": "The priority in recovery",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "Most important, usable live data and alerts are much more valuable than access to historical data.",
+   "note": "From Datadog's post."
+  },
+  {
+   "label": "A simulated networkd setting",
+   "kind": "simulated",
+   "lang": "ini",
+   "body": "[Network]\nManageForeignRoutes=no\nManageForeignRoutingPolicyRules=no",
+   "note": "Settings that tell networkd not to manage routes added by others. Shown as an example; Datadog's exact change is not published in the post."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check what changed on the nodes just before the failure.",
+    "why": "A systemd update matched the time."
+   },
+   {
+    "step": "Compare failing nodes with fresh nodes.",
+    "why": "Fresh nodes were fine."
+   },
+   {
+    "step": "Check routes on a failed node.",
+    "why": "Missing Cilium routes explained it.",
+    "cmd": "ip route show"
+   }
+  ],
+  "correct": [
+   {
+    "step": "Restore compute capacity region by region.",
+    "why": "Datadog scaled above normal in some clouds."
+   },
+   {
+    "step": "Restore control planes before clusters.",
+    "why": "Dependency order."
+   },
+   {
+    "step": "Prioritise live data and alerts over history.",
+    "why": "Backfill history afterwards."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Confirm ingestion and monitors work.",
+    "why": "Live data first."
+   },
+   {
+    "step": "Backfill history.",
+    "why": "Complete on 10 March."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Disable legacy update channels.",
+    "why": "Datadog's action."
+   },
+   {
+    "step": "Configure networkd to leave routes unchanged.",
+    "why": "Datadog's action."
+   },
+   {
+    "step": "Audit for similar channels.",
+    "why": "Datadog's action."
+   },
+   {
+    "step": "Test degraded mode at scale.",
+    "why": "Datadog's stated step."
+   }
+  ],
+  "safety": "Do not restart network services on production nodes as a fix without testing on one node. Restoring routes by hand across thousands of nodes needs automation."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Tens of thousands of nodes lose container networking at 06:03 in four regions at once. No deploys ran.",
+   "clues": [
+    "Update window 06:00 to 07:00",
+    "Fresh nodes are healthy",
+    "Routes missing"
+   ],
+   "question": "How do you find the cause and recover?",
+   "hints": [
+    "What runs at 06:00?",
+    "What differs between nodes?",
+    "What do you restore first?"
+   ],
+   "answer": "Find the automatic update, compare routes on failed and fresh nodes, restore compute, then control planes, then clusters, prioritising live data. Disable the update channel."
+  },
+  "rootcause": {
+   "q": "Why did several regions fail together?",
+   "options": [
+    "The same default update window applied everywhere",
+    "A shared DNS",
+    "A cut cable",
+    "A DDoS"
+   ],
+   "answer": 0,
+   "why": "Datadog's post."
+  },
+  "remediation": [
+   {
+    "task": "Design update staging.",
+    "answer": "Roll out to one region at a time with a bake time."
+   },
+   {
+    "task": "Plan recovery order.",
+    "answer": "Compute, control planes, clusters, services, live data, history."
+   },
+   {
+    "task": "Write a node check.",
+    "answer": "Verify routes after any network service restart."
+   }
+  ],
+  "design": {
+   "prompt": "Design a fleet whose regions cannot fail from one scheduled change.",
+   "constraints": [
+    "Many clouds",
+    "Auto updates",
+    "Large Kubernetes fleets"
+   ],
+   "answer": "Immutable images, staged updates, region-specific windows, canaries and degraded-mode tests."
+  },
+  "checks": [
+   {
+    "q": "What version of systemd was involved?",
+    "options": [
+     "v249 on Ubuntu 22.04",
+     "v1",
+     "v500",
+     "None"
+    ],
+    "answer": 0,
+    "why": "The post names it."
+   },
+   {
+    "q": "What CNI was in use?",
+    "options": [
+     "Cilium",
+     "Flannel",
+     "Calico",
+     "None"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   },
+   {
+    "q": "When were all services operational?",
+    "options": [
+     "09 March 08:58 UTC",
+     "08 March 06:03",
+     "10 March",
+     "Never"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   },
+   {
+    "q": "What was prioritised in recovery?",
+    "options": [
+     "Live data and alerts",
+     "Old data",
+     "Billing",
+     "Marketing"
+    ],
+    "answer": 0,
+    "why": "The quote says so."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Disable legacy update channels",
+   "Immutable images",
+   "Staged updates"
+  ],
+  "monitoring": [
+   "Route table checks"
+  ],
+  "recovery": [
+   "Restore compute then control planes",
+   "Prioritise live data"
+  ],
+  "practices": [
+   "Audit auto-update paths",
+   "Test degraded modes at scale"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Datadog: 2023-03-08 Incident: Infrastructure connectivity issue affecting multiple regions",
+   "url": "https://www.datadoghq.com/blog/2023-03-08-multiregion-infrastructure-connectivity-issue/",
+   "used": "timeline, cause, impact, recovery, corrective actions"
+  }
+ ],
+ "verification": "Facts were read from Datadog's post on 29 October 2026. The networkd settings are Simulated and not claimed to be Datadog's exact fix."
+}

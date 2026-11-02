@@ -1,0 +1,381 @@
+{
+ "id": "heartbleed",
+ "checked": "29 October 2026",
+ "summary": "Heartbleed (CVE-2014-0160) was a missing bounds check in OpenSSL's TLS heartbeat extension. A malformed request could make a server return up to 64 KiB of memory, which could contain private keys, passwords and session cookies. A fixed version, 1.0.1g, was released on 7 April 2014.",
+ "overview": {
+  "background": "OpenSSL implements TLS for much of the web. Versions 1.0.1 through 1.0.1f had the flaw. Builds compiled with the heartbeat option disabled were not affected.",
+  "systems": [
+   "OpenSSL 1.0.1 to 1.0.1f",
+   "TLS heartbeat extension",
+   "Web servers and other services using that library",
+   "Server private keys and certificates"
+  ],
+  "impact": "Servers could leak up to 64 KiB of memory per request, potentially including private keys and user data.",
+  "severity": "Critical. Wikipedia reports that by 9 May 2014 only 43 percent of affected sites had reissued certificates (Netcraft).",
+  "gaps": "This file uses Wikipedia as the readable source; heartbleed.com (the card source) could not be read."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A read beyond the buffer leaks memory",
+   "caption": "A malformed heartbeat request makes the server return more memory than the payload it was sent.",
+   "nodes": [
+    {
+     "id": "req",
+     "label": "Heartbeat request with a false length",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "ssl",
+     "label": "OpenSSL 1.0.1 to 1.0.1f with no bounds check",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "mem",
+     "label": "Up to 64 KiB of process memory returned",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "key",
+     "label": "Possible private keys, cookies, passwords",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "req",
+     "t": "ssl",
+     "state": "fail"
+    },
+    {
+     "f": "ssl",
+     "t": "mem",
+     "state": "fail"
+    },
+    {
+     "f": "mem",
+     "t": "key",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Patch, then reissue keys (conceptual)",
+   "caption": "After patching, treat private keys as compromised.",
+   "nodes": [
+    {
+     "id": "patch",
+     "label": "Upgrade to 1.0.1g or later and restart",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "key",
+     "label": "Generate new keys and certificates",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "rev",
+     "label": "Revoke old certificates",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "pw",
+     "label": "Rotate passwords and sessions",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "patch",
+     "t": "key",
+     "state": "new"
+    },
+    {
+     "f": "patch",
+     "t": "rev",
+     "state": "new"
+    },
+    {
+     "f": "key",
+     "t": "pw",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Library is patched and processes restarted.",
+  "Keys are replaced.",
+  "Credentials are rotated."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "31 Dec 2011",
+   "phase": "change",
+   "e": "The flawed code enters OpenSSL's repository."
+  },
+  {
+   "t": "14 Mar 2012",
+   "phase": "change",
+   "e": "The flaw ships with OpenSSL 1.0.1."
+  },
+  {
+   "t": "1 Apr 2014",
+   "phase": "detect",
+   "e": "Neel Mehta of Google reports the bug privately to OpenSSL."
+  },
+  {
+   "t": "3 Apr 2014",
+   "phase": "detect",
+   "e": "Codenomicon independently finds the bug."
+  },
+  {
+   "t": "7 Apr 2014",
+   "phase": "trigger",
+   "e": "The bug is publicly disclosed and OpenSSL 1.0.1g is released."
+  },
+  {
+   "t": "Following weeks",
+   "phase": "recover",
+   "e": "Operators patch, restart, and reissue certificates. By 9 May, 43 percent of affected sites had done so, per Netcraft."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A missing bounds check in the TLS heartbeat extension.",
+  "underlying": "A malformed request could make the server return more memory than the payload it was sent.",
+  "contributing": [
+   "The code was in a very widely used library",
+   "Memory contents are not controlled by the attacker, so any secret may leak",
+   "Many operators patched but did not reissue keys"
+  ],
+  "propagation": [
+   "Malformed request.",
+   "Memory over-read.",
+   "Secrets exposed.",
+   "Keys reissued slowly."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Fixed version",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "A fixed version of OpenSSL was released on 7 April 2014",
+   "note": "From Wikipedia's article on Heartbleed."
+  },
+  {
+   "label": "Slow certificate reissue",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "only 43% of affected web sites had reissued their security certificates",
+   "note": "Wikipedia citing Netcraft, 9 May 2014."
+  },
+  {
+   "label": "A simulated version check",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ openssl version\nOpenSSL 1.0.1f 6 Jan 2014\n$ # 1.0.1f is in the affected range",
+   "note": "Shows how to read the version. The output is an example."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check the OpenSSL version.",
+    "why": "1.0.1 to 1.0.1f is affected."
+   },
+   {
+    "step": "Check which processes use the library.",
+    "why": "All must restart."
+   },
+   {
+    "step": "Check whether heartbeat is compiled out.",
+    "why": "Then not affected."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Upgrade to 1.0.1g or later.",
+    "why": "The fixed release."
+   },
+   {
+    "step": "Restart or relink all software.",
+    "why": "Old memory images are still vulnerable."
+   },
+   {
+    "step": "Reissue keys and certificates and revoke the old ones.",
+    "why": "Treat keys as compromised."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Scan to confirm the fix.",
+    "why": "Use a trusted test tool."
+   },
+   {
+    "step": "Check certificates were reissued.",
+    "why": "Not just patched."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Keep an inventory of crypto libraries.",
+    "why": "General practice."
+   },
+   {
+    "step": "Practice emergency key rotation.",
+    "why": "General practice."
+   },
+   {
+    "step": "Fund critical open source.",
+    "why": "General practice."
+   }
+  ],
+  "safety": "Do not test other people's servers without permission."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A critical OpenSSL bug is announced. You run hundreds of services and some use the library statically.",
+   "clues": [
+    "Versions unknown",
+    "Some use containers",
+    "Keys on disk"
+   ],
+   "question": "How do you respond?",
+   "hints": [
+    "How do you find all users of the library?",
+    "In what order do you patch?",
+    "What do you rotate?"
+   ],
+   "answer": "Inventory, patch internet-facing services first, restart everything that loaded the library, then reissue keys and rotate secrets."
+  },
+  "rootcause": {
+   "q": "Which versions were affected?",
+   "options": [
+    "1.0.1 through 1.0.1f",
+    "1.0.0",
+    "0.9",
+    "1.1.1"
+   ],
+   "answer": 0,
+   "why": "Per the article."
+  },
+  "remediation": [
+   {
+    "task": "Build a library inventory.",
+    "answer": "SBOM for every service."
+   },
+   {
+    "task": "Plan key rotation.",
+    "answer": "Automated issuance."
+   },
+   {
+    "task": "Write a restart runbook.",
+    "answer": "Find stale processes."
+   }
+  ],
+  "design": {
+   "prompt": "Design a fast response to a library vulnerability.",
+   "constraints": [
+    "200 services",
+    "Mixed packaging",
+    "Compliance"
+   ],
+   "answer": "SBOM, central patch pipeline, automated certificates, canary and rollout."
+  },
+  "checks": [
+   {
+    "q": "When was it disclosed?",
+    "options": [
+     "7 April 2014",
+     "1 January",
+     "9 May",
+     "1 April 2015"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   },
+   {
+    "q": "How much memory per request could leak?",
+    "options": [
+     "Up to 64 KiB",
+     "1 byte",
+     "1 GB",
+     "Nothing"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   },
+   {
+    "q": "What must you do after patching?",
+    "options": [
+     "Reissue keys and certificates",
+     "Nothing",
+     "Disable TLS",
+     "Change DNS"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   },
+   {
+    "q": "Who reported it privately to OpenSSL?",
+    "options": [
+     "Neel Mehta of Google",
+     "Codenomicon only",
+     "A regulator",
+     "A vendor"
+    ],
+    "answer": 0,
+    "why": "Per the article."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "SBOM and inventory",
+   "Automated certificates"
+  ],
+  "monitoring": [
+   "Library version scans"
+  ],
+  "recovery": [
+   "Patch, restart, rotate"
+  ],
+  "practices": [
+   "Key rotation drills",
+   "Fund critical open source"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Wikipedia: Heartbleed",
+   "url": "https://en.wikipedia.org/wiki/Heartbleed",
+   "used": "versions, dates, response"
+  }
+ ],
+ "verification": "Facts were read on 29 October 2026 from Wikipedia's article, which cites OpenSSL and Netcraft. The card's source, heartbleed.com, could not be read. The version output is an example (Simulated)."
+}

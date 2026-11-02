@@ -1,0 +1,378 @@
+{
+ "id": "verizon-route-leak",
+ "checked": "29 October 2026",
+ "summary": "On 24 June 2019 a BGP optimizer at a small Pennsylvania ISP split prefixes into more-specific routes. Verizon accepted and passed them on to the wider internet, pulling traffic for Cloudflare, Amazon, Linode and others through a network that could not carry it.",
+ "overview": {
+  "background": "BGP lets networks announce which addresses they can reach. More-specific routes win over general ones. A BGP optimizer at DQE Communications (AS33154) split received prefixes into more-specific routes. Customer Allegheny Technologies (AS396531) passed them to Verizon (AS701).",
+  "systems": [
+   "DQE Communications (AS33154) with a BGP optimizer",
+   "Allegheny Technologies (AS396531), a DQE customer",
+   "Verizon (AS701), another transit provider of Allegheny",
+   "Cloudflare and other networks whose prefixes were split"
+  ],
+  "impact": "Many sites were unreachable from large parts of the internet, including services of Amazon, Linode and Cloudflare. Cloudflare saw a loss of about 15 percent of its global traffic at the worst point.",
+  "severity": "A large partial outage that started at 10:30 UTC. The post gives no end time.",
+  "gaps": "Cloudflare had not heard back from Verizon when its post was written. Verizon's side is not covered."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A leaked more-specific route overrides the real one",
+   "caption": "Per Cloudflare, the optimizer's specific routes should have stayed inside the network. Verizon forwarded them, and they overrode more general routes.",
+   "nodes": [
+    {
+     "id": "opt",
+     "label": "DQE BGP optimizer splits prefixes (e.g. a /20 into two /21s)",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "cust",
+     "label": "Allegheny Technologies passes routes on",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "ver",
+     "label": "Verizon accepts and propagates them",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "net",
+     "label": "Traffic for Cloudflare, Amazon and Linode pulled through a small ISP",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "opt",
+     "t": "cust",
+     "state": "fail"
+    },
+    {
+     "f": "cust",
+     "t": "ver",
+     "state": "fail"
+    },
+    {
+     "f": "ver",
+     "t": "net",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Route filtering at each hop (conceptual)",
+   "caption": "Cloudflare recommends prefix limits, IRR filtering and RPKI origin validation. This picture shows where such filters would sit.",
+   "nodes": [
+    {
+     "id": "opt",
+     "label": "Optimizer output",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "cust",
+     "label": "Customer edge: prefix list and limit",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "ver",
+     "label": "Transit: IRR filter, RPKI validation",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "net",
+     "label": "Internet receives only valid routes",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "opt",
+     "t": "cust",
+     "state": "new"
+    },
+    {
+     "f": "cust",
+     "t": "ver",
+     "state": "new"
+    },
+    {
+     "f": "ver",
+     "t": "net",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Customers cannot announce what they do not own.",
+  "Transit providers filter customer routes.",
+  "Invalid routes are dropped automatically."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "24 Jun 2019, 10:30 UTC",
+   "phase": "trigger",
+   "e": "The leak begins. Specific routes from the optimizer spread through Verizon."
+  },
+  {
+   "t": "Following minutes",
+   "phase": "impact",
+   "e": "Traffic for many networks is pulled toward the small ISP and overwhelmed."
+  },
+  {
+   "t": "Following minutes",
+   "phase": "detect",
+   "e": "Cloudflare sees a loss of about 15 percent of global traffic at the worst point."
+  },
+  {
+   "t": "During the incident",
+   "phase": "investigate",
+   "e": "Cloudflare finds the routes come through Verizon from DQE and Allegheny."
+  },
+  {
+   "t": "During the incident",
+   "phase": "mitigate",
+   "e": "Cloudflare contacts DQE, which is reached quickly, and after a delay is connected to someone who can fix it."
+  },
+  {
+   "t": "After DQE acts",
+   "phase": "recover",
+   "e": "DQE stops advertising the optimized routes to Allegheny and the internet stabilises."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A BGP optimizer split prefixes into more-specific routes.",
+  "underlying": "The more-specific routes were leaked and Verizon should never have forwarded them.",
+  "contributing": [
+   "Verizon did not filter customer routes",
+   "No RPKI validation dropped the invalid routes",
+   "The routes were more-specific, so they overrode the normal ones"
+  ],
+  "propagation": [
+   "Optimizer splits prefixes.",
+   "Customer passes to Verizon.",
+   "Verizon propagates.",
+   "Traffic is misrouted."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The key sentence on Verizon",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "should never have forwarded those routes",
+   "note": "Cloudflare's words about Verizon in its post."
+  },
+  {
+   "label": "The impact",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "a loss... of about 15% of our global traffic",
+   "note": "As quoted in the summary of the post; the ellipsis is in the original quote."
+  },
+  {
+   "label": "A simulated route check",
+   "kind": "simulated",
+   "lang": "bash",
+   "body": "$ bgpq4 -4 -l PFX AS-EXAMPLE\n$ rpki-client -j | jq '.roas | length'",
+   "note": "Commands showing how a prefix list and ROAs are built. Not output from the incident."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check which routes appear for your prefixes.",
+    "why": "Specific routes were new."
+   },
+   {
+    "step": "Find the origin and the path.",
+    "why": "DQE, Allegheny, Verizon."
+   },
+   {
+    "step": "Find a contact at the source network.",
+    "why": "DQE responded."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Ask the source network to stop advertising.",
+    "why": "DQE stopped the optimizer routes."
+   },
+   {
+    "step": "Ask transit providers to filter.",
+    "why": "Cloudflare could not reach Verizon."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check routes return to normal.",
+    "why": "Confirm in route collectors."
+   },
+   {
+    "step": "Check traffic recovers.",
+    "why": "Compare with baseline."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Set prefix limits on sessions.",
+    "why": "Cloudflare's advice."
+   },
+   {
+    "step": "Filter using IRR data.",
+    "why": "Cloudflare's advice."
+   },
+   {
+    "step": "Validate origins with RPKI.",
+    "why": "Cloudflare's advice."
+   }
+  ],
+  "safety": "Filtering on an invalid basis can cut real customers off. Test filters in monitor mode first."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Your traffic drops 15 percent. Route collectors show specific routes for your prefixes from an unrelated small ISP.",
+   "clues": [
+    "Path goes through a large transit",
+    "The origin is wrong",
+    "No contact at transit"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "Who can stop it fastest?",
+    "What do you ask transit?",
+    "How do you stop a repeat?"
+   ],
+   "answer": "Contact the origin ISP to stop the announcement, escalate to the transit, then publish ROAs and ask peers to validate."
+  },
+  "rootcause": {
+   "q": "What happened to the prefixes?",
+   "options": [
+    "They were split into more-specific routes",
+    "They were deleted",
+    "They were encrypted",
+    "They were renamed"
+   ],
+   "answer": 0,
+   "why": "Per the post."
+  },
+  "remediation": [
+   {
+    "task": "Write a prefix limit policy.",
+    "answer": "Per-session max prefix with a warning level."
+   },
+   {
+    "task": "Plan ROA creation.",
+    "answer": "Publish ROAs for every prefix you originate."
+   },
+   {
+    "task": "Write an escalation list.",
+    "answer": "Network operations contacts for major transits."
+   }
+  ],
+  "design": {
+   "prompt": "Design routing hygiene for a transit provider.",
+   "constraints": [
+    "Many customers",
+    "Optimizers in use",
+    "Strict uptime"
+   ],
+   "answer": "Strict customer filters from IRR and RPKI, prefix limits, reject optimizer leaks, monitoring and 24-hour contacts."
+  },
+  "checks": [
+   {
+    "q": "Which ISP ran the optimizer?",
+    "options": [
+     "DQE Communications",
+     "Verizon",
+     "Cloudflare",
+     "Linode"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   },
+   {
+    "q": "When did it start?",
+    "options": [
+     "10:30 UTC on 24 June 2019",
+     "Midnight",
+     "21:00",
+     "Unknown"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   },
+   {
+    "q": "Which mechanism makes specific routes win?",
+    "options": [
+     "Longest prefix match",
+     "Lowest AS number",
+     "Oldest route",
+     "Random"
+    ],
+    "answer": 0,
+    "why": "General BGP behaviour."
+   },
+   {
+    "q": "Which control does Cloudflare say could have dropped them automatically?",
+    "options": [
+     "RPKI origin validation",
+     "A firewall",
+     "DNSSEC",
+     "A CDN"
+    ],
+    "answer": 0,
+    "why": "Per the post."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Prefix limits",
+   "IRR filtering",
+   "RPKI validation"
+  ],
+  "monitoring": [
+   "Route collectors and alerts"
+  ],
+  "recovery": [
+   "Contact the source network",
+   "Escalate to transit"
+  ],
+  "practices": [
+   "Publish ROAs",
+   "Follow MANRS"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Cloudflare: How Verizon and a BGP Optimizer Knocked Large Parts of the Internet Offline Today",
+   "url": "https://blog.cloudflare.com/how-verizon-and-a-bgp-optimizer-knocked-large-parts-of-the-internet-offline-today/",
+   "used": "time, networks, root cause, impact, mitigation"
+  }
+ ],
+ "verification": "Facts were read from Cloudflare's post on 29 October 2026. The card cited a related Cloudflare URL; this one was the page found by search. The commands are Simulated."
+}

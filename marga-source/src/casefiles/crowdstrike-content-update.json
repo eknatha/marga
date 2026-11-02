@@ -1,0 +1,471 @@
+{
+ "id": "crowdstrike-content-update",
+ "checked": "29 October 2026",
+ "summary": "On 19 July 2024 a security content update for CrowdStrike's Windows sensor carried one more input field than the sensor code expected. The sensor read memory out of bounds and Windows machines crashed at scale.",
+ "overview": {
+  "background": "CrowdStrike's Falcon sensor runs on customer endpoints and receives two kinds of updates: sensor software, and content updates called Rapid Response Content, delivered as channel files. Content updates are meant to be small, frequent and fast, so they follow a lighter path than software releases.",
+  "systems": [
+   "Falcon sensor on Windows hosts",
+   "Channel File 291, one of the content files the sensor reads",
+   "The content update pipeline and its validation",
+   "Customer Windows machines"
+  ],
+  "impact": "CrowdStrike calls it a widespread outage. Windows hosts that received the update crashed. As of 29 July 2024 at 8:00 PM EDT, about 99 percent of Windows sensors were online compared with before the update.",
+  "severity": "CrowdStrike does not publish a severity rating. The scale of the disruption is described as widespread in its own summary.",
+  "gaps": "The executive summary I read gives dates only. It does not give the UTC deployment or reversion times, and it does not state why earlier testing missed the mismatch."
+ },
+ "archNote": "The components and update flow below are described in CrowdStrike's root cause summary. The layout, labels and the failure path are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A content update and the sensor that reads it",
+   "caption": "Content is delivered as channel files and interpreted by the sensor on the endpoint. The new instance supplied a field count the sensor code did not expect, and the sensor read past the end of its data.",
+   "nodes": [
+    {
+     "id": "author",
+     "label": "Detection engineers author content with a Template Type",
+     "row": 0,
+     "col": 0.5
+    },
+    {
+     "id": "val",
+     "label": "Content Validator and tests",
+     "row": 1,
+     "col": 0.5,
+     "state": "hit"
+    },
+    {
+     "id": "cloud",
+     "label": "Content delivered to all Windows sensors",
+     "row": 2,
+     "col": 0.5,
+     "state": "hit"
+    },
+    {
+     "id": "sensor",
+     "label": "Sensor expects 20 input fields",
+     "row": 3,
+     "col": 0,
+     "state": "fail"
+    },
+    {
+     "id": "file",
+     "label": "Channel File 291 supplies 21 input fields",
+     "row": 3,
+     "col": 2,
+     "state": "fail"
+    },
+    {
+     "id": "crash",
+     "label": "Out-of-bounds read, then system crash",
+     "row": 4,
+     "col": 1,
+     "state": "fail"
+    }
+   ],
+   "edges": [
+    {
+     "f": "author",
+     "t": "val"
+    },
+    {
+     "f": "val",
+     "t": "cloud",
+     "label": "released",
+     "state": "fail"
+    },
+    {
+     "f": "cloud",
+     "t": "sensor",
+     "state": "fail"
+    },
+    {
+     "f": "cloud",
+     "t": "file",
+     "state": "fail"
+    },
+    {
+     "f": "sensor",
+     "t": "crash",
+     "state": "fail"
+    },
+    {
+     "f": "file",
+     "t": "crash",
+     "state": "fail"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Rings, validation and customer control (conceptual)",
+   "caption": "CrowdStrike describes deployment rings, validation of the number of input fields, upgraded Template Type tests, bounds checking in the sensor and customer control over content deployment. This picture is our illustration, not their architecture diagram.",
+   "nodes": [
+    {
+     "id": "author",
+     "label": "Content authored",
+     "row": 0,
+     "col": 1
+    },
+    {
+     "id": "val",
+     "label": "Validator checks field count and Template Type tests",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "r1",
+     "label": "Ring 1: internal",
+     "row": 2,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "r2",
+     "label": "Ring 2: early adopters",
+     "row": 2,
+     "col": 1.5,
+     "state": "new"
+    },
+    {
+     "id": "r3",
+     "label": "Ring 3: customer-controlled schedule",
+     "row": 2,
+     "col": 3,
+     "state": "new"
+    },
+    {
+     "id": "sensor",
+     "label": "Sensor with bounds checking",
+     "row": 3,
+     "col": 1.5,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "author",
+     "t": "val",
+     "state": "new"
+    },
+    {
+     "f": "val",
+     "t": "r1",
+     "state": "new"
+    },
+    {
+     "f": "val",
+     "t": "r2",
+     "state": "new"
+    },
+    {
+     "f": "val",
+     "t": "r3",
+     "state": "new"
+    },
+    {
+     "f": "r2",
+     "t": "sensor",
+     "label": "bad data rejected",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "The number of input fields is validated before release, so this exact mismatch cannot ship.",
+  "Content reaches a small ring first. A crash there stops the rollout before most customers are touched.",
+  "Customers can decide how and when Rapid Response Content reaches their machines.",
+  "The sensor checks bounds, so a bad file is rejected instead of crashing the machine."
+ ],
+ "afterNote": "The lesson is that a fast content path needs the same discipline as a software release: validation, staging, and a safe failure mode on the endpoint.",
+ "timelineNote": "The source I read gives dates, not clock times. Entries are in date order. Dates and statuses are as stated in CrowdStrike's root cause summary.",
+ "timeline": [
+  {
+   "t": "5 March 2024",
+   "phase": "change",
+   "e": "The first Channel File 291 Rapid Response Content is released to production after a stress test. Earlier releases performed as expected."
+  },
+  {
+   "t": "8 to 24 April 2024",
+   "phase": "change",
+   "e": "Three more updates of the same kind are deployed, and they also work in production."
+  },
+  {
+   "t": "19 July 2024",
+   "phase": "trigger",
+   "e": "An update to Channel File 291 is delivered to certain Windows hosts. It supplies 21 input fields where the sensor expects 20."
+  },
+  {
+   "t": "19 July 2024",
+   "phase": "impact",
+   "e": "The mismatch causes an out-of-bounds memory read and a system crash on affected hosts."
+  },
+  {
+   "t": "25 July 2024",
+   "phase": "mitigate",
+   "e": "Bounds checking is added to the sensor code. General availability is expected on 9 August and the fix is backported to sensor versions 7.11 and above."
+  },
+  {
+   "t": "29 July 2024, 8:00 PM EDT",
+   "phase": "recover",
+   "e": "About 99 percent of Windows sensors are online compared with before the update."
+  },
+  {
+   "t": "6 August 2024",
+   "phase": "change",
+   "e": "CrowdStrike publishes its root cause analysis."
+  }
+ ],
+ "rootCause": {
+  "trigger": "A Channel File 291 content update was delivered to Windows hosts with a data shape the sensor did not expect.",
+  "underlying": "The sensor expected 20 input fields and the update provided 21. The mismatch resulted in an out-of-bounds memory read, which crashed the system.",
+  "contributing": [
+   "The sensor did not check bounds when reading the fields",
+   "Validation did not check the number of input fields (CrowdStrike later added this check)",
+   "Template Type tests did not cover this case; automated tests for all existing Template Types were added afterwards",
+   "Content was released to the broad fleet without successive deployment rings",
+   "Customer control over how Rapid Response Content is deployed was only added afterwards"
+  ],
+  "propagation": [
+   "The update is delivered to many Windows hosts at about the same time.",
+   "On each host the sensor reads the new content with the wrong field count.",
+   "The out-of-bounds read crashes the system.",
+   "Recovery has to be carried out on the affected hosts, and CrowdStrike reports that about 99 percent of Windows sensors were back online by 29 July."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The mismatch, in CrowdStrike's words",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "The sensor expected 20 input fields, while the update provided 21 input fields.",
+   "note": "From CrowdStrike's root cause analysis executive summary."
+  },
+  {
+   "label": "The result, in CrowdStrike's words",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "the mismatch resulted in an out-of-bounds memory read, causing a system crash.",
+   "note": "Same document."
+  },
+  {
+   "label": "A validation check that would have caught it",
+   "kind": "simulated",
+   "lang": "python",
+   "body": "def validate_instance(template, instance):\n    expected = len(template.fields)          # what the sensor will read\n    supplied = len(instance.values)          # what the content provides\n    if supplied != expected:\n        raise ValueError(f\"{supplied} inputs supplied, template defines {expected}\")",
+   "note": "A teaching sketch of the kind of check CrowdStrike says it added. It is not their code."
+  },
+  {
+   "label": "A safe parser on the endpoint",
+   "kind": "simulated",
+   "lang": "python",
+   "body": "def read_fields(buf, count):\n    if count > len(buf):\n        return None          # reject the file, keep running with the last good content\n    return buf[:count]",
+   "note": "Shows the principle of failing safe instead of crashing. Not vendor code."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Correlate the start of the crashes with a content or software delivery.",
+    "why": "A fleet-wide failure within minutes of an update points at the update.",
+    "cmd": "fleet-report --since 2h --group-by content_version,host_state"
+   },
+   {
+    "step": "Read the crash data from an affected host.",
+    "why": "The fault address and driver name tell you which component read invalid memory.",
+    "cmd": "windbg -z C:\\Windows\\MEMORY.DMP -c \"!analyze -v; q\""
+   },
+   {
+    "step": "Check what changed in the content and what the code expected.",
+    "why": "Here the count of input fields differed by one."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Stop the rollout and revert the bad content at the source.",
+    "why": "No new host should receive the faulty file."
+   },
+   {
+    "step": "Recover each affected host with the vendor's published steps.",
+    "why": "Machines that crash early in start-up need a manual or assisted fix. Use the vendor's current guidance and not a copy from a blog post.",
+    "cmd": "# boot into the recovery environment or safe mode, remove the faulty channel file as the vendor instructs, then reboot"
+   },
+   {
+    "step": "Prioritise by business impact and bring critical systems back first.",
+    "why": "Limited hands should restore what matters most (emergency, clinical, payment systems) before the rest."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Confirm hosts boot, the sensor reports in and the content version is the good one.",
+    "why": "A host that boots but lacks protection is not recovered.",
+    "cmd": "fleet-report --group-by content_version,sensor_state"
+   },
+   {
+    "step": "Track the share of fleet online, as CrowdStrike did.",
+    "why": "A number you can watch rise gives everyone the same picture of progress."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Validate the shape of every content instance against its template before release.",
+    "why": "Cheap checks on field counts and types catch a whole class of errors.",
+    "cmd": "content-validate --template templates/ipc.json --instance channel/291.bin --strict"
+   },
+   {
+    "step": "Roll content out in rings and stop automatically if early rings crash.",
+    "why": "A crash in ring one should cost a few machines, not the fleet."
+   },
+   {
+    "step": "Make the endpoint code fail safe: check bounds and fall back to the last known good content.",
+    "why": "A bad data file must never be able to take down the operating system."
+   },
+   {
+    "step": "Give customers controls over when content is deployed to their machines.",
+    "why": "Customers with strict change rules can then stage it themselves."
+   }
+  ],
+  "safety": "Do not copy recovery commands from unofficial sources during a live incident. Use the vendor's current published steps, test on one machine, and keep a record of every host you change."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Within minutes of a security content update, thousands of Windows machines reboot into a crash loop. The tool that delivered the update shows it completed successfully everywhere.",
+   "clues": [
+    "The crash dump points at a driver that parses the new content",
+    "The previous content version worked",
+    "The new content has one more field than the template defines",
+    "Machines cannot start long enough to receive a fix over the network"
+   ],
+   "question": "What stops the damage from growing, and what fixes the machines already affected?",
+   "hints": [
+    "Think about the source of the bad data, not the machines.",
+    "Which fix can be sent to a machine that cannot boot?",
+    "What order would you recover systems in?"
+   ],
+   "answer": "Stop distribution and revert the bad content at the source first. Machines that cannot boot need a local fix, such as booting into a recovery environment and removing the faulty file as the vendor instructs. Recover in order of business criticality, and report progress as a share of the fleet online."
+  },
+  "rootcause": {
+   "q": "Which best summarises the technical root cause?",
+   "options": [
+    "A cyberattack on the vendor",
+    "A content update supplied 21 input fields where the sensor expected 20, causing an out-of-bounds read",
+    "A Windows update broke the sensor",
+    "A hardware fault"
+   ],
+   "answer": 1,
+   "why": "CrowdStrike's analysis states exactly this mismatch and the resulting out-of-bounds memory read."
+  },
+  "remediation": [
+   {
+    "task": "Write the validation rules you would run on every content instance before release.",
+    "answer": "Check the number and types of fields against the template, check size limits, check that parsing succeeds in a sandbox, and check that the sensor handles the file in a test fleet. Fail the release on any error."
+   },
+   {
+    "task": "Design the rings for a content rollout.",
+    "answer": "Ring 0 is internal machines, ring 1 a small volunteer set, ring 2 a larger sample across operating systems, ring 3 the rest. Each ring waits for a health signal such as crash rate and heartbeat. An automatic stop prevents a bad update from advancing."
+   },
+   {
+    "task": "Define the safe behaviour of an endpoint component when data is invalid.",
+    "answer": "Reject the data, log the reason, keep using the last known good content, and report the failure to the cloud so the rollout can stop."
+   }
+  ],
+  "design": {
+   "prompt": "Design an update system for security content on a million endpoints, where an update can take effect within minutes but cannot crash a machine.",
+   "constraints": [
+    "Content must be able to reach endpoints fast during an attack",
+    "A bad update must affect only a small part of the fleet",
+    "Endpoints must keep working if content is invalid"
+   ],
+   "answer": "Separate content from code, validate content against schemas in the pipeline, test it on a representative fleet, then deliver in rings with automatic halting on crash or heartbeat loss. Make the endpoint parser memory-safe and bounds-checked, with a last-known-good fallback. Offer customers a policy to delay or stage content. Keep an emergency lane that still includes a first ring."
+  },
+  "checks": [
+   {
+    "q": "What mismatch caused the crash?",
+    "options": [
+     "20 fields supplied, 21 expected",
+     "21 input fields supplied where the sensor expected 20",
+     "A missing certificate",
+     "A wrong timestamp"
+    ],
+    "answer": 1,
+    "why": "That is the wording in CrowdStrike's analysis."
+   },
+   {
+    "q": "Which control addresses the blast radius?",
+    "options": [
+     "Longer log retention",
+     "Successive deployment rings",
+     "A bigger database",
+     "A new logo"
+    ],
+    "answer": 1,
+    "why": "Rings send content to a small group first and stop if it crashes."
+   },
+   {
+    "q": "Why is an out-of-bounds read in a security sensor especially serious?",
+    "options": [
+     "It makes logs bigger",
+     "The sensor runs with high privilege, so a fault can crash the whole system",
+     "It slows the network",
+     "It changes DNS"
+    ],
+    "answer": 1,
+    "why": "Software that runs close to the operating system can bring the machine down when it faults."
+   },
+   {
+    "q": "According to the summary, what did the security review conclude about exploitability?",
+    "options": [
+     "It is easily exploitable",
+     "Analysis with a third-party review confirmed the bug is not exploitable by a threat actor",
+     "It was exploited in the wild",
+     "It was not reviewed"
+    ],
+    "answer": 1,
+    "why": "The summary states that its analysis and a third-party review confirmed the bug is not exploitable."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Validate every content instance against its template before release",
+   "Add automated tests for all Template Types",
+   "Check bounds in code that parses external data",
+   "Deploy through rings, even for fast content"
+  ],
+  "monitoring": [
+   "Watch crash and heartbeat rates per ring and halt automatically",
+   "Track the share of the fleet online during recovery"
+  ],
+  "recovery": [
+   "Prepare a documented recovery for machines that cannot boot",
+   "Prioritise recovery by business criticality",
+   "Publish clear customer guidance and one progress number"
+  ],
+  "practices": [
+   "Fast does not mean unstaged",
+   "Treat configuration and content as code",
+   "Give customers control over change timing where they need it",
+   "Commission independent reviews of code and release processes"
+  ]
+ },
+ "sources": [
+  {
+   "title": "CrowdStrike: Channel File 291 Incident Root Cause Analysis, executive summary",
+   "url": "https://www.crowdstrike.com/wp-content/uploads/2024/08/Executive-Summary_Root-Cause-Analysis_Channel-File-291.pdf",
+   "used": "dates, the 20 versus 21 field mismatch, mitigations and their status"
+  },
+  {
+   "title": "CrowdStrike: Channel File 291 Incident, Root Cause Analysis is available",
+   "url": "https://www.crowdstrike.com/en-us/blog/channel-file-291-rca-available/",
+   "used": "the 99 percent recovery figure and the publication date"
+  }
+ ],
+ "verification": "Facts marked Reported or Verified were read from the two CrowdStrike pages above on 29 October 2026. The full root cause analysis PDF was not available to this review, so UTC times and the explanation of why testing missed the mismatch are not included. Evidence marked Simulated is written for teaching and is not vendor code or output."
+}

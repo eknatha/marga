@@ -1,0 +1,420 @@
+{
+ "id": "microsoft-azure-leap-day-certificate-bug",
+ "checked": "29 October 2026",
+ "summary": "On 28 February 2012 (29 February UTC) Windows Azure's guest agents tried to create certificates valid for one year by adding one to the year. On leap day that produced 29 February 2013, which does not exist, and compute service management failed worldwide.",
+ "overview": {
+  "background": "Each Windows Azure guest agent (GA) creates a transfer certificate with a one-year validity so it can talk securely to its host. The fabric controller manages servers and, on repeated failures, marks hardware as bad.",
+  "systems": [
+   "Guest agents inside VMs",
+   "Fabric Controller and service management",
+   "Compute, Access Control Service, Service Bus, Caching",
+   "SQL Azure Portal and Data Sync",
+   "Service dashboard"
+  ],
+  "impact": "A partial outage of Windows Azure Compute and dependent services. Storage and SQL Azure were not affected. Customers could not deploy, update, stop or scale applications, and some VMs went offline.",
+  "severity": "Global, with a secondary outage in seven clusters. Microsoft gave a 33 percent service credit to affected customers.",
+  "gaps": "The post gives no VM counts."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "A date calculation fails and the fabric blames hardware",
+   "caption": "The GA added one to the year and got an invalid date. Certificate creation failed, the GA terminated, and repeated failures made the fabric controller treat servers as faulty.",
+   "nodes": [
+    {
+     "id": "ga",
+     "label": "Guest agent: valid-to = 29 Feb 2013",
+     "row": 0,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "cert",
+     "label": "Transfer certificate creation fails",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "fc",
+     "label": "Fabric Controller counts failures, flags servers",
+     "row": 2,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "sm",
+     "label": "Service management disabled worldwide",
+     "row": 3,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "dep",
+     "label": "ACS, Service Bus, caching, portals",
+     "row": 3,
+     "col": 2,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "ga",
+     "t": "cert",
+     "label": "invalid date",
+     "state": "fail"
+    },
+    {
+     "f": "cert",
+     "t": "fc",
+     "label": "GA terminates",
+     "state": "fail"
+    },
+    {
+     "f": "fc",
+     "t": "sm",
+     "state": "hit"
+    },
+    {
+     "f": "fc",
+     "t": "dep",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Better testing and finer controls (conceptual)",
+   "caption": "Microsoft listed time-bug testing, fault isolation, finer-grained disabling of service parts and clearer dashboards. This picture shows the idea.",
+   "nodes": [
+    {
+     "id": "test",
+     "label": "Tests for dates such as leap days",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "iso",
+     "label": "Software faults separated from hardware faults",
+     "row": 1,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "ctl",
+     "label": "Disable parts of the service, not all of it",
+     "row": 2,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "dash",
+     "label": "Dashboard with a summary of the situation",
+     "row": 2,
+     "col": 2,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "test",
+     "t": "iso",
+     "state": "new"
+    },
+    {
+     "f": "iso",
+     "t": "ctl",
+     "state": "new"
+    },
+    {
+     "f": "iso",
+     "t": "dash",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "Time bugs are caught before release.",
+  "A software bug is not treated as a hardware failure.",
+  "Operators can pause only what is unsafe."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "28 Feb 4:00 PM PST (00:00 UTC 29 Feb)",
+   "phase": "trigger",
+   "e": "The bug triggers as new VMs try to create certificates."
+  },
+  {
+   "t": "5:15 PM",
+   "phase": "detect",
+   "e": "The Human Investigate threshold is reached in clusters being updated."
+  },
+  {
+   "t": "6:38 PM",
+   "phase": "investigate",
+   "e": "Developers identify the bug."
+  },
+  {
+   "t": "6:55 PM",
+   "phase": "mitigate",
+   "e": "Service management is disabled in all clusters worldwide, the first time this step was taken."
+  },
+  {
+   "t": "11:20 PM",
+   "phase": "mitigate",
+   "e": "Updated GA code is ready."
+  },
+  {
+   "t": "29 Feb 2:11 AM",
+   "phase": "mitigate",
+   "e": "The fix completes rollout to one production cluster, then is pushed to all clusters."
+  },
+  {
+   "t": "2:47 AM",
+   "phase": "impact",
+   "e": "An incompatible combination of components is pushed to seven clusters, causing a secondary outage."
+  },
+  {
+   "t": "5:23 AM",
+   "phase": "recover",
+   "e": "Service management is restored to most clusters."
+  },
+  {
+   "t": "8:00 AM",
+   "phase": "recover",
+   "e": "The seven clusters are largely operational."
+  },
+  {
+   "t": "1 Mar 2:15 AM",
+   "phase": "recover",
+   "e": "The dashboard reports all services healthy."
+  }
+ ],
+ "rootCause": {
+  "trigger": "On leap day any GA creating a transfer certificate set a valid-to date of 29 February 2013.",
+  "underlying": "The code added one to the current year without handling leap day, so certificate creation failed and the GA terminated.",
+  "contributing": [
+   "The fabric controller treated repeated failures as hardware faults",
+   "A fix pushed in a hurry was incompatible with some components",
+   "The dashboard and communication were weak",
+   "Dependent services such as ACS and Service Bus needed prioritised recovery"
+  ],
+  "propagation": [
+   "Certificate fails.",
+   "GA terminates.",
+   "Fabric flags servers.",
+   "Management is disabled to stop the spread."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "The bug",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "any GA that tried to create a transfer certificate on leap day set a valid-to date of February 29, 2013",
+   "note": "From Microsoft's summary."
+  },
+  {
+   "label": "The lesson",
+   "kind": "quoted",
+   "lang": "text",
+   "body": "The three truths of cloud computing are: hardware fails, software has bugs and people make mistakes.",
+   "note": "From Microsoft's summary."
+  },
+  {
+   "label": "A simulated date bug",
+   "kind": "simulated",
+   "lang": "python",
+   "body": "from datetime import date\ntoday = date(2012, 2, 29)\nvalid_to = today.replace(year=today.year + 1)  # ValueError: day is out of range",
+   "note": "Reproduces the class of bug in Python. Not Azure code."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Check what is common to the failing machines.",
+    "why": "All failures started at the same moment, so a date or clock was the clue."
+   },
+   {
+    "step": "Read the agent's error for the certificate step.",
+    "why": "The failure was in creating the certificate."
+   },
+   {
+    "step": "Check whether the fabric is blaming hardware.",
+    "why": "Repeated failures were wrongly flagged as hardware faults."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Stop changes that spread the failure.",
+    "why": "Service management was disabled worldwide."
+   },
+   {
+    "step": "Fix the date calculation and test it first.",
+    "why": "The fix was tested on a test cluster."
+   },
+   {
+    "step": "Roll out the fix cluster by cluster.",
+    "why": "Do not push untested combinations."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check the fabric reports healthy servers.",
+    "why": "Confirm the false hardware flags clear."
+   },
+   {
+    "step": "Check dependent services.",
+    "why": "ACS and Service Bus recovered separately."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Test dates around leap days and year ends.",
+    "why": "Microsoft's stated action."
+   },
+   {
+    "step": "Separate software faults from hardware faults.",
+    "why": "Microsoft's stated action."
+   },
+   {
+    "step": "Improve the dashboard.",
+    "why": "Microsoft's stated action."
+   }
+  ],
+  "safety": "Disabling service management stops customers changing their apps, but it protects running ones. Announce it clearly."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "Every new VM fails to start on the same minute and servers are being marked bad. Today is 29 February.",
+   "clues": [
+    "Certificate step fails",
+    "All clusters show the same errors",
+    "Hardware tests pass"
+   ],
+   "question": "How do you find and contain the cause?",
+   "hints": [
+    "What do the failures share?",
+    "How do you stop spread?",
+    "How do you test the fix?"
+   ],
+   "answer": "Notice the shared timing, find the certificate date error, stop service management, fix and test the date logic, roll out in stages and check fabric hardware flags."
+  },
+  "rootcause": {
+   "q": "What date did the GA compute?",
+   "options": [
+    "29 February 2013",
+    "28 February 2012",
+    "1 March 2012",
+    "31 December 2012"
+   ],
+   "answer": 0,
+   "why": "Microsoft quotes February 29, 2013."
+  },
+  "remediation": [
+   {
+    "task": "Write date tests.",
+    "answer": "Include 29 February, 28 February in a leap year, year end and time zone boundaries."
+   },
+   {
+    "task": "Design fault classes.",
+    "answer": "Separate software errors from hardware by symptom and spread."
+   },
+   {
+    "task": "Plan staged rollout.",
+    "answer": "Test, one cluster, then more, with compatibility checks."
+   }
+  ],
+  "design": {
+   "prompt": "Design certificate creation that cannot fail on a date.",
+   "constraints": [
+    "One-year validity",
+    "Many agents",
+    "Time zones"
+   ],
+   "answer": "Use a date library that adds a year safely, test edge dates, handle failure by retry and alert rather than terminate, and avoid failing hard."
+  },
+  "checks": [
+   {
+    "q": "Which services were not affected?",
+    "options": [
+     "Storage and SQL Azure",
+     "Compute",
+     "ACS",
+     "Service Bus"
+    ],
+    "answer": 0,
+    "why": "Microsoft says storage and SQL Azure were not affected."
+   },
+   {
+    "q": "What was the first time Microsoft took which step?",
+    "options": [
+     "Disabled service management worldwide",
+     "Deleted data",
+     "Rebooted all",
+     "Closed the portal"
+    ],
+    "answer": 0,
+    "why": "Microsoft says it was the first time."
+   },
+   {
+    "q": "What credit was given?",
+    "options": [
+     "33 percent",
+     "100 percent",
+     "None",
+     "5 percent"
+    ],
+    "answer": 0,
+    "why": "Microsoft gave a 33 percent credit."
+   },
+   {
+    "q": "What caused the secondary outage?",
+    "options": [
+     "An incompatible combination of components pushed to seven clusters",
+     "A fire",
+     "A cable cut",
+     "A bad certificate"
+    ],
+    "answer": 0,
+    "why": "Microsoft explains this."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "Test leap days and boundaries",
+   "Separate software faults from hardware faults",
+   "Finer controls to disable parts of a service"
+  ],
+  "monitoring": [
+   "Agent failures after time rollovers"
+  ],
+  "recovery": [
+   "Contain first",
+   "Roll out fixes in stages"
+  ],
+  "practices": [
+   "Have clear dashboards",
+   "Plan for hardware fails, software has bugs, people make mistakes"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Windows Azure Blog: Summary of Windows Azure Service Disruption on Feb 29th, 2012",
+   "url": "https://azure.microsoft.com/en-us/blog/summary-of-windows-azure-service-disruption-on-feb-29th-2012/",
+   "used": "timeline, cause, impact, actions"
+  }
+ ],
+ "verification": "Facts were read from Microsoft's published summary on 29 October 2026. The code is Simulated and fails in Python the same way."
+}

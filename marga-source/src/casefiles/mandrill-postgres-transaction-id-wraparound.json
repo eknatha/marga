@@ -1,0 +1,399 @@
+{
+ "id": "mandrill-postgres-transaction-id-wraparound",
+ "checked": "29 October 2026",
+ "summary": "On 4 February 2019 a Mandrill Postgres shard reached its transaction ID limit and shut itself down to protect data. Mandrill could not send email for about 40.5 hours. The fix was to truncate two huge tables so vacuum could finish.",
+ "overview": {
+  "background": "Mandrill, Mailchimp's transactional email service, used sharded Postgres. Postgres uses transaction IDs that must be vacuumed, or the database stops accepting writes.",
+  "systems": [
+   "Postgres shard4",
+   "Autovacuum",
+   "Search and Url tables (terabyte scale)",
+   "App servers holding queued jobs on disk"
+  ],
+  "impact": "Mandrill could not send email for about 40.5 hours. Only 80 percent of queued email was sent. Refunds and credits followed.",
+  "severity": "Severe and long. Mailchimp refunded purchases between 1 January and 13 February 2019.",
+  "gaps": "Mailchimp says it could not determine whether autovacuum fell behind or failed."
+ },
+ "archNote": "Components and relationships come from the cited source where it describes them. Layout and labels are ours.",
+ "diagrams": [
+  {
+   "id": "before",
+   "section": "arch",
+   "kind": "verified",
+   "title": "XID limit reached, database stops, queues back up",
+   "caption": "Per Mailchimp, shard4 shut down at the XID limit. Retries added load and queued jobs filled app server disks.",
+   "nodes": [
+    {
+     "id": "xid",
+     "label": "XID limit reached on shard4",
+     "row": 0,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "db",
+     "label": "Postgres protective shutdown",
+     "row": 1,
+     "col": 1,
+     "state": "fail"
+    },
+    {
+     "id": "retry",
+     "label": "Retries increase load",
+     "row": 2,
+     "col": 0,
+     "state": "hit"
+    },
+    {
+     "id": "disk",
+     "label": "Queued jobs fill app server disks",
+     "row": 2,
+     "col": 2,
+     "state": "hit"
+    },
+    {
+     "id": "mail",
+     "label": "No email sent for 40.5 hours",
+     "row": 3,
+     "col": 1,
+     "state": "hit"
+    }
+   ],
+   "edges": [
+    {
+     "f": "xid",
+     "t": "db",
+     "state": "fail"
+    },
+    {
+     "f": "db",
+     "t": "retry",
+     "state": "hit"
+    },
+    {
+     "f": "db",
+     "t": "disk",
+     "state": "hit"
+    },
+    {
+     "f": "retry",
+     "t": "mail",
+     "state": "hit"
+    }
+   ]
+  },
+  {
+   "id": "after",
+   "section": "after",
+   "kind": "conceptual",
+   "title": "Early warning and a rehearsed vacuum plan (conceptual)",
+   "caption": "Mailchimp added XID alerting. This adds general guards.",
+   "nodes": [
+    {
+     "id": "mon",
+     "label": "XID age alerts at 50 percent",
+     "row": 0,
+     "col": 1,
+     "state": "new"
+    },
+    {
+     "id": "vac",
+     "label": "Vacuum tuned for large tables",
+     "row": 1,
+     "col": 0,
+     "state": "new"
+    },
+    {
+     "id": "shard",
+     "label": "Even write distribution",
+     "row": 1,
+     "col": 2,
+     "state": "new"
+    },
+    {
+     "id": "run",
+     "label": "Runbook rehearsed",
+     "row": 2,
+     "col": 1,
+     "state": "new"
+    }
+   ],
+   "edges": [
+    {
+     "f": "mon",
+     "t": "vac",
+     "state": "new"
+    },
+    {
+     "f": "mon",
+     "t": "shard",
+     "state": "new"
+    },
+    {
+     "f": "vac",
+     "t": "run",
+     "state": "new"
+    }
+   ]
+  }
+ ],
+ "afterChanges": [
+  "XID age is alerted.",
+  "Vacuum keeps up.",
+  "Writes are evenly spread."
+ ],
+ "afterNote": "The after picture shows the corrective ideas in the source and general good practice. It is conceptual unless the source says otherwise.",
+ "timelineNote": "Times are as published by the source. Entries without a clock time are given in order only.",
+ "timeline": [
+  {
+   "t": "Nov 2018",
+   "phase": "change",
+   "e": "Engineers see XIDs climbing to about half the limit at peak load; monitoring is added to the backlog."
+  },
+  {
+   "t": "4 Feb 05:35 UTC",
+   "phase": "trigger",
+   "e": "The XID limit is reached and shard4 shuts down."
+  },
+  {
+   "t": "4 Feb 11:58",
+   "phase": "detect",
+   "e": "Investigation opens; retries had already increased load."
+  },
+  {
+   "t": "4 Feb 12:56",
+   "phase": "investigate",
+   "e": "Wraparound is identified."
+  },
+  {
+   "t": "4 Feb 14:16",
+   "phase": "mitigate",
+   "e": "Vacuum starts; estimates run as high as 40 days."
+  },
+  {
+   "t": "5 Feb 19:12",
+   "phase": "mitigate",
+   "e": "Search and Url tables are truncated, which frees the XIDs."
+  },
+  {
+   "t": "5 Feb 21:36",
+   "phase": "recover",
+   "e": "Sending from the backlog begins."
+  },
+  {
+   "t": "6 Feb 01:00",
+   "phase": "recover",
+   "e": "Queues are back to normal."
+  }
+ ],
+ "rootCause": {
+  "trigger": "Shard4 reached the transaction ID limit.",
+  "underlying": "Mailchimp could not determine whether autovacuum fell behind or failed outright.",
+  "contributing": [
+   "Early warnings in Nov 2018 were not acted on",
+   "Hashing sent more writes to shard4",
+   "The first exception was buried in unrelated alerts",
+   "Knowledge of Mandrill systems was concentrated in a few people"
+  ],
+  "propagation": [
+   "XID limit.",
+   "Shutdown.",
+   "Retries and disk pressure.",
+   "Truncate tables to recover."
+  ]
+ },
+ "evidence": [
+  {
+   "label": "Impact figure (restated)",
+   "kind": "simulated",
+   "lang": "text",
+   "body": "Sending stopped for about 40.5 hours; about 80 percent of queued email was later sent.",
+   "note": "A restatement of figures on Mailchimp's page, not a verbatim quote."
+  },
+  {
+   "label": "A simulated XID check",
+   "kind": "simulated",
+   "lang": "sql",
+   "body": "SELECT datname, age(datfrozenxid) AS xid_age\nFROM pg_database\nORDER BY xid_age DESC;",
+   "note": "A query to monitor transaction ID age. Output omitted."
+  }
+ ],
+ "fix": {
+  "simulated": true,
+  "diagnose": [
+   {
+    "step": "Read the database error.",
+    "why": "The shutdown message names wraparound."
+   },
+   {
+    "step": "Check XID age per database.",
+    "why": "Near the limit."
+   },
+   {
+    "step": "Check autovacuum activity.",
+    "why": "Progress was not enough."
+   }
+  ],
+  "correct": [
+   {
+    "step": "Start vacuum on the shard.",
+    "why": "Estimates were far too long."
+   },
+   {
+    "step": "Truncate huge disposable tables.",
+    "why": "Search and Url tables were truncated."
+   },
+   {
+    "step": "Resume sending from backlog.",
+    "why": "Watch disk and load."
+   }
+  ],
+  "verify": [
+   {
+    "step": "Check XID age drops.",
+    "why": "Confirms."
+   },
+   {
+    "step": "Check queues return to normal.",
+    "why": "01:00 on 6 Feb."
+   }
+  ],
+  "prevent": [
+   {
+    "step": "Alert on XID age.",
+    "why": "Mailchimp's change."
+   },
+   {
+    "step": "Spread writes evenly.",
+    "why": "Hashing lesson."
+   },
+   {
+    "step": "Rotate incident commanders.",
+    "why": "Mailchimp's change."
+   }
+  ],
+  "safety": "Truncating tables destroys data. Confirm the data is disposable first."
+ },
+ "activities": {
+  "troubleshoot": {
+   "scenario": "A Postgres shard has shut down and logs mention wraparound. Vacuum estimates are 40 days.",
+   "clues": [
+    "Tables are huge",
+    "Retries increase load",
+    "Queue disks filling"
+   ],
+   "question": "What do you do?",
+   "hints": [
+    "What shortens vacuum?",
+    "What protects other systems?",
+    "What do you add afterwards?"
+   ],
+   "answer": "Drop or truncate disposable large tables, vacuum, limit retries, protect queues and add XID alerts."
+  },
+  "rootcause": {
+   "q": "How long was sending down?",
+   "options": [
+    "About 40.5 hours",
+    "5 minutes",
+    "1 week",
+    "3 hours"
+   ],
+   "answer": 0,
+   "why": "Per Mailchimp."
+  },
+  "remediation": [
+   {
+    "task": "Write an XID alert.",
+    "answer": "Warn at 40 percent of the limit."
+   },
+   {
+    "task": "Plan table retention.",
+    "answer": "Expire search and URL data."
+   },
+   {
+    "task": "Plan shard balance.",
+    "answer": "Choose keys that spread writes."
+   }
+  ],
+  "design": {
+   "prompt": "Design a vacuum strategy for terabyte tables.",
+   "constraints": [
+    "High write rate",
+    "Sharded",
+    "Mission critical"
+   ],
+   "answer": "Aggressive autovacuum, partitions that can be dropped, XID monitoring, and runbooks."
+  },
+  "checks": [
+   {
+    "q": "What caused the shutdown?",
+    "options": [
+     "Transaction ID wraparound protection",
+     "A disk fault",
+     "A DDoS",
+     "A bad deploy"
+    ],
+    "answer": 0,
+    "why": "Per Mailchimp."
+   },
+   {
+    "q": "What fix freed the XIDs?",
+    "options": [
+     "Truncating the Search and Url tables",
+     "A reboot",
+     "More RAM",
+     "New DNS"
+    ],
+    "answer": 0,
+    "why": "Per Mailchimp."
+   },
+   {
+    "q": "How much queued email was sent?",
+    "options": [
+     "80 percent",
+     "100 percent",
+     "0",
+     "10 percent"
+    ],
+    "answer": 0,
+    "why": "Per Mailchimp."
+   },
+   {
+    "q": "When was the first sign of high XID?",
+    "options": [
+     "November 2018",
+     "4 February",
+     "1 January 2019",
+     "Never"
+    ],
+    "answer": 0,
+    "why": "Per Mailchimp."
+   }
+  ]
+ },
+ "lessons": {
+  "preventive": [
+   "XID alerts",
+   "Even write distribution"
+  ],
+  "monitoring": [
+   "Alert triage"
+  ],
+  "recovery": [
+   "Truncate disposable tables",
+   "Vacuum"
+  ],
+  "practices": [
+   "Rotate incident commanders",
+   "Spread knowledge"
+  ]
+ },
+ "sources": [
+  {
+   "title": "Mailchimp: What We Learned from the Recent Mandrill Outage",
+   "url": "https://mailchimp.com/what-we-learned-from-the-recent-mandrill-outage/",
+   "used": "timeline, cause, fix, lessons"
+  }
+ ],
+ "verification": "Facts were read from Mailchimp's page on 29 October 2026. The first evidence item restates the page's figures and is not a quotation. The SQL is Simulated."
+}
