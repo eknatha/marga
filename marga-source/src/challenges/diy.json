@@ -1,0 +1,1264 @@
+[
+ {
+  "id": "linux-owner-only-plus-group-read",
+  "lesson": "linux/users-groups-permissions",
+  "title": "Owner only plus group read",
+  "kind": "cmd",
+  "prompt": "Give the file deploy.sh these permissions: the owner can read, write and run it; the group can read and run it; everyone else gets nothing. Type the command.",
+  "accept": [
+   "^chmod (750|u=rwx,g=rx,o=|u=rwx,g=r-x,o=) (\\./)?deploy\\.sh$"
+  ],
+  "ci": false,
+  "hints": [
+   "Permissions are three digits: owner, group, others.",
+   "Read is 4, write is 2, execute is 1. Add them up for each digit.",
+   "Owner 4+2+1, group 4+1, others 0."
+  ],
+  "solution": "chmod 750 deploy.sh"
+ },
+ {
+  "id": "linux-biggest-memory-users",
+  "lesson": "linux/processes-and-services",
+  "title": "Biggest memory users",
+  "kind": "cmd",
+  "prompt": "Show the five processes that use the most memory, biggest first. Use ps and head. Type the command.",
+  "accept": [
+   "^ps (aux|-eo [^|]+|-ef) ?--sort[= ]-(%mem|rss|pmem)\\s*\\|\\s*head( -n ?| -)6$",
+   "^ps (aux|-eo [^|]+) --sort=-(%mem|rss)\\s*\\|\\s*head( -n ?| -)?[56]$"
+  ],
+  "ci": false,
+  "hints": [
+   "ps can sort its output with --sort. A minus sign means biggest first.",
+   "The header line counts as one, so ask head for six lines."
+  ],
+  "solution": "ps aux --sort=-%mem | head -n 6"
+ },
+ {
+  "id": "linux-which-folder-is-eating-var",
+  "lesson": "linux/disks-and-filesystems",
+  "title": "Which folder is eating /var",
+  "kind": "cmd",
+  "prompt": "List the folders directly under /var with their sizes, biggest first. Type the command.",
+  "accept": [
+   "^du -s?h(x)? /var/\\*\\s*\\|\\s*sort -(r?h|hr)( \\| head( -n ?\\d+)?)?$",
+   "^du -(sh|hs|h -s|sx?h) /var/\\* 2>/dev/null\\s*\\|\\s*sort -(rh|hr)( \\| head( -n ?\\d+)?)?$"
+  ],
+  "ci": false,
+  "hints": [
+   "du -sh prints a summary size in human form for each path you give it.",
+   "Give it /var/* and sort the result: sort -h understands sizes such as 12M.",
+   "Add -r to sort so the biggest is first."
+  ],
+  "solution": "du -sh /var/* | sort -rh | head"
+ },
+ {
+  "id": "linux-follow-the-ssh-service-log",
+  "lesson": "linux/logs-and-troubleshooting",
+  "title": "Follow the ssh service log",
+  "kind": "cmd",
+  "prompt": "Show the last 50 lines of the journal for the ssh service and keep following new lines. Type the command.",
+  "accept": [
+   "^journalctl(?=.*\\s-u\\s+ssh(d|\\.service)?(\\s|$))(?=.*\\s-n\\s*50(\\s|$))(?=.*\\s-f(\\s|$)).*$"
+  ],
+  "ci": false,
+  "hints": [
+   "journalctl reads the systemd journal.",
+   "-u picks a unit, -n sets the number of lines, -f follows."
+  ],
+  "solution": "journalctl -u ssh -n 50 -f"
+ },
+ {
+  "id": "linux-fix-the-backup-schedule",
+  "lesson": "linux/cron-and-timers",
+  "title": "Fix the backup schedule",
+  "kind": "fix",
+  "lang": "text",
+  "prompt": "This crontab line runs every night. Change it so the backup runs every Monday at 03:30 and adds its output (normal and error) to /var/log/backup.log.",
+  "starter": "0 2 * * * /usr/local/bin/backup.sh",
+  "rules": [
+   {
+    "re": "^30\\s+3\\s+\\*\\s+\\*\\s+(1|mon|MON)\\s+/usr/local/bin/backup\\.sh",
+    "msg": "The time fields should be minute 30, hour 3, any day of month, any month, Monday."
+   },
+   {
+    "re": ">>\\s*/var/log/backup\\.log",
+    "msg": "Append the output to /var/log/backup.log with >>."
+   },
+   {
+    "re": "2>&1",
+    "msg": "Send errors to the same place with 2>&1."
+   }
+  ],
+  "hints": [
+   "Cron fields are minute, hour, day of month, month, day of week.",
+   "Monday is 1 in the last field.",
+   "Redirect with: >> file 2>&1"
+  ],
+  "solution": "30 3 * * 1 /usr/local/bin/backup.sh >> /var/log/backup.log 2>&1"
+ },
+ {
+  "id": "linux-harden-sshd",
+  "lesson": "linux/ssh-and-remote-access",
+  "title": "Harden sshd",
+  "kind": "fix",
+  "lang": "text",
+  "prompt": "Edit these sshd settings so root cannot log in and passwords are not accepted (keys only).",
+  "starter": "PermitRootLogin yes\nPasswordAuthentication yes\nPubkeyAuthentication yes",
+  "rules": [
+   {
+    "re": "^PermitRootLogin\\s+no\\s*$",
+    "msg": "PermitRootLogin should be no."
+   },
+   {
+    "re": "^PasswordAuthentication\\s+no\\s*$",
+    "msg": "PasswordAuthentication should be no."
+   },
+   {
+    "re": "^PubkeyAuthentication\\s+yes\\s*$",
+    "msg": "Keep PubkeyAuthentication yes, or you lock yourself out."
+   }
+  ],
+  "hints": [
+   "Each setting is a keyword and a value on one line.",
+   "Keep key login on, or nobody can get in."
+  ],
+  "solution": "PermitRootLogin no\nPasswordAuthentication no\nPubkeyAuthentication yes"
+ },
+ {
+  "id": "git-undo-the-last-commit-keep-the-work",
+  "lesson": "git/staging-undoing-and-stashing",
+  "title": "Undo the last commit, keep the work",
+  "kind": "cmd",
+  "prompt": "Undo the last commit but keep all its changes staged. Type the command.",
+  "accept": [
+   "^git reset --soft (HEAD~1|HEAD\\^)$"
+  ],
+  "ci": false,
+  "hints": [
+   "git reset moves the branch pointer back.",
+   "--soft keeps your changes staged; --hard would throw them away."
+  ],
+  "solution": "git reset --soft HEAD~1"
+ },
+ {
+  "id": "git-create-and-switch",
+  "lesson": "git/branches-and-merging",
+  "title": "Create and switch",
+  "kind": "cmd",
+  "prompt": "Create a branch called fix/login and switch to it in one command. Type the command.",
+  "accept": [
+   "^git (switch -c|checkout -b) fix/login$"
+  ],
+  "ci": false,
+  "hints": [
+   "Both git switch and git checkout can do this.",
+   "Look for the flag that creates the branch."
+  ],
+  "solution": "git switch -c fix/login"
+ },
+ {
+  "id": "git-squash-three-commits",
+  "lesson": "git/rebase-and-clean-history",
+  "title": "Squash three commits",
+  "kind": "cmd",
+  "prompt": "Start an interactive rebase to tidy the last three commits. Type the command.",
+  "accept": [
+   "^git rebase (-i|--interactive) HEAD~3$"
+  ],
+  "ci": false,
+  "hints": [
+   "Interactive rebase is rebase -i.",
+   "Count back from HEAD."
+  ],
+  "solution": "git rebase -i HEAD~3"
+ },
+ {
+  "id": "git-annotated-release-tag",
+  "lesson": "git/tags-releases-and-versioning",
+  "title": "Annotated release tag",
+  "kind": "cmd",
+  "prompt": "Create an annotated tag v1.4.0 with the message \"Release 1.4.0\". Type the command.",
+  "accept": [
+   "^git tag (-a v1\\.4\\.0 -m|-m) ?[\"\\']Release 1\\.4\\.0[\"\\']( v1\\.4\\.0)?$",
+   "^git tag -a v1\\.4\\.0 -m [\"\\']Release 1\\.4\\.0[\"\\']$"
+  ],
+  "ci": false,
+  "hints": [
+   "-a makes an annotated tag.",
+   "-m gives the message in quotes."
+  ],
+  "solution": "git tag -a v1.4.0 -m \"Release 1.4.0\""
+ },
+ {
+  "id": "git-first-push-of-a-branch",
+  "lesson": "git/remotes-fetch-pull-and-push",
+  "title": "First push of a branch",
+  "kind": "cmd",
+  "prompt": "Push the current branch to origin and remember it as the upstream. Type the command.",
+  "accept": [
+   "^git push (-u|--set-upstream) origin (HEAD|[\\w/.-]+)$"
+  ],
+  "ci": false,
+  "hints": [
+   "The remote is named origin.",
+   "-u links the local branch to the remote one."
+  ],
+  "solution": "git push -u origin HEAD"
+ },
+ {
+  "id": "bash-make-the-script-stop-on-errors",
+  "lesson": "bash/safe-automation",
+  "title": "Make the script stop on errors",
+  "kind": "fix",
+  "lang": "bash",
+  "prompt": "This script keeps going after a failure and uses an unquoted variable. Make it stop on errors, on unset variables and in failed pipelines, and quote the variable.",
+  "starter": "#!/bin/bash\ncp $1 /backup/\necho \"done\"",
+  "rules": [
+   {
+    "re": "set\\s+-[a-z]*e[a-z]*u[a-z]*o?\\s*(pipefail)?|set\\s+-euo\\s+pipefail",
+    "msg": "Add set -euo pipefail near the top."
+   },
+   {
+    "re": "\"\\$1\"",
+    "msg": "Quote $1 as \"$1\"."
+   },
+   {
+    "re": "cp \\$1",
+    "msg": "The unquoted $1 is still there.",
+    "not": true
+   }
+  ],
+  "hints": [
+   "Strict mode is one line after the shebang.",
+   "Quotes stop spaces in a name from splitting the word."
+  ],
+  "solution": "#!/bin/bash\nset -euo pipefail\ncp \"$1\" /backup/\necho \"done\""
+ },
+ {
+  "id": "bash-count-unique-visitors",
+  "lesson": "bash/text-processing",
+  "title": "Count unique visitors",
+  "kind": "cmd",
+  "prompt": "access.log has the client address in the first field. Count the unique addresses with awk, sort and wc. Type the command.",
+  "accept": [
+   "^awk '\\{ ?print \\$1 ?\\}' access\\.log \\| sort -u \\| wc -l$",
+   "^awk '\\{ ?print \\$1 ?\\}' access\\.log \\| sort \\| uniq \\| wc -l$",
+   "^cut -d' ' -f1 access\\.log \\| sort -u \\| wc -l$",
+   "^cut -d' ' -f1 access\\.log \\| sort \\| uniq \\| wc -l$"
+  ],
+  "ci": false,
+  "hints": [
+   "awk can print one field of each line.",
+   "sort -u keeps unique lines; wc -l counts lines."
+  ],
+  "solution": "awk '{print $1}' access.log | sort -u | wc -l"
+ },
+ {
+  "id": "bash-a-default-value",
+  "lesson": "bash/arrays-and-parameter-expansion",
+  "title": "A default value",
+  "kind": "cmd",
+  "prompt": "Print the value of APP_ENV, or the word dev if APP_ENV is unset or empty. Type the echo command.",
+  "accept": [
+   "^echo \"?\\$\\{APP_ENV:-dev\\}\"?$"
+  ],
+  "ci": false,
+  "hints": [
+   "Parameter expansion has a default form with :-",
+   "The form is ${NAME:-default}."
+  ],
+  "solution": "echo \"${APP_ENV:-dev}\""
+ },
+ {
+  "id": "bash-quote-the-loop",
+  "lesson": "bash/control-flow-and-functions",
+  "title": "Quote the loop",
+  "kind": "fix",
+  "lang": "bash",
+  "prompt": "This loop breaks on file names with spaces. Fix it by quoting the variable and reading the glob directly.",
+  "starter": "for f in $(ls *.log); do\n  gzip $f\ndone",
+  "rules": [
+   {
+    "re": "\\$\\(ls",
+    "msg": "Do not parse ls. Use for f in *.log.",
+    "not": true
+   },
+   {
+    "re": "\"\\$f\"",
+    "msg": "Quote \"$f\"."
+   },
+   {
+    "re": "for\\s+f\\s+in\\s+\\*\\.log",
+    "msg": "Loop over the glob: for f in *.log"
+   }
+  ],
+  "hints": [
+   "ls output is split on spaces.",
+   "A glob expands to separate words safely."
+  ],
+  "solution": "for f in *.log; do\n  gzip \"$f\"\ndone"
+ },
+ {
+  "id": "python-a-safe-http-call",
+  "lesson": "python/http-apis-and-json",
+  "title": "A safe HTTP call",
+  "kind": "fix",
+  "lang": "python",
+  "prompt": "Make this call safe: add a 5 second timeout and stop with an error on a bad status.",
+  "starter": "import requests\nr = requests.get(url)\ndata = r.json()",
+  "rules": [
+   {
+    "re": "requests\\.get\\([^)]*timeout\\s*=\\s*5",
+    "msg": "Add timeout=5 to the get call."
+   },
+   {
+    "re": "raise_for_status\\(\\)",
+    "msg": "Call r.raise_for_status() before reading the body."
+   }
+  ],
+  "hints": [
+   "Without a timeout, a call can wait forever.",
+   "raise_for_status turns 4xx and 5xx into an exception."
+  ],
+  "solution": "import requests\nr = requests.get(url, timeout=5)\nr.raise_for_status()\ndata = r.json()"
+ },
+ {
+  "id": "python-use-logging-not-print",
+  "lesson": "python/logging-for-scripts-and-services",
+  "title": "Use logging, not print",
+  "kind": "fix",
+  "lang": "python",
+  "prompt": "Replace the print calls with the logging module: log the start as info and the failure as error.",
+  "starter": "def run():\n    print(\"starting\")\n    try:\n        work()\n    except Exception as e:\n        print(\"failed\", e)",
+  "rules": [
+   {
+    "re": "import logging|logging\\.",
+    "msg": "Import and use the logging module."
+   },
+   {
+    "re": "logging\\.info|log\\.info|logger\\.info",
+    "msg": "Log the start with info."
+   },
+   {
+    "re": "logging\\.(error|exception)|log\\.(error|exception)|logger\\.(error|exception)",
+    "msg": "Log the failure with error or exception."
+   },
+   {
+    "re": "\\bprint\\(",
+    "msg": "Remove the print calls.",
+    "not": true
+   }
+  ],
+  "hints": [
+   "logging has levels: debug, info, warning, error.",
+   "logging.exception logs the traceback too."
+  ],
+  "solution": "import logging\n\ndef run():\n    logging.info(\"starting\")\n    try:\n        work()\n    except Exception:\n        logging.exception(\"failed\")"
+ },
+ {
+  "id": "python-close-the-file",
+  "lesson": "python/files-and-processes",
+  "title": "Close the file",
+  "kind": "fix",
+  "lang": "python",
+  "prompt": "Rewrite this so the file is always closed, even on errors, and read it as UTF-8.",
+  "starter": "f = open(\"data.txt\")\ntext = f.read()\nf.close()",
+  "rules": [
+   {
+    "re": "with\\s+open\\(",
+    "msg": "Use a with block."
+   },
+   {
+    "re": "encoding\\s*=\\s*[\"\\']utf-8[\"\\']",
+    "msg": "Pass encoding=\"utf-8\"."
+   },
+   {
+    "re": "\\.close\\(\\)",
+    "msg": "The with block closes the file; remove close().",
+    "not": true
+   }
+  ],
+  "hints": [
+   "with ... as f: closes the file for you.",
+   "open() takes an encoding argument."
+  ],
+  "solution": "with open(\"data.txt\", encoding=\"utf-8\") as f:\n    text = f.read()"
+ },
+ {
+  "id": "networking-hosts-in-a-26",
+  "lesson": "networking/ip-addressing-and-subnets",
+  "title": "Hosts in a /26",
+  "kind": "answer",
+  "prompt": "How many usable host addresses are in a /26 network? Type the number.",
+  "accept": [
+   "^62$"
+  ],
+  "ci": false,
+  "hints": [
+   "A /26 leaves 6 host bits.",
+   "2 to the power 6, minus the network and broadcast addresses."
+  ],
+  "solution": "62"
+ },
+ {
+  "id": "networking-find-the-mail-servers",
+  "lesson": "networking/dns",
+  "title": "Find the mail servers",
+  "kind": "cmd",
+  "prompt": "Ask DNS for the mail (MX) records of example.com using dig. Type the command.",
+  "accept": [
+   "^dig (\\+short )?(MX example\\.com|example\\.com MX)$",
+   "^dig (-t MX|-t mx) (\\+short )?example\\.com$"
+  ],
+  "ci": false,
+  "hints": [
+   "dig takes a name and a record type.",
+   "The record type for mail is MX."
+  ],
+  "solution": "dig MX example.com"
+ },
+ {
+  "id": "networking-who-is-listening",
+  "lesson": "networking/troubleshooting-toolkit",
+  "title": "Who is listening",
+  "kind": "cmd",
+  "prompt": "Show listening TCP sockets with numeric ports and the owning process. Type the ss command.",
+  "accept": [
+   "^(sudo )?ss -(tlnp|tnlp|ltnp|lntp|plnt|ntlp)$",
+   "^(sudo )?ss -t -l -n -p$"
+  ],
+  "ci": false,
+  "hints": [
+   "ss replaces netstat.",
+   "Flags: t for TCP, l for listening, n for numbers, p for process."
+  ],
+  "solution": "ss -tlnp"
+ },
+ {
+  "id": "networking-only-the-headers",
+  "lesson": "networking/http-and-tls",
+  "title": "Only the headers",
+  "kind": "cmd",
+  "prompt": "Show only the response headers of https://example.com with curl. Type the command.",
+  "accept": [
+   "^curl (-I|--head|-sI|-Is) https://example\\.com/?$"
+  ],
+  "ci": false,
+  "hints": [
+   "curl can send a HEAD request.",
+   "The short flag is a capital I."
+  ],
+  "solution": "curl -I https://example.com"
+ },
+ {
+  "id": "docker-a-safer-dockerfile",
+  "lesson": "docker/writing-dockerfiles",
+  "title": "A safer Dockerfile",
+  "kind": "fix",
+  "lang": "dockerfile",
+  "prompt": "Improve this Dockerfile: pin the base image to a specific version (not latest), and run as a non-root user.",
+  "starter": "FROM ubuntu:latest\nCOPY app /app\nCMD [\"/app/run\"]",
+  "rules": [
+   {
+    "re": ":latest",
+    "msg": "Do not use the latest tag.",
+    "not": true
+   },
+   {
+    "re": "^FROM\\s+\\S+:\\S+",
+    "msg": "Pin a version tag, for example ubuntu:24.04."
+   },
+   {
+    "re": "^USER\\s+(?!root)\\S+",
+    "msg": "Add a USER line with a non-root user."
+   }
+  ],
+  "hints": [
+   "A tag such as 24.04 is repeatable; latest changes over time.",
+   "USER switches the user for later steps and the container."
+  ],
+  "solution": "FROM ubuntu:24.04\nRUN useradd -r app\nCOPY app /app\nUSER app\nCMD [\"/app/run\"]"
+ },
+ {
+  "id": "docker-run-a-web-server",
+  "lesson": "docker/containers-and-images",
+  "title": "Run a web server",
+  "kind": "cmd",
+  "prompt": "Run nginx in the background, name it web, and publish host port 8080 to container port 80. Type the command.",
+  "accept": [
+   "^docker run(?=.*\\s-d(\\s|$))(?=.*\\s--name[ =]web(\\s|$))(?=.*\\s-p\\s*8080:80(\\s|$)).*\\snginx(:\\S+)?$"
+  ],
+  "ci": false,
+  "hints": [
+   "-d runs it detached; --name names it.",
+   "-p host:container publishes a port."
+  ],
+  "solution": "docker run -d --name web -p 8080:80 nginx"
+ },
+ {
+  "id": "docker-keep-the-database-data",
+  "lesson": "docker/volumes-and-networking",
+  "title": "Keep the database data",
+  "kind": "cmd",
+  "prompt": "Run postgres with a named volume called pgdata mounted at /var/lib/postgresql/data. Type the command.",
+  "accept": [
+   "^docker run(?=.*\\s-v\\s*pgdata:/var/lib/postgresql/data(\\s|$)).*\\spostgres(:\\S+)?$",
+   "^docker run(?=.*--mount[ =]\\S*source=pgdata\\S*target=/var/lib/postgresql/data).*\\spostgres(:\\S+)?$"
+  ],
+  "ci": false,
+  "hints": [
+   "A named volume is name:path with -v.",
+   "The image name comes last."
+  ],
+  "solution": "docker run -d -v pgdata:/var/lib/postgresql/data -e POSTGRES_PASSWORD=secret postgres"
+ },
+ {
+  "id": "docker-limit-memory-and-cpu",
+  "lesson": "docker/container-logging-and-resource-limits",
+  "title": "Limit memory and CPU",
+  "kind": "cmd",
+  "prompt": "Run nginx with at most 256 MB of memory and half a CPU. Type the command.",
+  "accept": [
+   "^docker run(?=.*\\s(--memory[ =]256m|-m\\s*256m)(\\s|$))(?=.*\\s--cpus[ =]0?\\.5(\\s|$)).*\\snginx(:\\S+)?$"
+  ],
+  "ci": false,
+  "hints": [
+   "Memory flag: --memory 256m.",
+   "CPU flag: --cpus 0.5."
+  ],
+  "solution": "docker run -d --memory 256m --cpus 0.5 nginx"
+ },
+ {
+  "id": "docker-restart-and-health",
+  "lesson": "docker/compose",
+  "title": "Restart and health",
+  "kind": "fix",
+  "lang": "yaml",
+  "prompt": "Add a restart policy that keeps the service running unless you stop it, and a health check that runs curl -f http://localhost every 30 seconds.",
+  "starter": "services:\n  web:\n    image: nginx:1.27\n    ports:\n      - \"8080:80\"",
+  "rules": [
+   {
+    "re": "restart:\\s*(unless-stopped|always)",
+    "msg": "Add restart: unless-stopped."
+   },
+   {
+    "re": "healthcheck:",
+    "msg": "Add a healthcheck block."
+   },
+   {
+    "re": "test:.*curl.*-f.*http://localhost",
+    "msg": "The test should run curl -f http://localhost."
+   },
+   {
+    "re": "interval:\\s*30s",
+    "msg": "Set interval: 30s."
+   }
+  ],
+  "hints": [
+   "Both belong under the web service.",
+   "healthcheck has test, interval, timeout and retries."
+  ],
+  "solution": "services:\n  web:\n    image: nginx:1.27\n    ports:\n      - \"8080:80\"\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD\", \"curl\", \"-f\", \"http://localhost\"]\n      interval: 30s"
+ },
+ {
+  "id": "kubernetes-scale-a-deployment",
+  "lesson": "kubernetes/pods-and-deployments",
+  "title": "Scale a deployment",
+  "kind": "cmd",
+  "prompt": "Scale the deployment web to 5 replicas. Type the kubectl command.",
+  "accept": [
+   "^kubectl scale (deployment|deploy)[ /]web --replicas[= ]5$",
+   "^kubectl scale --replicas[= ]5 (deployment|deploy)[ /]web$"
+  ],
+  "ci": false,
+  "hints": [
+   "kubectl scale changes the replica count.",
+   "Name the resource kind and name, then --replicas."
+  ],
+  "solution": "kubectl scale deployment web --replicas=5"
+ },
+ {
+  "id": "kubernetes-probes-and-limits",
+  "lesson": "kubernetes/pods-and-deployments",
+  "title": "Probes and limits",
+  "kind": "fix",
+  "lang": "yaml",
+  "prompt": "Add a readiness probe (HTTP GET / on port 80) and resource requests and limits to the container.",
+  "starter": "containers:\n  - name: web\n    image: nginx:1.27\n    ports:\n      - containerPort: 80",
+  "rules": [
+   {
+    "re": "readinessProbe:",
+    "msg": "Add a readinessProbe."
+   },
+   {
+    "re": "httpGet:[\\s\\S]*path:\\s*/[\\s\\S]*port:\\s*80|httpGet:[\\s\\S]*port:\\s*80[\\s\\S]*path:\\s*/",
+    "msg": "The probe should use httpGet on path / and port 80."
+   },
+   {
+    "re": "resources:",
+    "msg": "Add a resources block."
+   },
+   {
+    "re": "requests:",
+    "msg": "Add requests."
+   },
+   {
+    "re": "limits:",
+    "msg": "Add limits."
+   }
+  ],
+  "hints": [
+   "Probes sit at the same level as image and ports.",
+   "resources has requests and limits, each with cpu and memory."
+  ],
+  "solution": "containers:\n  - name: web\n    image: nginx:1.27\n    ports:\n      - containerPort: 80\n    readinessProbe:\n      httpGet:\n        path: /\n        port: 80\n    resources:\n      requests:\n        cpu: 100m\n        memory: 128Mi\n      limits:\n        cpu: 500m\n        memory: 256Mi"
+ },
+ {
+  "id": "kubernetes-expose-a-deployment",
+  "lesson": "kubernetes/services-and-ingress",
+  "title": "Expose a deployment",
+  "kind": "cmd",
+  "prompt": "Create a ClusterIP service for deployment web that listens on port 80 and sends traffic to container port 8080. Type the command.",
+  "accept": [
+   "^kubectl expose (deployment|deploy)[ /]web(?=.*--port[= ]80(\\s|$))(?=.*--target-port[= ]8080(\\s|$)).*$"
+  ],
+  "ci": false,
+  "hints": [
+   "kubectl expose creates a service for a workload.",
+   "Two port flags: --port and --target-port."
+  ],
+  "solution": "kubectl expose deployment web --port=80 --target-port=8080"
+ },
+ {
+  "id": "kubernetes-make-a-secret",
+  "lesson": "kubernetes/config-and-secrets",
+  "title": "Make a secret",
+  "kind": "cmd",
+  "prompt": "Create a generic secret named db-pass with the key password and the value s3cret. Type the command.",
+  "accept": [
+   "^kubectl create secret generic db-pass --from-literal[= ]password=s3cret$"
+  ],
+  "ci": false,
+  "hints": [
+   "The type of secret is generic.",
+   "--from-literal takes key=value."
+  ],
+  "solution": "kubectl create secret generic db-pass --from-literal=password=s3cret"
+ },
+ {
+  "id": "kubernetes-why-is-it-pending",
+  "lesson": "kubernetes/scheduling-and-troubleshooting",
+  "title": "Why is it Pending",
+  "kind": "cmd",
+  "prompt": "Show the events and details for the pod web-7d so you can see why it is Pending. Type the command.",
+  "accept": [
+   "^kubectl describe (pod|pods|po)[ /]web-7d( -n \\S+)?$"
+  ],
+  "ci": false,
+  "hints": [
+   "describe shows events at the bottom.",
+   "The resource kind is pod."
+  ],
+  "solution": "kubectl describe pod web-7d"
+ },
+ {
+  "id": "kubernetes-logs-of-the-crashed-container",
+  "lesson": "kubernetes/scheduling-and-troubleshooting",
+  "title": "Logs of the crashed container",
+  "kind": "cmd",
+  "prompt": "Show the logs of the previous (crashed) container of pod web-7d. Type the command.",
+  "accept": [
+   "^kubectl logs (--previous|-p) (pod/)?web-7d( -n \\S+)?$",
+   "^kubectl logs (pod/)?web-7d (--previous|-p)( -n \\S+)?$"
+  ],
+  "ci": false,
+  "hints": [
+   "A restarted container has a previous instance.",
+   "The flag is --previous (or -p)."
+  ],
+  "solution": "kubectl logs web-7d --previous"
+ },
+ {
+  "id": "kubernetes-can-jane-delete-pods",
+  "lesson": "kubernetes/rbac-and-security",
+  "title": "Can jane delete pods",
+  "kind": "cmd",
+  "prompt": "Ask the API whether the user jane can delete pods in the namespace prod. Type the command.",
+  "accept": [
+   "^kubectl auth can-i delete pods?(?=.*--as[= ]jane(\\s|$))(?=.*(-n|--namespace)[= ]prod(\\s|$)).*$"
+  ],
+  "ci": false,
+  "hints": [
+   "kubectl auth can-i answers yes or no.",
+   "--as impersonates a user."
+  ],
+  "solution": "kubectl auth can-i delete pods --as jane -n prod"
+ },
+ {
+  "id": "kubernetes-autoscale-a-deployment",
+  "lesson": "kubernetes/autoscaling",
+  "title": "Autoscale a deployment",
+  "kind": "cmd",
+  "prompt": "Autoscale deployment web between 2 and 10 replicas at 70 percent CPU. Type the command.",
+  "accept": [
+   "^kubectl autoscale (deployment|deploy)[ /]web(?=.*--min[= ]2(\\s|$))(?=.*--max[= ]10(\\s|$))(?=.*(--cpu-percent[= ]70|--cpu[= ]70%)(\\s|$)).*$"
+  ],
+  "ci": false,
+  "hints": [
+   "kubectl autoscale creates a HorizontalPodAutoscaler.",
+   "Flags: --min, --max and a CPU target."
+  ],
+  "solution": "kubectl autoscale deployment web --min=2 --max=10 --cpu-percent=70"
+ },
+ {
+  "id": "kubernetes-ask-for-5-gib",
+  "lesson": "kubernetes/storage",
+  "title": "Ask for 5 GiB",
+  "kind": "fix",
+  "lang": "yaml",
+  "prompt": "Complete this claim: it needs 5 GiB of storage and can be mounted read-write by one node.",
+  "starter": "apiVersion: v1\nkind: PersistentVolumeClaim\nmetadata:\n  name: data\nspec:\n  resources:\n    requests:\n      storage: 1Gi",
+  "rules": [
+   {
+    "re": "storage:\\s*5Gi",
+    "msg": "Request storage: 5Gi."
+   },
+   {
+    "re": "accessModes:\\s*\\n\\s*-\\s*ReadWriteOnce",
+    "msg": "Add accessModes with ReadWriteOnce."
+   }
+  ],
+  "hints": [
+   "accessModes is a list under spec.",
+   "ReadWriteOnce means one node at a time."
+  ],
+  "solution": "apiVersion: v1\nkind: PersistentVolumeClaim\nmetadata:\n  name: data\nspec:\n  accessModes:\n    - ReadWriteOnce\n  resources:\n    requests:\n      storage: 5Gi"
+ },
+ {
+  "id": "kubernetes-nightly-job",
+  "lesson": "kubernetes/jobs-cronjobs-daemonsets",
+  "title": "Nightly job",
+  "kind": "fix",
+  "lang": "yaml",
+  "prompt": "Set the CronJob to run every day at 02:00 and never run two copies at once.",
+  "starter": "spec:\n  schedule: \"*/5 * * * *\"\n  jobTemplate:\n    spec:\n      template:\n        spec:\n          restartPolicy: OnFailure",
+  "rules": [
+   {
+    "re": "schedule:\\s*[\"\\']?0\\s+2\\s+\\*\\s+\\*\\s+\\*[\"\\']?",
+    "msg": "The schedule should be 0 2 * * *."
+   },
+   {
+    "re": "concurrencyPolicy:\\s*Forbid",
+    "msg": "Add concurrencyPolicy: Forbid."
+   }
+  ],
+  "hints": [
+   "Cron fields: minute hour day month weekday.",
+   "concurrencyPolicy sits next to schedule."
+  ],
+  "solution": "spec:\n  schedule: \"0 2 * * *\"\n  concurrencyPolicy: Forbid\n  jobTemplate:\n    spec:\n      template:\n        spec:\n          restartPolicy: OnFailure"
+ },
+ {
+  "id": "helm-install-with-a-value",
+  "lesson": "helm/installing-charts-and-values",
+  "title": "Install with a value",
+  "kind": "cmd",
+  "prompt": "Install the chart bitnami/nginx as release web in the namespace prod (create it if needed) with replicaCount set to 3. Type the helm command.",
+  "accept": [
+   "^helm install web bitnami/nginx(?=.*--set[ =]replicaCount=3(\\s|$))(?=.*(-n|--namespace)[ =]prod(\\s|$))(?=.*--create-namespace(\\s|$)).*$"
+  ],
+  "ci": false,
+  "hints": [
+   "helm install takes a release name and a chart.",
+   "--set changes one value; --create-namespace makes the namespace."
+  ],
+  "solution": "helm install web bitnami/nginx --set replicaCount=3 -n prod --create-namespace"
+ },
+ {
+  "id": "helm-go-back-to-revision-2",
+  "lesson": "helm/upgrade-rollback-and-release-history",
+  "title": "Go back to revision 2",
+  "kind": "cmd",
+  "prompt": "Roll the release web back to revision 2. Type the command.",
+  "accept": [
+   "^helm rollback web 2( -n \\S+)?$"
+  ],
+  "ci": false,
+  "hints": [
+   "helm history lists revisions.",
+   "helm rollback takes the release and a revision number."
+  ],
+  "solution": "helm rollback web 2"
+ },
+ {
+  "id": "helm-render-without-installing",
+  "lesson": "helm/debugging-helm-releases",
+  "title": "Render without installing",
+  "kind": "cmd",
+  "prompt": "Render the chart in ./chart with the file values.yaml and print the YAML without installing anything. Type the command.",
+  "accept": [
+   "^helm template \\S+ \\./chart(?=.*(-f|--values)[ =]values\\.yaml(\\s|$)).*$"
+  ],
+  "ci": false,
+  "hints": [
+   "helm template renders locally.",
+   "Give a release name, the chart path, and -f for the values file."
+  ],
+  "solution": "helm template web ./chart -f values.yaml"
+ },
+ {
+  "id": "terraform-list-what-terraform-manages",
+  "lesson": "terraform/state",
+  "title": "List what Terraform manages",
+  "kind": "cmd",
+  "prompt": "List every resource in the Terraform state. Type the command.",
+  "accept": [
+   "^terraform state list$"
+  ],
+  "ci": false,
+  "hints": [
+   "The state subcommand has a list action.",
+   "Run terraform state with nothing after it to see the actions."
+  ],
+  "solution": "terraform state list"
+ },
+ {
+  "id": "terraform-save-the-plan",
+  "lesson": "terraform/workflows-and-drift",
+  "title": "Save the plan",
+  "kind": "cmd",
+  "prompt": "Save a plan to a file called tfplan so you can apply exactly that plan later. Type the command.",
+  "accept": [
+   "^terraform plan (-out[= ]tfplan)$"
+  ],
+  "ci": false,
+  "hints": [
+   "terraform plan can write its result to a file.",
+   "The flag is -out."
+  ],
+  "solution": "terraform plan -out=tfplan"
+ },
+ {
+  "id": "terraform-a-checked-variable",
+  "lesson": "terraform/variables-and-outputs",
+  "title": "A checked variable",
+  "kind": "fix",
+  "lang": "hcl",
+  "prompt": "Give this variable a description and a validation that only allows the values dev, test and prod.",
+  "starter": "variable \"env\" {\n  type = string\n}",
+  "rules": [
+   {
+    "re": "description\\s*=\\s*\"",
+    "msg": "Add a description."
+   },
+   {
+    "re": "validation\\s*\\{",
+    "msg": "Add a validation block."
+   },
+   {
+    "re": "contains\\(\\s*\\[\\s*\"dev\"\\s*,\\s*\"test\"\\s*,\\s*\"prod\"\\s*\\]\\s*,\\s*var\\.env\\s*\\)",
+    "msg": "Use contains([\"dev\", \"test\", \"prod\"], var.env)."
+   },
+   {
+    "re": "error_message\\s*=",
+    "msg": "Add an error_message."
+   }
+  ],
+  "hints": [
+   "validation has a condition and an error_message.",
+   "contains(list, value) returns true or false."
+  ],
+  "solution": "variable \"env\" {\n  type        = string\n  description = \"Deployment environment\"\n  validation {\n    condition     = contains([\"dev\", \"test\", \"prod\"], var.env)\n    error_message = \"env must be dev, test or prod.\"\n  }\n}"
+ },
+ {
+  "id": "terraform-rename-without-destroying",
+  "lesson": "terraform/import-refactor-and-moved-blocks",
+  "title": "Rename without destroying",
+  "kind": "fix",
+  "lang": "hcl",
+  "prompt": "You renamed aws_instance.web to aws_instance.app in the code. Add a block that tells Terraform it is the same object.",
+  "starter": "# resource renamed from web to app",
+  "rules": [
+   {
+    "re": "moved\\s*\\{",
+    "msg": "Add a moved block."
+   },
+   {
+    "re": "from\\s*=\\s*aws_instance\\.web",
+    "msg": "from should be aws_instance.web."
+   },
+   {
+    "re": "to\\s*=\\s*aws_instance\\.app",
+    "msg": "to should be aws_instance.app."
+   }
+  ],
+  "hints": [
+   "The block is called moved.",
+   "It has from and to, both resource addresses."
+  ],
+  "solution": "moved {\n  from = aws_instance.web\n  to   = aws_instance.app\n}"
+ },
+ {
+  "id": "terraform-hide-an-output",
+  "lesson": "terraform/secrets-and-sensitive-data",
+  "title": "Hide an output",
+  "kind": "fix",
+  "lang": "hcl",
+  "prompt": "Mark this output so Terraform does not print its value.",
+  "starter": "output \"db_password\" {\n  value = random_password.db.result\n}",
+  "rules": [
+   {
+    "re": "sensitive\\s*=\\s*true",
+    "msg": "Add sensitive = true."
+   }
+  ],
+  "hints": [
+   "Outputs accept a sensitive argument.",
+   "It is a true or false value inside the output block."
+  ],
+  "solution": "output \"db_password\" {\n  value     = random_password.db.result\n  sensitive = true\n}"
+ },
+ {
+  "id": "observability-request-rate",
+  "lesson": "observability/metrics-and-prometheus",
+  "title": "Request rate",
+  "kind": "query",
+  "prompt": "Write a PromQL expression for the per-second rate of http_requests_total averaged over 5 minutes.",
+  "accept": [
+   "^(sum(\\s+by\\s*\\([^)]*\\))?\\s*\\()?rate\\(\\s*http_requests_total(\\{[^}]*\\})?\\[5m\\]\\s*\\)\\)?$"
+  ],
+  "ci": false,
+  "hints": [
+   "Counters only go up; use rate().",
+   "A range selector looks like [5m]."
+  ],
+  "solution": "rate(http_requests_total[5m])"
+ },
+ {
+  "id": "observability-error-ratio",
+  "lesson": "observability/red-use-and-golden-signals",
+  "title": "Error ratio",
+  "kind": "query",
+  "prompt": "Write a PromQL expression for the share of requests with a 5xx status over 5 minutes: errors divided by all requests.",
+  "accept": [
+   "^sum\\(\\s*rate\\(\\s*http_requests_total\\{[^}]*status=~\"5\\.\\.\"[^}]*\\}\\[5m\\]\\s*\\)\\s*\\)\\s*/\\s*sum\\(\\s*rate\\(\\s*http_requests_total(\\{[^}]*\\})?\\[5m\\]\\s*\\)\\s*\\)$"
+  ],
+  "ci": false,
+  "hints": [
+   "Divide the rate of 5xx requests by the rate of all requests.",
+   "Match 5xx with status=~\"5..\"."
+  ],
+  "solution": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))"
+ },
+ {
+  "id": "observability-a-calmer-alert",
+  "lesson": "observability/alerting-and-dashboards",
+  "title": "A calmer alert",
+  "kind": "fix",
+  "lang": "yaml",
+  "prompt": "Make this alert wait ten minutes before firing, label it as a page, and add a summary.",
+  "starter": "- alert: HighErrorRate\n  expr: error_ratio > 0.05",
+  "rules": [
+   {
+    "re": "for:\\s*10m",
+    "msg": "Add for: 10m."
+   },
+   {
+    "re": "severity:\\s*page",
+    "msg": "Add labels with severity: page."
+   },
+   {
+    "re": "summary:",
+    "msg": "Add an annotation named summary."
+   }
+  ],
+  "hints": [
+   "for: goes next to expr.",
+   "labels and annotations are maps."
+  ],
+  "solution": "- alert: HighErrorRate\n  expr: error_ratio > 0.05\n  for: 10m\n  labels:\n    severity: page\n  annotations:\n    summary: \"More than 5 percent of requests fail\""
+ },
+ {
+  "id": "sre-error-budget-in-minutes",
+  "lesson": "sre/slos-and-error-budgets",
+  "title": "Error budget in minutes",
+  "kind": "answer",
+  "prompt": "An SLO of 99.9 percent over 30 days allows how many minutes of downtime? Type the number.",
+  "accept": [
+   "^43(\\.[0-9]+)?( ?(min|minutes))?$"
+  ],
+  "ci": false,
+  "hints": [
+   "30 days is 43,200 minutes.",
+   "The budget is 0.1 percent of that."
+  ],
+  "solution": "43.2"
+ },
+ {
+  "id": "system-design-requests-per-second",
+  "lesson": "system-design/the-design-method-and-estimation",
+  "title": "Requests per second",
+  "kind": "answer",
+  "prompt": "100 million requests per day is about how many requests per second on average? Type a number.",
+  "accept": [
+   "^1,?[12][0-9]{2}(\\.[0-9]+)?( ?(rps|req/s|requests per second))?$"
+  ],
+  "ci": false,
+  "hints": [
+   "A day has 86,400 seconds.",
+   "Divide 100,000,000 by 86,400."
+  ],
+  "solution": "1157"
+ },
+ {
+  "id": "security-a-locked-down-container",
+  "lesson": "security/kubernetes-security",
+  "title": "A locked-down container",
+  "kind": "fix",
+  "lang": "yaml",
+  "prompt": "Add a security context that runs as non-root, blocks privilege escalation and makes the file system read-only.",
+  "starter": "containers:\n  - name: app\n    image: app:1.0",
+  "rules": [
+   {
+    "re": "securityContext:",
+    "msg": "Add a securityContext."
+   },
+   {
+    "re": "runAsNonRoot:\\s*true",
+    "msg": "runAsNonRoot: true"
+   },
+   {
+    "re": "allowPrivilegeEscalation:\\s*false",
+    "msg": "allowPrivilegeEscalation: false"
+   },
+   {
+    "re": "readOnlyRootFilesystem:\\s*true",
+    "msg": "readOnlyRootFilesystem: true"
+   }
+  ],
+  "hints": [
+   "securityContext is a field of the container.",
+   "Three booleans do the job."
+  ],
+  "solution": "containers:\n  - name: app\n    image: app:1.0\n    securityContext:\n      runAsNonRoot: true\n      allowPrivilegeEscalation: false\n      readOnlyRootFilesystem: true"
+ },
+ {
+  "id": "ansible-idempotent-install",
+  "lesson": "ansible/playbooks-tasks-and-idempotence",
+  "title": "Idempotent install",
+  "kind": "fix",
+  "lang": "yaml",
+  "prompt": "Replace the shell command with a module that only changes the server when nginx is missing.",
+  "starter": "- name: install nginx\n  shell: apt-get install -y nginx",
+  "rules": [
+   {
+    "re": "\\bshell:",
+    "msg": "Do not use shell for this.",
+    "not": true
+   },
+   {
+    "re": "(ansible\\.builtin\\.)?(apt|package):",
+    "msg": "Use the apt or package module."
+   },
+   {
+    "re": "name:\\s*nginx",
+    "msg": "Set name: nginx for the module."
+   },
+   {
+    "re": "state:\\s*(present|latest)",
+    "msg": "Set state: present."
+   }
+  ],
+  "hints": [
+   "Modules describe the end state.",
+   "apt takes name and state."
+  ],
+  "solution": "- name: install nginx\n  ansible.builtin.apt:\n    name: nginx\n    state: present"
+ },
+ {
+  "id": "databases-index-a-column",
+  "lesson": "databases/indexes-and-query-plans",
+  "title": "Index a column",
+  "kind": "query",
+  "prompt": "Create an index called idx_orders_customer on the orders table for the customer_id column. Type the SQL.",
+  "accept": [
+   "^create index idx_orders_customer on orders ?\\( ?customer_id ?\\);?$"
+  ],
+  "ci": true,
+  "hints": [
+   "CREATE INDEX name ON table (column).",
+   "The index name is idx_orders_customer, the table is orders."
+  ],
+  "solution": "CREATE INDEX idx_orders_customer ON orders (customer_id);"
+ },
+ {
+  "id": "databases-see-the-real-plan",
+  "lesson": "databases/indexes-and-query-plans",
+  "title": "See the real plan",
+  "kind": "query",
+  "prompt": "Run a query on orders and show the real execution plan with timings. Type the SQL (any simple select).",
+  "accept": [
+   "^explain \\(?analyze\\)? ?select .+;?$",
+   "^explain analyze select .+;?$"
+  ],
+  "ci": true,
+  "hints": [
+   "EXPLAIN shows the plan; ANALYZE runs it and times it.",
+   "Put both words before a normal SELECT."
+  ],
+  "solution": "EXPLAIN ANALYZE SELECT * FROM orders WHERE customer_id = 42;"
+ },
+ {
+  "id": "cloud-iam-least-privilege",
+  "lesson": "cloud-iam/aws-iam-policies-roles-and-assume-role",
+  "title": "Least privilege",
+  "kind": "fix",
+  "lang": "json",
+  "prompt": "This policy allows everything. Allow only reading objects (s3:GetObject) from the bucket reports-bucket.",
+  "starter": "{\n  \"Effect\": \"Allow\",\n  \"Action\": \"*\",\n  \"Resource\": \"*\"\n}",
+  "rules": [
+   {
+    "re": "\"Action\"\\s*:\\s*\"\\*\"",
+    "msg": "Do not allow all actions.",
+    "not": true
+   },
+   {
+    "re": "s3:GetObject",
+    "msg": "Allow s3:GetObject."
+   },
+   {
+    "re": "\"Resource\"\\s*:\\s*\"\\*\"",
+    "msg": "Do not allow all resources.",
+    "not": true
+   },
+   {
+    "re": "reports-bucket",
+    "msg": "Limit Resource to reports-bucket."
+   }
+  ],
+  "hints": [
+   "Name the action and the resource.",
+   "An S3 object ARN looks like arn:aws:s3:::bucket/*"
+  ],
+  "solution": "{\n  \"Effect\": \"Allow\",\n  \"Action\": \"s3:GetObject\",\n  \"Resource\": \"arn:aws:s3:::reports-bucket/*\"\n}"
+ },
+ {
+  "id": "k8s-ops-snapshot-etcd",
+  "lesson": "k8s-ops/etcd-backup-and-restore",
+  "title": "Snapshot etcd",
+  "kind": "cmd",
+  "prompt": "Save an etcd snapshot to /backup/etcd.db with etcdctl. Type the command (certificate flags are not needed here).",
+  "accept": [
+   "^(ETCDCTL_API=3 )?etcdctl(?=.*\\ssnapshot save /backup/etcd\\.db(\\s|$)).*$"
+  ],
+  "ci": false,
+  "hints": [
+   "etcdctl has a snapshot subcommand.",
+   "snapshot save takes the output path."
+  ],
+  "solution": "etcdctl snapshot save /backup/etcd.db"
+ },
+ {
+  "id": "k8s-ops-drain-a-node",
+  "lesson": "k8s-ops/nodes-draining-taints-and-capacity",
+  "title": "Drain a node",
+  "kind": "cmd",
+  "prompt": "Safely drain node worker-1: ignore daemon sets and allow deleting pods that use emptyDir. Type the command.",
+  "accept": [
+   "^kubectl drain worker-1(?=.*--ignore-daemonsets(\\s|$))(?=.*--delete-emptydir-data(\\s|$)).*$"
+  ],
+  "ci": false,
+  "hints": [
+   "kubectl drain evicts the pods.",
+   "Two flags are almost always needed."
+  ],
+  "solution": "kubectl drain worker-1 --ignore-daemonsets --delete-emptydir-data"
+ },
+ {
+  "id": "argocd-sync-an-app",
+  "lesson": "argocd/sync-health-and-drift",
+  "title": "Sync an app",
+  "kind": "cmd",
+  "prompt": "Ask Argo CD to sync the application web from the command line. Type the command.",
+  "accept": [
+   "^argocd app sync web$"
+  ],
+  "ci": false,
+  "hints": [
+   "argocd app has sync, get and diff.",
+   "Give the action and then the application name."
+  ],
+  "solution": "argocd app sync web"
+ },
+ {
+  "id": "prompting-ask-for-json-only",
+  "lesson": "prompting/structured-output-json-and-schemas",
+  "title": "Ask for JSON only",
+  "kind": "fix",
+  "lang": "text",
+  "prompt": "Rewrite this prompt so the model answers with JSON only, using the keys \"severity\" and \"summary\", and gets one example.",
+  "starter": "Tell me about this incident.",
+  "rules": [
+   {
+    "re": "\\bjson\\b",
+    "msg": "Ask for JSON.",
+    "i": true
+   },
+   {
+    "re": "only",
+    "msg": "Say \"only\" so there is no extra text.",
+    "i": true
+   },
+   {
+    "re": "\"severity\"",
+    "msg": "Name the severity key."
+   },
+   {
+    "re": "\"summary\"",
+    "msg": "Name the summary key."
+   },
+   {
+    "re": "example",
+    "msg": "Include an example.",
+    "i": true
+   }
+  ],
+  "hints": [
+   "Say what format, which keys, and show one example.",
+   "Use the word only."
+  ],
+  "solution": "Classify the incident below. Reply with JSON only, no other text, using the keys \"severity\" and \"summary\".\nExample: {\"severity\": \"high\", \"summary\": \"Checkout fails for all users\"}\nIncident: ..."
+ },
+ {
+  "id": "mcp-a-clear-tool-definition",
+  "lesson": "mcp/function-calling-and-tool-schemas",
+  "title": "A clear tool definition",
+  "kind": "fix",
+  "lang": "json",
+  "prompt": "Give this tool a description that says when to use it and a required string parameter named city.",
+  "starter": "{\n  \"name\": \"get_weather\"\n}",
+  "rules": [
+   {
+    "re": "\"description\"\\s*:\\s*\"[^\"]{20,}",
+    "msg": "Add a description of at least 20 characters."
+   },
+   {
+    "re": "\"city\"",
+    "msg": "Add a city property."
+   },
+   {
+    "re": "\"type\"\\s*:\\s*\"string\"",
+    "msg": "City should have type string."
+   },
+   {
+    "re": "\"required\"\\s*:\\s*\\[\\s*\"city\"\\s*\\]",
+    "msg": "Make city required."
+   }
+  ],
+  "hints": [
+   "Tools have name, description and an input schema.",
+   "The schema lists properties and required names."
+  ],
+  "solution": "{\n  \"name\": \"get_weather\",\n  \"description\": \"Get the current weather for a city. Use when the user asks about temperature or rain.\",\n  \"input_schema\": {\n    \"type\": \"object\",\n    \"properties\": {\"city\": {\"type\": \"string\"}},\n    \"required\": [\"city\"]\n  }\n}"
+ }
+]
