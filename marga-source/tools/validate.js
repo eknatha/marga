@@ -804,7 +804,14 @@ function checkLabsAndChallenges() {
   const LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
   const FORBID = /\bgit(hub|lab|ops|leaks|ea)/i, EMOJI = /\p{Extended_Pictographic}/u, ARROW = /[←→⇒]/;
   const vm = A.vmlabs || [], seen = new Set();
-  if (vm.length < 12) err('vm', 'need at least 12 real Linux scenarios');
+  if (vm.length < 130) err('vm', 'need at least 130 real Linux scenarios');
+  for (const lv of LEVELS) if (vm.filter((x) => x.level === lv).length < 30) err('vm', `need at least 30 ${lv} scenarios`);
+  const answers = JSON.parse(fs.readFileSync(path.join(__dirname, 'vmanswers.json'), 'utf8'));
+  for (const f of ['systemctl', 'journalctl', 'sdlib.sh', 'sdrun', 'sdboot', 'netlib.sh', 'inns']) if (!fs.existsSync(path.join(SRC, 'vm', 'shims', f))) err('vm', `src/vm/shims/${f} is missing`);
+  const kc = fs.existsSync(path.join(SRC, 'vm', 'kernel.config')) ? fs.readFileSync(path.join(SRC, 'vm', 'kernel.config'), 'utf8') : '';
+  for (const o of ['CONFIG_NET_NS=y', 'CONFIG_VETH=y', 'CONFIG_BRIDGE=y', 'CONFIG_DUMMY=y', 'CONFIG_COMPAT_32BIT_TIME=y']) if (!kc.includes(o)) err('vm', `kernel.config needs ${o}`);
+  const kinds = { diagnose: 0, multi: 0, network: 0, systemd: 0 };
+  const fixes = JSON.parse(fs.readFileSync(path.join(__dirname, 'vmfixes.json'), 'utf8'));
   for (const x of vm) {
     const w = 'vm ' + x.id;
     if (!/^[a-z0-9-]+$/.test(x.id || '') || seen.has(x.id)) err('vm', `${w}: bad or duplicate id`); seen.add(x.id);
@@ -816,8 +823,31 @@ function checkLabsAndChallenges() {
     if (!(x.goals || []).length) err('vm', `${w}: needs goals`);
     if ((x.hints || []).length < 3) err('vm', `${w}: needs at least 3 hints`);
     if (!x.solution || x.solution.length < 10) err('vm', `${w}: needs a solution`);
+    if (!Array.isArray(fixes[x.id]) || !fixes[x.id].length) err('vm', `${w}: needs a typed fix in tools/vmfixes.json`);
     for (const t of [x.title, x.story, ...(x.goals || []), ...(x.hints || []), x.solution]) if (FORBID.test(t || '') || EMOJI.test(t || '') || ARROW.test(t || '')) err('vm', `${w}: forbidden text in "${String(t).slice(0, 40)}"`);
+    if (x.kind === 'diagnose') {
+      kinds.diagnose++;
+      if (!x.ask || !Array.isArray(x.accept) || !x.accept.length || !x.answer) err('vm', `${w}: a diagnose lab needs ask, accept and answer`);
+      else {
+        let rx = []; try { rx = x.accept.map((a) => new RegExp(a, 'i')); } catch (m) { err('vm', `${w}: bad accept pattern`); }
+        if (rx.length && !rx.some((r) => r.test(x.answer))) err('vm', `${w}: its own answer is not accepted`);
+        for (const junk of ['ls', 'yes', 'i do not know', 'disk']) if (!x.answer.toLowerCase().includes(junk) && rx.some((r) => r.test(junk))) err('vm', `${w}: accepts "${junk}"`);
+      }
+      if (!answers[x.id] || !(answers[x.id].bad || answers[x.id].good)) err('vm', `${w}: needs an entry in tools/vmanswers.json`);
+    }
+    if (x.tag === 'network') kinds.network++;
+    if (x.tag === 'systemd') kinds.systemd++;
+    if (x.faults) { kinds.multi++; if (!(x.faults >= 2 && x.faults <= 6)) err('vm', `${w}: faults must be 2 to 6`); }
+    if (x.tag && !['network', 'systemd'].includes(x.tag)) err('vm', `${w}: unknown tag ${x.tag}`);
+    if (x.why) {
+      if (!x.why.q || !Array.isArray(x.why.o) || x.why.o.length < 2 || x.why.o.length > 4 || !Number.isInteger(x.why.a) || x.why.a < 0 || x.why.a >= x.why.o.length || !x.why.x) err('vm', `${w}: bad why prompt`);
+    }
   }
+  if (kinds.diagnose < 10) err('vm', 'need at least 10 diagnose-only labs');
+  if (kinds.multi < 8) err('vm', 'need at least 8 multi-fault labs');
+  if (kinds.network < 8) err('vm', 'need at least 8 network labs');
+  if (kinds.systemd < 8) err('vm', 'need at least 8 systemd-style labs');
+  stats['diagnose / multi-fault / network / systemd labs'] = `${kinds.diagnose} / ${kinds.multi} / ${kinds.network} / ${kinds.systemd}`;
   for (const f of ['bzImage', 'initrd.gz', 'libv86.js', 'v86.wasm', 'seabios.bin', 'vgabios.bin', 'NOTICE.md']) if (!fs.existsSync(path.join(DIST, 'vm', f))) err('vm', `dist/vm/${f} is missing`);
   const core = require(path.join(SRC, 'app', 'challenge-core.js')), ch = A.challenges || [], ids = new Set();
   if (ch.length < 50) err('challenges', 'need at least 50 challenges');

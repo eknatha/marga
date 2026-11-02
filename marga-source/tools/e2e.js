@@ -1336,7 +1336,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const { ctx, page, issues } = await open();
     await go(page, '/');
     await page.keyboard.press('/'); await page.waitForSelector('#sq');
-    ok(await page.locator('#sfilters .schip').count() === 7, 'filter chips');
+    ok(await page.locator('#sfilters .schip').count() === 9, 'filter chips');
     await page.fill('#sq', 'kuberntes'); await page.waitForSelector('#sres li');
     ok(/Kubernetes/i.test(await page.textContent('#sres li:first-child .t')), 'typo still finds Kubernetes');
     await page.fill('#sq', 'inode'); await page.waitForSelector('#sres li');
@@ -1596,33 +1596,84 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     }
   });
 
-  await test('real Linux lab: index lists every scenario; each lab boots a real kernel, fails its checks, accepts a typed fix and is remembered; the empty machine boots; phone width, no overflow', async () => {
-    const fixes = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'vmfixes.json'), 'utf8'));
-    const { ctx, page, issues } = await open(); await go(page, '/linux');
-    const labs = await page.evaluate(() => window.ACADEMY.vmlabs.map((x) => x.id));
-    ok(labs.length >= 12, 'at least 12 scenarios');
-    eq(await page.locator('.tl-item').count(), labs.length, 'one row per scenario');
-    ok(/real Linux kernel/i.test(await page.textContent('.tl-warn')), 'honest banner');
-    for (const id of labs) ok(fixes[id] && fixes[id].length, id + ' has a typed fix in tools/vmfixes.json');
-    for (const id of labs) {
-      await go(page, '/linux/' + id);
-      await page.click('#vm-start');
-      await page.waitForFunction(() => /machine is running/i.test(document.querySelector('#vm-status').textContent), null, { timeout: 180000 });
-      await page.click('#vm-check'); await page.waitForSelector('.vm-checks li', { timeout: 90000 });
-      ok(await page.locator('.vm-checks li.fail').count() >= 1, id + ': checks fail before the fix');
+  // One lab, start to finish, in the real VM: it must fail before the fix, accept the typed fix and be remembered.
+  const vmFixes = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'vmfixes.json'), 'utf8'));
+  const vmAnswers = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'vmanswers.json'), 'utf8'));
+  /* the "Why did that work?" prompt: a wrong choice is corrected, the right one is confirmed, and the choice is remembered */
+  async function whyCheck(page, id) {
+    const w = await page.evaluate((i) => (window.ACADEMY.vmlabs.find((x) => x.id === i) || {}).why || null, id);
+    if (!w) return;
+    await page.waitForSelector('#vm-whyform', { timeout: 10000 });
+    const wrong = (w.a + 1) % w.o.length;
+    await page.locator('#vm-whyform input[value="' + wrong + '"]').check(); await page.click('#vm-why-go');
+    ok(/Not quite/.test(await page.textContent('#vm-whyout')), id + ': a wrong reason is corrected');
+    await page.locator('#vm-whyform input[value="' + w.a + '"]').check(); await page.click('#vm-why-go');
+    ok(/Right\./.test(await page.textContent('#vm-whyout')), id + ': the right reason is confirmed');
+  }
+  async function vmSolve(page, id) {
+    const kind = await page.evaluate((i) => (window.ACADEMY.vmlabs.find((x) => x.id === i) || {}).kind || 'fix', id);
+    await go(page, '/linux/' + id);
+    await page.click('#vm-start');
+    await page.waitForFunction(() => /machine is running/i.test(document.querySelector('#vm-status').textContent), null, { timeout: 180000 });
+    if (kind === 'diagnose') {
+      const a = vmAnswers[id]; ok(a && a.good && a.bad, id + ': has answers in tools/vmanswers.json');
       await page.click('#vm-term'); await new Promise((r) => setTimeout(r, 500));
-      for (const line of fixes[id]) { await page.keyboard.type(line, { delay: 4 }); await page.keyboard.press('Enter'); await new Promise((r) => setTimeout(r, 2500)); }
-      await page.click('#vm-check'); await page.waitForFunction(() => /All \d+ checks pass/.test(document.querySelector('#vm-status').textContent), null, { timeout: 90000 }).catch(async () => { throw new Error(id + ': checks did not pass after the fix: ' + (await page.textContent('#vm-result'))); });
-      ok(/Solved/.test(await page.textContent('#vm-result')), id + ': solved message');
+      const re = new RegExp(a.probe_re, 'm'), shown = () => page.locator('.xterm-rows').first().innerText().then((t) => t.replace(/\n\s*\n/g, '\n'));
+      await page.keyboard.type(a.probe, { delay: 4 }); await page.keyboard.press('Enter');
+      let seen = ''; for (let k = 0; k < 20 && !re.test(seen.split('\n').slice(1).join('\n')); k++) { await new Promise((r) => setTimeout(r, 1500)); seen = await shown(); }
+      ok(re.test(seen), id + ': the probe shows the evidence in the real machine');
+      await page.fill('#vm-ans', a.bad); await page.click('#vm-submit');
+      ok(/Not yet/.test(await page.textContent('#vm-result')), id + ': a wrong diagnosis is not accepted');
+      ok(!(await page.evaluate((i) => !!window.MargaApp.state().vm.done[i], id)), id + ': not remembered after a wrong diagnosis');
+      await page.fill('#vm-ans', a.good); await page.click('#vm-submit');
+      ok(/Correct/.test(await page.textContent('#vm-result')), id + ': the right diagnosis is accepted');
       ok(await page.evaluate((i) => !!window.MargaApp.state().vm.done[i], id), id + ': remembered');
+      await whyCheck(page, id);
+      return;
     }
-    await go(page, '/linux'); ok((await page.textContent('#vm-progress')).startsWith(labs.length + ' of ' + labs.length), 'index shows all solved');
+    await page.click('#vm-check'); await page.waitForSelector('.vm-checks li', { timeout: 90000 });
+    ok(await page.locator('.vm-checks li.fail').count() >= 1, id + ': checks fail before the fix');
+    await page.click('#vm-term'); await new Promise((r) => setTimeout(r, 500));
+    for (const line of vmFixes[id]) { await page.keyboard.type(line, { delay: 4 }); await page.keyboard.press('Enter'); await new Promise((r) => setTimeout(r, 2500)); }
+    const allPass = () => page.waitForFunction(() => /All \d+ checks pass/.test(document.querySelector('#vm-status').textContent), null, { timeout: 60000 });
+    await page.click('#vm-check');
+    await allPass().catch(async () => { await new Promise((r) => setTimeout(r, 8000)); await page.click('#vm-check'); await allPass(); }).catch(async () => { await page.click('#vm-term'); for (const line of vmFixes[id]) { await page.keyboard.type(line, { delay: 4 }); await page.keyboard.press('Enter'); await new Promise((r) => setTimeout(r, 4000)); } await page.click('#vm-check'); await allPass(); }).catch(async () => { throw new Error(id + ': checks did not pass after the fix: ' + (await page.locator('.vm-checks li').allTextContents()).join(' | ')); });
+    ok(/Solved/.test(await page.textContent('#vm-result')), id + ': solved message');
+    ok(await page.evaluate((i) => !!window.MargaApp.state().vm.done[i], id), id + ': remembered');
+    await whyCheck(page, id);
+  }
+
+  await test('real Linux lab: 130 scenarios (36 beginner, 42 intermediate, 52 advanced) with a typed fix each; the index filters by level, text and status; one lab runs in the real VM; the empty machine boots; phone width, no overflow', async () => {
+    const { ctx, page, issues } = await open(); await go(page, '/linux');
+    const labs = await page.evaluate(() => window.ACADEMY.vmlabs.map((x) => ({ id: x.id, level: x.level })));
+    eq(labs.length, 130, '130 scenarios');
+    const PER = { Beginner: 36, Intermediate: 42, Advanced: 52 };
+    for (const lv of ['Beginner', 'Intermediate', 'Advanced']) eq(labs.filter((x) => x.level === lv).length, PER[lv], lv + ' has ' + PER[lv]);
+    ok(/real Linux kernel/i.test(await page.textContent('.tl-warn')), 'honest banner');
+    for (const x of labs) ok(vmFixes[x.id] && vmFixes[x.id].length, x.id + ' has a typed fix in tools/vmfixes.json');
+    eq(await page.locator('.tl-item').count(), 36, 'a new visitor starts on the Beginner list');
+    ok(/Showing 36 of 130/.test(await page.textContent('#vm-count')), 'the count is announced');
+    await page.click('.vm-tabs [data-lv="All"]'); eq(await page.locator('.tl-item').count(), 130, 'All shows 130');
+    for (const lv of ['Intermediate', 'Advanced', 'Beginner']) { await page.click('.vm-tabs [data-lv="' + lv + '"]'); eq(await page.locator('.tl-item').count(), PER[lv], lv + ' shows ' + PER[lv]); eq(await page.locator('.tl-item .small:has-text("' + lv + ' |")').count(), PER[lv], lv + ': every row is ' + lv); }
+    await page.click('.vm-tabs [data-lv="All"]'); await page.fill('#vm-q', 'hard link'); ok(await page.locator('.tl-item').count() >= 1 && await page.locator('.tl-item').count() < 10, 'search narrows the list');
+    await page.fill('#vm-q', 'zzzz-no-such'); ok(/No scenario matches/.test(await page.textContent('#vm-list')), 'an empty search says so'); await page.fill('#vm-q', '');
+    await page.selectOption('#vm-st', 'done'); eq(await page.locator('.tl-item').count(), 0, 'nothing is solved yet'); await page.selectOption('#vm-st', 'open'); eq(await page.locator('.tl-item').count(), 130, 'all are open');
+    await page.click('#vm-random'); await page.waitForSelector('#vm-start'); ok(/^#\/linux\/[a-z0-9-]+$/.test(await page.evaluate(() => location.hash)), 'Pick one for me opens a lab');
+    await go(page, '/linux?q=' + encodeURIComponent('linux/disks-and-filesystems')); await page.waitForSelector('.tl-item');
+    ok(await page.locator('.tl-item').count() >= 5, 'a lesson link filters the list to that lesson\'s labs'); eq(await page.inputValue('#vm-q'), 'linux/disks-and-filesystems', 'the search box shows the filter');
+    await go(page, '/linux?q=&level=All'); eq(await page.locator('.tl-item').count(), 130, 'clearing the query shows all 130');
+    await setProgress(page, allDone()); await go(page, '/lesson/linux/disks-and-filesystems'); await page.waitForSelector('#diy'); ok(await page.locator('.diy-labs a[href^="#/linux?q="]').count() === 1, 'the lesson links to all its labs'); ok(await page.locator('.diy-labs a[href^="#/linux/"]').count() === 4, 'four labs are listed on the lesson page');
+    await vmSolve(page, 'disk-full');
+    await go(page, '/linux'); ok((await page.textContent('#vm-progress')).startsWith('1 of 130'), 'the index counts the solved lab');
+    await page.selectOption('#vm-st', 'done'); await page.click('.vm-tabs [data-lv="All"]'); eq(await page.locator('.tl-item').count(), 1, 'the solved filter shows it');
     await go(page, '/linux/sandbox'); await page.click('#vm-start');
     await page.waitForFunction(() => /machine is running/i.test(document.querySelector('#vm-status').textContent), null, { timeout: 180000 });
     await page.click('#vm-term'); await page.keyboard.type('uname -sr', { delay: 4 }); await page.keyboard.press('Enter'); await new Promise((r) => setTimeout(r, 1500));
     ok(/Linux 6\.8/.test(await page.locator('.xterm-accessibility, .xterm-rows').first().textContent()), 'uname shows the real kernel');
     await ctx.close();
-    const m = await open({ viewport: { width: 390, height: 800 } }); await go(m.page, '/linux/disk-full');
+    const m = await open({ viewport: { width: 390, height: 800 } }); await go(m.page, '/linux');
+    ok(await m.page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'the index fits at 390 px');
+    await go(m.page, '/linux/disk-full');
     ok(await m.page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'no horizontal overflow at 390 px');
     await m.page.click('#vm-start'); await m.page.waitForSelector('#vm-keys:not([hidden])');
     ok(await m.page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'no overflow with the machine open');
@@ -1630,6 +1681,41 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await m.ctx.close();
     eq(issues.filter((i) => !/favicon/.test(i)).length, 0, 'no console errors: ' + issues.join(' | '));
   });
+
+  await test('real Linux lab kinds: the Kind filter counts (12 diagnose, 10 several-faults, 11 network, 11 systemd-style); every diagnose lab refuses a wrong answer and accepts the right one in the page; the several-faults and why prompts are present', async () => {
+    const { ctx, page, issues } = await open(); await go(page, '/linux?level=All');
+    const kinds = await page.evaluate(() => { const v = window.ACADEMY.vmlabs; return { diagnose: v.filter((x) => x.kind === 'diagnose').length, multi: v.filter((x) => x.faults).length, network: v.filter((x) => x.tag === 'network').length, systemd: v.filter((x) => x.tag === 'systemd').length, why: v.filter((x) => x.why).length }; });
+    eq(kinds.diagnose, 12, 'diagnose labs'); eq(kinds.multi, 10, 'several-faults labs'); eq(kinds.network, 11, 'network labs'); eq(kinds.systemd, 11, 'systemd-style labs'); ok(kinds.why >= 20, 'at least 20 labs ask why: ' + kinds.why);
+    for (const [v, n] of [['diagnose', 12], ['multi', 10], ['network', 11], ['systemd', 11]]) { await page.selectOption('#vm-tp', v); eq(await page.locator('.tl-item').count(), n, v + ' filter shows ' + n); }
+    await page.selectOption('#vm-tp', 'fix'); eq(await page.locator('.tl-item').count(), 130 - 12, 'the fix filter hides diagnose labs');
+    const dg = await page.evaluate(() => window.ACADEMY.vmlabs.filter((x) => x.kind === 'diagnose').map((x) => x.id));
+    for (const id of dg) {
+      const a = vmAnswers[id];
+      await go(page, '/linux/' + id); await page.waitForSelector('#vm-ans');
+      ok(await page.locator('#vm-check').count() === 0, id + ': a diagnose lab has no Check button');
+      await page.fill('#vm-ans', a.bad); await page.click('#vm-submit'); ok(/Not yet/.test(await page.textContent('#vm-result')), id + ': wrong answer refused');
+      await page.fill('#vm-ans', 'ls'); await page.click('#vm-submit'); ok(/Not yet/.test(await page.textContent('#vm-result')), id + ': junk refused');
+      await page.fill('#vm-ans', a.good); await page.press('#vm-ans', 'Enter'); ok(/Correct/.test(await page.textContent('#vm-result')), id + ': right answer accepted');
+      ok(await page.evaluate((i) => !!window.MargaApp.state().vm.done[i], id), id + ': remembered');
+      await whyCheck(page, id);
+    }
+    await go(page, '/linux/crash-cause'); await page.waitForSelector('#vm-ans'); ok(/Diagnose|diagnosis/i.test(await page.textContent('#main h1') + await page.textContent('#vm-ask')), 'the diagnose box is labelled');
+    await go(page, '/linux?level=All&topic=multi'); eq(await page.locator('.tl-item').count(), 10, 'a topic link filters the list');
+    eq(issues.filter((i) => !/favicon/.test(i)).length, 0, 'no console errors: ' + issues.join(' | ')); await ctx.close();
+  });
+
+  for (const level of ['Beginner', 'Intermediate', 'Advanced']) {
+    await test('real Linux lab, ' + level + ' scenarios: each one boots a real kernel, fails its checks, accepts its typed fix and is remembered', async () => {
+      const { ctx, page, issues } = await open(); await go(page, '/linux');
+      const ids = await page.evaluate((lv) => window.ACADEMY.vmlabs.filter((x) => x.level === lv).map((x) => x.id), level);
+      eq(ids.length, { Beginner: 36, Intermediate: 42, Advanced: 52 }[level], level + ' count');
+      const only = process.env.VMONLY ? process.env.VMONLY.split(',') : null;
+      const failed = [];
+      for (const id of ids) { if (only && !only.includes(id)) continue; try { await vmSolve(page, id); } catch (err) { failed.push(id + ': ' + String(err.message || err).slice(0, 300)); } }
+      eq(failed.length, 0, 'labs that failed: ' + failed.join(' || '));
+      eq(issues.filter((i) => !/favicon/.test(i)).length, 0, 'no console errors: ' + issues.join(' | ')); await ctx.close();
+    });
+  }
 
   await test('do-it-yourself challenges: every solution passes and every start fails in the page; a lesson shows its challenge, feedback, hints, solution and is remembered; the index lists all', async () => {
     const { ctx, page, issues } = await open(); await go(page, '/challenges');
@@ -1662,6 +1748,73 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const m = await open({ viewport: { width: 390, height: 800 } }); await go(m.page, '/'); await setProgress(m.page, allDone()); await go(m.page, '/lesson/' + fix.lesson); await m.page.waitForSelector('#diy');
     ok(await m.page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'no horizontal overflow at 390 px'); await m.ctx.close();
     eq(issues.filter((i) => !/favicon/.test(i)).length, 0, 'no console errors: ' + issues.join(' | ')); await ctx.close();
+  });
+
+  await test('save my machine: files and a background process survive a save, a reload and a resume; the save downloads as a .mvm file, can be deleted and loaded back from the file', async () => {
+    const { ctx, page, issues } = await open();
+    await go(page, '/linux/sandbox'); await page.click('#vm-start');
+    await page.waitForFunction(() => /machine is running/i.test(document.querySelector('#vm-status').textContent), null, { timeout: 180000 });
+    const term = async (cmd, wait) => { await page.click('#vm-term'); await new Promise((r) => setTimeout(r, 400)); await page.keyboard.type(cmd, { delay: 4 }); await page.keyboard.press('Enter'); await new Promise((r) => setTimeout(r, wait || 2500)); return (await page.locator('.xterm-rows').innerText()).replace(/\n\s*\n/g, '\n'); };
+    await term('echo kept-after-save > /root/marker; sleep 300 & sleep 1; jobs');
+    await page.locator('#vm-saves summary').click(); await page.click('#vm-save');
+    await page.waitForFunction(() => /Saved:/.test(document.querySelector('#vm-savemsg').textContent), null, { timeout: 120000 });
+    await go(page, '/'); await go(page, '/linux/sandbox');
+    await page.locator('#vm-saves summary').click(); await page.waitForSelector('#vm-resume:not([hidden])', { timeout: 10000 });
+    await page.click('#vm-resume');
+    await page.waitForFunction(() => /saved machine is running again/i.test(document.querySelector('#vm-status').textContent), null, { timeout: 180000 });
+    const out = await term('cat /root/marker; ps | grep "sleep 300" | grep -v grep', 3500);
+    ok(/kept-after-save/.test(out), 'the file survived'); ok(/sleep 300/.test(out), 'the background process survived');
+    const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#vm-dl')]);
+    const fp = require('path').join(require('os').tmpdir(), 'marga-e2e-' + process.pid + '.mvm'); await dl.saveAs(fp);
+    ok(fs.readFileSync(fp).slice(0, 8).toString() === 'MARGAVM1', 'the file has the MARGAVM1 header'); ok(/\.mvm$/.test(dl.suggestedFilename()), 'the file is named .mvm');
+    await page.click('#vm-delsave'); await page.waitForTimeout(500); ok(await page.locator('#vm-resume').isHidden(), 'delete hides Resume');
+    await page.setInputFiles('#vm-file', fp);
+    await page.waitForFunction(() => /saved machine is running again/i.test(document.querySelector('#vm-status').textContent), null, { timeout: 180000 });
+    await new Promise((r) => setTimeout(r, 3000));
+    ok(/kept-after-save/.test(await term('cat /root/marker', 3500)), 'the file loads back from the .mvm file');
+    await page.setInputFiles('#vm-file', { name: 'bad.mvm', mimeType: 'application/octet-stream', buffer: Buffer.from('not a machine') });
+    await page.waitForTimeout(1500); ok(/not a MARGA machine save|damaged/i.test(await page.textContent('#vm-savemsg')), 'a bad file is refused with a message');
+    try { fs.unlinkSync(fp); } catch (x) { /* ignore */ }
+    eq(issues.filter((i) => !/favicon/.test(i)).length, 0, 'no console errors: ' + issues.join(' | ')); await ctx.close();
+  });
+
+  await test('search across everything: the page finds labs, games, plans and lessons; group chips count; Shift+Enter in the box opens the page; a typo is suggested; phone width', async () => {
+    const { ctx, page, issues } = await open();
+    await go(page, '/search?q=systemd'); await page.waitForSelector('.sp-item');
+    const kinds = await page.$$eval('.sp-item .chip', (a) => a.map((x) => x.textContent));
+    for (const k of ['Lesson', 'Cheat sheet', 'Glossary']) ok(kinds.includes(k), 'systemd finds a ' + k);
+    await go(page, '/search?q=namespace&g=Labs'); await page.waitForSelector('.sp-item');
+    ok((await page.$$eval('.sp-item .chip', (a) => a.map((x) => x.textContent))).every((k) => ['Linux lab', 'Terminal lab', 'Challenge', 'Game'].includes(k)), 'the Labs filter shows only lab kinds');
+    for (const [q, kind] of [['diagnose', 'Linux lab'], ['plan sre', 'Plan'], ['capstone', 'Capstone'], ['roadmap devops', 'Roadmap'], ['handbook', 'Handbook']]) { await go(page, '/search?q=' + encodeURIComponent(q)); await page.waitForSelector('.sp-item'); ok((await page.$$eval('.sp-item .chip', (a) => a.map((x) => x.textContent))).includes(kind), q + ' finds a ' + kind); }
+    await go(page, '/search?q=zzzqqq'); await page.waitForSelector('#sp-out p'); ok(/Nothing matches/.test(await page.textContent('#sp-out')), 'an empty search says so');
+    await go(page, '/search?q=kubernets'); await page.waitForSelector('.sp-item'); ok(await page.locator('.sp-item').count() > 3, 'a typo still finds results');
+    await go(page, '/'); await page.keyboard.press('/'); await page.fill('#sq', 'multi fault'); await page.waitForSelector('#sres li');
+    await page.keyboard.press('Shift+Enter'); await page.waitForSelector('.sp-item'); ok(/#\/search\?q=multi%20fault/.test(await page.evaluate(() => location.hash)), 'Shift+Enter opens the full page');
+    await page.fill('#sp-q', 'chmod'); await page.press('#sp-q', 'Enter'); await page.waitForFunction(() => /chmod/.test(location.hash)); await page.waitForSelector('.sp-item');
+    const m = await open({ viewport: { width: 390, height: 800 } }); await go(m.page, '/search?q=linux'); await m.page.waitForSelector('.sp-item');
+    ok(await m.page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'no horizontal overflow at 390 px'); await m.ctx.close();
+    eq(issues.filter((i) => !/favicon/.test(i)).length, 0, 'no console errors: ' + issues.join(' | ')); await ctx.close();
+  });
+
+  await test('watermarks: every print and PDF path carries the MARGA watermark (app pages, standalone cheat sheets, the downloaded handbook), as real PDFs', async () => {
+    const { ctx, page, issues } = await open();
+    const sh = require('child_process'), os = require('os');
+    const paths = [BASE + '/cheatsheets/docker.html', BASE + '/cheatsheets/', BASE + '/#/cheatsheet/docker', BASE + '/#/lesson/linux/users-groups-permissions', BASE + '/#/handbook/linux', BASE + '/#/roadmap/devops', BASE + '/#/portfolio', BASE + '/#/plan/sre-30', BASE + '/#/linux/disk-full', BASE + '/#/search?q=systemd'];
+    for (const u of paths) {
+      await page.goto(u); await page.waitForTimeout(1200); await page.emulateMedia({ media: 'print' });
+      const c = await page.evaluate(() => [getComputedStyle(document.body, '::before').content, getComputedStyle(document.body, '::after').content, getComputedStyle(document.body, '::before').position].join('|'));
+      ok(/MARGA by EknathaLabs/.test(c) && /marga\.eknathalabs\.com/.test(c) && /fixed/.test(c), u + ': the watermark is a fixed element, repeated on each page: ' + c);
+      const f = require('path').join(os.tmpdir(), 'marga-wm-' + process.pid + '.pdf'); await page.pdf({ path: f, format: 'A4' });
+      const txt = sh.execSync('pdftotext -layout "' + f + '" -').toString(); ok(/MARGA by EknathaLabs/.test(txt), u + ': the PDF text has the watermark'); fs.unlinkSync(f);
+      await page.emulateMedia({ media: 'screen' });
+    }
+    await page.goto(BASE + '/#/handbook/linux'); await page.waitForSelector('#hb-dl');
+    const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#hb-dl')]);
+    const fp = require('path').join(os.tmpdir(), 'marga-hb-' + process.pid + '.html'); await dl.saveAs(fp);
+    const pg2 = await ctx.newPage(); await pg2.goto('file://' + fp); await pg2.emulateMedia({ media: 'print' });
+    const c2 = await pg2.evaluate(() => getComputedStyle(document.body, '::before').content + getComputedStyle(document.body, '::after').content);
+    ok(/MARGA by EknathaLabs/.test(c2) && /marga\.eknathalabs\.com/.test(c2), 'the downloaded handbook web page prints with the watermark'); fs.unlinkSync(fp);
+    eq(issues.filter((i) => !/favicon|file:/.test(i)).length, 0, 'no console errors: ' + issues.join(' | ')); await ctx.close();
   });
 
   await test('embed and workshop: bare embed pages, the embed builder, a workshop built, shared and read back from progress codes; phone width', async () => {
@@ -2344,7 +2497,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await ctx.close();
   });
 
-  await test('hero demo: rotates by itself through four demos, can be paused, and every link target exists', async () => {
+  await test('hero demo: rotates by itself through five demos, can be paused, and every link target exists', async () => {
     const { ctx, page } = await open({ motion: true }); await go(page, '/');
     await page.waitForSelector('#term.hd');
     const first = await page.textContent('#hd-title');
@@ -2353,11 +2506,12 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const frozen = await page.textContent('#hd-title'); await page.waitForTimeout(6000);
     eq(await page.textContent('#hd-title'), frozen, 'a paused demo does not rotate');
     const data = await A(page);
-    for (let n = 0; n < 4; n++) {
+    for (let n = 0; n < 5; n++) {
       await page.click('#hd-t' + n);
       const h = await page.getAttribute('#hd-link', 'href');
       if (/^#\/game\//.test(h)) ok(data.games.some((g) => '#/game/' + g.id === h), 'game exists: ' + h);
       if (/^#\/terminal-lab\//.test(h)) ok(data.termlabs.some((g) => '#/terminal-lab/' + g.id === h), 'lab exists: ' + h);
+      if (/^#\/linux\//.test(h)) ok(data.vmlabs.some((g) => '#/linux/' + g.id === h), 'real Linux lab exists: ' + h);
       if (/^#\/walkthrough\//.test(h)) ok(data.walkthroughs.some((g) => '#/walkthrough/' + g.id === h), 'walkthrough exists: ' + h);
     }
     await ctx.close();
@@ -2374,8 +2528,9 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const nums = await page.locator('.stats b').allTextContents(); ok(nums.every((n) => +n > 0), 'stats from data: ' + nums);
     eq(await page.locator('.tl-l.pend').count(), 0, 'terminal shows its finished state with reduced motion');
     ok(await page.locator('#term a[href="#/terminal-lab/lx-ssh-perms"]').count() === 1, 'demo links to a lab');
-    eq(await page.locator('.hd-tab').count(), 4, 'four demo tabs');
-    await page.click('#hd-t2'); eq(await page.locator('#hd-link').getAttribute('href'), '#/explainers/dns-lookup', 'explainer tab switches the link');
+    eq(await page.locator('.hd-tab').count(), 5, 'five demo tabs');
+    await page.click('#hd-t1'); eq(await page.locator('#hd-link').getAttribute('href'), '#/linux/disk-full', 'the real Linux tab links to its lab'); ok(/real Linux/i.test(await page.textContent('#hd-title')), 'real Linux demo title');
+    await page.click('#hd-t3'); eq(await page.locator('#hd-link').getAttribute('href'), '#/explainers/dns-lookup', 'explainer tab switches the link');
     ok(await page.locator('.hero .hero-copy .hero-free').count() === 1, 'free line sits in the hero');
     eq(await page.locator('#today-band .prac li').count(), 5, 'today strip');
     eq(await page.locator('.tl-card li').count(), 5, 'incident timeline');

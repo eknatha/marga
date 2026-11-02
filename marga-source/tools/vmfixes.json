@@ -38,5 +38,431 @@
  ],
  "path-and-env": [
   "printf 'export PATH=$PATH:/opt/tools/bin\\nexport APP_ENV=staging\\n' > /root/.profile"
+ ],
+ "hidden-setting": [
+  "sed -i \"s/^DEBUG=true/DEBUG=false/\" /srv/app/.env"
+ ],
+ "find-lost-file": [
+  "cp \"$(find /srv/archive -name invoice-2026-0417.pdf)\" /root/invoice.pdf"
+ ],
+ "script-not-executable": [
+  "chmod +x /usr/local/bin/hello-report"
+ ],
+ "wrong-shebang": [
+  "sed -i \"1s|.*|#!/bin/sh|\" /opt/tools/cleanup.sh"
+ ],
+ "crlf-script": [
+  "sed -i \"s/\\r$//\" /opt/tools/sync.sh"
+ ],
+ "file-owner": [
+  "chown webapp /srv/uploads"
+ ],
+ "group-access": [
+  "sed -i \"s/^analysts:x:2000:$/analysts:x:2000:maya/\" /etc/group"
+ ],
+ "sticky-share": [
+  "chmod 1777 /srv/share"
+ ],
+ "kill-stuck-process": [
+  "kill -9 $(pidof stuck-job)"
+ ],
+ "biggest-folder": [
+  "echo \"biggest=$(du -sk /srv/data/* | sort -rn | head -1 | awk -F/ '{print $NF}')\" > /root/answer.txt"
+ ],
+ "archive-the-site": [
+  "mkdir -p /backup",
+  "tar czf /backup/site.tar.gz -C /srv site"
+ ],
+ "extract-release": [
+  "mkdir -p /opt/app",
+  "tar xzf /root/release-1.4.tar.gz -C /opt/app"
+ ],
+ "count-the-errors": [
+  "grep -c \" ERROR \" /var/log/app/app.log > /root/errors.txt"
+ ],
+ "unique-visitors": [
+  "sort -u /srv/data/visitors.txt | wc -l > /root/unique.txt"
+ ],
+ "hostname-files": [
+  "echo web-01 > /etc/hostname",
+  "sed -i \"s/^127.0.1.1.*/127.0.1.1 web-01/\" /etc/hosts"
+ ],
+ "interface-down": [
+  "ifconfig lo 127.0.0.1 up"
+ ],
+ "wrong-port": [
+  "sed -i \"s/8081/8080/\" /etc/monitor.conf"
+ ],
+ "rename-extensions": [
+  "for f in /srv/docs/*.txt; do mv \"$f\" \"${f%.txt}.md\"; done"
+ ],
+ "split-streams": [
+  "noisy > /root/out.log 2> /root/err.log"
+ ],
+ "old-cache-files": [
+  "find /var/cache/app -type f -mtime +7 -exec rm {} \\;"
+ ],
+ "read-only-mount": [
+  "mount -o remount,rw /srv/records"
+ ],
+ "spaces-in-names": [
+  "cp \"/srv/papers/Q3 report.txt\" /backup/"
+ ],
+ "cron-every-five": [
+  "echo \"*/5 * * * * /usr/local/bin/backup\" | crontab -"
+ ],
+ "case-matters": [
+  "sed -i \"s#/srv/App#/srv/app#\" /usr/local/bin/app-info"
+ ],
+ "rotate-by-hand": [
+  "mv /var/log/svc/app.log /var/log/svc/app.log.1",
+  "gzip /var/log/svc/app.log.1"
+ ],
+ "cron-path": [
+  "sed -i \"s#^mytool#/opt/tools/bin/mytool#\" /opt/job/nightly.sh"
+ ],
+ "stale-host-entry": [
+  "sed -i \"/^10.1.1.5 /d\" /etc/hosts"
+ ],
+ "start-order": [
+  "printf \"db\\napp\\n\" > /etc/stack.order",
+  "stack-up"
+ ],
+ "env-file-spaces": [
+  "sed -i \"s/ = /=/\" /etc/app/app.env"
+ ],
+ "run-as-user": [
+  "kill $(pidof webd)",
+  "su -s /bin/sh webapp -c \"/usr/local/bin/webd >/dev/null 2>&1 &\""
+ ],
+ "renice-batch": [
+  "renice 15 -p $(pidof batch-crunch)"
+ ],
+ "config-drift": [
+  "echo \"key=$(diff /root/staging.conf /root/prod.conf | sed -n 's/^-\\([A-Z_]*\\)=.*/\\1/p')\" > /root/answer.txt"
+ ],
+ "ini-section": [
+  "sed -i \"/^\\[db\\]/,/^\\[cache\\]/ s/^port=5432/port=5433/\" /etc/app/app.ini"
+ ],
+ "sum-the-bytes": [
+  "echo \"bytes=$(awk '$9==200{s+=$10} END{print s}' /var/log/web/access.log)\" > /root/answer.txt"
+ ],
+ "xargs-spaces": [
+  "find /srv/work -name \"*.tmp\" -print0 | xargs -0 rm"
+ ],
+ "recursive-perms": [
+  "find /srv/site -type d -exec chmod 755 {} \\;",
+  "find /srv/site -type f -exec chmod 644 {} \\;"
+ ],
+ "setgid-folder": [
+  "chmod g+s /srv/proj"
+ ],
+ "inodes-full": [
+  "rm /var/sessions/sess-*"
+ ],
+ "two-services-one-port": [
+  "sed -i \"s/8080/8081/\" /etc/svc-b.conf",
+  "start-b"
+ ],
+ "index-case": [
+  "mv /srv/shop/Index.html /srv/shop/index.html"
+ ],
+ "missing-address": [
+  "ip addr add 10.20.30.40/32 dev lo",
+  "start-api"
+ ],
+ "path-order": [
+  "echo 'export PATH=/opt/deploy/bin:$PATH' >> /root/.profile"
+ ],
+ "listen-address": [
+  "kill $(pidof httpd)",
+  "httpd -p 8095 -h /srv/public"
+ ],
+ "ssh-key-perms": [
+  "chown -R deploy:deploy /home/deploy/.ssh",
+  "chmod 700 /home/deploy/.ssh",
+  "chmod 600 /home/deploy/.ssh/authorized_keys"
+ ],
+ "service-account-shell": [
+  "sed -i 's|^\\(svc-backup:.*:\\)/bin/sh$|\\1/bin/false|' /etc/passwd"
+ ],
+ "world-writable": [
+  "find /srv/apps -type f -perm -002 -exec chmod o-w {} \\;",
+  "find /srv/apps -type d -perm -002 ! -perm -1000 -exec chmod o-w {} \\;"
+ ],
+ "setuid-audit": [
+  "find /usr/local /opt -type f -perm -4000 -exec chmod u-s {} \\;",
+  "find /usr/local /opt -type f -perm -2000 -exec chmod g-s {} \\;"
+ ],
+ "apply-a-patch": [
+  "cd /etc/app && patch -p1 < /root/fix.patch"
+ ],
+ "report-umask": [
+  "sed -i \"s/umask 077/umask 022/\" /usr/local/bin/report-gen",
+  "rm /srv/out/report.txt; report-gen"
+ ],
+ "open-files-limit": [
+  "sed -i \"s/ulimit -n 64/ulimit -n 1024/\" /usr/local/bin/start-worker",
+  "start-worker"
+ ],
+ "recover-deleted-data": [
+  "ls -l /proc/$(pidof ledger-writer)/fd",
+  "cp /proc/$(pidof ledger-writer)/fd/3 /root/recovered.dat"
+ ],
+ "process-environment": [
+  "echo \"host=$(tr '\\0' '\\n' < /proc/$(pidof db-proxy)/environ | sed -n 's/^DB_HOST=//p')\" > /root/answer.txt"
+ ],
+ "reload-with-sighup": [
+  "sed -i \"s/v1/v2/\" /etc/webd.conf",
+  "kill -HUP $(cat /run/webd.pid)"
+ ],
+ "graceful-stop": [
+  "kill $(pidof queue-worker)",
+  "sleep 2"
+ ],
+ "stopped-process": [
+  "kill -CONT $(pidof etl-job)"
+ ],
+ "ip-forward": [
+  "echo \"net.ipv4.ip_forward = 1\" >> /etc/sysctl.conf",
+  "sysctl -p"
+ ],
+ "hardlinks-keep-space": [
+  "find /srv/store -name data.bin -exec rm {} \\;"
+ ],
+ "sparse-file": [
+  "echo \"used_kb=$(du -k /srv/vm/disk.img | cut -f1)\" > /root/answer.txt"
+ ],
+ "busy-unmount": [
+  "kill $(pidof nightly-report)",
+  "sleep 1; umount /mnt/data"
+ ],
+ "hidden-under-mount": [
+  "mkdir -p /mnt/rootview /backup/old-data",
+  "mount --bind / /mnt/rootview",
+  "cp -a /mnt/rootview/srv/data/. /backup/old-data/",
+  "umount /mnt/rootview"
+ ],
+ "wait-for-jobs": [
+  "sed -i \"s/^cat /wait; cat /\" /usr/local/bin/fetch-all"
+ ],
+ "lock-race": [
+  "sed -i 's|^if \\[ -e $LOCK \\]; then|if ! mkdir $LOCK 2>/dev/null; then|' /usr/local/bin/single-run",
+  "sed -i '/^touch $LOCK$/d' /usr/local/bin/single-run",
+  "sed -i 's|rm -f $LOCK|rmdir $LOCK|' /usr/local/bin/single-run"
+ ],
+ "atomic-config-write": [
+  "sed -i \"s|^OUT=.*|OUT=/etc/app/live.conf.new|\" /usr/local/bin/update-conf",
+  "echo \"mv /etc/app/live.conf.new /etc/app/live.conf\" >> /usr/local/bin/update-conf"
+ ],
+ "keep-going-after-failure": [
+  "sed -i \"1a set -e\" /usr/local/bin/deploy"
+ ],
+ "cleanup-on-exit": [
+  "sed -i '2a trap \"rm -f /run/nightly.lock\" EXIT' /usr/local/bin/nightly-job",
+  "rm -f /run/nightly.lock"
+ ],
+ "copy-with-history": [
+  "mkdir -p /srv/dst",
+  "cp -a /srv/src/. /srv/dst/"
+ ],
+ "top-spender": [
+  "awk -F, 'NR==FNR{n[$1]=$2; next} {s[$2]+=$3} END{for(c in s) if(s[c]>m){m=s[c]; b=c}; print \"top=\" n[b]}' /srv/sales/customers.csv /srv/sales/orders.csv > /root/answer.txt"
+ ],
+ "unique-domains": [
+  "echo \"domains=$(grep -o \"email=[^ ]*\" /srv/data/signups.txt | sed \"s/.*@//\" | sort -u | wc -l)\" > /root/answer.txt"
+ ],
+ "json-by-hand": [
+  "echo \"version=$(sed -n 's/.*\"version\":\"\\([^\"]*\\)\".*/\\1/p' /srv/api/response.json)\" > /root/answer.txt"
+ ],
+ "decode-secret": [
+  "base64 -d /etc/app/secret.b64 > /root/db-password.txt",
+  "chmod 600 /root/db-password.txt"
+ ],
+ "verify-checksums": [
+  "cd /srv/downloads",
+  "echo \"bad=$(sha256sum -c SHA256SUMS 2>/dev/null | grep -v ': OK$' | cut -d: -f1)\" > /root/answer.txt"
+ ],
+ "block-the-attackers": [
+  "grep \"Failed password\" /var/log/auth.log | grep -oE \"[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+\" | sort | uniq -c | awk '$1>=5{print $2}' | sort > /root/blocklist.txt"
+ ],
+ "build-a-jail": [
+  "mkdir -p /jail/bin /jail/etc",
+  "cp /bin/busybox /jail/bin/",
+  "ln -s busybox /jail/bin/cat",
+  "echo \"inside the jail\" > /jail/etc/motd"
+ ],
+ "grow-a-tmpfs": [
+  "mount -o remount,size=8m /var/cache/app"
+ ],
+ "line-before-the-crash": [
+  "echo \"req=$(grep -B1 segfault /var/log/app/crash.log | head -1 | grep -o 'REQ-[0-9]*')\" > /root/answer.txt"
+ ],
+ "numeric-sort": [
+  "echo \"max_ms=$(sort -n /srv/data/latency.txt | tail -1)\" > /root/answer.txt"
+ ],
+ "orphaned-children": [
+  "kill $(pidof batch-parent batch-child)"
+ ],
+ "who-has-it-open": [
+  "for p in /proc/[0-9]*; do ls -l $p/fd 2>/dev/null | grep -q mystery.log && echo \"owner=$(cat $p/comm)\" > /root/answer.txt; done"
+ ],
+ "unit-wrong-path": [
+  "sed -i \"s#/opt/ledger/ledgerd#/opt/ledger/bin/ledgerd#\" /etc/systemd/system/ledger.service",
+  "systemctl daemon-reload",
+  "systemctl start ledger"
+ ],
+ "service-not-enabled": [
+  "systemctl enable billing"
+ ],
+ "stale-unit-reload": [
+  "systemctl daemon-reload",
+  "systemctl restart api"
+ ],
+ "missing-env-file": [
+  "sed -i \"s#/etc/payments/payments.env#/etc/payments/env.d/payments.env#\" /etc/systemd/system/payments.service",
+  "systemctl daemon-reload",
+  "systemctl start payments"
+ ],
+ "no-restart-policy": [
+  "sed -i \"/^ExecStart/a Restart=on-failure\" /etc/systemd/system/datasync.service",
+  "systemctl daemon-reload",
+  "systemctl start datasync"
+ ],
+ "service-user-missing": [
+  "sed -i \"s/^User=.*/User=metrics/\" /etc/systemd/system/metrics-agent.service",
+  "systemctl daemon-reload",
+  "systemctl start metrics-agent"
+ ],
+ "masked-unit": [
+  "systemctl unmask queue-worker",
+  "systemctl enable --now queue-worker"
+ ],
+ "dropin-override": [
+  "rm /etc/systemd/system/db-sync.service.d/ticket-4417.conf",
+  "systemctl daemon-reload",
+  "systemctl restart db-sync"
+ ],
+ "start-limit-hit": [
+  "sed -i \"s/workers=.*/workers=4/\" /etc/indexer.conf",
+  "systemctl reset-failed indexer",
+  "systemctl start indexer"
+ ],
+ "start-order-units": [
+  "systemctl enable --now orders-db",
+  "systemctl enable --now orders"
+ ],
+ "route-to-db-missing": [
+  "ip route add 10.0.2.0/24 via 10.0.1.254"
+ ],
+ "router-forwarding-off": [
+  "inns router sh -c \"echo 1 > /proc/sys/net/ipv4/ip_forward\""
+ ],
+ "no-return-route": [
+  "inns db ip route add default via 10.0.2.254"
+ ],
+ "wrong-netmask": [
+  "ip addr del 10.0.3.1/30 dev h-w",
+  "ip addr add 10.0.3.1/24 dev h-w"
+ ],
+ "interface-admin-down": [
+  "ip link set h-w up"
+ ],
+ "service-bound-to-loopback": [
+  "sed -i \"s/BIND=127.0.0.1/BIND=0.0.0.0/\" /usr/local/bin/start-web",
+  "kill $(pidof httpd)",
+  "start-web"
+ ],
+ "route-wrong-gateway": [
+  "ip route replace 10.0.2.0/24 via 10.0.1.254"
+ ],
+ "bridge-port-missing": [
+  "brctl addif br0 p-db"
+ ],
+ "port-9101-owner": [
+  "ps -o pid,ppid,args | grep 'nc -l -p 9101'"
+ ],
+ "biggest-file-owner": [
+  "find /srv/exports -type f -exec ls -l {} +"
+ ],
+ "crash-cause": [
+  "grep FATAL /var/log/shop.log"
+ ],
+ "failing-cron-job": [
+  "grep -v \"rc=0\" /var/log/cron-jobs.log"
+ ],
+ "which-hop-drops": [
+  "inns router cat /proc/sys/net/ipv4/ip_forward"
+ ],
+ "slowest-endpoint": [
+  "awk '{s[$2]+=$4; n[$2]++} END {for (p in s) print s[p]/n[p], p}' /var/log/access.log | sort -n | tail -1"
+ ],
+ "who-removed-it": [
+  "grep \"rm -rf\" /var/log/auth.log"
+ ],
+ "memory-hog": [
+  "for p in /proc/[0-9]*; do echo \"$(awk '/VmRSS/{print $2}' $p/status 2>/dev/null) $(cat $p/cmdline | tr '\\000' ' ')\"; done | sort -n | tail -3"
+ ],
+ "fd-leak-owner": [
+  "for p in /proc/[0-9]*; do echo \"$(ls $p/fd 2>/dev/null | wc -l) $(cat $p/cmdline | tr '\\000' ' ')\"; done | sort -n | tail -2"
+ ],
+ "crowded-directory": [
+  "for d in /var/spool/*; do echo \"$(ls $d | wc -l) $d\"; done | sort -n | tail -1"
+ ],
+ "leaked-access-key": [
+  "grep -rl AKIA /srv/app"
+ ],
+ "blackhole-route": [
+  "ip route | grep blackhole"
+ ],
+ "deploy-script-three-faults": [
+  "chmod +x /opt/app/deploy.sh",
+  "sed -i \"s/\\r$//\" /opt/app/deploy.sh",
+  "sed -i \"1s|.*|#!/bin/sh|\" /opt/app/deploy.sh"
+ ],
+ "volume-full-and-stale-pid": [
+  "rm /var/log/app/dump.tmp",
+  "rm /run/app-writer.pid",
+  "start-writer"
+ ],
+ "uploads-three-faults": [
+  "sed -i \"s#/srv/upload\\$#/srv/uploads/incoming#\" /etc/uploader.conf",
+  "chmod 755 /srv",
+  "chown www /srv/uploads/incoming"
+ ],
+ "network-two-faults": [
+  "ip route add 10.0.2.0/24 via 10.0.1.254",
+  "inns router sh -c \"echo 1 > /proc/sys/net/ipv4/ip_forward\""
+ ],
+ "unit-three-faults": [
+  "sed -i \"s#/opt/reports/reportd#/opt/reports/bin/reportd#\" /etc/systemd/system/reports.service",
+  "sed -i \"s#/etc/reports.env#/etc/reports/reports.env#\" /etc/systemd/system/reports.service",
+  "systemctl daemon-reload",
+  "systemctl enable --now reports"
+ ],
+ "cron-three-faults": [
+  "chmod +x /usr/local/bin/nightly-clean.sh",
+  "echo \"*/5 * * * * /usr/local/bin/nightly-clean.sh\" | crontab -",
+  "crond -b"
+ ],
+ "backup-three-faults": [
+  "chmod +x /usr/local/bin/backup-site.sh",
+  "sed -i \"s#/srv/sitee#/srv/site#\" /usr/local/bin/backup-site.sh",
+  "mkdir -p /backup/daily"
+ ],
+ "port-taken-and-bad-env": [
+  "kill $(pidof httpd)",
+  "sed -i \"s/db.old/db.internal/\" /etc/web.env",
+  "start-web"
+ ],
+ "rotation-gone-wrong": [
+  "kill -HUP $(pidof app-logger)",
+  "rm /var/log/app/app.log.2 /var/log/app/app.log.3"
+ ],
+ "ghost-app-three-faults": [
+  "rm /run/ghost.lock",
+  "sed -i \"s/\\r$//\" /etc/ghost.conf",
+  "chown ghost /var/lib/ghost",
+  "start-ghost"
  ]
 }

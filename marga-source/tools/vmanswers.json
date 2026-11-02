@@ -1,0 +1,74 @@
+{
+ "port-9101-owner": {
+  "probe": "ps -o pid,ppid,args | grep 'nc -l -p 9101'",
+  "probe_re": "nc -l -p 9101",
+  "good": "metrics-exporter",
+  "bad": "feature-flags"
+ },
+ "biggest-file-owner": {
+  "probe": "find /srv/exports -type f -exec ls -l {} +",
+  "probe_re": "bruno",
+  "good": "bruno",
+  "bad": "ana"
+ },
+ "crash-cause": {
+  "probe": "grep FATAL /var/log/shop.log",
+  "probe_re": "no space left",
+  "good": "no space left on device",
+  "bad": "memory"
+ },
+ "failing-cron-job": {
+  "probe": "grep -v \"rc=0\" /var/log/cron-jobs.log",
+  "probe_re": "nightly-export",
+  "good": "nightly-export",
+  "bad": "backup-db"
+ },
+ "which-hop-drops": {
+  "probe": "inns router cat /proc/sys/net/ipv4/ip_forward",
+  "probe_re": "^0$",
+  "good": "ip_forward",
+  "bad": "dns"
+ },
+ "slowest-endpoint": {
+  "probe": "awk '{s[$2]+=$4; n[$2]++} END {for (p in s) print s[p]/n[p], p}' /var/log/access.log | sort -n | tail -1",
+  "probe_re": "/api/search",
+  "good": "/api/search",
+  "bad": "/home"
+ },
+ "who-removed-it": {
+  "probe": "grep \"rm -rf\" /var/log/auth.log",
+  "probe_re": "deploy",
+  "good": "deploy",
+  "bad": "maya"
+ },
+ "memory-hog": {
+  "probe": "for p in /proc/[0-9]*; do echo \"$(awk '/VmRSS/{print $2}' $p/status 2>/dev/null) $(cat $p/cmdline | tr '\\000' ' ')\"; done | sort -n | tail -3",
+  "probe_re": "report-builder",
+  "good": "report-builder",
+  "bad": "cron-mailer"
+ },
+ "fd-leak-owner": {
+  "probe": "for p in /proc/[0-9]*; do echo \"$(ls $p/fd 2>/dev/null | wc -l) $(cat $p/cmdline | tr '\\000' ' ')\"; done | sort -n | tail -2",
+  "probe_re": "uploader",
+  "good": "uploader",
+  "bad": "mailer"
+ },
+ "crowded-directory": {
+  "probe": "for d in /var/spool/*; do echo \"$(ls $d | wc -l) $d\"; done | sort -n | tail -1",
+  "probe_re": "mailq",
+  "good": "mailq",
+  "bad": "printq"
+ },
+ "leaked-access-key": {
+  "probe": "grep -rl AKIA /srv/app",
+  "probe_re": "settings\\.bak",
+  "good": "settings.bak",
+  "bad": "config.ini"
+ },
+ "blackhole-route": {
+  "probe": "ip route | grep blackhole",
+  "probe_re": "blackhole 10\\.6\\.0\\.0/24",
+  "good": "10.6.0.0/24",
+  "bad": "10.7.0.0/24"
+ }
+}
