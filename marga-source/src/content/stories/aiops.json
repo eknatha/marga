@@ -1,0 +1,30 @@
+{
+ "what-aiops-is-and-is-not": {
+  "r": "An anomaly detector trained on three quiet weeks flagged everything during a busy sales period. Engineers muted it, and a real fault later went unnoticed.",
+  "x": "AIOps helps with anomaly detection, alert correlation, cause hints and remediation, but only on top of good telemetry and change records. Judge tools by measured noise and time-to-cause improvements, and treat output as checkable hints."
+ },
+ "anomaly-detection-on-metrics": {
+  "r": "A detector compared each hour with the one before it, so every Monday rush raised a severe alert. Engineers learned to ignore Mondays, and one Monday a real fault slipped by.",
+  "x": "Start with seasonal baselines rather than static limits or complex models: compare with the same time earlier, require duration, set size floors and review alerts. Add models only if they beat this on past incidents."
+ },
+ "alert-correlation-and-noise-reduction": {
+  "r": "A full storage volume made dozens of services fail. The on-call engineer got around two hundred alerts and spent the early minutes reading them rather than looking at the disk.",
+  "x": "Correlate with labels, time and dependency graphs so one incident shows a likely source with echoes folded away. Use inhibition with care, expire silences and track alerts per incident as a noise metric."
+ },
+ "logs-and-traces-finding-patterns-with-ml": {
+  "r": "A new error appeared at a low rate after a release and sat unseen among millions of lines until customers complained. A report of new message templates would have flagged it within minutes.",
+  "x": "Template clustering, new-message reports, version and host splits, trace comparisons and a change overlay find most causes faster than reading raw logs. Structured, versioned logs make all of it easier."
+ },
+ "root-cause-hints-and-incident-assistants": {
+  "r": "An assistant blamed the database for an outage and the team lost twenty minutes there. The real cause was a load balancer configuration change that sat low in the list.",
+  "x": "Rank causes from change timing, dependency relations and anomaly size, show evidence with every hint, restrict language models to summaries and search, and keep people in charge of production actions."
+ },
+ "safe-automation-and-auto-remediation": {
+  "r": "A cleanup automation ran with an empty path variable and deleted data other services needed. A dry run and a rule to delete only inside a named directory would have stopped it.",
+  "x": "Automate small, well-understood, reversible fixes first, wrapped in preconditions, limits, verification, audit logs and a kill switch, and increase autonomy only as evidence of correct decisions accumulates."
+ },
+ "debugging-and-investigating-aiops-output": {
+  "r": "An assistant blamed a deploy for slow checkout. An engineer rolled back without checking, but a database lock was the cause. The rollback added ten minutes of disruption.",
+  "x": "Check AIOps answers like any guess: ask for evidence, test against data and the timeline, keep a person on every action, and record the misses."
+ }
+}

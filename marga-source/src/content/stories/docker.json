@@ -1,0 +1,50 @@
+{
+"containers-and-images": {
+"r": "A service worked in testing and failed in production because the image used the latest tag, and the base image had changed between builds. Pinning the image version made both environments run the same bytes.",
+"x": "An image is an immutable artifact: identify it by digest, build it once and promote it. Understand what is shared with the host kernel and what the image layers hide, including leftover files and secrets."
+},
+"writing-dockerfiles": {
+"r": "Every code change triggered a ten-minute build because dependencies were installed after copying the whole source. Copying only the dependency file first allowed layer caching, and builds dropped to under a minute.",
+"x": "Dockerfile order is a performance and security decision. Use multi-stage builds to keep tools out of the final image, run as non-root, and review what ends up in each layer."
+},
+"volumes-and-networking": {
+"r": "A database container was removed and recreated during an update, and its data vanished because it lived in the container's writable layer. Mounting a named volume kept the data across container replacements.",
+"x": "Containers are disposable; state is not. Decide where data lives, how it is backed up and what happens on host loss. Bind mounts leak host assumptions into the container, so use them carefully."
+},
+"compose": {
+"r": "An app started before its database was ready and crashed in a loop. A health check on the database with the application waiting for it to be healthy removed the race, and the whole stack came up cleanly.",
+"x": "Compose is excellent for development and small deployments but is not an orchestrator. Know its limits for rollout, scaling and failure handling, and keep one file per purpose with secrets outside it."
+},
+"registries-and-supply-chain": {
+"r": "A vulnerability scan found a critical flaw in an image already running in production. Because every image had an inventory of its contents, the team found all affected services within minutes and rebuilt them.",
+"x": "Registries are part of your supply chain. Use private registries, sign images, scan continuously and not only at build time, and set retention so old vulnerable images cannot be redeployed by accident."
+},
+"runtimes-oci-and-podman": {
+"r": "A team wanted to run containers without a root-owned daemon for security reasons. Because images follow the OCI standard, they moved to Podman and rootless mode without rebuilding anything.",
+"x": "Standards give portability, but runtimes differ in isolation and defaults. Understand what is really enforcing the boundary, and weigh stronger sandboxes against startup cost and compatibility."
+},
+"security-and-troubleshooting": {
+"r": "A container ran as root with extra privileges for convenience and was used as a foothold after a vulnerability in the application. Dropping capabilities and using a read-only filesystem would have limited what the attacker could do.",
+"x": "Start from the least privilege that works: non-root user, no extra capabilities, read-only root filesystem and no host mounts. Review exceptions and treat the Docker socket as root access."
+},
+"buildkit-caching-and-multi-arch": {
+"r": "A build passed secrets as arguments, and they ended up readable in the image history. Using BuildKit secret mounts kept them out of every layer. Passing a build argument looked harmless, yet anyone with the image could read it.",
+"x": "Builds are production code. Make them reproducible, keep secrets out of layers, use remote caches in CI and test every architecture you ship rather than assuming emulation behaves the same."
+},
+"container-logging-and-resource-limits": {
+"r": "A container with no memory limit grew until it took the whole host down, and every other service on that machine went with it. A per-container limit and a health check confined the problem to one container.",
+"x": "Limits are how you share a machine fairly. Set requests and limits from measurements, log to standard output with rotation, and make health checks reflect real readiness, not just a running process."
+},
+"slim-images-and-faster-builds": {
+"r": "A 1.2 GB image slowed every deploy and every autoscale event. Moving to a smaller base and a multi-stage build cut it to under 100 MB, and cold starts fell sharply.",
+"x": "Smaller means faster to pull and smaller attack surface, but minimal images make debugging harder. Choose deliberately between distroless, slim and full images, and plan how you will debug without a shell."
+},
+"running-containers-in-production": {
+"r": "A rolling deploy dropped requests because containers were stopped without time to finish work. Handling the stop signal and setting a grace period let in-flight requests complete.",
+"x": "Production needs graceful shutdown, health checks, resource limits, read-only filesystems and restart policy as defaults. Treat these as a baseline checked by automation, not as advice."
+},
+"debugging-containers": {
+"r": "A container exited immediately with no output. The exit code showed it was killed for memory, and the events confirmed it, so raising the limit and fixing a leak solved it. Reading the code and the events first saved hours of guessing.",
+"x": "Exit codes, events and inspect output tell the story before logs do. Keep a debug image or ephemeral container ready, and avoid fixing a problem by hand inside a running container where the change will be lost."
+}
+}

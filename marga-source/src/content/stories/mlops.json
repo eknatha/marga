@@ -1,0 +1,34 @@
+{
+ "what-mlops-is-and-how-ml-systems-fail": {
+  "r": "A ranking model kept answering quickly while a renamed upstream field left one feature empty. Conversions fell for weeks before anyone linked it to the data, because only latency and errors were being watched.",
+  "x": "ML systems fail through data and drift without raising errors, so MLOps adds data and model versioning, input checks, quality monitoring and a safe retraining path on top of normal delivery and observability practice."
+ },
+ "data-and-feature-pipelines-for-ml": {
+  "r": "A cancellation model scored very well in testing and poorly in production. One feature counted support tickets after the customer had already left, information the model would never have at prediction time.",
+  "x": "Data quality is the main reliability lever in ML: validate and version data, fail closed on bad batches, build training rows with point-in-time joins to prevent leakage, and share one feature definition between training and serving."
+ },
+ "experiment-tracking-and-reproducibility": {
+  "r": "A team shipped its best model, then could not rebuild it. The notebook, data file and library versions had all changed and none of the original settings had been recorded.",
+  "x": "Reproducibility needs a recorded recipe: code, data, parameters, seed and environment. Automatic run tracking, fixed evaluation sets and containerised training make results comparable, repeatable and auditable."
+ },
+ "training-pipelines-and-testing-models-in-ci": {
+  "r": "An automatic weekly retrain replaced the live model with one that was far worse for new customers. The overall metric barely moved, so nothing blocked it until support noticed.",
+  "x": "A safe ML pipeline validates data, tests code and model behaviour, and gates registration on a comparison with production that includes important groups, so automation cannot quietly ship a regression."
+ },
+ "model-registry-packaging-and-safe-releases": {
+  "r": "A bad model went live and the team wanted to roll back, but the old artifact had been deleted and its environment was gone. Rebuilding took most of a day.",
+  "x": "Safe model release combines a registry with lineage, immutable packaging, staged exposure through shadow and canary, and a rehearsed rollback that keeps the prior version available."
+ },
+ "serving-models-batch-online-and-streaming": {
+  "r": "A slow model service caused callers to time out and retry, which doubled the load until it stopped answering. There was no concurrency limit and no fallback answer.",
+  "x": "Serving choices follow freshness needs: batch for cheap staleness, online for latest answers, streaming in between. Protect services with batching limits, readiness checks, load-based scaling, timeouts, retry budgets and fallbacks."
+ },
+ "monitoring-drift-and-retraining": {
+  "r": "A forecasting model slowly got worse as customer behaviour changed. No quality metric was reviewed, so stock shortages were the first sign that it had stopped beating a simple baseline.",
+  "x": "Keep models healthy with drift monitoring on inputs and predictions, delayed quality reports against a baseline, tuned alerts on sustained shifts, and retraining that passes the same gate as any release."
+ },
+ "debugging-ml-systems-in-production": {
+  "r": "Recommendations lost conversion for two days. Two retrains changed nothing. A pipeline had begun filling a column with nulls after an upstream change, and no data check existed to notice.",
+  "x": "Debug ML bottom-up: what changed, data, features versus training, replay from logs, then the model and serving. One layer at a time, then add the check that would have caught it."
+ }
+}

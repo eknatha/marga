@@ -1,0 +1,50 @@
+{
+"pipeline-fundamentals": {
+"r": "A team deployed by hand every other week and each release was an event. After building a pipeline that ran tests and deployed on every merge, releases became small and boring, and rollbacks took minutes.",
+"x": "A pipeline encodes how you trust change. Keep it fast and deterministic, fail early, build once and promote, and measure lead time and change failure rate to learn whether it is helping."
+},
+"building-a-pipeline": {
+"r": "A pipeline passed on the build server but a secret printed in a log line exposed a token. Masking credentials and using short-lived deploy tokens stopped the leak from being useful.",
+"x": "Pipelines hold powerful credentials. Give each job the minimum access, pin tool versions, separate build from deploy permissions and review pipeline changes as carefully as production code."
+},
+"testing-and-quality-gates": {
+"r": "A flaky test failed one run in five, so engineers learned to re-run until green and ignored a real failure one day. Quarantining the flaky test and fixing it restored trust in red builds.",
+"x": "A gate is only useful if people believe it. Keep tests fast and reliable, track flaky ones as defects, and place checks where they give the cheapest early signal."
+},
+"deployment-strategies": {
+"r": "A new version with a performance bug was released to five percent of users first. Metrics showed latency rising, an automatic rollback ran, and only a handful of users noticed.",
+"x": "Choose a strategy by the cost of being wrong and your ability to detect it. Canary needs good metrics and automatic judgement; database changes need backward compatible steps so rollback is possible."
+},
+"versioning-and-artifacts": {
+"r": "A bug fix was rebuilt for production from source, and the new build contained a different dependency than the tested one. Promoting the same artifact through each environment removed that gap.",
+"x": "Build once, promote the same artifact and record exactly what is in it. Keep artifacts immutable and traceable to a commit, and plan retention so you can rebuild or roll back."
+},
+"pipeline-security": {
+"r": "A malicious package was pulled into a build through an unpinned dependency. Pinning versions with checksums and scanning in CI meant the next such attempt failed the build.",
+"x": "Assume the build environment is a target. Isolate runners, avoid long-lived secrets, verify what you import, sign what you produce, and limit who can change the pipeline definition."
+},
+"declarative-delivery-with-argo-cd": {
+"r": "Someone changed a setting directly in the cluster to fix an issue and forgot to record it. The pull-based controller noticed the drift, reported it and restored the declared state, which exposed the missing change in the repository.",
+"x": "Pull-based delivery makes the repository the source of truth and drift visible. Plan secrets, ordering and rollbacks, and be clear about who may still change the cluster directly."
+},
+"release-management-and-feature-flags": {
+"r": "A risky feature was merged behind a flag that was off. It was turned on for staff first, then one percent of users, then everyone, and switched off in seconds when an issue appeared.",
+"x": "Flags separate deploy from release, but they are also debt. Give each flag an owner and an expiry, test both states and watch for combinations that nobody has tried."
+},
+"fast-pipelines-caching-parallelism-monorepos": {
+"r": "A forty-minute pipeline made people batch changes together, which made failures harder to find. Caching, parallel jobs and running only affected tests brought it under ten minutes, and changes got smaller again.",
+"x": "Pipeline speed shapes behaviour. Measure where time goes, cache with care for correctness, and avoid optimisations that let stale results through."
+},
+"reusable-pipelines-and-templates": {
+"r": "Thirty repositories copied the same pipeline file, and a security fix had to be applied thirty times. A shared, versioned template let the fix ship once.",
+"x": "Shared pipelines centralise good practice and also centralise risk. Version them, test changes against sample projects, and let teams pin or opt in so one change cannot break everyone."
+},
+"debugging-pipelines": {
+"r": "A job passed locally and failed in CI. Comparing tool versions showed the CI runner used an older compiler, and a stale cache hid it on some runs. Pinning versions and clearing the cache made results consistent.",
+"x": "Reproduce the pipeline environment locally, separate flaky from deterministic failures and look for hidden state in caches, shared runners and environment variables. Fix classes of failure, not single runs."
+},
+"environments-promotion-and-approvals": {
+"r": "A release reached production without anyone checking the staging results because the approval step was just a button. Linking approval to evidence such as test results and a change record made it meaningful.",
+"x": "Approvals should add information, not delay. Automate what can be checked by a machine, keep human approval for real judgement, and keep an audit record that is easy to produce."
+}
+}
