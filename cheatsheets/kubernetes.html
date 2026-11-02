@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>"Kubernetes" cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content=""kubectl essentials, manifests, troubleshooting order, RBAC and exam-speed tricks."">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/kubernetes.html">
+<meta property="og:title" content=""Kubernetes" cheat sheet">
+<meta property="og:description" content=""kubectl essentials, manifests, troubleshooting order, RBAC and exam-speed tricks."">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/kubernetes.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=49dfa572">
+<script src="../assets/a11y.js?v=49dfa572"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="../#/interview">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>"Kubernetes" cheat sheet</h1>
+    <p class="lede">"kubectl essentials, manifests, troubleshooting order, RBAC and exam-speed tricks."</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="setup-for-speed">Setup for speed</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="alias k=kubectl
+source &lt;(kubectl completion bash)
+export do=&quot;--dry-run=client -o yaml&quot;
+k config get-contexts
+k config use-context CONTEXT
+k config set-context --current --namespace=shop" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-built_in">alias</span> k=kubectl
+<span class="hljs-built_in">source</span> &lt;(kubectl completion bash)
+<span class="hljs-built_in">export</span> <span class="hljs-keyword">do</span>=<span class="hljs-string">&quot;--dry-run=client -o yaml&quot;</span>
+k config get-contexts
+k config use-context CONTEXT
+k config set-context --current --namespace=shop</code></pre></div>
+<p>Always confirm the context with <code>k config current-context</code> before changing anything.</p>
+<h2 id="read-cluster-state">Read cluster state</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="k get nodes -o wide
+k get pods -A
+k get pods -n shop -o wide --show-labels
+k get deploy,svc,ingress,pvc -n shop
+k get events -n shop --sort-by=.lastTimestamp
+k describe pod NAME -n shop
+k explain pod.spec.containers.resources
+k api-resources
+k top pod -n shop" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">k get nodes -o wide
+k get pods -A
+k get pods -n shop -o wide --show-labels
+k get deploy,svc,ingress,pvc -n shop
+k get events -n shop --sort-by=.lastTimestamp
+k describe pod NAME -n shop
+k explain pod.spec.containers.resources
+k api-resources
+k top pod -n shop</code></pre></div>
+<h2 id="create-and-change">Create and change</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="k create deployment api --image=nginx:1.27 --replicas=3 $do &gt; deploy.yaml
+k run tmp --rm -it --image=busybox:1.36 --restart=Never -- sh
+k expose deployment api --port=80 --target-port=8080
+k scale deployment api --replicas=5
+k set image deployment/api nginx=nginx:1.27.1
+k apply -f deploy.yaml
+k delete -f deploy.yaml
+k label pod NAME tier=backend
+k annotate pod NAME note=checked
+k edit deployment api" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">k create deployment api --image=nginx:1.27 --replicas=3 <span class="hljs-variable">$do</span> &gt; deploy.yaml
+k run tmp --<span class="hljs-built_in">rm</span> -it --image=busybox:1.36 --restart=Never -- sh
+k expose deployment api --port=80 --target-port=8080
+k scale deployment api --replicas=5
+k <span class="hljs-built_in">set</span> image deployment/api nginx=nginx:1.27.1
+k apply -f deploy.yaml
+k delete -f deploy.yaml
+k label pod NAME tier=backend
+k annotate pod NAME note=checked
+k edit deployment api</code></pre></div>
+<h2 id="rollouts">Rollouts</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="k rollout status deployment/api
+k rollout history deployment/api
+k rollout undo deployment/api
+k rollout undo deployment/api --to-revision=2
+k rollout restart deployment/api" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">k rollout status deployment/api
+k rollout <span class="hljs-built_in">history</span> deployment/api
+k rollout undo deployment/api
+k rollout undo deployment/api --to-revision=2
+k rollout restart deployment/api</code></pre></div>
+<h2 id="debugging-order">Debugging order</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="k get pods -n shop                       # status and restarts
+k describe pod NAME -n shop              # events at the bottom
+k logs NAME -n shop --previous           # logs of the crashed container
+k logs NAME -c CONTAINER -n shop         # a specific container
+k exec -it NAME -n shop -- sh
+k get endpoints SERVICE -n shop          # empty means selector or readiness problem
+k debug NAME -it --image=busybox:1.36    # ephemeral debug container" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">k get pods -n shop                       <span class="hljs-comment"># status and restarts</span>
+k describe pod NAME -n shop              <span class="hljs-comment"># events at the bottom</span>
+k logs NAME -n shop --previous           <span class="hljs-comment"># logs of the crashed container</span>
+k logs NAME -c CONTAINER -n shop         <span class="hljs-comment"># a specific container</span>
+k <span class="hljs-built_in">exec</span> -it NAME -n shop -- sh
+k get endpoints SERVICE -n shop          <span class="hljs-comment"># empty means selector or readiness problem</span>
+k debug NAME -it --image=busybox:1.36    <span class="hljs-comment"># ephemeral debug container</span></code></pre></div>
+<div class="table-wrap"><table><thead><tr>
+<th>Status</th>
+<th>Likely cause</th>
+</tr>
+</thead><tbody><tr>
+<td><code>Pending</code></td>
+<td>No node fits, or an unbound PVC</td>
+</tr>
+<tr>
+<td><code>ImagePullBackOff</code></td>
+<td>Wrong image or missing registry credentials</td>
+</tr>
+<tr>
+<td><code>CrashLoopBackOff</code></td>
+<td>Application error; read <code>--previous</code> logs</td>
+</tr>
+<tr>
+<td><code>CreateContainerConfigError</code></td>
+<td>Missing ConfigMap, Secret or key</td>
+</tr>
+<tr>
+<td><code>OOMKilled</code></td>
+<td>Memory limit exceeded</td>
+</tr>
+<tr>
+<td>Running, <code>0/1</code> ready</td>
+<td>Readiness probe failing</td>
+</tr>
+</tbody></table></div>
+<h2 id="pod-template-essentials">Pod template essentials</h2>
+<div class="code" data-lang="yaml"><button class="copy" type="button" data-copy="resources:
+  requests: { cpu: 100m, memory: 128Mi }
+  limits: { memory: 256Mi }
+readinessProbe:
+  httpGet: { path: /healthz/ready, port: 8080 }
+livenessProbe:
+  httpGet: { path: /healthz/live, port: 8080 }
+securityContext:
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities: { drop: [&quot;ALL&quot;] }" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-attr">resources:</span>
+  <span class="hljs-attr">requests:</span> { <span class="hljs-attr">cpu:</span> <span class="hljs-string">100m</span>, <span class="hljs-attr">memory:</span> <span class="hljs-string">128Mi</span> }
+  <span class="hljs-attr">limits:</span> { <span class="hljs-attr">memory:</span> <span class="hljs-string">256Mi</span> }
+<span class="hljs-attr">readinessProbe:</span>
+  <span class="hljs-attr">httpGet:</span> { <span class="hljs-attr">path:</span> <span class="hljs-string">/healthz/ready</span>, <span class="hljs-attr">port:</span> <span class="hljs-number">8080</span> }
+<span class="hljs-attr">livenessProbe:</span>
+  <span class="hljs-attr">httpGet:</span> { <span class="hljs-attr">path:</span> <span class="hljs-string">/healthz/live</span>, <span class="hljs-attr">port:</span> <span class="hljs-number">8080</span> }
+<span class="hljs-attr">securityContext:</span>
+  <span class="hljs-attr">runAsNonRoot:</span> <span class="hljs-literal">true</span>
+  <span class="hljs-attr">allowPrivilegeEscalation:</span> <span class="hljs-literal">false</span>
+  <span class="hljs-attr">readOnlyRootFilesystem:</span> <span class="hljs-literal">true</span>
+  <span class="hljs-attr">capabilities:</span> { <span class="hljs-attr">drop:</span> [<span class="hljs-string">&quot;ALL&quot;</span>] }</code></pre></div>
+<h2 id="services">Services</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Type</th>
+<th>Reachable from</th>
+</tr>
+</thead><tbody><tr>
+<td><code>ClusterIP</code></td>
+<td>Inside the cluster</td>
+</tr>
+<tr>
+<td><code>NodePort</code></td>
+<td>Node IP on a high port</td>
+</tr>
+<tr>
+<td><code>LoadBalancer</code></td>
+<td>Cloud load balancer address</td>
+</tr>
+<tr>
+<td><code>ExternalName</code></td>
+<td>DNS alias for an external name</td>
+</tr>
+</tbody></table></div>
+<p>Service DNS name: <code>SERVICE.NAMESPACE.svc.cluster.local</code>.</p>
+<h2 id="rbac">RBAC</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="k create role reader --verb=get,list,watch --resource=pods -n shop
+k create rolebinding rb --role=reader --serviceaccount=shop:app -n shop
+k auth can-i list pods -n shop --as=system:serviceaccount:shop:app
+k auth can-i --list -n shop" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">k create role reader --verb=get,list,watch --resource=pods -n shop
+k create rolebinding rb --role=reader --serviceaccount=shop:app -n shop
+k auth can-i list pods -n shop --as=system:serviceaccount:shop:app
+k auth can-i --list -n shop</code></pre></div>
+<h2 id="nodes-and-maintenance">Nodes and maintenance</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="k cordon NODE                                     # stop new scheduling
+k drain NODE --ignore-daemonsets --delete-emptydir-data
+k uncordon NODE
+k taint nodes NODE dedicated=gpu:NoSchedule
+k label node NODE disktype=ssd" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">k cordon NODE                                     <span class="hljs-comment"># stop new scheduling</span>
+k drain NODE --ignore-daemonsets --delete-emptydir-data
+k uncordon NODE
+k taint nodes NODE dedicated=gpu:NoSchedule
+k label node NODE disktype=ssd</code></pre></div>
+<h2 id="storage">Storage</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Item</th>
+<th>Note</th>
+</tr>
+</thead><tbody><tr>
+<td>PVC <code>ReadWriteOnce</code></td>
+<td>One node at a time</td>
+</tr>
+<tr>
+<td>PVC <code>ReadWriteMany</code></td>
+<td>Needs a file-capable storage class</td>
+</tr>
+<tr>
+<td>Reclaim <code>Delete</code></td>
+<td>Claim deletion deletes the disk</td>
+</tr>
+<tr>
+<td>StatefulSet</td>
+<td>Stable names and a volume per Pod</td>
+</tr>
+</tbody></table></div>
+<h2 id="jsonpath-and-output">JSONPath and output</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="k get pods -o jsonpath='{.items[*].metadata.name}'
+k get pod NAME -o jsonpath='{.status.containerStatuses[0].lastState}'
+k get secret NAME -o jsonpath='{.data.password}' | base64 -d
+k get pods -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeName" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">k get pods -o jsonpath=<span class="hljs-string">&#x27;{.items[*].metadata.name}&#x27;</span>
+k get pod NAME -o jsonpath=<span class="hljs-string">&#x27;{.status.containerStatuses[0].lastState}&#x27;</span>
+k get secret NAME -o jsonpath=<span class="hljs-string">&#x27;{.data.password}&#x27;</span> | <span class="hljs-built_in">base64</span> -d
+k get pods -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeName</code></pre></div>
+<h2 id="context-and-namespaces">Context and namespaces</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl config get-contexts
+kubectl config current-context
+kubectl config use-context staging
+kubectl config set-context --current --namespace=shop
+kubectl get ns
+kubectl api-resources --namespaced=true
+kubectl explain deployment.spec.strategy
+kubectl auth can-i delete pods -n shop
+kubectl auth can-i --list -n shop" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubectl config get-contexts
+kubectl config current-context
+kubectl config use-context staging
+kubectl config set-context --current --namespace=shop
+kubectl get ns
+kubectl api-resources --namespaced=<span class="hljs-literal">true</span>
+kubectl explain deployment.spec.strategy
+kubectl auth can-i delete pods -n shop
+kubectl auth can-i --list -n shop</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Check <code>kubectl config current-context</code> before any change. Most production accidents are the right command on the wrong cluster. Consider a prompt that shows the context.</p>
+</aside>
+<h2 id="inspect-and-debug-more">Inspect and debug, more</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl get pods -A -o wide --field-selector status.phase!=Running
+kubectl get events -n shop --sort-by=.lastTimestamp
+kubectl describe pod api-0 -n shop
+kubectl logs api-0 -c app --previous --tail=200
+kubectl logs -l app=api --all-containers --since=15m
+kubectl exec -it api-0 -c app -- sh
+kubectl debug -it api-0 --image=busybox:1.36 --target=app
+kubectl debug node/worker-1 -it --image=busybox:1.36
+kubectl port-forward svc/api 8080:80 -n shop
+kubectl cp shop/api-0:/tmp/dump.txt ./dump.txt
+kubectl top pod -n shop --containers
+kubectl top node
+kubectl get pod api-0 -o yaml | less" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubectl get pods -A -o wide --field-selector status.phase!=Running
+kubectl get events -n shop --sort-by=.lastTimestamp
+kubectl describe pod api-0 -n shop
+kubectl logs api-0 -c app --previous --<span class="hljs-built_in">tail</span>=200
+kubectl logs -l app=api --all-containers --since=15m
+kubectl <span class="hljs-built_in">exec</span> -it api-0 -c app -- sh
+kubectl debug -it api-0 --image=busybox:1.36 --target=app
+kubectl debug node/worker-1 -it --image=busybox:1.36
+kubectl port-forward svc/api 8080:80 -n shop
+kubectl <span class="hljs-built_in">cp</span> shop/api-0:/tmp/dump.txt ./dump.txt
+kubectl top pod -n shop --containers
+kubectl top node
+kubectl get pod api-0 -o yaml | less</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>kubectl exec</code> and <code>debug</code> give shell access to a running workload. Do not change files or install tools in a production container: the change is lost and may hide the real cause.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>kubectl port-forward</code> exposes the service to your machine only, but anything you paste through it goes to production. Never point a test tool at it.</p>
+</aside>
+<h2 id="change-safely">Change safely</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl diff -f deploy.yaml
+kubectl apply -f deploy.yaml --dry-run=server
+kubectl apply -f deploy.yaml
+kubectl rollout status deploy/api -n shop
+kubectl rollout undo deploy/api -n shop
+kubectl scale deploy/api --replicas=5 -n shop
+kubectl set image deploy/api app=registry.example.com/api:1.5 -n shop
+kubectl annotate deploy/api kubernetes.io/change-cause=&quot;bump to 1.5&quot;
+kubectl label pod api-0 debug=true
+kubectl patch deploy api -p '{&quot;spec&quot;:{&quot;replicas&quot;:3}}'" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubectl diff -f deploy.yaml
+kubectl apply -f deploy.yaml --dry-run=server
+kubectl apply -f deploy.yaml
+kubectl rollout status deploy/api -n shop
+kubectl rollout undo deploy/api -n shop
+kubectl scale deploy/api --replicas=5 -n shop
+kubectl <span class="hljs-built_in">set</span> image deploy/api app=registry.example.com/api:1.5 -n shop
+kubectl annotate deploy/api kubernetes.io/change-cause=<span class="hljs-string">&quot;bump to 1.5&quot;</span>
+kubectl label pod api-0 debug=<span class="hljs-literal">true</span>
+kubectl patch deploy api -p <span class="hljs-string">&#x27;{&quot;spec&quot;:{&quot;replicas&quot;:3}}&#x27;</span></code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>kubectl edit</code> and <code>patch</code> change live objects that are not in your source files, so the next <code>apply</code> or pipeline run can undo them silently, or the cluster can drift. Prefer changing the manifest and applying it.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>kubectl scale --replicas=0</code> stops the service. Do it only on purpose and say so in the incident channel.</p>
+</aside>
+<h2 id="nodes-and-maintenance-more">Nodes and maintenance, more</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl get nodes -o wide
+kubectl describe node worker-1 | sed -n '/Taints/,/Conditions/p'
+kubectl cordon worker-1
+kubectl drain worker-1 --ignore-daemonsets --delete-emptydir-data --timeout=300s
+kubectl uncordon worker-1
+kubectl taint nodes worker-1 dedicated=gpu:NoSchedule
+kubectl get pdb -A" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubectl get nodes -o wide
+kubectl describe node worker-1 | sed -n <span class="hljs-string">&#x27;/Taints/,/Conditions/p&#x27;</span>
+kubectl cordon worker-1
+kubectl drain worker-1 --ignore-daemonsets --delete-emptydir-data --<span class="hljs-built_in">timeout</span>=300s
+kubectl uncordon worker-1
+kubectl taint nodes worker-1 dedicated=gpu:NoSchedule
+kubectl get pdb -A</code></pre></div>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>kubectl drain</code> evicts pods. With <code>--delete-emptydir-data</code> the data in emptyDir volumes is lost, and a PodDisruptionBudget of 0 can block it forever. Drain one node at a time and watch the rollout.</p>
+</aside>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>kubectl delete node</code> removes the node object, not the machine. Drain first and confirm the cloud instance state.</p>
+</aside>
+<h2 id="secrets-and-config">Secrets and config</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl create secret generic db --from-literal=password='change-me' -n shop --dry-run=client -o yaml
+kubectl get secret db -n shop -o jsonpath='{.data.password}' | base64 -d
+kubectl create configmap app-config --from-file=app.properties
+kubectl get cm app-config -o yaml
+kubectl rollout restart deploy/api -n shop" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubectl create secret generic db --from-literal=password=<span class="hljs-string">&#x27;change-me&#x27;</span> -n shop --dry-run=client -o yaml
+kubectl get secret db -n shop -o jsonpath=<span class="hljs-string">&#x27;{.data.password}&#x27;</span> | <span class="hljs-built_in">base64</span> -d
+kubectl create configmap app-config --from-file=app.properties
+kubectl get cm app-config -o yaml
+kubectl rollout restart deploy/api -n shop</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Base64 is not encryption. Anyone who can read a Secret can read its value. Restrict access with RBAC, and do not paste decoded values into chat or tickets.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Passwords on the command line end up in shell history. Prefer files or a secrets manager.</p>
+</aside>
+<h2 id="cautions-for-destructive-commands">Cautions for destructive commands</h2>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>kubectl delete -f</code> and <code>kubectl delete ns shop</code> remove everything in the file or namespace, including volumes with <code>Delete</code> reclaim policy. Run <code>kubectl get all -n shop</code> and use <code>--dry-run=server</code> first.</p>
+</aside>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>kubectl delete pod --force --grace-period=0</code> skips graceful shutdown and can leave a StatefulSet pod running twice. Use it only for stuck terminating pods after you confirm the node is gone.</p>
+</aside>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>kubectl delete pvc</code> can delete the underlying disk. Check <code>kubectl get pv</code> for the reclaim policy first.</p>
+</aside>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p>Commands with <code>-A</code> or <code>--all</code> act on every namespace. Read the output of the matching <code>get</code> before you run <code>delete</code>.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not bind <code>cluster-admin</code> to users or service accounts for convenience. Grant the smallest Role that works.</p>
+</aside>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://kubernetes.io/docs/reference/kubectl/quick-reference/" target="_blank" rel="noopener">kubectl quick reference</a><span class="host">kubernetes.io</span></li><li><a href="https://kubernetes.io/docs/concepts/" target="_blank" rel="noopener">Kubernetes concepts</a><span class="host">kubernetes.io</span></li><li><a href="https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/" target="_blank" rel="noopener">Kubernetes: installing with kubeadm</a><span class="host">kubernetes.io</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=49dfa572"></script>
+<script src="../assets/counter.js?v=49dfa572"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

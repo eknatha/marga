@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>"AIOps" cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content=""Practical rules for anomaly detection, alert grouping, incident hints and safe auto-remediation."">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/aiops.html">
+<meta property="og:title" content=""AIOps" cheat sheet">
+<meta property="og:description" content=""Practical rules for anomaly detection, alert grouping, incident hints and safe auto-remediation."">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/aiops.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=49dfa572">
+<script src="../assets/a11y.js?v=49dfa572"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="../#/interview">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>"AIOps" cheat sheet</h1>
+    <p class="lede">"Practical rules for anomaly detection, alert grouping, incident hints and safe auto-remediation."</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="before-you-buy-or-build">Before you buy or build</h2>
+<ul>
+<li>Write down a baseline: alerts per incident, time to acknowledge, time to find cause, false pages.</li>
+<li>Fix telemetry, service names and the change log first.</li>
+<li>Trial beside current practice for a few weeks. Keep it only if the numbers improve.</li>
+</ul>
+<h2 id="anomaly-detection-ladder">Anomaly detection ladder</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Step</th>
+<th>Method</th>
+<th>Good for</th>
+</tr>
+</thead><tbody><tr>
+<td>1</td>
+<td>Static threshold</td>
+<td>Hard limits such as disk full</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Rolling mean and spread</td>
+<td>Metrics without a daily pattern</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Seasonal baseline</td>
+<td>Traffic, with daily and weekly rhythm</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Forecast or model</td>
+<td>Many series, after simple methods fail</td>
+</tr>
+</tbody></table></div>
+<div class="code" data-lang="promql"><button class="copy" type="button" data-copy="sum(rate(http_requests_total{job=&quot;checkout&quot;}[5m]))
+/
+sum(rate(http_requests_total{job=&quot;checkout&quot;}[5m] offset 1w))" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-built_in">sum</span>(<span class="hljs-built_in">rate</span>(http_requests_total{<span class="hljs-attr">job</span>=<span class="hljs-string">&quot;checkout&quot;</span>}[<span class="hljs-number">5</span>m]))
+/
+<span class="hljs-built_in">sum</span>(<span class="hljs-built_in">rate</span>(http_requests_total{<span class="hljs-attr">job</span>=<span class="hljs-string">&quot;checkout&quot;</span>}[<span class="hljs-number">5</span>m] <span class="hljs-keyword">offset</span> <span class="hljs-number">1</span>w))</code></pre></div>
+<h2 id="reduce-alert-noise">Reduce alert noise</h2>
+<div class="code" data-lang="yaml"><button class="copy" type="button" data-copy="route:
+  group_by: [cluster, service]
+  group_wait: 30s
+inhibit_rules:
+  - source_matchers: [alertname = &quot;NodeDown&quot;]
+    target_matchers: [severity = &quot;warning&quot;]
+    equal: [cluster, node]" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-attr">route:</span>
+  <span class="hljs-attr">group_by:</span> [<span class="hljs-string">cluster</span>, <span class="hljs-string">service</span>]
+  <span class="hljs-attr">group_wait:</span> <span class="hljs-string">30s</span>
+<span class="hljs-attr">inhibit_rules:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">source_matchers:</span> [<span class="hljs-string">alertname</span> <span class="hljs-string">=</span> <span class="hljs-string">&quot;NodeDown&quot;</span>]
+    <span class="hljs-attr">target_matchers:</span> [<span class="hljs-string">severity</span> <span class="hljs-string">=</span> <span class="hljs-string">&quot;warning&quot;</span>]
+    <span class="hljs-attr">equal:</span> [<span class="hljs-string">cluster</span>, <span class="hljs-string">node</span>]</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Silences need an expiry, a narrow matcher and a reason.</p>
+</aside>
+<h2 id="root-cause-hints">Root cause hints</h2>
+<ol>
+<li>List changes just before the first symptom.</li>
+<li>Overlay dependency health.</li>
+<li>Rank by time gap, graph distance and size of anomaly.</li>
+<li>Show evidence with every hint.</li>
+<li>A person confirms before any production change.</li>
+</ol>
+<h2 id="safe-auto-remediation-checklist">Safe auto-remediation checklist</h2>
+<div class="code" data-lang="yaml"><button class="copy" type="button" data-copy="preconditions: [alert_still_firing, no_active_deploy, target_count_max: 2]
+limits: {max_per_hour: 2, cooldown: 30m, kill_switch: automation/global}
+verify: {after: 5m, expect: &quot;queue_depth &lt; 100&quot;}
+on_verify_fail: page_human" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-attr">preconditions:</span> [<span class="hljs-string">alert_still_firing</span>, <span class="hljs-string">no_active_deploy</span>, <span class="hljs-attr">target_count_max:</span> <span class="hljs-number">2</span>]
+<span class="hljs-attr">limits:</span> {<span class="hljs-attr">max_per_hour:</span> <span class="hljs-number">2</span>, <span class="hljs-attr">cooldown:</span> <span class="hljs-string">30m</span>, <span class="hljs-attr">kill_switch:</span> <span class="hljs-string">automation/global</span>}
+<span class="hljs-attr">verify:</span> {<span class="hljs-attr">after:</span> <span class="hljs-string">5m</span>, <span class="hljs-attr">expect:</span> <span class="hljs-string">&quot;queue_depth &lt; 100&quot;</span>}
+<span class="hljs-attr">on_verify_fail:</span> <span class="hljs-string">page_human</span></code></pre></div>
+<aside class="callout callout-why-it-matters"><div class="callout-title">Why it matters</div><p>Automation acts fast and at scale. Limits and a kill switch contain mistakes.</p>
+</aside>
+<h2 id="check-an-assistant-s-answer">Check an assistant&#39;s answer</h2>
+<ol>
+<li>Ask which evidence the claim rests on, and open it.</li>
+<li>Turn the cause into a query you can run.</li>
+<li>Line up alerts, deploys and changes on one timeline.</li>
+<li>Record hits and misses.</li>
+<li>A person approves every action.</li>
+</ol>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>A fluent answer is not evidence. A claim with no source is a guess.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not run a suggested rollback or restart before testing the claim against the data.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Do not give an AIOps tool write access before it has earned trust on read-only work.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Anomaly detection fires on harmless change too. Tune windows and keep the alert on user impact.</p>
+</aside>
+<h2 id="commands-for-checking-a-claim">Commands for checking a claim</h2>
+<div class="code console" data-lang="terminal"><button class="copy" type="button" data-copy="promtool query instant http://prometheus:9090 'sum(rate(http_requests_total{code=~&quot;5..&quot;}[5m]))'" aria-label="Copy commands">Copy commands</button><pre tabindex="0"><code class="hljs"><span class="ln cmd"><span class="ps" aria-hidden="true">$ </span>promtool query instant http://prometheus:9090 <span class="hljs-string">&#x27;sum(rate(http_requests_total{code=~&quot;5..&quot;}[5m]))&#x27;</span></span></code></pre></div>
+<div class="code console" data-lang="terminal"><button class="copy" type="button" data-copy="git log --since=&quot;2 hours ago&quot; --oneline" aria-label="Copy commands">Copy commands</button><pre tabindex="0"><code class="hljs"><span class="ln cmd"><span class="ps" aria-hidden="true">$ </span>git <span class="hljs-built_in">log</span> --since=<span class="hljs-string">&quot;2 hours ago&quot;</span> --oneline</span></code></pre></div>
+<div class="code console" data-lang="terminal"><button class="copy" type="button" data-copy="kubectl rollout history deployment/checkout" aria-label="Copy commands">Copy commands</button><pre tabindex="0"><code class="hljs"><span class="ln cmd"><span class="ps" aria-hidden="true">$ </span>kubectl rollout <span class="hljs-built_in">history</span> deployment/checkout</span></code></pre></div>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://prometheus.io/docs/alerting/latest/alertmanager/" target="_blank" rel="noopener">Prometheus Alertmanager</a><span class="host">prometheus.io</span></li><li><a href="https://sre.google/sre-book/monitoring-distributed-systems/" target="_blank" rel="noopener">Google SRE book: Monitoring distributed systems</a><span class="host">sre.google</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="../#/interview">InterviewHub</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=49dfa572"></script>
+<script src="../assets/counter.js?v=49dfa572"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>
