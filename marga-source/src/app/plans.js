@@ -59,6 +59,15 @@ function indexView() {
         '<p><a class="btn ' + (started ? 'btn-primary' : 'btn-quiet') + '" href="#/plan/' + e(p.id) + '">' + (s.next < 0 ? 'Plan complete: review it' : (started ? 'Continue with day ' + (s.next + 1) : 'See the plan')) + '</a></p></li>';
     }).join('') + '</ul></div>';
 }
+function gridHtml(p, s) {
+  var cells = p.days.map(function (d, i) {
+    var di = s.days[i], cur = i === s.next, rev = !!d.practice || (i + 1) % 7 === 0, st = di.done ? 'done' : cur ? 'today' : rev ? 'review' : 'later';
+    var lab = 'Day ' + (i + 1) + ', ' + ({ done: 'done', today: 'today', review: 'review day', later: 'not yet' })[st];
+    return '<button type="button" class="pg-d pg-' + st + (di.done && rev ? ' pg-rev' : '') + '" data-act="plan-go" data-day="' + (i + 1) + '" aria-label="' + lab + '">' + (i + 1) + '</button>';
+  }).join('');
+  return '<section class="plan-grid" aria-label="Plan map"><h2 class="sub-h">All ' + p.days.length + ' days at a glance</h2><div class="pg-cells">' + cells + '</div>' +
+    '<ul class="pg-key"><li><i class="pg-k pg-done"></i>Done</li><li><i class="pg-k pg-today"></i>Today</li><li><i class="pg-k pg-review"></i>Review day</li><li><i class="pg-k pg-later"></i>Not yet</li></ul></section>';
+}
 function planView(id) {
   var p = BY[id];
   if (!p) { view.title = 'Plan not found | MARGA'; view.nav = 'practice'; view.html = '<section class="page-head wrap"><h1>That plan does not exist</h1><p class="lede"><a href="#/plans">See all plans</a>.</p></section>'; return; }
@@ -67,6 +76,7 @@ function planView(id) {
   var h = '<section class="page-head wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="#/plans">Plans</a></nav><h1>' + e(p.title) + '</h1><p class="lede">' + e(p.summary) + '</p></section><div class="wrap narrow plan-page" id="plan-body" data-plan="' + e(p.id) + '">';
   h += '<section class="plan-now" aria-label="Your progress">' + ring(s.pct, s.pct + ' percent complete') + '<div><p><strong>' + (s.next < 0 ? 'You finished every day.' : 'Next up: day ' + (s.next + 1) + ' of ' + s.total + '.') + '</strong> ' + s.done + ' of ' + s.total + ' days done.</p>' +
     (s.next >= 0 ? '<p><button type="button" class="btn btn-primary" data-act="plan-go" data-day="' + (s.next + 1) + '">Go to day ' + (s.next + 1) + '</button></p>' : '') + '</div></section>';
+  if (p.days.length >= 28) h += gridHtml(p, s);
   h += '<section class="plan-meta"><h2 class="sub-h">What you will be able to do</h2><ul>' + p.outcomes.map(function (o) { return '<li>' + e(o) + '</li>'; }).join('') + '</ul><p class="small"><strong>Who it is for.</strong> ' + e(p.who) + '</p>' +
     '<p class="small">Some lessons stay locked until you pass the ones before them or finish the skills they build on. Locked items say so. <a href="#/placement">The placement check</a> can show where to start.</p></section>';
   for (var w = 0; w < weeks; w++) {

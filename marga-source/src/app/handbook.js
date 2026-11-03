@@ -74,7 +74,7 @@ function handbookView(mid) {
   var p = parts(mid), wc = wordCount(p);
   view.html = '<section class="page-head wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="#/handbooks">Handbooks</a></nav><h1>' + e(m.title) + ' handbook</h1>' +
     '<p class="lede">All ' + p.ls.length + ' lessons, the cheat sheets, glossary, interview questions and references in one document. About ' + pagesOf(wc) + ' printed pages.</p>' +
-    '<div class="actions hb-actions"><button type="button" class="btn btn-primary" data-act="pdf">Save as PDF</button><button type="button" class="btn btn-quiet" data-act="print">Print</button><button type="button" class="btn btn-quiet" id="hb-dl">Download as a web page</button></div>' +
+    '<div class="actions hb-actions"><button type="button" class="btn btn-primary" data-act="pdf">Save as PDF</button><button type="button" class="btn btn-quiet" data-act="print">Print</button><button type="button" class="btn btn-quiet" id="hb-dl">Download as a web page</button>' + A.printStyleSelect() + '</div>' +
     '<p class="small">The downloaded page is one file. It opens offline in any browser.</p></section>' +
     '<div class="wrap narrow prose hb-doc" id="hb-doc">' + bodyHtml(p) + '</div>';
   view.after = function () { var b = $('#hb-dl'); if (b) b.addEventListener('click', function () { download(p); A.toast('Handbook downloaded.'); }); };

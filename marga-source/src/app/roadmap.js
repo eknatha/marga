@@ -40,7 +40,7 @@ function mapView(id) {
     '<div class="rm-meter" role="img" aria-label="' + n + ' percent of the lessons done"><span style="width:' + n + '%"></span></div>' +
     '<p class="small" id="rm-sum">' + s.done + ' of ' + s.total + ' lessons done (' + n + ' percent), across ' + s.mods.length + ' skills.</p>' +
     '<p class="actions">' + (s.here ? '<button type="button" class="btn btn-primary" id="rm-jump">Jump to where I am</button>' : '') + (nl && A.isLoaded !== undefined ? '<a class="btn btn-quiet" id="rm-next" href="' + A.hrefLesson(nl) + '">Continue: ' + e(A.LES[nl].title) + '</a>' : '') +
-    '<button type="button" class="btn btn-quiet" data-act="print">Print the map</button></p></section>' +
+    '<button type="button" class="btn btn-quiet" data-act="print">Print the map</button> ' + A.printStyleSelect() + '</p></section>' +
     '<div class="wrap narrow"><ol class="rm-map">' + s.mods.map(function (m, i) {
       var d = modCount(m), full = modDone(m), here = s.here === m, ok = unlocked(m), cls = full ? 'is-done' : here ? 'is-here' : ok ? 'is-ready' : 'is-locked';
       var state = full ? 'Complete' : here ? 'You are here' : ok ? 'Ready' : 'Locked until ' + missing(m).map(function (x) { return x.title; }).join(' and ');

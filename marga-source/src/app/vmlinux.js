@@ -102,13 +102,14 @@ function tagsOf(x) {
   return t;
 }
 function row(x) {
-  var lesson = x.lesson && A.LES[x.lesson] ? A.LES[x.lesson] : null;
-  return '<li class="tl-item"><div><h3><a href="#/linux/' + e(x.id) + '">' + e(x.title) + '</a></h3><p>' + e(x.story) + '</p>' +
-    '<p class="small">' + e(x.level) + ' | ' + x.minutes + ' min' + tagsOf(x).map(function (t) { return ' | <span class="chip">' + e(t) + '</span>'; }).join('') + (lesson ? ' | Goes with the lesson <a href="' + A.hrefLesson(x.lesson) + '">' + e(lesson.title) + '</a>' : '') + '</p></div>' +
-    '<span class="chip' + (isDone(x.id) ? ' pass' : '') + '">' + (isDone(x.id) ? 'Solved' : 'Not solved') + '</span></li>';
+  var lesson = x.lesson && A.LES[x.lesson] ? A.LES[x.lesson] : null, done = isDone(x.id);
+  return '<li class="tl-item vm-card' + (done ? ' is-done' : '') + '"><div class="vc-top"><span class="chip vc-lv">' + e(x.level) + '</span>' + tagsOf(x).map(function (t) { return '<span class="chip">' + e(t) + '</span>'; }).join('') + '<span class="vc-m' + (done ? ' ok' : '') + '">' + (done ? 'Solved' : x.minutes + ' min') + '</span></div>' +
+    '<h3><a href="#/linux/' + e(x.id) + '">' + e(x.title) + '</a></h3><p class="vc-s">' + e(x.story) + '</p>' +
+    (lesson ? '<p class="small">Goes with the lesson <a href="' + A.hrefLesson(x.lesson) + '">' + e(lesson.title) + '</a></p>' : '') +
+    '<p class="vc-go"><a class="btn ' + (done ? 'btn-quiet' : 'btn-primary') + '" href="#/linux/' + e(x.id) + '" aria-label="' + (done ? 'Open again: ' : 'Start lab: ') + e(x.title) + '">' + (done ? 'Open again' : 'Start lab') + '</a></p><span class="sr">' + (done ? 'Solved' : 'Not solved') + '</span></li>';
 }
 var IDX = { level: '', q: '', st: 'all', tp: '' };
-var TOPICS = [['', 'All kinds'], ['fix', 'Fix it'], ['diagnose', 'Diagnose only'], ['multi', 'Several faults'], ['network', 'Network'], ['systemd', 'systemd-style']];
+var TOPICS = [['', 'All kinds'], ['fix', 'Fix it'], ['diagnose', 'Diagnose only'], ['multi', 'Several faults'], ['network', 'Network'], ['systemd', 'systemd-style'], ['packages', 'Packages'], ['tls', 'TLS and certificates']];
 function inTopic(x, tp) { return !tp || (tp === 'fix' ? x.kind !== 'diagnose' : tp === 'diagnose' ? x.kind === 'diagnose' : tp === 'multi' ? !!x.faults : x.tag === tp); }
 function levelCount(lv) { var xs = SC.filter(function (x) { return x.level === lv; }); return { n: xs.length, done: xs.filter(function (x) { return isDone(x.id); }).length }; }
 function firstOpenLevel() { for (var i = 0; i < LEVEL_ORDER.length; i++) { var c = levelCount(LEVEL_ORDER[i]); if (c.n && c.done < c.n) return LEVEL_ORDER[i]; } return 'All'; }
@@ -126,7 +127,7 @@ function visible() {
 function listHtml() {
   var xs = visible();
   if (!xs.length) return '<p class="tl-warn" role="note">No scenario matches. Clear the search or choose another level.</p>';
-  return '<ul class="tl-list">' + xs.map(row).join('') + '</ul>';
+  return '<ul class="tl-list vm-cards">' + xs.map(row).join('') + '</ul>';
 }
 function indexView(qs) {
   view.title = 'Real Linux lab | MARGA by EknathaLabs'; view.nav = 'practice'; view.voice = '';
@@ -145,8 +146,8 @@ function indexView(qs) {
   view.html = '<section class="page-head wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="#/practice">Practice</a></nav><h1>Real Linux lab</h1>' +
     '<p class="lede">A real Linux machine inside your browser. Something is broken. Find it with real commands, fix it, and press Check. ' + SC.length + ' scenarios: ' + LEVEL_ORDER.map(function (l) { return levelCount(l).n + ' ' + l; }).join(', ') + '. Fix it, diagnose it, or untangle several faults at once, including networks and a systemd-style service manager. Free, no sign-up, nothing leaves your device.</p>' +
     '<p class="small" id="vm-progress">' + doneCount() + ' of ' + SC.length + ' solved</p></section>' +
-    '<div class="wrap narrow vm-index">' + BANNER +
-    '<p class="small">The first start downloads about 5 MB (the emulator, a small kernel and the tools). After that the lab works offline. It needs a recent desktop or phone browser with WebAssembly.</p>' +
+    '<div class="wrap vm-index">' + BANNER +
+    '<p class="small">The first start downloads about 8 MB (the emulator, a small kernel and the tools). After that the lab works offline. It needs a recent desktop or phone browser with WebAssembly.</p>' +
     '<p class="actions"><a class="btn btn-primary" href="#/linux/sandbox">Open an empty machine</a> <button type="button" class="btn btn-quiet" id="vm-random">Pick one for me</button> <a class="btn btn-quiet" href="#/terminal-labs">Simulated terminal labs</a></p>' +
     '<div class="vm-browse" role="group" aria-label="Choose scenarios"><div class="vm-tabs">' + tabs + '</div>' +
     '<div class="vm-filter"><label class="field"><span>Search the scenarios</span><input type="search" id="vm-q" value="' + e(IDX.q) + '" autocomplete="off" spellcheck="false"></label>' +
@@ -206,23 +207,37 @@ function labView(id) {
   view.html = '<section class="page-head wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="#/linux">Real Linux lab</a></nav><h1>' + e(x.title) + '</h1><p class="lede">' + e(x.story) + '</p>' +
     '<p class="small">' + e(x.level) + ' | about ' + x.minutes + ' minutes' + tagsOf(x).map(function (t) { return ' | <span class="chip">' + e(t) + '</span>'; }).join('') + (lesson ? ' | Goes with the lesson <a href="' + A.hrefLesson(x.lesson) + '">' + e(lesson.title) + '</a>' : '') + '</p></section>' +
     '<div class="wrap vm">' + BANNER +
+    '<div class="vm-split"><div class="vm-left">' +
     (x.goals.length ? '<h2 class="sub-h">Goals</h2><ul class="vm-goals">' + x.goals.map(function (g) { return '<li>' + e(g) + '</li>'; }).join('') + '</ul>' : '') +
+    (dg ? '<section class="vm-ask" id="vm-ask" aria-labelledby="vm-ask-h"><h2 class="sub-h" id="vm-ask-h">Your diagnosis</h2><p>' + e(x.ask) + '</p><label class="field"><span>Your answer</span><input type="text" id="vm-ans" autocomplete="off" spellcheck="false" autocapitalize="off"></label><div class="actions"><button type="button" class="btn btn-primary" id="vm-submit">Submit diagnosis</button></div></section>' : '') +
+    '<div id="vm-result" class="vm-result" role="status" aria-live="polite"></div><div id="vm-why" class="vm-why"></div>' +
+    '<div id="vm-hints" class="vm-hints"></div><div id="vm-solbox"></div>' +
+    '</div><div class="vm-right">' +
     '<div class="actions vm-bar"><button type="button" class="btn btn-primary" id="vm-start">Start the machine</button>' +
     (sb ? '' : (dg ? '' : '<button type="button" class="btn btn-quiet" id="vm-check" disabled>Check my work</button>') + '<button type="button" class="btn btn-quiet" id="vm-hint">Show a hint</button><button type="button" class="btn btn-quiet" id="vm-sol">' + (dg ? 'Show the answer' : 'Show the solution') + '</button>') +
     '<button type="button" class="btn btn-quiet" id="vm-reset" disabled>Restart the machine</button></div>' +
-    '<p class="small" id="vm-status" role="status" aria-live="polite">The machine is off. Press Start. The first start downloads about 5 MB.</p>' +
-    '<div id="vm-term" class="vm-term" hidden></div>' +
+    '<p class="small" id="vm-status" role="status" aria-live="polite">The machine is off. Press Start. The first start downloads about 8 MB.</p>' +
+    '<div id="vm-fail" class="vm-fail" role="alert" hidden></div><div id="vm-term" class="vm-term" hidden></div>' +
     '<div class="vm-keys" id="vm-keys" hidden>' + KEYS.map(function (k, i) { return '<button type="button" class="btn btn-quiet" data-k="' + i + '" aria-label="Send ' + e(k[0]) + '">' + e(k[0]) + '</button>'; }).join('') + '</div>' +
     '<details class="vm-saves" id="vm-saves"><summary>Save my machine</summary><p class="small">Save the whole machine as it is now, files, processes and all, and carry on later. The save stays in this browser. You can also download it as a file and load it on another device. It is only for this lab, and it never leaves your device unless you move the file yourself.</p>' +
     '<div class="actions"><button type="button" class="btn btn-quiet" id="vm-save" disabled>Save my machine</button><button type="button" class="btn btn-quiet" id="vm-resume" hidden>Resume my saved machine</button><button type="button" class="btn btn-quiet" id="vm-dl" hidden>Download the save file</button><button type="button" class="btn btn-quiet" id="vm-delsave" hidden>Delete the save</button></div>' +
     '<label class="field"><span>Load a save file</span><input type="file" id="vm-file" accept=".mvm"></label><p class="small" id="vm-savemsg" role="status" aria-live="polite"></p></details>' +
-    (dg ? '<section class="vm-ask" id="vm-ask" aria-labelledby="vm-ask-h"><h2 class="sub-h" id="vm-ask-h">Your diagnosis</h2><p>' + e(x.ask) + '</p><label class="field"><span>Your answer</span><input type="text" id="vm-ans" autocomplete="off" spellcheck="false" autocapitalize="off"></label><div class="actions"><button type="button" class="btn btn-primary" id="vm-submit">Submit diagnosis</button></div></section>' : '') +
-    '<div id="vm-result" class="vm-result" role="status" aria-live="polite"></div><div id="vm-why" class="vm-why"></div>' +
-    '<div id="vm-hints" class="vm-hints"></div><div id="vm-solbox"></div>' +
+    '</div></div>' +
     '<p class="actions">' + (nxt ? '<a class="btn btn-quiet" href="#/linux/' + e(nxt.id) + '">Next lab: ' + e(nxt.title) + '</a>' : '') + '<a class="btn btn-quiet" href="#/linux">All Linux labs</a></p></div>';
   view.after = function () {
     var mach = null, started = false, st = $('#vm-status'), savedRec = null;
     function say(t) { if (st) st.textContent = t; }
+    function showFail(err) {
+      var box = $('#vm-fail'); if (!box) return; var msg = err && err.message ? err.message : String(err || 'unknown error'), wasm = typeof WebAssembly === 'object';
+      box.hidden = false;
+      box.innerHTML = '<h2>The machine could not start</h2><p>Your progress is safe. Nothing was lost.</p><b>Try these, in order</b><ol><li>Close other tabs, then press Start again.</li><li>Use the simulated terminal instead. It needs far less memory.</li><li>Open MARGA in a desktop browser. Phones and older tablets often cannot run the real machine.</li></ol>' +
+        '<ul class="vm-fail-facts"><li><span>WebAssembly</span><strong>' + (wasm ? 'Supported' : 'Not supported') + '</strong></li><li><span>Browser memory hint</span><strong>' + (navigator.deviceMemory ? 'about ' + navigator.deviceMemory + ' GB' : 'not reported') + '</strong></li></ul>' +
+        '<pre class="vm-fail-err" tabindex="0">' + e(msg) + '</pre>' +
+        '<p class="actions"><button type="button" class="btn btn-primary" id="vm-retry">Start again</button><a class="btn btn-quiet" href="#/terminal-labs/linux">Use the simulated terminal</a><button type="button" class="btn btn-quiet" id="vm-copyerr">Copy the error to report it</button></p>';
+      var r = $('#vm-retry'); if (r) r.addEventListener('click', function () { box.hidden = true; var sbtn = $('#vm-start'); if (sbtn) sbtn.click(); });
+      var c = $('#vm-copyerr'); if (c) c.addEventListener('click', function () { var t = 'MARGA machine error: ' + msg + ' | ' + navigator.userAgent; (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { c.textContent = 'Copied'; }, function () { c.textContent = 'Select the error above and copy it'; }); });
+      var h = box.querySelector('h2'); if (h) { h.tabIndex = -1; h.focus(); }
+    }
     function saymsg(t) { var m = $('#vm-savemsg'); if (m) m.textContent = t; }
     function showHints() {
       var n = Math.min(bag().h[x.id] || 0, x.hints.length), box = $('#vm-hints'); if (!box) return;
@@ -262,14 +277,28 @@ function labView(id) {
           var c = $('#vm-check'); if (c) c.disabled = false; var r = $('#vm-reset'); if (r) r.disabled = false; var sv = $('#vm-save'); if (sv) sv.disabled = false; b.textContent = 'Machine running';
           if (mach && mach.term) mach.term.focus();
         },
-        failed: function (err) { if (mach) mach.stop(); mach = null; started = false; $('#vm-term').innerHTML = ''; b.disabled = false; say(err && err.message ? err.message : 'The machine could not start.'); }
+        failed: function (err) { if (mach) mach.stop(); mach = null; started = false; $('#vm-term').innerHTML = ''; b.disabled = false; say('The machine could not start.'); showFail(err); }
       }, saved);
-      mach.start().catch(function (err) { started = false; b.disabled = false; say(err && err.message ? err.message : 'The machine could not start in this browser.'); });
+      mach.start().catch(function (err) { started = false; b.disabled = false; say('The machine could not start in this browser.'); showFail(err); });
     }
     function stopMachine() { if (mach) mach.stop(); mach = null; started = false; $('#vm-term').innerHTML = ''; $('#vm-result').innerHTML = ''; var rs = $('#vm-reset'); if (rs) rs.disabled = true; var c = $('#vm-check'); if (c) c.disabled = true; var sv = $('#vm-save'); if (sv) sv.disabled = true; var b = $('#vm-start'); b.textContent = 'Start the machine'; b.disabled = false; }
     $('#vm-start').addEventListener('click', function () { begin(null); });
     var kb = $('#vm-keys'); if (kb) kb.addEventListener('click', function (ev) { var b = ev.target.closest('button[data-k]'); if (b && mach) mach.type(KEYS[+b.getAttribute('data-k')][1]); });
     var rs = $('#vm-reset'); if (rs) rs.addEventListener('click', function () { stopMachine(); begin(null); });
+    document.addEventListener('click', function vmx(ev) {
+      if (!$('#vm-term')) { document.removeEventListener('click', vmx); return; }
+      var t = ev.target && ev.target.id;
+      if (t === 'vm-again') { stopMachine(); begin(null); say('The fault is back in a fresh machine. Fix it again without looking at the solution.'); }
+      if (t === 'vm-replay' && mach && x.fix && !x.replaying) {
+        x.replaying = true; var cmds = x.fix.slice(), quick = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+        say('Typing the fix into the machine. Watch the terminal.');
+        (function next() {
+          if (!cmds.length || !mach) { x.replaying = false; say('Done. Press Check my work.'); return; }
+          var line = cmds.shift(), i = 0;
+          (function ch() { if (!mach) { x.replaying = false; return; } if (i < line.length) { mach.type(line[i++]); setTimeout(ch, quick ? 0 : 35); } else { setTimeout(function () { if (mach) mach.type('\r'); setTimeout(next, quick ? 600 : 1800); }, quick ? 0 : 400); } }());
+        }());
+      }
+    });
     window.addEventListener('resize', onResize); function onResize() { if (mach && mach.refit) mach.refit(); }
     /* ---- check (fix labs) */
     var ck = $('#vm-check');
@@ -278,7 +307,7 @@ function labView(id) {
       mach.check().then(function (rows) {
         var ok = rows.length > 0 && rows.every(function (r) { return r.ok; });
         $('#vm-result').innerHTML = '<h2 class="sub-h">Check result</h2><ul class="vm-checks">' + rows.map(function (r) { return '<li class="' + (r.ok ? 'pass' : 'fail') + '"><strong>' + (r.ok ? 'Pass' : 'Not yet') + '</strong> ' + e(r.text) + '</li>'; }).join('') + '</ul>' +
-          (ok ? '<p><strong>Solved.</strong> ' + (nxt ? '<a href="#/linux/' + e(nxt.id) + '">Try the next lab</a>.' : 'That is the last lab.') + '</p>' : '<p class="small">Keep going. Read each line above, or open a hint.</p>');
+          (ok ? '<p><strong>Solved.</strong> ' + (nxt ? '<a href="#/linux/' + e(nxt.id) + '">Try the next lab</a>.' : 'That is the last lab.') + '</p><p class="actions"><button type="button" class="btn btn-quiet" id="vm-again">Break it again</button>' + (x.fix ? '<button type="button" class="btn btn-quiet" id="vm-replay">Watch the fix typed in</button>' : '') + '</p>' : '<p class="small">Keep going. Read each line above, or open a hint.</p>');
         if (ok) solved();
         say(ok ? 'All ' + rows.length + ' checks pass.' : rows.filter(function (r) { return r.ok; }).length + ' of ' + rows.length + ' checks pass.'); ck.disabled = false;
       }, function (err) { say(err && err.message ? err.message : 'The check failed.'); ck.disabled = false; });

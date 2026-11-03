@@ -4,9 +4,9 @@ var TL_VQ = (function () { try { var s = document.currentScript && document.curr
 window.MargaTermLabs = function (A) {
 'use strict';
 var D = A.D, view = A.view, $ = A.$, e = A.e, plural = A.plural, LABS = D.termlabs || [];
-var ENGINE = ['term-fs.js', 'term-parse.js', 'term-exec.js', 'term-cmds.js', 'term-text.js', 'term-awk.js', 'term-jq.js', 'term-sys.js', 'term-net.js', 'term-k8s.js', 'term-docker.js', 'term-labs.js'];
-var STAGES = ['linux', 'bash', 'networking', 'python', 'kubernetes', 'docker'];
-var BANNER = '<strong>This is a simulation.</strong> The terminal is a program written for MARGA that imitates a Linux shell, a small network, a few services, a Kubernetes cluster and a Docker engine. It is not a real kernel, a real network, a real cluster or a real Docker, and the output of real tools can differ in the details. Python labs run real Python (Pyodide) in your browser. Nothing you type leaves your device.';
+var ENGINE = ['term-fs.js', 'term-parse.js', 'term-exec.js', 'term-cmds.js', 'term-text.js', 'term-awk.js', 'term-jq.js', 'term-sys.js', 'term-net.js', 'term-k8s.js', 'term-docker.js', 'term-cloud.js', 'term-labs.js'];
+var STAGES = ['linux', 'bash', 'networking', 'python', 'kubernetes', 'docker', 'cloud'];
+var BANNER = '<strong>This is a simulation.</strong> The terminal is a program written for MARGA that imitates a Linux shell, a small network, a few services, a Kubernetes cluster, a Docker engine, and a small cloud account with imitations of the aws and az commands. It is not a real kernel, a real network, a real cluster or a real Docker, and the output of real tools can differ in the details. Python labs run real Python (Pyodide) in your browser. Nothing you type leaves your device.';
 function bag() { var s = A.state(); if (!s.tl || typeof s.tl !== 'object' || Array.isArray(s.tl)) s.tl = {}; return s.tl; }
 function find(id) { for (var i = 0; i < LABS.length; i++) if (LABS[i].id === id) return LABS[i]; return null; }
 function isDone(id) { return !!(bag()[id] && bag()[id].d); }
@@ -54,7 +54,7 @@ function indexView(mod) {
     '<div class="note-panel"><h3>What is not here</h3><p>These labs do not give you a real Linux machine. A real one, running in the browser, would need a download of tens of megabytes and a third-party engine, so it was left out for now. For the real thing, use a virtual machine or container on your own computer. Kubernetes, Docker and Terraform labs are still planned.</p></div></div>';
   view.after = null;
 }
-A.addRoute(/^\/terminal-labs(?:\/(linux|bash|networking|python|kubernetes|docker))?$/, indexView);
+A.addRoute(/^\/terminal-labs(?:\/(linux|bash|networking|python|kubernetes|docker|cloud))?$/, indexView);
 
 /* ---------------------------------------------------------------- one lab */
 var cur = null;   /* { lab, T, s, hist, hi, pending, busy, hintsShown, solShown, comp } */
@@ -93,6 +93,7 @@ async function submit(raw) {
   try {
     var r = await cur.s.exec1(full);
     r.chunks.forEach(function (c) { put(c.s, c.fd === 2 ? 'tl-e' : ''); });
+    cur.last = { cmd: full, out: r.chunks.map(function (c) { return c.s; }).join('') };
     ensureNl();
   } catch (x) { ensureNl(); put('terminal: internal error: ' + (x && x.message ? x.message : x) + '\n', 'tl-e'); }
   setBusy(false); setPrompt(); var i = $('#tl-in'); if (i) i.focus();
@@ -206,7 +207,8 @@ async function runChecks() {
     var b = bag(), first = !b[cur.lab.id] || !b[cur.lab.id].d;
     b[cur.lab.id] = { d: (b[cur.lab.id] && b[cur.lab.id].d) || new Date().toISOString().slice(0, 10), h: cur.hintsShown, s: cur.solShown ? 1 : 0 };
     if (first) { A.markActive(); A.save(); A.renderChrome(); A.setNav(view.nav); }
-    html += '<div class="tl-explain"><h3>What this lab showed</h3><p>' + plain(cur.lab.explain) + '</p></div>' +
+    var took = cur.hardMode && cur.t0 ? '<p><strong>Fixed again without hints in ' + Math.max(1, Math.round((Date.now() - cur.t0) / 1000)) + ' seconds.</strong></p>' : '';
+    html += took + '<p class="actions"><button type="button" class="btn btn-quiet" data-act="tl-break">Break it again</button><button type="button" class="btn btn-quiet" id="tl-replay" data-act="tl-replay">Watch a replay</button></p><div class="tl-explain"><h3>What this lab showed</h3><p>' + plain(cur.lab.explain) + '</p></div>' +
       '<p><a class="btn btn-quiet" href="#/terminal-labs/' + e(cur.lab.module) + '">More ' + e(stageTitle(cur.lab.module)) + ' labs</a></p>';
     var chip = $('#tl-status'); if (chip) { chip.textContent = 'Done'; chip.className = 'chip pass'; }
   }
@@ -226,11 +228,43 @@ A.onAct('tl-sol', function () {
   b.textContent = open ? 'Hide the solution' : 'Show a solution'; if (open) { cur.solShown = true; box.querySelector('code').textContent = cur.lab.solution; }
 });
 A.onAct('tl-reset', function () { if (cur) startSession(true); });
+A.onAct('tl-explain', function () {
+  var box = $('#tl-explain'); if (!box) return;
+  if (!cur.last) { box.innerHTML = '<p class="small">Run a command first, then press Explain this output.</p>'; return; }
+  var window_ = window.MargaExplain; if (!window_) return;
+  box.innerHTML = '<h3>Explain this output</h3><p class="small">For: <code>' + e(cur.last.cmd.split('\n')[0].slice(0, 120)) + '</code></p><ul>' + window_.explain(cur.last.cmd, cur.last.out).map(function (x) { return '<li>' + e(x) + '</li>'; }).join('') + '</ul><p class="small">A fixed set of rules, not an AI. It can miss things; the output above is the truth.</p>';
+});
+function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+A.onAct('tl-replay', async function () {
+  if (!cur || cur.busy || cur.replaying) return;
+  var lab = cur.lab, lines = lab.solution.split('\n').filter(function (x) { return x.trim() && !/^\s*#/.test(x); });
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  cur.replaying = true; var rb = $('#tl-replay'); if (rb) { rb.textContent = 'Stop the replay'; rb.setAttribute('data-act', 'tl-replay-stop'); }
+  await startSession(true); put('Replay of one solution. You can stop it at any time.\n', 'tl-note');
+  var inp = $('#tl-in');
+  for (var k = 0; k < lines.length && cur && cur.replaying; k++) {
+    inp.value = '';
+    for (var c = 0; c < lines[k].length && cur.replaying; c++) { inp.value += lines[k][c]; if (!reduce) await sleep(28); }
+    if (!cur.replaying) break; await sleep(reduce ? 0 : 350); var v = inp.value; inp.value = ''; await submit(v); await sleep(reduce ? 0 : 500);
+  }
+  var stopped = !cur || !cur.replaying; if (cur) cur.replaying = false;
+  rb = $('#tl-replay'); if (rb) { rb.textContent = 'Watch a replay'; rb.setAttribute('data-act', 'tl-replay'); }
+  if (!stopped) { put('Replay finished. Press Check my work to see the checks pass, or Break it again to try yourself.\n', 'tl-note'); }
+});
+A.onAct('tl-replay-stop', function () { if (cur) cur.replaying = false; });
+A.onAct('tl-break', function () {
+  if (!cur) return; cur.replaying = false;
+  startSession(true); cur.hardMode = true; cur.t0 = Date.now(); cur.hintsShown = 99;
+  var h = $('#tl-hint'); if (h) h.disabled = true; var sb = $('#tl-sol'); if (sb) sb.disabled = true;
+  put('The fault is back. No hints this time. Fix it, then press Check my work.\n', 'tl-note');
+});
 
 async function startSession(reset) {
   var T = cur.T, lab = cur.lab;
   cur.s = T.newLab(lab, { tty: true, edit: editHook, python: pyHook });
-  cur.hist = []; cur.hi = 0; cur.pending = ''; cur.busy = false;
+  cur.hist = []; cur.hi = 0; cur.pending = ''; cur.busy = false; cur.last = null;
+  if (cur.hardMode) { cur.hardMode = false; var shown = $('#tl-hints') ? $('#tl-hints').children.length : 0; cur.hintsShown = shown; var hb = $('#tl-hint'), sb2 = $('#tl-sol'); if (hb) hb.disabled = shown >= lab.hints.length; if (sb2) sb2.disabled = false; }
+  var xb = $('#tl-explain'); if (xb) xb.innerHTML = '';
   var o = out(); o.textContent = '';
   put((reset ? 'The lab was reset to its starting state.\n' : '') + 'Simulated terminal. Type help to list the commands. Tab completes, Up and Down show history.\n', 'tl-note');
   $('#tl-res').innerHTML = ''; setPrompt();
@@ -265,7 +299,7 @@ function labView(id) {
     '<div class="tl-edit" id="tl-edit" hidden><p id="tl-edit-title" class="small"></p><label class="field"><span>File contents</span><textarea id="tl-edit-text" class="editor" rows="10" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea></label>' +
     '<div class="actions"><button type="button" class="btn btn-primary" data-act="tl-edit-save">Save the file</button><button type="button" class="btn btn-quiet" data-act="tl-edit-cancel">Cancel</button></div></div>' +
     '<div class="tl-line"><label class="tl-ps" id="tl-ps" for="tl-in">$ </label><input id="tl-in" class="tl-in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-label="Terminal input"></div>' +
-    '<div class="tl-keys" role="group" aria-label="Terminal keys"><button type="button" class="btn btn-quiet" data-act="tl-key" data-key="Tab">Tab</button><button type="button" class="btn btn-quiet" data-act="tl-key" data-key="Up">Up</button><button type="button" class="btn btn-quiet" data-act="tl-key" data-key="Down">Down</button><button type="button" class="btn btn-quiet" data-act="tl-key" data-key="Ctrl+C">Ctrl+C</button><button type="button" class="btn btn-quiet" data-act="tl-key" data-key="Clear">Clear</button></div>' +
+    '<div class="tl-keys" role="group" aria-label="Terminal keys"><button type="button" class="btn btn-quiet" data-act="tl-key" data-key="Tab">Tab</button><button type="button" class="btn btn-quiet" data-act="tl-key" data-key="Up">Up</button><button type="button" class="btn btn-quiet" data-act="tl-key" data-key="Down">Down</button><button type="button" class="btn btn-quiet" data-act="tl-key" data-key="Ctrl+C">Ctrl+C</button><button type="button" class="btn btn-quiet" data-act="tl-key" data-key="Clear">Clear</button><button type="button" class="btn btn-quiet" data-act="tl-explain">Explain this output</button></div><div id="tl-explain" class="tl-explain" role="status" aria-live="polite"></div>' +
     '<p class="small tl-help">Press Enter to run a command. Press Escape and then Tab to move focus out of the terminal. <span id="tl-leave" role="status"></span></p></div></div></div></div>';
   view.after = function () {
     cur = { lab: lab, T: null, s: null, hist: [], hi: 0, pending: '', busy: false, hintsShown: 0, solShown: false, leave: false };
