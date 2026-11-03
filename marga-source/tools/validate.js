@@ -804,13 +804,13 @@ function checkLabsAndChallenges() {
   const LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
   const FORBID = /\bgit(hub|lab|ops|leaks|ea)/i, EMOJI = /\p{Extended_Pictographic}/u, ARROW = /[←→⇒]/;
   const vm = A.vmlabs || [], seen = new Set();
-  if (vm.length < 130) err('vm', 'need at least 130 real Linux scenarios');
+  if (vm.length < 149) err('vm', 'need at least 149 real Linux scenarios');
   for (const lv of LEVELS) if (vm.filter((x) => x.level === lv).length < 30) err('vm', `need at least 30 ${lv} scenarios`);
   const answers = JSON.parse(fs.readFileSync(path.join(__dirname, 'vmanswers.json'), 'utf8'));
-  for (const f of ['systemctl', 'journalctl', 'sdlib.sh', 'sdrun', 'sdboot', 'netlib.sh', 'inns']) if (!fs.existsSync(path.join(SRC, 'vm', 'shims', f))) err('vm', `src/vm/shims/${f} is missing`);
+  for (const f of ['systemctl', 'journalctl', 'sdlib.sh', 'sdrun', 'sdboot', 'netlib.sh', 'inns', 'apt', 'dpkg', 'apt-mark', 'pkglib.sh', 'repolib.sh', 'tlslib.sh', 'shop-tls', 'update-ca-certificates', 'fn.sh']) if (!fs.existsSync(path.join(SRC, 'vm', 'shims', f))) err('vm', `src/vm/shims/${f} is missing`);
   const kc = fs.existsSync(path.join(SRC, 'vm', 'kernel.config')) ? fs.readFileSync(path.join(SRC, 'vm', 'kernel.config'), 'utf8') : '';
   for (const o of ['CONFIG_NET_NS=y', 'CONFIG_VETH=y', 'CONFIG_BRIDGE=y', 'CONFIG_DUMMY=y', 'CONFIG_COMPAT_32BIT_TIME=y']) if (!kc.includes(o)) err('vm', `kernel.config needs ${o}`);
-  const kinds = { diagnose: 0, multi: 0, network: 0, systemd: 0 };
+  const kinds = { diagnose: 0, multi: 0, network: 0, systemd: 0, packages: 0, tls: 0 };
   const fixes = JSON.parse(fs.readFileSync(path.join(__dirname, 'vmfixes.json'), 'utf8'));
   for (const x of vm) {
     const w = 'vm ' + x.id;
@@ -837,8 +837,10 @@ function checkLabsAndChallenges() {
     }
     if (x.tag === 'network') kinds.network++;
     if (x.tag === 'systemd') kinds.systemd++;
+    if (x.tag === 'packages') kinds.packages++;
+    if (x.tag === 'tls') kinds.tls++;
     if (x.faults) { kinds.multi++; if (!(x.faults >= 2 && x.faults <= 6)) err('vm', `${w}: faults must be 2 to 6`); }
-    if (x.tag && !['network', 'systemd'].includes(x.tag)) err('vm', `${w}: unknown tag ${x.tag}`);
+    if (x.tag && !['network', 'systemd', 'packages', 'tls'].includes(x.tag)) err('vm', `${w}: unknown tag ${x.tag}`);
     if (x.why) {
       if (!x.why.q || !Array.isArray(x.why.o) || x.why.o.length < 2 || x.why.o.length > 4 || !Number.isInteger(x.why.a) || x.why.a < 0 || x.why.a >= x.why.o.length || !x.why.x) err('vm', `${w}: bad why prompt`);
     }
@@ -847,7 +849,9 @@ function checkLabsAndChallenges() {
   if (kinds.multi < 8) err('vm', 'need at least 8 multi-fault labs');
   if (kinds.network < 8) err('vm', 'need at least 8 network labs');
   if (kinds.systemd < 8) err('vm', 'need at least 8 systemd-style labs');
-  stats['diagnose / multi-fault / network / systemd labs'] = `${kinds.diagnose} / ${kinds.multi} / ${kinds.network} / ${kinds.systemd}`;
+  if (kinds.packages < 8) err('vm', 'need at least 8 package labs');
+  if (kinds.tls < 8) err('vm', 'need at least 8 TLS labs');
+  stats['diagnose / multi-fault / network / systemd / packages / TLS labs'] = `${kinds.diagnose} / ${kinds.multi} / ${kinds.network} / ${kinds.systemd} / ${kinds.packages} / ${kinds.tls}`;
   for (const f of ['bzImage', 'initrd.gz', 'libv86.js', 'v86.wasm', 'seabios.bin', 'vgabios.bin', 'NOTICE.md']) if (!fs.existsSync(path.join(DIST, 'vm', f))) err('vm', `dist/vm/${f} is missing`);
   const core = require(path.join(SRC, 'app', 'challenge-core.js')), ch = A.challenges || [], ids = new Set();
   if (ch.length < 50) err('challenges', 'need at least 50 challenges');
@@ -876,9 +880,9 @@ function checkTermLabs() {
   parsed.forEach((l) => (l.errors || []).forEach((m) => err('termlabs', `${l.id || l.title}: ${m}`)));
   if (labs.length !== parsed.length) err('termlabs', 'data.js does not match src/termlabs');
   const KNOWN = new Set(['file', 'contains', 'equals', 'mode', 'owner', 'unchanged', 'service', 'proc', 'disk', 'cron', 'ran', 'group', 'cmd']);
-  const MODS = ['linux', 'bash', 'networking', 'python', 'kubernetes', 'docker'], LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
+  const MODS = ['linux', 'bash', 'networking', 'python', 'kubernetes', 'docker', 'cloud'], LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
   const ids = new Set();
-  for (const m of MODS) if (labs.filter((l) => l.module === m).length < (['kubernetes', 'docker'].includes(m) ? 10 : 18)) err("termlabs", `${m}: need more labs`);
+  for (const m of MODS) if (labs.filter((l) => l.module === m).length < (['kubernetes', 'docker', 'cloud'].includes(m) ? 10 : 18)) err("termlabs", `${m}: need more labs`);
   for (const l of labs) {
     const w = l.id || l.title;
     if (!/^[a-z0-9-]+$/.test(l.id || '')) err('termlabs', `${w}: bad id`);
@@ -906,7 +910,7 @@ function checkTermLabs() {
     if (/TODO|FIXME|lorem ipsum/i.test(txt)) err('termlabs', `${w}: placeholder text`);
     if (/undefined|NaN|\[object Object\]/.test(`${l.title} ${l.summary} ${l.story} ${l.goals.join(' ')} ${l.hints.join(' ')} ${l.explain}`)) err('termlabs', `${w}: bad rendered text`);
   }
-  for (const f of ['term-fs', 'term-parse', 'term-exec', 'term-cmds', 'term-text', 'term-awk', 'term-jq', 'term-sys', 'term-net', 'term-k8s', 'term-docker', 'term-labs', 'termlabs-ui']) {
+  for (const f of ['term-fs', 'term-parse', 'term-exec', 'term-cmds', 'term-text', 'term-awk', 'term-jq', 'term-sys', 'term-net', 'term-k8s', 'term-docker', 'term-cloud', 'term-labs', 'termlabs-ui']) {
     const t = read(path.join(SRC, 'app', f + '.js'));
     if (FORBID.test(t)) err('termlabs', `${f}.js contains a forbidden word`);
     if (EMOJI.test(t) || ARROW.test(t)) err('termlabs', `${f}.js contains an emoji or arrow glyph`);
@@ -1057,7 +1061,7 @@ function checkPlans() {
   const order = {}; for (const m of modIds) { const d = path.join(SRC, 'content', m); order[m] = fs.existsSync(d) ? fs.readdirSync(d).filter((x) => x.endsWith('.md')).sort().map((f) => m + '/' + f.replace(/^\d+-/, '').replace(/\.md$/, '')) : []; }
   const lessonSet = new Set(Object.values(order).flat());
   const widgetIds = new Set(); const wdir = path.join(SRC, 'widgets'); if (fs.existsSync(wdir)) for (const f of fs.readdirSync(wdir).filter((x) => x.endsWith('.json'))) for (const w of JSON.parse(read(path.join(wdir, f)))) widgetIds.add(w.id);
-  const okHash = /^#\/(flashcards|games|calculators|placement|widgets(\?skill=[a-z0-9-]+)?|system-design-lab|design-interview|interview\/mock|terminal-labs(\/(linux|bash|networking|python|kubernetes|docker))?|playground\/(go|hcl|python|sql|yaml)|capstones|today|daily|mix|weak)$/;
+  const okHash = /^#\/(flashcards|games|calculators|placement|widgets(\?skill=[a-z0-9-]+)?|system-design-lab|design-interview|interview\/mock|terminal-labs(\/(linux|bash|networking|python|kubernetes|docker|cloud))?|linux|playground\/(go|hcl|python|sql|yaml)|capstones|today|daily|mix|weak)$/;
   const bad = /\bgit(hub|lab|ops|leaks|ea)/i; const glyph = /[←-⇿☀-➿\u{1F300}-\u{1FAFF}]/u; const junk = /\bundefined\b|\bNaN\b|\[object Object\]|\bTODO\b|\bFIXME\b|lorem ipsum/;
   const ids = new Set(); let n = 0;
   for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.json')).sort()) {

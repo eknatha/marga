@@ -3,7 +3,7 @@
    A "@@ file /path [mode=644 owner=user group=user size=4G]" section defines one file. */
 const fs = require('fs');
 const path = require('path');
-const MODULES = ['linux', 'bash', 'networking', 'python', 'kubernetes', 'docker'];
+const MODULES = ['linux', 'bash', 'networking', 'python', 'kubernetes', 'docker', 'cloud'];
 function parseFile(file) {
   const text = fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
   const labs = []; let cur = null, sec = null;

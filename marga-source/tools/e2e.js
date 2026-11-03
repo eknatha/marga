@@ -39,6 +39,7 @@ let current = '';
 let TESTN = 0;
 async function test(name, fn) {
   if (process.env.ONLY && !name.includes(process.env.ONLY)) return;
+  if (process.env.SKIP && process.env.SKIP.split('|').some((x) => name.includes(x))) return;
   if (process.env.SHARD) { const [a, n] = process.env.SHARD.split('/').map(Number); if ((TESTN++) % n !== a) return; }
   current = name;
   const t0 = Date.now();
@@ -776,12 +777,13 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await ctx.close();
   });
 
-  await test('nav: InterviewHub sits right after Progress', async () => {
+  await test('nav: InterviewHub (external) sits right after Progress, then the in-site interview questions', async () => {
     const { ctx, page } = await open();
     await go(page, '/');
-    const links = await page.locator('nav[aria-label], header nav').first().locator('a').allInnerTexts();
-    const i = links.indexOf('Progress');
-    ok(i >= 0 && links[i + 1] === 'InterviewHub', 'order: ' + links.join(','));
+    const links = await page.locator('#topnav > a').allInnerTexts();
+    eq(links.join('|'), 'Skills|Skill trees|Practice|Real Linux labs|Progress|Interview questions|About', 'visible nav links: ' + links.join('|'));
+    ok(await page.locator('#nav-more-menu a.nav-ih').count() === 1, 'InterviewHub sits in the Elsewhere menu');
+    const ih = page.locator('#topnav a.nav-ih'); eq(await ih.getAttribute('href'), 'https://interviewhub.eknathalabs.com', 'InterviewHub href'); eq(await ih.getAttribute('target'), '_blank', 'opens in a new tab'); ok(/noopener/.test(await ih.getAttribute('rel')), 'noopener');
     await ctx.close();
   });
 
@@ -1266,10 +1268,10 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
   await test('practice hub and navigation: Practice, Case studies, search, module links, export and import keep new data', async () => {
     const { ctx, page } = await open();
     await go(page, '/');
-    const links = await page.locator('#topnav a').allInnerTexts();
-    eq(links.join('|'), 'Skills|Skill trees|Cheat sheets|Case studies|Practice|Certifications|Progress|InterviewHub|About', 'nav order');
+    const links = await page.locator('#topnav > a').allInnerTexts();
+    eq(links.join('|'), 'Skills|Skill trees|Practice|Real Linux labs|Progress|Interview questions|About', 'nav order');
     await nav(page, '/practice');
-    eq(await page.locator('.prac li').count(), 41, 'hub cards');
+    eq(await page.locator('.prac li').count(), 42, 'hub cards');
     for (const href of ['#/drills', '#/interview/mock', '#/flashcards', '#/cases', '#/architecture', '#/calculators', '#/review', '#/terminal-labs']) ok(await page.locator(`.prac a[href="${href}"]`).count() === 1, 'hub links to ' + href);
     await nav(page, '/module/kubernetes');
     ok(await page.locator('a[href="#/drills/kubernetes"]').count() === 1 && await page.locator('a[href="#/cases/kubernetes"]').count() === 1, 'module page links to practice');
@@ -1433,10 +1435,10 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     }
   });
 
-  await test('learning plans: six plans (five of 30 days and the 100-day challenge), current day open, ticks persist and clear, phone width, axe in both themes', async () => {
+  await test('learning plans: seven plans (five of 30 days and two 100-day challenges), current day open, ticks persist and clear, phone width, axe in both themes', async () => {
     for (const dark of [false, true]) {
       const { ctx, page, issues } = await open({ dark }); await go(page, '/plans'); await page.waitForSelector('.plan-card');
-      eq(await page.locator('.plan-card').count(), 6, 'six plans');
+      eq(await page.locator('.plan-card').count(), 7, 'seven plans');
       await nav(page, '/plan/sre-30'); await page.waitForSelector('.plan-day');
       eq(await page.locator('.plan-day').count(), 30, '30 days');
       eq(await page.locator('.plan-day.current[open]').count(), 1, 'current day open');
@@ -1451,7 +1453,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
         eq(after, 0, 'clear removes ticks');
       }
       await page.addScriptTag({ content: AXE });
-      for (const r of ['/plans', '/plan/kubernetes-30', '/plan/devops-100']) {
+      for (const r of ['/plans', '/plan/kubernetes-30', '/plan/devops-100', '/plan/sre-100']) {
         await nav(page, '/practice'); await nav(page, r); await page.waitForSelector('.plan-card, .plan-day');
         const v = await page.evaluate(async () => (await window.axe.run(document, { resultTypes: ['violations'] })).violations.filter((x) => x.impact === 'serious' || x.impact === 'critical').map((x) => x.id));
         eq(v.length, 0, (dark ? 'dark ' : 'light ') + r + ' ' + v.join(','));
@@ -1643,28 +1645,28 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await whyCheck(page, id);
   }
 
-  await test('real Linux lab: 130 scenarios (36 beginner, 42 intermediate, 52 advanced) with a typed fix each; the index filters by level, text and status; one lab runs in the real VM; the empty machine boots; phone width, no overflow', async () => {
+  await test('real Linux lab: 149 scenarios (42 beginner, 49 intermediate, 58 advanced) with a typed fix each; the index filters by level, text and status; one lab runs in the real VM; the empty machine boots; phone width, no overflow', async () => {
     const { ctx, page, issues } = await open(); await go(page, '/linux');
     const labs = await page.evaluate(() => window.ACADEMY.vmlabs.map((x) => ({ id: x.id, level: x.level })));
-    eq(labs.length, 130, '130 scenarios');
-    const PER = { Beginner: 36, Intermediate: 42, Advanced: 52 };
+    eq(labs.length, 149, '149 scenarios');
+    const PER = { Beginner: 42, Intermediate: 49, Advanced: 58 };
     for (const lv of ['Beginner', 'Intermediate', 'Advanced']) eq(labs.filter((x) => x.level === lv).length, PER[lv], lv + ' has ' + PER[lv]);
     ok(/real Linux kernel/i.test(await page.textContent('.tl-warn')), 'honest banner');
     for (const x of labs) ok(vmFixes[x.id] && vmFixes[x.id].length, x.id + ' has a typed fix in tools/vmfixes.json');
-    eq(await page.locator('.tl-item').count(), 36, 'a new visitor starts on the Beginner list');
-    ok(/Showing 36 of 130/.test(await page.textContent('#vm-count')), 'the count is announced');
-    await page.click('.vm-tabs [data-lv="All"]'); eq(await page.locator('.tl-item').count(), 130, 'All shows 130');
-    for (const lv of ['Intermediate', 'Advanced', 'Beginner']) { await page.click('.vm-tabs [data-lv="' + lv + '"]'); eq(await page.locator('.tl-item').count(), PER[lv], lv + ' shows ' + PER[lv]); eq(await page.locator('.tl-item .small:has-text("' + lv + ' |")').count(), PER[lv], lv + ': every row is ' + lv); }
+    eq(await page.locator('.tl-item').count(), 42, 'a new visitor starts on the Beginner list');
+    ok(/Showing 42 of 149/.test(await page.textContent('#vm-count')), 'the count is announced');
+    await page.click('.vm-tabs [data-lv="All"]'); eq(await page.locator('.tl-item').count(), 149, 'All shows 149');
+    for (const lv of ['Intermediate', 'Advanced', 'Beginner']) { await page.click('.vm-tabs [data-lv="' + lv + '"]'); eq(await page.locator('.tl-item').count(), PER[lv], lv + ' shows ' + PER[lv]); eq(await page.locator('.tl-item .vc-lv:text-is("' + lv + '")').count(), PER[lv], lv + ': every row is ' + lv); }
     await page.click('.vm-tabs [data-lv="All"]'); await page.fill('#vm-q', 'hard link'); ok(await page.locator('.tl-item').count() >= 1 && await page.locator('.tl-item').count() < 10, 'search narrows the list');
     await page.fill('#vm-q', 'zzzz-no-such'); ok(/No scenario matches/.test(await page.textContent('#vm-list')), 'an empty search says so'); await page.fill('#vm-q', '');
-    await page.selectOption('#vm-st', 'done'); eq(await page.locator('.tl-item').count(), 0, 'nothing is solved yet'); await page.selectOption('#vm-st', 'open'); eq(await page.locator('.tl-item').count(), 130, 'all are open');
+    await page.selectOption('#vm-st', 'done'); eq(await page.locator('.tl-item').count(), 0, 'nothing is solved yet'); await page.selectOption('#vm-st', 'open'); eq(await page.locator('.tl-item').count(), 149, 'all are open');
     await page.click('#vm-random'); await page.waitForSelector('#vm-start'); ok(/^#\/linux\/[a-z0-9-]+$/.test(await page.evaluate(() => location.hash)), 'Pick one for me opens a lab');
     await go(page, '/linux?q=' + encodeURIComponent('linux/disks-and-filesystems')); await page.waitForSelector('.tl-item');
     ok(await page.locator('.tl-item').count() >= 5, 'a lesson link filters the list to that lesson\'s labs'); eq(await page.inputValue('#vm-q'), 'linux/disks-and-filesystems', 'the search box shows the filter');
-    await go(page, '/linux?q=&level=All'); eq(await page.locator('.tl-item').count(), 130, 'clearing the query shows all 130');
+    await go(page, '/linux?q=&level=All'); eq(await page.locator('.tl-item').count(), 149, 'clearing the query shows all 149');
     await setProgress(page, allDone()); await go(page, '/lesson/linux/disks-and-filesystems'); await page.waitForSelector('#diy'); ok(await page.locator('.diy-labs a[href^="#/linux?q="]').count() === 1, 'the lesson links to all its labs'); ok(await page.locator('.diy-labs a[href^="#/linux/"]').count() === 4, 'four labs are listed on the lesson page');
     await vmSolve(page, 'disk-full');
-    await go(page, '/linux'); ok((await page.textContent('#vm-progress')).startsWith('1 of 130'), 'the index counts the solved lab');
+    await go(page, '/linux'); ok((await page.textContent('#vm-progress')).startsWith('1 of 149'), 'the index counts the solved lab');
     await page.selectOption('#vm-st', 'done'); await page.click('.vm-tabs [data-lv="All"]'); eq(await page.locator('.tl-item').count(), 1, 'the solved filter shows it');
     await go(page, '/linux/sandbox'); await page.click('#vm-start');
     await page.waitForFunction(() => /machine is running/i.test(document.querySelector('#vm-status').textContent), null, { timeout: 180000 });
@@ -1682,12 +1684,12 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     eq(issues.filter((i) => !/favicon/.test(i)).length, 0, 'no console errors: ' + issues.join(' | '));
   });
 
-  await test('real Linux lab kinds: the Kind filter counts (12 diagnose, 10 several-faults, 11 network, 11 systemd-style); every diagnose lab refuses a wrong answer and accepts the right one in the page; the several-faults and why prompts are present', async () => {
+  await test('real Linux lab kinds: the Kind filter counts (16 diagnose, 10 several-faults, 11 network, 11 systemd-style, 10 packages, 9 TLS); every diagnose lab refuses a wrong answer and accepts the right one in the page; the several-faults and why prompts are present', async () => {
     const { ctx, page, issues } = await open(); await go(page, '/linux?level=All');
-    const kinds = await page.evaluate(() => { const v = window.ACADEMY.vmlabs; return { diagnose: v.filter((x) => x.kind === 'diagnose').length, multi: v.filter((x) => x.faults).length, network: v.filter((x) => x.tag === 'network').length, systemd: v.filter((x) => x.tag === 'systemd').length, why: v.filter((x) => x.why).length }; });
-    eq(kinds.diagnose, 12, 'diagnose labs'); eq(kinds.multi, 10, 'several-faults labs'); eq(kinds.network, 11, 'network labs'); eq(kinds.systemd, 11, 'systemd-style labs'); ok(kinds.why >= 20, 'at least 20 labs ask why: ' + kinds.why);
-    for (const [v, n] of [['diagnose', 12], ['multi', 10], ['network', 11], ['systemd', 11]]) { await page.selectOption('#vm-tp', v); eq(await page.locator('.tl-item').count(), n, v + ' filter shows ' + n); }
-    await page.selectOption('#vm-tp', 'fix'); eq(await page.locator('.tl-item').count(), 130 - 12, 'the fix filter hides diagnose labs');
+    const kinds = await page.evaluate(() => { const v = window.ACADEMY.vmlabs; return { diagnose: v.filter((x) => x.kind === 'diagnose').length, multi: v.filter((x) => x.faults).length, network: v.filter((x) => x.tag === 'network').length, systemd: v.filter((x) => x.tag === 'systemd').length, packages: v.filter((x) => x.tag === 'packages').length, tls: v.filter((x) => x.tag === 'tls').length, why: v.filter((x) => x.why).length }; });
+    eq(kinds.diagnose, 16, 'diagnose labs'); eq(kinds.packages, 10, 'package labs'); eq(kinds.tls, 9, 'TLS labs'); eq(kinds.multi, 10, 'several-faults labs'); eq(kinds.network, 11, 'network labs'); eq(kinds.systemd, 11, 'systemd-style labs'); ok(kinds.why >= 20, 'at least 20 labs ask why: ' + kinds.why);
+    for (const [v, n] of [['diagnose', 16], ['multi', 10], ['network', 11], ['systemd', 11], ['packages', 10], ['tls', 9]]) { await page.selectOption('#vm-tp', v); eq(await page.locator('.tl-item').count(), n, v + ' filter shows ' + n); }
+    await page.selectOption('#vm-tp', 'fix'); eq(await page.locator('.tl-item').count(), 149 - 16, 'the fix filter hides diagnose labs');
     const dg = await page.evaluate(() => window.ACADEMY.vmlabs.filter((x) => x.kind === 'diagnose').map((x) => x.id));
     for (const id of dg) {
       const a = vmAnswers[id];
@@ -1708,7 +1710,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await test('real Linux lab, ' + level + ' scenarios: each one boots a real kernel, fails its checks, accepts its typed fix and is remembered', async () => {
       const { ctx, page, issues } = await open(); await go(page, '/linux');
       const ids = await page.evaluate((lv) => window.ACADEMY.vmlabs.filter((x) => x.level === lv).map((x) => x.id), level);
-      eq(ids.length, { Beginner: 36, Intermediate: 42, Advanced: 52 }[level], level + ' count');
+      eq(ids.length, { Beginner: 42, Intermediate: 49, Advanced: 58 }[level], level + ' count');
       const only = process.env.VMONLY ? process.env.VMONLY.split(',') : null;
       const failed = [];
       for (const id of ids) { if (only && !only.includes(id)) continue; try { await vmSolve(page, id); } catch (err) { failed.push(id + ': ' + String(err.message || err).slice(0, 300)); } }
@@ -1815,6 +1817,33 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const c2 = await pg2.evaluate(() => getComputedStyle(document.body, '::before').content + getComputedStyle(document.body, '::after').content);
     ok(/MARGA by EknathaLabs/.test(c2) && /marga\.eknathalabs\.com/.test(c2), 'the downloaded handbook web page prints with the watermark'); fs.unlinkSync(fp);
     eq(issues.filter((i) => !/favicon|file:/.test(i)).length, 0, 'no console errors: ' + issues.join(' | ')); await ctx.close();
+  });
+
+  await test('print themes: Light, Dark and Large type on the print bar, remembered, each rendered as a real PDF that still carries the watermark', async () => {
+    const { ctx, page, issues } = await open(); const sh = require('child_process'), os = require('os');
+    await go(page, '/lesson/linux/filesystem-and-navigation'); await page.waitForSelector('[data-print-style]');
+    eq(await page.locator('[data-print-style] option').count(), 3, 'three print styles');
+    for (const v of ['light', 'dark', 'large']) {
+      await page.selectOption('[data-print-style]', v);
+      eq(await page.evaluate(() => document.documentElement.getAttribute('data-a-print') || 'light'), v, v + ': attribute set');
+      await page.emulateMedia({ media: 'print' });
+      const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+      if (v === 'dark') ok(/^rgb\((\d+), (\d+), (\d+)\)$/.test(bg) && bg.match(/\d+/g).every((x) => +x < 90), 'dark print has a dark page: ' + bg); else ok(/255, 255, 255|rgba\(0, 0, 0, 0\)/.test(bg), v + ' print has a light page: ' + bg);
+      const f = require('path').join(os.tmpdir(), 'marga-ps-' + process.pid + '.pdf'); await page.pdf({ path: f, format: 'A4', printBackground: true });
+      ok(/MARGA by EknathaLabs/.test(sh.execSync('pdftotext -layout "' + f + '" -').toString()), v + ': the PDF has the watermark'); fs.unlinkSync(f);
+      await page.emulateMedia({ media: 'screen' });
+    }
+    await go(page, '/handbook/linux'); await page.waitForSelector('[data-print-style]'); eq(await page.inputValue('[data-print-style]'), 'large', 'the choice is remembered on another page');
+    eq(issues.filter((i) => !/favicon/.test(i)).length, 0, 'no console errors: ' + issues.join(' | ')); await ctx.close();
+  });
+
+  await test('home page: the Real Linux labs band shows the scenario count and links to the labs, the Kind filters and the empty machine', async () => {
+    const { ctx, page, issues } = await open(); await go(page, '/'); await page.waitForSelector('.vmx');
+    const t = await page.textContent('.vmx'); ok(/149 production-style scenarios/.test(t), 'count in the band: ' + t.slice(0, 160));
+    ok(await page.locator('.vmx a[href="#/linux"]').count() >= 1 && await page.locator('.vmx a[href="#/linux/sandbox"]').count() === 1, 'buttons');
+    for (const k of ['packages', 'tls']) ok(await page.locator('.vmx-kinds a[href*="topic=' + k + '"]').count() === 1, 'chip ' + k);
+    await page.click('.vmx-kinds a[href*="topic=tls"]'); await page.waitForSelector('.tl-item'); eq(await page.locator('.tl-item').count(), 9, 'the TLS chip opens the nine TLS labs');
+    eq(issues.filter((i) => !/favicon/.test(i)).length, 0, 'no console errors: ' + issues.join(' | ')); await ctx.close();
   });
 
   await test('embed and workshop: bare embed pages, the embed builder, a workshop built, shared and read back from progress codes; phone width', async () => {
@@ -2258,12 +2287,12 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await ctx.close();
   });
 
-  await test('skill trees panel: hover and keyboard open all five paths, links work, Escape closes, Certifications sits beside Practice, no author line', async () => {
-    const { ctx, page } = await open();
+  await test('skill trees panel: hover and keyboard open all five paths, links work, Escape closes, Real Linux labs sits beside Practice, no author line', async () => {
+    const { ctx, page } = await open({ viewport: { width: 1700, height: 900 } });
     await go(page, '/');
     eq(await page.locator('#pmega').isHidden(), true, 'closed at rest');
     const names = await page.locator('#topnav > a').allInnerTexts();
-    eq(names.indexOf('Certifications'), names.indexOf('Practice') + 1, 'certifications right after Practice');
+    eq(names.indexOf('Real Linux labs'), names.indexOf('Practice') + 1, 'Real Linux labs right after Practice');
     await page.hover('#topnav a[data-nav="paths"]');
     await page.waitForSelector('#pmega:not([hidden]) .pm-col');
     eq(await page.locator('#pmega .pm-col').count(), 6, 'six path columns');
@@ -2584,7 +2613,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const { ctx, page, issues } = await open(); await go(page, '/practice'); await page.waitForSelector('.pr-cmd');
     eq(await page.locator('.pr-feat .prac a').count(), 3, 'three featured tools');
     for (const h of ['#/explainers', '#/architecture', '#/drills']) eq(await page.locator(`.prac a[href="${h}"]`).count(), 1, h + ' appears once');
-    eq(await page.locator('.pr-li').count(), 41, '41 tools');
+    eq(await page.locator('.pr-li').count(), 42, '42 tools');
     eq(await page.locator('.pr-node').count(), 5, 'five groups');
     eq(await page.locator('.pr-week li').count(), 7, 'week strip');
     const t1 = await page.textContent('.pr-cmd h2');
@@ -2599,7 +2628,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await page.fill('#pr-q', 'terraform');
     ok((await page.locator('.pr-li:not([hidden])').count()) >= 1 && (await page.locator('.pr-li:not([hidden])').count()) < 6, 'search narrows');
     await page.fill('#pr-q', 'zzzqqq'); eq(await page.locator('#pr-empty').isVisible(), true, 'empty state');
-    await page.click('#pr-empty [data-act="pr-clear"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 41, 'clear shows all');
+    await page.click('#pr-empty [data-act="pr-clear"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 42, 'clear shows all');
     await page.click('[data-flag="starred"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 0, 'no favourites yet');
     await page.click('[data-flag="all"]');
     await page.click('.pr-li[data-id="yaml"] .pr-star'); eq(await page.getAttribute('.pr-li[data-id="yaml"] .pr-star', 'aria-pressed'), 'true', 'starred');
@@ -2914,9 +2943,9 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
 
 
   await test('about page: nav link beside InterviewHub, full text, LinkedIn link', async () => {
-    const { ctx, page } = await open(); await go(page, '/');
+    const { ctx, page } = await open({ viewport: { width: 1700, height: 900 } }); await go(page, '/');
     const links = await page.locator('#topnav a').allTextContents();
-    eq(links[links.indexOf('InterviewHub') + 1], 'About', 'About sits right after InterviewHub: ' + links.join(','));
+    eq(links[links.indexOf('Interview questions') + 1], 'About', 'About sits right after Interview questions: ' + links.join(','));
     await page.click('#topnav a[data-nav=about]'); await page.waitForSelector('.about');
     const txt = await page.textContent('.about');
     ok(/Pure Global Public Good/.test(txt) && /Free · No login · No ads · No cookies/.test(txt) && /localStorage/.test(txt) && /14 years/.test(txt), 'text');
@@ -3410,34 +3439,34 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
   };
   const openLab = async (page, id) => { await go(page, '/terminal-lab/' + id); await page.waitForFunction(() => /Simulated terminal/.test(document.querySelector('#tl-out').textContent), null, { timeout: 30000 }); };
 
-  await test('terminal labs: index shows 98 labs in six stages with the honest warning; hub, footer and stage pages link to it', async () => {
+  await test('terminal labs: index shows 121 labs in seven stages with the honest warning; hub, footer and stage pages link to it', async () => {
     const { ctx, page, issues } = await open();
     await go(page, '/terminal-labs');
     const data = await A(page);
-    eq(data.termlabs.length, 98, 'labs in data');
-    eq(await page.locator('.tl-item').count(), 98, 'labs listed');
+    eq(data.termlabs.length, 121, 'labs in data');
+    eq(await page.locator('.tl-item').count(), 121, 'labs listed');
     const t = await page.textContent('#main');
     ok(/This is a simulation/.test(t) && /not a real kernel/.test(t), 'simulation warning');
     ok(/What is not here/.test(t) && /real Linux machine/.test(t), 'says what is not included');
     await page.click('.tl-filter a[href="#/terminal-labs/networking"]');
     await page.waitForFunction(() => document.querySelectorAll('.tl-item').length === 18);
     await nav(page, '/practice');
-    eq(await page.locator('.prac li').count(), 41, 'hub cards');
+    eq(await page.locator('.prac li').count(), 42, 'hub cards');
     ok(await page.locator('.prac a[href="#/terminal-labs"]').count() === 1, 'hub link');
     ok(await page.locator('footer a[href="#/terminal-labs"]').count() === 1, 'footer link');
-    for (const m of ['linux', 'bash', 'networking', 'python', 'kubernetes', 'docker']) { await nav(page, '/module/' + m); ok(await page.locator(`a[href="#/terminal-labs/${m}"]`).count() >= 1, 'stage page links to labs: ' + m); }
+    for (const m of ['linux', 'bash', 'networking', 'python', 'kubernetes', 'docker', 'cloud']) { await nav(page, '/module/' + m); ok(await page.locator(`a[href="#/terminal-labs/${m}"]`).count() >= 1, 'stage page links to labs: ' + m); }
     await nav(page, '/module/terraform'); eq(await page.locator('a[href^="#/terminal-labs/"]').count(), 0, 'no labs link on a stage without labs');
     await nav(page, '/terminal-lab/nope'); ok(/does not exist/.test(await page.textContent('#main')), 'unknown lab');
     eq(issues.filter((x) => !/goatcounter/.test(x)).length, 0, issues.join(' | '));
     await ctx.close();
   });
 
-  await test('terminal labs: every Linux, Shell and Networking lab is solved by typing its solution into the terminal, and a wrong state is not accepted', async () => {
+  await test('terminal labs: every Linux, Shell, Networking, Docker, Kubernetes and Cloud lab is solved by typing its solution into the terminal, and a wrong state is not accepted', async () => {
     const { ctx, page, issues } = await open();
     await go(page, '/');
     const data = await A(page);
     const labs = data.termlabs.filter((l) => l.module !== 'python');
-    eq(labs.length, 80, 'non-python labs');
+    eq(labs.length, 103, 'non-python labs');
     for (const lab of labs) {
       await openLab(page, lab.id);
       await page.click('[data-act=tl-check]'); await page.waitForSelector('#tl-res .drill-res');
@@ -3450,7 +3479,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       ok(/What this lab showed/.test(await page.textContent('#tl-res')), lab.id + ': explanation');
     }
     const p = await progress(page);
-    eq(Object.keys(p.tl).length, 80, "all non-python done");
+    eq(Object.keys(p.tl).length, 103, "all non-python done");
     eq(issues.filter((x) => !/goatcounter/.test(x)).length, 0, issues.join(' | '));
     await ctx.close();
   });
@@ -3485,6 +3514,23 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     await typeLine(page, 'echo still works');
     ok(/still works/.test(await page.textContent('#tl-out')), 'shell still works');
     await ctx.close();
+  });
+
+  await test('cloud labs: the simulated aws and az refuse and answer like the real tools, and the cloud stage is listed with 23 labs', async () => {
+    const { ctx, page, issues } = await open(); await go(page, '/terminal-labs/cloud'); await page.waitForSelector('.tl-item');
+    eq(await page.locator('.tl-item').count(), 23, 'twenty-three cloud labs');
+    await openLab(page, 'cl-aws-wrong-profile');
+    await typeLine(page, 'aws s3 cp report.csv s3://shop-reports/');
+    ok(/AccessDenied/.test(await page.textContent('#tl-out')), 'the reader profile is refused');
+    await typeLine(page, 'aws sts get-caller-identity --query Arn --output text');
+    ok(/user\/report-reader/.test(await page.textContent('#tl-out')), 'the identity is shown');
+    await typeLine(page, 'export AWS_PROFILE=deployer'); await typeLine(page, 'aws s3 cp report.csv s3://shop-reports/');
+    ok(/upload: report\.csv to s3:\/\/shop-reports\/report\.csv/.test(await page.textContent('#tl-out')), 'the deployer profile uploads');
+    await typeLine(page, 'aws ec2 describe-instances');
+    ok(/not part of this simulator|Unauthorized|Reservations|not authorized/.test(await page.textContent('#tl-out')), 'unknown or unpermitted calls answer sensibly');
+    await openLab(page, 'cl-az-vm-deallocated'); await typeLine(page, 'az vm start -g rg-app'); ok(/required: --name/.test(await page.textContent('#tl-out')), 'a missing option is named');
+    ok(/Simulated|simulat/i.test(await page.textContent('#main')), 'the page says it is a simulation');
+    eq(issues.filter((i) => !/favicon|goatcounter/.test(i)).length, 0, 'no console errors: ' + issues.join(' | ')); await ctx.close();
   });
 
   await test('terminal labs: Tab completion, history, Ctrl+C, here-documents, the editor, hints, solution and reset', async () => {
@@ -3531,7 +3577,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     const p = emptyProgress(); p.tl = { 'lx-cron': { d: '2026-01-05', h: 1, s: 0 } };
     await setProgress(page, p);
     await nav(page, '/terminal-labs');
-    ok(/1 of 98 labs done/.test(await page.textContent('.tl-count')), 'count: ' + await page.textContent('.tl-count'));
+    ok(/1 of 121 labs done/.test(await page.textContent('.tl-count')), 'count: ' + await page.textContent('.tl-count'));
     ok(/Done/.test(await page.textContent('.tl-item a[href="#/terminal-lab/lx-cron"] >> xpath=ancestor::li')), 'lab marked done');
     const exported = await page.evaluate(() => JSON.parse(localStorage.getItem('ea.progress.v1')));
     ok(exported.tl['lx-cron'], 'kept in storage');
@@ -3553,7 +3599,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       }
       await go(page, '/terminal-lab/lx-cron'); await page.waitForFunction(() => /Simulated terminal/.test(document.querySelector('#tl-out').textContent));
       const keys = (await page.locator('.tl-keys button').allInnerTexts()).join('|');
-      eq(keys, 'Tab|Up|Down|Ctrl+C|Clear', 'key row text labels');
+      eq(keys, 'Tab|Up|Down|Ctrl+C|Clear|Explain this output', 'key row text labels');
       for (const b of await page.locator('.tl-keys button').all()) { const bb = await b.boundingBox(); ok(bb.height >= 40 && bb.width >= 40, 'touch target size'); }
       await page.fill('#tl-in', 'cr'); await page.click('.tl-keys [data-key=Tab]'); ok((await page.inputValue('#tl-in')).startsWith('cron'), 'on-screen Tab completes');
       await page.fill('#tl-in', 'abc'); await page.click('.tl-keys [data-key="Ctrl+C"]'); eq(await page.inputValue('#tl-in'), '', 'on-screen Ctrl+C');
@@ -3702,7 +3748,7 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
     for (const sl of ['kernel-modules-sysctl-and-boot-parameters', 'processes-memory-and-the-oom-killer', 'system-calls-strace-and-perf']) ok(lx.lessons.some((l) => l.endsWith(sl)), 'kernel lesson ' + sl);
     const { ctx, page } = await open();
     await go(page, '/');
-    const a = page.locator('#topnav a.nav-certs');
+    const a = page.locator('#topnav a.nav-certs:not(.nav-ih)');
     eq(await a.getAttribute('href'), 'https://certs.eknathalabs.com', 'certs href'); eq(await a.getAttribute('target'), '_blank', 'opens in new tab'); ok(/noopener/.test(await a.getAttribute('rel')), 'noopener');
     ok(/Certifications/.test(await a.textContent()), 'accessible name');
     await ctx.close();
@@ -3783,6 +3829,128 @@ function ok(c, msg) { if (!c) throw new Error(msg || 'assertion failed'); }
       await m.ctx.close();
     }
   });
+
+  await test('round 32: Elsewhere menu, Continue strip, goal links, find-my-path quiz, goal pages', async () => {
+    const { ctx, page, issues } = await open();
+    await go(page, '/');
+    ok(await page.locator('#nav-more-menu').isHidden(), 'Elsewhere menu closed at rest');
+    await page.click('.nav-more-btn'); ok(await page.locator('#nav-more-menu').isVisible(), 'Elsewhere opens');
+    eq(await page.getAttribute('.nav-more-btn', 'aria-expanded'), 'true', 'aria-expanded true');
+    eq(await page.locator('#nav-more-menu a').count(), 4, 'four links in Elsewhere');
+    await page.keyboard.press('Escape'); ok(await page.locator('#nav-more-menu').isHidden(), 'Escape closes it');
+    eq(await page.locator('.goal-list a, .gs-list a').count() >= 5, true, 'home links to five goals');
+    await go(page, '/find-my-path');
+    const picks = [0, 0, 0, 1, 0];
+    for (const n of picks) { await page.locator('.gq-opt').nth(n).click(); }
+    ok(/Your goal:/.test(await page.textContent('.gq-res h2')), 'result shown');
+    ok(await page.locator('.gq-res a[href^="#/plan/"]').count() === 1 && await page.locator('.gq-res a[href^="#/path/"]').count() === 1, 'result links a plan and a path');
+    await page.click('[data-gq=again]'); ok(await page.locator('.gq-opt').count() > 0, 'retake restarts the quiz');
+    for (const g of ['sre', 'linux', 'kubernetes', 'devops', 'cloud']) {
+      await go(page, '/goal/' + g);
+      ok(await page.locator('.gp-steps li').count() === 5, g + ': five first steps');
+      for (const a of await page.locator('#main a[href^="#/"]').evaluateAll((els) => els.map((x) => x.getAttribute('href')))) {
+        if (!/^#\/(plan|path|module|roadmap|terminal-labs|linux|goal|find-my-path|cheatsheets|interview)(\/|\?|$)/.test(a) && a !== '#/') ok(false, g + ': unexpected link ' + a);
+      }
+    }
+    await go(page, '/goal/nope'); await page.waitForSelector('.gq-opt');
+    ok(issues.length === 0, 'page errors ' + issues.join('|'));
+    await ctx.close();
+  });
+
+  await test('round 32: explain this output, replay, break it again in a terminal lab', async () => {
+    const { ctx, page, issues } = await open();
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await go(page, '/terminal-lab/cl-aws-wrong-profile'); await page.waitForSelector('#tl-in'); await page.waitForTimeout(600);
+    await page.click('[data-act=tl-explain]'); ok(/Run a command first/.test(await page.textContent('#tl-explain')), 'asks for a command first');
+    await page.fill('#tl-in', 'aws s3 cp /nonexistent s3://shop-reports/'); await page.press('#tl-in', 'Enter'); await page.waitForTimeout(500);
+    await page.click('[data-act=tl-explain]'); ok(/not an AI/.test(await page.textContent('#tl-explain')), 'explain box filled');
+    await page.fill('#tl-in', 'ls /nonexistent'); await page.press('#tl-in', 'Enter'); await page.waitForTimeout(400);
+    await page.click('[data-act=tl-explain]'); ok(/No such file or directory/.test(await page.textContent('#tl-explain')), 'ls error explained');
+    await page.click('#tl-sol'); await page.click('#tl-check'); await page.waitForSelector('#tl-res .drill-res');
+    ok(await page.locator('#tl-res .drill-res.no').count() === 1, 'not solved yet');
+    await page.evaluate(() => { const b = document.createElement('button'); b.id = 'tl-replay'; b.setAttribute('data-act', 'tl-replay'); document.body.appendChild(b); });
+    await page.click('#tl-replay'); await page.waitForTimeout(4500);
+    await page.click('#tl-check'); await page.waitForSelector('#tl-res .drill-res.ok');
+    ok(await page.locator('[data-act=tl-break]').count() === 1 && await page.locator('#tl-res [data-act=tl-replay]').count() === 1, 'break it again and replay offered after solving');
+    await page.click('[data-act=tl-break]'); await page.waitForTimeout(300);
+    ok(/fault is back/.test(await page.textContent('#tl-out')), 'fault restored');
+    ok(await page.isDisabled('#tl-hint') && await page.isDisabled('#tl-sol'), 'hints and solution off in break mode');
+    await page.click('#tl-check'); await page.waitForSelector('#tl-res .drill-res');
+    ok(await page.locator('#tl-res .drill-res.no').count() === 1, 'broken again, checks fail');
+    ok(issues.length === 0, 'page errors ' + issues.join('|'));
+    await ctx.close();
+  });
+
+  await test('round 32: Real Linux lab split view, failure panel, and page-head alignment', async () => {
+    const { ctx, page } = await open({ viewport: { width: 1280, height: 900 } });
+    await go(page, '/linux/disk-full');
+    const l = await page.locator('.vm-left').boundingBox(), r = await page.locator('.vm-right').boundingBox();
+    ok(r.x > l.x + l.width - 2 && Math.abs(r.y - l.y) < 60, 'goals on the left, machine on the right');
+    const h1 = await page.locator('.page-head h1').boundingBox(), body = await page.locator('.vm-left').boundingBox();
+    ok(Math.abs(h1.x - body.x) < 3, 'heading lines up with the body: ' + h1.x + ' vs ' + body.x);
+    await ctx.close();
+    const m = await open({ viewport: { width: 390, height: 844 } });
+    await go(m.page, '/linux/disk-full');
+    const lb = await m.page.locator('.vm-left').boundingBox(), rb = await m.page.locator('.vm-right').boundingBox();
+    ok(rb.y >= lb.y + lb.height - 2, 'stacked on a phone');
+    await m.ctx.close();
+    const f = await open(); await f.page.route('**/libv86.js*', (rt) => rt.abort());
+    await go(f.page, '/linux/disk-full'); await f.page.click('#vm-start'); await f.page.waitForSelector('#vm-fail:not([hidden])');
+    ok(/Use the simulated terminal/.test(await f.page.textContent('#vm-fail')) && await f.page.locator('#vm-retry').count() === 1, 'failure panel with fallback');
+    await f.ctx.close();
+  });
+
+  await test('round 32: 23 cloud labs, goals on the home page, no stale page script after leaving Interview', async () => {
+    const { ctx, page, issues } = await open();
+    await go(page, '/interview'); await page.goto(BASE + '/#/plans'); await page.waitForSelector('#main h1'); await page.waitForTimeout(700);
+    ok(issues.length === 0, 'no page errors after quick navigation: ' + issues.join('|'));
+    const data = await page.evaluate(() => MargaApp.D.termlabs.filter((l) => l.module === 'cloud').length);
+    eq(data, 23, 'cloud labs in data');
+    await ctx.close();
+  });
+
+
+  await test('round 32: real Linux lab, replay of the typed fix and break it again', async () => {
+    const { ctx, page, issues } = await open(); await go(page, '/linux');
+    await vmSolve(page, 'disk-full');
+    ok(await page.locator('#vm-replay').count() === 1 && await page.locator('#vm-again').count() === 1, 'replay and break-again offered after solving');
+    await page.click('#vm-replay');
+    await page.waitForFunction(() => /Done\. Press Check my work/.test(document.querySelector('#vm-status').textContent), null, { timeout: 90000 });
+    const shown = await page.locator('.xterm-rows').first().innerText();
+    ok(/rm \/var\/log\/app|app\.log/.test(shown), 'the fix was typed into the terminal');
+    await page.click('#vm-again');
+    await page.waitForFunction(() => /machine is running/i.test(document.querySelector('#vm-status').textContent), null, { timeout: 180000 });
+    await page.click('#vm-check'); await page.waitForSelector('.vm-checks li', { timeout: 90000 });
+    ok(await page.locator('.vm-checks li.fail').count() >= 1, 'the fault is back after Break it again');
+    ok(issues.length === 0, 'page errors ' + issues.join('|'));
+    await ctx.close();
+  });
+
+
+  await test('round 32: lab cards, 100-day grid, winding skill map, progress share card, one-row phone header', async () => {
+    const { ctx, page, issues } = await open({ viewport: { width: 1280, height: 900 } });
+    await go(page, '/linux?level=All');
+    ok(await page.locator('.vm-card').count() === 149 && await page.locator('.vm-card .vc-go a').count() === 149, 'lab cards with a Start button each');
+    await go(page, '/plan/sre-100');
+    eq(await page.locator('.pg-d').count(), 100, '100 grid cells');
+    ok(await page.locator('.pg-d.pg-today').count() === 1 && await page.locator('.pg-d.pg-review').count() >= 10, 'today and review days marked');
+    await page.click('.pg-d >> nth=9'); ok(await page.evaluate(() => document.querySelector('#day-10').open), 'a grid cell opens its day');
+    await go(page, '/roadmap/devops');
+    ok(await page.locator('.sn-n').count() === 17 && await page.locator('.sn-n.here').count() === 1, 'winding map with a you-are-here step');
+    await page.click('.sn-n a >> nth=0'); await page.waitForSelector('#main h1');
+    await go(page, '/progress');
+    await page.fill('#sc-name', 'Test Name');
+    const png = await page.evaluate(() => document.querySelector('#sc-cv').toDataURL('image/png').length);
+    ok(png > 5000, 'share card draws a picture');
+    const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#sc-dl')]);
+    eq(dl.suggestedFilename(), 'marga-progress.png', 'card downloads as a PNG');
+    ok(issues.length === 0, 'page errors ' + issues.join('|'));
+    await ctx.close();
+    const m = await open({ viewport: { width: 360, height: 700 } }); await go(m.page, '/');
+    ok((await m.page.locator('.topbar').boundingBox()).height < 70, 'header is one row on a phone');
+    await m.ctx.close();
+  });
+
 
   await browser.close();
   srv.close();

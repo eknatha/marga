@@ -70,5 +70,29 @@
   "probe_re": "blackhole 10\\.6\\.0\\.0/24",
   "good": "10.6.0.0/24",
   "bad": "10.7.0.0/24"
+ },
+ "tls-expiring-first": {
+  "probe": "for f in /etc/tls/sites/*.pem; do echo $f $(openssl x509 -noout -enddate -in $f); done",
+  "probe_re": "site-beta\\.pem notAfter=Dec 15",
+  "good": "beta",
+  "bad": "alpha"
+ },
+ "tls-who-issued": {
+  "probe": "openssl s_client -connect 127.0.0.1:8443 </dev/null 2>/dev/null | openssl x509 -noout -issuer",
+  "probe_re": "Issuing CA",
+  "good": "MARGA Lab Issuing CA",
+  "bad": "MARGA Lab Root CA"
+ },
+ "pkg-owner-of-file": {
+  "probe": "dpkg -S /usr/bin/ledgerctl",
+  "probe_re": "ledger-tools: /usr/bin/ledgerctl",
+  "good": "ledger-tools",
+  "bad": "ledgerctl-completion"
+ },
+ "pkg-which-version": {
+  "probe": "apt policy mailq-lite",
+  "probe_re": "Candidate: 3\\.2\\.1",
+  "good": "3.2.1",
+  "bad": "3.1.0"
  }
 }

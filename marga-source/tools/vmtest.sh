@@ -20,7 +20,7 @@ for(const x of sc){ if(x.kind!=='diagnose')continue; const a=an[x.id]; if(!a){co
 sol() { cat "$FX/$1"; }
 for s in $(ls "$R/scen"); do
   [ -n "$1" ] && case " $* " in *" $s "*) ;; *) continue;; esac
-  run() { unshare --net --pid --fork --mount --mount-proc="$R/proc" chroot $R /bin/busybox sh -c "export PATH=/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin; mount -t sysfs sys /sys 2>/dev/null; ifconfig lo 127.0.0.1 up; ifconfig lo:2 127.0.0.2 up; mkdir -p /root /tmp /run /var/log /backup; [ -s /etc/passwd ] || printf 'root:x:0:0:root:/root:/bin/sh\n' > /etc/passwd; [ -s /etc/group ] || printf 'root:x:0:\n' > /etc/group; [ -s /etc/hosts ] || echo '127.0.0.1 localhost' > /etc/hosts; $1" 2>&1; }
+  run() { unshare --net --pid --fork --mount --mount-proc="$R/proc" chroot $R /bin/busybox sh -c "export PATH=/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin; mount -t sysfs sys /sys 2>/dev/null; ifconfig lo 127.0.0.1 up; ifconfig lo:2 127.0.0.2 up; mkdir -p /root /tmp /run /var/log /backup; . /usr/lib/marga-pkg/fn.sh; [ -s /etc/passwd ] || printf 'root:x:0:0:root:/root:/bin/sh\n' > /etc/passwd; [ -s /etc/group ] || printf 'root:x:0:\n' > /etc/group; [ -s /etc/hosts ] || echo '127.0.0.1 localhost' > /etc/hosts; $1" 2>&1; }
   echo "== $s"
   if [ -f "$FX/$s.probe" ]; then
     run ". /scen/$s/setup.sh; echo ---probe; $(cat $FX/$s.probe)" > "$R/out.$s" 2>&1

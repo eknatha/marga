@@ -18,9 +18,9 @@ const SRC = path.join(ROOT, 'src');
 const DIST = path.join(ROOT, 'dist');
 const DOMAIN = 'marga.eknathalabs.com';
 // GoatCounter site code for the visitor count (https://CODE.goatcounter.com). Empty string disables it.
-const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js', 'choose.js', 'skilllab.js', 'casefile.js', 'sdlab.js', 'widgets.js', 'diagrams.js', 'plans.js', 'replay.js', 'portfolio.js', 'guided.js', 'handbook.js', 'share.js', 'vmlinux.js', 'challenge-core.js', 'challenge.js', 'workshop.js', 'interviewlab.js', 'roadmap.js', 'searchpage.js'];
+const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js', 'choose.js', 'skilllab.js', 'casefile.js', 'sdlab.js', 'widgets.js', 'diagrams.js', 'plans.js', 'replay.js', 'portfolio.js', 'guided.js', 'handbook.js', 'share.js', 'vmlinux.js', 'challenge-core.js', 'challenge.js', 'workshop.js', 'interviewlab.js', 'roadmap.js', 'searchpage.js', 'guide.js', 'explain-out.js', 'designs.js'];
 // terminal lab engine: loaded only when a terminal lab is opened, but cached for offline use
-const ENGINE = ['term-fs.js', 'term-parse.js', 'term-exec.js', 'term-cmds.js', 'term-text.js', 'term-awk.js', 'term-jq.js', 'term-sys.js', 'term-net.js', 'term-k8s.js', 'term-docker.js', 'term-labs.js'];
+const ENGINE = ['term-fs.js', 'term-parse.js', 'term-exec.js', 'term-cmds.js', 'term-text.js', 'term-awk.js', 'term-jq.js', 'term-sys.js', 'term-net.js', 'term-k8s.js', 'term-docker.js', 'term-cloud.js', 'term-labs.js'];
 const COUNTER = process.env.MARGA_COUNTER !== undefined ? process.env.MARGA_COUNTER : 'marga-eknathalabs';
 const SITE = 'https://' + DOMAIN;
 
@@ -475,6 +475,7 @@ function loadContent() {
   const labs = require('./labs').load(path.join(SRC, 'labs'));
   // Real Linux labs (src/vm/scenarios.json) and lesson challenges (src/challenges/*.json)
   const vmlabs = JSON.parse(fs.readFileSync(path.join(SRC, 'vm', 'scenarios.json'), 'utf8'));
+  { const fx = JSON.parse(fs.readFileSync(path.join(__dirname, 'vmfixes.json'), 'utf8')); for (const l of vmlabs) if (fx[l.id]) l.fix = fx[l.id]; }
   const challenges = [];
   const chDir = path.join(SRC, 'challenges');
   if (fs.existsSync(chDir)) for (const f of fs.readdirSync(chDir).filter((x) => x.endsWith('.json')).sort()) { let j; try { j = JSON.parse(fs.readFileSync(path.join(chDir, f), 'utf8')); } catch (x) { throw new Error(`challenges/${f}: invalid JSON (${x.message})`); } for (const c of j) challenges.push(c); }

@@ -16,6 +16,14 @@ cp src/vm/shims/systemctl src/vm/shims/journalctl "$T/usr/bin/"; chmod 755 "$T/u
 cp src/vm/shims/sdlib.sh src/vm/shims/sdrun "$T/usr/lib/marga-sd/"; cp src/vm/shims/sdboot "$T/usr/lib/marga-sd/boot"; chmod 755 "$T/usr/lib/marga-sd/sdrun" "$T/usr/lib/marga-sd/boot"
 cp src/vm/shims/netlib.sh "$T/usr/lib/marga-net/"
 cp src/vm/shims/inns "$T/usr/bin/"; chmod 755 "$T/usr/bin/inns"
+# package-manager and TLS labs: the apt/dpkg imitation, a real openssl (static, 32-bit), certificates for the labs
+mkdir -p "$T/usr/lib/marga-pkg" "$T/usr/share/marga-tls"
+cp src/vm/shims/pkglib.sh src/vm/shims/repolib.sh src/vm/shims/tlslib.sh src/vm/shims/fn.sh "$T/usr/lib/marga-pkg/"
+cp src/vm/shims/apt src/vm/shims/dpkg src/vm/shims/apt-mark src/vm/shims/shop-tls src/vm/shims/update-ca-certificates "$T/usr/local/bin/"
+ln -s apt "$T/usr/local/bin/apt-get"; ln -s apt "$T/usr/local/bin/apt-cache"
+chmod 755 "$T"/usr/local/bin/apt "$T"/usr/local/bin/dpkg "$T"/usr/local/bin/apt-mark "$T"/usr/local/bin/shop-tls "$T"/usr/local/bin/update-ca-certificates
+cp src/vm/openssl "$T/usr/bin/openssl"; chmod 755 "$T/usr/bin/openssl"
+cp src/vm/fixtures/tls/*.pem src/vm/fixtures/tls/*.key src/vm/fixtures/tls/shop.csr "$T/usr/share/marga-tls/"
 ( cd "$T" && find . | cpio -o -H newc --quiet | gzip -9 ) > src/vm/initrd.gz
 rm -rf "$T"
 ls -l src/vm/initrd.gz

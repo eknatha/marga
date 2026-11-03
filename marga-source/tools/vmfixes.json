@@ -464,5 +464,81 @@
   "sed -i \"s/\\r$//\" /etc/ghost.conf",
   "chown ghost /var/lib/ghost",
   "start-ghost"
+ ],
+ "tls-key-permissions": [
+  "chmod 600 /etc/tls/shop.key",
+  "shop-tls start"
+ ],
+ "tls-untrusted-ca": [
+  "cp /root/lab-root-ca.pem /usr/local/share/ca-certificates/lab-root-ca.crt",
+  "update-ca-certificates"
+ ],
+ "tls-expired-cert": [
+  "openssl x509 -req -in /etc/tls/shop.csr -CA /etc/tls/inter.pem -CAkey /etc/tls/inter.key -CAcreateserial -days 90 -copy_extensions copy -out /etc/tls/shop.pem",
+  "shop-tls restart"
+ ],
+ "tls-hostname-mismatch": [
+  "printf \"subjectAltName=DNS:shop.lab,DNS:www.shop.lab\\n\" > /tmp/san.cnf",
+  "openssl x509 -req -in /etc/tls/shop.csr -CA /etc/tls/inter.pem -CAkey /etc/tls/inter.key -CAcreateserial -days 90 -extfile /tmp/san.cnf -out /etc/tls/shop.pem",
+  "shop-tls restart"
+ ],
+ "tls-missing-intermediate": [
+  "cp /etc/tls/inter.pem /etc/tls/chain.pem",
+  "shop-tls restart"
+ ],
+ "tls-key-mismatch": [
+  "sed -i \"s#shop-old.key#shop.key#\" /etc/shop-tls.conf",
+  "shop-tls start"
+ ],
+ "tls-protocol-mismatch": [
+  "sed -i \"s/^PROTOCOLS=.*/PROTOCOLS=/\" /etc/shop-tls.conf",
+  "shop-tls restart"
+ ],
+ "tls-expiring-first": [
+  "for f in /etc/tls/sites/*.pem; do echo $f $(openssl x509 -noout -enddate -in $f); done"
+ ],
+ "tls-who-issued": [
+  "openssl s_client -connect 127.0.0.1:8443 </dev/null 2>/dev/null | openssl x509 -noout -issuer"
+ ],
+ "pkg-stale-index": [
+  "apt update",
+  "apt install -y nginx-lite"
+ ],
+ "pkg-wrong-repo-url": [
+  "sed -i \"s/8091/8090/\" /etc/apt/sources.list",
+  "apt update",
+  "apt install -y curl-lite"
+ ],
+ "pkg-held-blocks-upgrade": [
+  "apt-mark unhold libtls-lite",
+  "apt upgrade -y"
+ ],
+ "pkg-unmet-dependency": [
+  "sed -i \"s/^# *deb/deb/\" /etc/apt/sources.list.d/backports.list",
+  "apt update",
+  "apt install -y report-tool"
+ ],
+ "pkg-lock-held": [
+  "kill $(cat /var/lib/dpkg/lock-frontend)",
+  "apt install -y jq-lite"
+ ],
+ "pkg-hash-mismatch": [
+  "apt update",
+  "apt install -y payd-lite"
+ ],
+ "pkg-half-configured": [
+  "mkdir -p /var/spool/queue",
+  "dpkg --configure -a",
+  "apt install -y other-tool"
+ ],
+ "pkg-pin-version": [
+  "apt install -y appd-lite=2.0.3",
+  "apt-mark hold appd-lite"
+ ],
+ "pkg-owner-of-file": [
+  "dpkg -S /usr/bin/ledgerctl"
+ ],
+ "pkg-which-version": [
+  "apt policy mailq-lite"
  ]
 }
