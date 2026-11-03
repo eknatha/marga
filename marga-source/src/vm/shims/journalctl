@@ -1,0 +1,6 @@
+#!/bin/sh
+# MARGA teaching shim: a small imitation of journalctl. It is not systemd.
+. /usr/lib/marga-sd/sdlib.sh
+UN=""; NL=""; while [ $# -gt 0 ]; do case "$1" in -u|--unit) UN=${2%.service}; shift;; -n|--lines) NL=$2; shift;; -n[0-9]*) NL=${1#-n};; --no-pager|-x|-e|-xe|-r|-q) ;; -p|--priority|--since|-b|-S) shift;; esac; shift; done
+if [ -n "$UN" ]; then [ -f "$JD/$UN.log" ] && out=$(cat "$JD/$UN.log") || out="-- No entries --"; else out=$(cat "$JD"/*.log 2>/dev/null | sort); fi
+if [ -n "$NL" ]; then echo "$out" | tail -n "$NL"; else echo "$out"; fi

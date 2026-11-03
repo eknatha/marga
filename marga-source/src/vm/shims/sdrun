@@ -1,0 +1,60 @@
+#!/bin/sh
+# Supervisor for one unit (started by systemctl). Usage: sdrun NAME
+. /usr/lib/marga-sd/sdlib.sh
+N=$1; echo $$ > "$S/$N.sup"; tries=0; t0=$(date +%s)
+fail_unit() { setstate "$N" failed; echo "$1" > "$S/$N.result"; rm -f "$S/$N.main"; jlog "$N" systemd "$N.service: Failed with result '$1'."; jlog "$N" systemd "Failed to start $N.service."; exit 1; }
+while :; do
+  EX=$(cget "$N" ExecStart); USR=$(cget "$N" User); WD=$(cget "$N" WorkingDirectory); RS=$(cget "$N" Restart); RSEC=$(cget "$N" RestartSec)
+  TYPE=$(cget "$N" Type); EF=$(cgetall "$N" EnvironmentFile | tail -1); [ -n "$RS" ] || RS=no; [ -n "$RSEC" ] || RSEC=1
+  jlog "$N" systemd "Started $N.service."
+  [ -n "$EX" ] || fail_unit "exec-condition"
+  bin=${EX%% *}
+  case "$bin" in -*) bin=${bin#-}; EX=${EX#-};; esac
+  case "$bin" in /*) ;; *) jlog "$N" systemd "$N.service: Executable path is not absolute: $EX"; fail_unit "exit-code";; esac
+  if [ ! -x "$bin" ]; then jlog "$N" systemd "$N.service: Failed at step EXEC spawning $bin: No such file or directory"; jlog "$N" systemd "$N.service: Main process exited, code=exited, status=203/EXEC"; fail_unit "exit-code"; fi
+  if [ -n "$USR" ] && ! grep -q "^$USR:" /etc/passwd; then jlog "$N" systemd "$N.service: Failed at step USER spawning $bin: No such process"; jlog "$N" systemd "$N.service: Main process exited, code=exited, status=217/USER"; fail_unit "exit-code"; fi
+  if [ -n "$WD" ] && [ ! -d "$WD" ]; then jlog "$N" systemd "$N.service: Failed at step CHDIR spawning $bin: No such file or directory"; jlog "$N" systemd "$N.service: Main process exited, code=exited, status=200/CHDIR"; fail_unit "exit-code"; fi
+  EFP=${EF#-}
+  if [ -n "$EF" ] && [ "$EFP" = "$EF" ] && [ ! -f "$EFP" ]; then jlog "$N" systemd "$N.service: Failed to load environment files: No such file or directory"; jlog "$N" systemd "$N.service: Failed to run 'start' task: No such file or directory"; fail_unit "resources"; fi
+  okpre=1
+  for pre in $(cgetall "$N" ExecStartPre | tr ' ' '\001'); do
+    cmd=$(echo "$pre" | tr '\001' ' '); cmd=${cmd#-}
+    if ! sh -c "exec $cmd" >> "$JD/$N.log" 2>&1; then jlog "$N" systemd "$N.service: Control process exited, code=exited, status=1/FAILURE"; okpre=0; break; fi
+  done
+  [ "$okpre" = 1 ] || fail_unit "exit-code"
+  rm -f "$S/$N.fifo"; mkfifo "$S/$N.fifo"
+  ( while IFS= read -r l; do jlog "$N" "$(basename "$bin")[$(mainpid "$N")]" "$l"; done < "$S/$N.fifo" ) &
+  rd=$!
+  exec 7> "$S/$N.fifo"
+  (
+    cd "${WD:-/}" || exit 200
+    if [ -n "$EFP" ] && [ -f "$EFP" ]; then set -a; . "$EFP"; set +a; fi
+    for kv in $(cgetall "$N" Environment | tr -d '"' ); do export "$kv"; done
+    if [ -n "$USR" ] && [ "$USR" != root ]; then exec su -s /bin/sh "$USR" -c "exec $EX"; fi
+    exec $EX
+  ) >&7 2>&7 &
+  pid=$!; echo $pid > "$S/$N.main"; exec 7>&-
+  if [ "$TYPE" = oneshot ]; then :; else setstate "$N" active; fi
+  date +%s > "$S/$N.since"
+  wait $pid; rc=$?
+  wait $rd 2>/dev/null
+  if [ "$rc" -eq 0 ]; then jlog "$N" systemd "$N.service: Succeeded."; else jlog "$N" systemd "$N.service: Main process exited, code=exited, status=$rc/FAILURE"; fi
+  rm -f "$S/$N.main"
+  case "$RS" in
+    always) again=1;;
+    on-failure) [ "$rc" -ne 0 ] && again=1 || again=0;;
+    on-success) [ "$rc" -eq 0 ] && again=1 || again=0;;
+    *) again=0;;
+  esac
+  if [ "$again" = 1 ]; then
+    now=$(date +%s); tries=$((tries+1))
+    if [ $((now - t0)) -gt 10 ]; then tries=1; t0=$now; fi
+    if [ "$tries" -gt 5 ]; then jlog "$N" systemd "$N.service: Start request repeated too quickly."; fail_unit "start-limit-hit"; fi
+    setstate "$N" activating; jlog "$N" systemd "$N.service: Scheduled restart job, restart counter is at $tries."
+    sleep "$RSEC"; snap_now=1; continue
+  fi
+  if [ "$rc" -eq 0 ]; then
+    if [ "$TYPE" = oneshot ] && [ "$(cget "$N" RemainAfterExit)" = yes ]; then setstate "$N" active; else setstate "$N" inactive; fi
+  else setstate "$N" failed; echo "exit-code" > "$S/$N.result"; jlog "$N" systemd "$N.service: Failed with result 'exit-code'."; fi
+  exit 0
+done

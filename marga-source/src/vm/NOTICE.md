@@ -8,6 +8,7 @@ MARGA runs a real Linux kernel inside your browser tab. Nothing is sent to a ser
 | seabios.bin, vgabios.bin | BIOS images that ship with v86 (SeaBIOS and VGABIOS) | LGPL 3 and LGPL 2.1 |
 | bzImage | The Linux kernel 6.8.12 for 32-bit x86, built from the Ubuntu `linux-source-6.8.0` package with the configuration in `kernel.config` (a small "tinyconfig" plus serial console, TTY, tmpfs, procfs, sysfs, IPv4 and sockets) | GPL 2 |
 | busybox | BusyBox 1.36.1, the static 32-bit build from the Ubuntu package `busybox-static` | GPL 2 |
+| openssl (inside initrd.gz) | OpenSSL 3.0.13, built static for 32-bit x86 from the Ubuntu source tarball `openssl_3.0.13.orig.tar.gz` with most algorithms switched off (see `tools/` notes in the README); used by the TLS labs | Apache 2.0 |
 | initrd.gz | The root file system: BusyBox, `init`, and the lab scenarios in `scenarios/`. Rebuilt with `tools/mkvm.sh` | GPL 2 for BusyBox; the scenario scripts are part of MARGA |
 | xterm.js, xterm.css, addon-fit.js | The xterm.js terminal widget, version 6.0.0, from the npm packages `@xterm/xterm` and `@xterm/addon-fit` | MIT |
 
@@ -22,3 +23,5 @@ v86 emulates a 32-bit PC without PAE. The kernels shipped in Ubuntu for 32-bit P
 ## What this lab is and is not
 
 It is a real kernel and real BusyBox tools, so `ps`, `df`, `mount`, `kill`, `/proc` and the file system behave as on Linux. It is a small machine: there is no systemd, no package manager, no network to the internet, and about 96 MB of memory. Commands from other distributions may be missing. The checks inside each scenario read the actual state of the machine.
+
+The package and TLS labs also use small teaching shell scripts (`apt`, `dpkg`, `apt-mark`, `shop-tls`, `update-ca-certificates`) in `src/vm/shims/`. They imitate the real tools on a tiny local repository and are not the real apt or dpkg. The test certificates are made by `tools/mkcerts.sh` and are not valid for anything outside the labs.

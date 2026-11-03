@@ -1,0 +1,82 @@
+#!/bin/sh
+# MARGA teaching shim: a small imitation of systemctl. It is not systemd.
+. /usr/lib/marga-sd/sdlib.sh
+NOW=0; ARGS=""
+for a in "$@"; do case "$a" in --now) NOW=1;; --no-pager|--quiet|-q|-l|--full|--no-legend) ;; *) ARGS="$ARGS $a";; esac; done
+set -- $ARGS
+cmd=${1:-}; shift 2>/dev/null
+nm() { echo "${1%.service}"; }
+need() { [ -n "$1" ] || { echo "Too few arguments." >&2; exit 1; }; }
+missing() { echo "Unit $1.service could not be found." >&2; exit 4; }
+load() { f=$(unit_file "$1"); [ -n "$f" ] || missing "$1"; [ "$f" = MASKED ] && { echo "Failed to $cmd $1.service: Unit $1.service is masked." >&2; exit 1; }; [ -f "$S/$1.loaded" ] || snap "$1"; }
+stale_warn() { changed "$1" && echo "Warning: The unit file, source configuration file or drop-ins of $1.service changed on disk. Run 'systemctl daemon-reload' to reload units." >&2; return 0; }
+do_start() {
+  n=$1; load "$n"; stale_warn "$n"
+  if supervisor_alive "$n" && { running "$n" || [ "$(getstate "$n")" = activating ]; }; then return 0; fi
+  rm -f "$S/$n.result" "$S/$n.main"; setstate "$n" activating
+  setsid sh /usr/lib/marga-sd/sdrun "$n" >/dev/null 2>&1 &
+  i=0; while [ $i -lt 20 ]; do sleep 0.1; i=$((i+1)); st=$(getstate "$n"); [ "$st" = failed ] && break; done
+  sleep 0.5; st=$(getstate "$n"); p=$(mainpid "$n")
+  if [ "$st" = failed ]; then
+    echo "Job for $n.service failed because the control process exited with error code." >&2
+    echo "See \"systemctl status $n.service\" and \"journalctl -xeu $n.service\" for details." >&2; return 1
+  fi
+  return 0
+}
+do_stop() {
+  n=$1; load "$n"
+  sp=$(cat "$S/$n.sup" 2>/dev/null); p=$(mainpid "$n")
+  alive "$sp" && kill "$sp" 2>/dev/null
+  if alive "$p"; then jlog "$n" systemd "Stopping $n.service..."; kill -TERM "$p" 2>/dev/null; i=0; while alive "$p" && [ $i -lt 30 ]; do sleep 0.1; i=$((i+1)); done; alive "$p" && kill -KILL "$p" 2>/dev/null; jlog "$n" systemd "Stopped $n.service."; fi
+  rm -f "$S/$n.main" "$S/$n.sup"; setstate "$n" inactive; return 0
+}
+case "$cmd" in
+  start) need "$1"; for u in "$@"; do do_start "$(nm "$u")" || exit 1; done;;
+  stop) need "$1"; for u in "$@"; do do_stop "$(nm "$u")"; done;;
+  restart) need "$1"; for u in "$@"; do n=$(nm "$u"); load "$n"; do_stop "$n"; do_start "$n" || exit 1; done;;
+  try-restart) for u in "$@"; do n=$(nm "$u"); running "$n" && { do_stop "$n"; do_start "$n"; }; done;;
+  reload)
+    need "$1"; n=$(nm "$1"); load "$n"; r=$(cget "$n" ExecReload)
+    [ -n "$r" ] || { echo "Failed to reload $n.service: Job type reload is not applicable for unit $n.service." >&2; exit 1; }
+    running "$n" || { echo "Failed to reload $n.service: Unit $n.service is not active." >&2; exit 1; }
+    MAINPID=$(mainpid "$n"); export MAINPID; r=$(echo "$r" | sed "s/\$MAINPID/$MAINPID/g"); sh -c "exec $r" || exit 1;;
+  status)
+    need "$1"; n=$(nm "$1"); f=$(unit_file "$n")
+    if [ -z "$f" ]; then echo "Unit $n.service could not be found." >&2; exit 4; fi
+    if [ "$f" = MASKED ]; then echo "* $n.service"; echo "     Loaded: masked (Reason: Unit $n.service is masked.)"; echo "     Active: inactive (dead)"; exit 3; fi
+    [ -f "$S/$n.loaded" ] || snap "$n"
+    st=$(getstate "$n"); p=$(mainpid "$n"); en=disabled; [ -L "$U/multi-user.target.wants/$n.service" ] && en=enabled
+    desc=$(cget "$n" Description); [ -n "$desc" ] && echo "* $n.service - $desc" || echo "* $n.service"
+    echo "     Loaded: loaded ($f; $en)"
+    since=""; [ -f "$S/$n.since" ] && since="; $(( $(date +%s) - $(cat "$S/$n.since") ))s ago"
+    case "$st" in
+      active) if alive "$p"; then echo "     Active: active (running) since $(date -d @$(cat "$S/$n.since" 2>/dev/null || date +%s) '+%a %Y-%m-%d %H:%M:%S' 2>/dev/null)$since"; else echo "     Active: active (exited)"; fi;;
+      activating) echo "     Active: activating (auto-restart)";;
+      failed) echo "     Active: failed (Result: $(cat "$S/$n.result" 2>/dev/null || echo exit-code))";;
+      *) echo "     Active: inactive (dead)";;
+    esac
+    alive "$p" && echo "   Main PID: $p ($(basename "$(cget "$n" ExecStart | cut -d' ' -f1)"))"
+    changed "$n" && echo "Warning: The unit file, source configuration file or drop-ins of $n.service changed on disk. Run 'systemctl daemon-reload' to reload units."
+    echo; tail -n 5 "$JD/$n.log" 2>/dev/null
+    [ "$st" = active ] || exit 3;;
+  is-active) n=$(nm "${1:-}"); st=$(getstate "$n"); if [ "$st" = active ] && ! alive "$(mainpid "$n")" && [ "$(cget "$n" Type)" != oneshot ]; then st=inactive; fi; echo "$st"; [ "$st" = active ];;
+  is-failed) n=$(nm "${1:-}"); st=$(getstate "$n"); echo "$st"; [ "$st" = failed ];;
+  is-enabled) n=$(nm "${1:-}"); f=$(unit_file "$n"); if [ "$f" = MASKED ]; then echo masked; exit 1; fi; [ -n "$f" ] || { echo "Failed to get unit file state for $n.service: No such file or directory" >&2; exit 1; }
+    if [ -L "$U/multi-user.target.wants/$n.service" ]; then echo enabled; elif grep -q '^\[Install\]' "$f"; then echo disabled; exit 1; else echo static; exit 1; fi;;
+  enable) need "$1"; for u in "$@"; do n=$(nm "$u"); f=$(unit_file "$n"); [ -n "$f" ] || missing "$n"; [ "$f" = MASKED ] && { echo "Failed to enable unit: Unit file $U/$n.service is masked." >&2; exit 1; }
+      if ! grep -q '^WantedBy=' "$f"; then echo "The unit files have no installation config (WantedBy=, RequiredBy=, Also=, Alias= settings in the [Install] section, and DefaultInstance= for template units). This means they are not meant to be enabled using systemctl." >&2; exit 0; fi
+      [ -L "$U/multi-user.target.wants/$n.service" ] || { ln -s "$f" "$U/multi-user.target.wants/$n.service"; echo "Created symlink $U/multi-user.target.wants/$n.service -> $f."; }
+      [ "$NOW" = 1 ] && { load "$n"; do_start "$n" || exit 1; }; done;;
+  disable) need "$1"; for u in "$@"; do n=$(nm "$u"); if [ -L "$U/multi-user.target.wants/$n.service" ]; then rm -f "$U/multi-user.target.wants/$n.service"; echo "Removed $U/multi-user.target.wants/$n.service."; fi; [ "$NOW" = 1 ] && do_stop "$n"; done;;
+  mask) need "$1"; n=$(nm "$1"); rm -f "$U/multi-user.target.wants/$n.service"; ln -sf /dev/null "$U/$n.service"; echo "Created symlink $U/$n.service -> /dev/null.";;
+  unmask) need "$1"; n=$(nm "$1"); if [ -L "$U/$n.service" ] && [ "$(readlink "$U/$n.service")" = /dev/null ]; then rm -f "$U/$n.service"; echo "Removed $U/$n.service."; fi;;
+  daemon-reload) for f in "$S"/*.loaded; do [ -f "$f" ] || continue; n=$(basename "$f" .loaded); snap "$n"; done; exit 0;;
+  reset-failed) for f in "$S"/*.state; do [ -f "$f" ] || continue; n=$(basename "$f" .state); [ "$(cat "$f")" = failed ] && { echo inactive > "$f"; rm -f "$S/$n.result"; }; done;;
+  cat) need "$1"; n=$(nm "$1"); f=$(unit_file "$n"); [ -n "$f" ] && [ "$f" != MASKED ] || missing "$n"; echo "# $f"; cat "$f"; for d in "$U/$n.service.d"/*.conf; do [ -f "$d" ] && { echo; echo "# $d"; cat "$d"; }; done;;
+  show) n=$(nm "${1:-}"); st=$(getstate "$n"); echo "ActiveState=$st"; echo "MainPID=$(mainpid "$n" || echo 0)"; echo "Result=$(cat "$S/$n.result" 2>/dev/null || echo success)"; echo "UnitFileState=$([ -L "$U/multi-user.target.wants/$n.service" ] && echo enabled || echo disabled)";;
+  list-units|list-unit-files|"")
+    echo "UNIT                        LOAD   ACTIVE     SUB"
+    for f in $U/*.service $V/*.service; do [ -e "$f" ] || [ -L "$f" ] || continue; n=$(basename "$f" .service); st=$(getstate "$n"); sub=dead; [ "$st" = active ] && sub=running; [ "$st" = failed ] && sub=failed; printf '%-27s loaded %-10s %s\n' "$n.service" "$st" "$sub"; done | sort -u;;
+  --failed|list-failed) for f in "$S"/*.state; do [ -f "$f" ] || continue; [ "$(cat "$f")" = failed ] && echo "$(basename "$f" .state).service loaded failed failed"; done;;
+  *) echo "Unknown command verb $cmd." >&2; exit 1;;
+esac

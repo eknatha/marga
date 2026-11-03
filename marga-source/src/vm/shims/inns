@@ -1,0 +1,5 @@
+#!/bin/sh
+# inns NAME command...   run a command inside the network namespace NAME (see "ls /run/ns")
+n=$1; shift
+[ -f "/run/ns/$n.pid" ] || { echo "inns: no network namespace called $n (try: ls /run/ns)" >&2; exit 1; }
+exec nsenter -t "$(cat /run/ns/$n.pid)" -n "$@"

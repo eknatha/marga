@@ -1,0 +1,9 @@
+#!/bin/sh
+# MARGA teaching shim: rebuilds /etc/ssl/certs/ca-bundle.pem from the base roots plus every .crt in /usr/local/share/ca-certificates
+D=/usr/local/share/ca-certificates; B=/etc/ssl/certs/ca-bundle.pem; mkdir -p $D /etc/ssl/certs
+echo "Updating certificates in /etc/ssl/certs..."
+cat /usr/share/marga-tls/public-roots.pem > $B; n=0
+for f in $D/*.crt; do [ -f "$f" ] || continue; cat "$f" >> $B; n=$((n+1)); done
+echo "$n added, 0 removed; done."
+for f in $D/*.pem; do [ -f "$f" ] && echo "W: $f ignored: files in $D must end in .crt"; done
+exit 0

@@ -1,0 +1,6 @@
+#!/bin/sh
+# Simulates a reboot for the systemd-style shim: everything stops, then the enabled units start.
+. /usr/lib/marga-sd/sdlib.sh
+for f in "$S"/*.state; do [ -f "$f" ] || continue; systemctl stop "$(basename "$f" .state)" >/dev/null 2>&1; rm -f "$S/$(basename "$f" .state).loaded"; done
+for l in "$U"/multi-user.target.wants/*.service; do [ -e "$l" ] || continue; systemctl start "$(basename "$l" .service)" >/dev/null 2>&1; done
+exit 0

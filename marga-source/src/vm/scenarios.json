@@ -16,7 +16,17 @@
    "Run ls -lh /var/log/app and see which files are large.",
    "You may delete or empty the big log. Emptying with : > file keeps the file in place."
   ],
-  "solution": "ls -lh /var/log/app\nrm /var/log/app/debug.trace\n: > /var/log/app/app.log\ndf -h /var/log/app"
+  "solution": "ls -lh /var/log/app\nrm /var/log/app/debug.trace\n: > /var/log/app/app.log\ndf -h /var/log/app",
+  "why": {
+   "q": "Why was emptying app.log with : > better than deleting it?",
+   "o": [
+    "Deleting always frees nothing on Linux",
+    ": > asks the kernel to repair the disk",
+    "The writing process keeps its open file, so the file stays in place and its space is freed"
+   ],
+   "a": 2,
+   "x": "A process holds the file open. Emptying it keeps the same file and frees the blocks now; deleting a file that is still open frees nothing until the process closes it."
+  }
  },
  {
   "id": "deleted-open-file",
@@ -35,7 +45,17 @@
    "Run ls -l /proc/*/fd 2>/dev/null | grep deleted.",
    "You can truncate through the descriptor, or stop the process and start it again."
   ],
-  "solution": "ps | grep ingest\nls -l /proc/<pid>/fd | grep deleted\n: > /proc/<pid>/fd/3\n# or: kill <pid> and run /usr/local/bin/ingest again\ndf -h /var/data"
+  "solution": "ps | grep ingest\nls -l /proc/<pid>/fd | grep deleted\n: > /proc/<pid>/fd/3\n# or: kill <pid> and run /usr/local/bin/ingest again\ndf -h /var/data",
+  "why": {
+   "q": "Why did deleting the file not free any space?",
+   "o": [
+    "The delete command is only a request and runs later",
+    "The process still had it open, so the data stayed until it was closed",
+    "The disk was too slow to update"
+   ],
+   "a": 1,
+   "x": "A file's blocks are freed when the last name and the last open handle are gone. /proc/PID/fd shows the open handle, and truncating through it frees the space."
+  }
  },
  {
   "id": "permission-denied",
@@ -53,7 +73,17 @@
    "ls -ld /srv/app and ls -l /srv/app/run.sh show owner, group and mode.",
    "A user needs execute on the directory to enter it, and execute plus read on a script to run it."
   ],
-  "solution": "chmod 755 /srv/app\nchmod 755 /srv/app/run.sh\nsu -s /bin/sh deploy -c /srv/app/run.sh"
+  "solution": "chmod 755 /srv/app\nchmod 755 /srv/app/run.sh\nsu -s /bin/sh deploy -c /srv/app/run.sh",
+  "why": {
+   "q": "The script was mode 755. Why did the deploy user still fail?",
+   "o": [
+    "755 is too many permissions",
+    "A parent folder also needs the execute bit to be entered",
+    "The user needs the script in its home folder"
+   ],
+   "a": 1,
+   "x": "To use a path, every folder in it needs the x permission for you. A readable file inside a closed folder is still out of reach."
+  }
  },
  {
   "id": "cpu-hog",
@@ -71,7 +101,17 @@
    "Killing the busy process may not help if its parent starts it again.",
    "Find the parent script, stop it first, then stop the child."
   ],
-  "solution": "ps\nkill $(pidof report-job)   # the parent loop first\nkill $(pidof yes)\nps"
+  "solution": "ps\nkill $(pidof report-job)   # the parent loop first\nkill $(pidof yes)\nps",
+  "why": {
+   "q": "Why kill the parent loop before the yes process?",
+   "o": [
+    "Otherwise the loop starts a new yes straight away",
+    "The parent is the only one that can be stopped",
+    "kill only works on parents"
+   ],
+   "a": 0,
+   "x": "A parent that restarts its child brings the hog back. Stopping the parent first means the child cannot be replaced."
+  }
  },
  {
   "id": "service-wont-start",
@@ -89,7 +129,17 @@
    "Compare PORT with a number: can you spot a letter?",
    "ls /srv shows which folder really exists."
   ],
-  "solution": "cat /etc/web/web.conf\nsed -i \"s/^PORT=.*/PORT=8080/;s#^ROOT=.*#ROOT=/srv/www#\" /etc/web/web.conf\nstart-web\nwget -qO- http://127.0.0.1:8080/"
+  "solution": "cat /etc/web/web.conf\nsed -i \"s/^PORT=.*/PORT=8080/;s#^ROOT=.*#ROOT=/srv/www#\" /etc/web/web.conf\nstart-web\nwget -qO- http://127.0.0.1:8080/",
+  "why": {
+   "q": "What is the fastest way to find why a service will not start?",
+   "o": [
+    "Reboot the machine and see",
+    "Run its start command and read the error it prints",
+    "Delete the config and recreate it"
+   ],
+   "a": 1,
+   "x": "The program says what it dislikes: a wrong port, a missing folder. The first error message nearly always names the setting to fix."
+  }
  },
  {
   "id": "port-in-use",
@@ -107,7 +157,17 @@
    "ps shows every process with its command line. Look for the one started with port 8080.",
    "Stop that process, then run start-web."
   ],
-  "solution": "netstat -tln | grep 8080\nps | grep httpd\nkill <pid>\nstart-web\nwget -qO- http://127.0.0.1:8080/"
+  "solution": "netstat -tln | grep 8080\nps | grep httpd\nkill <pid>\nstart-web\nwget -qO- http://127.0.0.1:8080/",
+  "why": {
+   "q": "Why can two programs not listen on the same port?",
+   "o": [
+    "A port belongs to one listening socket at a time",
+    "The network card allows one program only",
+    "Ports are reserved for the system"
+   ],
+   "a": 0,
+   "x": "The kernel ties a listening port to one socket. The second program gets \"address in use\" until the first one stops or uses another port."
+  }
  },
  {
   "id": "stale-pidfile",
@@ -125,7 +185,17 @@
    "ls /proc/4242 or ps tells you if that pid is alive.",
    "A pidfile for a dead process is stale and safe to remove."
   ],
-  "solution": "cat /run/web.pid\nps | grep 4242\nrm /run/web.pid\nstart-web\nwget -qO- http://127.0.0.1:8080/"
+  "solution": "cat /run/web.pid\nps | grep 4242\nrm /run/web.pid\nstart-web\nwget -qO- http://127.0.0.1:8080/",
+  "why": {
+   "q": "Why did start-web say it was running when it was not?",
+   "o": [
+    "It only checks that the pidfile exists, not that the process lives",
+    "The process was hidden from ps",
+    "pidfiles always lie"
+   ],
+   "a": 0,
+   "x": "A crash leaves the pidfile behind. A careful script checks that the PID exists, for example with kill -0, before trusting the file."
+  }
  },
  {
   "id": "bad-hosts",
@@ -143,7 +213,17 @@
    "cat /etc/hosts shows what names are known. Compare the spelling with db.internal.",
    "Add a line: address, then the name."
   ],
-  "solution": "cat /etc/hosts\necho \"127.0.0.2 db.internal\" >> /etc/hosts\ndb-check"
+  "solution": "cat /etc/hosts\necho \"127.0.0.2 db.internal\" >> /etc/hosts\ndb-check",
+  "why": {
+   "q": "What does /etc/hosts do?",
+   "o": [
+    "It stores user passwords",
+    "It lists the files on the disk",
+    "It maps names to addresses before DNS is asked"
+   ],
+   "a": 2,
+   "x": "The resolver reads /etc/hosts first on most systems, so a line there answers the name without DNS."
+  }
  },
  {
   "id": "broken-symlink",
@@ -161,7 +241,17 @@
    "ls /opt/app/releases shows which releases exist.",
    "ln -sfn replaces a symlink in one step."
   ],
-  "solution": "ls -l /opt/app\nls /opt/app/releases\nln -sfn releases/2024-09 /opt/app/current\napp-status"
+  "solution": "ls -l /opt/app\nls /opt/app/releases\nln -sfn releases/2024-09 /opt/app/current\napp-status",
+  "why": {
+   "q": "What was wrong with the current link?",
+   "o": [
+    "It was a hard link",
+    "It pointed to a path that does not exist",
+    "It had the wrong owner"
+   ],
+   "a": 1,
+   "x": "A symbolic link just holds a path. If the target is missing, the link is broken, and ln -sfn repoints it."
+  }
  },
  {
   "id": "find-error-spike",
@@ -179,7 +269,17 @@
    "awk '$9==502' keeps only the 502 lines.",
    "Count with wc -l. For the busiest client use awk, sort, uniq -c and sort -rn."
   ],
-  "solution": "awk '$9==502' /var/log/web/access.log | wc -l\nawk '$9==502{print $1}' /var/log/web/access.log | sort | uniq -c | sort -rn | head -1\nprintf 'count=N\\nip=ADDRESS\\n' > /root/answer.txt"
+  "solution": "awk '$9==502' /var/log/web/access.log | wc -l\nawk '$9==502{print $1}' /var/log/web/access.log | sort | uniq -c | sort -rn | head -1\nprintf 'count=N\\nip=ADDRESS\\n' > /root/answer.txt",
+  "why": {
+   "q": "Why count with sort, uniq -c and sort -rn?",
+   "o": [
+    "It deletes duplicates from the file",
+    "It counts each address and puts the largest count first",
+    "It sorts the file on disk"
+   ],
+   "a": 1,
+   "x": "uniq -c counts adjacent equal lines, so sort comes first to group them. sort -rn then puts the biggest count at the top."
+  }
  },
  {
   "id": "shell-script-bug",
@@ -197,7 +297,17 @@
    "Stop on errors: set -e, or check the result of cp.",
    "Print the success message only after cp has worked."
   ],
-  "solution": "cat > /usr/local/bin/backup.sh <<'X'\n#!/bin/sh\nset -eu\nSRC=$1\ncp -r \"$SRC\" /backup/\necho \"backup finished OK\"\nX"
+  "solution": "cat > /usr/local/bin/backup.sh <<'X'\n#!/bin/sh\nset -eu\nSRC=$1\ncp -r \"$SRC\" /backup/\necho \"backup finished OK\"\nX",
+  "why": {
+   "q": "What does set -e change in a script?",
+   "o": [
+    "The script stops at the first failing command",
+    "It makes the script run faster",
+    "It turns on colours"
+   ],
+   "a": 0,
+   "x": "Without set -e a failing command is ignored and the script goes on to print success. With it the failure ends the script with an error."
+  }
  },
  {
   "id": "path-and-env",
@@ -215,6 +325,3951 @@
    "Put an export PATH line and an export APP_ENV line in /root/.profile.",
    "Test with a new login shell: sh -lc deploytool"
   ],
-  "solution": "cat >> /root/.profile <<'X'\nexport PATH=$PATH:/opt/tools/bin\nexport APP_ENV=staging\nX\nsh -lc deploytool"
+  "solution": "cat >> /root/.profile <<'X'\nexport PATH=$PATH:/opt/tools/bin\nexport APP_ENV=staging\nX\nsh -lc deploytool",
+  "why": {
+   "q": "Why was the tool not found in a new shell?",
+   "o": [
+    "PATH was set only in the old session, not in a start-up file",
+    "The tool was deleted",
+    "The shell is too old"
+   ],
+   "a": 0,
+   "x": "Variables belong to the shell that set them. A file like .profile is read by each new login shell, so put exports there."
+  }
+ },
+ {
+  "id": "hidden-setting",
+  "title": "The setting in the hidden file",
+  "level": "Beginner",
+  "minutes": 6,
+  "lesson": "linux/filesystem-and-navigation",
+  "story": "The app in /srv/app runs in debug mode in production. Its settings live in a hidden file, so a plain ls shows nothing useful.",
+  "goals": [
+   "Set DEBUG=false in the hidden settings file of /srv/app.",
+   "Keep every other setting in that file."
+  ],
+  "hints": [
+   "Hidden files start with a dot. ls -a shows them.",
+   "The file is /srv/app/.env. Open it with cat to see the settings.",
+   "sed -i can change one line in place: sed -i \"s/old/new/\" file."
+  ],
+  "solution": "ls -a /srv/app\ncat /srv/app/.env\nsed -i \"s/^DEBUG=true/DEBUG=false/\" /srv/app/.env\ncat /srv/app/.env",
+  "why": {
+   "q": "Why did ls not show the .env file?",
+   "o": [
+    "Names that start with a dot are hidden unless you use -a",
+    "The file was empty",
+    "Only root can list it"
+   ],
+   "a": 0,
+   "x": "ls hides dotfiles by default. ls -a shows them, and many tools keep settings in them."
+  }
+ },
+ {
+  "id": "find-lost-file",
+  "title": "Where did the invoice go?",
+  "level": "Beginner",
+  "minutes": 7,
+  "lesson": "linux/filesystem-and-navigation",
+  "story": "Finance saved invoice-2026-0417.pdf somewhere under /srv/archive, in one of many folders. You need a copy in /root.",
+  "goals": [
+   "Find invoice-2026-0417.pdf under /srv/archive.",
+   "Copy it to /root/invoice.pdf.",
+   "Leave the original where it is."
+  ],
+  "hints": [
+   "find searches a folder tree by name: find /srv/archive -name \"pattern\".",
+   "Quote the pattern so the shell does not expand it first.",
+   "cp SOURCE DEST copies a file. You can put find inside $( ) to use its result."
+  ],
+  "solution": "find /srv/archive -name \"invoice-2026-0417.pdf\"\ncp \"$(find /srv/archive -name invoice-2026-0417.pdf)\" /root/invoice.pdf",
+  "why": {
+   "q": "Why is find better than looking folder by folder?",
+   "o": [
+    "It is faster because it only reads file names in the top folder",
+    "It searches a whole tree by name, size or date",
+    "It repairs missing files"
+   ],
+   "a": 1,
+   "x": "find walks the tree for you and filters by many properties, so you do not have to guess the folder."
+  }
+ },
+ {
+  "id": "script-not-executable",
+  "title": "Permission denied on the report script",
+  "level": "Beginner",
+  "minutes": 5,
+  "lesson": "bash/script-basics",
+  "story": "The command hello-report was copied to the server, but running it says permission denied. It should print \"report ready\".",
+  "goals": [
+   "Make hello-report run when you type its name.",
+   "Do not rewrite the script."
+  ],
+  "hints": [
+   "ls -l shows the permission bits. An x means executable.",
+   "The file is /usr/local/bin/hello-report.",
+   "chmod +x FILE adds the executable bit."
+  ],
+  "solution": "ls -l /usr/local/bin/hello-report\nchmod +x /usr/local/bin/hello-report\nhello-report",
+  "why": {
+   "q": "What does chmod +x do?",
+   "o": [
+    "It copies the file to the PATH",
+    "It sets the execute permission so the file can be run",
+    "It encrypts the file"
+   ],
+   "a": 1,
+   "x": "A file needs the x bit to be run directly. Without it, the shell answers Permission denied even if you can read the file."
+  }
+ },
+ {
+  "id": "wrong-shebang",
+  "title": "The script that points at a missing shell",
+  "level": "Beginner",
+  "minutes": 6,
+  "lesson": "bash/script-basics",
+  "story": "cleanup.sh was written on a laptop and starts with #!/bin/bash. This small server only has /bin/sh, so the script cannot start.",
+  "goals": [
+   "Make /opt/tools/cleanup.sh run and print \"cleanup done\".",
+   "Change only what is needed."
+  ],
+  "hints": [
+   "Run /opt/tools/cleanup.sh and read the error. It names the interpreter it cannot find.",
+   "The first line of a script says which program runs it.",
+   "Change line 1 to #!/bin/sh. sed -i \"1s|.*|NEWLINE|\" file replaces line 1."
+  ],
+  "solution": "/opt/tools/cleanup.sh\nhead -1 /opt/tools/cleanup.sh\nsed -i \"1s|.*|#!/bin/sh|\" /opt/tools/cleanup.sh\n/opt/tools/cleanup.sh",
+  "why": {
+   "q": "What does the first line #!/bin/bash do?",
+   "o": [
+    "It names the program that runs the script",
+    "It is just a comment with no effect",
+    "It sets the file name"
+   ],
+   "a": 0,
+   "x": "The kernel reads #! and starts that program with the script. If the program is missing, you get a confusing \"not found\" error."
+  }
+ },
+ {
+  "id": "crlf-script",
+  "title": "The script with Windows line endings",
+  "level": "Beginner",
+  "minutes": 7,
+  "lesson": "bash/script-basics",
+  "story": "sync.sh was edited on Windows. It fails with a strange \"not found\" error even though the file is there.",
+  "goals": [
+   "Make /opt/tools/sync.sh run and print \"sync ok\".",
+   "Remove the Windows line endings. Do not retype the script."
+  ],
+  "hints": [
+   "cat -A style tools show hidden characters. Try: od -c /opt/tools/sync.sh | head.",
+   "Windows ends each line with CR LF. Linux expects only LF. The extra CR sticks to the interpreter name.",
+   "sed -i \"s/\\r$//\" file removes the CR. dos2unix file does the same."
+  ],
+  "solution": "od -c /opt/tools/sync.sh | head -3\nsed -i \"s/\\r$//\" /opt/tools/sync.sh\n/opt/tools/sync.sh",
+  "why": {
+   "q": "Why did Windows line endings break the script?",
+   "o": [
+    "Windows files cannot be read",
+    "The script was too long",
+    "The hidden carriage return became part of each command"
+   ],
+   "a": 2,
+   "x": "A CR character stays at the end of every line, so the shell looks for a command named with a stray \\r. sed removes it."
+  }
+ },
+ {
+  "id": "file-owner",
+  "title": "The upload folder the app cannot write to",
+  "level": "Beginner",
+  "minutes": 7,
+  "lesson": "linux/users-groups-permissions",
+  "story": "The web app runs as the user webapp. Uploads fail with \"permission denied\" because /srv/uploads belongs to root.",
+  "goals": [
+   "Let the user webapp create files in /srv/uploads.",
+   "Do not make the folder writable by everyone."
+  ],
+  "hints": [
+   "ls -ld /srv/uploads shows the owner and the mode.",
+   "Only the owner or root can write to a mode 755 folder.",
+   "chown webapp /srv/uploads gives the folder to that user."
+  ],
+  "solution": "ls -ld /srv/uploads\nchown webapp /srv/uploads\nls -ld /srv/uploads",
+  "why": {
+   "q": "Why could the app not write to the folder?",
+   "o": [
+    "The folder was full",
+    "The app was not compiled",
+    "The folder belonged to another user and gave others no write access"
+   ],
+   "a": 2,
+   "x": "Writing needs the w permission for the user that runs the process. chown gives the folder to the right owner."
+  }
+ },
+ {
+  "id": "group-access",
+  "title": "Maya cannot open the reports",
+  "level": "Beginner",
+  "minutes": 8,
+  "lesson": "linux/users-groups-permissions",
+  "story": "The analysts group owns /srv/reports. Maya joined the team but cannot read q3.txt. Mode 777 would \"work\" but is not allowed.",
+  "goals": [
+   "Let the user maya read /srv/reports/q3.txt.",
+   "Do it with group membership, not with open permissions."
+  ],
+  "hints": [
+   "ls -ld /srv/reports and id maya show the folder group and her groups.",
+   "Group members are listed in /etc/group, in the last field of the group line.",
+   "Add maya to the analysts line: sed -i \"s/^analysts:\\(.*\\):$/analysts:\\1:maya/\" /etc/group, or edit the line with vi."
+  ],
+  "solution": "ls -ld /srv/reports\ngrep analysts /etc/group\nsed -i \"s/^analysts:x:2000:$/analysts:x:2000:maya/\" /etc/group\nid maya",
+  "why": {
+   "q": "Why did adding Maya to the group help?",
+   "o": [
+    "Groups give everyone access",
+    "The folder allowed the group, and group membership gives her that access",
+    "The group file is a backup"
+   ],
+   "a": 1,
+   "x": "Permissions have owner, group and others parts. Joining the group moves Maya into the group part, which already allowed access."
+  }
+ },
+ {
+  "id": "sticky-share",
+  "title": "Everyone can delete everyone else's files",
+  "level": "Beginner",
+  "minutes": 6,
+  "lesson": "linux/users-groups-permissions",
+  "story": "/srv/share is open to all users, but people keep deleting each other's files. Users should only be able to delete their own.",
+  "goals": [
+   "Keep the folder usable by everyone.",
+   "Set the sticky bit so only a file's owner can delete it."
+  ],
+  "hints": [
+   "ls -ld /srv/share shows rwxrwxrwx. A sticky folder shows a t at the end.",
+   "The sticky bit is the leading 1 in a four-digit mode.",
+   "chmod 1777 /srv/share, or chmod +t /srv/share."
+  ],
+  "solution": "ls -ld /srv/share\nchmod 1777 /srv/share\nls -ld /srv/share",
+  "why": {
+   "q": "What does the sticky bit on a shared folder do?",
+   "o": [
+    "Only a file's owner can delete or rename it",
+    "It makes the folder read-only",
+    "It hides the folder"
+   ],
+   "a": 0,
+   "x": "With the sticky bit (like /tmp) everyone can create files, but only the owner of a file, or root, can remove it."
+  }
+ },
+ {
+  "id": "kill-stuck-process",
+  "title": "The process that ignores a polite stop",
+  "level": "Beginner",
+  "minutes": 7,
+  "lesson": "linux/processes-and-services",
+  "story": "stuck-job ignores the normal stop signal and keeps running. web-heartbeat is healthy and must keep running.",
+  "goals": [
+   "Stop stuck-job.",
+   "Leave web-heartbeat running."
+  ],
+  "hints": [
+   "ps shows the running programs. pidof stuck-job prints its process id.",
+   "kill PID sends the polite signal TERM. This job ignores it.",
+   "kill -9 PID cannot be ignored. Use it when the polite stop fails."
+  ],
+  "solution": "ps | grep stuck\nkill $(pidof stuck-job)\nkill -9 $(pidof stuck-job)\nps | grep stuck",
+  "why": {
+   "q": "Why did kill alone not stop the process?",
+   "o": [
+    "It ignores the polite signal, so you need kill -9",
+    "kill only works on root's processes",
+    "The process was already stopped"
+   ],
+   "a": 0,
+   "x": "SIGTERM can be caught or ignored. SIGKILL (-9) cannot be caught, so it works when the program is stuck, but gives no chance to clean up."
+  }
+ },
+ {
+  "id": "biggest-folder",
+  "title": "Which folder is eating the disk?",
+  "level": "Beginner",
+  "minutes": 7,
+  "lesson": "linux/disks-and-filesystems",
+  "story": "Under /srv/data there are several folders. Someone asks which one is the biggest. Write its name into /root/answer.txt as biggest=NAME.",
+  "goals": [
+   "Find the largest folder directly under /srv/data.",
+   "Write biggest=NAME (just the folder name) into /root/answer.txt."
+  ],
+  "hints": [
+   "du -sk FOLDER prints the size in kilobytes.",
+   "du -sk /srv/data/* lists every folder with its size.",
+   "Sort the sizes with sort -rn and take the first line."
+  ],
+  "solution": "du -sk /srv/data/*\necho \"biggest=$(du -sk /srv/data/* | sort -rn | head -1 | awk -F/ '{print $NF}')\" > /root/answer.txt\ncat /root/answer.txt",
+  "why": {
+   "q": "Why is du -sk with sort -rn useful?",
+   "o": [
+    "It frees space automatically",
+    "It sizes each folder and shows the largest first",
+    "It compresses folders"
+   ],
+   "a": 1,
+   "x": "du adds up space per folder, and sort -rn puts the largest number at the top, so the culprit is easy to see."
+  }
+ },
+ {
+  "id": "archive-the-site",
+  "title": "Back up the site before the change",
+  "level": "Beginner",
+  "minutes": 7,
+  "lesson": "linux/filesystem-and-navigation",
+  "story": "Before a risky change, make a compressed backup of the website in /srv/site. Put it at /backup/site.tar.gz.",
+  "goals": [
+   "Create /backup/site.tar.gz holding everything in /srv/site.",
+   "Leave /srv/site as it is."
+  ],
+  "hints": [
+   "tar c creates an archive, z compresses it with gzip, f names the file.",
+   "tar czf ARCHIVE FOLDER. Use -C DIR to stay out of absolute paths.",
+   "Check the result with tar tzf /backup/site.tar.gz."
+  ],
+  "solution": "mkdir -p /backup\ntar czf /backup/site.tar.gz -C /srv site\ntar tzf /backup/site.tar.gz",
+  "why": {
+   "q": "Why use tar czf for a backup?",
+   "o": [
+    "It copies only changed files",
+    "It encrypts the files",
+    "It bundles many files into one compressed archive"
+   ],
+   "a": 2,
+   "x": "tar packs files and folders into one file, and z compresses it. One file is easy to store, move and test."
+  }
+ },
+ {
+  "id": "extract-release",
+  "title": "Unpack the release",
+  "level": "Beginner",
+  "minutes": 7,
+  "lesson": "linux/filesystem-and-navigation",
+  "story": "A release archive is in /root. Unpack it into /opt/app so that /opt/app/bin/run works and /opt/app/VERSION says 1.4.",
+  "goals": [
+   "Extract /root/release-1.4.tar.gz into /opt/app.",
+   "Running /opt/app/bin/run should print \"run 1.4\"."
+  ],
+  "hints": [
+   "tar tzf ARCHIVE lists what is inside without extracting.",
+   "tar xzf ARCHIVE extracts. -C DIR picks the target folder, which must exist.",
+   "mkdir -p /opt/app first, then tar xzf /root/release-1.4.tar.gz -C /opt/app."
+  ],
+  "solution": "tar tzf /root/release-1.4.tar.gz\nmkdir -p /opt/app\ntar xzf /root/release-1.4.tar.gz -C /opt/app\n/opt/app/bin/run",
+  "why": {
+   "q": "What does tar tzf let you do before extracting?",
+   "o": [
+    "Delete the archive",
+    "Change the archive's owner",
+    "List the contents without unpacking"
+   ],
+   "a": 2,
+   "x": "Looking first shows where the files will land, so you do not scatter files into the current folder."
+  }
+ },
+ {
+  "id": "count-the-errors",
+  "title": "How many errors today?",
+  "level": "Beginner",
+  "minutes": 7,
+  "lesson": "linux/logs-and-troubleshooting",
+  "story": "The app log mixes INFO, WARN and ERROR lines. Some INFO lines mention the word \"error\" in lower case. Count only the lines whose level is ERROR and save the number in /root/errors.txt.",
+  "goals": [
+   "Count the lines at level ERROR in /var/log/app/app.log.",
+   "Write only the number into /root/errors.txt."
+  ],
+  "hints": [
+   "grep prints matching lines. grep -c prints how many match.",
+   "The level sits between spaces: \" ERROR \". Searching for the level avoids the lower-case words.",
+   "grep -c \" ERROR \" /var/log/app/app.log > /root/errors.txt"
+  ],
+  "solution": "grep -c \" ERROR \" /var/log/app/app.log\ngrep -c \" ERROR \" /var/log/app/app.log > /root/errors.txt",
+  "why": {
+   "q": "Why use grep -c?",
+   "o": [
+    "It colours matches",
+    "It searches only the first line",
+    "It counts matching lines instead of printing them"
+   ],
+   "a": 2,
+   "x": "-c prints the number of lines that match, which is exactly what a report needs."
+  }
+ },
+ {
+  "id": "unique-visitors",
+  "title": "How many different visitors?",
+  "level": "Beginner",
+  "minutes": 6,
+  "lesson": "bash/text-processing",
+  "story": "/srv/data/visitors.txt has one visitor name per line, with many repeats. Count the different names and save the number in /root/unique.txt.",
+  "goals": [
+   "Count unique names in /srv/data/visitors.txt.",
+   "Write only the number into /root/unique.txt."
+  ],
+  "hints": [
+   "sort puts equal lines next to each other. sort -u removes repeats.",
+   "wc -l counts lines.",
+   "sort -u FILE | wc -l > /root/unique.txt"
+  ],
+  "solution": "sort -u /srv/data/visitors.txt | wc -l\nsort -u /srv/data/visitors.txt | wc -l > /root/unique.txt",
+  "why": {
+   "q": "Why does sort -u then wc -l count distinct values?",
+   "o": [
+    "wc -l removes duplicates",
+    "sort -u removes repeated lines and wc -l counts what is left",
+    "sort counts the characters"
+   ],
+   "a": 1,
+   "x": "sort -u keeps one copy of each line. Counting the remaining lines gives the number of different visitors."
+  }
+ },
+ {
+  "id": "hostname-files",
+  "title": "Name the server",
+  "level": "Beginner",
+  "minutes": 6,
+  "lesson": "linux/boot-and-kernel",
+  "story": "This server still calls itself localhost. It should be called web-01, in /etc/hostname and in the 127.0.1.1 line of /etc/hosts. Keep the localhost line.",
+  "goals": [
+   "Put web-01 in /etc/hostname.",
+   "Make the 127.0.1.1 line of /etc/hosts say web-01.",
+   "Keep the 127.0.0.1 localhost line."
+  ],
+  "hints": [
+   "cat /etc/hostname and cat /etc/hosts show the current names.",
+   "echo web-01 > /etc/hostname replaces the file.",
+   "sed -i \"s/^127.0.1.1.*/127.0.1.1 web-01/\" /etc/hosts changes one line."
+  ],
+  "solution": "echo web-01 > /etc/hostname\nsed -i \"s/^127.0.1.1.*/127.0.1.1 web-01/\" /etc/hosts\ncat /etc/hostname /etc/hosts",
+  "why": {
+   "q": "Why can the hostname show in more than one place?",
+   "o": [
+    "Every file has its own name",
+    "A machine's name is kept in /etc/hostname and often repeated in /etc/hosts",
+    "The name is stored in the BIOS only"
+   ],
+   "a": 1,
+   "x": "The system reads /etc/hostname at boot, and /etc/hosts lets the name resolve locally. They should agree."
+  }
+ },
+ {
+  "id": "interface-down",
+  "title": "The machine cannot talk to itself",
+  "level": "Beginner",
+  "minutes": 7,
+  "lesson": "networking/ip-addressing-and-subnets",
+  "story": "Local services cannot reach each other: even ping 127.0.0.1 fails. The web service on port 8080 is running, but nothing can connect to it.",
+  "goals": [
+   "Make ping 127.0.0.1 work again.",
+   "Make http://127.0.0.1:8080/ answer."
+  ],
+  "hints": [
+   "ifconfig -a lists all interfaces, even down ones. A working one shows UP.",
+   "The loopback interface is called lo.",
+   "ifconfig lo up (or ifconfig lo 127.0.0.1 up) brings it back."
+  ],
+  "solution": "ping -c 1 127.0.0.1\nifconfig -a\nifconfig lo 127.0.0.1 up\nping -c 1 127.0.0.1",
+  "why": {
+   "q": "What did the loopback interface need?",
+   "o": [
+    "It had to be brought up with an address",
+    "It needed a cable",
+    "It needed a new driver"
+   ],
+   "a": 0,
+   "x": "lo is a virtual interface. If it is down, even connections from the machine to itself fail."
+  }
+ },
+ {
+  "id": "wrong-port",
+  "title": "The health check looks at the wrong port",
+  "level": "Beginner",
+  "minutes": 7,
+  "lesson": "networking/troubleshooting-toolkit",
+  "story": "The web service runs on port 8080 and is fine. The health check says \"unhealthy\" because its settings point at another port. Fix the check, not the service.",
+  "goals": [
+   "Make the command healthcheck print \"healthy\".",
+   "Keep the web service on port 8080."
+  ],
+  "hints": [
+   "Run healthcheck and read what it says. cat /usr/local/bin/healthcheck shows where it reads its settings.",
+   "The settings file is /etc/monitor.conf.",
+   "sed -i \"s/8081/8080/\" /etc/monitor.conf"
+  ],
+  "solution": "healthcheck\ncat /etc/monitor.conf\nsed -i \"s/8081/8080/\" /etc/monitor.conf\nhealthcheck",
+  "why": {
+   "q": "Why does a health check fail when the service is fine?",
+   "o": [
+    "Health checks need internet",
+    "The check looks at a port the service does not use",
+    "The service is too fast"
+   ],
+   "a": 1,
+   "x": "A check is only as right as its config. Compare the port in the check with the port the service listens on (netstat -tln)."
+  }
+ },
+ {
+  "id": "rename-extensions",
+  "title": "Rename every .txt to .md",
+  "level": "Beginner",
+  "minutes": 7,
+  "lesson": "bash/script-basics",
+  "story": "The docs in /srv/docs are plain text but the new site generator wants Markdown. Rename every .txt file to .md. Do not touch the .log file.",
+  "goals": [
+   "No .txt files remain in /srv/docs.",
+   "Each file keeps its text, now with the .md ending.",
+   "notes.log is left alone."
+  ],
+  "hints": [
+   "ls /srv/docs shows the files.",
+   "A loop can do many: for f in /srv/docs/*.txt; do ...; done",
+   "${f%.txt} removes the ending: mv \"$f\" \"${f%.txt}.md\""
+  ],
+  "solution": "ls /srv/docs\nfor f in /srv/docs/*.txt; do mv \"$f\" \"${f%.txt}.md\"; done\nls /srv/docs",
+  "why": {
+   "q": "What does ${f%.txt} do in the loop?",
+   "o": [
+    "It removes .txt from the end of the name",
+    "It adds .txt to the end",
+    "It deletes the file"
+   ],
+   "a": 0,
+   "x": "${var%suffix} trims the shortest matching suffix, so you can build the new name with .md."
+  }
+ },
+ {
+  "id": "split-streams",
+  "title": "Send the data one way and the warnings another",
+  "level": "Beginner",
+  "minutes": 7,
+  "lesson": "bash/script-basics",
+  "story": "The command noisy prints data lines to standard output and warnings to standard error. Run it once so the data lands in /root/out.log and the warnings in /root/err.log.",
+  "goals": [
+   "/root/out.log holds only the data lines.",
+   "/root/err.log holds only the warning lines."
+  ],
+  "hints": [
+   "Run noisy and watch the screen: both kinds of lines appear.",
+   "> sends standard output to a file. 2> sends standard error.",
+   "noisy > /root/out.log 2> /root/err.log"
+  ],
+  "solution": "noisy\nnoisy > /root/out.log 2> /root/err.log\ncat /root/out.log /root/err.log",
+  "why": {
+   "q": "What are stdout and stderr?",
+   "o": [
+    "The input and the output",
+    "Two copies of the same output",
+    "Two output streams: normal data and warnings or errors"
+   ],
+   "a": 2,
+   "x": "Programs write results to stdout and problems to stderr. > redirects the first, 2> the second."
+  }
+ },
+ {
+  "id": "old-cache-files",
+  "title": "Clear out the old cache files",
+  "level": "Beginner",
+  "minutes": 8,
+  "lesson": "linux/disks-and-filesystems",
+  "story": "/var/cache/app holds cache files of different ages. Delete the ones older than 7 days and keep the newer ones.",
+  "goals": [
+   "Delete every cache file older than 7 days.",
+   "Keep the files that are 7 days old or newer."
+  ],
+  "hints": [
+   "ls -l shows dates. find can test the age of files.",
+   "find DIR -type f -mtime +7 lists files older than 7 days.",
+   "Add -exec rm {} \\; to delete what find lists. List first, then delete."
+  ],
+  "solution": "ls -l /var/cache/app\nfind /var/cache/app -type f -mtime +7\nfind /var/cache/app -type f -mtime +7 -exec rm {} \\;\nls -l /var/cache/app",
+  "why": {
+   "q": "What does find -mtime +7 match?",
+   "o": [
+    "Files modified more than 7 days ago",
+    "Files smaller than 7 KB",
+    "Files owned by user 7"
+   ],
+   "a": 0,
+   "x": "-mtime counts days since the last change. +7 means older than 7 days, a safe way to clear a cache."
+  }
+ },
+ {
+  "id": "read-only-mount",
+  "title": "The volume that turned read-only",
+  "level": "Beginner",
+  "minutes": 7,
+  "lesson": "linux/disks-and-filesystems",
+  "story": "/srv/records is mounted read-only, so the app cannot save anything. The data on it must stay.",
+  "goals": [
+   "Make /srv/records writable again.",
+   "Keep the existing ledger file and keep the volume mounted."
+  ],
+  "hints": [
+   "touch /srv/records/x tells you the error. mount | grep records shows the options, and ro means read-only.",
+   "You do not need to unmount. A remount changes the options in place.",
+   "mount -o remount,rw /srv/records"
+  ],
+  "solution": "mount | grep records\nmount -o remount,rw /srv/records\ntouch /srv/records/test && echo writable",
+  "why": {
+   "q": "How was the volume made writable again?",
+   "o": [
+    "By deleting its files",
+    "By rebooting the app",
+    "By remounting it read-write"
+   ],
+   "a": 2,
+   "x": "After disk errors the kernel can remount read-only. mount -o remount,rw changes the mode, but check the cause first."
+  }
+ },
+ {
+  "id": "spaces-in-names",
+  "title": "Copy the file with a space in its name",
+  "level": "Beginner",
+  "minutes": 6,
+  "lesson": "linux/filesystem-and-navigation",
+  "story": "Two quarterly reports are in /srv/papers. One of them has a space in its name. Copy \"Q3 report.txt\" to /backup without renaming it.",
+  "goals": [
+   "/backup/Q3 report.txt exists with the same content.",
+   "The original stays in /srv/papers."
+  ],
+  "hints": [
+   "Try cp /srv/papers/Q3 report.txt /backup and read the error. The shell sees two names.",
+   "Quotes keep a name with spaces together: \"Q3 report.txt\".",
+   "cp \"/srv/papers/Q3 report.txt\" /backup/"
+  ],
+  "solution": "ls /srv/papers\ncp \"/srv/papers/Q3 report.txt\" /backup/\nls /backup",
+  "why": {
+   "q": "Why quote a name that has a space?",
+   "o": [
+    "Quotes make the command faster",
+    "Without quotes the shell sees two separate words",
+    "Quotes hide the file"
+   ],
+   "a": 1,
+   "x": "The shell splits on spaces. Quotes keep \"Q3 report.txt\" as one argument."
+  }
+ },
+ {
+  "id": "cron-every-five",
+  "title": "The backup runs hourly, not every five minutes",
+  "level": "Beginner",
+  "minutes": 8,
+  "lesson": "linux/cron-and-timers",
+  "story": "The crontab for root runs /usr/local/bin/backup once an hour. It should run every 5 minutes.",
+  "goals": [
+   "The root crontab runs /usr/local/bin/backup every 5 minutes.",
+   "It has one backup line, not two."
+  ],
+  "hints": [
+   "crontab -l shows the table. The five fields are minute, hour, day, month, weekday.",
+   "*/5 in the minute field means every 5 minutes.",
+   "echo \"*/5 * * * * /usr/local/bin/backup\" | crontab -  replaces the table."
+  ],
+  "solution": "crontab -l\necho \"*/5 * * * * /usr/local/bin/backup\" | crontab -\ncrontab -l",
+  "why": {
+   "q": "Which cron schedule means every five minutes?",
+   "o": [
+    "5 * * * *",
+    "*/5 * * * *",
+    "0/5 * * * *"
+   ],
+   "a": 1,
+   "x": "The first field is minutes. */5 means every fifth minute; 5 alone means minute 5 of every hour."
+  }
+ },
+ {
+  "id": "case-matters",
+  "title": "Linux paths are case sensitive",
+  "level": "Beginner",
+  "minutes": 6,
+  "lesson": "linux/filesystem-and-navigation",
+  "story": "The command app-info should print the app name from the app's config file. It prints nothing useful because the path in the script uses the wrong case.",
+  "goals": [
+   "Make app-info print \"name: shop\".",
+   "Fix the path in the script. Do not rename the folder."
+  ],
+  "hints": [
+   "Run app-info, then ls /srv to see the real folder name.",
+   "/srv/App and /srv/app are different folders on Linux.",
+   "sed -i \"s#/srv/App#/srv/app#\" /usr/local/bin/app-info"
+  ],
+  "solution": "app-info\nls /srv\nsed -i \"s#/srv/App#/srv/app#\" /usr/local/bin/app-info\napp-info",
+  "why": {
+   "q": "Why did /srv/App fail when /srv/app exists?",
+   "o": [
+    "The path was too long",
+    "The folder was hidden",
+    "Linux file names are case sensitive"
+   ],
+   "a": 2,
+   "x": "Linux treats App and app as different names, unlike some other systems."
+  }
+ },
+ {
+  "id": "rotate-by-hand",
+  "title": "Rotate the log without stopping the app",
+  "level": "Intermediate",
+  "minutes": 10,
+  "lesson": "linux/logs-and-troubleshooting",
+  "story": "app.log has grown big. Rotate it by hand: keep the old lines compressed as app.log.1.gz and let the app go on writing a fresh app.log. The logger process must keep running.",
+  "goals": [
+   "/var/log/svc/app.log.1.gz holds the old lines.",
+   "A new /var/log/svc/app.log exists and is being written.",
+   "app-logger keeps running."
+  ],
+  "hints": [
+   "ls -l /var/log/svc shows the size. The logger opens the file by path each time it writes.",
+   "Move the file away first, then compress the moved copy.",
+   "mv app.log app.log.1, then gzip app.log.1. The logger creates a new app.log by itself."
+  ],
+  "solution": "cd /var/log/svc\nmv app.log app.log.1\ngzip app.log.1\nsleep 2; ls -l",
+  "why": {
+   "q": "Why is it safe to rename a log that an app writes to?",
+   "o": [
+    "The app keeps writing into the same open file, now under its new name",
+    "The app notices and stops",
+    "Renaming deletes the old data"
+   ],
+   "a": 0,
+   "x": "A process holds the file, not the name. After the rename it still writes to the same file; that is why apps need a reopen signal later."
+  }
+ },
+ {
+  "id": "cron-path",
+  "title": "Works in my shell, fails in cron",
+  "level": "Intermediate",
+  "minutes": 9,
+  "lesson": "linux/cron-and-timers",
+  "story": "nightly.sh runs fine when you type it, but cron runs jobs with a tiny PATH, and the tool it calls lives in /opt/tools/bin. The job fails at night.",
+  "goals": [
+   "Make /opt/job/nightly.sh work with a minimal PATH (only /usr/bin and /bin).",
+   "It should print \"nightly ok\"."
+  ],
+  "hints": [
+   "Test like cron: env -i PATH=/usr/bin:/bin /opt/job/nightly.sh",
+   "The script calls mytool by name. cron cannot find it. Where is it? find /opt -name mytool",
+   "Call it by its full path in the script, or set PATH at the top of the script."
+  ],
+  "solution": "env -i PATH=/usr/bin:/bin /opt/job/nightly.sh\nfind /opt -name mytool\nsed -i \"s#^mytool#/opt/tools/bin/mytool#\" /opt/job/nightly.sh\nenv -i PATH=/usr/bin:/bin /opt/job/nightly.sh",
+  "why": {
+   "q": "Why did the job work in the shell but not in cron?",
+   "o": [
+    "Cron cannot run scripts",
+    "Cron runs with a tiny environment and a short PATH",
+    "Your shell was broken"
+   ],
+   "a": 1,
+   "x": "Cron does not read your profile. Use full paths in the job, or set PATH in the script."
+  }
+ },
+ {
+  "id": "stale-host-entry",
+  "title": "Two lines for the same name",
+  "level": "Intermediate",
+  "minutes": 9,
+  "lesson": "networking/dns",
+  "story": "/etc/hosts has two entries for api.internal. The first one is an old address, and the first match wins. api-check keeps failing.",
+  "goals": [
+   "Make api-check print \"api ok\".",
+   "Keep the localhost line."
+  ],
+  "hints": [
+   "Run api-check and cat /etc/hosts. Look for the name appearing twice.",
+   "Resolvers use the first matching line. The old address 10.1.1.5 is unreachable.",
+   "Delete the stale line: sed -i \"/^10.1.1.5 /d\" /etc/hosts"
+  ],
+  "solution": "api-check\ngrep api.internal /etc/hosts\nsed -i \"/^10.1.1.5 /d\" /etc/hosts\napi-check",
+  "why": {
+   "q": "Why did the old address win?",
+   "o": [
+    "The newest line always wins",
+    "DNS is ignored forever",
+    "The first matching line in /etc/hosts is used"
+   ],
+   "a": 2,
+   "x": "The resolver stops at the first match, so an old line above a new one hides the right address."
+  }
+ },
+ {
+  "id": "start-order",
+  "title": "The app starts before its database",
+  "level": "Intermediate",
+  "minutes": 10,
+  "lesson": "linux/processes-and-services",
+  "story": "stack-up starts the services listed in /etc/stack.order, in that order. The app refuses to start unless the database is ready, but the list has them the wrong way round.",
+  "goals": [
+   "Run stack-up so that both db-svc and app-svc are running.",
+   "Fix the order file, do not edit the service scripts."
+  ],
+  "hints": [
+   "Run stack-up and read the error. cat /etc/stack.order shows the order.",
+   "Each line is a service name. The database must come first.",
+   "printf \"db\\napp\\n\" > /etc/stack.order, then run stack-up again."
+  ],
+  "solution": "stack-up\ncat /etc/stack.order\nprintf \"db\\napp\\n\" > /etc/stack.order\nstack-up",
+  "why": {
+   "q": "Why does the order of starting matter?",
+   "o": [
+    "Alphabetical order is required",
+    "The app starts faster last",
+    "The app needs the database to be ready first"
+   ],
+   "a": 2,
+   "x": "Dependencies must be up before what needs them. A start order file or a unit dependency expresses that."
+  }
+ },
+ {
+  "id": "env-file-spaces",
+  "title": "The settings file with spaces around the equals sign",
+  "level": "Intermediate",
+  "minutes": 8,
+  "lesson": "bash/script-basics",
+  "story": "run-app loads /etc/app/app.env as shell code. The file was written like an INI file with spaces around \"=\", and the shell tries to run the names as commands.",
+  "goals": [
+   "Make run-app print \"connecting to db1:5432\".",
+   "Keep both settings."
+  ],
+  "hints": [
+   "Run run-app and read the errors: \"DB_HOST: not found\".",
+   "In shell, VAR=value must have no spaces around the equals sign.",
+   "sed -i \"s/ = /=/\" /etc/app/app.env"
+  ],
+  "solution": "run-app\ncat /etc/app/app.env\nsed -i \"s/ = /=/\" /etc/app/app.env\nrun-app",
+  "why": {
+   "q": "Why do spaces around = break an env file?",
+   "o": [
+    "Shell assignments need NAME=value with no spaces",
+    "Spaces are only allowed in names",
+    "The file is too long"
+   ],
+   "a": 0,
+   "x": "In a shell, NAME = value runs a command called NAME. The setting must be written NAME=value."
+  }
+ },
+ {
+  "id": "run-as-user",
+  "title": "The service is running as root",
+  "level": "Intermediate",
+  "minutes": 10,
+  "lesson": "linux/users-groups-permissions",
+  "story": "webd must never run as root, but someone started it from a root shell. Run it as the user webapp instead and leave no root copy running.",
+  "goals": [
+   "Exactly one webd process runs.",
+   "It runs as the user webapp."
+  ],
+  "hints": [
+   "ps -o user,comm shows which user owns each process.",
+   "Stop the root copy with kill, then start a new one as the right user.",
+   "su -s /bin/sh webapp -c \"/usr/local/bin/webd >/dev/null 2>&1 &\""
+  ],
+  "solution": "ps -o user,comm | grep webd\nkill $(pidof webd)\nsu -s /bin/sh webapp -c \"/usr/local/bin/webd >/dev/null 2>&1 &\"\nps -o user,comm | grep webd",
+  "why": {
+   "q": "Why not run a web service as root?",
+   "o": [
+    "Root is slower",
+    "If it is hacked, the attacker gets root",
+    "Root cannot open ports"
+   ],
+   "a": 1,
+   "x": "Least privilege: a service account limits the damage of a break-in to what that user can reach."
+  }
+ },
+ {
+  "id": "renice-batch",
+  "title": "Slow down the batch job without killing it",
+  "level": "Intermediate",
+  "minutes": 8,
+  "lesson": "linux/performance-triage",
+  "story": "batch-crunch is useful, so it must finish, but it is hogging the CPU at normal priority and slowing the API. Give it a low priority (nice 10 or more). api-server must stay untouched.",
+  "goals": [
+   "batch-crunch keeps running with nice 10 or higher.",
+   "api-server keeps running at its normal priority."
+  ],
+  "hints": [
+   "top (press q to quit) or ps shows what is busy.",
+   "The nice value runs from -20 (greedy) to 19 (polite). renice changes it for a running process.",
+   "renice -n 15 -p PID or renice 15 -p PID. Get the PID with pidof batch-crunch."
+  ],
+  "solution": "pidof batch-crunch\nrenice 15 -p $(pidof batch-crunch)\nps -o pid,nice,comm | grep -E \"batch|api\"",
+  "why": {
+   "q": "What does renice do?",
+   "o": [
+    "It restarts the process",
+    "It changes the process name",
+    "It changes how much CPU time a process gets compared with others"
+   ],
+   "a": 2,
+   "x": "A higher nice value means lower priority. The job keeps running but yields to important work."
+  }
+ },
+ {
+  "id": "config-drift",
+  "title": "Staging works, production does not",
+  "level": "Intermediate",
+  "minutes": 9,
+  "lesson": "linux/logs-and-troubleshooting",
+  "story": "The same app behaves differently in staging and production. The two config files should be identical except for one line. Find the key that differs and write it as key=NAME in /root/answer.txt.",
+  "goals": [
+   "Compare /root/staging.conf and /root/prod.conf.",
+   "Write the name of the one key whose value differs into /root/answer.txt as key=NAME."
+  ],
+  "hints": [
+   "diff FILE1 FILE2 shows the lines that differ. Busybox diff prints a unified diff: lines starting with - come from the first file and + from the second.",
+   "The key is the part before the equals sign.",
+   "echo \"key=$(diff /root/staging.conf /root/prod.conf | sed -n \"s/^-\\([A-Z_]*\\)=.*/\\1/p\")\" > /root/answer.txt"
+  ],
+  "solution": "diff /root/staging.conf /root/prod.conf\necho \"key=$(diff /root/staging.conf /root/prod.conf | sed -n 's/^-\\([A-Z_]*\\)=.*/\\1/p')\" > /root/answer.txt\ncat /root/answer.txt",
+  "why": {
+   "q": "What is a quick way to find the difference between two files?",
+   "o": [
+    "diff shows the lines that differ",
+    "cat joins them",
+    "ls compares sizes only"
+   ],
+   "a": 0,
+   "x": "diff prints exactly the lines that are not the same, so a single changed key stands out."
+  }
+ },
+ {
+  "id": "ini-section",
+  "title": "Change a setting in one section only",
+  "level": "Intermediate",
+  "minutes": 9,
+  "lesson": "bash/text-processing",
+  "story": "app.ini has a port setting in each of three sections. Only the [db] port must change, from 5432 to 5433. The other ports must stay as they are.",
+  "goals": [
+   "The port under [db] is 5433.",
+   "The ports under [cache] and [web] are unchanged."
+  ],
+  "hints": [
+   "cat /etc/app/app.ini shows three \"port=\" lines. A plain sed on \"port=\" would change all of them.",
+   "sed can limit a change to a range of lines: sed \"/start/,/end/ s/a/b/\".",
+   "sed -i \"/^\\[db\\]/,/^\\[cache\\]/ s/^port=5432/port=5433/\" /etc/app/app.ini"
+  ],
+  "solution": "cat /etc/app/app.ini\nsed -i \"/^\\[db\\]/,/^\\[cache\\]/ s/^port=5432/port=5433/\" /etc/app/app.ini\ncat /etc/app/app.ini",
+  "why": {
+   "q": "Why restrict the sed edit to a range?",
+   "o": [
+    "sed cannot edit whole files",
+    "It is faster",
+    "The same key exists in several sections"
+   ],
+   "a": 2,
+   "x": "A sed address like /^\\[db\\]/,/^\\[cache\\]/ limits the edit, so port in [cache] stays untouched."
+  }
+ },
+ {
+  "id": "sum-the-bytes",
+  "title": "How much data did the good requests send?",
+  "level": "Intermediate",
+  "minutes": 9,
+  "lesson": "bash/text-processing",
+  "story": "In the access log, the status code is in the 9th field and the response size in the 10th. Add up the sizes of all requests that returned 200 and save it as bytes=NUMBER in /root/answer.txt.",
+  "goals": [
+   "Sum the bytes of the 200 responses in /var/log/web/access.log.",
+   "Write bytes=NUMBER into /root/answer.txt."
+  ],
+  "hints": [
+   "head -3 /var/log/web/access.log shows the line format. awk splits lines into fields $1, $2, and so on.",
+   "awk can add: awk '$9==200 {s+=$10} END {print s}' FILE",
+   "echo \"bytes=$(awk '$9==200{s+=$10} END{print s}' /var/log/web/access.log)\" > /root/answer.txt"
+  ],
+  "solution": "head -3 /var/log/web/access.log\necho \"bytes=$(awk '$9==200{s+=$10} END{print s}' /var/log/web/access.log)\" > /root/answer.txt\ncat /root/answer.txt",
+  "why": {
+   "q": "What does awk '$9==200{s+=$10} END{print s}' do?",
+   "o": [
+    "It prints every line",
+    "It adds up column 10 for lines whose status is 200",
+    "It deletes lines"
+   ],
+   "a": 1,
+   "x": "awk runs the action on lines that match the condition, adds the bytes, and prints the total at the end."
+  }
+ },
+ {
+  "id": "xargs-spaces",
+  "title": "Delete the temp files, even the ones with spaces",
+  "level": "Intermediate",
+  "minutes": 9,
+  "lesson": "linux/filesystem-and-navigation",
+  "story": "/srv/work is full of *.tmp files, some with spaces in their names. Delete all of them. The .keep files must stay.",
+  "goals": [
+   "No .tmp file remains under /srv/work.",
+   "Every .keep file is still there."
+  ],
+  "hints": [
+   "find /srv/work -name \"*.tmp\" lists the files.",
+   "Names with spaces break a plain pipe into rm. find can run the command itself.",
+   "find /srv/work -name \"*.tmp\" -exec rm {} \\;  or  find ... -print0 | xargs -0 rm"
+  ],
+  "solution": "find /srv/work -name \"*.tmp\"\nfind /srv/work -name \"*.tmp\" -print0 | xargs -0 rm\nfind /srv/work -type f",
+  "why": {
+   "q": "Why use -print0 with xargs -0?",
+   "o": [
+    "It separates names with a null character, so spaces are safe",
+    "It prints faster",
+    "It hides the names"
+   ],
+   "a": 0,
+   "x": "A name can contain spaces or even newlines, but never a NUL byte. Using NUL as the separator keeps each name whole."
+  }
+ },
+ {
+  "id": "recursive-perms",
+  "title": "The site only the owner can read",
+  "level": "Intermediate",
+  "minutes": 9,
+  "lesson": "linux/users-groups-permissions",
+  "story": "The web server user www gets \"permission denied\" for everything under /srv/site, because the files were copied with private permissions. Folders should be 755 and files 644, and nothing may be writable by others.",
+  "goals": [
+   "The user www can read /srv/site/css/app.css.",
+   "All folders under /srv/site are 755 and all files 644."
+  ],
+  "hints": [
+   "ls -lR /srv/site shows modes everywhere. Folders need x so people can enter them.",
+   "find can pick only folders (-type d) or only files (-type f).",
+   "find /srv/site -type d -exec chmod 755 {} \\;  and  find /srv/site -type f -exec chmod 644 {} \\;"
+  ],
+  "solution": "find /srv/site -type d -exec chmod 755 {} \\;\nfind /srv/site -type f -exec chmod 644 {} \\;\nls -lR /srv/site",
+  "why": {
+   "q": "Why chmod folders and files differently?",
+   "o": [
+    "Files need more permissions",
+    "Folders need x to be entered, files normally do not",
+    "There is no difference"
+   ],
+   "a": 1,
+   "x": "755 for folders lets people enter them; 644 for files lets them read without making data executable."
+  }
+ },
+ {
+  "id": "setgid-folder",
+  "title": "New files should belong to the team group",
+  "level": "Intermediate",
+  "minutes": 9,
+  "lesson": "linux/users-groups-permissions",
+  "story": "People in the devs group share /srv/proj. Files created there get the creator's own group, so teammates cannot edit them. New files should automatically get the group devs.",
+  "goals": [
+   "A file created by the user alice in /srv/proj belongs to the group devs.",
+   "The folder stays group-writable for devs."
+  ],
+  "hints": [
+   "ls -ld /srv/proj shows the group. New files normally get the creator's primary group.",
+   "The setgid bit on a folder makes new files inherit the folder's group.",
+   "chmod g+s /srv/proj  (or chmod 2775 /srv/proj)"
+  ],
+  "solution": "ls -ld /srv/proj\nchmod g+s /srv/proj\nls -ld /srv/proj",
+  "why": {
+   "q": "What does the setgid bit on a folder do?",
+   "o": [
+    "Files become read-only",
+    "Files are hidden",
+    "New files get the folder's group"
+   ],
+   "a": 2,
+   "x": "With g+s new files inherit the folder's group, so a team shares files without chgrp each time."
+  }
+ },
+ {
+  "id": "inodes-full",
+  "title": "Disk has space but no new files",
+  "level": "Intermediate",
+  "minutes": 10,
+  "lesson": "linux/disks-and-filesystems",
+  "story": "The session store /var/sessions cannot create new files: \"No space left on device\". But df -h shows plenty of free space. The old session files must go, and the current-session marker must stay.",
+  "goals": [
+   "New files can be created in /var/sessions again.",
+   "The file current-session is kept and the volume stays mounted."
+  ],
+  "hints": [
+   "df -h shows free space; df -i shows free inodes. Every file needs one inode.",
+   "Count the files: ls /var/sessions | wc -l",
+   "Remove the old session files: rm /var/sessions/sess-*"
+  ],
+  "solution": "df -h /var/sessions\ndf -i /var/sessions\nrm /var/sessions/sess-*\ndf -i /var/sessions",
+  "why": {
+   "q": "What does df -i show?",
+   "o": [
+    "The disk speed",
+    "How many inodes (file slots) are used and free",
+    "The hidden files"
+   ],
+   "a": 1,
+   "x": "A file system has a fixed number of inodes. A million tiny files can use them up while blocks remain free."
+  }
+ },
+ {
+  "id": "two-services-one-port",
+  "title": "Two services, one port",
+  "level": "Intermediate",
+  "minutes": 10,
+  "lesson": "networking/troubleshooting-toolkit",
+  "story": "service A and service B are both set to port 8080. A started first. B failed to start with an address-in-use error. Both must run: A on 8080 and B on 8081.",
+  "goals": [
+   "http://127.0.0.1:8080/ answers \"service A\".",
+   "http://127.0.0.1:8081/ answers \"service B\"."
+  ],
+  "hints": [
+   "Only one program can listen on a port. Read what start-b printed. cat /etc/svc-b.conf shows its port.",
+   "Change the port in B's config, not A's.",
+   "sed -i \"s/8080/8081/\" /etc/svc-b.conf, then run start-b."
+  ],
+  "solution": "cat /etc/svc-a.conf /etc/svc-b.conf\nsed -i \"s/8080/8081/\" /etc/svc-b.conf\nstart-b",
+  "why": {
+   "q": "Whose port should change when both want 8080?",
+   "o": [
+    "The one that is easier or safer to move, here service B",
+    "Always the first one",
+    "Neither, restart the machine"
+   ],
+   "a": 0,
+   "x": "Pick one clear owner for 8080, and move the other. Do not break a service that is already working."
+  }
+ },
+ {
+  "id": "index-case",
+  "title": "404 for a page that is there",
+  "level": "Intermediate",
+  "minutes": 8,
+  "lesson": "networking/http-and-tls",
+  "story": "The site on port 8085 returns \"404 Not Found\" for the home page, but the HTML file is in the folder. A web server looks for index.html in lower case.",
+  "goals": [
+   "http://127.0.0.1:8085/ shows \"Welcome to the shop\".",
+   "Do not restart the server."
+  ],
+  "hints": [
+   "wget -S -O - http://127.0.0.1:8085/ shows the status line. ls /srv/shop shows what is in the folder.",
+   "The file is called Index.html. On Linux, file names are case sensitive.",
+   "mv /srv/shop/Index.html /srv/shop/index.html"
+  ],
+  "solution": "wget -S -O - http://127.0.0.1:8085/\nls /srv/shop\nmv /srv/shop/Index.html /srv/shop/index.html\nwget -q -O - http://127.0.0.1:8085/",
+  "why": {
+   "q": "Why did the web server answer 404?",
+   "o": [
+    "The folder was empty",
+    "The server was off",
+    "It looks for index.html and the file is named Index.html"
+   ],
+   "a": 2,
+   "x": "Names are case sensitive. The default index file is exactly index.html."
+  }
+ },
+ {
+  "id": "missing-address",
+  "title": "The service wants an address the machine does not have",
+  "level": "Intermediate",
+  "minutes": 10,
+  "lesson": "networking/ip-addressing-and-subnets",
+  "story": "The API must listen on 10.20.30.40, port 8090. start-api fails with a bind error because that address is not configured on this machine.",
+  "goals": [
+   "Give the machine the address 10.20.30.40.",
+   "Start the API so http://10.20.30.40:8090/ answers \"api ok\"."
+  ],
+  "hints": [
+   "Run start-api and read the error. ip addr shows the addresses the machine has.",
+   "You can add an address to an interface: ip addr add ADDRESS/32 dev lo",
+   "ip addr add 10.20.30.40/32 dev lo, then start-api."
+  ],
+  "solution": "start-api\nip addr\nip addr add 10.20.30.40/32 dev lo\nstart-api",
+  "why": {
+   "q": "What does \"cannot assign requested address\" mean?",
+   "o": [
+    "The service wants an address this machine does not have",
+    "The port is closed",
+    "The disk is full"
+   ],
+   "a": 0,
+   "x": "A program can only bind to an address that belongs to one of the machine's interfaces. ip addr lists them."
+  }
+ },
+ {
+  "id": "path-order",
+  "title": "The old tool wins",
+  "level": "Intermediate",
+  "minutes": 9,
+  "lesson": "linux/working-efficiently-in-the-terminal",
+  "story": "Two versions of deploytool are installed. The old 1.0 is in /usr/local/bin and the new 2.0 is in /opt/deploy/bin. After login, typing deploytool runs the old one, because the login profile appends the new folder at the end of PATH.",
+  "goals": [
+   "After a login, deploytool prints \"deploytool 2.0\".",
+   "Keep the old version installed."
+  ],
+  "hints": [
+   "which deploytool shows which one runs. PATH is searched from left to right.",
+   "/root/.profile adds /opt/deploy/bin at the end. It must come first.",
+   "echo 'export PATH=/opt/deploy/bin:$PATH' >> /root/.profile"
+  ],
+  "solution": "which deploytool\ncat /root/.profile\necho 'export PATH=/opt/deploy/bin:$PATH' >> /root/.profile\n. /root/.profile; deploytool",
+  "why": {
+   "q": "Which directory in PATH wins?",
+   "o": [
+    "The last one",
+    "The longest one",
+    "The first one that contains the command"
+   ],
+   "a": 2,
+   "x": "The shell searches PATH from left to right, so putting your directory first makes your tool win."
+  }
+ },
+ {
+  "id": "listen-address",
+  "title": "Listening only on the loopback address",
+  "level": "Intermediate",
+  "minutes": 9,
+  "lesson": "networking/troubleshooting-toolkit",
+  "story": "The web service works from the machine itself (127.0.0.1) but not from the \"outside\" address 127.0.0.2. It was started bound to 127.0.0.1 only. Make it answer on every address.",
+  "goals": [
+   "http://127.0.0.2:8095/ answers \"public site\".",
+   "http://127.0.0.1:8095/ still answers."
+  ],
+  "hints": [
+   "wget http://127.0.0.1:8095/ works, wget http://127.0.0.2:8095/ does not. netstat -ltn shows the listening address.",
+   "The server was started with -p 127.0.0.1:8095. Without an address it listens on all of them.",
+   "kill $(pidof httpd); httpd -p 8095 -h /srv/public"
+  ],
+  "solution": "netstat -ltn\nkill $(pidof httpd)\nhttpd -p 8095 -h /srv/public\nnetstat -ltn",
+  "why": {
+   "q": "What does listening on 127.0.0.1 mean?",
+   "o": [
+    "Everyone can connect",
+    "The service is disabled",
+    "Only programs on the same machine can connect"
+   ],
+   "a": 2,
+   "x": "127.0.0.1 is loopback. 0.0.0.0 listens on all addresses, so other machines can reach it."
+  }
+ },
+ {
+  "id": "ssh-key-perms",
+  "title": "SSH ignores the key",
+  "level": "Intermediate",
+  "minutes": 9,
+  "lesson": "linux/ssh-and-remote-access",
+  "story": "The user deploy cannot log in with a key. The SSH server refuses key files that other people can read or write, or that belong to the wrong user. Fix the owner and the modes.",
+  "goals": [
+   "/home/deploy/.ssh and authorized_keys belong to deploy.",
+   ".ssh is mode 700 and authorized_keys is mode 600."
+  ],
+  "hints": [
+   "ls -ld /home/deploy/.ssh and ls -l /home/deploy/.ssh show owner and modes.",
+   "Three things are wrong: the owner, the folder mode and the file mode.",
+   "chown -R deploy:deploy /home/deploy/.ssh; chmod 700 /home/deploy/.ssh; chmod 600 /home/deploy/.ssh/authorized_keys"
+  ],
+  "solution": "ls -ld /home/deploy/.ssh\nls -l /home/deploy/.ssh\nchown -R deploy:deploy /home/deploy/.ssh\nchmod 700 /home/deploy/.ssh\nchmod 600 /home/deploy/.ssh/authorized_keys",
+  "why": {
+   "q": "Why does SSH ignore a key with loose permissions?",
+   "o": [
+    "It cannot read any keys",
+    "It refuses keys that others could read or change",
+    "Keys must be world-readable"
+   ],
+   "a": 1,
+   "x": "SSH checks .ssh (700) and private keys (600). If others can touch them, they could be stolen, so it ignores them."
+  }
+ },
+ {
+  "id": "service-account-shell",
+  "title": "A service account that can log in",
+  "level": "Intermediate",
+  "minutes": 8,
+  "lesson": "linux/security-hardening",
+  "story": "The account svc-backup only runs a nightly backup, but its entry in /etc/passwd gives it a normal login shell. Service accounts must not be able to log in. Do not change anything else about the account.",
+  "goals": [
+   "The shell of svc-backup is /bin/false (or a nologin shell).",
+   "Its user id (997) and home folder stay the same.",
+   "root keeps /bin/sh."
+  ],
+  "hints": [
+   "grep svc-backup /etc/passwd. The last field is the shell.",
+   "Fields are separated by colons. The shell is field 7.",
+   "sed -i 's|^\\(svc-backup:.*:\\)/bin/sh$|\\1/bin/false|' /etc/passwd"
+  ],
+  "solution": "grep svc-backup /etc/passwd\nsed -i 's|^\\(svc-backup:.*:\\)/bin/sh$|\\1/bin/false|' /etc/passwd\ngrep svc-backup /etc/passwd",
+  "why": {
+   "q": "Why give a service account /bin/false?",
+   "o": [
+    "It makes the service faster",
+    "It hides the account",
+    "Nobody can log in as that account interactively"
+   ],
+   "a": 2,
+   "x": "A service needs an identity, not a login. A non-login shell removes a way in."
+  }
+ },
+ {
+  "id": "world-writable",
+  "title": "Find and close world-writable files",
+  "level": "Intermediate",
+  "minutes": 10,
+  "lesson": "linux/security-hardening",
+  "story": "An audit found files and folders under /srv/apps that anyone can write to. Remove write access for \"others\" on files and on folders, except the shared folder, which is meant to be open but must be sticky (mode 1777).",
+  "goals": [
+   "No regular file under /srv/apps is writable by others.",
+   "No folder is writable by others except /srv/apps/shared.",
+   "/srv/apps/shared stays mode 1777."
+  ],
+  "hints": [
+   "find /srv/apps -perm -002 lists everything others can write.",
+   "Use -type f for files and -type d for folders. chmod o-w removes the write bit for others.",
+   "find /srv/apps -type f -perm -002 -exec chmod o-w {} \\;  and the same for folders that are not sticky: ! -perm -1000"
+  ],
+  "solution": "find /srv/apps -perm -002\nfind /srv/apps -type f -perm -002 -exec chmod o-w {} \\;\nfind /srv/apps -type d -perm -002 ! -perm -1000 -exec chmod o-w {} \\;\nfind /srv/apps -perm -002",
+  "why": {
+   "q": "Why are world-writable files a risk?",
+   "o": [
+    "Any user on the machine can change them",
+    "They are slower",
+    "They use more disk"
+   ],
+   "a": 0,
+   "x": "If everyone can write, any compromised account can alter the file, and scripts that run it become a way to escalate."
+  }
+ },
+ {
+  "id": "setuid-audit",
+  "title": "Programs that run as root for everyone",
+  "level": "Intermediate",
+  "minutes": 10,
+  "lesson": "linux/security-hardening",
+  "story": "A scan found programs under /usr/local and /opt with the setuid or setgid bit set. None of them needs it. Remove both bits but keep the programs executable.",
+  "goals": [
+   "No file under /usr/local or /opt has the setuid or setgid bit.",
+   "The programs stay executable."
+  ],
+  "hints": [
+   "ls -l shows an s instead of x in the owner or group permissions.",
+   "find /usr/local /opt -type f -perm -4000 finds setuid files. -perm -2000 finds setgid ones.",
+   "find ... -perm -4000 -exec chmod u-s {} \\;  and  find ... -perm -2000 -exec chmod g-s {} \\;"
+  ],
+  "solution": "find /usr/local /opt -type f -perm -4000\nfind /usr/local /opt -type f -perm -4000 -exec chmod u-s {} \\;\nfind /usr/local /opt -type f -perm -2000 -exec chmod g-s {} \\;\nls -l /usr/local/bin /opt/tools",
+  "why": {
+   "q": "What does the setuid bit do?",
+   "o": [
+    "The program runs with its owner's rights, often root",
+    "The program runs faster",
+    "The program is hidden"
+   ],
+   "a": 0,
+   "x": "A setuid root program lets any user run code as root. Few programs should have it, and each one needs a reason."
+  }
+ },
+ {
+  "id": "apply-a-patch",
+  "title": "Apply the patch from the ticket",
+  "level": "Intermediate",
+  "minutes": 9,
+  "lesson": "bash/building-and-testing-shell-tools",
+  "story": "A colleague sent a patch file, /root/fix.patch, for /etc/app/app.conf. Apply it. Do not edit the file by hand.",
+  "goals": [
+   "/etc/app/app.conf has MAX_CONN=200 and LOG_LEVEL=warn after the patch.",
+   "The other lines of the file are unchanged."
+  ],
+  "hints": [
+   "cat /root/fix.patch shows what changes. Lines with - are removed and lines with + are added.",
+   "The paths in the patch start with a/ and b/. patch -p1 removes that first folder.",
+   "cd /etc/app && patch -p1 < /root/fix.patch"
+  ],
+  "solution": "cat /root/fix.patch\ncd /etc/app && patch -p1 < /root/fix.patch\ncat /etc/app/app.conf",
+  "why": {
+   "q": "Why use patch instead of editing by hand?",
+   "o": [
+    "It applies exactly the described change and can be reviewed",
+    "It is the only way to edit files",
+    "It saves disk"
+   ],
+   "a": 0,
+   "x": "A patch file records a precise change, so the same fix can be shared, reviewed and re-applied."
+  }
+ },
+ {
+  "id": "report-umask",
+  "title": "The report nobody can read",
+  "level": "Intermediate",
+  "minutes": 9,
+  "lesson": "linux/users-groups-permissions",
+  "story": "report-gen writes /srv/out/report.txt for the web team, but the file is created with mode 600 so only root can read it. The script sets a strict umask. Fix the script so new reports are readable by others (mode 644) but not writable by them.",
+  "goals": [
+   "After running report-gen, /srv/out/report.txt is mode 644."
+  ],
+  "hints": [
+   "ls -l /srv/out/report.txt shows 600. cat /usr/local/bin/report-gen shows a umask line.",
+   "umask is a mask of permissions to remove from new files. 077 removes all access for group and others.",
+   "sed -i \"s/umask 077/umask 022/\" /usr/local/bin/report-gen, then run report-gen again."
+  ],
+  "solution": "ls -l /srv/out/report.txt\nsed -i \"s/umask 077/umask 022/\" /usr/local/bin/report-gen\nrm /srv/out/report.txt; report-gen\nls -l /srv/out/report.txt",
+  "why": {
+   "q": "What does umask 077 do?",
+   "o": [
+    "New files are public",
+    "New files are deleted",
+    "New files are private to the owner"
+   ],
+   "a": 2,
+   "x": "umask removes permission bits from new files. 077 removes everything for group and others."
+  }
+ },
+ {
+  "id": "open-files-limit",
+  "title": "Too many open files",
+  "level": "Advanced",
+  "minutes": 12,
+  "lesson": "linux/processes-memory-and-the-oom-killer",
+  "story": "The worker needs at least 256 open files, but the launcher sets a low limit. The worker writes its state to /run/worker.status and exits. Fix the limit in the launcher and start the worker so that it keeps running.",
+  "goals": [
+   "worker is running and /run/worker.status says \"worker: ok\".",
+   "The soft limit for open files of the running worker is at least 256."
+  ],
+  "hints": [
+   "cat /run/worker.status and cat /usr/local/bin/start-worker. The launcher runs ulimit -n before starting the worker.",
+   "ulimit -n shows the limit of your shell. A script sets it only for itself and its children.",
+   "sed -i \"s/ulimit -n 64/ulimit -n 1024/\" /usr/local/bin/start-worker, then run start-worker. Check /proc/PID/limits."
+  ],
+  "solution": "cat /run/worker.status\nsed -i \"s/ulimit -n 64/ulimit -n 1024/\" /usr/local/bin/start-worker\nstart-worker\ngrep \"open files\" /proc/$(pidof worker)/limits",
+  "why": {
+   "q": "Why did raising ulimit in a shell not help the service?",
+   "o": [
+    "The limit applies to that process and what it starts, so it must be set in the launcher",
+    "ulimit is global",
+    "The service ignores all limits"
+   ],
+   "a": 0,
+   "x": "ulimit sets limits for the current shell and its children. The service must be started with the higher limit."
+  }
+ },
+ {
+  "id": "recover-deleted-data",
+  "title": "Recover the file that was deleted while open",
+  "level": "Advanced",
+  "minutes": 12,
+  "lesson": "linux/filesystems-page-cache-and-io",
+  "story": "Someone deleted /var/lib/ledger/today.dat while the process ledger-writer still had it open. It holds today's orders. The data is not gone yet: the process can still read it. Save a copy as /root/recovered.dat and leave the process running.",
+  "goals": [
+   "/root/recovered.dat contains the order lines (ORDER-9917 and ORDER-9918).",
+   "ledger-writer keeps running."
+  ],
+  "hints": [
+   "ls -l /proc/PID/fd lists the files a process has open. Look for \"(deleted)\".",
+   "Get the PID with pidof ledger-writer. Find the fd number whose target says today.dat (deleted).",
+   "Open files can be copied through /proc: cp /proc/PID/fd/3 /root/recovered.dat"
+  ],
+  "solution": "ls -l /proc/$(pidof ledger-writer)/fd\ncp /proc/$(pidof ledger-writer)/fd/3 /root/recovered.dat\ncat /root/recovered.dat",
+  "why": {
+   "q": "How could the deleted file still be read?",
+   "o": [
+    "Deleted files stay forever",
+    "The process kept it open, and /proc/PID/fd gives access",
+    "It was restored from the trash"
+   ],
+   "a": 1,
+   "x": "While a handle is open, the data exists. cp from /proc/PID/fd/N copies it back out."
+  }
+ },
+ {
+  "id": "process-environment",
+  "title": "Which database is the running process using?",
+  "level": "Advanced",
+  "minutes": 10,
+  "lesson": "linux/debugging-a-sick-server",
+  "story": "db-proxy was started a week ago with a DB_HOST environment variable. Its config file says something else, and nobody remembers which value is in use. Ask the running process and write the answer as host=NAME into /root/answer.txt.",
+  "goals": [
+   "/root/answer.txt contains host=NAME, with the DB_HOST value the process really has."
+  ],
+  "hints": [
+   "A running process keeps its start-up environment in /proc/PID/environ, separated by NUL characters.",
+   "tr \"\\0\" \"\\n\" < /proc/PID/environ prints one variable per line.",
+   "echo \"host=$(tr \"\\0\" \"\\n\" < /proc/$(pidof db-proxy)/environ | sed -n \"s/^DB_HOST=//p\")\" > /root/answer.txt"
+  ],
+  "solution": "tr \"\\0\" \"\\n\" < /proc/$(pidof db-proxy)/environ | grep DB_HOST\necho \"host=$(tr \"\\0\" \"\\n\" < /proc/$(pidof db-proxy)/environ | sed -n \"s/^DB_HOST=//p\")\" > /root/answer.txt\ncat /root/answer.txt",
+  "why": {
+   "q": "Where does a running process keep its environment?",
+   "o": [
+    "In /etc/environment only",
+    "In the config file",
+    "In /proc/PID/environ"
+   ],
+   "a": 2,
+   "x": "The environment is fixed when a process starts. /proc/PID/environ shows the real values, which may differ from the config."
+  }
+ },
+ {
+  "id": "reload-with-sighup",
+  "title": "Change the setting without restarting",
+  "level": "Advanced",
+  "minutes": 11,
+  "lesson": "linux/processes-and-services",
+  "story": "webd greets visitors with the text in /etc/webd.conf. It reads the file at start and again when it gets the HUP signal. Change the greeting to \"hello v2\" and make webd use it without restarting the process, because it holds live connections.",
+  "goals": [
+   "/run/webd.state shows \"hello v2\".",
+   "webd keeps the same process id (no restart)."
+  ],
+  "hints": [
+   "cat /etc/webd.conf and cat /run/webd.state. The process id is in /run/webd.pid.",
+   "kill sends any signal. HUP is the traditional \"reload your config\" signal.",
+   "sed -i \"s/v1/v2/\" /etc/webd.conf; kill -HUP $(cat /run/webd.pid)"
+  ],
+  "solution": "cat /run/webd.state\nsed -i \"s/v1/v2/\" /etc/webd.conf\nkill -HUP $(cat /run/webd.pid)\nsleep 2; cat /run/webd.state",
+  "why": {
+   "q": "What does SIGHUP often mean to a daemon?",
+   "o": [
+    "Re-read the configuration",
+    "Delete the logs",
+    "Restart the machine"
+   ],
+   "a": 0,
+   "x": "Many daemons treat HUP as reload. It applies new settings without dropping connections."
+  }
+ },
+ {
+  "id": "graceful-stop",
+  "title": "Stop the worker without losing the queue",
+  "level": "Advanced",
+  "minutes": 10,
+  "lesson": "linux/processes-and-services",
+  "story": "queue-worker keeps messages in memory and writes them to disk only when it receives the normal stop signal (TERM). Stop it so that /var/spool/q/flushed appears. Do not use kill -9.",
+  "goals": [
+   "queue-worker is no longer running.",
+   "/var/spool/q/flushed exists, which proves it flushed before exiting."
+  ],
+  "hints": [
+   "kill -l lists signals. TERM (15) asks a program to stop; KILL (9) gives it no chance to clean up.",
+   "Plain kill PID sends TERM. The worker finishes its current sleep first, so wait a moment.",
+   "kill $(pidof queue-worker); sleep 2; ls /var/spool/q"
+  ],
+  "solution": "kill $(pidof queue-worker)\nsleep 2\nls /var/spool/q\npidof queue-worker",
+  "why": {
+   "q": "Why send SIGTERM before SIGKILL?",
+   "o": [
+    "SIGKILL is slower",
+    "SIGTERM is louder",
+    "It lets the program finish its work and clean up"
+   ],
+   "a": 2,
+   "x": "SIGTERM can be handled, so a worker can save the queue. SIGKILL gives it no chance."
+  }
+ },
+ {
+  "id": "stopped-process",
+  "title": "The job that froze without crashing",
+  "level": "Advanced",
+  "minutes": 9,
+  "lesson": "linux/debugging-a-sick-server",
+  "story": "etl-job writes the time into /run/etl.hb every second. The file stopped changing, but the process is still listed. Someone paused it with a signal. Resume the same process; do not restart it.",
+  "goals": [
+   "/run/etl.hb is updated again.",
+   "etl-job keeps its original process id."
+  ],
+  "hints": [
+   "ps -o pid,stat,comm shows the state. T means stopped.",
+   "A stopped process is resumed with a signal, not by restarting it.",
+   "kill -CONT $(pidof etl-job)"
+  ],
+  "solution": "ps -o pid,stat,comm | grep etl\nkill -CONT $(pidof etl-job)\nsleep 2; cat /run/etl.hb",
+  "why": {
+   "q": "What does kill -CONT do?",
+   "o": [
+    "It restarts the machine",
+    "It resumes a process that was stopped",
+    "It continues the log"
+   ],
+   "a": 1,
+   "x": "A stopped process (SIGSTOP) is frozen but alive. SIGCONT lets it run again."
+  }
+ },
+ {
+  "id": "ip-forward",
+  "title": "Turn on forwarding and keep it on",
+  "level": "Advanced",
+  "minutes": 9,
+  "lesson": "linux/kernel-modules-sysctl-and-boot-parameters",
+  "story": "This machine should route packets between networks, but kernel packet forwarding (net.ipv4.ip_forward) is off. Turn it on now and make it survive a reboot by writing it to /etc/sysctl.conf.",
+  "goals": [
+   "/proc/sys/net/ipv4/ip_forward is 1.",
+   "/etc/sysctl.conf contains net.ipv4.ip_forward = 1."
+  ],
+  "hints": [
+   "cat /proc/sys/net/ipv4/ip_forward shows the live value. sysctl net.ipv4.ip_forward shows the same.",
+   "sysctl -w sets it now. /etc/sysctl.conf keeps it for the next boot.",
+   "echo \"net.ipv4.ip_forward = 1\" >> /etc/sysctl.conf; sysctl -p"
+  ],
+  "solution": "sysctl net.ipv4.ip_forward\necho \"net.ipv4.ip_forward = 1\" >> /etc/sysctl.conf\nsysctl -p\nsysctl net.ipv4.ip_forward",
+  "why": {
+   "q": "Why also write the setting to /etc/sysctl.conf?",
+   "o": [
+    "So it survives a reboot",
+    "So it runs faster",
+    "So it can be seen"
+   ],
+   "a": 0,
+   "x": "sysctl -w changes the running kernel only. A line in sysctl.conf is applied at every boot."
+  }
+ },
+ {
+  "id": "hardlinks-keep-space",
+  "title": "Deleting the file did not free the space",
+  "level": "Advanced",
+  "minutes": 12,
+  "lesson": "linux/filesystems-page-cache-and-io",
+  "story": "/srv/store is nearly full. Someone deleted one data.bin, but the usage did not change. The same 6 MB file has other names (hard links) in other folders. Free the space by removing every name of that file, and keep keep.txt.",
+  "goals": [
+   "/srv/store is under 50 percent full.",
+   "keep.txt is still there."
+  ],
+  "hints": [
+   "ls -li shows inode numbers and the link count. Files with the same inode are the same data.",
+   "Space is freed only when the last name is gone. find /srv/store -name data.bin lists the names.",
+   "find /srv/store -name data.bin -exec rm {} \\;"
+  ],
+  "solution": "df -h /srv/store\nfind /srv/store -name data.bin\nfind /srv/store -name data.bin -exec rm {} \\;\ndf -h /srv/store",
+  "why": {
+   "q": "Why did deleting one name free no space?",
+   "o": [
+    "Another hard link still points to the same data",
+    "The disk was full",
+    "Deleting is delayed"
+   ],
+   "a": 0,
+   "x": "Data is freed when the last link is gone. Two names for one inode share the same blocks."
+  }
+ },
+ {
+  "id": "sparse-file",
+  "title": "A 200 MB file that uses almost no disk",
+  "level": "Advanced",
+  "minutes": 9,
+  "lesson": "linux/filesystems-page-cache-and-io",
+  "story": "/srv/vm/disk.img looks like 200 MB in ls -l, but it is a sparse file: most of it is empty space that takes no storage. Report the real disk usage in kilobytes as used_kb=NUMBER in /root/answer.txt.",
+  "goals": [
+   "/root/answer.txt contains used_kb=NUMBER, the blocks the file really uses (as du -k reports)."
+  ],
+  "hints": [
+   "ls -l shows the apparent size. du shows the blocks used.",
+   "du -k FILE prints kilobytes of real usage in the first column.",
+   "echo \"used_kb=$(du -k /srv/vm/disk.img | cut -f1)\" > /root/answer.txt"
+  ],
+  "solution": "ls -l /srv/vm/disk.img\ndu -k /srv/vm/disk.img\necho \"used_kb=$(du -k /srv/vm/disk.img | cut -f1)\" > /root/answer.txt\ncat /root/answer.txt",
+  "why": {
+   "q": "Why is a 200 MB file using almost no disk?",
+   "o": [
+    "It is compressed",
+    "It is a link",
+    "Empty holes in a sparse file take no blocks"
+   ],
+   "a": 2,
+   "x": "A sparse file records its size but only stores the written parts. ls shows the size, du shows the real use."
+  }
+ },
+ {
+  "id": "busy-unmount",
+  "title": "umount says the target is busy",
+  "level": "Advanced",
+  "minutes": 12,
+  "lesson": "linux/disks-and-filesystems",
+  "story": "/mnt/data must be unmounted, but umount fails with \"target is busy\". Something is using it. Find it, stop only that program, and unmount. api-server must keep running.",
+  "goals": [
+   "/mnt/data is no longer mounted.",
+   "api-server is still running and nightly-report is stopped."
+  ],
+  "hints": [
+   "Run umount /mnt/data and read the error. A process whose current directory is inside the mount keeps it busy.",
+   "ls -l /proc/*/cwd 2>/dev/null | grep /mnt/data shows who is in there.",
+   "kill $(pidof nightly-report); sleep 1; umount /mnt/data"
+  ],
+  "solution": "umount /mnt/data\nls -l /proc/*/cwd 2>/dev/null | grep /mnt/data\nkill $(pidof nightly-report)\nsleep 1; umount /mnt/data",
+  "why": {
+   "q": "Why does umount say the target is busy?",
+   "o": [
+    "The disk is broken",
+    "The mount is hidden",
+    "A process is using a file or folder on it"
+   ],
+   "a": 2,
+   "x": "A mount cannot be removed while something uses it, for example a shell inside it. Find the user and stop it."
+  }
+ },
+ {
+  "id": "hidden-under-mount",
+  "title": "The files vanished when the volume was mounted",
+  "level": "Advanced",
+  "minutes": 13,
+  "lesson": "linux/disks-and-filesystems",
+  "story": "The old files in /srv/data disappeared after a new volume was mounted on top of it. They are still on disk, hidden underneath. Copy them to /backup/old-data without unmounting the new volume (the app is writing to it).",
+  "goals": [
+   "/backup/old-data/ledger.csv exists with the old content.",
+   "The new volume stays mounted on /srv/data."
+  ],
+  "hints": [
+   "mount | grep srv shows the volume covering the folder. ls /srv/data shows only the new volume.",
+   "A bind mount of / shows the folder without the mounts that cover it: mkdir -p /mnt/rootview; mount --bind / /mnt/rootview",
+   "Copy from /mnt/rootview/srv/data, then umount /mnt/rootview."
+  ],
+  "solution": "mkdir -p /mnt/rootview /backup/old-data\nmount --bind / /mnt/rootview\ncp -a /mnt/rootview/srv/data/. /backup/old-data/\numount /mnt/rootview",
+  "why": {
+   "q": "Why did files disappear after mounting a volume?",
+   "o": [
+    "They were deleted",
+    "The mount covers the old folder's contents until unmounted",
+    "They moved to /tmp"
+   ],
+   "a": 1,
+   "x": "Mounting over a folder hides what was there. A bind mount of / shows the files underneath."
+  }
+ },
+ {
+  "id": "wait-for-jobs",
+  "title": "The script that does not wait for its jobs",
+  "level": "Advanced",
+  "minutes": 10,
+  "lesson": "bash/advanced-patterns",
+  "story": "fetch-all starts three background jobs and then summarises their results, but it summarises too early and says \"fetched 0 parts\". Fix the script so it prints \"fetched 3 parts\".",
+  "goals": [
+   "Running fetch-all prints \"fetched 3 parts\".",
+   "Keep the jobs running in parallel (do not run them one after another)."
+  ],
+  "hints": [
+   "Run fetch-all and read the output. Background jobs started with & run on their own; the script does not wait for them.",
+   "The shell builtin wait pauses until all background jobs finish.",
+   "sed -i \"s/^cat /wait; cat /\" /usr/local/bin/fetch-all"
+  ],
+  "solution": "fetch-all\nsed -i \"s/^cat /wait; cat /\" /usr/local/bin/fetch-all\nfetch-all",
+  "why": {
+   "q": "What does wait do in a script?",
+   "o": [
+    "It sleeps for one second",
+    "It reads input",
+    "It waits for background jobs to finish"
+   ],
+   "a": 2,
+   "x": "Jobs started with & run in the background. Without wait, the script may use their results too early or exit."
+  }
+ },
+ {
+  "id": "lock-race",
+  "title": "Two copies run at once despite the lock",
+  "level": "Advanced",
+  "minutes": 12,
+  "lesson": "bash/safe-automation",
+  "story": "single-run must never run twice at the same time. It checks for a lock file first, but when two copies start together, both see \"no lock\" and both run. Make the lock safe. mkdir is atomic: it either creates the directory or fails.",
+  "goals": [
+   "When two copies start at the same moment, only one runs (one line in /run/single.log).",
+   "A lone run still works and cleans up its lock."
+  ],
+  "hints": [
+   "Read the script: it tests for the lock, sleeps, and only then creates it. Another copy can slip in between.",
+   "Replace \"test, then create\" with one atomic step: if ! mkdir $LOCK 2>/dev/null; then ... exit.",
+   "Use sed to change the three lines: the test, the touch and the rm. Use rmdir for a lock that is a directory."
+  ],
+  "solution": "cat /usr/local/bin/single-run\nsed -i 's|^if \\[ -e $LOCK \\]; then|if ! mkdir $LOCK 2>/dev/null; then|' /usr/local/bin/single-run\nsed -i '/^touch $LOCK$/d' /usr/local/bin/single-run\nsed -i 's|rm -f $LOCK|rmdir $LOCK|' /usr/local/bin/single-run",
+  "why": {
+   "q": "Why is mkdir a better lock than test then touch?",
+   "o": [
+    "It is faster",
+    "It checks and creates in one atomic step",
+    "It hides the lock"
+   ],
+   "a": 1,
+   "x": "With test and create, two runs can both pass the test. mkdir either succeeds once or fails, with no gap."
+  }
+ },
+ {
+  "id": "atomic-config-write",
+  "title": "Readers see a half-written config",
+  "level": "Advanced",
+  "minutes": 12,
+  "lesson": "bash/temporary-files-and-atomic-writes",
+  "story": "update-conf rewrites /etc/app/live.conf by emptying it and then filling it again. For a moment the file is empty, and a program reading it then crashes. Change the script to write a temporary file and rename it into place, so readers see either the old or the new file, never half of one.",
+  "goals": [
+   "While update-conf runs, live.conf is never empty.",
+   "When it finishes, live.conf holds a=1, b=2 and c=3."
+  ],
+  "hints": [
+   "cat /usr/local/bin/update-conf. The first write truncates the live file.",
+   "A rename (mv) on the same filesystem is atomic. Build the new file next to the old one, then mv it over.",
+   "sed -i \"s|^OUT=.*|OUT=/etc/app/live.conf.new|\" the script, then append: echo \"mv /etc/app/live.conf.new /etc/app/live.conf\" >> the script."
+  ],
+  "solution": "cat /usr/local/bin/update-conf\nsed -i \"s|^OUT=.*|OUT=/etc/app/live.conf.new|\" /usr/local/bin/update-conf\necho \"mv /etc/app/live.conf.new /etc/app/live.conf\" >> /usr/local/bin/update-conf",
+  "why": {
+   "q": "Why write to a new file and then mv?",
+   "o": [
+    "mv compresses the file",
+    "It saves a copy",
+    "A rename is atomic, so readers see the old or new file, never half"
+   ],
+   "a": 2,
+   "x": "A reader that opens the file during a slow write sees a partial file. Renaming a finished file over it is instant."
+  }
+ },
+ {
+  "id": "keep-going-after-failure",
+  "title": "The deploy that says OK after a failed build",
+  "level": "Advanced",
+  "minutes": 10,
+  "lesson": "bash/safe-automation",
+  "story": "The deploy script runs a build step. When the build fails, the script carries on, uploads and prints \"deploy OK\". It must stop at the first failing command.",
+  "goals": [
+   "With /run/build.fail present, deploy exits with an error and does not print \"deploy OK\".",
+   "Without it, deploy still prints \"uploading artifact\" and \"deploy OK\"."
+  ],
+  "hints": [
+   "Create /run/build.fail with touch, run deploy and see it still says OK. Remove the file afterwards.",
+   "The shell option set -e stops a script at the first failing command.",
+   "Insert it after the first line: sed -i \"1a set -e\" /usr/local/bin/deploy"
+  ],
+  "solution": "touch /run/build.fail; deploy; rm /run/build.fail\nsed -i \"1a set -e\" /usr/local/bin/deploy\ntouch /run/build.fail; deploy; rm /run/build.fail",
+  "why": {
+   "q": "Why did the deploy print OK after a failed build?",
+   "o": [
+    "The build succeeded",
+    "The script ignored the failing command's exit code",
+    "OK is always printed"
+   ],
+   "a": 1,
+   "x": "Without set -e or an explicit check, a script continues after errors and its last command decides the result."
+  }
+ },
+ {
+  "id": "cleanup-on-exit",
+  "title": "The lock file that is never removed",
+  "level": "Advanced",
+  "minutes": 11,
+  "lesson": "bash/safe-automation",
+  "story": "nightly-job creates a lock file and removes it only at the very end. When a step fails, the script exits early and the stale lock blocks every later run. Make sure the lock is removed however the script ends.",
+  "goals": [
+   "After a failed run, /run/nightly.lock does not exist.",
+   "After a good run, the lock is gone and \"step done\" is printed."
+  ],
+  "hints": [
+   "cat /usr/local/bin/nightly-job. With set -e the script stops at the failing step and never reaches the rm.",
+   "trap runs a command when the script exits, for any reason: trap \"COMMAND\" EXIT",
+   "sed -i '2a trap \"rm -f /run/nightly.lock\" EXIT' /usr/local/bin/nightly-job"
+  ],
+  "solution": "cat /usr/local/bin/nightly-job\nsed -i '2a trap \"rm -f /run/nightly.lock\" EXIT' /usr/local/bin/nightly-job\nrm -f /run/nightly.lock",
+  "why": {
+   "q": "What does trap ... EXIT do?",
+   "o": [
+    "It runs a command when the script ends, even after an error",
+    "It blocks the script",
+    "It hides errors"
+   ],
+   "a": 0,
+   "x": "A trap on EXIT removes the lock file however the script ends, so a crash does not leave it behind."
+  }
+ },
+ {
+  "id": "copy-with-history",
+  "title": "Copy a tree and keep owners, dates and links",
+  "level": "Advanced",
+  "minutes": 11,
+  "lesson": "linux/filesystem-and-navigation",
+  "story": "Copy the release folder /srv/src to /srv/dst for the new host. The copy must keep each file's owner, its modification time and the symlink \"latest\". A plain cp -r loses these.",
+  "goals": [
+   "/srv/dst has the same files as /srv/src.",
+   "Owners and modification times are the same, and \"latest\" is still a symlink."
+  ],
+  "hints": [
+   "ls -l --time-style may not exist here; use stat -c \"%u %Y %N\" FILE to see owner, mtime and link target.",
+   "cp has an archive option that keeps everything: -a.",
+   "mkdir -p /srv/dst; cp -a /srv/src/. /srv/dst/   (or: tar -C /srv/src -cf - . | tar -C /srv/dst -xf -)"
+  ],
+  "solution": "mkdir -p /srv/dst\ncp -a /srv/src/. /srv/dst/\nstat -c \"%u %Y %N\" /srv/dst/conf/app.conf /srv/dst/latest",
+  "why": {
+   "q": "What does cp -a keep that a plain cp does not?",
+   "o": [
+    "Owners, times, links and permissions",
+    "Only the file names",
+    "Nothing, it is the same"
+   ],
+   "a": 0,
+   "x": "-a is archive mode: it copies recursively and preserves attributes, which a faithful copy needs."
+  }
+ },
+ {
+  "id": "top-spender",
+  "title": "Who spent the most?",
+  "level": "Advanced",
+  "minutes": 12,
+  "lesson": "bash/text-processing",
+  "story": "orders.csv lists order id, customer id and amount. customers.csv maps customer id to a name. Find the customer with the highest total spend and write top=NAME into /root/answer.txt.",
+  "goals": [
+   "/root/answer.txt contains top=NAME for the customer with the largest total."
+  ],
+  "hints": [
+   "head /srv/sales/orders.csv /srv/sales/customers.csv shows the columns. There are no header lines.",
+   "awk can add up amounts per customer id in an array: s[$2]+=$3",
+   "Read customers.csv first (NR==FNR), then orders.csv, and look up the name at the end."
+  ],
+  "solution": "awk -F, 'NR==FNR{n[$1]=$2; next} {s[$2]+=$3} END{for(c in s) if(s[c]>m){m=s[c]; b=c}; print \"top=\" n[b]}' /srv/sales/customers.csv /srv/sales/orders.csv > /root/answer.txt\ncat /root/answer.txt",
+  "why": {
+   "q": "Why join two files with awk?",
+   "o": [
+    "awk can only read one file",
+    "To delete one file",
+    "To turn an id into a name using a lookup table"
+   ],
+   "a": 2,
+   "x": "Read the small file into an array first, then use it to translate ids while reading the big file."
+  }
+ },
+ {
+  "id": "unique-domains",
+  "title": "How many different email domains signed up?",
+  "level": "Advanced",
+  "minutes": 10,
+  "lesson": "bash/text-processing",
+  "story": "signups.txt has one signup per line, in the form: date, text, email=ADDRESS, plan=PLAN. Other addresses appear in the text. Count how many different domains appear in the email= fields and write domains=NUMBER into /root/answer.txt.",
+  "goals": [
+   "/root/answer.txt contains domains=NUMBER, counting only the email= fields."
+  ],
+  "hints": [
+   "head /srv/data/signups.txt shows the format. grep -o prints only the matching part of each line.",
+   "grep -o \"email=[^ ]*\" gets the field. sed \"s/.*@//\" keeps what follows the @.",
+   "grep -o \"email=[^ ]*\" FILE | sed \"s/.*@//\" | sort -u | wc -l"
+  ],
+  "solution": "grep -o \"email=[^ ]*\" /srv/data/signups.txt | sed \"s/.*@//\" | sort -u | wc -l\necho \"domains=$(grep -o \"email=[^ ]*\" /srv/data/signups.txt | sed \"s/.*@//\" | sort -u | wc -l)\" > /root/answer.txt",
+  "why": {
+   "q": "Why strip the part before @?",
+   "o": [
+    "It makes names shorter",
+    "It hides users",
+    "Domains are the text after @, and duplicates then collapse"
+   ],
+   "a": 2,
+   "x": "sed removes the user part, and sort -u counts each domain once."
+  }
+ },
+ {
+  "id": "json-by-hand",
+  "title": "Read a JSON field without jq",
+  "level": "Advanced",
+  "minutes": 11,
+  "lesson": "bash/apis-and-json",
+  "story": "There is no jq on this machine. /srv/api/response.json is one line of JSON. Pull out the value of the \"version\" key (not \"api_version\") and write version=VALUE into /root/answer.txt.",
+  "goals": [
+   "/root/answer.txt contains version=2.4.1."
+  ],
+  "hints": [
+   "cat /srv/api/response.json. Two keys end in \"version\"; you want the exact key \"version\".",
+   "sed -n can print only a captured part: s/.*\"key\":\"\\([^\"]*\\)\".*/\\1/p",
+   "The quote before version excludes api_version, because there the character before \"version\" is an underscore."
+  ],
+  "solution": "cat /srv/api/response.json\necho \"version=$(sed -n 's/.*\"version\":\"\\([^\"]*\\)\".*/\\1/p' /srv/api/response.json)\" > /root/answer.txt\ncat /root/answer.txt",
+  "why": {
+   "q": "Why is sed fragile on JSON?",
+   "o": [
+    "JSON can change spacing and nesting, which breaks the pattern",
+    "sed cannot read files",
+    "JSON is binary"
+   ],
+   "a": 0,
+   "x": "A pattern that fits one layout can fail on another. A real parser is safer when available."
+  }
+ },
+ {
+  "id": "decode-secret",
+  "title": "Decode the secret and keep it private",
+  "level": "Advanced",
+  "minutes": 9,
+  "lesson": "security/secrets-management",
+  "story": "The database password is stored base64-encoded in /etc/app/secret.b64. Decode it into /root/db-password.txt exactly (no extra characters), and make the file readable only by its owner.",
+  "goals": [
+   "/root/db-password.txt holds the decoded password.",
+   "The file mode is 600."
+  ],
+  "hints": [
+   "base64 -d decodes. Base64 is an encoding, not encryption.",
+   "Redirect the output into the file. Then restrict the file with chmod.",
+   "base64 -d /etc/app/secret.b64 > /root/db-password.txt; chmod 600 /root/db-password.txt"
+  ],
+  "solution": "cat /etc/app/secret.b64\nbase64 -d /etc/app/secret.b64 > /root/db-password.txt\nchmod 600 /root/db-password.txt",
+  "why": {
+   "q": "Why chmod 600 the decoded file?",
+   "o": [
+    "Only the owner should read a password",
+    "600 makes it hidden",
+    "It encrypts it"
+   ],
+   "a": 0,
+   "x": "Anything that decodes to a secret needs private permissions at once, before anyone else can read it."
+  }
+ },
+ {
+  "id": "verify-checksums",
+  "title": "Which download is corrupted?",
+  "level": "Advanced",
+  "minutes": 10,
+  "lesson": "security/supply-chain-sboms-and-provenance",
+  "story": "Three release files were downloaded to /srv/downloads, with a SHA256SUMS list from the publisher. One file does not match its checksum. Write its name as bad=FILENAME into /root/answer.txt. Do not delete anything.",
+  "goals": [
+   "/root/answer.txt contains bad=NAME for the file that fails verification."
+  ],
+  "hints": [
+   "cat /srv/downloads/SHA256SUMS shows the expected checksums.",
+   "sha256sum -c FILE checks every file listed and prints OK or FAILED. Run it from the downloads folder.",
+   "cd /srv/downloads; sha256sum -c SHA256SUMS 2>/dev/null | grep -v \": OK\" | cut -d: -f1"
+  ],
+  "solution": "cd /srv/downloads\nsha256sum -c SHA256SUMS\necho \"bad=$(sha256sum -c SHA256SUMS 2>/dev/null | grep -v ': OK$' | cut -d: -f1)\" > /root/answer.txt\ncat /root/answer.txt",
+  "why": {
+   "q": "What does sha256sum -c prove?",
+   "o": [
+    "That the file is safe to run",
+    "That each file matches the recorded hash",
+    "That the file is new"
+   ],
+   "a": 1,
+   "x": "A matching hash shows the file is unchanged. A mismatch means damage or tampering."
+  }
+ },
+ {
+  "id": "block-the-attackers",
+  "title": "Build a block list from the auth log",
+  "level": "Advanced",
+  "minutes": 12,
+  "lesson": "security/detection-and-security-logging",
+  "story": "The auth log shows many failed SSH logins. Write the addresses with 5 or more \"Failed password\" lines, one per line and sorted, into /root/blocklist.txt. Successful logins must not count.",
+  "goals": [
+   "/root/blocklist.txt lists every address with at least 5 failed logins, sorted, one per line.",
+   "No address with fewer failures is listed."
+  ],
+  "hints": [
+   "head /var/log/auth.log. Only lines with \"Failed password\" count.",
+   "grep -oE \"[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+\" pulls out addresses. sort | uniq -c counts them.",
+   "awk \"$1>=5 {print $2}\" keeps the frequent ones."
+  ],
+  "solution": "grep \"Failed password\" /var/log/auth.log | grep -oE \"[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+\" | sort | uniq -c | awk '$1>=5{print $2}' | sort > /root/blocklist.txt\ncat /root/blocklist.txt",
+  "why": {
+   "q": "Why count failures per address?",
+   "o": [
+    "Each address is one user",
+    "A few failures are normal, many from one address are an attack",
+    "Counting is slower"
+   ],
+   "a": 1,
+   "x": "Counting and a threshold (five or more) picks out brute-force sources without blocking honest typos."
+  }
+ },
+ {
+  "id": "build-a-jail",
+  "title": "Build a tiny chroot jail",
+  "level": "Advanced",
+  "minutes": 13,
+  "lesson": "linux/namespaces-and-cgroups",
+  "story": "Create a minimal root file system at /jail so that chroot /jail /bin/cat /etc/motd prints \"inside the jail\". It needs a copy of busybox, a cat link to it and the motd file. It must not contain a copy of the host's /etc/passwd.",
+  "goals": [
+   "chroot /jail /bin/cat /etc/motd prints: inside the jail",
+   "/jail/etc/passwd does not exist."
+  ],
+  "hints": [
+   "A chroot only sees what is inside it, so the program and everything it needs must be copied in. busybox is one static file.",
+   "Make /jail/bin and /jail/etc, copy /bin/busybox into /jail/bin, and link cat to it: ln -s busybox /jail/bin/cat",
+   "Write the motd file: echo \"inside the jail\" > /jail/etc/motd"
+  ],
+  "solution": "mkdir -p /jail/bin /jail/etc\ncp /bin/busybox /jail/bin/\nln -s busybox /jail/bin/cat\necho \"inside the jail\" > /jail/etc/motd\nchroot /jail /bin/cat /etc/motd",
+  "why": {
+   "q": "What does chroot do?",
+   "o": [
+    "It deletes the root user",
+    "It changes the root of a process to a folder",
+    "It makes a backup"
+   ],
+   "a": 1,
+   "x": "After chroot, the process sees the chosen folder as /. It can only use tools you copied inside."
+  }
+ },
+ {
+  "id": "grow-a-tmpfs",
+  "title": "The cache volume is too small",
+  "level": "Advanced",
+  "minutes": 9,
+  "lesson": "linux/disks-and-filesystems",
+  "story": "/var/cache/app is a small in-memory volume that the app has nearly filled. It needs at least 8 MB. Resize it without unmounting, so the cached file survives.",
+  "goals": [
+   "/var/cache/app is at least 8 MB in size.",
+   "cache.bin is still there."
+  ],
+  "hints": [
+   "df -k /var/cache/app shows the size and use. mount | grep cache shows the options (size=2m).",
+   "A tmpfs can be resized live with a remount.",
+   "mount -o remount,size=8m /var/cache/app"
+  ],
+  "solution": "df -k /var/cache/app\nmount -o remount,size=8m /var/cache/app\ndf -k /var/cache/app",
+  "why": {
+   "q": "Where does a tmpfs live?",
+   "o": [
+    "On the disk",
+    "In memory, with a size limit you can change",
+    "On the network"
+   ],
+   "a": 1,
+   "x": "A tmpfs is RAM-backed. mount -o remount,size=8m changes the limit without losing files."
+  }
+ },
+ {
+  "id": "line-before-the-crash",
+  "title": "Which request killed the app?",
+  "level": "Advanced",
+  "minutes": 10,
+  "lesson": "linux/debugging-a-sick-server",
+  "story": "crash.log has start and finish lines for requests and, somewhere, a segfault line from the kernel. Find the request that started just before the crash and write req=REQ-NUMBER into /root/answer.txt.",
+  "goals": [
+   "/root/answer.txt contains req=ID of the request on the line just before the segfault."
+  ],
+  "hints": [
+   "grep -n segfault /var/log/app/crash.log shows the line number of the crash.",
+   "grep -B1 prints the matching line and the line before it.",
+   "grep -B1 segfault FILE | head -1 | grep -o \"REQ-[0-9]*\""
+  ],
+  "solution": "grep -B1 segfault /var/log/app/crash.log\necho \"req=$(grep -B1 segfault /var/log/app/crash.log | head -1 | grep -o 'REQ-[0-9]*')\" > /root/answer.txt\ncat /root/answer.txt",
+  "why": {
+   "q": "Why use grep -B1?",
+   "o": [
+    "It searches backwards",
+    "It also prints the line before each match",
+    "It bolds the match"
+   ],
+   "a": 1,
+   "x": "-B N prints N lines before the match, so you see the request that came just before the crash."
+  }
+ },
+ {
+  "id": "numeric-sort",
+  "title": "The slowest request",
+  "level": "Advanced",
+  "minutes": 8,
+  "lesson": "bash/text-processing",
+  "story": "latency.txt has one latency in milliseconds per line. Find the largest value and write max_ms=NUMBER into /root/answer.txt. A plain sort puts 95 after 2048, because it sorts as text.",
+  "goals": [
+   "/root/answer.txt contains max_ms=NUMBER with the real maximum."
+  ],
+  "hints": [
+   "sort FILE | tail -1 gives the wrong answer here. Sorting as text compares character by character.",
+   "sort -n sorts by number.",
+   "echo \"max_ms=$(sort -n /srv/data/latency.txt | tail -1)\" > /root/answer.txt"
+  ],
+  "solution": "sort /srv/data/latency.txt | tail -1\nsort -n /srv/data/latency.txt | tail -1\necho \"max_ms=$(sort -n /srv/data/latency.txt | tail -1)\" > /root/answer.txt",
+  "why": {
+   "q": "Why did plain sort give the wrong slowest request?",
+   "o": [
+    "It sorts as text, so 9 comes after 100",
+    "It sorts backwards",
+    "It ignores numbers"
+   ],
+   "a": 0,
+   "x": "Text sorting compares character by character. sort -n compares numbers."
+  }
+ },
+ {
+  "id": "orphaned-children",
+  "title": "Stop the job and everything it started",
+  "level": "Advanced",
+  "minutes": 10,
+  "lesson": "linux/processes-and-services",
+  "story": "batch-parent starts two batch-child workers and waits for them. Stop the whole job. If you kill only the parent, the children keep running. api-server must keep running.",
+  "goals": [
+   "No batch-parent and no batch-child process is running.",
+   "api-server is still running."
+  ],
+  "hints": [
+   "ps shows the family. Killing the parent does not kill its children.",
+   "pidof accepts several names: pidof batch-parent batch-child",
+   "kill $(pidof batch-parent batch-child)"
+  ],
+  "solution": "ps | grep batch\nkill $(pidof batch-parent batch-child)\nps | grep batch",
+  "why": {
+   "q": "Why did the children keep running after the parent stopped?",
+   "o": [
+    "Children are immortal",
+    "Killing a parent does not stop the processes it started",
+    "The parent was not killed"
+   ],
+   "a": 1,
+   "x": "Child processes continue and get a new parent. Stop the whole group, or children too."
+  }
+ },
+ {
+  "id": "who-has-it-open",
+  "title": "Which process keeps writing to this log?",
+  "level": "Advanced",
+  "minutes": 12,
+  "lesson": "linux/debugging-a-sick-server",
+  "story": "/var/log/mystery.log grows every second and nobody knows who writes it. Three writer programs run, and none shows the file name in its command line. Find the owner and write owner=NAME (the process name) into /root/answer.txt.",
+  "goals": [
+   "/root/answer.txt contains owner=NAME for the process that has mystery.log open."
+  ],
+  "hints": [
+   "Every open file of a process appears as a link in /proc/PID/fd.",
+   "Loop over the processes: for p in /proc/[0-9]*; do ls -l $p/fd 2>/dev/null | grep -q mystery.log && echo $p; done",
+   "The process name is in /proc/PID/comm."
+  ],
+  "solution": "for p in /proc/[0-9]*; do ls -l $p/fd 2>/dev/null | grep -q mystery.log && echo \"owner=$(cat $p/comm)\" > /root/answer.txt; done\ncat /root/answer.txt",
+  "why": {
+   "q": "How can you find which process has a file open?",
+   "o": [
+    "Ask the file",
+    "Look through /proc/PID/fd for links to that file",
+    "Check the file's owner"
+   ],
+   "a": 1,
+   "x": "Each process lists its open files in /proc/PID/fd. The one that links to the log is the writer."
+  }
+ },
+ {
+  "id": "unit-wrong-path",
+  "title": "The unit that points at the wrong binary",
+  "level": "Beginner",
+  "minutes": 8,
+  "lesson": "linux/systemd-overrides-targets-and-dependencies",
+  "story": "The ledger service will not start. Its unit file was written by hand and the program lives somewhere else. Fix the unit and start ledger with systemctl. This lab uses a small imitation of systemctl, not the real systemd.",
+  "goals": [
+   "ledger is active.",
+   "The unit file points at the real program."
+  ],
+  "hints": [
+   "systemctl status ledger shows the failure. journalctl -u ledger shows why.",
+   "Find the program: ls /opt/ledger/bin",
+   "Edit ExecStart in /etc/systemd/system/ledger.service, run systemctl daemon-reload, then systemctl start ledger."
+  ],
+  "solution": "systemctl status ledger\njournalctl -u ledger\nsed -i \"s#/opt/ledger/ledgerd#/opt/ledger/bin/ledgerd#\" /etc/systemd/system/ledger.service\nsystemctl daemon-reload\nsystemctl start ledger\nsystemctl status ledger",
+  "tag": "systemd",
+  "why": {
+   "q": "Why did the unit fail?",
+   "o": [
+    "The unit was too short",
+    "ExecStart named a file that does not exist",
+    "systemd was off"
+   ],
+   "a": 1,
+   "x": "The service manager starts exactly the path in ExecStart. A wrong path ends with status 203/EXEC."
+  }
+ },
+ {
+  "id": "service-not-enabled",
+  "title": "Works now, gone after the reboot",
+  "level": "Beginner",
+  "minutes": 8,
+  "lesson": "linux/systemd-overrides-targets-and-dependencies",
+  "story": "billing runs right now because someone started it by hand. After the last reboot it was down for an hour. Make sure billing starts by itself at boot, without stopping it now. This lab uses a small imitation of systemctl.",
+  "goals": [
+   "billing is running now.",
+   "billing is enabled, so a reboot starts it again."
+  ],
+  "hints": [
+   "systemctl is-enabled billing tells you whether it starts at boot.",
+   "systemctl enable billing creates the link that boot follows.",
+   "Do not stop it: it must keep running."
+  ],
+  "solution": "systemctl is-enabled billing\nsystemctl enable billing\nsystemctl is-enabled billing",
+  "tag": "systemd",
+  "why": {
+   "q": "What is the difference between start and enable?",
+   "o": [
+    "They are the same",
+    "enable only checks it",
+    "start runs it now, enable makes it start at boot"
+   ],
+   "a": 2,
+   "x": "start affects the running system. enable adds the link that boot follows. You usually want both."
+  }
+ },
+ {
+  "id": "stale-unit-reload",
+  "title": "I edited the unit, but nothing changed",
+  "level": "Intermediate",
+  "minutes": 10,
+  "lesson": "linux/systemd-overrides-targets-and-dependencies",
+  "story": "api must listen on port 9090 now. Someone changed the unit file and restarted the service, but api still reports port 8080. The change never took effect. Make api run with port 9090.",
+  "goals": [
+   "/run/api.args says --port 9090.",
+   "api is active."
+  ],
+  "hints": [
+   "cat /run/api.args shows the arguments the running api really got.",
+   "systemctl status api prints a warning about the unit file.",
+   "systemd keeps its own loaded copy of a unit. Reload it with systemctl daemon-reload, then restart the service."
+  ],
+  "solution": "cat /run/api.args\nsystemctl status api\nsystemctl daemon-reload\nsystemctl restart api\ncat /run/api.args",
+  "tag": "systemd",
+  "why": {
+   "q": "Why did the edit not take effect after a restart?",
+   "o": [
+    "The file was read-only",
+    "systemd uses its loaded copy until daemon-reload",
+    "The restart failed silently"
+   ],
+   "a": 1,
+   "x": "systemd keeps the unit definitions in memory. After editing a unit file, systemctl daemon-reload loads the new version."
+  }
+ },
+ {
+  "id": "missing-env-file",
+  "title": "The environment file that is not there",
+  "level": "Intermediate",
+  "minutes": 10,
+  "lesson": "linux/systemd-overrides-targets-and-dependencies",
+  "story": "payments will not start. Its unit loads settings from an environment file, and the service refuses to run without PAY_MODE. The file exists, but not where the unit looks for it.",
+  "goals": [
+   "payments is active.",
+   "/run/payments.mode says live."
+  ],
+  "hints": [
+   "journalctl -u payments says it failed to load the environment file.",
+   "Find the real file: find /etc/payments -type f",
+   "Fix the EnvironmentFile line, run systemctl daemon-reload and start payments."
+  ],
+  "solution": "journalctl -u payments\nfind /etc/payments -type f\nsed -i \"s#/etc/payments/payments.env#/etc/payments/env.d/payments.env#\" /etc/systemd/system/payments.service\nsystemctl daemon-reload\nsystemctl start payments\ncat /run/payments.mode",
+  "tag": "systemd",
+  "why": {
+   "q": "What does EnvironmentFile= do?",
+   "o": [
+    "It sets the file name",
+    "It hides files",
+    "It loads variables from a file for the service"
+   ],
+   "a": 2,
+   "x": "systemd reads KEY=value lines from the file and gives them to the process. A wrong path stops the start."
+  }
+ },
+ {
+  "id": "no-restart-policy",
+  "title": "A crash that nobody noticed",
+  "level": "Intermediate",
+  "minutes": 12,
+  "lesson": "linux/systemd-overrides-targets-and-dependencies",
+  "story": "datasync crashed at 03:10 with a lost database connection and stayed down until morning. It crashes the first two times it starts and then runs fine, so a restart policy would have saved the night. Add one and bring the service up.",
+  "goals": [
+   "datasync survives its early crashes and keeps running.",
+   "The unit has Restart=on-failure."
+  ],
+  "hints": [
+   "journalctl -u datasync shows the crash. systemctl status datasync shows it is failed.",
+   "Add a Restart=on-failure line in the [Service] section of /etc/systemd/system/datasync.service.",
+   "Run systemctl daemon-reload, then systemctl start datasync. Wait a few seconds and check the status again."
+  ],
+  "solution": "journalctl -u datasync\nsed -i \"/^ExecStart/a Restart=on-failure\" /etc/systemd/system/datasync.service\nsystemctl daemon-reload\nsystemctl start datasync\nsleep 5\nsystemctl status datasync",
+  "tag": "systemd",
+  "why": {
+   "q": "What does Restart=on-failure do?",
+   "o": [
+    "It restarts the machine",
+    "It restarts the service if it exits with an error",
+    "It deletes logs"
+   ],
+   "a": 1,
+   "x": "With a restart policy a crash is handled automatically, with a pause between tries."
+  }
+ },
+ {
+  "id": "service-user-missing",
+  "title": "The service account that does not exist",
+  "level": "Intermediate",
+  "minutes": 10,
+  "lesson": "linux/systemd-overrides-targets-and-dependencies",
+  "story": "metrics-agent must run as the user metrics, with uid 1001. Its unit names the user metrics-agent and the service fails with a USER error. Fix the unit so the agent runs as the right account.",
+  "goals": [
+   "metrics-agent is active.",
+   "It runs with uid 1001."
+  ],
+  "hints": [
+   "journalctl -u metrics-agent says no such process at step USER.",
+   "grep metrics /etc/passwd lists the real account name.",
+   "Fix User= in the unit, run systemctl daemon-reload and start the service."
+  ],
+  "solution": "journalctl -u metrics-agent\ngrep metrics /etc/passwd\nsed -i \"s/^User=.*/User=metrics/\" /etc/systemd/system/metrics-agent.service\nsystemctl daemon-reload\nsystemctl start metrics-agent",
+  "tag": "systemd",
+  "why": {
+   "q": "What does User= in a unit do?",
+   "o": [
+    "It creates the account",
+    "It names the owner of the file",
+    "It runs the service as that account"
+   ],
+   "a": 2,
+   "x": "systemd drops to that user before starting the program. If the user does not exist, the start fails at the USER step."
+  }
+ },
+ {
+  "id": "masked-unit",
+  "title": "The service somebody masked",
+  "level": "Advanced",
+  "minutes": 10,
+  "lesson": "linux/systemd-overrides-targets-and-dependencies",
+  "story": "queue-worker refuses to start: \"Unit is masked\". A teammate masked it during an incident last month and never undid it. It must run, and it must start at boot.",
+  "goals": [
+   "queue-worker is active.",
+   "queue-worker is enabled."
+  ],
+  "hints": [
+   "systemctl status queue-worker says it is masked. A masked unit is a link to /dev/null.",
+   "systemctl unmask queue-worker removes the block.",
+   "Then enable and start it. systemctl enable --now does both."
+  ],
+  "solution": "systemctl status queue-worker\nsystemctl unmask queue-worker\nsystemctl enable --now queue-worker\nsystemctl status queue-worker",
+  "tag": "systemd",
+  "why": {
+   "q": "What does masking a unit do?",
+   "o": [
+    "It makes it impossible to start, even by hand",
+    "It hides the log",
+    "It deletes the file"
+   ],
+   "a": 0,
+   "x": "A masked unit links to /dev/null. Unmask removes the block."
+  }
+ },
+ {
+  "id": "dropin-override",
+  "title": "The drop-in that quietly wins",
+  "level": "Advanced",
+  "minutes": 12,
+  "lesson": "linux/systemd-overrides-targets-and-dependencies",
+  "story": "db-sync must run in live mode. The main unit file says live, yet the job reports dry-run and changes nothing. Somebody left an override file from an old ticket. Make db-sync run live without editing the main unit.",
+  "goals": [
+   "/run/dbsync.mode says live.",
+   "db-sync is active."
+  ],
+  "hints": [
+   "systemctl cat db-sync prints the unit and every drop-in that applies to it.",
+   "The file under /etc/systemd/system/db-sync.service.d/ sets the mode.",
+   "Remove or fix the override, run systemctl daemon-reload and restart db-sync."
+  ],
+  "solution": "systemctl cat db-sync\nrm /etc/systemd/system/db-sync.service.d/ticket-4417.conf\nsystemctl daemon-reload\nsystemctl restart db-sync\ncat /run/dbsync.mode",
+  "tag": "systemd",
+  "why": {
+   "q": "How do drop-in files work?",
+   "o": [
+    "Their settings are added to the main unit and can override it",
+    "They replace the main unit",
+    "They are comments"
+   ],
+   "a": 0,
+   "x": "Files in unit.service.d/*.conf are merged in. systemctl cat shows the full result."
+  }
+ },
+ {
+  "id": "start-limit-hit",
+  "title": "Start request repeated too quickly",
+  "level": "Advanced",
+  "minutes": 12,
+  "lesson": "linux/systemd-overrides-targets-and-dependencies",
+  "story": "indexer keeps crashing right after it starts, and systemd gave up: the unit shows failed with a start limit. The crash comes from a typo in its configuration. Fix the cause, clear the failed state and start it.",
+  "goals": [
+   "indexer is active and stays up.",
+   "/etc/indexer.conf has a valid value for workers."
+  ],
+  "hints": [
+   "journalctl -u indexer shows the crash message and the start limit.",
+   "The program prints what is wrong with the config. The value for workers must be a number.",
+   "Fix /etc/indexer.conf, then systemctl reset-failed indexer and systemctl start indexer."
+  ],
+  "solution": "journalctl -u indexer -n 20\nsed -i \"s/workers=.*/workers=4/\" /etc/indexer.conf\nsystemctl reset-failed indexer\nsystemctl start indexer\nsystemctl status indexer",
+  "tag": "systemd",
+  "why": {
+   "q": "Why did systemd stop restarting the service?",
+   "o": [
+    "The service finished",
+    "The disk was full",
+    "It started too often in a short time"
+   ],
+   "a": 2,
+   "x": "After several fast restarts systemd gives up. Fix the cause, then use systemctl reset-failed."
+  }
+ },
+ {
+  "id": "start-order-units",
+  "title": "The app that needs its database first",
+  "level": "Advanced",
+  "minutes": 14,
+  "lesson": "linux/systemd-overrides-targets-and-dependencies",
+  "story": "orders refuses to start because its pre-start check cannot find the database. The database unit exists but is stopped and is not enabled. Both must run now, and both must come back after a reboot.",
+  "goals": [
+   "orders and orders-db are active.",
+   "Both units are enabled."
+  ],
+  "hints": [
+   "journalctl -u orders shows the failed pre-start check.",
+   "Start the database first: systemctl start orders-db.",
+   "Enable both units, then start orders. A simulated reboot must bring both back."
+  ],
+  "solution": "journalctl -u orders\nsystemctl enable --now orders-db\nsystemctl enable --now orders\nsystemctl status orders",
+  "tag": "systemd",
+  "why": {
+   "q": "What does ExecStartPre= do?",
+   "o": [
+    "It prints a message",
+    "It sets the user",
+    "It runs a command before the main program and must succeed"
+   ],
+   "a": 2,
+   "x": "If the pre-start command fails, the service does not start. Here it needs the database."
+  }
+ },
+ {
+  "id": "route-to-db-missing",
+  "title": "The app host has no route to the database",
+  "level": "Intermediate",
+  "minutes": 10,
+  "lesson": "networking/routing-and-nat",
+  "story": "The orders app on this host cannot reach the database at 10.0.2.10 port 5432. The database sits behind a router at 10.0.1.254. Other teams reach it fine. The lab builds a small private network inside the machine with network namespaces (inns NAME command runs a command inside one; ls /run/ns lists them).",
+  "goals": [
+   "wget http://10.0.2.10:5432/ answers \"orders-db ready\".",
+   "The fix is a route, not a change on the router or the database."
+  ],
+  "hints": [
+   "ip route lists this host's routes. Is there one for 10.0.2.0/24?",
+   "ping 10.0.1.254 works (the router is on the local network), ping 10.0.2.10 does not.",
+   "Add the route: ip route add 10.0.2.0/24 via 10.0.1.254"
+  ],
+  "solution": "ip route\nping -c1 10.0.1.254\nip route add 10.0.2.0/24 via 10.0.1.254\nwget -qO- http://10.0.2.10:5432/",
+  "tag": "network",
+  "why": {
+   "q": "How does a host know where to send a packet for another network?",
+   "o": [
+    "It asks every neighbour",
+    "It always uses the gateway",
+    "It checks its routing table for a matching route"
+   ],
+   "a": 2,
+   "x": "Without a route for 10.0.2.0/24 and without a default route the host has nowhere to send it."
+  }
+ },
+ {
+  "id": "router-forwarding-off",
+  "title": "The router that does not forward",
+  "level": "Advanced",
+  "minutes": 14,
+  "lesson": "networking/routing-and-nat",
+  "story": "The route to the database is in place, yet connections to 10.0.2.10 just time out. Pings to the router answer. A teammate rebuilt the router last night. Find out why traffic stops there and fix it on the router. The lab builds a small private network inside the machine with network namespaces (inns NAME command runs a command inside one; ls /run/ns lists them).",
+  "goals": [
+   "wget http://10.0.2.10:5432/ answers \"orders-db ready\".",
+   "The host routes are left as they are."
+  ],
+  "hints": [
+   "ping 10.0.1.254 answers, ping 10.0.2.10 does not. The packets reach the router and stop.",
+   "On a Linux router, /proc/sys/net/ipv4/ip_forward must be 1. Look inside the router: inns router cat /proc/sys/net/ipv4/ip_forward",
+   "Turn it on: inns router sh -c \"echo 1 > /proc/sys/net/ipv4/ip_forward\""
+  ],
+  "solution": "ping -c1 10.0.1.254\nping -c1 -W1 10.0.2.10\ninns router cat /proc/sys/net/ipv4/ip_forward\ninns router sh -c \"echo 1 > /proc/sys/net/ipv4/ip_forward\"\nwget -qO- http://10.0.2.10:5432/",
+  "tag": "network",
+  "why": {
+   "q": "What must be on for a Linux machine to act as a router?",
+   "o": [
+    "net.ipv4.ip_forward=1",
+    "The firewall",
+    "DNS"
+   ],
+   "a": 0,
+   "x": "By default Linux drops packets not meant for itself. ip_forward=1 turns on forwarding."
+  }
+ },
+ {
+  "id": "no-return-route",
+  "title": "Requests arrive, answers never come back",
+  "level": "Advanced",
+  "minutes": 14,
+  "lesson": "networking/debugging-network-problems",
+  "story": "Connections from this host to the database at 10.0.2.10 time out. The route and the router are fine. The database team says their server logs show every request arriving. The replies must be getting lost on the way back. The lab builds a small private network inside the machine with network namespaces (inns NAME command runs a command inside one; ls /run/ns lists them).",
+  "goals": [
+   "wget http://10.0.2.10:5432/ answers \"orders-db ready\".",
+   "Fix the problem where it is, on the database side."
+  ],
+  "hints": [
+   "A request needs a path in both directions. Look at the database machine's own routes: inns db ip route",
+   "The database has an address in 10.0.2.0/24 only. It has no way to reach 10.0.1.1 (this host).",
+   "Give it a default route through the router: inns db ip route add default via 10.0.2.254"
+  ],
+  "solution": "ip route\ninns db ip route\ninns db ip route add default via 10.0.2.254\nwget -qO- http://10.0.2.10:5432/",
+  "tag": "network",
+  "why": {
+   "q": "Why can a server receive requests but not answer?",
+   "o": [
+    "It is too busy",
+    "Its disk is full",
+    "Its replies have no route back"
+   ],
+   "a": 2,
+   "x": "A TCP connection needs both directions. If the server cannot route to the client's network, the answer is lost."
+  }
+ },
+ {
+  "id": "wrong-netmask",
+  "title": "The mask that is too small",
+  "level": "Intermediate",
+  "minutes": 10,
+  "lesson": "networking/ip-addressing-and-subnets",
+  "story": "The storefront at 10.0.3.20 is on the same network as this host, yet nothing can reach it: \"Network is unreachable\". The network is 10.0.3.0/24. Check how this host's interface h-w was configured. The lab builds a small private network inside the machine with network namespaces (inns NAME command runs a command inside one; ls /run/ns lists them).",
+  "goals": [
+   "wget http://10.0.3.20:8080/ answers \"storefront ok\".",
+   "h-w keeps the address 10.0.3.1 with the right mask."
+  ],
+  "hints": [
+   "ip addr show h-w shows the address and its mask. What does /30 cover?",
+   "A /30 holds only four addresses, so 10.0.3.20 is \"not on the local network\" for this host.",
+   "Remove the address and add it again with /24: ip addr del 10.0.3.1/30 dev h-w; ip addr add 10.0.3.1/24 dev h-w"
+  ],
+  "solution": "ip addr show h-w\nip addr del 10.0.3.1/30 dev h-w\nip addr add 10.0.3.1/24 dev h-w\nwget -qO- http://10.0.3.20:8080/",
+  "tag": "network",
+  "why": {
+   "q": "What does /30 mean?",
+   "o": [
+    "Thirty hosts fit",
+    "Only four addresses form the local network",
+    "A 30 MB limit"
+   ],
+   "a": 1,
+   "x": "The prefix length says how many bits are the network. /30 leaves 2 bits for hosts, so 10.0.3.20 is not local."
+  }
+ },
+ {
+  "id": "interface-admin-down",
+  "title": "The network interface somebody turned off",
+  "level": "Beginner",
+  "minutes": 6,
+  "lesson": "networking/dhcp-arp-and-the-local-network",
+  "story": "The storefront at 10.0.3.20 is not answering from this host. The link h-w to the storefront network was switched off during maintenance and nobody turned it back on. The lab builds a small private network inside the machine with network namespaces (inns NAME command runs a command inside one; ls /run/ns lists them).",
+  "goals": [
+   "wget http://10.0.3.20:8080/ answers \"storefront ok\"."
+  ],
+  "hints": [
+   "ip link show h-w prints the state of the interface. Look for DOWN.",
+   "ip addr show h-w also shows the address, which stays configured.",
+   "Bring it up: ip link set h-w up"
+  ],
+  "solution": "ip link show h-w\nip link set h-w up\nwget -qO- http://10.0.3.20:8080/",
+  "tag": "network",
+  "why": {
+   "q": "What does ip link set up do?",
+   "o": [
+    "It sets the speed",
+    "It brings the interface into service",
+    "It sets the address"
+   ],
+   "a": 1,
+   "x": "A link can be administratively down. Until it is up, no traffic passes and its routes disappear."
+  }
+ },
+ {
+  "id": "service-bound-to-loopback",
+  "title": "Listening, but only on the loopback address",
+  "level": "Intermediate",
+  "minutes": 12,
+  "lesson": "networking/troubleshooting-toolkit",
+  "story": "The storefront process runs and answers on its own machine, but nobody else can reach it at 10.0.3.20:8080. start-web starts it. Make it reachable from this host. The lab builds a small private network inside the machine with network namespaces (inns NAME command runs a command inside one; ls /run/ns lists them).",
+  "goals": [
+   "wget http://10.0.3.20:8080/ answers \"storefront ok\".",
+   "The storefront keeps listening on port 8080."
+  ],
+  "hints": [
+   "Inside the machine: inns web netstat -ln shows the address the server listens on. 127.0.0.1 means loopback only.",
+   "cat /usr/local/bin/start-web shows the bind address.",
+   "Change the address to 0.0.0.0, stop the old httpd (kill $(pidof httpd)) and run start-web again."
+  ],
+  "solution": "inns web netstat -ln\nsed -i \"s/BIND=127.0.0.1/BIND=0.0.0.0/\" /usr/local/bin/start-web\nkill $(pidof httpd)\nstart-web\nwget -qO- http://10.0.3.20:8080/",
+  "tag": "network",
+  "why": {
+   "q": "Which address makes a service reachable from other machines?",
+   "o": [
+    "0.0.0.0 or a real interface address",
+    "127.0.0.1",
+    "localhost"
+   ],
+   "a": 0,
+   "x": "127.0.0.1 only accepts local clients. 0.0.0.0 means all addresses."
+  }
+ },
+ {
+  "id": "route-wrong-gateway",
+  "title": "The route that points at the wrong gateway",
+  "level": "Intermediate",
+  "minutes": 10,
+  "lesson": "networking/routing-and-nat",
+  "story": "The orders app cannot reach the database at 10.0.2.10. Somebody added a static route for 10.0.2.0/24 by hand, but the gateway address in it is a typo. The router is at 10.0.1.254. The lab builds a small private network inside the machine with network namespaces (inns NAME command runs a command inside one; ls /run/ns lists them).",
+  "goals": [
+   "wget http://10.0.2.10:5432/ answers \"orders-db ready\".",
+   "There is exactly one route for 10.0.2.0/24, via the router."
+  ],
+  "hints": [
+   "ip route shows the route and its gateway. Then ping the gateway: it does not answer.",
+   "ip neigh show (or arp) lists hosts this machine has talked to. 10.0.1.253 stays unresolved.",
+   "Replace the route: ip route replace 10.0.2.0/24 via 10.0.1.254"
+  ],
+  "solution": "ip route\nping -c1 -W1 10.0.1.253\nip route replace 10.0.2.0/24 via 10.0.1.254\nwget -qO- http://10.0.2.10:5432/",
+  "tag": "network",
+  "why": {
+   "q": "Why does a route to a wrong gateway time out?",
+   "o": [
+    "Routes expire quickly",
+    "The packets are too large",
+    "No machine answers for that address, so packets are never delivered"
+   ],
+   "a": 2,
+   "x": "The next hop must exist on the local network. A typo gives a gateway no one owns."
+  }
+ },
+ {
+  "id": "bridge-port-missing",
+  "title": "The server that is not plugged into the bridge",
+  "level": "Advanced",
+  "minutes": 14,
+  "lesson": "networking/dhcp-arp-and-the-local-network",
+  "story": "web (10.0.9.2) and db (10.0.9.3) should talk to each other through the bridge br0 on this machine. web can reach the bridge, db cannot be reached from web. The cables (veth ports p-web and p-db) both exist and are up. The lab builds a small private network inside the machine with network namespaces (inns NAME command runs a command inside one; ls /run/ns lists them).",
+  "goals": [
+   "web can ping db at 10.0.9.3.",
+   "Both p-web and p-db are ports of br0."
+  ],
+  "hints": [
+   "ls /sys/class/net/br0/brif lists the ports attached to the bridge br0. Which one is missing?",
+   "A port that is not attached to the bridge is just a loose cable.",
+   "Attach it: brctl addif br0 p-db"
+  ],
+  "solution": "ls /sys/class/net/br0/brif\ninns web ping -c1 -W2 10.0.9.3\nbrctl addif br0 p-db\ninns web ping -c1 10.0.9.3",
+  "tag": "network",
+  "why": {
+   "q": "What does a bridge do?",
+   "o": [
+    "It joins its ports into one layer 2 network",
+    "It encrypts traffic",
+    "It assigns IP addresses"
+   ],
+   "a": 0,
+   "x": "Frames move between ports of the same bridge. A port not attached is not part of that network."
+  }
+ },
+ {
+  "id": "port-9101-owner",
+  "title": "Which program owns port 9101?",
+  "level": "Beginner",
+  "minutes": 8,
+  "lesson": "networking/troubleshooting-toolkit",
+  "story": "A security scan found something listening on port 9101 and nobody knows whose it is. Three small programs run on this machine, and none is called anything obvious. Diagnose only: find the cause, do not fix it.",
+  "goals": [
+   "Look around the machine with real commands. Do not change anything. Type your diagnosis in the box under the terminal and press Submit."
+  ],
+  "hints": [
+   "netstat -tln shows the listening ports, but not who owns them.",
+   "ps -o pid,ppid,args lists each process with its parent. The listener nc has a parent: the script that started it.",
+   "Find the nc line with -p 9101, then read the name of its parent script."
+  ],
+  "solution": "netstat -tln\nps -o pid,ppid,args\n# the nc with -p 9101 has a parent script\nAnswer: metrics-exporter",
+  "kind": "diagnose",
+  "ask": "Which program (give its file name) listens on port 9101?",
+  "accept": [
+   "metrics-exporter"
+  ],
+  "answer": "metrics-exporter",
+  "why": {
+   "q": "Why look at the parent of the listening process?",
+   "o": [
+    "Parents never matter",
+    "nc is the owner",
+    "The script that started nc is the program you want to name"
+   ],
+   "a": 2,
+   "x": "A tiny helper (nc) listens, but the script that spawns it is the service whose owner you must ask."
+  }
+ },
+ {
+  "id": "biggest-file-owner",
+  "title": "Who owns the biggest export?",
+  "level": "Beginner",
+  "minutes": 8,
+  "lesson": "linux/filesystem-and-navigation",
+  "story": "The export folder /srv/exports ate most of the disk last night. Before anyone deletes anything, the team wants to know who created the largest file, so they can ask. Diagnose only: find the cause, do not fix it.",
+  "goals": [
+   "Look around the machine with real commands. Do not change anything. Type your diagnosis in the box under the terminal and press Submit."
+  ],
+  "hints": [
+   "find /srv/exports -type f lists every file. Add -exec ls -l {} + to see sizes and owners.",
+   "ls -lS sorts by size, largest first. The owner is the third column.",
+   "The largest file is in one of the sub-folders, not at the top."
+  ],
+  "solution": "find /srv/exports -type f -exec ls -l {} +\nAnswer: bruno",
+  "kind": "diagnose",
+  "ask": "Which user owns the largest file under /srv/exports?",
+  "accept": [
+   "\\bbruno\\b"
+  ],
+  "answer": "bruno",
+  "why": {
+   "q": "What does ls -l show in its third column?",
+   "o": [
+    "The size",
+    "The file's owner",
+    "The group"
+   ],
+   "a": 1,
+   "x": "The columns are mode, links, owner, group, size, date and name. The owner is the third one."
+  }
+ },
+ {
+  "id": "crash-cause",
+  "title": "What did the shop run out of?",
+  "level": "Beginner",
+  "minutes": 8,
+  "lesson": "linux/logs-and-troubleshooting",
+  "story": "The shop service crashed at midnight. Its log is long and mostly routine. Somewhere in it, one line says why it stopped. Diagnose only: find the cause, do not fix it.",
+  "goals": [
+   "Look around the machine with real commands. Do not change anything. Type your diagnosis in the box under the terminal and press Submit."
+  ],
+  "hints": [
+   "The log is /var/log/shop.log. grep -n FATAL /var/log/shop.log finds the serious lines.",
+   "tail -n 20 shows the last lines before the crash.",
+   "The FATAL line names a resource and a file it could not write."
+  ],
+  "solution": "grep -n FATAL /var/log/shop.log\ntail -n 20 /var/log/shop.log\nAnswer: disk space",
+  "kind": "diagnose",
+  "ask": "What did the shop service run out of when it crashed? (one or two words)",
+  "accept": [
+   "disk|space|storage|device|quota"
+  ],
+  "answer": "disk space",
+  "why": {
+   "q": "Why start with grep FATAL in a long log?",
+   "o": [
+    "It sorts the log",
+    "It speeds up the system",
+    "Serious lines are few and name the cause"
+   ],
+   "a": 2,
+   "x": "Logs are mostly routine. Searching for FATAL or ERROR jumps to the lines that matter."
+  }
+ },
+ {
+  "id": "failing-cron-job",
+  "title": "Which scheduled job fails?",
+  "level": "Intermediate",
+  "minutes": 10,
+  "lesson": "linux/cron-and-timers",
+  "story": "A teammate says \"the nightly jobs are flaky\". Every job logs one line per run to /var/log/cron-jobs.log with its exit code. Four jobs run every night. Diagnose only: find the cause, do not fix it.",
+  "goals": [
+   "Look around the machine with real commands. Do not change anything. Type your diagnosis in the box under the terminal and press Submit."
+  ],
+  "hints": [
+   "cat /var/log/cron-jobs.log shows the lines. Each ends with rc=N.",
+   "rc=0 means success. grep -v \"rc=0\" shows only the failures.",
+   "Count: grep -c on the job name shows how often it failed."
+  ],
+  "solution": "grep -v \"rc=0\" /var/log/cron-jobs.log\nAnswer: nightly-export",
+  "kind": "diagnose",
+  "ask": "Which job fails (exit code not 0)? Give its name.",
+  "accept": [
+   "nightly-export"
+  ],
+  "answer": "nightly-export",
+  "why": {
+   "q": "What does exit code 0 mean?",
+   "o": [
+    "Failure",
+    "Nothing ran",
+    "Success"
+   ],
+   "a": 2,
+   "x": "By convention 0 means success and anything else is an error, so filtering rc=0 out shows the failures."
+  }
+ },
+ {
+  "id": "which-hop-drops",
+  "title": "Where does the traffic die?",
+  "level": "Intermediate",
+  "minutes": 12,
+  "lesson": "networking/routing-and-nat",
+  "story": "Connections from this host to the database at 10.0.2.10 time out. The route exists. Pings to the router at 10.0.1.254 work, pings to the database do not. Inside the machine there are private networks: inns NAME command runs a command inside one (ls /run/ns lists them). Diagnose only: find the cause, do not fix it.",
+  "goals": [
+   "Look around the machine with real commands. Do not change anything. Type your diagnosis in the box under the terminal and press Submit."
+  ],
+  "hints": [
+   "ping -c1 10.0.1.254 works and ping -c1 -W1 10.0.2.10 does not, so the packets die at or after the router.",
+   "Look inside the router: inns router ip route and inns router ip addr show where it is connected.",
+   "A Linux machine forwards packets only when /proc/sys/net/ipv4/ip_forward is 1."
+  ],
+  "solution": "ping -c1 10.0.1.254\nping -c1 -W1 10.0.2.10\ninns router cat /proc/sys/net/ipv4/ip_forward\nAnswer: net.ipv4.ip_forward is 0 on the router",
+  "kind": "diagnose",
+  "ask": "Which setting on the router stops the traffic? Name the setting or the file.",
+  "accept": [
+   "ip_forward|ip forward|forwarding"
+  ],
+  "answer": "net.ipv4.ip_forward is 0 on the router",
+  "tag": "network",
+  "why": {
+   "q": "How do you find where packets die?",
+   "o": [
+    "Restart everything",
+    "Check the colour of the cable",
+    "Test each hop in turn and compare what works"
+   ],
+   "a": 2,
+   "x": "If the router answers but the next machine does not, the problem sits at or after the router."
+  }
+ },
+ {
+  "id": "slowest-endpoint",
+  "title": "Which endpoint is slow on average?",
+  "level": "Intermediate",
+  "minutes": 12,
+  "lesson": "bash/text-processing",
+  "story": "Users say the site \"feels slow\". The access log /var/log/access.log has one line per request: method, path, status and the time in milliseconds. One path is much slower than the rest on average, even though it is not the busiest. Diagnose only: find the cause, do not fix it.",
+  "goals": [
+   "Look around the machine with real commands. Do not change anything. Type your diagnosis in the box under the terminal and press Submit."
+  ],
+  "hints": [
+   "Each line looks like: GET /path 200 123 (the last number is milliseconds).",
+   "awk can sum and count per path: awk '{s[$2]+=$4; n[$2]++} END {for (p in s) print s[p]/n[p], p}' /var/log/access.log",
+   "Sort the result: add | sort -n and read the last line."
+  ],
+  "solution": "awk '{s[$2]+=$4; n[$2]++} END {for (p in s) print s[p]/n[p], p}' /var/log/access.log | sort -n\nAnswer: /api/search",
+  "kind": "diagnose",
+  "ask": "Which path has the highest average response time?",
+  "accept": [
+   "/api/search"
+  ],
+  "answer": "/api/search",
+  "why": {
+   "q": "Why compare averages instead of one slow request?",
+   "o": [
+    "Averages are always larger",
+    "One slow request can be luck, an average shows a pattern",
+    "Single requests do not matter"
+   ],
+   "a": 1,
+   "x": "An average per path points to a path that is consistently slow."
+  }
+ },
+ {
+  "id": "who-removed-it",
+  "title": "Who deleted the data folder?",
+  "level": "Intermediate",
+  "minutes": 10,
+  "lesson": "linux/security-hardening",
+  "story": "/srv/data is gone. The auth log /var/log/auth.log records every sudo command with the user who ran it. Several people used sudo yesterday. Diagnose only: find the cause, do not fix it.",
+  "goals": [
+   "Look around the machine with real commands. Do not change anything. Type your diagnosis in the box under the terminal and press Submit."
+  ],
+  "hints": [
+   "grep sudo /var/log/auth.log shows the sudo lines.",
+   "Search for the command: grep \"rm -rf\" /var/log/auth.log",
+   "The user name comes before the colon after \"sudo:\"."
+  ],
+  "solution": "grep \"rm -rf\" /var/log/auth.log\nAnswer: deploy",
+  "kind": "diagnose",
+  "ask": "Which user ran the command that removed /srv/data?",
+  "accept": [
+   "\\bdeploy\\b"
+  ],
+  "answer": "deploy",
+  "why": {
+   "q": "Where do sudo commands get recorded?",
+   "o": [
+    "In the command's output",
+    "In /tmp",
+    "In the auth log with the user's name"
+   ],
+   "a": 2,
+   "x": "sudo logs who ran which command as root, which is the first place to look in an audit."
+  }
+ },
+ {
+  "id": "memory-hog",
+  "title": "Which process holds the memory?",
+  "level": "Advanced",
+  "minutes": 12,
+  "lesson": "linux/processes-memory-and-the-oom-killer",
+  "story": "free shows memory running low on this machine. Three background programs run. One of them holds far more memory than the others, while using almost no CPU, so top by CPU hides it. Diagnose only: find the cause, do not fix it.",
+  "goals": [
+   "Look around the machine with real commands. Do not change anything. Type your diagnosis in the box under the terminal and press Submit."
+  ],
+  "hints": [
+   "free shows the totals. top -b -n1 lists processes; the VSZ and RSS columns are about memory.",
+   "Every process has /proc/PID/status with a VmRSS line.",
+   "Compare the three scripts in /usr/local/bin by their memory, not their CPU."
+  ],
+  "solution": "free\ntop -b -n1 | head -15\nAnswer: report-builder",
+  "kind": "diagnose",
+  "ask": "Which program has the largest memory footprint? Give its name.",
+  "accept": [
+   "report-builder"
+  ],
+  "answer": "report-builder",
+  "why": {
+   "q": "Which column shows the memory a process really uses?",
+   "o": [
+    "PID",
+    "RSS, the resident set size",
+    "TIME"
+   ],
+   "a": 1,
+   "x": "RSS counts memory held in RAM. VSZ counts address space, which can be much larger."
+  }
+ },
+ {
+  "id": "fd-leak-owner",
+  "title": "Which process leaks file descriptors?",
+  "level": "Advanced",
+  "minutes": 12,
+  "lesson": "linux/processes-memory-and-the-oom-killer",
+  "story": "Opening files fails with \"Too many open files\" every few days. Four background programs run. One of them opens files and never closes them. Diagnose only: find the cause, do not fix it.",
+  "goals": [
+   "Look around the machine with real commands. Do not change anything. Type your diagnosis in the box under the terminal and press Submit."
+  ],
+  "hints": [
+   "Each process lists its open files in /proc/PID/fd. ls /proc/PID/fd | wc -l counts them.",
+   "Loop over all processes: for p in /proc/[0-9]*; do echo \"$(ls $p/fd 2>/dev/null | wc -l) $p\"; done | sort -n",
+   "Then read the name: cat /proc/PID/cmdline | tr \"\\0\" \" \""
+  ],
+  "solution": "for p in /proc/[0-9]*; do echo \"$(ls $p/fd 2>/dev/null | wc -l) $p\"; done | sort -n | tail -3\nAnswer: uploader",
+  "kind": "diagnose",
+  "ask": "Which program holds the most open file descriptors? Give its name.",
+  "accept": [
+   "uploader"
+  ],
+  "answer": "uploader",
+  "why": {
+   "q": "Where can you count a process's open files?",
+   "o": [
+    "ls /etc",
+    "ps -e",
+    "ls /proc/PID/fd"
+   ],
+   "a": 2,
+   "x": "Each open file or socket is a link in /proc/PID/fd. A very long list marks a leak."
+  }
+ },
+ {
+  "id": "crowded-directory",
+  "title": "Which directory has all the tiny files?",
+  "level": "Advanced",
+  "minutes": 10,
+  "lesson": "linux/filesystems-page-cache-and-io",
+  "story": "The spool volume reports \"No space left on device\" while df shows free blocks: it ran out of inodes. Under /var/spool there are several queue directories, and one of them holds almost all the files. Diagnose only: find the cause, do not fix it.",
+  "goals": [
+   "Look around the machine with real commands. Do not change anything. Type your diagnosis in the box under the terminal and press Submit."
+  ],
+  "hints": [
+   "df -i shows inode use. Each file costs one inode.",
+   "Count files per directory: for d in /var/spool/*; do echo \"$(ls $d | wc -l) $d\"; done",
+   "Sort the numbers and read the largest."
+  ],
+  "solution": "df -i /var/spool\nfor d in /var/spool/*; do echo \"$(ls $d | wc -l) $d\"; done | sort -n\nAnswer: mailq",
+  "kind": "diagnose",
+  "ask": "Which directory under /var/spool holds the most files? Give its name.",
+  "accept": [
+   "mailq"
+  ],
+  "answer": "mailq",
+  "why": {
+   "q": "Why can a disk be full while df shows free space?",
+   "o": [
+    "The file system ran out of inodes",
+    "The disk is invisible",
+    "df is always wrong"
+   ],
+   "a": 0,
+   "x": "Every file needs an inode. Millions of tiny files use them all."
+  }
+ },
+ {
+  "id": "leaked-access-key",
+  "title": "Where did the access key leak?",
+  "level": "Advanced",
+  "minutes": 12,
+  "lesson": "linux/security-hardening",
+  "story": "A scanner flagged an access key (it starts with AKIA) in the code tree /srv/app. Security needs to know which file holds it before they rotate the key. There are many files and old backups. Diagnose only: find the cause, do not fix it.",
+  "goals": [
+   "Look around the machine with real commands. Do not change anything. Type your diagnosis in the box under the terminal and press Submit."
+  ],
+  "hints": [
+   "grep -r \"AKIA\" /srv/app searches the whole tree. -l prints only file names.",
+   "Backups and old copies matter: do not skip hidden or .bak files.",
+   "Read the name from the grep output."
+  ],
+  "solution": "grep -rl AKIA /srv/app\nAnswer: settings.bak (in /srv/app/old)",
+  "kind": "diagnose",
+  "ask": "Which file contains the key? Give the file name.",
+  "accept": [
+   "settings\\.bak"
+  ],
+  "answer": "settings.bak (in /srv/app/old)",
+  "why": {
+   "q": "Why search backups and old copies for secrets?",
+   "o": [
+    "Backups are encrypted",
+    "Old files are never read",
+    "A leaked key often lives in a forgotten file"
+   ],
+   "a": 2,
+   "x": "grep -r finds secrets wherever they are. A key in a .bak file is still a leaked key."
+  }
+ },
+ {
+  "id": "blackhole-route",
+  "title": "Silent drops: which network is blackholed?",
+  "level": "Advanced",
+  "minutes": 12,
+  "lesson": "networking/routing-and-nat",
+  "story": "Connections to some addresses fail instantly, and connections to one network just hang forever with no error. A hang with no error usually means packets are dropped silently. Look at this machine's routing table. Diagnose only: find the cause, do not fix it.",
+  "goals": [
+   "Look around the machine with real commands. Do not change anything. Type your diagnosis in the box under the terminal and press Submit."
+  ],
+  "hints": [
+   "ip route lists every route. Some routes have a special type word instead of \"via\".",
+   "blackhole drops packets silently. unreachable and prohibit answer with an error right away.",
+   "Read the network that has the word blackhole."
+  ],
+  "solution": "ip route\nAnswer: 10.6.0.0/24",
+  "kind": "diagnose",
+  "ask": "Which network has the blackhole route? Give it like 10.1.0.0/24.",
+  "accept": [
+   "10\\.6\\.0\\.0"
+  ],
+  "answer": "10.6.0.0/24",
+  "tag": "network",
+  "why": {
+   "q": "What is different about a blackhole route?",
+   "o": [
+    "It answers with an error",
+    "It speeds up traffic",
+    "It drops packets silently, so connections hang"
+   ],
+   "a": 2,
+   "x": "unreachable and prohibit answer with an ICMP error. A blackhole gives no signal, so clients time out."
+  }
+ },
+ {
+  "id": "deploy-script-three-faults",
+  "title": "The release script that fails three ways",
+  "level": "Advanced",
+  "minutes": 14,
+  "lesson": "bash/script-basics",
+  "story": "The release script /opt/app/deploy.sh was written on a laptop and copied over. It will not run on this server, and each time one problem is fixed another shows up. Several things are wrong at once. Fixing the first one will not be enough.",
+  "goals": [
+   "Running /opt/app/deploy.sh writes \"deployed v42\" to /run/deploy.out.",
+   "The script runs directly, as ./deploy.sh would."
+  ],
+  "hints": [
+   "Run it and read the error: ls -l /opt/app/deploy.sh shows the permissions, head -1 shows the first line.",
+   "Three separate problems: permissions, line endings (cat -A shows ^M), and the interpreter named in the first line (which shells exist? ls /bin/sh /bin/bash).",
+   "Fix each: chmod +x, sed -i \"s/\\r$//\" file, and make the first line #!/bin/sh."
+  ],
+  "solution": "chmod +x /opt/app/deploy.sh\nsed -i \"s/\\r$//\" /opt/app/deploy.sh\nsed -i \"1s|.*|#!/bin/sh|\" /opt/app/deploy.sh\n/opt/app/deploy.sh\ncat /run/deploy.out",
+  "faults": 3,
+  "why": {
+   "q": "Why was it important to fix the three faults in order of the error messages?",
+   "o": [
+    "Each fix reveals the next problem hidden behind it",
+    "The order never matters",
+    "All errors show at once"
+   ],
+   "a": 0,
+   "x": "A script fails at the first problem. After you fix it, the next one shows up, so read each new message."
+  }
+ },
+ {
+  "id": "volume-full-and-stale-pid",
+  "title": "Full volume, stale pidfile",
+  "level": "Advanced",
+  "minutes": 14,
+  "lesson": "linux/disks-and-filesystems",
+  "story": "app-writer died when its log volume filled up. Restarting it with start-writer prints \"already running\", yet nothing is running. The log volume /var/log/app is also nearly full. Several things are wrong at once. Fixing the first one will not be enough.",
+  "goals": [
+   "app-writer is running and writes to /var/log/app/heartbeat.log.",
+   "/var/log/app is under 50 percent full."
+  ],
+  "hints": [
+   "df -h /var/log/app and ls -lh /var/log/app show what fills the volume.",
+   "start-writer trusts /run/app-writer.pid. Does the process with that PID exist? ps | grep app-writer",
+   "Free the space (the big file dump.tmp is safe to remove), delete the stale pidfile, then run start-writer."
+  ],
+  "solution": "df -h /var/log/app\nls -lh /var/log/app\nrm /var/log/app/dump.tmp\nrm /run/app-writer.pid\nstart-writer",
+  "faults": 2,
+  "why": {
+   "q": "Why do two small faults look like one big failure?",
+   "o": [
+    "Linux hides errors",
+    "One fault always causes the other",
+    "Each one alone would stop the service"
+   ],
+   "a": 2,
+   "x": "A full disk and a stale pidfile both block the start. Fixing only one leaves it down."
+  }
+ },
+ {
+  "id": "uploads-three-faults",
+  "title": "Uploads fail for three reasons",
+  "level": "Advanced",
+  "minutes": 16,
+  "lesson": "linux/users-groups-permissions",
+  "story": "Users cannot upload files. The upload helper store-upload runs as the user www and reports a different error each time it is run. The directory it should write to is /srv/uploads/incoming. Several things are wrong at once. Fixing the first one will not be enough.",
+  "goals": [
+   "As the user www, store-upload creates a file in /srv/uploads/incoming and prints OK."
+  ],
+  "hints": [
+   "Test it as the service does: su -s /bin/sh www -c store-upload",
+   "Read the message. Then check the path in /etc/uploader.conf, who owns /srv/uploads/incoming, and whether www can enter /srv (ls -ld /srv).",
+   "Fix each in turn: the path in the config, chown www /srv/uploads/incoming, chmod 755 /srv."
+  ],
+  "solution": "su -s /bin/sh www -c store-upload\nsed -i \"s#/srv/upload\\$#/srv/uploads/incoming#\" /etc/uploader.conf\nchmod 755 /srv\nchown www /srv/uploads/incoming\nsu -s /bin/sh www -c store-upload",
+  "faults": 3,
+  "why": {
+   "q": "What must be true for a user to write into /srv/uploads/incoming?",
+   "o": [
+    "Only the last folder matters",
+    "The user must be root",
+    "Every folder in the path is enterable and the last one is writable"
+   ],
+   "a": 2,
+   "x": "Path access needs x on every parent folder and w on the target folder, for the right user."
+  }
+ },
+ {
+  "id": "network-two-faults",
+  "title": "No route, and the router does not forward",
+  "level": "Advanced",
+  "minutes": 16,
+  "lesson": "networking/routing-and-nat",
+  "story": "The orders app cannot reach the database at 10.0.2.10. A new router sits between them at 10.0.1.254. Nobody added a route on this host, and the router was never told to forward packets. Several things are wrong at once. Fixing the first one will not be enough. Inside the machine: inns NAME command runs a command inside a private network (ls /run/ns).",
+  "goals": [
+   "wget http://10.0.2.10:5432/ answers \"orders-db ready\".",
+   "A route to 10.0.2.0/24 exists on this host and the router forwards packets."
+  ],
+  "hints": [
+   "ping -c1 10.0.1.254 works, ping -c1 -W1 10.0.2.10 does not. Start with the route: ip route add 10.0.2.0/24 via 10.0.1.254",
+   "It still fails. Look inside the router: inns router cat /proc/sys/net/ipv4/ip_forward",
+   "Turn forwarding on: inns router sh -c \"echo 1 > /proc/sys/net/ipv4/ip_forward\""
+  ],
+  "solution": "ip route add 10.0.2.0/24 via 10.0.1.254\ninns router sh -c \"echo 1 > /proc/sys/net/ipv4/ip_forward\"\nwget -qO- http://10.0.2.10:5432/",
+  "faults": 2,
+  "tag": "network",
+  "why": {
+   "q": "Why was one fix not enough?",
+   "o": [
+    "The host needed a route and the router needed forwarding",
+    "Routes are optional",
+    "The firewall was off"
+   ],
+   "a": 0,
+   "x": "A packet needs a way out (route) and a router willing to pass it (forwarding)."
+  }
+ },
+ {
+  "id": "unit-three-faults",
+  "title": "A new service with three problems",
+  "level": "Advanced",
+  "minutes": 16,
+  "lesson": "linux/systemd-overrides-targets-and-dependencies",
+  "story": "The reports service was installed from a ticket. It will not start; every fix reveals the next problem. Get it running, with its settings, and make sure it comes back after a reboot. This lab uses a small imitation of systemctl. Several things are wrong at once. Fixing the first one will not be enough.",
+  "goals": [
+   "reports is active and /run/reports.dir says /var/reports.",
+   "reports is enabled."
+  ],
+  "hints": [
+   "systemctl status reports and journalctl -u reports -n 10 name the current problem. Fix it, run systemctl daemon-reload, start again, read the next message.",
+   "The first problem is the path of the program (find /opt/reports -type f). The second is the environment file (find /etc/reports -type f).",
+   "The third has nothing to do with starting: systemctl is-enabled reports. Use systemctl enable reports."
+  ],
+  "solution": "journalctl -u reports -n 5\nsed -i \"s#/opt/reports/reportd#/opt/reports/bin/reportd#\" /etc/systemd/system/reports.service\nsed -i \"s#/etc/reports.env#/etc/reports/reports.env#\" /etc/systemd/system/reports.service\nsystemctl daemon-reload\nsystemctl enable --now reports",
+  "faults": 3,
+  "tag": "systemd",
+  "why": {
+   "q": "Why does it help to read journalctl after every fix?",
+   "o": [
+    "It restarts the unit",
+    "It hides errors",
+    "Each failure message names the next problem"
+   ],
+   "a": 2,
+   "x": "The journal shows what the service manager saw. When one error goes, the next appears there."
+  }
+ },
+ {
+  "id": "cron-three-faults",
+  "title": "The cleanup job that never runs",
+  "level": "Advanced",
+  "minutes": 16,
+  "lesson": "linux/cron-and-timers",
+  "story": "The cleanup script should run every five minutes and write /run/clean.done. It has never run. Nobody noticed, because nothing complains. Several things are wrong at once. Fixing the first one will not be enough.",
+  "goals": [
+   "crond is running.",
+   "The crontab line uses the full path of the script, and the script is executable and works with the minimal environment cron gives it."
+  ],
+  "hints": [
+   "ps | grep crond: is the scheduler running at all? crontab -l shows the job.",
+   "Cron runs jobs with a tiny PATH, so a bare script name is not found. Use the full path /usr/local/bin/nightly-clean.sh. Also check ls -l on the script.",
+   "Start the scheduler with crond -b. Replace the crontab: echo \"*/5 * * * * /usr/local/bin/nightly-clean.sh\" | crontab -"
+  ],
+  "solution": "ps | grep crond\ncrontab -l\nchmod +x /usr/local/bin/nightly-clean.sh\necho \"*/5 * * * * /usr/local/bin/nightly-clean.sh\" | crontab -\ncrond -b",
+  "faults": 3,
+  "why": {
+   "q": "Why must cron jobs use absolute paths?",
+   "o": [
+    "Relative paths are slower",
+    "Cron runs with almost no PATH",
+    "Cron cannot run scripts"
+   ],
+   "a": 1,
+   "x": "Cron does not read your profile. A bare script name is often not found."
+  }
+ },
+ {
+  "id": "backup-three-faults",
+  "title": "The backup script that quietly does nothing",
+  "level": "Advanced",
+  "minutes": 16,
+  "lesson": "bash/safe-automation",
+  "story": "The site backup has not produced an archive for two weeks. The script /usr/local/bin/backup-site.sh is run from cron, which hides its errors. It needs to create /backup/daily/site-*.tar.gz that contains index.html. Several things are wrong at once. Fixing the first one will not be enough.",
+  "goals": [
+   "The script is executable.",
+   "Running it produces /backup/daily/site-*.tar.gz that contains index.html."
+  ],
+  "hints": [
+   "Run it by hand and read the errors: /usr/local/bin/backup-site.sh",
+   "Permissions first (ls -l). Then the source directory (it has a typo: ls /srv) and the destination (does /backup/daily exist?).",
+   "chmod +x the script, fix SRC with sed, and mkdir -p /backup/daily."
+  ],
+  "solution": "/usr/local/bin/backup-site.sh\nchmod +x /usr/local/bin/backup-site.sh\nsed -i \"s#/srv/sitee#/srv/site#\" /usr/local/bin/backup-site.sh\nmkdir -p /backup/daily\n/usr/local/bin/backup-site.sh\nls /backup/daily",
+  "faults": 3,
+  "why": {
+   "q": "Why test the backup by running it with env -i?",
+   "o": [
+    "It makes the script faster",
+    "It deletes old archives",
+    "It shows what the script does with an empty environment, like cron"
+   ],
+   "a": 2,
+   "x": "env -i removes variables like PATH. If it works there, it works from cron."
+  }
+ },
+ {
+  "id": "port-taken-and-bad-env",
+  "title": "Port taken, and the wrong database",
+  "level": "Advanced",
+  "minutes": 14,
+  "lesson": "linux/processes-and-services",
+  "story": "The new web v2 must listen on port 8080 and use the database db.internal. start-web fails. Behind the failure there are two separate problems, and fixing only one leaves the site broken. Several things are wrong at once. Fixing the first one will not be enough.",
+  "goals": [
+   "http://127.0.0.1:8080/ answers \"web v2\".",
+   "/run/web.status says db=db.internal."
+  ],
+  "hints": [
+   "Run start-web and read the error. netstat -tln shows who holds 8080; ps shows the old server.",
+   "Stop the old server (kill $(pidof httpd)). Then look at /etc/web.env: the database name is the old one.",
+   "Edit APP_DB in /etc/web.env, then run start-web again and check /run/web.status."
+  ],
+  "solution": "start-web\nnetstat -tln\nkill $(pidof httpd)\nsed -i \"s/db.old/db.internal/\" /etc/web.env\nstart-web\nwget -qO- http://127.0.0.1:8080/",
+  "faults": 2,
+  "why": {
+   "q": "Why check the running service after you start it?",
+   "o": [
+    "Starting proves everything",
+    "The service reports errors by itself",
+    "A started process can still use wrong settings"
+   ],
+   "a": 2,
+   "x": "Only reading the result (status file, response) shows it uses the intended database and port."
+  }
+ },
+ {
+  "id": "rotation-gone-wrong",
+  "title": "Rotated, but the app still writes to the old file",
+  "level": "Advanced",
+  "minutes": 16,
+  "lesson": "linux/logs-and-troubleshooting",
+  "story": "Log rotation ran last night. Since then app.log is empty, the app seems silent, and the log volume is nearly full of old rotations. The logger is app-logger. Several things are wrong at once. Fixing the first one will not be enough.",
+  "goals": [
+   "New lines appear in /var/log/app/app.log.",
+   "The log volume /var/log/app is under 70 percent full."
+  ],
+  "hints": [
+   "ls -l /var/log/app: which file keeps growing? A process keeps writing to the file it opened, even after it was renamed.",
+   "The logger re-opens its log when it gets the HUP signal: kill -HUP $(pidof app-logger)",
+   "Free space: the old rotations app.log.2 and app.log.3 can be removed (or gzip them)."
+  ],
+  "solution": "ls -lh /var/log/app\nkill -HUP $(pidof app-logger)\nrm /var/log/app/app.log.2 /var/log/app/app.log.3\ndf -h /var/log/app\ntail /var/log/app/app.log",
+  "faults": 2,
+  "why": {
+   "q": "Why did the app keep writing to the rotated file?",
+   "o": [
+    "It ignored the signal",
+    "Rotation deletes the app",
+    "It holds the open file, not the name"
+   ],
+   "a": 2,
+   "x": "After mv, the app's file handle still points to the moved file. A reopen signal (HUP) switches it to the new one."
+  }
+ },
+ {
+  "id": "ghost-app-three-faults",
+  "title": "The service three people broke",
+  "level": "Advanced",
+  "minutes": 18,
+  "lesson": "linux/debugging-a-sick-server",
+  "story": "ghost-app must run as the user ghost and listen on port 8088. start-ghost refuses to start, and each time you fix its complaint, it finds another. Previous owners left a mess. Several things are wrong at once. Fixing the first one will not be enough.",
+  "goals": [
+   "ghost-app runs as the user ghost (uid 1200).",
+   "/var/lib/ghost/state says ok port=8088."
+  ],
+  "hints": [
+   "Run start-ghost and read what it says. The first message is about a lock file in /run.",
+   "Next: the config /etc/ghost.conf. cat -A shows hidden characters; a ^M at the end of a line is a Windows line ending. Remove it with sed -i \"s/\\r$//\".",
+   "Last: the data folder /var/lib/ghost must belong to the user ghost: chown ghost /var/lib/ghost"
+  ],
+  "solution": "start-ghost\nrm /run/ghost.lock\nsed -i \"s/\\r$//\" /etc/ghost.conf\nchown ghost /var/lib/ghost\nstart-ghost\ncat /var/lib/ghost/state",
+  "faults": 3,
+  "why": {
+   "q": "Why is a service sometimes blocked by a lock file?",
+   "o": [
+    "Lock files are always valid",
+    "A previous run left it behind and the new run refuses to start",
+    "Locks block the network"
+   ],
+   "a": 1,
+   "x": "A lock file stops two copies at once. After a crash it stays, so check that no process holds it before removing."
+  }
+ },
+ {
+  "id": "tls-key-permissions",
+  "title": "The service that will not start because of its key",
+  "level": "Beginner",
+  "minutes": 8,
+  "lesson": "networking/http-and-tls",
+  "story": "After a handover, shop-tls will not start. The error mentions the private key. Nobody changed the certificate. Fix the problem and start the service. The key must stay where it is. A small web service listens on 127.0.0.1:8443 with TLS (start, stop and restart it with shop-tls; its settings are in /etc/shop-tls.conf; certificates are in /etc/tls). Test it like a client would: openssl s_client -connect 127.0.0.1:8443 -servername shop.lab -verify_hostname shop.lab -CAfile /etc/ssl/certs/ca-bundle.pem -brief < /dev/null",
+  "goals": [
+   "The service is running and the client check passes.",
+   "The private key is readable only by its owner."
+  ],
+  "hints": [
+   "Run shop-tls start and read the message. It names the key file and says who can read it.",
+   "ls -l /etc/tls/shop.key shows the permissions. A private key must not be readable by the group or by others.",
+   "chmod 600 /etc/tls/shop.key, then shop-tls start."
+  ],
+  "solution": "shop-tls start\nls -l /etc/tls/shop.key\nchmod 600 /etc/tls/shop.key\nshop-tls start\nopenssl s_client -connect 127.0.0.1:8443 -servername shop.lab -CAfile /etc/ssl/certs/ca-bundle.pem -brief < /dev/null",
+  "tag": "tls",
+  "why": {
+   "q": "Why is a private key kept at mode 600?",
+   "o": [
+    "So the service can write to it",
+    "Anyone who can read the key can impersonate the server",
+    "Because TLS needs the file to be hidden from the certificate",
+    "So the key cannot be copied by the owner"
+   ],
+   "a": 1,
+   "x": "The private key is what proves the server is the one named in the certificate. If other users can read it, they can copy it and impersonate the server. Many services refuse to start with a loose key for this reason."
+  }
+ },
+ {
+  "id": "tls-untrusted-ca",
+  "title": "The client does not trust the company CA",
+  "level": "Beginner",
+  "minutes": 10,
+  "lesson": "security/network-and-edge-security",
+  "story": "The checkout client calls the shop over TLS and fails: \"unable to get local issuer certificate\". The service itself is fine; its certificate is signed by the company's own CA. The CA certificate is in /root/lab-root-ca.pem. Make this machine trust it the standard way. A small web service listens on 127.0.0.1:8443 with TLS (start, stop and restart it with shop-tls; its settings are in /etc/shop-tls.conf; certificates are in /etc/tls). Test it like a client would: openssl s_client -connect 127.0.0.1:8443 -servername shop.lab -verify_hostname shop.lab -CAfile /etc/ssl/certs/ca-bundle.pem -brief < /dev/null",
+  "goals": [
+   "openssl s_client (the command in the story) prints \"Verification: OK\".",
+   "The company CA is in the system trust bundle, added the way Debian does it."
+  ],
+  "hints": [
+   "Run the s_client command. The Verification line says the issuer is not known to this machine.",
+   "The system bundle is /etc/ssl/certs/ca-bundle.pem. It is rebuilt by update-ca-certificates from files ending in .crt in /usr/local/share/ca-certificates.",
+   "cp /root/lab-root-ca.pem /usr/local/share/ca-certificates/lab-root-ca.crt, then update-ca-certificates. The file name must end in .crt."
+  ],
+  "solution": "openssl s_client -connect 127.0.0.1:8443 -servername shop.lab -CAfile /etc/ssl/certs/ca-bundle.pem -brief < /dev/null\ncp /root/lab-root-ca.pem /usr/local/share/ca-certificates/lab-root-ca.crt\nupdate-ca-certificates\nopenssl s_client -connect 127.0.0.1:8443 -servername shop.lab -verify_hostname shop.lab -CAfile /etc/ssl/certs/ca-bundle.pem -brief < /dev/null",
+  "tag": "tls",
+  "why": {
+   "q": "Why does a certificate signed by your own CA fail on a fresh machine?",
+   "o": [
+    "The certificate is expired by default",
+    "The machine only trusts the roots in its bundle, and your CA is not one of them",
+    "TLS cannot use private CAs",
+    "The server must send its private key"
+   ],
+   "a": 1,
+   "x": "A client trusts a certificate only if it chains to a root in its own trust store. A company CA is not in the default store, so you add it deliberately, on every machine that should trust it."
+  }
+ },
+ {
+  "id": "tls-expired-cert",
+  "title": "The certificate that expired in the spring",
+  "level": "Intermediate",
+  "minutes": 12,
+  "lesson": "networking/http-and-tls",
+  "story": "Customers report certificate errors on the shop. The service has run for years without changes. Renew the certificate from the existing request (/etc/tls/shop.csr) with the issuing CA on this machine (/etc/tls/inter.pem and inter.key), for 90 days, and reload the service. A small web service listens on 127.0.0.1:8443 with TLS (start, stop and restart it with shop-tls; its settings are in /etc/shop-tls.conf; certificates are in /etc/tls). Test it like a client would: openssl s_client -connect 127.0.0.1:8443 -servername shop.lab -verify_hostname shop.lab -CAfile /etc/ssl/certs/ca-bundle.pem -brief < /dev/null",
+  "goals": [
+   "openssl s_client (the command in the story) prints \"Verification: OK\".",
+   "The new certificate is valid now and the service serves it."
+  ],
+  "hints": [
+   "Run the s_client command and read the Verification error. Then: openssl x509 -in /etc/tls/shop.pem -noout -dates",
+   "Sign the existing request again: openssl x509 -req -in /etc/tls/shop.csr -CA /etc/tls/inter.pem -CAkey /etc/tls/inter.key -CAcreateserial -days 90 -copy_extensions copy -out /etc/tls/shop.pem",
+   "A running service keeps the old certificate in memory. shop-tls restart loads the new file."
+  ],
+  "solution": "openssl x509 -in /etc/tls/shop.pem -noout -dates\nopenssl x509 -req -in /etc/tls/shop.csr -CA /etc/tls/inter.pem -CAkey /etc/tls/inter.key -CAcreateserial -days 90 -copy_extensions copy -out /etc/tls/shop.pem\nshop-tls restart",
+  "tag": "tls",
+  "why": {
+   "q": "Why was a restart needed after replacing the certificate file?",
+   "o": [
+    "The file is only read when the service starts",
+    "Restarting makes the certificate longer lived",
+    "The CA refuses to sign while the service runs",
+    "The client caches the key"
+   ],
+   "a": 0,
+   "x": "This service reads its certificate once at start-up. Replacing the file changes nothing for new connections until the service reloads it. Many servers can reload without a full restart; this one cannot."
+  }
+ },
+ {
+  "id": "tls-hostname-mismatch",
+  "title": "A valid certificate for the wrong name",
+  "level": "Intermediate",
+  "minutes": 12,
+  "lesson": "networking/http-and-tls",
+  "story": "The shop certificate is signed by the right CA and has not expired, yet the client says the name does not match. The shop is reached as shop.lab. Issue a new certificate from /etc/tls/shop.csr that names shop.lab (and keep www.shop.lab too), using the issuing CA on this machine. A small web service listens on 127.0.0.1:8443 with TLS (start, stop and restart it with shop-tls; its settings are in /etc/shop-tls.conf; certificates are in /etc/tls). Test it like a client would: openssl s_client -connect 127.0.0.1:8443 -servername shop.lab -verify_hostname shop.lab -CAfile /etc/ssl/certs/ca-bundle.pem -brief < /dev/null",
+  "goals": [
+   "openssl s_client (the command in the story) prints \"Verification: OK\".",
+   "The certificate names shop.lab and www.shop.lab."
+  ],
+  "hints": [
+   "Read the Verification line: it is about the hostname, not the CA.",
+   "openssl x509 -in /etc/tls/shop.pem -noout -ext subjectAltName shows the names the certificate covers. Clients check this list, not the common name.",
+   "Write an extension file: printf 'subjectAltName=DNS:shop.lab,DNS:www.shop.lab\\n' > /tmp/san.cnf. Then sign again with -extfile /tmp/san.cnf, and shop-tls restart."
+  ],
+  "solution": "openssl x509 -in /etc/tls/shop.pem -noout -ext subjectAltName\nprintf 'subjectAltName=DNS:shop.lab,DNS:www.shop.lab\\n' > /tmp/san.cnf\nopenssl x509 -req -in /etc/tls/shop.csr -CA /etc/tls/inter.pem -CAkey /etc/tls/inter.key -CAcreateserial -days 90 -extfile /tmp/san.cnf -out /etc/tls/shop.pem\nshop-tls restart",
+  "tag": "tls",
+  "why": {
+   "q": "Which part of a certificate do modern clients use to match the hostname?",
+   "o": [
+    "The common name only",
+    "The subject alternative names",
+    "The issuer name",
+    "The serial number"
+   ],
+   "a": 1,
+   "x": "Modern clients match the name against the subject alternative names (SAN) list. The common name is ignored when SANs exist, so a certificate must list every name it should serve."
+  }
+ },
+ {
+  "id": "tls-missing-intermediate",
+  "title": "The chain that stops short",
+  "level": "Advanced",
+  "minutes": 14,
+  "lesson": "security/network-and-edge-security",
+  "story": "Browsers open the shop, but a script on a server says \"unable to verify the first certificate\" / \"unable to get local issuer certificate\". The root CA is trusted on this machine. The shop certificate is signed by an intermediate CA (/etc/tls/inter.pem), not by the root. Fix what the service sends, without changing the trust bundle. A small web service listens on 127.0.0.1:8443 with TLS (start, stop and restart it with shop-tls; its settings are in /etc/shop-tls.conf; certificates are in /etc/tls). Test it like a client would: openssl s_client -connect 127.0.0.1:8443 -servername shop.lab -verify_hostname shop.lab -CAfile /etc/ssl/certs/ca-bundle.pem -brief < /dev/null",
+  "goals": [
+   "openssl s_client (the command in the story) prints \"Verification: OK\".",
+   "The service sends the intermediate certificate with its own."
+  ],
+  "hints": [
+   "Run: openssl s_client -connect 127.0.0.1:8443 -servername shop.lab -showcerts < /dev/null  and count the certificates the server sends.",
+   "The root is trusted, the shop certificate is signed by the intermediate, and the server did not send the intermediate. Browsers can fetch it themselves; scripts cannot.",
+   "The service reads extra chain certificates from CHAIN in /etc/shop-tls.conf (/etc/tls/chain.pem), and it is empty. Put the intermediate in it and restart."
+  ],
+  "solution": "openssl s_client -connect 127.0.0.1:8443 -servername shop.lab -showcerts < /dev/null | grep -c BEGIN\ncp /etc/tls/inter.pem /etc/tls/chain.pem\nshop-tls restart",
+  "tag": "tls",
+  "why": {
+   "q": "Why do browsers cope with a missing intermediate when scripts do not?",
+   "o": [
+    "Browsers skip certificate checks",
+    "Browsers can fetch or remember missing intermediates; most command-line clients do not",
+    "Scripts use a weaker protocol",
+    "Browsers trust every CA"
+   ],
+   "a": 1,
+   "x": "Browsers cache intermediates and can download them from the certificate's issuer link. Most command-line clients only use what the server sends, so the server must send the full chain except the root."
+  }
+ },
+ {
+  "id": "tls-key-mismatch",
+  "title": "The key that belongs to the old certificate",
+  "level": "Advanced",
+  "minutes": 14,
+  "lesson": "networking/http-and-tls",
+  "story": "The shop certificate was renewed yesterday and the service was stopped for the change. Now shop-tls will not start and complains about the key. The old key is still in /etc/tls (shop-old.key); the new one is shop.key. Find the cause and start the service, changing as little as possible. A small web service listens on 127.0.0.1:8443 with TLS (start, stop and restart it with shop-tls; its settings are in /etc/shop-tls.conf; certificates are in /etc/tls). Test it like a client would: openssl s_client -connect 127.0.0.1:8443 -servername shop.lab -verify_hostname shop.lab -CAfile /etc/ssl/certs/ca-bundle.pem -brief < /dev/null",
+  "goals": [
+   "openssl s_client (the command in the story) prints \"Verification: OK\".",
+   "The service uses the key that matches the certificate."
+  ],
+  "hints": [
+   "Run shop-tls start and read the error: \"key values mismatch\".",
+   "Compare the public key in the certificate with the one derived from each key: openssl x509 -in /etc/tls/shop.pem -noout -pubkey | md5sum  and  openssl pkey -in /etc/tls/shop.key -pubout | md5sum",
+   "Only one key matches. /etc/shop-tls.conf points KEY at the wrong file: sed -i or edit it, then shop-tls start."
+  ],
+  "solution": "shop-tls start\nopenssl x509 -in /etc/tls/shop.pem -noout -pubkey | md5sum\nopenssl pkey -in /etc/tls/shop.key -pubout | md5sum\nopenssl pkey -in /etc/tls/shop-old.key -pubout | md5sum\nsed -i \"s#shop-old.key#shop.key#\" /etc/shop-tls.conf\nshop-tls start",
+  "tag": "tls",
+  "why": {
+   "q": "How can you tell whether a private key matches a certificate?",
+   "o": [
+    "Compare the file names",
+    "Compare the public key inside the certificate with the public key derived from the private key",
+    "Check that both files have the same size",
+    "Check that the key is newer than the certificate"
+   ],
+   "a": 1,
+   "x": "A certificate contains the public half of a key pair. Deriving the public key from a private key and comparing it with the certificate's shows whether they are a pair, whatever the files are called."
+  }
+ },
+ {
+  "id": "tls-protocol-mismatch",
+  "title": "The gateway that only speaks TLS 1.3",
+  "level": "Advanced",
+  "minutes": 14,
+  "lesson": "networking/http-and-tls",
+  "story": "The payment gateway connects to the shop and fails the handshake with \"protocol version\". Its policy allows TLS 1.3 only. The shop service was pinned to TLS 1.2 years ago, and a few old internal clients still need 1.2, so they must keep working. Fix the service, not the gateway. A small web service listens on 127.0.0.1:8443 with TLS (start, stop and restart it with shop-tls; its settings are in /etc/shop-tls.conf; certificates are in /etc/tls). Test it like a client would: openssl s_client -connect 127.0.0.1:8443 -servername shop.lab -verify_hostname shop.lab -CAfile /etc/ssl/certs/ca-bundle.pem -brief < /dev/null",
+  "goals": [
+   "The gateway check (openssl s_client -tls1_3 ...) passes: \"Verification: OK\".",
+   "A client limited to TLS 1.2 still connects."
+  ],
+  "hints": [
+   "Try the gateway check: add -tls1_3 to the s_client command. Then look at /etc/shop-tls.conf: the PROTOCOLS line.",
+   "PROTOCOLS=tls1_2 pins the service to TLS 1.2 (it becomes the -tls1_2 option). Pinning to 1.3 instead would break the old clients.",
+   "Leave PROTOCOLS empty so the service offers both, then shop-tls restart. Test both with -tls1_3 and -tls1_2."
+  ],
+  "solution": "openssl s_client -connect 127.0.0.1:8443 -servername shop.lab -CAfile /etc/ssl/certs/ca-bundle.pem -tls1_3 -brief < /dev/null\ncat /etc/shop-tls.conf\nsed -i \"s/^PROTOCOLS=.*/PROTOCOLS=/\" /etc/shop-tls.conf\nshop-tls restart",
+  "tag": "tls",
+  "why": {
+   "q": "Why not pin the service to TLS 1.3 only?",
+   "o": [
+    "TLS 1.3 is insecure",
+    "Older clients that only speak 1.2 would stop working",
+    "TLS 1.3 needs a new certificate",
+    "Pinning is not possible"
+   ],
+   "a": 1,
+   "x": "Offering both versions lets each client use the best one it supports. Pinning to 1.3 would lock out every client that cannot speak it. Raising the minimum is a deliberate step taken once the old clients are gone."
+  }
+ },
+ {
+  "id": "tls-expiring-first",
+  "title": "Which certificate expires first?",
+  "level": "Intermediate",
+  "minutes": 8,
+  "lesson": "networking/http-and-tls",
+  "story": "Three internal sites keep their certificates in /etc/tls/sites: site-alpha.pem, site-beta.pem and site-gamma.pem. An audit wants to know which one needs renewal first. Diagnose only: find the cause, do not fix it.",
+  "goals": [
+   "Look around the machine with real commands. Do not change anything. Type your diagnosis in the box under the terminal and press Submit."
+  ],
+  "hints": [
+   "openssl x509 -noout -enddate -in FILE prints the expiry date of one certificate.",
+   "Loop over the files: for f in /etc/tls/sites/*.pem; do echo $f; openssl x509 -noout -enddate -in $f; done",
+   "Compare the years first, then the months and days."
+  ],
+  "solution": "for f in /etc/tls/sites/*.pem; do echo $f $(openssl x509 -noout -enddate -in $f); done\nAnswer: beta",
+  "kind": "diagnose",
+  "ask": "Which site (alpha, beta or gamma) has the certificate that expires first?",
+  "accept": [
+   "\\bbeta\\b"
+  ],
+  "answer": "beta",
+  "tag": "tls"
+ },
+ {
+  "id": "tls-who-issued",
+  "title": "Who signed the shop certificate?",
+  "level": "Beginner",
+  "minutes": 8,
+  "lesson": "networking/http-and-tls",
+  "story": "A service answers on 127.0.0.1:8443 with TLS. Before trusting it, the security team wants to know which CA signed the certificate it presents. Diagnose only: find the cause, do not fix it.",
+  "goals": [
+   "Look around the machine with real commands. Do not change anything. Type your diagnosis in the box under the terminal and press Submit."
+  ],
+  "hints": [
+   "openssl s_client -connect 127.0.0.1:8443 < /dev/null prints the server certificate, but it is long.",
+   "Pipe the certificate into openssl x509 -noout -issuer. s_client output has the certificate between BEGIN and END lines; openssl x509 reads the first one.",
+   "The issuer line has several fields. The common name is CN = ..."
+  ],
+  "solution": "openssl s_client -connect 127.0.0.1:8443 < /dev/null 2>/dev/null | openssl x509 -noout -issuer\nAnswer: MARGA Lab Issuing CA",
+  "kind": "diagnose",
+  "ask": "What is the common name of the CA that issued the certificate the service presents?",
+  "accept": [
+   "issuing\\s*ca"
+  ],
+  "answer": "MARGA Lab Issuing CA",
+  "tag": "tls"
+ },
+ {
+  "id": "pkg-stale-index",
+  "title": "Unable to locate a package that exists",
+  "level": "Beginner",
+  "minutes": 8,
+  "lesson": "linux/package-management",
+  "story": "A colleague says the web server package nginx-lite is in the repository. On this machine, \"apt install nginx-lite\" says \"Unable to locate package\". The repository is up. Install nginx-lite. This machine has a small package manager that works like apt, with its own tiny repository on 127.0.0.1 (apt, apt-get, dpkg and apt-mark; sources are in /etc/apt/sources.list). It is a teaching imitation, not the real apt.",
+  "goals": [
+   "nginx-lite is installed (dpkg -s nginx-lite says \"ok installed\").",
+   "The package lists on this machine are filled in."
+  ],
+  "hints": [
+   "Run apt install nginx-lite and read the error. Then apt list: is the list of known packages empty?",
+   "apt only knows the packages named in its local lists. apt update downloads the lists from the repositories in /etc/apt/sources.list.",
+   "apt update, then apt install -y nginx-lite."
+  ],
+  "solution": "apt install nginx-lite\napt list\napt update\napt install -y nginx-lite\ndpkg -s nginx-lite",
+  "tag": "packages",
+  "why": {
+   "q": "What does \"apt update\" actually do?",
+   "o": [
+    "Upgrades every installed package",
+    "Downloads the current list of available packages from the repositories",
+    "Removes unused packages",
+    "Checks the disk for errors"
+   ],
+   "a": 1,
+   "x": "apt update only refreshes the local lists of what each repository offers. It installs nothing. Until the lists are fresh, apt cannot find or choose versions of packages."
+  }
+ },
+ {
+  "id": "pkg-wrong-repo-url",
+  "title": "The repository that is not there",
+  "level": "Beginner",
+  "minutes": 10,
+  "lesson": "linux/package-management",
+  "story": "apt update prints a warning that it could not connect to the repository, and apt install curl-lite then says it cannot find the package. The repository itself is fine on port 8090. Someone edited /etc/apt/sources.list last week. Fix the source and install curl-lite. This machine has a small package manager that works like apt, with its own tiny repository on 127.0.0.1 (apt, apt-get, dpkg and apt-mark; sources are in /etc/apt/sources.list). It is a teaching imitation, not the real apt.",
+  "goals": [
+   "curl-lite is installed.",
+   "/etc/apt/sources.list points at the working repository."
+  ],
+  "hints": [
+   "Run apt update and read the warning: it names the URL it tried. Compare with the port in the story.",
+   "cat /etc/apt/sources.list shows the line. Spot the typo in the port.",
+   "Correct the line (sed -i \"s/8091/8090/\" /etc/apt/sources.list), apt update, apt install -y curl-lite."
+  ],
+  "solution": "apt update\ncat /etc/apt/sources.list\nsed -i \"s/8091/8090/\" /etc/apt/sources.list\napt update\napt install -y curl-lite",
+  "tag": "packages",
+  "why": {
+   "q": "Why did apt install say it could not find the package, not that the repository was down?",
+   "o": [
+    "The package was deleted",
+    "The failed update left the lists empty, so the package was unknown",
+    "apt hides network errors",
+    "The repository changed its name"
+   ],
+   "a": 1,
+   "x": "A failed update leaves no lists for that repository. The install step only looks at the lists, so the error you see later (cannot locate the package) is a symptom. The first warning, in apt update, is the cause."
+  }
+ },
+ {
+  "id": "pkg-held-blocks-upgrade",
+  "title": "The security update that never arrives",
+  "level": "Intermediate",
+  "minutes": 12,
+  "lesson": "linux/package-management",
+  "story": "A security notice says libtls-lite must be 1.2.0 or newer. apt upgrade finishes quickly, says some packages were \"kept back\", and libtls-lite is still at 1.0.0. webapp-lite depends on it and must stay installed. Get libtls-lite to 1.2.0. This machine has a small package manager that works like apt, with its own tiny repository on 127.0.0.1 (apt, apt-get, dpkg and apt-mark; sources are in /etc/apt/sources.list). It is a teaching imitation, not the real apt.",
+  "goals": [
+   "libtls-lite is at version 1.2.0.",
+   "webapp-lite is still installed."
+  ],
+  "hints": [
+   "apt list --upgradable shows libtls-lite as upgradable. apt upgrade says it was kept back.",
+   "A package that is on hold is never upgraded by apt upgrade. apt-mark showhold lists the held ones.",
+   "apt-mark unhold libtls-lite, then apt upgrade -y."
+  ],
+  "solution": "apt list --upgradable\napt upgrade -y\napt-mark showhold\napt-mark unhold libtls-lite\napt upgrade -y\ndpkg -s libtls-lite",
+  "tag": "packages",
+  "why": {
+   "q": "Why is a package ever put on hold?",
+   "o": [
+    "To make it download faster",
+    "To keep a known-good version from being changed by a routine upgrade",
+    "To make apt ignore the repository",
+    "To mark it as removed"
+   ],
+   "a": 1,
+   "x": "A hold pins a package at its current version, usually because a newer one broke something. The risk is forgetting it: held packages miss security fixes, so review holds regularly."
+  }
+ },
+ {
+  "id": "pkg-unmet-dependency",
+  "title": "The dependency that is too old",
+  "level": "Intermediate",
+  "minutes": 12,
+  "lesson": "linux/package-management",
+  "story": "apt install report-tool fails: it needs libchart 2.0 or newer, but the repository only has 1.4. Your team keeps a \"backports\" repository with newer libraries on port 8092, and its line in /etc/apt/sources.list.d/backports.list is switched off. Enable it and install report-tool. This machine has a small package manager that works like apt, with its own tiny repository on 127.0.0.1 (apt, apt-get, dpkg and apt-mark; sources are in /etc/apt/sources.list). It is a teaching imitation, not the real apt.",
+  "goals": [
+   "report-tool is installed.",
+   "libchart is at 2.0 or newer."
+  ],
+  "hints": [
+   "Read the apt error: \"Depends: libchart (>= 2.0) but 1.4.0 is to be installed\". apt policy libchart shows the versions it knows.",
+   "ls /etc/apt/sources.list.d and read backports.list. The deb line starts with #.",
+   "Remove the # (sed -i \"s/^# *deb/deb/\" ...), apt update, apt install -y report-tool."
+  ],
+  "solution": "apt install report-tool\napt policy libchart\ncat /etc/apt/sources.list.d/backports.list\nsed -i \"s/^# *deb/deb/\" /etc/apt/sources.list.d/backports.list\napt update\napt install -y report-tool",
+  "tag": "packages",
+  "why": {
+   "q": "Why did apt not simply install the newer libchart by itself?",
+   "o": [
+    "It only chooses versions from repositories that are enabled",
+    "It does not install dependencies",
+    "It prefers older versions",
+    "Dependencies are always optional"
+   ],
+   "a": 0,
+   "x": "apt resolves dependencies using only the repositories you enabled and have updated. If the newer version lives in a repository that is switched off, apt reports an unmet dependency rather than reaching for it."
+  }
+ },
+ {
+  "id": "pkg-lock-held",
+  "title": "The lock that someone is holding",
+  "level": "Intermediate",
+  "minutes": 12,
+  "lesson": "linux/package-management",
+  "story": "apt install jq-lite stops with \"Could not get lock /var/lib/dpkg/lock-frontend. It is held by process ...\". Nothing else seems to be installing anything. Find out what holds the lock, deal with it the right way, and install jq-lite. Do not delete the lock file. This machine has a small package manager that works like apt, with its own tiny repository on 127.0.0.1 (apt, apt-get, dpkg and apt-mark; sources are in /etc/apt/sources.list). It is a teaching imitation, not the real apt.",
+  "goals": [
+   "jq-lite is installed.",
+   "The process that held the lock is no longer running."
+  ],
+  "hints": [
+   "The error names the process and its program. Look at it: ps | grep unattended",
+   "unattended-upgrade is meant to finish in minutes. This one has been running since boot and is stuck. Deleting the lock file would let two package tools run at once, which can corrupt the package database.",
+   "Stop the stuck process: kill $(cat /var/lib/dpkg/lock-frontend). Then apt install -y jq-lite."
+  ],
+  "solution": "apt install jq-lite\nps | grep unattended\nkill $(cat /var/lib/dpkg/lock-frontend)\napt install -y jq-lite",
+  "tag": "packages",
+  "why": {
+   "q": "Why is deleting the lock file the wrong fix?",
+   "o": [
+    "The file is needed to install packages",
+    "It lets two package tools change the database at once, which can corrupt it",
+    "Deleting files needs root",
+    "The lock file is recreated anyway"
+   ],
+   "a": 1,
+   "x": "The lock exists to stop two tools editing the package database together. If another process really holds it, removing the file hides the problem and risks a corrupt database. Find the holder, wait for it or stop it, then continue."
+  }
+ },
+ {
+  "id": "pkg-hash-mismatch",
+  "title": "The download that does not match",
+  "level": "Advanced",
+  "minutes": 14,
+  "lesson": "linux/package-management",
+  "story": "apt install payd-lite downloads the package and fails with \"Hash Sum mismatch\". The repository team says they rebuilt payd-lite 2.0.1 this morning with the same version number (they should not, but they did). Install payd-lite from the repository as it is now. This machine has a small package manager that works like apt, with its own tiny repository on 127.0.0.1 (apt, apt-get, dpkg and apt-mark; sources are in /etc/apt/sources.list). It is a teaching imitation, not the real apt.",
+  "goals": [
+   "payd-lite is installed from the current repository build (its program file says \"rebuilt\")."
+  ],
+  "hints": [
+   "The error shows two hashes: the one the index promises and the one that arrived. The file on the server changed after this machine fetched the index.",
+   "The local lists are a copy taken earlier. Refresh them: apt update.",
+   "apt update, then apt install -y payd-lite."
+  ],
+  "solution": "apt install payd-lite\napt update\napt install -y payd-lite\ncat /usr/bin/payd-lite",
+  "tag": "packages",
+  "why": {
+   "q": "Why does apt compare a hash before installing?",
+   "o": [
+    "To make downloads faster",
+    "To be sure the file is exactly what the signed index promised",
+    "To compress the package",
+    "To find the newest version"
+   ],
+   "a": 1,
+   "x": "The index carries a checksum for each file. If the downloaded file differs, it was changed, corrupted or the index is stale, and apt refuses to install it. Refresh the index first; if the mismatch persists, suspect the repository."
+  }
+ },
+ {
+  "id": "pkg-half-configured",
+  "title": "The install that stopped halfway",
+  "level": "Advanced",
+  "minutes": 14,
+  "lesson": "linux/package-management",
+  "story": "An install of queue-lite was interrupted last night. Now apt install other-tool refuses: \"dpkg was interrupted, you must manually run dpkg --configure -a\". Running that fails too. Find out why queue-lite cannot finish configuring, fix the cause, finish the configuration, and then install other-tool. This machine has a small package manager that works like apt, with its own tiny repository on 127.0.0.1 (apt, apt-get, dpkg and apt-mark; sources are in /etc/apt/sources.list). It is a teaching imitation, not the real apt.",
+  "goals": [
+   "queue-lite is fully installed (dpkg -l shows ii).",
+   "other-tool is installed."
+  ],
+  "hints": [
+   "dpkg -l shows queue-lite with status iF (half-configured). Run dpkg --configure -a and read the message from its post-install script.",
+   "The script says /var/spool/queue is missing. The package expects the directory to exist.",
+   "mkdir -p /var/spool/queue, dpkg --configure -a, then apt install -y other-tool."
+  ],
+  "solution": "dpkg -l\ndpkg --configure -a\nmkdir -p /var/spool/queue\ndpkg --configure -a\napt install -y other-tool",
+  "tag": "packages",
+  "why": {
+   "q": "Why does a failed post-install script block other installs?",
+   "o": [
+    "dpkg cannot continue safely while a package is half-configured",
+    "Scripts lock the network",
+    "The failed script deletes the repository",
+    "apt only installs one package a day"
+   ],
+   "a": 0,
+   "x": "A half-configured package is in an unknown state, so the package manager insists on finishing or removing it first. Fix what the script needs, then run dpkg --configure -a to complete it."
+  }
+ },
+ {
+  "id": "pkg-pin-version",
+  "title": "Back to the version that worked",
+  "level": "Advanced",
+  "minutes": 14,
+  "lesson": "linux/package-management",
+  "story": "appd-lite 2.1.0 was installed by last night's upgrade and it crashes on start. The previous version 2.0.3 was fine. Roll back to 2.0.3, and make sure the next \"apt upgrade\" does not bring 2.1.0 back before the vendor fixes it. This machine has a small package manager that works like apt, with its own tiny repository on 127.0.0.1 (apt, apt-get, dpkg and apt-mark; sources are in /etc/apt/sources.list). It is a teaching imitation, not the real apt.",
+  "goals": [
+   "appd-lite is at version 2.0.3.",
+   "appd-lite is on hold."
+  ],
+  "hints": [
+   "apt policy appd-lite shows the installed version and every version the repository has.",
+   "You can install an exact version with name=version: apt install appd-lite=2.0.3. apt will downgrade it.",
+   "Then stop upgrades from touching it: apt-mark hold appd-lite. Check with apt-mark showhold."
+  ],
+  "solution": "apt policy appd-lite\napt install -y appd-lite=2.0.3\napt-mark hold appd-lite\napt-mark showhold",
+  "tag": "packages",
+  "why": {
+   "q": "What is the risk of leaving a package on hold forever?",
+   "o": [
+    "It uses more disk",
+    "It misses security fixes and may block other upgrades",
+    "It cannot be removed",
+    "Nothing; holds expire in a day"
+   ],
+   "a": 1,
+   "x": "A hold stops all upgrades for that package, including security fixes. Treat it as a temporary pause, note why it was set, and remove it once the bad version is fixed."
+  }
+ },
+ {
+  "id": "pkg-owner-of-file",
+  "title": "Which package owns this file?",
+  "level": "Beginner",
+  "minutes": 8,
+  "lesson": "linux/package-management",
+  "story": "A command called ledgerctl is on the PATH and nobody remembers installing it. Several packages related to the ledger are installed. The team wants to know which one put /usr/bin/ledgerctl on the disk. This machine has a small package manager that works like apt, with its own tiny repository on 127.0.0.1 (apt, apt-get, dpkg and apt-mark; sources are in /etc/apt/sources.list). It is a teaching imitation, not the real apt. Diagnose only: find the cause, do not fix it.",
+  "goals": [
+   "Look around the machine with real commands. Do not change anything. Type your diagnosis in the box under the terminal and press Submit."
+  ],
+  "hints": [
+   "dpkg -l lists the installed packages. Several have \"ledger\" in the name.",
+   "dpkg -L PACKAGE lists the files a package installed. dpkg -S PATH does the reverse: it names the package that owns a path.",
+   "dpkg -S /usr/bin/ledgerctl"
+  ],
+  "solution": "dpkg -S /usr/bin/ledgerctl\nAnswer: ledger-tools",
+  "kind": "diagnose",
+  "ask": "Which package owns /usr/bin/ledgerctl?",
+  "accept": [
+   "^\\s*ledger-tools\\s*$"
+  ],
+  "answer": "ledger-tools",
+  "tag": "packages"
+ },
+ {
+  "id": "pkg-which-version",
+  "title": "Which version will an upgrade bring?",
+  "level": "Intermediate",
+  "minutes": 8,
+  "lesson": "linux/package-management",
+  "story": "mailq-lite 3.1.0 is installed. The team has two repositories enabled and does not know which version \"apt install mailq-lite\" would pick now. Read the facts; do not install anything. This machine has a small package manager that works like apt, with its own tiny repository on 127.0.0.1 (apt, apt-get, dpkg and apt-mark; sources are in /etc/apt/sources.list). It is a teaching imitation, not the real apt. Diagnose only: find the cause, do not fix it.",
+  "goals": [
+   "Look around the machine with real commands. Do not change anything. Type your diagnosis in the box under the terminal and press Submit."
+  ],
+  "hints": [
+   "apt policy mailq-lite shows Installed, Candidate and a table of every version with the repository it comes from.",
+   "The candidate is the version apt would choose. It is the highest version among the enabled repositories.",
+   "Read the Candidate line."
+  ],
+  "solution": "apt policy mailq-lite\nAnswer: 3.2.1",
+  "kind": "diagnose",
+  "ask": "Which version of mailq-lite is the candidate, the one apt would install?",
+  "accept": [
+   "^\\s*3\\.2\\.1\\s*$"
+  ],
+  "answer": "3.2.1",
+  "tag": "packages"
  }
 ]

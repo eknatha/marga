@@ -1,0 +1,24 @@
+#!/bin/sh
+# MARGA teaching shim: an imitation of dpkg for the tiny local repository. Not the real dpkg.
+. /usr/lib/marga-pkg/pkglib.sh
+case $1 in
+  -l|--list) shift
+    echo "Desired=Unknown/Install/Remove/Purge/Hold"; echo "| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend"; echo "|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)"
+    echo "||/ Name           Version      Architecture Description"; echo "+++-==============-============-============-=================================="
+    for nm in $(sed 's/|.*//' $DB/status | sort); do case $# in 0) :;; *) case $nm in $1) :;; *) continue;; esac;; esac
+      v=$(iver "$nm"); st=$(istate "$nm"); c=i; [ "$st" = half-configured ] && c=F; [ "$st" = unpacked ] && c=U; d=i; isheld "$nm" && d=h
+      desc=$(indexline "$nm" "$v" | cut -d'|' -f7); printf '%s%s  %-14s %-12s all          %s\n' "$d" "$c" "$nm" "$v" "$desc"; done;;
+  -L|--listfiles) [ -f $INFO/$2.list ] || { echo "dpkg-query: package '$2' is not installed"; exit 1; }; cat $INFO/$2.list;;
+  -S|--search) found=1; for f in $INFO/*.list; do [ -f "$f" ] || continue; if grep -qx "$2" "$f"; then echo "$(basename "$f" .list): $2"; found=0; fi; done
+    [ $found -ne 0 ] && { echo "dpkg-query: no path found matching pattern $2"; exit 1; }; exit 0;;
+  -s|--status) v=$(iver "$2"); [ -z "$v" ] && { echo "dpkg-query: package '$2' is not installed and no information is available"; exit 1; }
+    st=$(istate "$2"); echo "Package: $2"; case $st in installed) echo "Status: install ok installed";; half-configured) echo "Status: install ok half-configured";; *) echo "Status: install ok unpacked";; esac
+    echo "Version: $v"; d=$(indexline "$2" "$v" | cut -d'|' -f3); [ -n "$d" ] && echo "Depends: $d";;
+  --configure) shift; [ "$1" = -a ] || [ "$1" = --pending ] || set -- "$@"; lock_get
+    for nm in $(grep '|half-configured$\||unpacked$' $DB/status | sed 's/|.*//'); do ver=$(iver "$nm"); echo "Setting up $nm ($ver) ..."
+      if [ -f $INFO/$nm.postinst ] && ! sh $INFO/$nm.postinst >/tmp/.pi.$$ 2>&1; then cat /tmp/.pi.$$; rm -f /tmp/.pi.$$; sed -i "s/^$nm|.*/$nm|$ver|half-configured/" $DB/status; echo "dpkg: error processing package $nm (--configure):"; echo " installed $nm package post-installation script subprocess returned error exit status 1"; exit 1; fi
+      rm -f /tmp/.pi.$$; sed -i "s/^$nm|.*/$nm|$ver|installed/" $DB/status; done;;
+  -r|--remove) shift; exec apt remove "$@";;
+  -P|--purge) shift; exec apt purge "$@";;
+  *) echo "dpkg: MARGA teaching shim. Try: -l, -L, -S, -s, --configure -a"; exit 1;;
+esac

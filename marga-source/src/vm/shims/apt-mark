@@ -1,0 +1,10 @@
+#!/bin/sh
+# MARGA teaching shim: an imitation of apt-mark (hold, unhold, showhold)
+. /usr/lib/marga-pkg/pkglib.sh
+c=$1; [ $# -gt 0 ] && shift
+case $c in
+  hold) for p in "$@"; do [ -z "$(iver "$p")" ] && { echo "E: Can't select installed nor candidate version from package '$p' as it has neither of them"; exit 100; }; isheld "$p" || echo "$p" >> $DB/holds; echo "$p set on hold."; done;;
+  unhold) for p in "$@"; do sed -i "/^$p\$/d" $DB/holds; echo "Canceled hold on $p."; done;;
+  showhold) cat $DB/holds;;
+  *) echo "apt-mark: hold, unhold, showhold"; exit 1;;
+esac

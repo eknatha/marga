@@ -22,6 +22,7 @@ if [ -f /scen/$SC/setup.sh ]; then . /scen/$SC/setup.sh; fi
 cat > /etc/profile <<'X'
 export PATH=/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin
 export PS1='\u@marga-lab:\w\$ '
+. /usr/lib/marga-pkg/fn.sh 2>/dev/null
 alias ll='ls -l'
 [ -f /root/.profile ] && . /root/.profile
 X

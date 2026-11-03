@@ -1,0 +1,15 @@
+#!/bin/sh
+# MARGA teaching helper: starts the lab's TLS service (openssl s_server) from /etc/shop-tls.conf
+. /etc/shop-tls.conf
+LOG=/var/log/shop-tls.log; PIDF=/run/shop-tls.pid
+stop() { [ -f $PIDF ] && kill "$(cat $PIDF)" 2>/dev/null; rm -f $PIDF; sleep 1; }
+start() {
+  if [ -f $PIDF ] && [ -d "/proc/$(cat $PIDF)" ]; then echo "shop-tls: already running (pid $(cat $PIDF))"; return 0; fi
+  m=$(stat -c %a "$KEY" 2>/dev/null)
+  if [ -n "$m" ] && [ $((m % 100)) -ne 0 ]; then echo "shop-tls: private key file $KEY has group or world access; permissions should be u=rw (0600) or less"; return 1; fi
+  extra=""; [ -n "$PROTOCOLS" ] && extra="-$PROTOCOLS"; [ -s "$CHAIN" ] && extra="$extra -cert_chain $CHAIN"
+  openssl s_server -accept 127.0.0.1:$PORT -cert "$CERT" -key "$KEY" $extra -www -ign_eof -quiet < /dev/null > $LOG 2>&1 &
+  echo $! > $PIDF; i=0
+  while [ $i -lt 8 ]; do sleep 1; [ -d "/proc/$(cat $PIDF)" ] || { cat $LOG; echo "shop-tls: failed to start"; rm -f $PIDF; return 1; }; netstat -tln 2>/dev/null | grep -q ":$PORT " && { echo "shop-tls: listening on 127.0.0.1:$PORT"; return 0; }; i=$((i+1)); done
+  echo "shop-tls: started (pid $(cat $PIDF))"; }
+case $1 in start) start;; stop) stop; echo "shop-tls: stopped";; restart) stop; start;; status) if [ -f $PIDF ] && [ -d "/proc/$(cat $PIDF)" ]; then echo "shop-tls: running (pid $(cat $PIDF)), listening on 127.0.0.1:$PORT"; else echo "shop-tls: not running"; exit 3; fi;; *) echo "usage: shop-tls start|stop|restart|status"; exit 2;; esac

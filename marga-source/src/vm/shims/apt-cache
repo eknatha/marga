@@ -1,0 +1,114 @@
+#!/bin/sh
+# MARGA teaching shim: an imitation of apt for a tiny local repository. Not the real apt.
+. /usr/lib/marga-pkg/pkglib.sh
+cmd=$1; [ $# -gt 0 ] && shift
+yes=0; args=""
+for a in "$@"; do case $a in -y|--yes|-qq|-q|--no-install-recommends) [ "$a" = -y ] || [ "$a" = --yes ] && yes=1;; --installed|--upgradable) opt=$a;; -*) ;; *) args="$args $a";; esac; done
+case "$(basename "$0")" in apt-cache) case $cmd in policy|show|search|madison) :;; *) echo "E: Invalid operation $cmd"; exit 100;; esac;; esac
+fetch_all() { # download each index
+  n=0; rm -f $L/*.idx; ok=0
+  for u in $(sources); do
+    n=$((n+1)); u=${u%/}
+    if wget -q -T 5 -O $L/$n.raw "$u/Packages" 2>/dev/null && [ -s $L/$n.raw ]; then echo "Get:$n $u stable InRelease"; flatten < $L/$n.raw > $L/$n.idx; rm -f $L/$n.raw
+    else rm -f $L/$n.raw; echo "Err:$n $u stable InRelease"; echo "  Could not connect to ${u#http://} (connection refused or not found)"; ok=1; fi
+  done
+  [ $n -eq 0 ] && echo "W: No sources are configured in /etc/apt/sources.list"
+  [ $ok -ne 0 ] && echo "W: Failed to fetch $u/Packages  Could not connect. Some index files failed to download. They have been ignored, or old ones used instead."
+  echo "Reading package lists... Done"; }
+# plan: sets PLAN (lines name|version), or prints the unmet dependency error and returns 1
+PLAN=""; ERR=""
+inplan() { echo "$PLAN" | grep -q "^$1|"; }
+want() { # want NAME [VERSION]  -> adds the package and its dependencies to the plan
+  nm=$1; ver=$2
+  inplan "$nm" && return 0
+  if [ -z "$ver" ]; then
+    iv=$(iver "$nm"); st=$(istate "$nm")
+    if [ -n "$iv" ] && [ "$st" = installed ] && [ -z "$PARENT" ] && ! isheld "$nm" && vcmp "$(cand "$nm")" '>>' "$iv"; then iv=""; fi
+    if [ -n "$iv" ] && [ "$st" = installed ]; then
+      if [ -n "$MINVER" ] && ! satisfies "$iv" "$MINVER"; then
+        if isheld "$nm"; then ERR="$ERR\n $PARENT : Depends: $nm $MINVER but $iv is to be installed\n   $nm is held at $iv"; return 1; fi
+      else return 0; fi
+    fi
+    ver=$(cand "$nm")
+    if [ -n "$MINVER" ]; then ver=$(candidates "$nm" | while read v; do satisfies "$v" "$MINVER" && echo "$v"; done | tail -1); fi
+    if [ -z "$ver" ]; then
+      if [ -n "$PARENT" ]; then have=$(cand "$nm"); ERR="$ERR\n $PARENT : Depends: $nm $MINVER but ${have:-it is not installable}${have:+ is to be installed}"; return 1; fi
+      echo "E: Unable to locate package $nm"; return 2; fi
+  else
+    candidates "$nm" | grep -qx "$ver" || { echo "E: Version '$ver' for '$nm' was not found"; return 2; }
+  fi
+  line=$(indexline "$nm" "$ver"); [ -z "$line" ] && { echo "E: Unable to locate package $nm"; return 2; }
+  PLAN="$PLAN$nm|$ver\n"
+  deps=$(echo "$line" | cut -d'|' -f3)
+  oldp=$PARENT; oldm=$MINVER
+  echo "$deps" | tr ',' '\n' | sed 's/^ *//; s/ *$//' | while read d; do [ -z "$d" ] && continue; echo "$d"; done > /tmp/.deps.$$
+  while read d; do
+    first=${d%%|*}; dn=$(echo "$first" | sed 's/ *(.*//; s/ *$//'); dc=$(echo "$first" | sed -n 's/^[^(]*\(([^)]*)\).*/\1/p')
+    PARENT=$nm; MINVER=$dc; want "$dn" || { rm -f /tmp/.deps.$$; PARENT=$oldp; MINVER=$oldm; return 1; }
+  done < /tmp/.deps.$$
+  rm -f /tmp/.deps.$$; PARENT=$oldp; MINVER=$oldm; return 0; }
+dl_and_unpack() { # NAME VERSION
+  line=$(indexline "$1" "$2"); sha=$(echo "$line" | cut -d'|' -f4); fn=$(echo "$line" | cut -d'|' -f5)
+  base=$(basename "$fn"); src=""
+  for u in $(sources); do u=${u%/}; if wget -q -T 5 -O $AR/$base.part "$u/$fn" 2>/dev/null && [ -s $AR/$base.part ]; then src=$u; break; fi; done
+  if [ -z "$src" ]; then rm -f $AR/$base.part; echo "Err:1 $(sources | head -1) stable/main $1 $2"; echo "  404  Not Found"; echo "E: Failed to fetch $(sources | head -1)/$fn  404  Not Found"; echo "E: Unable to fetch some archives, maybe run apt-get update or try with --fix-missing?"; return 1; fi
+  got=$(sha256sum $AR/$base.part | cut -d' ' -f1)
+  if [ "$got" != "$sha" ]; then rm -f $AR/$base.part; echo "E: Failed to fetch $src/$fn  Hash Sum mismatch"; echo "   Hashes of expected file:"; echo "    - SHA256:$sha"; echo "   Hashes of received file:"; echo "    - SHA256:$got"; echo "E: Some files failed to download"; return 1; fi
+  mv $AR/$base.part $AR/$base; return 0; }
+unpack() { # NAME VERSION  (after download)
+  nm=$1; ver=$2; line=$(indexline "$nm" "$ver"); base=$(basename "$(echo "$line" | cut -d'|' -f5)")
+  echo "Selecting previously unselected package $nm."; echo "Unpacking $nm ($ver) ..."
+  tar tzf $AR/$base | grep -v '/$' | grep -v '^\.marga' | sed 's#^\./#/#; s#^\([^/]\)#/\1#' > $INFO/$nm.list
+  tar xzf $AR/$base -C / 2>/dev/null; [ -f /.marga/postinst ] && { mv /.marga/postinst $INFO/$nm.postinst; }; rm -rf /.marga
+  sed -i "/^$nm|/d" $DB/status; echo "$nm|$ver|unpacked" >> $DB/status; }
+configure() { nm=$1; ver=$(iver "$nm"); echo "Setting up $nm ($ver) ..."
+  if [ -f $INFO/$nm.postinst ] && ! sh $INFO/$nm.postinst >/tmp/.pi.$$ 2>&1; then cat /tmp/.pi.$$; rm -f /tmp/.pi.$$; sed -i "s/^$nm|.*/$nm|$ver|half-configured/" $DB/status
+    echo "dpkg: error processing package $nm (--configure):"; echo " installed $nm package post-installation script subprocess returned error exit status 1"; return 1; fi
+  rm -f /tmp/.pi.$$; sed -i "s/^$nm|.*/$nm|$ver|installed/" $DB/status; return 0; }
+do_install() { # args: name[=ver] ...
+  lock_get
+  if grep -q '|half-configured$' $DB/status; then echo "E: dpkg was interrupted, you must manually run 'dpkg --configure -a' to correct the problem."; exit 100; fi
+  PLAN=""; ERR=""; PARENT=""; MINVER=""
+  for a in "$@"; do nm=${a%%=*}; ver=""; case $a in *=*) ver=${a#*=};; esac
+    want "$nm" "$ver"; r=$?; [ $r -eq 2 ] && exit 100
+    if [ $r -ne 0 ]; then echo "Reading package lists... Done"; echo "Reading state information... Done"; echo "Some packages could not be installed."; echo "The following packages have unmet dependencies:"; printf "$ERR\n"; echo "E: Unable to correct problems, you have held broken packages."; exit 100; fi
+  done
+  todo=$(printf "$PLAN" | while IFS='|' read n v; do [ -z "$n" ] && continue; [ "$(iver "$n")" = "$v" ] && [ "$(istate "$n")" = installed ] && continue; echo "$n|$v"; done)
+  echo "Reading package lists... Done"; echo "Building dependency tree... Done"
+  if [ -z "$todo" ]; then for a in "$@"; do echo "${a%%=*} is already the newest version ($(iver "${a%%=*}"))."; done; echo "0 upgraded, 0 newly installed, 0 to remove."; return 0; fi
+  echo "The following packages will be installed:"; echo "  $(echo "$todo" | cut -d'|' -f1 | tr '\n' ' ')"
+  echo "$todo" | while IFS='|' read n v; do dl_and_unpack_pre=1; :; done
+  echo "$todo" | while IFS='|' read n v; do [ -z "$n" ] && continue; dl_and_unpack "$n" "$v" || exit 1; done || exit 100
+  # dependencies first: the plan lists a package before its dependencies, so go through it backwards
+  order=$(echo "$todo" | awk '{a[NR]=$0} END{for(i=NR;i>=1;i--)print a[i]}')
+  rc=0; echo "$order" | while IFS='|' read n v; do [ -z "$n" ] && continue; unpack "$n" "$v"; done
+  for n in $(echo "$order" | cut -d'|' -f1); do configure "$n" || rc=1; done
+  [ $rc -ne 0 ] && { echo "E: Sub-process /usr/bin/dpkg returned an error code (1)"; exit 100; }
+  return 0; }
+do_remove() { purge=$1; shift; lock_get
+  for nm in "$@"; do [ -z "$(iver "$nm")" ] && { echo "E: Unable to locate package $nm"; exit 100; }
+    echo "Removing $nm ($(iver "$nm")) ..."
+    for f in $(cat $INFO/$nm.list 2>/dev/null); do case $f in /etc/*) [ "$purge" = 1 ] && rm -f "$f";; *) rm -f "$f";; esac; done
+    sed -i "/^$nm|/d" $DB/status; if [ "$purge" = 0 ] && grep -q '^/etc/' $INFO/$nm.list 2>/dev/null; then :; else rm -f $INFO/$nm.list $INFO/$nm.postinst; fi
+  done; }
+case $cmd in
+  update) lock_get; fetch_all; echo "All packages are up to date."; [ -n "$(allpk)" ] && echo "$(allpk | wc -l) packages can be listed with 'apt list'.";;
+  install) [ -z "$args" ] && { echo "E: No packages specified"; exit 100; }; do_install $args;;
+  remove) do_remove 0 $args;;
+  purge) do_remove 1 $args;;
+  upgrade|full-upgrade|dist-upgrade) lock_get; echo "Reading package lists... Done"; echo "Calculating upgrade... Done"; kept=""; ups=""
+    for nm in $(sed 's/|.*//' $DB/status); do iv=$(iver "$nm"); cv=$(cand "$nm"); [ -z "$cv" ] && continue; vcmp "$cv" '>>' "$iv" || continue
+      if isheld "$nm"; then kept="$kept $nm"; else ups="$ups $nm"; fi; done
+    [ -n "$kept" ] && { echo "The following packages have been kept back:"; echo " $kept"; }
+    [ -n "$ups" ] && { rm -f $LOCK; do_install $ups; }
+    echo "$(echo $ups | wc -w) upgraded, 0 newly installed, 0 to remove and $(echo $kept | wc -w) not upgraded.";;
+  autoremove|clean|autoclean) [ "$cmd" = clean ] && rm -f $AR/*.pkg 2>/dev/null; echo "Reading package lists... Done";;
+  list) if [ "$opt" = --installed ]; then for nm in $(sed 's/|.*//' $DB/status); do echo "$nm/stable,now $(iver "$nm") all [installed]"; done
+        elif [ "$opt" = --upgradable ]; then for nm in $(sed 's/|.*//' $DB/status); do iv=$(iver "$nm"); cv=$(cand "$nm"); [ -n "$cv" ] && vcmp "$cv" '>>' "$iv" && echo "$nm/stable $cv all [upgradable from: $iv]"; done
+        else allpk | awk -F'|' '{print $1"/stable "$2" all"}'; fi;;
+  show) for nm in $args; do l=$(indexline "$nm" "$(cand "$nm")"); [ -z "$l" ] && { echo "E: No packages found"; exit 100; }; echo "Package: $nm"; echo "Version: $(echo "$l" | cut -d'|' -f2)"; d=$(echo "$l" | cut -d'|' -f3); [ -n "$d" ] && echo "Depends: $d"; echo "Description: $(echo "$l" | cut -d'|' -f7)"; done;;
+  policy) for nm in $args; do echo "$nm:"; iv=$(iver "$nm"); echo "  Installed: ${iv:-(none)}"; echo "  Candidate: $(cand "$nm")"; echo "  Version table:"
+      for v in $(candidates "$nm" | sort -rV); do m="   "; [ "$v" = "$iv" ] && m="***"; echo " $m $v 500"; echo "        500 $(sources | head -1) stable/main all Packages"; done; done;;
+  search) allpk | awk -F'|' -v q="$args" 'index($1,q)||index($7,q){print $1" - "$7}';;
+  *) echo "apt: MARGA teaching shim. Try: update, install, remove, purge, upgrade, list, show, policy"; exit 1;;
+esac
