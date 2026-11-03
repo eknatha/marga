@@ -1,7 +1,7 @@
 /* MARGA terminal engine, part 10: building a lab session and evaluating its checks. */
 (function () {
 'use strict';
-var T = (typeof module === 'object' && module.exports) ? require('./term-docker.js') : window.MargaTerm;
+var T = (typeof module === 'object' && module.exports) ? require('./term-cloud.js') : window.MargaTerm;
 
 T.newLab = function (lab, opts) {
   var w = JSON.parse(JSON.stringify(lab.world || {}));

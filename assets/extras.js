@@ -52,7 +52,7 @@ function prTools() {
   add('daily', 'today', '#/today', 'Today', 'An interview question, a real incident and a quiz question.', 'New every day', '5 min', '', '', null);
   add('daily', 'daily', '#/daily', 'Daily challenge', 'One quiz question a day. Keep the streak going.', S().dc ? Object.keys(S().dc).length + ' answered' : 'Not started', '2 min', '', '', null);
   add('daily', 'review', '#/review', 'Review due cards', 'Spaced repetition for lessons you have passed.', 'Cards return when due', '5 min', '', '', null);
-  add('labs', 'terminal', '#/terminal-labs', 'Terminal labs', 'Fix broken systems in a simulated terminal, with hints.', (window.MargaTermLabs && MargaTermLabs.count ? MargaTermLabs.count() : 'Simulated terminal'), '20 min', 'starter', 'Linux, Shell, Networking, Kubernetes, Docker', null);
+  add('labs', 'terminal', '#/terminal-labs', 'Terminal labs', 'Fix broken systems in a simulated terminal, with hints.', (window.MargaTermLabs && MargaTermLabs.count ? MargaTermLabs.count() : 'Simulated terminal'), '20 min', 'starter', 'Linux, Shell, Networking, Kubernetes, Docker, Cloud', null);
   add('labs', 'yaml', '#/playground/yaml', 'YAML playground', 'Check manifests, convert to JSON, find risky settings.', labDone('yaml') + ' of ' + labN('yaml') + ' solved', '10 min', 'starter', 'Kubernetes, Helm', labN('yaml') ? labDone('yaml') / labN('yaml') : 0);
   add('labs', 'python', '#/playground/python', 'Python playground', 'Write and run Python with built-in tests.', pyDone + ' of ' + pyN + ' solved', '15 min', 'starter', 'Python', pyN ? pyDone / pyN : 0);
   add('labs', 'go', '#/playground/go', 'Go playground', 'Fifty Go exercises for operations work.', labDone('go') + ' of ' + labN('go') + ' solved', '15 min', 'mid', 'Go', labN('go') ? labDone('go') / labN('go') : 0);
@@ -69,7 +69,8 @@ function prTools() {
   add('study', 'plans', '#/plans', 'Learning plans', 'Day-by-day routes: 30 days for SRE, system design, Kubernetes, DevOps and cloud, and a 100-day challenge. Lessons and widgets tick themselves.', (D.plans || []).length + ' plans', '30 min a day', 'starter', 'Every skill', null);
   add('study', 'replay', '#/replay', 'Incident replays', 'Step through a real outage as it unfolded, pause to decide, then see what changed. No video.', '60 replays', '10 min', 'starter', 'Every skill', null);
   add('study', 'watch', '#/watch', 'Guided lessons', 'A short video-style version of every lesson: commands type out, output appears line by line, captions explain. Pause, step, or read aloud.', 'Every lesson', '4 min', 'starter', 'Every skill', null);
-  add('study', 'challenge', '#/plan/devops-100', '100-day challenge', 'One lesson a day for 100 days, from Linux to pipelines, with a review day each week. Your streak and progress stay on your device.', '100 days', '30 min a day', 'starter', 'DevOps basics', null);
+  add('study', 'challenge', '#/plan/sre-100', '100-day SRE challenge', 'One lesson a day for 100 days: SLOs, incidents, on-call, capacity and reliability habits, with a review day each week. Your streak and progress stay on your device.', '100 days', '30 min a day', 'starter', 'SRE', null);
+  add('study', 'challenge', '#/plan/devops-100', '100-day DevOps challenge', 'One lesson a day for 100 days, from Linux to pipelines, with a review day each week. Your streak and progress stay on your device.', '100 days', '30 min a day', 'starter', 'DevOps basics', null);
   add('study', 'handbooks', '#/handbooks', 'Handbooks', 'Every skill as one document: lessons, cheat sheets, glossary and interview questions. Save as PDF or download one web page.', (D.modules || A.MODS || []).length + ' handbooks', '', 'starter', 'Every skill', null);
   add('study', 'share', '#/share', 'Tell a friend', 'Share MARGA with a link, a message or a picture. Free, with no tracking.', 'Passes it on', '1 min', 'starter', 'Everyone', null);
   add('scenarios', 'linux', '#/linux', 'Real Linux lab', 'A real Linux kernel in your browser. Something is broken: find it, fix it, press Check. Works offline.', (D.vmlabs || []).length + ' scenarios', '10 min', 'mid', 'Linux, Bash, Networking', null);
@@ -441,7 +442,7 @@ function mockFinish() {
       return '<li><a href="#/module/' + r.id + '"><span>' + e(modTitle(r.id)) + '</span><span class="bar"><i style="width:' + r.pct + '%"></i></span><b>' + r.pct + '%</b></a></li>'; }).join('') + '</ul>' +
     (weak.length ? '<h3 class="sub-h">Study next</h3><ul class="chips">' + weak.map(function (r) { return '<li><a href="#/module/' + r.id + '">' + e(modTitle(r.id)) + '</a></li>'; }).join('') + '</ul>' : '<p>No weak topics in this round.</p>') +
     (missed.length ? '<h3 class="sub-h">Questions to revisit</h3>' + missed.map(function (q) { return '<details class="mk-miss"><summary>' + e(q.q) + '</summary><div class="iv-a">' + q.html + '</div></details>'; }).join('') : '') +
-    '<div class="actions"><button type="button" class="btn btn-primary" data-act="mock-again">Start another</button><a class="btn btn-quiet" href="#/interview">Open InterviewHub</a>' + A.printBar() + '</div></section>';
+    '<div class="actions"><button type="button" class="btn btn-primary" data-act="mock-again">Start another</button><a class="btn btn-quiet" href="#/interview">Open the interview questions</a>' + A.printBar() + '</div></section>';
   var h = $('#mr-h'); if (h) h.focus();
 }
 A.onAct('mock-again', function () { MK = null; mockSetup(); });
@@ -470,7 +471,7 @@ A.addRoute(/^\/flashcards$/, flashView);
 function fcSetup() {
   var fc = bag('fc'), known = Object.keys(fc).filter(function (k) { return fc[k] === 'k'; }).length;
   $('#fc-root').innerHTML = '<form class="mock-setup" onsubmit="return false">' +
-    sel('fc-deck', 'Deck', [['all', 'All lessons'], ['interview', 'InterviewHub questions']].concat(MODS.map(function (m) { return [m.id, m.title]; })), 'all') +
+    sel('fc-deck', 'Deck', [['all', 'All lessons'], ['interview', 'Interview questions']].concat(MODS.map(function (m) { return [m.id, m.title]; })), 'all') +
     sel('fc-order', 'Order', [['shuffle', 'Shuffled'], ['order', 'In lesson order']], 'shuffle') +
     sel('fc-only', 'Show', [['all', 'All cards'], ['unknown', 'Skip cards I know']], 'all') +
     '<div class="actions"><button type="button" class="btn btn-primary" data-act="fc-start">Start studying</button></div>' +

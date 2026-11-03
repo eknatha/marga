@@ -107,10 +107,20 @@ function hrefLesson(id) { return '#/lesson/' + id; }
 
 
 /* ---------- print, voice and references ---------- */
+function printStyleSelect() {
+  var cur = document.documentElement.getAttribute('data-a-print') || 'light';
+  return '<label class="print-style no-print"><span>Print style</span><select data-print-style aria-label="Print and Save as PDF style">' +
+    [['light', 'Light'], ['dark', 'Dark'], ['large', 'Large type']].map(function (o) { return '<option value="' + o[0] + '"' + (cur === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>';
+}
 function printBar() {
   return '<button class="btn btn-quiet" type="button" data-act="print">Print</button>' +
-    '<button class="btn btn-quiet" type="button" data-act="pdf">Save as PDF</button>';
+    '<button class="btn btn-quiet" type="button" data-act="pdf">Save as PDF</button>' + printStyleSelect();
 }
+document.addEventListener('change', function (ev) {
+  var t = ev.target; if (!t || !t.matches || !t.matches('[data-print-style]')) return;
+  if (window.MargaA11y) { MargaA11y.set('print', t.value); MargaA11y.sync(); }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-print-style]'), function (x) { x.value = t.value; });
+});
 function refsHtml(list, heading) {
   if (!list || !list.length) return '';
   return '<section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">' + (heading || 'Official references') + '</h2>' +
@@ -162,8 +172,13 @@ function renderChrome() {
     '<nav class="topnav" id="topnav" aria-label="Main">' +
     '<a href="#/skills" data-nav="skills">Skills</a><a href="#/paths" data-nav="paths" aria-controls="pmega" aria-expanded="false">Skill trees</a>' +
     '<button class="pm-toggle" type="button" data-act="pm-toggle" aria-controls="pmega" aria-expanded="false" aria-label="Show the skills in each path"></button><div class="pmega" id="pmega" hidden></div>' +
-    '<a href="#/cheatsheets" data-nav="cheatsheets">Cheat sheets</a><a href="#/cases" data-nav="cases">Case studies</a><a href="#/practice" data-nav="practice">Practice</a>' +
-    '<a class="nav-certs" href="https://certs.eknathalabs.com" target="_blank" rel="noopener" title="Certifications (opens in a new tab)">Certifications</a><a href="#/progress" data-nav="progress">Progress</a><a href="#/interview" data-nav="interview">InterviewHub</a><a href="#/about" data-nav="about">About</a></nav>' +
+    '<a href="#/practice" data-nav="practice">Practice</a><a href="#/linux" data-nav="linux">Real Linux labs</a><a href="#/progress" data-nav="progress">Progress</a><a href="#/interview" data-nav="interview">Interview questions</a><a href="#/about" data-nav="about">About</a>' +
+    '<div class="nav-more"><button class="nav-more-btn" type="button" data-act="more" aria-expanded="false" aria-controls="nav-more-menu">Elsewhere</button>' +
+    '<div class="nav-more-menu" id="nav-more-menu" hidden>' +
+    '<a class="nav-ih" href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener" title="InterviewHub (opens in a new tab)"><b>InterviewHub</b><span>Question bank, opens in a new tab</span></a>' +
+    '<a class="nav-certs" href="https://certs.eknathalabs.com" target="_blank" rel="noopener" title="Certifications (opens in a new tab)"><b>Certifications</b><span>Exam prep, opens in a new tab</span></a>' +
+    '<a href="#/cheatsheets" data-nav="cheatsheets"><b>Cheat sheets</b><span>Printable, with watermark</span></a>' +
+    '<a href="#/cases" data-nav="cases"><b>Case studies</b><span>Real outages explained</span></a></div></div></nav>' +
     '<div class="tools">' +
     '<button class="btn btn-quiet search-btn" type="button" data-act="search" aria-label="Search lessons and cheat sheets">' + ICON.search + '<span>Search</span><kbd>/</kbd></button>' +
     '<a class="streak' + (st.cur ? ' on' : '') + '" href="#/progress" title="Current streak ' + plural(st.cur, 'day') + ', best ' + plural(st.best, 'day') + '" aria-label="Current streak ' + plural(st.cur, 'day') + '">' + ICON.flame + '<b>' + st.cur + '</b></a>' +
@@ -174,7 +189,7 @@ function renderChrome() {
   $('#footer').innerHTML =
     '<footer class="foot"><div class="wrap foot-in">' +
     '<span>MARGA by EknathaLabs</span>' +
-    '<a href="cheatsheets/">Printable cheat sheets</a><a href="#/interview">InterviewHub</a><a href="#/practice">Practice</a><a href="#/glossary">Glossary</a><a href="#/terminal-labs">Terminal labs</a><a href="#/badges">Badges</a><a href="#/license">Open content license</a>' +
+    '<a href="cheatsheets/">Printable cheat sheets</a><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="#/interview">Interview questions</a><a href="#/practice">Practice</a><a href="#/glossary">Glossary</a><a href="#/terminal-labs">Terminal labs</a><a href="#/badges">Badges</a><a href="#/license">Open content license</a>' +
     '<span class="foot-note">Progress is saved in this browser only.</span>' +
     '<p class="foot-promise">Free \u00b7 No login \u00b7 No ads \u00b7 No cookies</p><p class="small foot-ver">Version ' + siteVer() + '</p></div></footer>';
   if (window.MargaCounter && D.counter) MargaCounter.rebind('#visitors');
@@ -182,7 +197,7 @@ function renderChrome() {
 
 /* ---------- Skill trees panel in the nav: every path and its skills ---------- */
 var pmTimer = 0, pmSkip = false;
-function pmWide() { return !window.matchMedia || window.matchMedia('(min-width: 901px)').matches; }
+function pmWide() { return !window.matchMedia || window.matchMedia('(min-width: 1161px)').matches; }
 function pmHtml() {
   return '<div class="wrap pm-in">' + LIVE.map(function (p) {
     var pp = pathProgress(p), pct = pp.total ? Math.round(pp.done / pp.total * 100) : 0;
@@ -210,7 +225,9 @@ document.addEventListener('mouseover', function (ev) { if (pmWide() && inPm(ev.t
 document.addEventListener('mouseout', function (ev) {
   if (pmWide() && inPm(ev.target) && !inPm(ev.relatedTarget)) { clearTimeout(pmTimer); pmTimer = setTimeout(function () { pmOpen(false); }, 180); }
 });
+document.addEventListener('click', function (ev) { var mm = $('#nav-more-menu'); if (mm && !mm.hidden && !(ev.target.closest && ev.target.closest('.nav-more'))) moreOpen(false); });
 document.addEventListener('focusin', function (ev) {
+  var mm2 = $('#nav-more-menu'); if (mm2 && !mm2.hidden && !(ev.target.closest && ev.target.closest('.nav-more'))) moreOpen(false);
   var m = $('#pmega'); if (!m || pmSkip) return;
   if (pmWide() && inPm(ev.target)) pmOpen(true);
   else if (pmWide() && !m.hidden) pmOpen(false);
@@ -220,7 +237,13 @@ document.addEventListener('focusin', function (ev) {
 function siteVer() { try { var m = /[?&]v=([0-9a-f]+)/.exec(document.querySelector('script[src*="app.js"]').getAttribute('src')); return m ? m[1] : 'dev'; } catch (x) { return 'dev'; } }
 function visitors() { if (window.MargaCounter && D.counter) MargaCounter.init(D.counter, '#visitors'); }
 function setNav(name) {
+  if (name === 'practice' && /^#\/linux/.test(location.hash)) name = 'linux';
   $$('#topnav a').forEach(function (a) { a.classList.toggle('on', a.getAttribute('data-nav') === name); });
+  var mb = $('.nav-more-btn'); if (mb) mb.classList.toggle('on', !!$('.nav-more-menu a.on'));
+}
+function moreOpen(on) {
+  var b = $('.nav-more-btn'), m = $('#nav-more-menu'); if (!b || !m) return;
+  m.hidden = !on; b.setAttribute('aria-expanded', String(on));
 }
 
 /* ---------- skill tree component ---------- */
@@ -379,6 +402,25 @@ document.addEventListener('visibilitychange', function () { if (!document.hidden
 /* ---------- views ---------- */
 var view = { title: '', html: '', after: null, nav: '', voice: '', voiceLabel: '' };
 
+function continueStrip(p, next, pp, st) {
+  var weak = (window.MargaFeatures && MargaFeatures.weakCount) ? MargaFeatures.weakCount() : 0;
+  var dots = '', i, d, set = {}; S.days.forEach(function (k) { set[k] = 1; });
+  for (i = 7; i >= 0; i--) { d = new Date(); d.setDate(d.getDate() - i); dots += '<span class="cs-dot' + (set[dayKey(d)] ? ' on' : '') + (i === 0 ? ' today' : '') + '"></span>'; }
+  var started = pp.done > 0;
+  return '<section class="cs" aria-label="Where you are"><div class="wrap cs-in">' +
+    '<div class="cs-card"><span class="cs-k">' + (started ? 'Continue where you left off' : 'Start here') + '</span>' +
+    (next ? '<b>' + e(LES[next].title) + '</b><span class="cs-s">' + e(p.title) + ' path. ' + pp.done + ' of ' + pp.total + ' lessons passed.</span><div class="cs-bar" role="img" aria-label="' + (pp.total ? Math.round(pp.done / pp.total * 100) : 0) + ' percent of the path passed"><i style="width:' + (pp.total ? Math.round(pp.done / pp.total * 100) : 0) + '%"></i></div><a class="cs-a" href="' + hrefLesson(next) + '">' + (started ? 'Resume lesson' : 'Start the first lesson') + '</a>'
+          : '<b>Path complete</b><span class="cs-s">You passed every lesson in ' + e(p.title) + '.</span><a class="cs-a" href="#/path/' + p.id + '">Review the path</a>') + '</div>' +
+    '<div class="cs-card"><span class="cs-k">Review</span>' + (weak ? '<b>' + plural(weak, 'item') + ' waiting</b><span class="cs-s">Things you missed come back until you get them right.</span><a class="cs-a" href="#/weak">Start the review</a>' : '<b>Nothing waiting</b><span class="cs-s">Try a mixed set from different stages.</span><a class="cs-a" href="#/mix">Mixed practice</a>') + '</div>' +
+    '<div class="cs-card"><span class="cs-k">Your streak</span><b>' + plural(st.cur, 'day') + ' in a row</b><div class="cs-dots" aria-hidden="true">' + dots + '</div><span class="cs-s">Saved on this device only.</span></div>' +
+    '</div></section>';
+}
+function goalStrip() {
+  var G = [['sre', 'Become an SRE in 100 days'], ['linux', 'Linux from zero'], ['kubernetes', 'Pass the CKA'], ['devops', 'Get a DevOps job'], ['cloud', 'Learn AWS and Azure']];
+  return '<section class="band goals"><div class="wrap"><div class="band-head"><h2>Start with a goal</h2><p>Not sure where to begin? Take the two-minute quiz and get a path, a plan and your first labs.</p></div>' +
+    '<ul class="goal-list">' + G.map(function (g) { return '<li><a href="#/goal/' + g[0] + '">' + e(g[1]) + '</a></li>'; }).join('') + '</ul>' +
+    '<p class="actions"><a class="btn btn-primary" href="#/find-my-path">Find my path in 2 minutes</a><a class="btn btn-quiet" href="#/placement">Or test what you know</a></p></div></section>';
+}
 function homeView() {
   var p = PATH[S.path] || LIVE[0];
   var t = totals(), st = streaks();
@@ -408,13 +450,16 @@ function homeView() {
     '<p class="hero-proof small"><span class="chip" id="off-chip">Checking offline support</span> Open it once, turn off wifi, and keep learning. Lessons, labs and widgets run from your device.</p>' +
     '<p class="lede">Practical DevOps, cloud and SRE training from someone who runs production. Real incidents, real commands, no login, no ads.</p>' +
     '<div class="roles" role="radiogroup" aria-label="Choose your role">' + roles + '</div>' +
-    '<div class="actions">' + cta + '<a class="btn btn-quiet" href="#/placement">Take the 10-question placement check</a></div>' +
+    '<div class="actions">' + cta + '<a class="btn btn-quiet" href="#/find-my-path">Find my path in 2 minutes</a></div>' +
     '<p class="small">No account needed. Start now. Progress stays in your browser on this device; export it to move it.</p>' +
     '<dl class="today"><div><dt>Day streak</dt><dd>' + st.cur + '</dd></div><div><dt>Lessons passed</dt><dd>' + t.done + '<small> of ' + t.total + '</small></dd></div>' +
     '<div><dt>Best streak</dt><dd>' + st.best + '</dd></div></dl></div>' +
     heroDemoHtml() + '</div></section>' +
 
+    continueStrip(p, next, pp, st) +
     '<section class="stats" aria-label="What is on MARGA"><div class="wrap">' + stats + '</div></section>' +
+    vmShowcase() +
+    goalStrip() +
     (api.doorsHtml ? api.doorsHtml() : '') +
 
     '<section class="band"><div class="wrap"><div class="band-head"><h2>Pick a skill tree. Pass each check to unlock the next skill.</h2><p>Each role is a tree of skills. A skill unlocks when the skills that lead into it are mastered.</p></div>' +
@@ -439,12 +484,12 @@ function homeView() {
     '<p><a class="btn btn-quiet" href="#/cheatsheets">Open cheat sheets</a></p></div>' +
     '<ul class="chips">' + Object.keys(SHEETS).map(function (id) { return '<li><a href="#/cheatsheet/' + id + '">' + e(SHEETS[id].title) + '</a></li>'; }).join('') + '</ul></div></section>' +
 
-    '<section class="band"><div class="wrap two"><div><h2>Prepare for the interview</h2><p>InterviewHub has model answers for common DevOps, cloud and SRE questions, grouped by topic and level. Mark what you know, revisit what you do not, and listen to any answer read aloud.</p>' +
-    '<p><a class="btn btn-quiet" href="#/interview">Open InterviewHub</a></p></div>' +
+    '<section class="band"><div class="wrap two"><div><h2>Prepare for the interview</h2><p>MARGA has model answers for common DevOps, cloud and SRE questions, grouped by topic and level. Mark what you know, revisit what you do not, and listen to any answer read aloud.</p>' +
+    '<p><a class="btn btn-quiet" href="#/interview">Open the interview questions</a> <a class="btn btn-quiet" href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">Visit InterviewHub</a></p></div>' +
     '<div class="note-panel"><h3>Listen while you learn</h3><p>Every lesson, cheat sheet and interview answer can be read aloud. Pick any voice installed on your device from the Voice dropdown.</p></div></div></section>' +
 
     '<section class="band"><div class="wrap two"><div><h2>How a lesson works</h2><ol class="steps"><li><strong>Read.</strong> Each lesson explains why, then shows commands with their output.</li><li><strong>Check.</strong> Answer a short quiz. Pass it to mark the lesson done and unlock the next.</li><li><strong>Remember.</strong> Flip the flashcards now, and review them again later from the Review cards page.</li></ol></div>' +
-    '<div class="note-panel"><h3>Terminal labs</h3><p>Break-and-fix practice for Linux, Shell, Networking, Python, Kubernetes and Docker, in a simulated terminal in your browser, with automatic checks. It is a simulation, not a real server. Labs for Terraform are still planned.</p><p><a href="#/terminal-labs">Open the terminal labs</a> | <a href="#/labs">What is planned</a></p></div></div></section>';
+    '<div class="note-panel"><h3>Terminal labs</h3><p>Break-and-fix practice for Linux, Shell, Networking, Python, Kubernetes, Docker and the cloud (an imitation AWS and Azure account, no sign-up), in a simulated terminal in your browser, with automatic checks. It is a simulation, not a real server or cloud account. Labs for Terraform are still planned.</p><p><a href="#/terminal-labs">Open the terminal labs</a> | <a href="#/labs">What is planned</a></p></div></div></section>';
   view.after = function () { armTree(); armTerm(); offlineChip(); };
 }
 
@@ -457,7 +502,7 @@ var HD = [
     ['cmd', 'df -h /var/log/app'], ['out bad', 'tmpfs  8.0M  7.7M  292K  96% /var/log/app'], ['cmd', 'ls -lh /var/log/app'], ['out', '7.0M app.log    700K debug.trace'],
     ['cmd', 'rm /var/log/app/debug.trace'], ['cmd', ': > /var/log/app/app.log'], ['cmd', 'df -h /var/log/app'], ['out ok', 'tmpfs  8.0M  4.0K  8.0M  0% /var/log/app'],
     ['out ok', 'PASS  /var/log/app is under 50 percent full'], ['out ok', 'PASS  app-writer is still running'],
-    ['note', '<b>Check passed.</b> This is a real Linux kernel that boots in your browser in about 8 seconds, with ' + ((D.vmlabs || []).length || 130) + ' scenarios from beginner to advanced. Free, offline, nothing to install.']] },
+    ['note', '<b>Check passed.</b> This is a real Linux kernel that boots in your browser in about 8 seconds, with ' + ((D.vmlabs || []).length || 149) + ' scenarios from beginner to advanced. Free, offline, nothing to install.']] },
   { tab: 'Incident game', title: 'game: Healthy Pods, no traffic', cap: 'Incident game: choose, then see why', href: '#/game/healthy-pods-no-traffic', go: 'Play this game', items: [
     ['out dim', 'The shop returns 503 after a rollout.'], ['out', 'All 3 new Pods are Running, but READY shows 0/1.'], ['out warn', 'What do you do first?'],
     ['choice', 'Delete the Pods so they are recreated'], ['choice pick', 'Describe a Pod and read the readiness events'], ['choice', 'Scale the Deployment to ten replicas'],
@@ -967,11 +1012,11 @@ function interviewDeep(id) {
   view.after = function () { if (base) base(); var c = $('.iv[data-id="' + id + '"]'); if (c) { ivToggle(c, true); try { c.scrollIntoView({ block: 'center' }); } catch (x2) { /* ignore */ } } };
 }
 function interviewView() {
-  view.title = 'InterviewHub | MARGA by EknathaLabs'; view.nav = 'interview';
+  view.title = 'Interview questions | MARGA by EknathaLabs'; view.nav = 'interview';
   var modOpts = '<option value="">All topics</option>' + MODS.filter(function (m) { return IV.some(function (x) { return x.module === m.id; }); }).map(function (m) { return '<option value="' + m.id + '"' + (ivFilter.mod === m.id ? ' selected' : '') + '>' + e(m.title) + '</option>'; }).join('');
   var lvOpts = '<option value="">All levels</option>' + Object.keys(LEVELS).map(function (k) { return '<option value="' + k + '"' + (ivFilter.level === k ? ' selected' : '') + '>' + LEVELS[k] + '</option>'; }).join('');
   var stOpts = [['', 'All questions'], ['new', 'Not rated yet'], ['review', 'Need review'], ['know', 'I know these']].map(function (p) { return '<option value="' + p[0] + '"' + (ivFilter.status === p[0] ? ' selected' : '') + '>' + p[1] + '</option>'; }).join('');
-  view.html = '<section class="page-head wrap"><h1>InterviewHub</h1>' +
+  view.html = '<section class="page-head wrap"><h1>Interview questions</h1>' +
     '<p class="lede">Common DevOps, cloud and SRE interview questions with model answers. Open any question, say your answer out loud first, then compare. Everything here is open: no lesson needs to be passed.</p>' +
     '<p class="small" id="iv-stats">' + e(ivStats()) + '</p>' +
     '<div class="actions"><a class="btn btn-primary" href="#/interview/mock">Start a mock interview</a>' + printBar() + '<button type="button" class="btn btn-quiet" data-act="iv-all" id="iv-all">Show all answers</button></div>' + voiceSlot() +
@@ -1070,7 +1115,7 @@ function route() {
   var h = location.hash.replace(/^#/, '') || '/';
   if (h.charAt(0) !== '/') h = '/';
   var res;
-  view.voice = ''; view.voiceLabel = '';
+  view.voice = ''; view.voiceLabel = ''; view.after = null;
   for (var i = 0; i < routes.length; i++) {
     var m = h.match(routes[i][0]);
     if (m) { res = routes[i][1].apply(null, m.slice(1)); break; }
@@ -1087,6 +1132,22 @@ function route() {
   afterHooks.forEach(function (fn) { try { fn(h); } catch (x) { if (window.console) console.error(x); } });
   var hd = $('#main h1'); if (hd) { hd.setAttribute('tabindex', '-1'); }
   if (window.MargaCounter && D.counter) MargaCounter.hit(h === '/' ? '/' : h, view.title);
+}
+
+
+/* the Real Linux lab, shown on the home page */
+function vmShowcase() {
+  var V = D.vmlabs || []; if (!V.length) return '';
+  var n = function (f) { return V.filter(f).length; };
+  var kinds = [['fix', 'Fix it', n(function (x) { return x.kind !== 'diagnose'; })], ['diagnose', 'Diagnose only', n(function (x) { return x.kind === 'diagnose'; })], ['multi', 'Several faults', n(function (x) { return !!x.faults; })], ['network', 'Network', n(function (x) { return x.tag === 'network'; })], ['systemd', 'systemd-style', n(function (x) { return x.tag === 'systemd'; })], ['packages', 'Packages', n(function (x) { return x.tag === 'packages'; })], ['tls', 'TLS and certificates', n(function (x) { return x.tag === 'tls'; })]];
+  var lv = ['Beginner', 'Intermediate', 'Advanced'].map(function (l) { return l + ' ' + n(function (x) { return x.level === l; }); }).join(', ');
+  return '<section class="band vmx" aria-labelledby="vmx-h"><div class="wrap two"><div>' +
+    '<h2 id="vmx-h">A real Linux machine in your browser. Break it, fix it, check it.</h2>' +
+    '<p>' + V.length + ' production-style scenarios (' + e(lv) + ') on a real Linux kernel, with a real shell. Something is wrong: a full disk, a service that will not start, a network that drops a hop. Find the cause, fix it, press Check. You can also save your machine and carry on later.</p>' +
+    '<ul class="vmx-kinds">' + kinds.map(function (k) { return '<li><a href="#/linux?level=All&amp;topic=' + k[0] + '"><strong>' + k[2] + '</strong> ' + e(k[1]) + '</a></li>'; }).join('') + '</ul>' +
+    '<p class="actions"><a class="btn btn-primary" href="#/linux">Open the Real Linux labs</a><a class="btn btn-quiet" href="#/linux/sandbox">Open an empty machine</a></p>' +
+    '<p class="small">Free, offline once loaded, no sign-up. The first start downloads about 8 MB.</p></div>' +
+    '<div class="vmx-term" aria-hidden="true"><div class="vmx-bar"><i></i><i></i><i></i><span>marga-lab</span></div><pre>root@marga-lab:~# df -h /var/log/app\nFilesystem   Size  Used  Avail  Use%\n/dev/loop0    20M   20M      0  100%\nroot@marga-lab:~# ls -lS /var/log/app | head -2\n-rw-r--r--  19M  debug.log.1\nroot@marga-lab:~# : &gt; /var/log/app/debug.log.1\nroot@marga-lab:~# check\n<span class="ok">PASS</span> volume has free space\n<span class="ok">PASS</span> app-writer is still running</pre></div></div></section>';
 }
 
 /* ---------- search (ranking in search.js) ---------- */
@@ -1248,6 +1309,8 @@ document.addEventListener('click', function (ev) {
     var n = theme() === 'dark' ? 'light' : 'dark';
     if (window.MargaA11y) { MargaA11y.set('theme', n); MargaA11y.sync(); } else { document.documentElement.setAttribute('data-theme', n); try { localStorage.setItem('ea.theme', n); } catch (x) { /* ignore */ } }
     renderChrome(); setNav(view.nav);
+  } else if (a === 'more') {
+    var mm = $('#nav-more-menu'); moreOpen(!!(mm && mm.hidden));
   } else if (a === 'menu') {
     var nav = $('#topnav'), open = !nav.classList.contains('open');
     nav.classList.toggle('open', open); act.setAttribute('aria-expanded', String(open));
@@ -1275,10 +1338,10 @@ document.addEventListener('click', function (ev) {
 document.addEventListener('keydown', function (ev) {
   var tag = (document.activeElement && document.activeElement.tagName) || '';
   var typing = /INPUT|TEXTAREA|SELECT/.test(tag);
-  if (ev.key === 'Escape') { var pm = $('#pmega'); if (pm && !pm.hidden) { pmOpen(false); var pl = $('#topnav a[data-nav="paths"]'); if (pl && pm.contains(document.activeElement)) { pmSkip = true; pl.focus(); pmSkip = false; } } if ($('#smodal')) closeSearch(); var nv = $('#topnav'); if (nv) nv.classList.remove('open'); return; }
+  if (ev.key === 'Escape') { var mmx = $('#nav-more-menu'); if (mmx && !mmx.hidden) { moreOpen(false); var mbx = $('.nav-more-btn'); if (mbx) mbx.focus(); } } if (ev.key === 'Escape') { var pm = $('#pmega'); if (pm && !pm.hidden) { pmOpen(false); var pl = $('#topnav a[data-nav="paths"]'); if (pl && pm.contains(document.activeElement)) { pmSkip = true; pl.focus(); pmSkip = false; } } if ($('#smodal')) closeSearch(); var nv = $('#topnav'); if (nv) nv.classList.remove('open'); return; }
   if ((ev.key === 'k' && (ev.metaKey || ev.ctrlKey)) || (ev.key === '/' && !typing)) { ev.preventDefault(); if (!$('#smodal')) openSearch(); }
 });
-window.addEventListener('hashchange', function () { pmOpen(false); var nv = $('#topnav'); if (nv) nv.classList.remove('open'); route(); });
+window.addEventListener('hashchange', function () { pmOpen(false); moreOpen(false); var nv = $('#topnav'); if (nv) nv.classList.remove('open'); route(); });
 
 /* ---------- extension API (extras.js registers more views through this) ---------- */
 var actions = {};
@@ -1287,7 +1350,7 @@ var api = {
   D: D, MODS: MODS, MOD: MOD, LES: LES, LIVE: LIVE, PATH: PATH, LEVELS: LEVELS, IV: IV,
   $: $, $$: $$, e: e, plural: plural, shuffle: shuffle, hours: hours,
   state: function () { return S; }, save: save, markActive: markActive, renderChrome: renderChrome, setNav: setNav,
-  view: view, toast: toast, printBar: printBar, voiceSlot: voiceSlot, wireSay: wireSay, refsHtml: refsHtml,
+  view: view, toast: toast, printBar: printBar, printStyleSelect: printStyleSelect, voiceSlot: voiceSlot, wireSay: wireSay, refsHtml: refsHtml,
   searchAll: function (q, group, stage, limit) { return loadAll().then(function () { INDEX = null; buildIndex(); return { groups: GROUPS, counts: MargaSearch.counts(q, stage || ''), hits: MargaSearch.query(q, { kind: group || '', module: stage || '', limit: limit || 60 }) }; }); },
   hrefLesson: hrefLesson, isDone: isDone, route: route, loadAll: loadAll, loadModule: loadModule,
   addRoute: function (re, fn) { routes.push([re, fn]); },
@@ -1320,6 +1383,8 @@ if (typeof window.MargaWorkshop === 'function') window.MargaWorkshop(api);
 if (typeof window.MargaInterviewLab === 'function') window.MargaInterviewLab(api);
 if (typeof window.MargaRoadmap === 'function') window.MargaRoadmap(api);
 if (typeof window.MargaSearchPage === 'function') window.MargaSearchPage(api);
+if (typeof window.MargaGuide === "function") window.MargaGuide(api);
+if (typeof window.MargaDesigns === "function") window.MargaDesigns(api);
 
 /* ---------- accessibility panel ---------- */
 (function () {

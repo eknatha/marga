@@ -14,6 +14,7 @@ var OPTIONS = [
   { id: 'motion', label: 'Motion', values: [['system', 'Follow my device'], ['reduce', 'Reduce animations']], def: 'system' },
   { id: 'links', label: 'Links', values: [['normal', 'Standard'], ['underline', 'Always underlined']], def: 'normal' },
   { id: 'focus', label: 'Keyboard focus', values: [['normal', 'Standard'], ['strong', 'Extra strong outline']], def: 'normal' },
+  { id: 'print', label: 'Print and Save as PDF style', values: [['light', 'Light, saves ink'], ['dark', 'Dark'], ['large', 'Light, large type']], def: 'light' },
   { id: 'hl', label: 'Highlight the text being read aloud', values: [['on', 'On'], ['off', 'Off']], def: 'on' }
 ];
 var DEF = {};
