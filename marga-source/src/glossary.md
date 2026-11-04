@@ -1279,3 +1279,271 @@ def: Automation that detects a known condition and applies a predefined fix, wit
 module: aiops
 plain: One control that stops all automation.
 def: A global setting that disables automated actions at once, used when automation behaves unexpectedly.
+
+## ARN
+module: cloud
+plain: The full unique name of anything in AWS.
+def: Amazon Resource Name: a string such as arn:aws:s3:::my-bucket that policies use to say exactly which resource a permission covers.
+
+## S3 bucket
+module: cloud
+plain: A named container in AWS that holds files.
+def: The top-level container in S3 object storage. Its name is unique across all of AWS, and access is controlled by policies, ACLs and the public access block.
+aliases: bucket
+
+## Public access block
+module: cloud
+plain: A master switch that stops a bucket from being made public.
+def: Four S3 settings that override any ACL or policy that would expose data to the internet. Turning all four on is the safe default.
+
+## Resource group
+module: cloud
+plain: An Azure folder that holds related cloud resources.
+def: A container for resources that share a life cycle. Deleting a group deletes everything inside it, so check what it holds first.
+
+## Subscription
+module: cloud
+plain: The Azure account that gets billed.
+def: A billing and access boundary in Azure. Every resource lives in one subscription, and az commands act on the active one.
+
+## Network security group
+module: cloud
+plain: Azure's firewall rules for a network or a VM.
+def: A list of allow and deny rules with priority numbers. The lowest number that matches wins.
+aliases: NSG
+
+## Role assignment
+module: cloud
+plain: A grant that gives someone a role at a place.
+def: In Azure RBAC, who (the principal), what (the role) and where (the scope). A wide scope such as the subscription gives wide access.
+
+## Scope
+module: cloud
+plain: How far a permission or lock reaches.
+def: In Azure, the level a role or lock applies to: subscription, resource group or a single resource. Lower scopes inherit from above.
+
+## Resource lock
+module: cloud
+plain: A safety catch that blocks deletes or edits.
+def: An Azure setting (CanNotDelete or ReadOnly) that stops changes even for people with permission, until the lock is removed.
+
+## Termination protection
+module: cloud
+plain: A setting that stops an instance being deleted by mistake.
+def: An EC2 attribute that makes terminate calls fail until it is turned off. It is a deliberate safety lock.
+
+## Hypervisor
+module: virtualization
+plain: Software that lets one machine run several virtual machines.
+def: The layer that creates and runs virtual machines and shares CPU, memory, disk and network between them. KVM is built into Linux.
+
+## Overcommit
+module: virtualization
+plain: Promising guests more than the host really has.
+def: Allocating more virtual CPU or memory to guests than the physical host has, betting that guests will not all use it at once.
+
+## Live migration
+module: virtualization
+plain: Moving a running virtual machine to another host.
+def: Copying a guest memory and state to another host while it keeps running, so it can move with little or no downtime.
+
+## qcow2
+module: virtualization
+plain: A disk image format that grows as it is used.
+def: The QEMU copy-on-write image format, which supports snapshots and backing files and stores only the blocks that were written.
+
+## Virtual bridge
+module: virtualization
+plain: A virtual switch that joins guests to a network.
+def: A software layer-2 switch on the host that connects guest network interfaces to each other and to the physical network.
+
+## Steal time
+module: virtualization
+plain: CPU time your guest wanted but did not get.
+def: The share of time a virtual CPU was ready to run but the hypervisor ran something else, which shows an oversubscribed host.
+
+## Block storage
+module: storage
+plain: A raw disk that a computer formats itself.
+def: Storage presented as fixed-size blocks, such as a disk or SAN volume, on which a host creates a filesystem or a database writes directly.
+
+## Filesystem
+module: storage
+plain: The structure that organises files on a disk.
+def: The method an operating system uses to store, name and find files on a device, for example ext4 or XFS.
+
+## LVM
+module: storage
+plain: Flexible volumes that can grow and move.
+def: The Logical Volume Manager, which groups disks into volume groups and carves logical volumes that can be resized, moved and snapshotted.
+
+## RAID
+module: storage
+plain: Several disks working together for safety or speed.
+def: A way to combine disks so data survives a disk failure or is spread for performance. It does not replace backups.
+
+## IOPS
+module: storage
+plain: How many reads and writes a disk does each second.
+def: Input and output operations per second, a measure of how many separate requests a storage device can handle.
+
+## fstab
+module: storage
+plain: The file that says what to mount at boot.
+def: The file /etc/fstab, which lists devices, mount points, filesystem types and options for mounts at boot. A bad line can stop boot.
+
+## NFS
+module: storage
+plain: A way to share a folder over the network.
+def: The Network File System protocol, which lets a client mount a directory from a server and use it like local files.
+
+## Query plan
+module: sql-ops
+plain: The database plan for answering a query.
+def: The steps the planner chooses to run a statement, such as scanning a table, using an index or joining tables, shown by EXPLAIN.
+
+## Sequential scan
+module: sql-ops
+plain: Reading every row of a table.
+def: A plan step that reads the whole table. It is fine for small tables and slow when a filter could use an index.
+
+## Lock
+module: sql-ops
+plain: A claim that stops others changing the same data.
+def: A mechanism that stops concurrent transactions from conflicting. Long locks make others wait, and cycles cause deadlocks.
+
+## Deadlock
+module: sql-ops
+plain: Two transactions each waiting for the other.
+def: A cycle in which transactions hold locks the others need, so none can proceed. The database ends one of them with an error.
+
+## Vacuum
+module: sql-ops
+plain: Cleaning up dead rows in PostgreSQL.
+def: The process that removes old row versions left by updates and deletes so space can be reused and tables do not bloat.
+
+## Bloat
+module: sql-ops
+plain: Wasted space inside tables and indexes.
+def: Space held by dead row versions or sparse pages that the table no longer needs, making scans slower and files larger.
+
+## GPU memory
+module: gpu-serving
+plain: The fast memory on the graphics card.
+def: The on-card memory (VRAM) that must hold model weights, the KV cache and working data. Running out stops the model.
+
+## KV cache
+module: gpu-serving
+plain: Remembered work for the tokens so far.
+def: Stored key and value tensors for processed tokens so the model does not recompute them. It grows with context length and concurrency.
+
+## Quantisation
+module: gpu-serving
+plain: Storing a model with fewer bits per number.
+def: Reducing the precision of model weights, for example from 16 to 8 or 4 bits, to save memory at some cost in quality.
+
+## Continuous batching
+module: gpu-serving
+plain: Adding new requests to a running batch.
+def: A serving technique that adds and removes requests from the running batch at each step, keeping the GPU busy.
+
+## Tensor parallelism
+module: gpu-serving
+plain: Splitting one model across several GPUs.
+def: Dividing each layer of a model across GPUs so a model larger than one card can run, at the cost of communication between cards.
+
+## Time to first token
+module: gpu-serving
+plain: How long until the answer starts appearing.
+def: The delay between sending a prompt and receiving the first generated token, a main measure of how responsive a model feels.
+
+## Nova
+module: openstack
+plain: The OpenStack part that runs virtual machines.
+def: The OpenStack compute service, which schedules and manages servers on compute nodes.
+
+## Neutron
+module: openstack
+plain: The OpenStack part that does networking.
+def: The OpenStack networking service, providing networks, subnets, routers, security groups and floating IPs.
+
+## Keystone
+module: openstack
+plain: The OpenStack part that knows who you are.
+def: The OpenStack identity service, which holds users, projects and roles and issues tokens and the service catalog.
+
+## Floating IP
+module: openstack
+plain: A public address mapped to a private server.
+def: An address on the external network that Neutron maps by NAT to a server on a private network, and that can be moved between servers.
+
+## Flavor
+module: openstack
+plain: The size of a server: CPU, memory and disk.
+def: A named template of virtual CPUs, memory and root disk that you choose when creating a server.
+
+## Project
+module: openstack
+plain: A team space that owns resources and quotas.
+def: The OpenStack unit that owns servers, networks and volumes, and to which quotas and user roles apply.
+
+## BMC
+module: baremetal
+plain: The small computer that manages a server remotely.
+def: The baseboard management controller, a separate chip with its own network port that can power a server on and off, show its console and log hardware events.
+
+## IPMI
+module: baremetal
+plain: An older standard for managing servers remotely.
+def: The Intelligent Platform Management Interface, a protocol spoken to the BMC for power control, sensors and the event log.
+
+## PXE
+module: baremetal
+plain: Booting a server from the network.
+def: The Preboot Execution Environment, which lets a network card fetch a boot loader and installer over DHCP and TFTP or HTTP.
+
+## Leaf-spine
+module: baremetal
+plain: A network layout where every rack switch links to every spine.
+def: A two-tier datacentre fabric in which each leaf switch connects to every spine switch, giving short, equal-cost paths between any two racks.
+
+## Burn-in
+module: baremetal
+plain: Stress testing new hardware before it takes load.
+def: A run of memory, CPU and disk tests lasting hours or days, used to catch early failures before the machine holds real data.
+
+## ECC memory
+module: baremetal
+plain: Memory that corrects small errors by itself.
+def: Error-correcting memory, which repairs single-bit errors silently and reports them, so a rising count can warn that a module is failing.
+
+## Service mesh
+module: service-mesh
+plain: A layer that handles calls between services.
+def: Platform infrastructure, usually a proxy beside every service plus a control plane, that provides encryption, routing, retries and metrics without changes to application code.
+
+## Sidecar
+module: service-mesh
+plain: A helper container that runs inside a pod.
+def: A second container in the same pod, such as the Envoy proxy in Istio, that handles network traffic for the main container.
+
+## mTLS
+module: service-mesh
+plain: Both sides of a call prove who they are.
+def: Mutual TLS, in which client and server each present a certificate and check the other, giving encrypted and authenticated service to service traffic.
+
+## CNI plugin
+module: service-mesh
+plain: The part that gives pods their network.
+def: A plugin following the Container Network Interface that creates a pod network device, assigns an address and sets up routes between nodes.
+
+## eBPF
+module: service-mesh
+plain: Small safe programs that run inside the Linux kernel.
+def: A kernel technology that runs verified programs at hooks in the networking and tracing paths, used by Cilium for policy, load balancing and observability.
+
+
+## Mesh control plane
+module: service-mesh
+plain: The part of a mesh that tells proxies what to do.
+def: The set of components, such as istiod in Istio, that turn mesh configuration into proxy settings, push them out and issue workload certificates.
