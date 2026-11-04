@@ -9,13 +9,13 @@
 <meta property="og:title" content=""systemd and services" cheat sheet">
 <meta property="og:description" content=""Manage services, write unit files, read the journal, schedule with timers and harden services."">
 <meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/systemd.html">
-<meta name="theme-color" content="#0F2547">
+<meta name="theme-color" content="#0B2B2E">
 <link rel="icon" href="../icon.svg" type="image/svg+xml">
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=dfe017aa">
-<script src="../assets/a11y.js?v=dfe017aa"></script>
+<link rel="stylesheet" href="../assets/app.css?v=875a5fa5">
+<script src="../assets/a11y.js?v=875a5fa5"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -89,7 +89,7 @@ WantedBy=multi-user.target" aria-label="Copy code">Copy</button><pre tabindex="0
 <span class="hljs-section">[Install]</span>
 <span class="hljs-attr">WantedBy</span>=multi-user.target</code></pre></div>
 <p>Save as <code>/etc/systemd/system/shop.service</code>, then run <code>systemctl daemon-reload</code> and <code>systemctl enable --now shop</code>.</p>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Setting</th>
 <th>Meaning</th>
 </tr>
@@ -192,7 +192,7 @@ MemoryMax=512M" aria-label="Copy code">Copy</button><pre tabindex="0"><code clas
 <li>Check permissions on files, the working directory and ports</li>
 <li><code>systemctl daemon-reload</code> if you edited the unit and nothing changed</li>
 </ol>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Symptom</th>
 <th>Likely cause</th>
 </tr>
@@ -333,8 +333,8 @@ PrivateTmp=true" aria-label="Copy code">Copy</button><pre tabindex="0"><code cla
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://systemd.io/" target="_blank" rel="noopener">systemd documentation</a><span class="host">systemd.io</span></li><li><a href="https://www.freedesktop.org/software/systemd/man/latest/" target="_blank" rel="noopener">systemd manual pages</a><span class="host">www.freedesktop.org</span></li><li><a href="https://www.freedesktop.org/software/systemd/man/latest/journalctl.html" target="_blank" rel="noopener">journalctl manual</a><span class="host">www.freedesktop.org</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="../#/interview">Interview questions</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=dfe017aa"></script>
-<script src="../assets/counter.js?v=dfe017aa"></script>
+<script src="../assets/voice.js?v=875a5fa5"></script>
+<script src="../assets/counter.js?v=875a5fa5"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

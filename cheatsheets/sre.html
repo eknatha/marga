@@ -9,13 +9,13 @@
 <meta property="og:title" content=""SRE practices" cheat sheet">
 <meta property="og:description" content=""SLO maths, error budget policy, incident roles and updates, postmortem template, toil and reliability patterns."">
 <meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/sre.html">
-<meta name="theme-color" content="#0F2547">
+<meta name="theme-color" content="#0B2B2E">
 <link rel="icon" href="../icon.svg" type="image/svg+xml">
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=dfe017aa">
-<script src="../assets/a11y.js?v=dfe017aa"></script>
+<link rel="stylesheet" href="../assets/app.css?v=875a5fa5">
+<script src="../assets/a11y.js?v=875a5fa5"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -31,7 +31,7 @@
     <div id="voice-slot"></div>
   </header>
   <article class="sheet"><h2 id="definitions">Definitions</h2>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Term</th>
 <th>Meaning</th>
 </tr>
@@ -53,7 +53,7 @@
 </tr>
 </tbody></table></div>
 <h2 id="downtime-allowed-per-30-days">Downtime allowed per 30 days</h2>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>SLO</th>
 <th>Allowed downtime</th>
 </tr>
@@ -76,7 +76,7 @@
 </tbody></table></div>
 <p>A 30-day window is 43,200 minutes. Multiply by the error budget fraction.</p>
 <h2 id="error-budget-policy">Error budget policy</h2>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Budget state</th>
 <th>Action</th>
 </tr>
@@ -95,7 +95,7 @@
 </tbody></table></div>
 <p>Agree the policy before you need it. Never using the budget also means the target may be too strict.</p>
 <h2 id="burn-rate">Burn rate</h2>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Burn rate</th>
 <th>Meaning</th>
 <th>Typical action</th>
@@ -118,7 +118,7 @@
 </tbody></table></div>
 <p>Alert on a long and short window together so you are paged for sustained burn only.</p>
 <h2 id="incident-roles">Incident roles</h2>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Role</th>
 <th>Job</th>
 </tr>
@@ -140,7 +140,7 @@
 </tr>
 </tbody></table></div>
 <h2 id="severity">Severity</h2>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Level</th>
 <th>Impact</th>
 <th>Updates</th>
@@ -180,7 +180,7 @@ Impact: who is affected and how
 Status: what we know and what we are doing
 Next update: HH:MM UTC</code></pre></div>
 <h2 id="postmortem-template">Postmortem template</h2>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Section</th>
 <th>Content</th>
 </tr>
@@ -212,7 +212,7 @@ Next update: HH:MM UTC</code></pre></div>
 <p>Blameless: ask how the system made the mistake easy, not who made it.</p>
 <h2 id="toil">Toil</h2>
 <p>Toil is manual, repetitive, automatable, reactive work with no lasting value that grows with the service.</p>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Reduce by</th>
 <th>Example</th>
 </tr>
@@ -235,7 +235,7 @@ Next update: HH:MM UTC</code></pre></div>
 </tbody></table></div>
 <p>Keep toil below about half of an engineer&#39;s time.</p>
 <h2 id="reliability-patterns">Reliability patterns</h2>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Pattern</th>
 <th>Rule</th>
 </tr>
@@ -348,8 +348,8 @@ curl -s localhost:9090/api/v1/query --data-urlencode <span class="hljs-string">&
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://sre.google/sre-book/service-level-objectives/" target="_blank" rel="noopener">SRE book: service level objectives</a><span class="host">sre.google</span></li><li><a href="https://sre.google/sre-book/managing-incidents/" target="_blank" rel="noopener">SRE book: managing incidents</a><span class="host">sre.google</span></li><li><a href="https://sre.google/sre-book/postmortem-culture/" target="_blank" rel="noopener">SRE book: postmortem culture</a><span class="host">sre.google</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="../#/interview">Interview questions</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=dfe017aa"></script>
-<script src="../assets/counter.js?v=dfe017aa"></script>
+<script src="../assets/voice.js?v=875a5fa5"></script>
+<script src="../assets/counter.js?v=875a5fa5"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

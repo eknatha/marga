@@ -9,13 +9,13 @@
 <meta property="og:title" content=""Networking" cheat sheet">
 <meta property="og:description" content=""Addressing, DNS, HTTP and TLS checks, and the order to troubleshoot connectivity."">
 <meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/networking.html">
-<meta name="theme-color" content="#0F2547">
+<meta name="theme-color" content="#0B2B2E">
 <link rel="icon" href="../icon.svg" type="image/svg+xml">
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=dfe017aa">
-<script src="../assets/a11y.js?v=dfe017aa"></script>
+<link rel="stylesheet" href="../assets/app.css?v=875a5fa5">
+<script src="../assets/a11y.js?v=875a5fa5"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -41,7 +41,7 @@ ip route get 10.20.20.15             <span class="hljs-comment"># which route a 
 ss -tulpn                            <span class="hljs-comment"># listening TCP/UDP ports and owners</span>
 ss -s                                <span class="hljs-comment"># socket summary</span></code></pre></div>
 <h2 id="cidr-quick-reference">CIDR quick reference</h2>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>CIDR</th>
 <th>Addresses</th>
 <th>Mask</th>
@@ -95,7 +95,7 @@ dig @8.8.8.8 example.com            <span class="hljs-comment"># ask a specific 
 dig +trace example.com              <span class="hljs-comment"># follow delegation from the root</span>
 dig -x 192.0.2.10                   <span class="hljs-comment"># reverse lookup</span>
 getent hosts example.com            <span class="hljs-comment"># what the system resolver returns</span></code></pre></div>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Record</th>
 <th>Holds</th>
 </tr>
@@ -128,7 +128,7 @@ openssl s_client -connect example.com:443 -servername example.com &lt;/dev/null 
 curl -I https://example.com
 curl -v --resolve example.com:443:192.0.2.10 https://example.com
 openssl s_client -connect example.com:443 -servername example.com &lt;/dev/null 2&gt;/dev/null | openssl x509 -noout -dates -subject</code></pre></div>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Status</th>
 <th>Meaning</th>
 </tr>
@@ -262,8 +262,8 @@ ethtool eth0</code></pre></div>
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://www.rfc-editor.org/rfc/rfc1918" target="_blank" rel="noopener">RFC 1918: private address space</a><span class="host">www.rfc-editor.org</span></li><li><a href="https://www.netfilter.org/documentation/" target="_blank" rel="noopener">Netfilter documentation</a><span class="host">www.netfilter.org</span></li><li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP" target="_blank" rel="noopener">MDN: HTTP</a><span class="host">developer.mozilla.org</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="../#/interview">Interview questions</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=dfe017aa"></script>
-<script src="../assets/counter.js?v=dfe017aa"></script>
+<script src="../assets/voice.js?v=875a5fa5"></script>
+<script src="../assets/counter.js?v=875a5fa5"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

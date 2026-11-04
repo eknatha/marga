@@ -9,13 +9,13 @@
 <meta property="og:title" content=""Terraform" cheat sheet">
 <meta property="og:description" content=""Workflow commands, HCL syntax, state operations, meta-arguments and safe pipeline practices."">
 <meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/terraform.html">
-<meta name="theme-color" content="#0F2547">
+<meta name="theme-color" content="#0B2B2E">
 <link rel="icon" href="../icon.svg" type="image/svg+xml">
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=dfe017aa">
-<script src="../assets/a11y.js?v=dfe017aa"></script>
+<link rel="stylesheet" href="../assets/app.css?v=875a5fa5">
+<script src="../assets/a11y.js?v=875a5fa5"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -46,7 +46,7 @@ terraform apply tfplan
 terraform destroy
 terraform output
 terraform output -raw bucket_name</code></pre></div>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Plan symbol</th>
 <th>Meaning</th>
 </tr>
@@ -159,7 +159,7 @@ variable &quot;db_password&quot; {
 <span class="hljs-attr">  names</span>   = [for n in <span class="hljs-built_in">var</span>.names : upper(n)]
 <span class="hljs-attr">  size</span>    = <span class="hljs-built_in">local</span>.is_prod ? <span class="hljs-string">&quot;m5.large&quot;</span> : <span class="hljs-string">&quot;t3.micro&quot;</span>
 }</code></pre></div>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Function</th>
 <th>Example</th>
 </tr>
@@ -379,8 +379,8 @@ lifecycle { prevent_destroy = <span class="hljs-literal">true</span> }</code></p
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://developer.hashicorp.com/terraform/cli" target="_blank" rel="noopener">Terraform CLI</a><span class="host">developer.hashicorp.com</span></li><li><a href="https://developer.hashicorp.com/terraform/language" target="_blank" rel="noopener">Terraform language</a><span class="host">developer.hashicorp.com</span></li><li><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs" target="_blank" rel="noopener">Terraform AWS provider</a><span class="host">registry.terraform.io</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="../#/interview">Interview questions</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=dfe017aa"></script>
-<script src="../assets/counter.js?v=dfe017aa"></script>
+<script src="../assets/voice.js?v=875a5fa5"></script>
+<script src="../assets/counter.js?v=875a5fa5"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

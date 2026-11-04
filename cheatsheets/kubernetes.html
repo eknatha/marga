@@ -9,13 +9,13 @@
 <meta property="og:title" content=""Kubernetes" cheat sheet">
 <meta property="og:description" content=""kubectl essentials, manifests, troubleshooting order, RBAC and exam-speed tricks."">
 <meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/kubernetes.html">
-<meta name="theme-color" content="#0F2547">
+<meta name="theme-color" content="#0B2B2E">
 <link rel="icon" href="../icon.svg" type="image/svg+xml">
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=dfe017aa">
-<script src="../assets/a11y.js?v=dfe017aa"></script>
+<link rel="stylesheet" href="../assets/app.css?v=875a5fa5">
+<script src="../assets/a11y.js?v=875a5fa5"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -105,7 +105,7 @@ k logs NAME -c CONTAINER -n shop         <span class="hljs-comment"># a specific
 k <span class="hljs-built_in">exec</span> -it NAME -n shop -- sh
 k get endpoints SERVICE -n shop          <span class="hljs-comment"># empty means selector or readiness problem</span>
 k debug NAME -it --image=busybox:1.36    <span class="hljs-comment"># ephemeral debug container</span></code></pre></div>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Status</th>
 <th>Likely cause</th>
 </tr>
@@ -159,7 +159,7 @@ securityContext:
   <span class="hljs-attr">readOnlyRootFilesystem:</span> <span class="hljs-literal">true</span>
   <span class="hljs-attr">capabilities:</span> { <span class="hljs-attr">drop:</span> [<span class="hljs-string">&quot;ALL&quot;</span>] }</code></pre></div>
 <h2 id="services">Services</h2>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Type</th>
 <th>Reachable from</th>
 </tr>
@@ -200,7 +200,7 @@ k uncordon NODE
 k taint nodes NODE dedicated=gpu:NoSchedule
 k label node NODE disktype=ssd</code></pre></div>
 <h2 id="storage">Storage</h2>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Item</th>
 <th>Note</th>
 </tr>
@@ -350,8 +350,8 @@ kubectl rollout restart deploy/api -n shop</code></pre></div>
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://kubernetes.io/docs/reference/kubectl/quick-reference/" target="_blank" rel="noopener">kubectl quick reference</a><span class="host">kubernetes.io</span></li><li><a href="https://kubernetes.io/docs/concepts/" target="_blank" rel="noopener">Kubernetes concepts</a><span class="host">kubernetes.io</span></li><li><a href="https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/" target="_blank" rel="noopener">Kubernetes: installing with kubeadm</a><span class="host">kubernetes.io</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="../#/interview">Interview questions</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=dfe017aa"></script>
-<script src="../assets/counter.js?v=dfe017aa"></script>
+<script src="../assets/voice.js?v=875a5fa5"></script>
+<script src="../assets/counter.js?v=875a5fa5"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

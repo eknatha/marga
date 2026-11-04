@@ -9,13 +9,13 @@
 <meta property="og:title" content=""Storage and filesystems" cheat sheet">
 <meta property="og:description" content=""Disks, filesystems, LVM, RAID, network storage and the commands that explain a full, slow or missing volume."">
 <meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/storage.html">
-<meta name="theme-color" content="#0F2547">
+<meta name="theme-color" content="#0B2B2E">
 <link rel="icon" href="../icon.svg" type="image/svg+xml">
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=dfe017aa">
-<script src="../assets/a11y.js?v=dfe017aa"></script>
+<link rel="stylesheet" href="../assets/app.css?v=875a5fa5">
+<script src="../assets/a11y.js?v=875a5fa5"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -101,7 +101,7 @@ nfsstat -m
 iscsiadm -m session
 ceph status</code></pre></div>
 <h2 id="quick-diagnosis">Quick diagnosis</h2>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Symptom</th>
 <th>First look</th>
 </tr>
@@ -135,8 +135,8 @@ ceph status</code></pre></div>
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://docs.kernel.org/filesystems/ext4/index.html" target="_blank" rel="noopener">ext4 documentation</a><span class="host">docs.kernel.org</span></li><li><a href="https://sourceware.org/lvm2/" target="_blank" rel="noopener">LVM2 resource page</a><span class="host">sourceware.org</span></li><li><a href="https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/managing_file_systems/" target="_blank" rel="noopener">Red Hat: Managing file systems</a><span class="host">docs.redhat.com</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="../#/interview">Interview questions</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=dfe017aa"></script>
-<script src="../assets/counter.js?v=dfe017aa"></script>
+<script src="../assets/voice.js?v=875a5fa5"></script>
+<script src="../assets/counter.js?v=875a5fa5"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

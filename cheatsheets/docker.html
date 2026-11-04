@@ -9,13 +9,13 @@
 <meta property="og:title" content=""Docker and Compose" cheat sheet">
 <meta property="og:description" content=""Run, build, inspect, clean up and harden containers, plus everyday Compose commands."">
 <meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/docker.html">
-<meta name="theme-color" content="#0F2547">
+<meta name="theme-color" content="#0B2B2E">
 <link rel="icon" href="../icon.svg" type="image/svg+xml">
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=dfe017aa">
-<script src="../assets/a11y.js?v=dfe017aa"></script>
+<link rel="stylesheet" href="../assets/app.css?v=875a5fa5">
+<script src="../assets/a11y.js?v=875a5fa5"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -44,7 +44,7 @@ docker stop web &amp;&amp; docker <span class="hljs-built_in">rm</span> web
 docker <span class="hljs-built_in">exec</span> -it web sh                       <span class="hljs-comment"># shell in a running container</span>
 docker logs -f --<span class="hljs-built_in">tail</span> 50 web
 docker <span class="hljs-built_in">cp</span> web:/etc/nginx/nginx.conf ./nginx.conf</code></pre></div>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Flag</th>
 <th>Meaning</th>
 </tr>
@@ -109,7 +109,7 @@ CMD [&quot;python&quot;, &quot;app.py&quot;]" aria-label="Copy code">Copy</butto
 <span class="hljs-keyword">USER</span> <span class="hljs-number">10001</span>
 <span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">8080</span>
 <span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;python&quot;</span>, <span class="hljs-string">&quot;app.py&quot;</span>]</span></code></pre></div>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Rule</th>
 <th>Why</th>
 </tr>
@@ -159,7 +159,7 @@ docker stats --no-stream
 docker top web
 docker events --since 10m
 docker run --<span class="hljs-built_in">rm</span> -it --entrypoint sh shop-api:1.8.2</code></pre></div>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Exit code</th>
 <th>Meaning</th>
 </tr>
@@ -323,8 +323,8 @@ docker builder prune --filter <span class="hljs-keyword">until</span>=168h</code
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://docs.docker.com/reference/dockerfile/" target="_blank" rel="noopener">Dockerfile reference</a><span class="host">docs.docker.com</span></li><li><a href="https://docs.docker.com/get-started/" target="_blank" rel="noopener">Docker: get started</a><span class="host">docs.docker.com</span></li><li><a href="https://docs.docker.com/compose/" target="_blank" rel="noopener">Docker Compose documentation</a><span class="host">docs.docker.com</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="../#/interview">Interview questions</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=dfe017aa"></script>
-<script src="../assets/counter.js?v=dfe017aa"></script>
+<script src="../assets/voice.js?v=875a5fa5"></script>
+<script src="../assets/counter.js?v=875a5fa5"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

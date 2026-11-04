@@ -9,13 +9,13 @@
 <meta property="og:title" content=""Prometheus and observability" cheat sheet">
 <meta property="og:description" content=""Metric types, PromQL patterns, scrape and alert configuration, and the RED, USE and golden-signal checklists."">
 <meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/prometheus.html">
-<meta name="theme-color" content="#0F2547">
+<meta name="theme-color" content="#0B2B2E">
 <link rel="icon" href="../icon.svg" type="image/svg+xml">
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=dfe017aa">
-<script src="../assets/a11y.js?v=dfe017aa"></script>
+<link rel="stylesheet" href="../assets/app.css?v=875a5fa5">
+<script src="../assets/a11y.js?v=875a5fa5"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -31,7 +31,7 @@
     <div id="voice-slot"></div>
   </header>
   <article class="sheet"><h2 id="what-to-measure">What to measure</h2>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Method</th>
 <th>For</th>
 <th>Signals</th>
@@ -54,7 +54,7 @@
 </tbody></table></div>
 <p>Use percentiles, not averages, for latency.</p>
 <h2 id="metric-types">Metric types</h2>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Type</th>
 <th>Behaviour</th>
 <th>Query with</th>
@@ -214,7 +214,7 @@ promtool check config prometheus.yml</code></pre></div>
 </ol>
 <p>Page on symptoms; ticket for slow-burn causes; dashboards for the rest.</p>
 <h2 id="logs-and-traces">Logs and traces</h2>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Practice</th>
 <th>Why</th>
 </tr>
@@ -324,8 +324,8 @@ amtool config routes <span class="hljs-built_in">test</span> --config.file=alert
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://prometheus.io/docs/introduction/overview/" target="_blank" rel="noopener">Prometheus overview</a><span class="host">prometheus.io</span></li><li><a href="https://prometheus.io/docs/prometheus/latest/querying/basics/" target="_blank" rel="noopener">Prometheus: querying basics</a><span class="host">prometheus.io</span></li><li><a href="https://prometheus.io/docs/alerting/latest/alertmanager/" target="_blank" rel="noopener">Alertmanager</a><span class="host">prometheus.io</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="../#/interview">Interview questions</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=dfe017aa"></script>
-<script src="../assets/counter.js?v=dfe017aa"></script>
+<script src="../assets/voice.js?v=875a5fa5"></script>
+<script src="../assets/counter.js?v=875a5fa5"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});

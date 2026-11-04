@@ -9,13 +9,13 @@
 <meta property="og:title" content=""Linux" cheat sheet">
 <meta property="og:description" content=""Files, permissions, processes, disks, logs and performance commands you reach for daily."">
 <meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/linux.html">
-<meta name="theme-color" content="#0F2547">
+<meta name="theme-color" content="#0B2B2E">
 <link rel="icon" href="../icon.svg" type="image/svg+xml">
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=dfe017aa">
-<script src="../assets/a11y.js?v=dfe017aa"></script>
+<link rel="stylesheet" href="../assets/app.css?v=875a5fa5">
+<script src="../assets/a11y.js?v=875a5fa5"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -31,7 +31,7 @@
     <div id="voice-slot"></div>
   </header>
   <article class="sheet"><h2 id="navigate-and-inspect">Navigate and inspect</h2>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Command</th>
 <th>What it does</th>
 </tr>
@@ -81,7 +81,7 @@ readlink -f linkname         # resolve the final path" aria-label="Copy code">Co
 <span class="hljs-built_in">ln</span> -sfn target linkname      <span class="hljs-comment"># replace a symlink to a directory safely</span>
 <span class="hljs-built_in">readlink</span> -f linkname         <span class="hljs-comment"># resolve the final path</span></code></pre></div>
 <h2 id="users-and-permissions">Users and permissions</h2>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Command</th>
 <th>What it does</th>
 </tr>
@@ -173,7 +173,7 @@ free -h                               <span class="hljs-comment"># memory and sw
 iostat -xz 1 3                        <span class="hljs-comment"># disk utilization and latency</span>
 ss -s                                 <span class="hljs-comment"># socket summary</span>
 sar -n DEV 1 3                        <span class="hljs-comment"># network throughput per interface</span></code></pre></div>
-<div class="table-wrap"><table><thead><tr>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
 <th>Symptom</th>
 <th>Look at</th>
 </tr>
@@ -317,8 +317,8 @@ nc -zv host 443
   <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://man7.org/linux/man-pages/index.html" target="_blank" rel="noopener">Linux man-pages (man7.org)</a><span class="host">man7.org</span></li><li><a href="https://refspecs.linuxfoundation.org/FHS_3.0/fhs/index.html" target="_blank" rel="noopener">Filesystem Hierarchy Standard 3.0</a><span class="host">refspecs.linuxfoundation.org</span></li><li><a href="https://systemd.io/" target="_blank" rel="noopener">systemd documentation</a><span class="host">systemd.io</span></li></ul></section>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="../#/interview">Interview questions</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/voice.js?v=dfe017aa"></script>
-<script src="../assets/counter.js?v=dfe017aa"></script>
+<script src="../assets/voice.js?v=875a5fa5"></script>
+<script src="../assets/counter.js?v=875a5fa5"></script>
 <script>
 if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
 document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
