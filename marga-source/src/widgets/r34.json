@@ -1,0 +1,1497 @@
+[
+ {
+  "id": "bm-rack-power",
+  "module": "baremetal",
+  "lesson": "baremetal/servers-racks-and-remote-management",
+  "title": "Rack power budget with two feeds",
+  "summary": "Add servers to a rack and see when one feed can no longer carry the whole load, which makes the redundancy a promise you cannot keep.",
+  "inputs": [
+   {
+    "id": "servers",
+    "label": "Servers in the rack",
+    "min": 4,
+    "max": 40,
+    "value": 20,
+    "step": 1
+   },
+   {
+    "id": "watts",
+    "label": "Power per server",
+    "min": 100,
+    "max": 1000,
+    "value": 500,
+    "step": 50,
+    "unit": "W"
+   },
+   {
+    "id": "feed",
+    "label": "Rating of one feed",
+    "min": 3,
+    "max": 20,
+    "value": 7,
+    "step": 1,
+    "unit": "kW"
+   },
+   {
+    "id": "redundant",
+    "label": "Feeds A and B are meant to be redundant",
+    "type": "toggle",
+    "value": true
+   }
+  ],
+  "vars": [
+   [
+    "load",
+    "servers * watts / 1000"
+   ],
+   [
+    "safe",
+    "feed * 0.8"
+   ],
+   [
+    "single",
+    "load > safe"
+   ],
+   [
+    "over",
+    "load > feed"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "s",
+    "label": "Servers",
+    "x": 0,
+    "y": 0,
+    "state": "over ? 2 : (single ? 1 : 0)",
+    "sub": "round(load*10)/10 + \" kW drawn\""
+   },
+   {
+    "id": "a",
+    "label": "Feed A",
+    "x": 1,
+    "y": 0,
+    "state": "redundant && over ? 2 : (redundant && single ? 1 : 0)",
+    "sub": "\"rated \" + feed + \" kW\""
+   },
+   {
+    "id": "b",
+    "label": "Feed B",
+    "x": 2,
+    "y": 0,
+    "state": "redundant && over ? 2 : (redundant && single ? 1 : 0)",
+    "sub": "\"rated \" + feed + \" kW\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "a",
+    "to": "s",
+    "flow": "min(1, safe/load)",
+    "bad": "redundant && over"
+   },
+   {
+    "from": "b",
+    "to": "s",
+    "flow": "redundant ? min(1, safe/load) : 0",
+    "bad": "redundant && over"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Rack load",
+    "expr": "load",
+    "dp": 1,
+    "unit": "kW"
+   },
+   {
+    "label": "Safe limit of one feed",
+    "expr": "safe",
+    "dp": 1,
+    "unit": "kW"
+   },
+   {
+    "label": "Spare on one feed",
+    "expr": "max(0, safe - load)",
+    "dp": 1,
+    "unit": "kW"
+   },
+   {
+    "label": "Servers that fit safely",
+    "expr": "floor(safe*1000/watts)",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "redundant && over",
+    "tone": "bad",
+    "text": "If one feed fails, the other must carry more than it is rated for and will trip. The redundancy does not work."
+   },
+   {
+    "when": "redundant && single",
+    "tone": "warn",
+    "text": "The load is above 80 percent of one feed. A single feed failure leaves no margin for a spike."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "One feed alone can carry the rack with margin, so the A and B design really is redundant."
+   }
+  ],
+  "tries": [
+   "Raise the servers until the verdict turns bad.",
+   "Raise the feed rating and see how many more servers fit.",
+   "Lower the watts per server and watch the margin grow."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Twenty servers draw more than one 7 kW feed can carry.",
+    "tone": "bad",
+    "values": {
+     "servers": 20,
+     "watts": 500,
+     "feed": 7,
+     "redundant": true
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Fourteen servers fit inside one feed with margin.",
+    "tone": "good",
+    "values": {
+     "servers": 10,
+     "watts": 500,
+     "feed": 7,
+     "redundant": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "bm-raid-rebuild",
+  "module": "baremetal",
+  "lesson": "baremetal/disks-raid-firmware-and-burn-in",
+  "title": "RAID rebuild time and the second failure",
+  "summary": "Larger disks take longer to rebuild, and every extra hour is time when a second failure can lose the array.",
+  "inputs": [
+   {
+    "id": "size",
+    "label": "Disk size",
+    "min": 1,
+    "max": 24,
+    "value": 12,
+    "step": 1,
+    "unit": "TB"
+   },
+   {
+    "id": "speed",
+    "label": "Rebuild speed",
+    "min": 30,
+    "max": 300,
+    "value": 100,
+    "step": 10,
+    "unit": "MB/s"
+   },
+   {
+    "id": "disks",
+    "label": "Disks in the array",
+    "min": 2,
+    "max": 12,
+    "value": 8,
+    "step": 1
+   },
+   {
+    "id": "afr",
+    "label": "Yearly failure rate per disk",
+    "min": 1,
+    "max": 10,
+    "value": 3,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "level",
+    "label": "RAID level",
+    "type": "select",
+    "options": [
+     [
+      "5",
+      "RAID 5"
+     ],
+     [
+      "6",
+      "RAID 6"
+     ]
+    ],
+    "value": "5"
+   }
+  ],
+  "vars": [
+   [
+    "hours",
+    "size * 1000000 / speed / 3600"
+   ],
+   [
+    "p2",
+    "(disks - 1) * hours * afr / 100 / 8760"
+   ],
+   [
+    "risk",
+    "level == \"5\" ? p2 : p2 * p2 * 40"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "d",
+    "label": "Failed disk",
+    "x": 0,
+    "y": 0,
+    "state": "1",
+    "sub": "\"one disk lost\""
+   },
+   {
+    "id": "r",
+    "label": "Rebuild",
+    "x": 1,
+    "y": 0,
+    "state": "risk > 0.01 ? 2 : (risk > 0.003 ? 1 : 0)",
+    "sub": "round(hours) + \" hours\""
+   },
+   {
+    "id": "a",
+    "label": "Array",
+    "x": 2,
+    "y": 0,
+    "state": "risk > 0.01 ? 2 : (risk > 0.003 ? 1 : 0)",
+    "sub": "level == \"5\" ? \"RAID 5\" : \"RAID 6\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "d",
+    "to": "r",
+    "flow": "0.8",
+    "bad": "false"
+   },
+   {
+    "from": "r",
+    "to": "a",
+    "flow": "min(1, 1 - risk*20)",
+    "bad": "risk > 0.01"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Rebuild time",
+    "expr": "hours",
+    "dp": 0,
+    "unit": "hours"
+   },
+   {
+    "label": "Chance another disk fails during rebuild",
+    "expr": "p2*100",
+    "dp": 2,
+    "unit": "%"
+   },
+   {
+    "label": "Chance the array is lost",
+    "expr": "risk*100",
+    "dp": 3,
+    "unit": "%"
+   },
+   {
+    "label": "Disks that must be read",
+    "expr": "disks - 1",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "risk > 0.01",
+    "tone": "bad",
+    "text": "The window is long enough that losing the array is a real risk. Use smaller disks, faster rebuilds or RAID 6 or 10."
+   },
+   {
+    "when": "risk > 0.003",
+    "tone": "warn",
+    "text": "The risk is small but not negligible. Keep a verified backup and a spare on site."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The rebuild window is short enough that the risk is low."
+   }
+  ],
+  "tries": [
+   "Switch RAID 5 to RAID 6 and compare the chance of loss.",
+   "Raise the disk size and watch the rebuild time grow.",
+   "Raise the rebuild speed and see the window shrink."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Big RAID 5 disks with a slow rebuild leave a long window.",
+    "tone": "bad",
+    "values": {
+     "size": 24,
+     "speed": 40,
+     "disks": 12,
+     "afr": 8,
+     "level": "5"
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "RAID 6 with faster rebuild makes the risk small.",
+    "tone": "good",
+    "values": {
+     "size": 8,
+     "speed": 150,
+     "disks": 8,
+     "afr": 3,
+     "level": "6"
+    }
+   }
+  ]
+ },
+ {
+  "id": "bm-bond-throughput",
+  "module": "baremetal",
+  "lesson": "baremetal/datacenter-networking-leaf-spine-and-bonding",
+  "title": "What a network bond really gives you",
+  "summary": "Compare bonding modes and see why one flow cannot use two links under LACP, why round-robin can hurt, and what a failed link costs.",
+  "inputs": [
+   {
+    "id": "links",
+    "label": "Links in the bond",
+    "min": 1,
+    "max": 4,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "speed",
+    "label": "Speed of each link",
+    "type": "select",
+    "options": [
+     [
+      "10",
+      "10 Gbit/s"
+     ],
+     [
+      "25",
+      "25 Gbit/s"
+     ],
+     [
+      "100",
+      "100 Gbit/s"
+     ]
+    ],
+    "value": "25"
+   },
+   {
+    "id": "mode",
+    "label": "Bonding mode",
+    "type": "select",
+    "options": [
+     [
+      "ab",
+      "active-backup"
+     ],
+     [
+      "lacp",
+      "802.3ad (LACP)"
+     ],
+     [
+      "rr",
+      "balance-rr"
+     ]
+    ],
+    "value": "lacp"
+   },
+   {
+    "id": "flows",
+    "label": "Number of connections",
+    "min": 1,
+    "max": 100,
+    "value": 20,
+    "step": 1
+   },
+   {
+    "id": "down",
+    "label": "Links that are down",
+    "min": 0,
+    "max": 4,
+    "value": 0,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "up",
+    "max(0, links - down)"
+   ],
+   [
+    "total",
+    "up == 0 ? 0 : (mode == \"ab\" ? speed : (mode == \"lacp\" ? speed * min(up, flows) : speed * up * 0.6))"
+   ],
+   [
+    "single",
+    "up == 0 ? 0 : (mode == \"rr\" ? speed * up * 0.6 : speed)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "s",
+    "label": "Server",
+    "x": 0,
+    "y": 0,
+    "state": "up == 0 ? 2 : 0",
+    "sub": "up + \" of \" + links + \" links up\""
+   },
+   {
+    "id": "b",
+    "label": "Bond",
+    "x": 1,
+    "y": 0,
+    "state": "up == 0 ? 2 : (mode == \"rr\" ? 1 : 0)",
+    "sub": "mode == \"ab\" ? \"active-backup\" : (mode == \"lacp\" ? \"LACP\" : \"round-robin\")"
+   },
+   {
+    "id": "w",
+    "label": "Switch",
+    "x": 2,
+    "y": 0,
+    "state": "up == 0 ? 2 : (down > 0 ? 1 : 0)",
+    "sub": "\"port channel\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "s",
+    "to": "b",
+    "flow": "up > 0 ? 1 : 0",
+    "bad": "up == 0"
+   },
+   {
+    "from": "b",
+    "to": "w",
+    "flow": "up > 0 ? min(1, total/(speed*links)) : 0",
+    "bad": "up == 0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Total capacity",
+    "expr": "total",
+    "dp": 0,
+    "unit": "Gbit/s"
+   },
+   {
+    "label": "Best speed for one connection",
+    "expr": "single",
+    "dp": 0,
+    "unit": "Gbit/s"
+   },
+   {
+    "label": "Links in use",
+    "expr": "up",
+    "dp": 0
+   },
+   {
+    "label": "Capacity lost to failures",
+    "expr": "max(0, speed * links - total)",
+    "dp": 0,
+    "unit": "Gbit/s"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "up == 0",
+    "tone": "bad",
+    "text": "Every link is down, so the server has no network. Check cables, optics and the switch ports."
+   },
+   {
+    "when": "mode == \"rr\"",
+    "tone": "warn",
+    "text": "Round-robin spreads packets of one connection across links, so they arrive out of order and TCP slows down."
+   },
+   {
+    "when": "down > 0",
+    "tone": "warn",
+    "text": "The bond is degraded. Traffic flows but with less capacity, and a physical fault needs attention."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The bond is healthy. Many connections spread across the links, though one connection still uses one link."
+   }
+  ],
+  "tries": [
+   "Set connections to 1 under LACP and see that capacity equals one link.",
+   "Take one link down in active-backup mode.",
+   "Switch to round-robin and read the warning."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "All links down: the server has no network.",
+    "tone": "bad",
+    "values": {
+     "links": 2,
+     "speed": "25",
+     "mode": "lacp",
+     "flows": 20,
+     "down": 2
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "LACP with many connections uses both links.",
+    "tone": "good",
+    "values": {
+     "links": 2,
+     "speed": "25",
+     "mode": "lacp",
+     "flows": 20,
+     "down": 0
+    }
+   }
+  ]
+ },
+ {
+  "id": "bm-leaf-oversub",
+  "module": "baremetal",
+  "lesson": "baremetal/datacenter-networking-leaf-spine-and-bonding",
+  "title": "Leaf switch oversubscription",
+  "summary": "Compare the bandwidth the servers could send with the bandwidth the leaf can send up to the spines.",
+  "inputs": [
+   {
+    "id": "servers",
+    "label": "Servers per rack",
+    "min": 8,
+    "max": 48,
+    "value": 32,
+    "step": 1
+   },
+   {
+    "id": "nic",
+    "label": "Server link speed",
+    "type": "select",
+    "options": [
+     [
+      "10",
+      "10 Gbit/s"
+     ],
+     [
+      "25",
+      "25 Gbit/s"
+     ],
+     [
+      "100",
+      "100 Gbit/s"
+     ]
+    ],
+    "value": "25"
+   },
+   {
+    "id": "uplinks",
+    "label": "Uplinks per leaf",
+    "min": 2,
+    "max": 16,
+    "value": 4,
+    "step": 1
+   },
+   {
+    "id": "up",
+    "label": "Uplink speed",
+    "type": "select",
+    "options": [
+     [
+      "100",
+      "100 Gbit/s"
+     ],
+     [
+      "400",
+      "400 Gbit/s"
+     ]
+    ],
+    "value": "100"
+   },
+   {
+    "id": "busy",
+    "label": "Share of server links busy at once",
+    "min": 5,
+    "max": 100,
+    "value": 40,
+    "step": 5,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "down",
+    "servers * nic"
+   ],
+   [
+    "upc",
+    "uplinks * up"
+   ],
+   [
+    "ratio",
+    "down / upc"
+   ],
+   [
+    "need",
+    "down * busy / 100"
+   ],
+   [
+    "short",
+    "need > upc"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "s",
+    "label": "Servers",
+    "x": 0,
+    "y": 0,
+    "state": "short ? 1 : 0",
+    "sub": "round(down) + \" Gbit/s possible\""
+   },
+   {
+    "id": "l",
+    "label": "Leaf switch",
+    "x": 1,
+    "y": 0,
+    "state": "short ? 2 : (ratio > 3 ? 1 : 0)",
+    "sub": "round(ratio*10)/10 + \" to 1\""
+   },
+   {
+    "id": "p",
+    "label": "Spines",
+    "x": 2,
+    "y": 0,
+    "state": "short ? 1 : 0",
+    "sub": "round(upc) + \" Gbit/s up\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "s",
+    "to": "l",
+    "flow": "min(1, need/down)",
+    "bad": "short"
+   },
+   {
+    "from": "l",
+    "to": "p",
+    "flow": "min(1, upc/need)",
+    "bad": "short"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Server bandwidth",
+    "expr": "down",
+    "dp": 0,
+    "unit": "Gbit/s"
+   },
+   {
+    "label": "Uplink bandwidth",
+    "expr": "upc",
+    "dp": 0,
+    "unit": "Gbit/s"
+   },
+   {
+    "label": "Oversubscription",
+    "expr": "ratio",
+    "dp": 1,
+    "unit": "to 1"
+   },
+   {
+    "label": "Traffic wanted at once",
+    "expr": "need",
+    "dp": 0,
+    "unit": "Gbit/s"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "short",
+    "tone": "bad",
+    "text": "At this load the uplinks are saturated. Packets queue and drop, and east-west traffic slows down."
+   },
+   {
+    "when": "ratio > 3",
+    "tone": "warn",
+    "text": "Oversubscription is above 3 to 1. It works while few servers send at once, but a busy job will hit the limit."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The uplinks have room for the traffic the servers can send."
+   }
+  ],
+  "tries": [
+   "Raise the number of busy servers until the uplinks saturate.",
+   "Add uplinks to lower the ratio.",
+   "Move to 400 Gbit/s uplinks and compare."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A full rack of fast servers on thin uplinks.",
+    "tone": "bad",
+    "values": {
+     "servers": 48,
+     "nic": "100",
+     "uplinks": 2,
+     "up": "100",
+     "busy": 60
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "More uplinks bring the ratio under control.",
+    "tone": "good",
+    "values": {
+     "servers": 32,
+     "nic": "25",
+     "uplinks": 8,
+     "up": "100",
+     "busy": 40
+    }
+   }
+  ]
+ },
+ {
+  "id": "sm-retry-storm",
+  "module": "service-mesh",
+  "lesson": "service-mesh/mtls-and-traffic-management",
+  "title": "Retry storm calculator",
+  "summary": "Stack retries across layers and see how a small slowdown becomes many times the load on the slowest dependency.",
+  "inputs": [
+   {
+    "id": "layers",
+    "label": "Layers that retry",
+    "min": 1,
+    "max": 5,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "retries",
+    "label": "Retries per layer",
+    "min": 0,
+    "max": 5,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "rps",
+    "label": "User requests per second",
+    "min": 10,
+    "max": 500,
+    "value": 100,
+    "step": 10
+   },
+   {
+    "id": "cap",
+    "label": "Backend capacity",
+    "min": 500,
+    "max": 50000,
+    "value": 5000,
+    "step": 500,
+    "unit": "req/s"
+   },
+   {
+    "id": "budget",
+    "label": "Use a retry budget of 20 percent",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "amp",
+    "budget ? 1.2 : pow(retries + 1, layers)"
+   ],
+   [
+    "load",
+    "rps * amp"
+   ],
+   [
+    "over",
+    "load > cap"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "u",
+    "label": "Users",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "rps + \" req/s\""
+   },
+   {
+    "id": "m",
+    "label": "Services with retries",
+    "x": 1,
+    "y": 0,
+    "state": "amp > 5 ? 2 : (amp > 2 ? 1 : 0)",
+    "sub": "layers + \" layers, \" + retries + \" retries\""
+   },
+   {
+    "id": "d",
+    "label": "Backend",
+    "x": 2,
+    "y": 0,
+    "state": "over ? 2 : (load > cap*0.7 ? 1 : 0)",
+    "sub": "round(load) + \" req/s\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "u",
+    "to": "m",
+    "flow": "1",
+    "bad": "false"
+   },
+   {
+    "from": "m",
+    "to": "d",
+    "flow": "min(1, load/cap)",
+    "bad": "over"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Amplification",
+    "expr": "amp",
+    "dp": 1,
+    "unit": "times"
+   },
+   {
+    "label": "Load on the backend",
+    "expr": "load",
+    "dp": 0,
+    "unit": "req/s"
+   },
+   {
+    "label": "Backend capacity",
+    "expr": "cap",
+    "dp": 0,
+    "unit": "req/s"
+   },
+   {
+    "label": "Overload",
+    "expr": "max(0, load/cap*100 - 100)",
+    "dp": 0,
+    "unit": "%"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "over",
+    "tone": "bad",
+    "text": "The retries multiply the load beyond what the backend can take, so a slowdown becomes an outage."
+   },
+   {
+    "when": "amp > 2",
+    "tone": "warn",
+    "text": "Retries more than double the load during a failure. Cut them to one layer or set a budget."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The extra load from retries stays well inside the capacity of the backend."
+   }
+  ],
+  "tries": [
+   "Raise layers from 1 to 4 and watch the amplification.",
+   "Turn on the retry budget.",
+   "Raise the backend capacity to see what it takes to survive."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Three layers each retrying three times.",
+    "tone": "bad",
+    "values": {
+     "layers": 3,
+     "retries": 3,
+     "rps": 100,
+     "cap": 5000,
+     "budget": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A retry budget keeps the extra load small.",
+    "tone": "good",
+    "values": {
+     "layers": 3,
+     "retries": 3,
+     "rps": 100,
+     "cap": 5000,
+     "budget": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "sm-canary-weights",
+  "module": "service-mesh",
+  "lesson": "service-mesh/mtls-and-traffic-management",
+  "title": "Canary weights and errors",
+  "summary": "Split traffic between two versions and see what fraction of users meet errors, including what happens when the rule is wrong.",
+  "inputs": [
+   {
+    "id": "w1",
+    "label": "Weight to v1",
+    "min": 0,
+    "max": 100,
+    "value": 90,
+    "step": 5
+   },
+   {
+    "id": "w2",
+    "label": "Weight to v2",
+    "min": 0,
+    "max": 100,
+    "value": 10,
+    "step": 5
+   },
+   {
+    "id": "err",
+    "label": "Error rate of v2",
+    "min": 0,
+    "max": 100,
+    "value": 20,
+    "step": 5,
+    "unit": "%"
+   },
+   {
+    "id": "dr",
+    "label": "The v2 subset exists in a DestinationRule",
+    "type": "toggle",
+    "value": true
+   }
+  ],
+  "vars": [
+   [
+    "total",
+    "w1 + w2"
+   ],
+   [
+    "valid",
+    "total == 100"
+   ],
+   [
+    "bad2",
+    "!dr"
+   ],
+   [
+    "user",
+    "!valid ? 100 : (bad2 ? w2 : w2 * err / 100)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Clients",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "\"requests\""
+   },
+   {
+    "id": "p",
+    "label": "Proxy rules",
+    "x": 1,
+    "y": 0,
+    "state": "!valid ? 2 : (bad2 ? 2 : 0)",
+    "sub": "\"weights \" + w1 + \" / \" + w2"
+   },
+   {
+    "id": "v",
+    "label": "v2 pods",
+    "x": 2,
+    "y": 0,
+    "state": "bad2 ? 2 : (err > 30 ? 1 : 0)",
+    "sub": "err + \"% errors\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "p",
+    "flow": "1",
+    "bad": "!valid"
+   },
+   {
+    "from": "p",
+    "to": "v",
+    "flow": "w2/100",
+    "bad": "bad2"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Total weight",
+    "expr": "total",
+    "dp": 0
+   },
+   {
+    "label": "Users that see an error",
+    "expr": "user",
+    "dp": 1,
+    "unit": "%"
+   },
+   {
+    "label": "Traffic to v2",
+    "expr": "w2",
+    "dp": 0,
+    "unit": "%"
+   },
+   {
+    "label": "Traffic to v1",
+    "expr": "w1",
+    "dp": 0,
+    "unit": "%"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!valid",
+    "tone": "bad",
+    "text": "The weights do not add up to 100, so the rule is rejected or behaves unpredictably."
+   },
+   {
+    "when": "bad2",
+    "tone": "bad",
+    "text": "The v2 subset is not defined, so every request routed to v2 fails with a 503."
+   },
+   {
+    "when": "user > 5",
+    "tone": "warn",
+    "text": "More than 5 percent of users see errors. Lower the weight or fix v2 before going further."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The canary affects few users and the rule is valid."
+   }
+  ],
+  "tries": [
+   "Set the weights to 90 and 20 to see the invalid rule.",
+   "Turn off the DestinationRule toggle.",
+   "Raise the error rate of v2 and lower its weight to limit harm."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The canary names a subset that does not exist.",
+    "tone": "bad",
+    "values": {
+     "w1": 90,
+     "w2": 10,
+     "err": 20,
+     "dr": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A valid rule and a small weight limit the harm.",
+    "tone": "good",
+    "values": {
+     "w1": 95,
+     "w2": 5,
+     "err": 20,
+     "dr": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "sm-sidecar-cost",
+  "module": "service-mesh",
+  "lesson": "service-mesh/what-a-service-mesh-is-and-how-it-works",
+  "title": "What a sidecar mesh costs",
+  "summary": "Add up the memory and CPU of a proxy in every pod and compare it with the ambient model.",
+  "inputs": [
+   {
+    "id": "pods",
+    "label": "Pods in the cluster",
+    "min": 20,
+    "max": 3000,
+    "value": 500,
+    "step": 20
+   },
+   {
+    "id": "cpu",
+    "label": "CPU reserved per sidecar",
+    "min": 10,
+    "max": 300,
+    "value": 100,
+    "step": 10,
+    "unit": "m"
+   },
+   {
+    "id": "mem",
+    "label": "Memory per sidecar",
+    "min": 30,
+    "max": 300,
+    "value": 100,
+    "step": 10,
+    "unit": "MiB"
+   },
+   {
+    "id": "mode",
+    "label": "Mesh mode",
+    "type": "select",
+    "options": [
+     [
+      "side",
+      "Sidecar in every pod"
+     ],
+     [
+      "amb",
+      "Ambient (shared per node)"
+     ]
+    ],
+    "value": "side"
+   },
+   {
+    "id": "nodes",
+    "label": "Nodes",
+    "min": 3,
+    "max": 200,
+    "value": 30,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "cores",
+    "mode == \"side\" ? pods * cpu / 1000 : nodes * 0.3"
+   ],
+   [
+    "gib",
+    "mode == \"side\" ? pods * mem / 1024 : nodes * 0.15"
+   ],
+   [
+    "cluster",
+    "nodes * 16"
+   ],
+   [
+    "share",
+    "cores / cluster * 100"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "p",
+    "label": "Pods",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "pods + \" pods\""
+   },
+   {
+    "id": "x",
+    "label": "Proxies",
+    "x": 1,
+    "y": 0,
+    "state": "share > 15 ? 2 : (share > 8 ? 1 : 0)",
+    "sub": "mode == \"side\" ? \"one per pod\" : \"one per node\""
+   },
+   {
+    "id": "n",
+    "label": "Nodes",
+    "x": 2,
+    "y": 0,
+    "state": "share > 15 ? 2 : (share > 8 ? 1 : 0)",
+    "sub": "nodes + \" nodes\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "p",
+    "to": "x",
+    "flow": "1",
+    "bad": "false"
+   },
+   {
+    "from": "x",
+    "to": "n",
+    "flow": "min(1, share/20)",
+    "bad": "share > 15"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "CPU used by proxies",
+    "expr": "cores",
+    "dp": 1,
+    "unit": "cores"
+   },
+   {
+    "label": "Memory used by proxies",
+    "expr": "gib",
+    "dp": 1,
+    "unit": "GiB"
+   },
+   {
+    "label": "Share of cluster CPU",
+    "expr": "share",
+    "dp": 1,
+    "unit": "%"
+   },
+   {
+    "label": "Cluster CPU",
+    "expr": "cluster",
+    "dp": 0,
+    "unit": "cores"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "share > 15",
+    "tone": "bad",
+    "text": "The proxies take more than 15 percent of the cluster CPU. You are paying a lot for the mesh."
+   },
+   {
+    "when": "share > 8",
+    "tone": "warn",
+    "text": "The proxies take a noticeable share of the cluster. Check whether every pod needs one, or consider ambient mode."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The mesh overhead is small compared with the cluster."
+   }
+  ],
+  "tries": [
+   "Switch to ambient mode and compare the totals.",
+   "Raise the CPU per sidecar and watch the share.",
+   "Add pods without adding nodes."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A sidecar with a large reservation in every pod of a small cluster.",
+    "tone": "bad",
+    "values": {
+     "pods": 1500,
+     "cpu": 200,
+     "mem": 200,
+     "mode": "side",
+     "nodes": 20
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Ambient mode shares the cost per node.",
+    "tone": "good",
+    "values": {
+     "pods": 1500,
+     "cpu": 200,
+     "mem": 200,
+     "mode": "amb",
+     "nodes": 20
+    }
+   }
+  ]
+ },
+ {
+  "id": "sm-dns-ndots",
+  "module": "service-mesh",
+  "lesson": "service-mesh/kubernetes-networking-under-the-hood",
+  "title": "ndots and slow DNS lookups",
+  "summary": "See why an external name can take many failed lookups inside a pod, and what a trailing dot or a lower ndots does.",
+  "inputs": [
+   {
+    "id": "ndots",
+    "label": "ndots setting",
+    "min": 1,
+    "max": 15,
+    "value": 5,
+    "step": 1
+   },
+   {
+    "id": "dots",
+    "label": "Dots in the name",
+    "min": 0,
+    "max": 6,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "suffix",
+    "label": "Search suffixes",
+    "min": 1,
+    "max": 6,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "fail",
+    "label": "Time for each failed lookup",
+    "min": 1,
+    "max": 200,
+    "value": 40,
+    "step": 1,
+    "unit": "ms"
+   },
+   {
+    "id": "trailing",
+    "label": "Name ends with a dot",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "extra",
+    "(trailing || dots >= ndots) ? 0 : suffix"
+   ],
+   [
+    "time",
+    "extra * fail + 5"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "p",
+    "label": "Pod",
+    "x": 0,
+    "y": 0,
+    "state": "time > 100 ? 1 : 0",
+    "sub": "\"asks for the name\""
+   },
+   {
+    "id": "d",
+    "label": "CoreDNS",
+    "x": 1,
+    "y": 0,
+    "state": "extra > 2 ? 1 : 0",
+    "sub": "extra + \" failed lookups\""
+   },
+   {
+    "id": "e",
+    "label": "Real answer",
+    "x": 2,
+    "y": 0,
+    "state": "time > 100 ? 2 : 0",
+    "sub": "round(time) + \" ms in total\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "p",
+    "to": "d",
+    "flow": "1",
+    "bad": "false"
+   },
+   {
+    "from": "d",
+    "to": "e",
+    "flow": "min(1, 100/time)",
+    "bad": "time > 100"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Failed lookups first",
+    "expr": "extra",
+    "dp": 0
+   },
+   {
+    "label": "Total lookup time",
+    "expr": "time",
+    "dp": 0,
+    "unit": "ms"
+   },
+   {
+    "label": "Wasted time",
+    "expr": "extra * fail",
+    "dp": 0,
+    "unit": "ms"
+   },
+   {
+    "label": "Lookups saved by a trailing dot",
+    "expr": "extra",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "time > 100",
+    "tone": "bad",
+    "text": "Each connection to the external name waits for failed lookups first. Use a trailing dot, lower ndots, or a node-local DNS cache."
+   },
+   {
+    "when": "extra > 0",
+    "tone": "warn",
+    "text": "The resolver tries search suffixes before the real name. The extra lookups add latency to every new connection."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The name is looked up once and answered quickly."
+   }
+  ],
+  "tries": [
+   "Add the trailing dot.",
+   "Lower ndots to 2 and compare.",
+   "Raise the suffix count and watch the time grow."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A short external name with the default ndots of 5.",
+    "tone": "bad",
+    "values": {
+     "ndots": 5,
+     "dots": 2,
+     "suffix": 4,
+     "fail": 40,
+     "trailing": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The trailing dot skips the search suffixes.",
+    "tone": "good",
+    "values": {
+     "ndots": 5,
+     "dots": 2,
+     "suffix": 4,
+     "fail": 40,
+     "trailing": true
+    }
+   }
+  ]
+ }
+]

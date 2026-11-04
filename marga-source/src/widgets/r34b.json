@@ -1,0 +1,1601 @@
+[
+ {
+  "id": "vm-steal-time",
+  "module": "virtualization",
+  "lesson": "virtualization/cpu-memory-and-overcommit",
+  "title": "vCPU oversubscription and steal time",
+  "summary": "Put more vCPUs on a host than it has cores and see when guests start to wait for a core.",
+  "inputs": [
+   {
+    "id": "cores",
+    "label": "Physical cores",
+    "min": 8,
+    "max": 128,
+    "value": 32,
+    "step": 4
+   },
+   {
+    "id": "vcpus",
+    "label": "Total vCPUs promised",
+    "min": 8,
+    "max": 512,
+    "value": 96,
+    "step": 8
+   },
+   {
+    "id": "busy",
+    "label": "Share of vCPUs busy at once",
+    "min": 5,
+    "max": 100,
+    "value": 50,
+    "step": 5,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "ratio",
+    "vcpus / cores"
+   ],
+   [
+    "want",
+    "vcpus * busy / 100"
+   ],
+   [
+    "wait",
+    "max(0, want - cores) / want"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "g",
+    "label": "Guests",
+    "x": 0,
+    "y": 0,
+    "state": "wait > 0.2 ? 2 : (wait > 0 ? 1 : 0)",
+    "sub": "vcpus + \" vCPUs\""
+   },
+   {
+    "id": "h",
+    "label": "Host cores",
+    "x": 1,
+    "y": 0,
+    "state": "wait > 0.2 ? 2 : (wait > 0 ? 1 : 0)",
+    "sub": "cores + \" cores\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "g",
+    "to": "h",
+    "flow": "min(1, cores/want)",
+    "bad": "wait > 0.2"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Oversubscription",
+    "expr": "ratio",
+    "dp": 1,
+    "unit": "to 1"
+   },
+   {
+    "label": "vCPUs wanting to run",
+    "expr": "want",
+    "dp": 0
+   },
+   {
+    "label": "Time guests wait (steal)",
+    "expr": "wait*100",
+    "dp": 0,
+    "unit": "%"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "wait > 0.2",
+    "tone": "bad",
+    "text": "Guests wait for a core more than a fifth of the time. Applications feel slow although their own load is low."
+   },
+   {
+    "when": "wait > 0",
+    "tone": "warn",
+    "text": "At peak some vCPUs wait. Watch steal time and keep the ratio modest for latency-sensitive guests."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "There is a core for every vCPU that wants to run, so steal time stays near zero."
+   }
+  ],
+  "tries": [
+   "Raise the busy share until steal appears.",
+   "Lower the vCPUs promised.",
+   "Add cores and see the wait vanish."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Many vCPUs, all busy at once.",
+    "tone": "bad",
+    "values": {
+     "cores": 16,
+     "vcpus": 256,
+     "busy": 80
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The same guests on more cores.",
+    "tone": "good",
+    "values": {
+     "cores": 64,
+     "vcpus": 128,
+     "busy": 50
+    }
+   }
+  ]
+ },
+ {
+  "id": "vm-migration-converge",
+  "module": "virtualization",
+  "lesson": "virtualization/live-migration-ha-and-troubleshooting",
+  "title": "Will this live migration finish?",
+  "summary": "Compare how fast a guest dirties memory with how fast the network can copy it.",
+  "inputs": [
+   {
+    "id": "mem",
+    "label": "Guest memory",
+    "min": 4,
+    "max": 256,
+    "value": 64,
+    "step": 4,
+    "unit": "GB"
+   },
+   {
+    "id": "link",
+    "label": "Migration bandwidth",
+    "min": 1,
+    "max": 100,
+    "value": 10,
+    "step": 1,
+    "unit": "Gbit/s"
+   },
+   {
+    "id": "dirty",
+    "label": "Memory dirtied per second",
+    "min": 0,
+    "max": 20,
+    "value": 3,
+    "step": 0.5,
+    "unit": "GB/s"
+   },
+   {
+    "id": "ac",
+    "label": "Auto-converge is on",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "rate",
+    "link / 8"
+   ],
+   [
+    "eff",
+    "ac ? dirty * 0.3 : dirty"
+   ],
+   [
+    "ok",
+    "rate > eff"
+   ],
+   [
+    "secs",
+    "ok ? mem / (rate - eff) : 9999"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "s",
+    "label": "Source host",
+    "x": 0,
+    "y": 0,
+    "state": "ok ? 0 : 2",
+    "sub": "round(rate*10)/10 + \" GB/s link\""
+   },
+   {
+    "id": "g",
+    "label": "Guest",
+    "x": 1,
+    "y": 0,
+    "state": "eff > 0 ? 1 : 0",
+    "sub": "round(eff*10)/10 + \" GB/s dirtied\""
+   },
+   {
+    "id": "d",
+    "label": "Destination",
+    "x": 2,
+    "y": 0,
+    "state": "ok ? 0 : 1",
+    "sub": "\"waiting\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "s",
+    "to": "d",
+    "flow": "ok ? 1 : 0.2",
+    "bad": "!ok"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Link speed",
+    "expr": "rate",
+    "dp": 1,
+    "unit": "GB/s"
+   },
+   {
+    "label": "Effective dirty rate",
+    "expr": "eff",
+    "dp": 1,
+    "unit": "GB/s"
+   },
+   {
+    "label": "Estimated time",
+    "expr": "min(secs, 9999)",
+    "dp": 0,
+    "unit": "seconds"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!ok",
+    "tone": "bad",
+    "text": "The guest dirties memory faster than the link copies it, so the migration never converges. Enable auto-converge, add bandwidth or migrate at a quiet time."
+   },
+   {
+    "when": "secs > 300",
+    "tone": "warn",
+    "text": "It will finish but slowly, and the guest may see a longer final pause."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The link is faster than the dirty rate, so the migration converges quickly."
+   }
+  ],
+  "tries": [
+   "Raise the dirty rate above the link speed.",
+   "Turn on auto-converge.",
+   "Raise the bandwidth."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A busy database on a slow link.",
+    "tone": "bad",
+    "values": {
+     "mem": 128,
+     "link": 10,
+     "dirty": 3,
+     "ac": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Throttling the guest lets it converge.",
+    "tone": "good",
+    "values": {
+     "mem": 128,
+     "link": 10,
+     "dirty": 3,
+     "ac": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "st-inode-capacity",
+  "module": "storage",
+  "lesson": "storage/filesystems-ext4-xfs-and-mounts",
+  "title": "Space free but inodes gone",
+  "summary": "Many small files can exhaust inodes long before blocks run out.",
+  "inputs": [
+   {
+    "id": "size",
+    "label": "Filesystem size",
+    "min": 10,
+    "max": 2000,
+    "value": 200,
+    "step": 10,
+    "unit": "GB"
+   },
+   {
+    "id": "files",
+    "label": "Files stored (millions)",
+    "min": 1,
+    "max": 200,
+    "value": 40,
+    "step": 1
+   },
+   {
+    "id": "avg",
+    "label": "Average file size",
+    "min": 1,
+    "max": 512,
+    "value": 4,
+    "step": 1,
+    "unit": "KB"
+   },
+   {
+    "id": "ratio",
+    "label": "Bytes per inode at mkfs",
+    "type": "select",
+    "options": [
+     [
+      "16384",
+      "16 KiB (default)"
+     ],
+     [
+      "4096",
+      "4 KiB (more inodes)"
+     ]
+    ],
+    "value": "16384"
+   }
+  ],
+  "vars": [
+   [
+    "inodes",
+    "size * 1073741824 / ratio / 1000000"
+   ],
+   [
+    "used",
+    "files * avg / 1048576"
+   ],
+   [
+    "ino",
+    "files / inodes * 100"
+   ],
+   [
+    "blk",
+    "used / size * 100"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "label": "Application",
+    "x": 0,
+    "y": 0,
+    "state": "ino > 100 ? 2 : 0",
+    "sub": "files + \"M files\""
+   },
+   {
+    "id": "f",
+    "label": "Filesystem",
+    "x": 1,
+    "y": 0,
+    "state": "ino > 100 ? 2 : (ino > 85 ? 1 : 0)",
+    "sub": "round(ino) + \"% inodes\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "a",
+    "to": "f",
+    "flow": "min(1, 1 - (ino-100)/100)",
+    "bad": "ino > 100"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Inodes available",
+    "expr": "inodes",
+    "dp": 1,
+    "unit": "million"
+   },
+   {
+    "label": "Inodes used",
+    "expr": "ino",
+    "dp": 0,
+    "unit": "%"
+   },
+   {
+    "label": "Blocks used",
+    "expr": "blk",
+    "dp": 0,
+    "unit": "%"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "ino > 100",
+    "tone": "bad",
+    "text": "Inodes run out first. Writes fail with no space left on device while df -h shows free space."
+   },
+   {
+    "when": "ino > 85",
+    "tone": "warn",
+    "text": "Inodes are nearly used. Clean up or plan a filesystem with more inodes."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Inodes and blocks both have headroom."
+   }
+  ],
+  "tries": [
+   "Raise the number of files.",
+   "Choose more inodes at mkfs.",
+   "Watch blocks stay low while inodes fill."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Forty million tiny files on a default filesystem.",
+    "tone": "bad",
+    "values": {
+     "size": 200,
+     "files": 40,
+     "avg": 4,
+     "ratio": "16384"
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "More inodes per byte.",
+    "tone": "good",
+    "values": {
+     "size": 200,
+     "files": 40,
+     "avg": 4,
+     "ratio": "4096"
+    }
+   }
+  ]
+ },
+ {
+  "id": "st-backup-window",
+  "module": "storage",
+  "lesson": "storage/performance-backups-and-troubleshooting",
+  "title": "Does the backup fit its window?",
+  "summary": "Compare the amount of data, daily change and the speed of the backup path.",
+  "inputs": [
+   {
+    "id": "data",
+    "label": "Total data",
+    "min": 100,
+    "max": 20000,
+    "value": 2000,
+    "step": 100,
+    "unit": "GB"
+   },
+   {
+    "id": "chg",
+    "label": "Daily change",
+    "min": 1,
+    "max": 40,
+    "value": 5,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "speed",
+    "label": "Backup throughput",
+    "min": 20,
+    "max": 1000,
+    "value": 150,
+    "step": 10,
+    "unit": "MB/s"
+   },
+   {
+    "id": "win",
+    "label": "Backup window",
+    "min": 1,
+    "max": 12,
+    "value": 6,
+    "step": 1,
+    "unit": "hours"
+   },
+   {
+    "id": "inc",
+    "label": "Incremental backups",
+    "type": "toggle",
+    "value": true
+   }
+  ],
+  "vars": [
+   [
+    "gb",
+    "inc ? data * chg / 100 : data"
+   ],
+   [
+    "hrs",
+    "gb * 1024 / speed / 3600"
+   ],
+   [
+    "fit",
+    "hrs <= win"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "d",
+    "label": "Data",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "data + \" GB\""
+   },
+   {
+    "id": "j",
+    "label": "Backup job",
+    "x": 1,
+    "y": 0,
+    "state": "fit ? 0 : 2",
+    "sub": "round(hrs*10)/10 + \" hours\""
+   },
+   {
+    "id": "s",
+    "label": "Backup store",
+    "x": 2,
+    "y": 0,
+    "state": "fit ? 0 : 1",
+    "sub": "round(gb) + \" GB moved\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "d",
+    "to": "j",
+    "flow": "1",
+    "bad": "false"
+   },
+   {
+    "from": "j",
+    "to": "s",
+    "flow": "fit ? 1 : 0.4",
+    "bad": "!fit"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Data to copy",
+    "expr": "gb",
+    "dp": 0,
+    "unit": "GB"
+   },
+   {
+    "label": "Time needed",
+    "expr": "hrs",
+    "dp": 1,
+    "unit": "hours"
+   },
+   {
+    "label": "Window",
+    "expr": "win",
+    "dp": 0,
+    "unit": "hours"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!fit",
+    "tone": "bad",
+    "text": "The backup runs past its window and overlaps with business hours. Use incrementals, more throughput or a longer window."
+   },
+   {
+    "when": "hrs > win*0.7",
+    "tone": "warn",
+    "text": "It fits, but with little room for growth."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The backup finishes well inside its window."
+   }
+  ],
+  "tries": [
+   "Turn off incrementals to see a full copy.",
+   "Raise the throughput.",
+   "Raise the data size until it no longer fits."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Full copies of a large volume on a slow path.",
+    "tone": "bad",
+    "values": {
+     "data": 8000,
+     "chg": 5,
+     "speed": 100,
+     "win": 6,
+     "inc": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Incrementals shrink the copy.",
+    "tone": "good",
+    "values": {
+     "data": 8000,
+     "chg": 5,
+     "speed": 100,
+     "win": 6,
+     "inc": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "sq-lag-seconds",
+  "module": "sql-ops",
+  "lesson": "sql-ops/replication-lag-vacuum-and-day-two-operations",
+  "title": "Replication lag over time",
+  "summary": "Compare the rate of writes with the rate a replica can replay them.",
+  "inputs": [
+   {
+    "id": "wr",
+    "label": "Write rate on primary",
+    "min": 1,
+    "max": 100,
+    "value": 20,
+    "step": 1,
+    "unit": "MB/s"
+   },
+   {
+    "id": "rep",
+    "label": "Replay speed on replica",
+    "min": 1,
+    "max": 100,
+    "value": 25,
+    "step": 1,
+    "unit": "MB/s"
+   },
+   {
+    "id": "mins",
+    "label": "Minutes of a heavy burst",
+    "min": 1,
+    "max": 60,
+    "value": 10,
+    "step": 1
+   },
+   {
+    "id": "long",
+    "label": "A long query blocks replay on the replica",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "eff",
+    "long ? rep * 0.2 : rep"
+   ],
+   [
+    "gap",
+    "max(0, wr - eff)"
+   ],
+   [
+    "lagmb",
+    "gap * mins * 60"
+   ],
+   [
+    "lag",
+    "lagmb / eff"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "p",
+    "label": "Primary",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "wr + \" MB/s\""
+   },
+   {
+    "id": "r",
+    "label": "Replica",
+    "x": 1,
+    "y": 0,
+    "state": "lag > 60 ? 2 : (lag > 5 ? 1 : 0)",
+    "sub": "round(lag) + \" s behind\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "p",
+    "to": "r",
+    "flow": "min(1, eff/wr)",
+    "bad": "gap > 0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Replay speed",
+    "expr": "eff",
+    "dp": 1,
+    "unit": "MB/s"
+   },
+   {
+    "label": "Backlog after the burst",
+    "expr": "lagmb",
+    "dp": 0,
+    "unit": "MB"
+   },
+   {
+    "label": "Replica lag",
+    "expr": "lag",
+    "dp": 0,
+    "unit": "seconds"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "lag > 60",
+    "tone": "bad",
+    "text": "The replica is more than a minute behind. Reads see old data and failover would lose recent writes."
+   },
+   {
+    "when": "lag > 5",
+    "tone": "warn",
+    "text": "The replica is a few seconds behind. Watch it during bursts."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Replay keeps up with the primary."
+   }
+  ],
+  "tries": [
+   "Block replay with a long query.",
+   "Raise replay speed.",
+   "Lower the write rate."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A long query holds back replay.",
+    "tone": "bad",
+    "values": {
+     "wr": 20,
+     "rep": 25,
+     "mins": 10,
+     "long": true
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Replay runs freely.",
+    "tone": "good",
+    "values": {
+     "wr": 20,
+     "rep": 25,
+     "mins": 10,
+     "long": false
+    }
+   }
+  ]
+ },
+ {
+  "id": "sq-bloat-vacuum",
+  "module": "sql-ops",
+  "lesson": "sql-ops/replication-lag-vacuum-and-day-two-operations",
+  "title": "Table bloat and autovacuum",
+  "summary": "Dead rows pile up when updates outrun vacuum, especially with a long transaction open.",
+  "inputs": [
+   {
+    "id": "upd",
+    "label": "Updates per second",
+    "min": 10,
+    "max": 5000,
+    "value": 500,
+    "step": 10
+   },
+   {
+    "id": "vac",
+    "label": "Rows vacuum can clean per second",
+    "min": 10,
+    "max": 5000,
+    "value": 800,
+    "step": 10
+   },
+   {
+    "id": "hrs",
+    "label": "Hours running",
+    "min": 1,
+    "max": 72,
+    "value": 24,
+    "step": 1
+   },
+   {
+    "id": "old",
+    "label": "An old transaction is open",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "clean",
+    "old ? 0 : vac"
+   ],
+   [
+    "dead",
+    "max(0, upd - clean) * hrs * 3600 / 1000000"
+   ],
+   [
+    "bloat",
+    "dead"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "label": "Updates",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "upd + \"/s\""
+   },
+   {
+    "id": "t",
+    "label": "Table",
+    "x": 1,
+    "y": 0,
+    "state": "dead > 100 ? 2 : (dead > 10 ? 1 : 0)",
+    "sub": "round(dead) + \"M dead rows\""
+   },
+   {
+    "id": "v",
+    "label": "Autovacuum",
+    "x": 2,
+    "y": 0,
+    "state": "old ? 2 : 0",
+    "sub": "old ? \"blocked\" : \"running\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "a",
+    "to": "t",
+    "flow": "1",
+    "bad": "false"
+   },
+   {
+    "from": "v",
+    "to": "t",
+    "flow": "old ? 0 : min(1, vac/upd)",
+    "bad": "old"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Rows cleaned per second",
+    "expr": "clean",
+    "dp": 0
+   },
+   {
+    "label": "Dead rows",
+    "expr": "dead",
+    "dp": 1,
+    "unit": "million"
+   },
+   {
+    "label": "Net growth per second",
+    "expr": "max(0, upd - clean)",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "dead > 100",
+    "tone": "bad",
+    "text": "The table is heavily bloated. Queries slow down and disk fills. Close the old transaction and vacuum."
+   },
+   {
+    "when": "dead > 10",
+    "tone": "warn",
+    "text": "Dead rows are building up. Tune autovacuum or reduce update churn."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Vacuum keeps up with updates, so the table stays compact."
+   }
+  ],
+  "tries": [
+   "Open an old transaction.",
+   "Raise the vacuum speed.",
+   "Lower the update rate."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A forgotten transaction blocks cleanup.",
+    "tone": "bad",
+    "values": {
+     "upd": 500,
+     "vac": 800,
+     "hrs": 72,
+     "old": true
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Vacuum can clean again.",
+    "tone": "good",
+    "values": {
+     "upd": 500,
+     "vac": 800,
+     "hrs": 72,
+     "old": false
+    }
+   }
+  ]
+ },
+ {
+  "id": "gp-kv-concurrency",
+  "module": "gpu-serving",
+  "lesson": "gpu-serving/gpu-basics-memory-and-what-limits-inference",
+  "title": "How many requests fit in GPU memory",
+  "summary": "After the weights, the rest of GPU memory holds the KV cache, which limits concurrent requests.",
+  "inputs": [
+   {
+    "id": "mem",
+    "label": "GPU memory",
+    "min": 16,
+    "max": 192,
+    "value": 80,
+    "step": 8,
+    "unit": "GB"
+   },
+   {
+    "id": "w",
+    "label": "Model weights",
+    "min": 4,
+    "max": 160,
+    "value": 40,
+    "step": 2,
+    "unit": "GB"
+   },
+   {
+    "id": "ctx",
+    "label": "Tokens per request",
+    "min": 256,
+    "max": 32768,
+    "value": 4096,
+    "step": 256
+   },
+   {
+    "id": "kv",
+    "label": "KV cache per token",
+    "min": 0.1,
+    "max": 2,
+    "value": 0.5,
+    "step": 0.1,
+    "unit": "MB"
+   },
+   {
+    "id": "util",
+    "label": "GPU memory utilisation cap",
+    "min": 50,
+    "max": 100,
+    "value": 90,
+    "step": 5,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "room",
+    "mem * util / 100 - w"
+   ],
+   [
+    "per",
+    "ctx * kv / 1024"
+   ],
+   [
+    "n",
+    "room > 0 ? floor(room / per) : 0"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "m",
+    "label": "Weights",
+    "x": 0,
+    "y": 0,
+    "state": "room < 0 ? 2 : 0",
+    "sub": "w + \" GB\""
+   },
+   {
+    "id": "c",
+    "label": "KV cache",
+    "x": 1,
+    "y": 0,
+    "state": "n < 2 ? 2 : (n < 8 ? 1 : 0)",
+    "sub": "round(max(room,0)) + \" GB free\""
+   },
+   {
+    "id": "r",
+    "label": "Requests",
+    "x": 2,
+    "y": 0,
+    "state": "n < 2 ? 2 : (n < 8 ? 1 : 0)",
+    "sub": "n + \" at once\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "m",
+    "to": "c",
+    "flow": "1",
+    "bad": "room < 0"
+   },
+   {
+    "from": "c",
+    "to": "r",
+    "flow": "min(1, n/16)",
+    "bad": "n < 2"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Memory for cache",
+    "expr": "max(room,0)",
+    "dp": 1,
+    "unit": "GB"
+   },
+   {
+    "label": "Cache per request",
+    "expr": "per",
+    "dp": 2,
+    "unit": "GB"
+   },
+   {
+    "label": "Concurrent requests",
+    "expr": "n",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "room < 0",
+    "tone": "bad",
+    "text": "The weights do not fit. Use more GPUs, a smaller model or quantisation."
+   },
+   {
+    "when": "n < 2",
+    "tone": "bad",
+    "text": "Almost nothing is left for the cache. Requests queue or the server runs out of memory."
+   },
+   {
+    "when": "n < 8",
+    "tone": "warn",
+    "text": "Concurrency is low. Throughput will be poor under load."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "There is room for many concurrent requests."
+   }
+  ],
+  "tries": [
+   "Raise tokens per request and watch concurrency fall.",
+   "Lower the weights by quantising.",
+   "Use a larger GPU."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Long contexts on a tight card.",
+    "tone": "bad",
+    "values": {
+     "mem": 48,
+     "w": 40,
+     "ctx": 8192,
+     "kv": 0.5,
+     "util": 90
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A bigger card leaves room.",
+    "tone": "good",
+    "values": {
+     "mem": 80,
+     "w": 40,
+     "ctx": 4096,
+     "kv": 0.5,
+     "util": 90
+    }
+   }
+  ]
+ },
+ {
+  "id": "gp-gpu-count-cost",
+  "module": "gpu-serving",
+  "lesson": "gpu-serving/scaling-latency-and-cost",
+  "title": "GPUs needed for a traffic target",
+  "summary": "Estimate how many GPUs and how much money it takes to serve a number of requests per second.",
+  "inputs": [
+   {
+    "id": "rps",
+    "label": "Requests per second",
+    "min": 1,
+    "max": 200,
+    "value": 20,
+    "step": 1
+   },
+   {
+    "id": "tok",
+    "label": "Output tokens per request",
+    "min": 50,
+    "max": 2000,
+    "value": 300,
+    "step": 50
+   },
+   {
+    "id": "tps",
+    "label": "Tokens per second per GPU",
+    "min": 200,
+    "max": 6000,
+    "value": 1500,
+    "step": 100
+   },
+   {
+    "id": "price",
+    "label": "Price per GPU hour",
+    "min": 1,
+    "max": 12,
+    "value": 4,
+    "step": 0.5,
+    "unit": "USD"
+   },
+   {
+    "id": "head",
+    "label": "Headroom",
+    "min": 0,
+    "max": 100,
+    "value": 30,
+    "step": 5,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "need",
+    "rps * tok"
+   ],
+   [
+    "gpus",
+    "ceil(need * (1 + head/100) / tps)"
+   ],
+   [
+    "month",
+    "gpus * price * 730"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "t",
+    "label": "Traffic",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(need) + \" tokens/s\""
+   },
+   {
+    "id": "g",
+    "label": "GPUs",
+    "x": 1,
+    "y": 0,
+    "state": "gpus > 20 ? 2 : (gpus > 8 ? 1 : 0)",
+    "sub": "gpus + \" GPUs\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "t",
+    "to": "g",
+    "flow": "min(1, 1/(1 + head/100))",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Tokens per second needed",
+    "expr": "need",
+    "dp": 0
+   },
+   {
+    "label": "GPUs",
+    "expr": "gpus",
+    "dp": 0
+   },
+   {
+    "label": "Monthly cost",
+    "expr": "month",
+    "dp": 0,
+    "unit": "USD"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "gpus > 20",
+    "tone": "bad",
+    "text": "This needs a large fleet. Look at batching, a smaller or quantised model, caching or limits."
+   },
+   {
+    "when": "gpus > 8",
+    "tone": "warn",
+    "text": "A sizeable bill. Check utilisation and consider autoscaling."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "A modest number of GPUs covers the target with headroom."
+   }
+  ],
+  "tries": [
+   "Raise the requests per second.",
+   "Raise tokens per second with better batching.",
+   "Reduce headroom and see the risk."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "High traffic with long answers.",
+    "tone": "bad",
+    "values": {
+     "rps": 150,
+     "tok": 600,
+     "tps": 1000,
+     "price": 4,
+     "head": 30
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Better batching raises throughput.",
+    "tone": "good",
+    "values": {
+     "rps": 20,
+     "tok": 300,
+     "tps": 3000,
+     "price": 4,
+     "head": 30
+    }
+   }
+  ]
+ },
+ {
+  "id": "os-ip-pool",
+  "module": "openstack",
+  "lesson": "openstack/neutron-networking-security-groups-and-floating-ips",
+  "title": "Floating IP pool and quota",
+  "summary": "Floating IPs are a limited pool, and projects have their own quota.",
+  "inputs": [
+   {
+    "id": "pool",
+    "label": "Addresses in the external pool",
+    "min": 10,
+    "max": 500,
+    "value": 100,
+    "step": 10
+   },
+   {
+    "id": "proj",
+    "label": "Projects",
+    "min": 1,
+    "max": 50,
+    "value": 10,
+    "step": 1
+   },
+   {
+    "id": "each",
+    "label": "Floating IPs each project asks for",
+    "min": 0,
+    "max": 30,
+    "value": 8,
+    "step": 1
+   },
+   {
+    "id": "quota",
+    "label": "Quota per project",
+    "min": 1,
+    "max": 30,
+    "value": 10,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "ask",
+    "proj * min(each, quota)"
+   ],
+   [
+    "left",
+    "pool - ask"
+   ],
+   [
+    "over",
+    "left < 0"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "p",
+    "label": "Projects",
+    "x": 0,
+    "y": 0,
+    "state": "over ? 1 : 0",
+    "sub": "proj + \" projects\""
+   },
+   {
+    "id": "n",
+    "label": "External pool",
+    "x": 1,
+    "y": 0,
+    "state": "over ? 2 : (left < pool*0.1 ? 1 : 0)",
+    "sub": "round(max(left,0)) + \" free\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "p",
+    "to": "n",
+    "flow": "min(1, pool/ask)",
+    "bad": "over"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Addresses requested",
+    "expr": "ask",
+    "dp": 0
+   },
+   {
+    "label": "Addresses left",
+    "expr": "left",
+    "dp": 0
+   },
+   {
+    "label": "Pool in use",
+    "expr": "ask/pool*100",
+    "dp": 0,
+    "unit": "%"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "over",
+    "tone": "bad",
+    "text": "The projects want more floating IPs than the pool holds. New allocations fail until addresses are freed or the pool is extended."
+   },
+   {
+    "when": "left < pool*0.1",
+    "tone": "warn",
+    "text": "The pool is nearly full. Plan to extend it."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The pool has comfortable room."
+   }
+  ],
+  "tries": [
+   "Raise the number of projects.",
+   "Lower the quota.",
+   "Increase the pool."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "More demand than addresses.",
+    "tone": "bad",
+    "values": {
+     "pool": 50,
+     "proj": 20,
+     "each": 8,
+     "quota": 10
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A larger pool.",
+    "tone": "good",
+    "values": {
+     "pool": 300,
+     "proj": 20,
+     "each": 8,
+     "quota": 10
+    }
+   }
+  ]
+ },
+ {
+  "id": "os-overcommit-ratio",
+  "module": "openstack",
+  "lesson": "openstack/compute-flavors-images-and-scheduling",
+  "title": "CPU allocation ratio and capacity",
+  "summary": "The scheduler counts virtual cores against physical cores times the allocation ratio.",
+  "inputs": [
+   {
+    "id": "hosts",
+    "label": "Compute hosts",
+    "min": 1,
+    "max": 100,
+    "value": 10,
+    "step": 1
+   },
+   {
+    "id": "cores",
+    "label": "Cores per host",
+    "min": 8,
+    "max": 128,
+    "value": 32,
+    "step": 4
+   },
+   {
+    "id": "ratio",
+    "label": "CPU allocation ratio",
+    "min": 1,
+    "max": 16,
+    "value": 4,
+    "step": 1
+   },
+   {
+    "id": "vc",
+    "label": "vCPUs per flavor",
+    "min": 1,
+    "max": 32,
+    "value": 4,
+    "step": 1
+   },
+   {
+    "id": "used",
+    "label": "Servers already running",
+    "min": 0,
+    "max": 2000,
+    "value": 150,
+    "step": 10
+   }
+  ],
+  "vars": [
+   [
+    "cap",
+    "hosts * cores * ratio"
+   ],
+   [
+    "servers",
+    "floor(cap / vc)"
+   ],
+   [
+    "free",
+    "servers - used"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "s",
+    "label": "Scheduler",
+    "x": 0,
+    "y": 0,
+    "state": "free < 0 ? 2 : (free < 10 ? 1 : 0)",
+    "sub": "free + \" slots left\""
+   },
+   {
+    "id": "h",
+    "label": "Hosts",
+    "x": 1,
+    "y": 0,
+    "state": "ratio > 8 ? 1 : 0",
+    "sub": "round(cap) + \" vCPUs\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "s",
+    "to": "h",
+    "flow": "min(1, max(free,0)/50)",
+    "bad": "free <= 0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Schedulable vCPUs",
+    "expr": "cap",
+    "dp": 0
+   },
+   {
+    "label": "Servers that fit",
+    "expr": "servers",
+    "dp": 0
+   },
+   {
+    "label": "Slots left",
+    "expr": "free",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "free < 0",
+    "tone": "bad",
+    "text": "There is no room. The next request fails with No valid host was found."
+   },
+   {
+    "when": "ratio > 8",
+    "tone": "warn",
+    "text": "A high ratio packs many servers per core. Watch steal time and latency."
+   },
+   {
+    "when": "free < 10",
+    "tone": "warn",
+    "text": "Capacity is almost used up."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "There is room for more servers at a reasonable ratio."
+   }
+  ],
+  "tries": [
+   "Raise servers running until no room is left.",
+   "Raise the ratio and see capacity grow.",
+   "Add hosts."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "All the capacity is in use.",
+    "tone": "bad",
+    "values": {
+     "hosts": 5,
+     "cores": 32,
+     "ratio": 4,
+     "vc": 4,
+     "used": 160
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "More hosts give room.",
+    "tone": "good",
+    "values": {
+     "hosts": 10,
+     "cores": 32,
+     "ratio": 4,
+     "vc": 4,
+     "used": 160
+    }
+   }
+  ]
+ }
+]

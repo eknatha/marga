@@ -1,0 +1,1861 @@
+[
+ {
+  "id": "vm-memory-overcommit",
+  "module": "virtualization",
+  "lesson": "virtualization/cpu-memory-and-overcommit",
+  "title": "Memory overcommit on a KVM host",
+  "summary": "Promise guests more memory than the host has and see when idle guests hide the risk and when a busy afternoon turns it into swapping or kills.",
+  "inputs": [
+   {
+    "id": "host",
+    "label": "Host memory",
+    "min": 16,
+    "max": 256,
+    "value": 64,
+    "step": 8,
+    "unit": "GB"
+   },
+   {
+    "id": "guests",
+    "label": "Number of guests",
+    "min": 1,
+    "max": 40,
+    "value": 8,
+    "step": 1
+   },
+   {
+    "id": "per",
+    "label": "Memory per guest",
+    "min": 1,
+    "max": 32,
+    "value": 8,
+    "step": 1,
+    "unit": "GB"
+   },
+   {
+    "id": "busy",
+    "label": "Share of promised memory in use",
+    "min": 10,
+    "max": 100,
+    "value": 60,
+    "step": 5,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "promised",
+    "guests * per"
+   ],
+   [
+    "actual",
+    "promised * busy / 100"
+   ],
+   [
+    "usable",
+    "host * 0.9"
+   ],
+   [
+    "ratio",
+    "promised / host"
+   ],
+   [
+    "oom",
+    "actual > host"
+   ],
+   [
+    "swap",
+    "actual > usable && !oom"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "g",
+    "label": "Guests",
+    "x": 0,
+    "y": 0,
+    "state": "oom ? 2 : (ratio > 1 ? 1 : 0)",
+    "sub": "round(promised) + \" GB promised\""
+   },
+   {
+    "id": "h",
+    "label": "Host memory",
+    "x": 1,
+    "y": 0,
+    "state": "oom ? 2 : (swap ? 1 : 0)",
+    "sub": "round(actual) + \" of \" + round(host) + \" GB in use\""
+   },
+   {
+    "id": "k",
+    "label": "Kernel",
+    "x": 2,
+    "y": 0,
+    "state": "oom ? 2 : (swap ? 1 : 0)",
+    "sub": "oom ? \"kills a process\" : (swap ? \"starts swapping\" : \"quiet\")"
+   }
+  ],
+  "edges": [
+   {
+    "from": "g",
+    "to": "h",
+    "flow": "min(1, actual/host)",
+    "bad": "oom"
+   },
+   {
+    "from": "h",
+    "to": "k",
+    "flow": "oom ? 1 : (swap ? 0.7 : 0.2)",
+    "bad": "oom"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Memory promised",
+    "expr": "promised",
+    "dp": 0,
+    "unit": "GB"
+   },
+   {
+    "label": "Overcommit ratio",
+    "expr": "ratio",
+    "dp": 2,
+    "unit": "to 1"
+   },
+   {
+    "label": "Memory really in use",
+    "expr": "actual",
+    "dp": 0,
+    "unit": "GB"
+   },
+   {
+    "label": "Host headroom",
+    "expr": "max(0, host - actual)",
+    "dp": 0,
+    "unit": "GB"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "oom",
+    "tone": "bad",
+    "text": "Guests want more memory than the host has. The kernel will kill a process, possibly a guest. Overcommit only works while guests stay idle."
+   },
+   {
+    "when": "swap",
+    "tone": "warn",
+    "text": "The host is above 90 percent and will swap. Guests that touch swapped memory become very slow."
+   },
+   {
+    "when": "ratio > 1",
+    "tone": "warn",
+    "text": "You promised more than the host has. It is fine while guests stay quiet, but a busy period will expose it."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Everything promised fits in the host, with headroom."
+   }
+  ],
+  "tries": [
+   "Raise the share of memory in use to 100 and watch the host run out.",
+   "Lower the number of guests until the ratio drops below 1.",
+   "Raise the host memory and see how much busier the guests can be."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Guests want more memory than the host has.",
+    "tone": "bad",
+    "values": {
+     "host": 32,
+     "guests": 16,
+     "per": 8,
+     "busy": 80
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Everything fits in the host with headroom.",
+    "tone": "good",
+    "values": {
+     "host": 128,
+     "guests": 8,
+     "per": 8,
+     "busy": 60
+    }
+   }
+  ]
+ },
+ {
+  "id": "vm-snapshot-pool",
+  "module": "virtualization",
+  "lesson": "virtualization/virtual-disks-snapshots-and-templates",
+  "title": "Snapshots filling a storage pool",
+  "summary": "Snapshots grow with every write. See how the number of guests, the daily change and the age of the snapshots decide when the pool pauses your guests.",
+  "inputs": [
+   {
+    "id": "pool",
+    "label": "Pool size",
+    "min": 200,
+    "max": 4000,
+    "value": 1000,
+    "step": 100,
+    "unit": "GB"
+   },
+   {
+    "id": "guests",
+    "label": "Guests with snapshots",
+    "min": 1,
+    "max": 40,
+    "value": 12,
+    "step": 1
+   },
+   {
+    "id": "base",
+    "label": "Disk used per guest",
+    "min": 10,
+    "max": 120,
+    "value": 40,
+    "step": 5,
+    "unit": "GB"
+   },
+   {
+    "id": "rate",
+    "label": "Changed data per guest each day",
+    "min": 1,
+    "max": 40,
+    "value": 8,
+    "step": 1,
+    "unit": "GB"
+   },
+   {
+    "id": "age",
+    "label": "Age of the snapshots",
+    "min": 1,
+    "max": 30,
+    "value": 7,
+    "step": 1,
+    "unit": "days"
+   }
+  ],
+  "vars": [
+   [
+    "data",
+    "guests * base"
+   ],
+   [
+    "snap",
+    "guests * rate * age"
+   ],
+   [
+    "used",
+    "data + snap"
+   ],
+   [
+    "pct",
+    "used / pool * 100"
+   ],
+   [
+    "full",
+    "used >= pool"
+   ],
+   [
+    "left",
+    "rate * guests > 0 ? max(0, (pool - used) / (guests * rate)) : 99"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "g",
+    "label": "Guests",
+    "x": 0,
+    "y": 0,
+    "state": "full ? 2 : (pct > 80 ? 1 : 0)",
+    "sub": "guests + \" guests writing\""
+   },
+   {
+    "id": "s",
+    "label": "Snapshots",
+    "x": 1,
+    "y": 0,
+    "state": "full ? 2 : (pct > 80 ? 1 : 0)",
+    "sub": "round(snap) + \" GB of changes\""
+   },
+   {
+    "id": "p",
+    "label": "Storage pool",
+    "x": 2,
+    "y": 0,
+    "state": "full ? 2 : (pct > 80 ? 1 : 0)",
+    "sub": "round(pct) + \" percent used\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "g",
+    "to": "s",
+    "flow": "min(1, snap/pool + 0.2)",
+    "bad": "full"
+   },
+   {
+    "from": "s",
+    "to": "p",
+    "flow": "min(1, pct/100)",
+    "bad": "full"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Pool used",
+    "expr": "pct",
+    "dp": 0,
+    "unit": "%"
+   },
+   {
+    "label": "Snapshot data",
+    "expr": "snap",
+    "dp": 0,
+    "unit": "GB"
+   },
+   {
+    "label": "Space left",
+    "expr": "max(0, pool - used)",
+    "dp": 0,
+    "unit": "GB"
+   },
+   {
+    "label": "Days until full at this rate",
+    "expr": "left",
+    "dp": 0,
+    "unit": "days"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "full",
+    "tone": "bad",
+    "text": "The pool is full. Writes fail and the hypervisor pauses guests with I/O errors."
+   },
+   {
+    "when": "pct > 80",
+    "tone": "warn",
+    "text": "The pool is above 80 percent. Snapshots keep growing, so act before it fills."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The pool has room. Merge or delete snapshots when the change is done."
+   }
+  ],
+  "tries": [
+   "Raise the age of the snapshots to 30 days.",
+   "Reduce the age to 2 days and see how much space returns.",
+   "Increase the pool size and see how much time you gain."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The pool is full and guests pause.",
+    "tone": "bad",
+    "values": {
+     "pool": 600,
+     "guests": 20,
+     "base": 40,
+     "rate": 10,
+     "age": 14
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The pool has room.",
+    "tone": "good",
+    "values": {
+     "pool": 1000,
+     "guests": 12,
+     "base": 40,
+     "rate": 8,
+     "age": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "raid-usable-capacity",
+  "module": "storage",
+  "lesson": "storage/lvm-and-raid",
+  "title": "RAID level, capacity and failure tolerance",
+  "summary": "Choose a RAID level and a number of disks and see the usable space, how many disks can fail and when rebuilds become a risk.",
+  "inputs": [
+   {
+    "id": "n",
+    "label": "Number of disks",
+    "min": 2,
+    "max": 16,
+    "value": 6,
+    "step": 1
+   },
+   {
+    "id": "size",
+    "label": "Size of each disk",
+    "min": 1,
+    "max": 20,
+    "value": 8,
+    "step": 1,
+    "unit": "TB"
+   },
+   {
+    "id": "lvl",
+    "label": "RAID level",
+    "type": "select",
+    "options": [
+     [
+      "r0",
+      "RAID 0 (stripe)"
+     ],
+     [
+      "r1",
+      "RAID 1 (mirror)"
+     ],
+     [
+      "r5",
+      "RAID 5 (one parity)"
+     ],
+     [
+      "r6",
+      "RAID 6 (two parity)"
+     ],
+     [
+      "r10",
+      "RAID 10 (striped mirrors)"
+     ]
+    ],
+    "value": "r5"
+   }
+  ],
+  "vars": [
+   [
+    "usable",
+    "lvl == \"r0\" ? n*size : (lvl == \"r1\" ? size : (lvl == \"r5\" ? (n-1)*size : (lvl == \"r6\" ? max(0,(n-2))*size : floor(n/2)*size)))"
+   ],
+   [
+    "tol",
+    "lvl == \"r0\" ? 0 : (lvl == \"r1\" ? n-1 : (lvl == \"r5\" ? 1 : (lvl == \"r6\" ? 2 : 1)))"
+   ],
+   [
+    "raw",
+    "n*size"
+   ],
+   [
+    "risky",
+    "lvl == \"r5\" && size >= 8"
+   ],
+   [
+    "none",
+    "lvl == \"r0\""
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "d",
+    "label": "Disks",
+    "x": 0,
+    "y": 0,
+    "state": "none ? 2 : (risky ? 1 : 0)",
+    "sub": "n + \" x \" + size + \" TB\""
+   },
+   {
+    "id": "a",
+    "label": "Array",
+    "x": 1,
+    "y": 0,
+    "state": "none ? 2 : (risky ? 1 : 0)",
+    "sub": "round(usable) + \" TB usable\""
+   },
+   {
+    "id": "f",
+    "label": "Failures survived",
+    "x": 2,
+    "y": 0,
+    "state": "none ? 2 : (tol < 2 ? 1 : 0)",
+    "sub": "tol + \" disk(s)\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "d",
+    "to": "a",
+    "flow": "min(1, usable/raw + 0.2)",
+    "bad": "none"
+   },
+   {
+    "from": "a",
+    "to": "f",
+    "flow": "tol > 0 ? 0.7 : 0.2",
+    "bad": "none"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Raw capacity",
+    "expr": "raw",
+    "dp": 0,
+    "unit": "TB"
+   },
+   {
+    "label": "Usable capacity",
+    "expr": "usable",
+    "dp": 0,
+    "unit": "TB"
+   },
+   {
+    "label": "Usable share",
+    "expr": "raw > 0 ? usable / raw * 100 : 0",
+    "dp": 0,
+    "unit": "%"
+   },
+   {
+    "label": "Disks that can fail",
+    "expr": "tol",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "none",
+    "tone": "bad",
+    "text": "RAID 0 has no redundancy. Losing any one disk loses all the data."
+   },
+   {
+    "when": "risky",
+    "tone": "warn",
+    "text": "A large RAID 5 takes long to rebuild, and a second failure or read error during the rebuild loses the array. Consider RAID 6."
+   },
+   {
+    "when": "lvl == \"r10\" && n % 2 == 1",
+    "tone": "warn",
+    "text": "RAID 10 needs an even number of disks. One disk is left unused."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The array survives a disk failure. Remember that RAID is not a backup."
+   }
+  ],
+  "tries": [
+   "Switch to RAID 0 and watch the safety disappear.",
+   "Use 12 disks of 16 TB in RAID 5, then switch to RAID 6.",
+   "Compare usable space of RAID 10 and RAID 6 with 8 disks."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "RAID 0 has no redundancy.",
+    "tone": "bad",
+    "values": {
+     "n": 4,
+     "size": 8,
+     "lvl": "r0"
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The array survives a disk failure.",
+    "tone": "good",
+    "values": {
+     "n": 6,
+     "size": 4,
+     "lvl": "r6"
+    }
+   }
+  ]
+ },
+ {
+  "id": "disk-queue-latency",
+  "module": "storage",
+  "lesson": "storage/performance-backups-and-troubleshooting",
+  "title": "Why a busy disk gets slow so quickly",
+  "summary": "As demand approaches what a disk can do, waiting time explodes. Move the load and see utilisation, latency and the point where users notice.",
+  "inputs": [
+   {
+    "id": "demand",
+    "label": "Requests per second",
+    "min": 100,
+    "max": 20000,
+    "value": 3000,
+    "step": 100
+   },
+   {
+    "id": "cap",
+    "label": "What the disk can do per second",
+    "min": 500,
+    "max": 30000,
+    "value": 5000,
+    "step": 100
+   },
+   {
+    "id": "base",
+    "label": "Time to serve one request",
+    "min": 0.1,
+    "max": 10,
+    "value": 0.5,
+    "step": 0.1,
+    "unit": "ms"
+   }
+  ],
+  "vars": [
+   [
+    "util",
+    "min(demand / cap, 1.5)"
+   ],
+   [
+    "sat",
+    "demand >= cap"
+   ],
+   [
+    "lat",
+    "sat ? 500 : min(500, base / (1 - util))"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "label": "Application",
+    "x": 0,
+    "y": 0,
+    "state": "sat ? 2 : (util > 0.8 ? 1 : 0)",
+    "sub": "round(demand) + \" req/s\""
+   },
+   {
+    "id": "q",
+    "label": "Queue",
+    "x": 1,
+    "y": 0,
+    "state": "sat ? 2 : (util > 0.8 ? 1 : 0)",
+    "sub": "sat ? \"growing without limit\" : round(util*100) + \" percent busy\""
+   },
+   {
+    "id": "d",
+    "label": "Disk",
+    "x": 2,
+    "y": 0,
+    "state": "sat ? 2 : (util > 0.8 ? 1 : 0)",
+    "sub": "round(cap) + \" req/s capacity\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "a",
+    "to": "q",
+    "flow": "min(1, util)",
+    "bad": "sat"
+   },
+   {
+    "from": "q",
+    "to": "d",
+    "flow": "min(1, util)",
+    "bad": "sat"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Utilisation",
+    "expr": "util * 100",
+    "dp": 0,
+    "unit": "%"
+   },
+   {
+    "label": "Average time per request",
+    "expr": "lat",
+    "dp": 1,
+    "unit": "ms"
+   },
+   {
+    "label": "Spare capacity",
+    "expr": "max(0, cap - demand)",
+    "dp": 0,
+    "unit": "req/s"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "sat",
+    "tone": "bad",
+    "text": "Demand is at or above capacity. The queue grows and latency is limited only by timeouts."
+   },
+   {
+    "when": "util > 0.8",
+    "tone": "warn",
+    "text": "Above 80 percent utilisation, small increases in load make latency climb steeply."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The disk has room. Latency is close to the base service time."
+   }
+  ],
+  "tries": [
+   "Raise demand towards the disk capacity and watch latency climb.",
+   "Double the capacity and see how latency falls.",
+   "Lower the base time to model a faster device."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The disk is saturated.",
+    "tone": "bad",
+    "values": {
+     "demand": 5000,
+     "cap": 5000,
+     "base": 0.5
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The disk has room.",
+    "tone": "good",
+    "values": {
+     "demand": 2000,
+     "cap": 10000,
+     "base": 0.5
+    }
+   }
+  ]
+ },
+ {
+  "id": "sql-index-benefit",
+  "module": "sql-ops",
+  "lesson": "sql-ops/indexes-that-help-and-indexes-that-hurt",
+  "title": "When an index helps a query",
+  "summary": "Compare scanning a whole table with using an index, and see why an index stops helping when the query returns a large share of the rows.",
+  "inputs": [
+   {
+    "id": "rows",
+    "label": "Rows in the table",
+    "min": 1,
+    "max": 500,
+    "value": 50,
+    "step": 1,
+    "unit": "million"
+   },
+   {
+    "id": "match",
+    "label": "Share of rows the query returns",
+    "min": 0,
+    "max": 100,
+    "value": 1,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "idx",
+    "label": "Index on the filter column",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "writes",
+    "label": "Writes per second",
+    "min": 0,
+    "max": 5000,
+    "value": 500,
+    "step": 50
+   }
+  ],
+  "vars": [
+   [
+    "returned",
+    "rows * 1000000 * match / 100"
+   ],
+   [
+    "seq",
+    "rows * 1000"
+   ],
+   [
+    "indexed",
+    "min(seq * 3, returned / 20000 + 2)"
+   ],
+   [
+    "ms",
+    "idx ? indexed : seq"
+   ],
+   [
+    "wcost",
+    "idx ? writes * 0.02 : 0"
+   ],
+   [
+    "pointless",
+    "idx && match > 20"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "q",
+    "label": "Query",
+    "x": 0,
+    "y": 0,
+    "state": "ms > 5000 ? 2 : (ms > 500 ? 1 : 0)",
+    "sub": "round(match) + \" percent of rows\""
+   },
+   {
+    "id": "p",
+    "label": "Plan",
+    "x": 1,
+    "y": 0,
+    "state": "pointless ? 1 : (ms > 5000 ? 2 : 0)",
+    "sub": "idx ? (pointless ? \"index barely helps\" : \"index scan\") : \"sequential scan\""
+   },
+   {
+    "id": "s",
+    "label": "Storage",
+    "x": 2,
+    "y": 0,
+    "state": "ms > 5000 ? 2 : (ms > 500 ? 1 : 0)",
+    "sub": "round(ms) + \" ms\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "q",
+    "to": "p",
+    "flow": "0.6",
+    "bad": "false"
+   },
+   {
+    "from": "p",
+    "to": "s",
+    "flow": "min(1, ms/5000 + 0.2)",
+    "bad": "ms > 5000"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Estimated query time",
+    "expr": "ms",
+    "dp": 0,
+    "unit": "ms"
+   },
+   {
+    "label": "Rows returned",
+    "expr": "returned / 1000000",
+    "dp": 1,
+    "unit": "million"
+   },
+   {
+    "label": "Extra write cost",
+    "expr": "wcost",
+    "dp": 1,
+    "unit": "percent of one core"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!idx && ms > 5000",
+    "tone": "bad",
+    "text": "The query scans the whole table and takes seconds. An index on the filter column would turn this into a short lookup."
+   },
+   {
+    "when": "pointless",
+    "tone": "warn",
+    "text": "The query returns a large share of the table, so the planner will prefer a sequential scan and the index only adds write cost."
+   },
+   {
+    "when": "idx && writes > 2000",
+    "tone": "warn",
+    "text": "The index helps reads, but heavy writes must maintain it. Check that the benefit is worth it."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The query is fast enough for this table size."
+   }
+  ],
+  "tries": [
+   "Turn the index on with a small match share and see the time drop.",
+   "Raise the match share to 50 percent with the index on.",
+   "Raise the number of writes and watch the extra cost."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The query scans a large table without an index.",
+    "tone": "bad",
+    "values": {
+     "rows": 300,
+     "match": 1,
+     "idx": false,
+     "writes": 500
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The query is fast enough.",
+    "tone": "good",
+    "values": {
+     "rows": 300,
+     "match": 1,
+     "idx": true,
+     "writes": 500
+    }
+   }
+  ]
+ },
+ {
+  "id": "db-pool-sizing",
+  "module": "sql-ops",
+  "lesson": "sql-ops/connections-pooling-and-capacity",
+  "title": "Sizing a connection pool",
+  "summary": "Use requests per second and transaction time to see how many connections you really need, and what happens to waiting time when the pool is too small.",
+  "inputs": [
+   {
+    "id": "rps",
+    "label": "Transactions per second",
+    "min": 10,
+    "max": 5000,
+    "value": 800,
+    "step": 10
+   },
+   {
+    "id": "ms",
+    "label": "Time per transaction",
+    "min": 1,
+    "max": 500,
+    "value": 20,
+    "step": 1,
+    "unit": "ms"
+   },
+   {
+    "id": "pool",
+    "label": "Server connections available",
+    "min": 5,
+    "max": 400,
+    "value": 40,
+    "step": 5
+   },
+   {
+    "id": "cores",
+    "label": "Database CPU cores",
+    "min": 2,
+    "max": 64,
+    "value": 16,
+    "step": 2
+   }
+  ],
+  "vars": [
+   [
+    "need",
+    "rps * ms / 1000"
+   ],
+   [
+    "util",
+    "need / pool"
+   ],
+   [
+    "over",
+    "util >= 1"
+   ],
+   [
+    "toomany",
+    "pool > cores * 4"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Clients",
+    "x": 0,
+    "y": 0,
+    "state": "over ? 2 : (util > 0.8 ? 1 : 0)",
+    "sub": "round(rps) + \" tx/s\""
+   },
+   {
+    "id": "p",
+    "label": "Pool",
+    "x": 1,
+    "y": 0,
+    "state": "over ? 2 : (util > 0.8 ? 1 : 0)",
+    "sub": "round(need) + \" busy of \" + pool"
+   },
+   {
+    "id": "d",
+    "label": "Database",
+    "x": 2,
+    "y": 0,
+    "state": "toomany ? 1 : 0",
+    "sub": "toomany ? \"contention risk\" : \"healthy\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "p",
+    "flow": "min(1, util)",
+    "bad": "over"
+   },
+   {
+    "from": "p",
+    "to": "d",
+    "flow": "min(1, pool/(cores*8))",
+    "bad": "toomany"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Connections busy on average",
+    "expr": "need",
+    "dp": 1
+   },
+   {
+    "label": "Pool utilisation",
+    "expr": "util * 100",
+    "dp": 0,
+    "unit": "%"
+   },
+   {
+    "label": "Pool size per core",
+    "expr": "pool / cores",
+    "dp": 1
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "over",
+    "tone": "bad",
+    "text": "Demand for connections is at or above the pool size. Requests queue without limit and latency rises."
+   },
+   {
+    "when": "util > 0.8",
+    "tone": "warn",
+    "text": "The pool is more than 80 percent busy, so waiting for a free connection will grow with small increases in load."
+   },
+   {
+    "when": "toomany",
+    "tone": "warn",
+    "text": "The pool is far larger than the database can run at once. More connections add contention and memory use, not speed."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The pool fits the load and the database."
+   }
+  ],
+  "tries": [
+   "Raise transactions per second until the pool is saturated.",
+   "Lengthen the transaction time to 200 ms and see how many connections are needed.",
+   "Set the pool to 400 and see the warning about too many."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The pool is saturated.",
+    "tone": "bad",
+    "values": {
+     "rps": 2000,
+     "ms": 50,
+     "pool": 40,
+     "cores": 16
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The pool fits the load and the database.",
+    "tone": "good",
+    "values": {
+     "rps": 800,
+     "ms": 20,
+     "pool": 40,
+     "cores": 16
+    }
+   }
+  ]
+ },
+ {
+  "id": "llm-vram-fit",
+  "module": "gpu-serving",
+  "lesson": "gpu-serving/gpu-basics-memory-and-what-limits-inference",
+  "title": "Does the model fit in GPU memory?",
+  "summary": "Add up weights and the KV cache for your model size, precision, context length and number of users, and see whether they fit on your GPUs.",
+  "inputs": [
+   {
+    "id": "params",
+    "label": "Model size",
+    "min": 1,
+    "max": 120,
+    "value": 13,
+    "step": 1,
+    "unit": "billion parameters"
+   },
+   {
+    "id": "bits",
+    "label": "Weight precision",
+    "type": "select",
+    "options": [
+     [
+      "b16",
+      "16-bit"
+     ],
+     [
+      "b8",
+      "8-bit"
+     ],
+     [
+      "b4",
+      "4-bit"
+     ]
+    ],
+    "value": "b16"
+   },
+   {
+    "id": "gpumem",
+    "label": "Memory per GPU",
+    "min": 8,
+    "max": 80,
+    "value": 24,
+    "step": 8,
+    "unit": "GB"
+   },
+   {
+    "id": "gpus",
+    "label": "Number of GPUs",
+    "min": 1,
+    "max": 8,
+    "value": 1,
+    "step": 1
+   },
+   {
+    "id": "ctx",
+    "label": "Context length",
+    "min": 512,
+    "max": 32768,
+    "value": 4096,
+    "step": 512,
+    "unit": "tokens"
+   },
+   {
+    "id": "users",
+    "label": "Concurrent requests",
+    "min": 1,
+    "max": 64,
+    "value": 8,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "bytes",
+    "bits == \"b16\" ? 2 : (bits == \"b8\" ? 1 : 0.5)"
+   ],
+   [
+    "weights",
+    "params * bytes"
+   ],
+   [
+    "kv",
+    "params * 0.07 * ctx * users / 1024 / 1.0"
+   ],
+   [
+    "total",
+    "weights + kv + 2"
+   ],
+   [
+    "avail",
+    "gpumem * gpus * 0.9"
+   ],
+   [
+    "nofit",
+    "weights > avail"
+   ],
+   [
+    "tight",
+    "!nofit && total > avail"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "w",
+    "label": "Weights",
+    "x": 0,
+    "y": 0,
+    "state": "nofit ? 2 : 0",
+    "sub": "round(weights) + \" GB\""
+   },
+   {
+    "id": "k",
+    "label": "KV cache",
+    "x": 1,
+    "y": 0,
+    "state": "tight ? 2 : 0",
+    "sub": "round(kv) + \" GB\""
+   },
+   {
+    "id": "g",
+    "label": "GPU memory",
+    "x": 2,
+    "y": 0,
+    "state": "nofit ? 2 : (tight ? 2 : (total > avail * 0.85 ? 1 : 0))",
+    "sub": "round(avail) + \" GB usable\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "w",
+    "to": "g",
+    "flow": "min(1, weights/avail)",
+    "bad": "nofit"
+   },
+   {
+    "from": "k",
+    "to": "g",
+    "flow": "min(1, kv/avail + 0.1)",
+    "bad": "tight"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Weights",
+    "expr": "weights",
+    "dp": 1,
+    "unit": "GB"
+   },
+   {
+    "label": "KV cache",
+    "expr": "kv",
+    "dp": 1,
+    "unit": "GB"
+   },
+   {
+    "label": "Total needed",
+    "expr": "total",
+    "dp": 1,
+    "unit": "GB"
+   },
+   {
+    "label": "Usable memory",
+    "expr": "avail",
+    "dp": 1,
+    "unit": "GB"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "nofit",
+    "tone": "bad",
+    "text": "The weights alone do not fit. Use a lower precision, more GPUs or a smaller model."
+   },
+   {
+    "when": "tight",
+    "tone": "bad",
+    "text": "The weights fit, but the KV cache for this context and number of users does not. Lower the context or concurrency, or add memory."
+   },
+   {
+    "when": "total > avail * 0.85",
+    "tone": "warn",
+    "text": "It fits with very little headroom. A few long requests could cause an out of memory error."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Weights and cache fit with headroom."
+   }
+  ],
+  "tries": [
+   "Switch from 16-bit to 4-bit and watch the weights shrink.",
+   "Raise context to 32768 with 32 users and see the cache grow.",
+   "Add a second GPU to a model that did not fit."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The weights do not fit on one GPU.",
+    "tone": "bad",
+    "values": {
+     "params": 13,
+     "bits": "b16",
+     "gpumem": 24,
+     "gpus": 1,
+     "ctx": 4096,
+     "users": 8
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Weights and cache fit with headroom.",
+    "tone": "good",
+    "values": {
+     "params": 13,
+     "bits": "b8",
+     "gpumem": 48,
+     "gpus": 1,
+     "ctx": 4096,
+     "users": 8
+    }
+   }
+  ]
+ },
+ {
+  "id": "llm-cost-per-million",
+  "module": "gpu-serving",
+  "lesson": "gpu-serving/scaling-latency-and-cost",
+  "title": "What a million tokens costs",
+  "summary": "Utilisation decides the cost per token. See how GPU price, speed and how busy the GPUs are change the price, and when a self-hosted model beats paying per token.",
+  "inputs": [
+   {
+    "id": "price",
+    "label": "GPU price per hour",
+    "min": 1,
+    "max": 12,
+    "value": 3,
+    "step": 0.5,
+    "unit": "dollars"
+   },
+   {
+    "id": "tps",
+    "label": "Tokens per second per GPU, batched",
+    "min": 100,
+    "max": 5000,
+    "value": 1500,
+    "step": 100
+   },
+   {
+    "id": "util",
+    "label": "Share of time the GPU is busy",
+    "min": 5,
+    "max": 100,
+    "value": 40,
+    "step": 5,
+    "unit": "%"
+   },
+   {
+    "id": "gpus",
+    "label": "GPUs running",
+    "min": 1,
+    "max": 16,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "api",
+    "label": "Price from a hosted API per million tokens",
+    "min": 0.2,
+    "max": 20,
+    "value": 2,
+    "step": 0.2,
+    "unit": "dollars"
+   }
+  ],
+  "vars": [
+   [
+    "tokens",
+    "tps * 3600 * gpus * util / 100"
+   ],
+   [
+    "cost",
+    "price * gpus"
+   ],
+   [
+    "per",
+    "tokens > 0 ? cost / tokens * 1000000 : 999"
+   ],
+   [
+    "worse",
+    "per > api"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "t",
+    "label": "Traffic",
+    "x": 0,
+    "y": 0,
+    "state": "util < 20 ? 1 : 0",
+    "sub": "round(util) + \" percent busy\""
+   },
+   {
+    "id": "g",
+    "label": "GPUs",
+    "x": 1,
+    "y": 0,
+    "state": "worse ? 1 : 0",
+    "sub": "gpus + \" GPUs at \" + price + \" dollars an hour\""
+   },
+   {
+    "id": "c",
+    "label": "Cost",
+    "x": 2,
+    "y": 0,
+    "state": "worse ? 2 : 0",
+    "sub": "round(per*100)/100 + \" dollars per million\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "t",
+    "to": "g",
+    "flow": "util/100",
+    "bad": "false"
+   },
+   {
+    "from": "g",
+    "to": "c",
+    "flow": "min(1, per/api/2)",
+    "bad": "worse"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Tokens served each hour",
+    "expr": "tokens / 1000000",
+    "dp": 1,
+    "unit": "million"
+   },
+   {
+    "label": "Spend each hour",
+    "expr": "cost",
+    "dp": 1,
+    "unit": "dollars"
+   },
+   {
+    "label": "Cost per million tokens",
+    "expr": "per",
+    "dp": 2,
+    "unit": "dollars"
+   },
+   {
+    "label": "Hosted API price",
+    "expr": "api",
+    "dp": 2,
+    "unit": "dollars"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "worse && util < 30",
+    "tone": "bad",
+    "text": "The GPUs are idle most of the time, so each token costs more than a hosted API. Raise utilisation, share the GPUs or scale down."
+   },
+   {
+    "when": "worse",
+    "tone": "warn",
+    "text": "Self-hosting costs more than the hosted price at this load. Check whether control, privacy or latency justify it."
+   },
+   {
+    "when": "util > 90",
+    "tone": "warn",
+    "text": "Very high utilisation leaves no headroom for spikes, so latency will rise. Keep some spare capacity."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Self-hosting is cheaper than the hosted price at this utilisation."
+   }
+  ],
+  "tries": [
+   "Lower utilisation to 10 percent and see the cost per token rise.",
+   "Raise the batched speed and see the price fall.",
+   "Add GPUs without raising traffic and watch the cost."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The GPUs are mostly idle.",
+    "tone": "bad",
+    "values": {
+     "price": 3,
+     "tps": 1000,
+     "util": 10,
+     "gpus": 4,
+     "api": 2
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Self-hosting is cheaper.",
+    "tone": "good",
+    "values": {
+     "price": 3,
+     "tps": 2500,
+     "util": 60,
+     "gpus": 2,
+     "api": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "os-no-valid-host",
+  "module": "openstack",
+  "lesson": "openstack/compute-flavors-images-and-scheduling",
+  "title": "Why the scheduler finds no valid host",
+  "summary": "Total free memory is not what counts. See how down hosts and the spread of free memory decide whether a large flavor can be placed.",
+  "inputs": [
+   {
+    "id": "hosts",
+    "label": "Compute nodes",
+    "min": 2,
+    "max": 20,
+    "value": 8,
+    "step": 1
+   },
+   {
+    "id": "down",
+    "label": "Nodes down or disabled",
+    "min": 0,
+    "max": 10,
+    "value": 1,
+    "step": 1
+   },
+   {
+    "id": "free",
+    "label": "Free memory on each healthy node",
+    "min": 1,
+    "max": 64,
+    "value": 8,
+    "step": 1,
+    "unit": "GB"
+   },
+   {
+    "id": "flavor",
+    "label": "Flavor memory",
+    "min": 2,
+    "max": 64,
+    "value": 16,
+    "step": 2,
+    "unit": "GB"
+   }
+  ],
+  "vars": [
+   [
+    "up",
+    "max(0, hosts - down)"
+   ],
+   [
+    "total",
+    "up * free"
+   ],
+   [
+    "fits",
+    "free >= flavor"
+   ],
+   [
+    "frag",
+    "!fits && total >= flavor"
+   ],
+   [
+    "empty",
+    "up == 0"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "r",
+    "label": "Request",
+    "x": 0,
+    "y": 0,
+    "state": "fits ? 0 : 2",
+    "sub": "flavor + \" GB flavor\""
+   },
+   {
+    "id": "s",
+    "label": "Scheduler",
+    "x": 1,
+    "y": 0,
+    "state": "fits ? 0 : 2",
+    "sub": "fits ? \"host found\" : \"No valid host\""
+   },
+   {
+    "id": "c",
+    "label": "Compute nodes",
+    "x": 2,
+    "y": 0,
+    "state": "empty ? 2 : (frag ? 1 : 0)",
+    "sub": "up + \" up, \" + free + \" GB free each\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "r",
+    "to": "s",
+    "flow": "0.7",
+    "bad": "!fits"
+   },
+   {
+    "from": "s",
+    "to": "c",
+    "flow": "fits ? 0.8 : 0.2",
+    "bad": "!fits"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Healthy nodes",
+    "expr": "up",
+    "dp": 0
+   },
+   {
+    "label": "Total free memory",
+    "expr": "total",
+    "dp": 0,
+    "unit": "GB"
+   },
+   {
+    "label": "Largest free slot",
+    "expr": "up > 0 ? free : 0",
+    "dp": 0,
+    "unit": "GB"
+   },
+   {
+    "label": "Flavor needs",
+    "expr": "flavor",
+    "dp": 0,
+    "unit": "GB"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "empty",
+    "tone": "bad",
+    "text": "No compute node is available. Bring services back before anything can be scheduled."
+   },
+   {
+    "when": "frag",
+    "tone": "bad",
+    "text": "The cloud has enough memory in total, but no single node has enough. The server goes to ERROR with No valid host."
+   },
+   {
+    "when": "!fits",
+    "tone": "bad",
+    "text": "Not enough free memory on any node for this flavor. Add capacity or use a smaller flavor."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "At least one node can hold the server, so the scheduler can place it."
+   }
+  ],
+  "tries": [
+   "Raise the flavor memory above the free memory on each node.",
+   "Bring a down node back and see the total grow while the largest slot stays the same.",
+   "Lower the flavor until it fits."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Free memory is spread too thin.",
+    "tone": "bad",
+    "values": {
+     "hosts": 10,
+     "down": 1,
+     "free": 8,
+     "flavor": 16
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A node can hold the server.",
+    "tone": "good",
+    "values": {
+     "hosts": 10,
+     "down": 1,
+     "free": 20,
+     "flavor": 16
+    }
+   }
+  ]
+ },
+ {
+  "id": "os-security-group-exposure",
+  "module": "openstack",
+  "lesson": "openstack/neutron-networking-security-groups-and-floating-ips",
+  "title": "What a security group rule exposes",
+  "summary": "Pick who may reach SSH and what other ports are open, and see how many addresses can try to log in and whether the server can be reached at all.",
+  "inputs": [
+   {
+    "id": "src",
+    "label": "Who may connect to SSH",
+    "type": "select",
+    "options": [
+     [
+      "none",
+      "Nobody"
+     ],
+     [
+      "vpn",
+      "VPN range only"
+     ],
+     [
+      "office",
+      "Office range (a /24)"
+     ],
+     [
+      "home",
+      "One home address (a /32)"
+     ],
+     [
+      "any",
+      "Anywhere (0.0.0.0/0)"
+     ]
+    ],
+    "value": "office"
+   },
+   {
+    "id": "fip",
+    "label": "Floating IP attached",
+    "type": "toggle",
+    "value": true
+   },
+   {
+    "id": "extra",
+    "label": "Other ports open to the world",
+    "min": 0,
+    "max": 20,
+    "value": 1,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "addrs",
+    "src == \"none\" ? 0 : (src == \"vpn\" ? 254 : (src == \"office\" ? 254 : (src == \"home\" ? 1 : 4294967296)))"
+   ],
+   [
+    "open",
+    "src == \"any\""
+   ],
+   [
+    "reach",
+    "src != \"none\" && fip"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "i",
+    "label": "Internet",
+    "x": 0,
+    "y": 0,
+    "state": "open ? 2 : 0",
+    "sub": "open ? \"anyone\" : \"limited sources\""
+   },
+   {
+    "id": "sg",
+    "label": "Security group",
+    "x": 1,
+    "y": 0,
+    "state": "open ? 2 : (extra > 5 ? 1 : 0)",
+    "sub": "extra + \" other ports open\""
+   },
+   {
+    "id": "s",
+    "label": "Server",
+    "x": 2,
+    "y": 0,
+    "state": "reach ? 0 : 1",
+    "sub": "reach ? \"reachable\" : \"not reachable\""
+   }
+  ],
+  "edges": [
+   {
+    "from": "i",
+    "to": "sg",
+    "flow": "open ? 1 : 0.3",
+    "bad": "open"
+   },
+   {
+    "from": "sg",
+    "to": "s",
+    "flow": "reach ? 0.8 : 0.1",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Addresses allowed to try SSH",
+    "expr": "addrs",
+    "dp": 0
+   },
+   {
+    "label": "Other open ports",
+    "expr": "extra",
+    "dp": 0
+   },
+   {
+    "label": "Reachable from outside",
+    "expr": "reach ? 1 : 0",
+    "dp": 0,
+    "unit": "(1 means yes)"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "open",
+    "tone": "bad",
+    "text": "SSH is open to the whole internet. Expect constant password guessing. Limit it to a VPN, a bastion or known addresses."
+   },
+   {
+    "when": "src != \"none\" && !fip",
+    "tone": "warn",
+    "text": "The rule allows SSH, but there is no floating IP, so the server cannot be reached from outside the private network."
+   },
+   {
+    "when": "extra > 5",
+    "tone": "warn",
+    "text": "Many other ports are open to the world. Each one is something that must be patched and monitored."
+   },
+   {
+    "when": "src == \"none\"",
+    "tone": "warn",
+    "text": "Nobody can connect. That is safe, but it is probably not what you want."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Access is limited and the server can be reached by the people who need it."
+   }
+  ],
+  "tries": [
+   "Choose Anywhere and read the warning.",
+   "Turn off the floating IP with the office range.",
+   "Raise the number of other open ports above 5."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "SSH is open to the whole internet.",
+    "tone": "bad",
+    "values": {
+     "src": "any",
+     "fip": true,
+     "extra": 1
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Access is limited.",
+    "tone": "good",
+    "values": {
+     "src": "vpn",
+     "fip": true,
+     "extra": 1
+    }
+   }
+  ]
+ }
+]
