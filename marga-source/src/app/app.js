@@ -46,6 +46,108 @@ function load() {
 var S = load();
 function save() { memStore = S; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (x) { /* ignore */ } if (typeof refreshTree === 'function') refreshTree(); }
 
+/* ---------- callsign and avatar (device only, optional) ---------- */
+var ME_KEY = 'ea.me';
+var ME_COLORS = ['#0b5cad', '#1a7f4b', '#6f2dbd', '#b42318', '#a15c00', '#0e7490', '#be185d', '#475569'];
+var ME_COLOR_NAMES = ['Blue', 'Green', 'Purple', 'Red', 'Amber', 'Teal', 'Pink', 'Slate'];
+var ME_GLYPHS = {
+  term: ['Terminal', '<path d="M3 4.5l4 3.5-4 3.5M8.5 12H13" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>'],
+  bolt: ['Bolt', '<path d="M9.2 1.8L3.6 9H8l-1 5.2L12.4 7H8z" fill="#fff"/>'],
+  shield: ['Shield', '<path d="M8 1.8l5 2v3.9c0 2.9-2.1 5-5 6.4-2.9-1.4-5-3.5-5-6.4V3.8z" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>'],
+  cloud: ['Cloud', '<path d="M4.6 12.4a3 3 0 01-.4-6A4 4 0 0112 6.6a2.9 2.9 0 01-.6 5.8z" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>'],
+  server: ['Server', '<rect x="2.6" y="2.6" width="10.8" height="4" rx="1" fill="none" stroke="#fff" stroke-width="1.5"/><rect x="2.6" y="9.4" width="10.8" height="4" rx="1" fill="none" stroke="#fff" stroke-width="1.5"/><circle cx="5" cy="4.6" r=".9" fill="#fff"/><circle cx="5" cy="11.4" r=".9" fill="#fff"/>'],
+  branch: ['Branch', '<circle cx="4.6" cy="3.6" r="1.6" fill="none" stroke="#fff" stroke-width="1.5"/><circle cx="4.6" cy="12.4" r="1.6" fill="none" stroke="#fff" stroke-width="1.5"/><circle cx="11.4" cy="6" r="1.6" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M4.6 5.2v5.6M11.4 7.6c0 2.4-3 2.5-6.2 3.6" fill="none" stroke="#fff" stroke-width="1.5"/>'],
+  cube: ['Cube', '<path d="M8 1.9l5.2 3v6.2L8 14.1l-5.2-3V4.9zM8 8v6M2.8 4.9L8 8l5.2-3.1" fill="none" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>']
+};
+var meMem = null;
+function meClean(s) { return Array.from(String(s || '').replace(/[\u0000-\u001f\u007f<>]/g, ' ').replace(/\s+/g, ' ').trim()).slice(0, 24).join(''); }
+function meGet() {
+  var o = meMem;
+  try { var raw = localStorage.getItem(ME_KEY); if (raw) o = JSON.parse(raw); } catch (x) { /* storage unavailable */ }
+  o = (o && typeof o === 'object') ? o : {};
+  var c = parseInt(o.c, 10);
+  return { n: meClean(o.n), c: (c >= 0 && c < ME_COLORS.length) ? c : 0, a: (o.a === 'i' || ME_GLYPHS[o.a]) ? o.a : 'i' };
+}
+function meSet(o) {
+  var v = { n: meClean(o.n), c: o.c, a: o.a }; meMem = v;
+  try { if (!v.n) localStorage.removeItem(ME_KEY); else localStorage.setItem(ME_KEY, JSON.stringify(v)); } catch (x) { /* ignore */ }
+  if (!v.n) meMem = null;
+}
+function meAv(me, cls) {
+  var g = (me.a !== 'i' && ME_GLYPHS[me.a]) ? me.a : (me.n ? '' : 'term');
+  var inner = g ? '<svg viewBox="0 0 16 16" width="60%" height="60%" aria-hidden="true">' + ME_GLYPHS[g][1] + '</svg>' : '<span>' + e(Array.from(me.n)[0].toUpperCase()) + '</span>';
+  return '<span class="me-av ' + (cls || '') + '" style="background:' + ME_COLORS[me.c] + '" aria-hidden="true" translate="no">' + inner + '</span>';
+}
+function meHello() { var h = new Date().getHours(); return h < 12 ? 'Good morning' : (h < 17 ? 'Good afternoon' : 'Good evening'); }
+function meGreet() {
+  var me = meGet();
+  if (!me.n) return '<p class="greet greet-ask"><button class="linkish" type="button" data-act="me">Add a callsign</button> <span>to personalise this page. Optional, and it stays on this device.</span></p>';
+  return '<p class="greet">' + meAv(me, 'sm') + '<span>' + meHello() + ',</span> <b translate="no">' + e(me.n) + '</b>. <button class="linkish" type="button" data-act="me">Rename</button></p>';
+}
+function meBtn() {
+  var me = meGet();
+  return '<button class="btn btn-quiet me-btn' + (me.n ? ' has' : '') + '" type="button" data-act="me" aria-haspopup="dialog" aria-label="' + (me.n ? 'Your callsign is ' + e(me.n) + '. Change it' : 'Add a callsign') + '">' + meAv(me, 'sm') + (me.n ? '<span class="me-name" translate="no">' + e(me.n) + '</span>' : '') + '</button>';
+}
+function meDialog(opener) {
+  if ($('#me-dlg')) return;
+  var me = meGet(), draft = { n: me.n, c: me.c, a: me.a };
+  var wrap = document.createElement('div'); wrap.id = 'me-dlg'; wrap.className = 'me-dlg';
+  function glyphBtns() {
+    var list = [['i', 'Initial']].concat(Object.keys(ME_GLYPHS).map(function (k) { return [k, ME_GLYPHS[k][0]]; }));
+    return list.map(function (g) {
+      var v = { n: draft.n || 'A', c: draft.c, a: g[0] };
+      return '<button type="button" role="radio" class="me-pick' + (draft.a === g[0] ? ' on' : '') + '" data-me-a="' + g[0] + '" aria-checked="' + (draft.a === g[0]) + '" aria-label="' + g[1] + '">' + meAv(v, '') + '</button>';
+    }).join('');
+  }
+  function colorBtns() {
+    return ME_COLORS.map(function (c, i) { return '<button type="button" role="radio" class="me-pick me-sw' + (draft.c === i ? ' on' : '') + '" data-me-c="' + i + '" aria-checked="' + (draft.c === i) + '" aria-label="' + ME_COLOR_NAMES[i] + '"><span style="background:' + c + '"></span></button>'; }).join('');
+  }
+  function paint() {
+    $('#me-ga', wrap).innerHTML = glyphBtns(); $('#me-gc', wrap).innerHTML = colorBtns();
+    $('#me-prev', wrap).innerHTML = meAv({ n: draft.n || 'A', c: draft.c, a: draft.a }, 'lg') + '<span class="me-prev-n" translate="no">' + e(draft.n || 'Your callsign') + '</span>';
+  }
+  wrap.innerHTML = '<div class="me-back" data-me-close="1"></div><div class="me-card" role="dialog" aria-modal="true" aria-labelledby="me-h">' +
+    '<h2 id="me-h">' + (me.n ? 'Rename or change your avatar' : 'Choose a callsign') + '</h2>' +
+    '<p class="small">A name for greetings and your progress page. It is saved only on this device. No account, nothing is sent anywhere.</p>' +
+    '<div class="me-prev" id="me-prev"></div>' +
+    '<label class="me-f" for="me-name">Callsign<input id="me-name" type="text" maxlength="24" autocomplete="off" spellcheck="false" value="' + e(me.n) + '" placeholder="For example, Ravi"></label>' +
+    '<div class="me-grp" role="radiogroup" aria-label="Avatar"><span class="me-gl">Avatar</span><div id="me-ga" class="me-row"></div></div>' +
+    '<div class="me-grp" role="radiogroup" aria-label="Colour"><span class="me-gl">Colour</span><div id="me-gc" class="me-row"></div></div>' +
+    '<div class="me-act"><button class="btn btn-primary" type="button" data-me="save">Save</button><button class="btn btn-quiet" type="button" data-me-close="1">Cancel</button>' +
+    (me.n ? '<button class="btn btn-quiet danger" type="button" data-me="remove">Remove callsign</button>' : '') + '</div></div>';
+  document.body.appendChild(wrap); paint();
+  var inp = $('#me-name', wrap), card = $('.me-card', wrap);
+  function close(back) { wrap.remove(); document.removeEventListener('keydown', onKey, true); if (back !== false && opener && opener.isConnected) opener.focus(); }
+  function onKey(ev) {
+    if (ev.key === 'Escape') { ev.stopPropagation(); close(); return; }
+    if (ev.key === 'Enter' && ev.target === inp) { ev.preventDefault(); $('[data-me=save]', wrap).click(); return; }
+    if (ev.key !== 'Tab') return;
+    var f = $$('button, input', card).filter(function (x) { return !x.disabled && x.offsetParent !== null; });
+    if (!f.length) return;
+    if (ev.shiftKey && document.activeElement === f[0]) { ev.preventDefault(); f[f.length - 1].focus(); }
+    else if (!ev.shiftKey && document.activeElement === f[f.length - 1]) { ev.preventDefault(); f[0].focus(); }
+  }
+  document.addEventListener('keydown', onKey, true);
+  inp.addEventListener('input', function () { draft.n = meClean(inp.value); $('#me-prev', wrap).innerHTML = meAv({ n: draft.n || 'A', c: draft.c, a: draft.a }, 'lg') + '<span class="me-prev-n" translate="no">' + e(draft.n || 'Your callsign') + '</span>'; });
+  wrap.addEventListener('click', function (ev) {
+    var t = ev.target;
+    if (t.closest('[data-me-close]')) { close(); return; }
+    var pa = t.closest('[data-me-a]'), pc = t.closest('[data-me-c]');
+    if (pa) { draft.a = pa.getAttribute('data-me-a'); paint(); var n1 = $('[data-me-a="' + draft.a + '"]', wrap); if (n1) n1.focus(); return; }
+    if (pc) { draft.c = parseInt(pc.getAttribute('data-me-c'), 10); paint(); var n2 = $('[data-me-c="' + draft.c + '"]', wrap); if (n2) n2.focus(); return; }
+    var b = t.closest('[data-me]'); if (!b) return;
+    if (b.getAttribute('data-me') === 'save') {
+      draft.n = meClean(inp.value);
+      if (!draft.n) { toast('Type a callsign first, or choose Cancel.'); inp.focus(); return; }
+      meSet(draft); close(false); renderChrome(); setNav(view.nav); route(); toast('Callsign saved: ' + draft.n + '.');
+    } else if (b.getAttribute('data-me') === 'remove') {
+      if (b.getAttribute('data-armed')) { meSet({ n: '', c: 0, a: 'i' }); close(false); renderChrome(); setNav(view.nav); route(); toast('Callsign removed.'); }
+      else { b.setAttribute('data-armed', '1'); b.textContent = 'Select again to remove'; setTimeout(function () { if (b.isConnected) { b.removeAttribute('data-armed'); b.textContent = 'Remove callsign'; } }, 5000); }
+    }
+  });
+  inp.focus(); inp.select();
+}
+
 function dayKey(d) {
   d = d || new Date();
   var m = d.getMonth() + 1, dd = d.getDate();
@@ -184,6 +286,7 @@ function renderChrome() {
     '<div class="tools">' +
     '<button class="btn btn-quiet search-btn" type="button" data-act="search" aria-label="Search lessons and cheat sheets">' + ICON.search + '<span>Search</span><kbd>/</kbd></button>' +
     '<a class="streak' + (st.cur ? ' on' : '') + '" href="#/progress" title="Current streak ' + plural(st.cur, 'day') + ', best ' + plural(st.best, 'day') + '" aria-label="Current streak ' + plural(st.cur, 'day') + '">' + ICON.flame + '<b>' + st.cur + '</b></a>' +
+    meBtn() +
     '<button class="btn btn-quiet icon-btn a11y-btn" type="button" data-act="a11y" aria-label="Reading and accessibility options" aria-expanded="false" aria-controls="a11y-panel"><b aria-hidden="true">Aa</b></button>' +
     '<button class="btn btn-quiet icon-btn" type="button" data-act="theme" aria-label="Switch to ' + (theme() === 'dark' ? 'light' : 'dark') + ' theme">' + (theme() === 'dark' ? ICON.sun : ICON.moon) + '</button>' +
     '<button class="btn btn-quiet icon-btn menu-btn" type="button" data-act="menu" aria-label="Menu" aria-expanded="false"><span></span></button>' +
@@ -447,7 +550,7 @@ function homeView() {
   var tools = [['#/subnet', 'Subnet and CIDR', 'Split networks, plan VLSM, merge routes.'], ['#/playground/yaml', 'YAML playground', 'Find errors and risky Kubernetes settings.'], ['#/playground/python', 'Python playground', 'Run Python with built-in tests.'], ['#/playground/go', 'Go playground', '50 Go exercises run on the Go Playground.'], ['#/playground/hcl', 'Terraform playground', '50 HCL exercises checked in the browser.'], ['#/playground/sql', 'SQL for SREs', '50 SQL exercises on a real SQLite engine.'], ['#/explainers', 'Animated explainers', 'DNS, TLS, pods, rolling updates and more.'], ['#/skill-lab', 'Skill-writing lab', 'Write a SKILL.md and check its header, description, size and safety.']];
   view.html =
     '<section class="hero hero2"><div class="wrap hero-grid2">' +
-    '<div class="hero-copy"><div class="hero-mark" lang="te" aria-hidden="true">మార్గ</div><h1>Learn to fix production before production breaks.</h1>' +
+    '<div class="hero-copy">' + meGreet() + '<div class="hero-mark" lang="te" aria-hidden="true">మార్గ</div><h1>Learn to fix production before production breaks.</h1>' +
     '<p class="hero-free"><strong>Free. Offline. No sign-up.</strong> No payment, no ads.</p>' +
     '<p class="hero-proof small"><span class="chip" id="off-chip">Checking offline support</span> Open it once, turn off wifi, and keep learning. Lessons, labs and widgets run from your device.</p>' +
     '<p class="lede">Practical DevOps, cloud and SRE training from someone who runs production. Real incidents, real commands, no login, no ads.</p>' +
@@ -1077,12 +1180,13 @@ function progressView() {
     var n = modCount(m), pct = Math.round(n / m.lessons.length * 100);
     return '<li><a href="#/module/' + m.id + '"><span>' + e(m.title) + '</span><span class="bar"><i style="width:' + pct + '%"></i></span><b>' + n + '/' + m.lessons.length + '</b></a></li>';
   }).join('');
-  view.html = '<section class="page-head wrap"><h1>Your progress</h1><p class="lede">Saved in this browser. Export a backup if you switch devices.</p></section>' +
+  view.html = '<section class="page-head wrap">' + meGreet() + '<h1>Your progress</h1><p class="lede">Saved in this browser. Export a backup if you switch devices.</p></section>' +
     '<div class="wrap"><dl class="today wide"><div><dt>Current streak</dt><dd>' + st.cur + '<small> ' + (st.cur === 1 ? 'day' : 'days') + '</small></dd></div><div><dt>Best streak</dt><dd>' + st.best + '<small> ' + (st.best === 1 ? 'day' : 'days') + '</small></dd></div>' +
     '<div><dt>Lessons passed</dt><dd>' + t.done + '<small> of ' + t.total + '</small></dd></div><div><dt>Active days</dt><dd>' + S.days.length + '</dd></div></dl>' +
     (st.cur && !st.today ? '<p class="small">Do one lesson check or review a card today to keep your streak.</p>' : '') +
     '<h2 class="sub-h">Activity, last 12 weeks</h2><div class="heat" aria-hidden="true">' + cells + '</div>' +
     '<h2 class="sub-h">Completion by stage</h2><ul class="modbars">' + mods + '</ul>' +
+    '<h2 class="sub-h">Your callsign</h2><div class="actions"><button class="btn btn-quiet" type="button" data-act="me">' + (meGet().n ? 'Rename or change avatar' : 'Add a callsign') + '</button></div><p class="small">Saved only on this device. Resetting progress keeps your callsign; remove it from the same dialog.</p>' +
     '<h2 class="sub-h">Your data</h2><div class="actions"><button class="btn btn-quiet" type="button" data-act="export">Export progress</button>' +
     '<label class="btn btn-quiet file">Import progress<input type="file" accept="application/json" id="import-file"></label>' +
     '<button class="btn btn-quiet danger" type="button" data-act="reset" id="reset-btn">Reset all progress</button></div></div>';
@@ -1097,6 +1201,7 @@ function progressView() {
           S = { v: 1, lessons: o.lessons || {}, cards: o.cards || {}, days: o.days, path: o.path || 'devops', iv: (o.iv && typeof o.iv === 'object') ? o.iv : {} };
           ['cs', 'dr', 'fc', 'dc', 'py', 'lab', 'wk', 'cap', 'gm', 'bd', 'tl', 'wgt', 'pl'].forEach(function (k) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) S[k] = o[k]; });
           if (Array.isArray(o.mock)) S.mock = o.mock.slice(-20);
+          if (o.me && typeof o.me === 'object' && meClean(o.me.n)) meSet(o.me);
           save(); renderChrome(); toast('Progress imported.'); route();
         } catch (x) { toast('That file is not a MARGA progress export.'); }
       };
@@ -1327,13 +1432,14 @@ document.addEventListener('click', function (ev) {
     S.path = act.getAttribute('data-id'); save();
     if (act.getAttribute('data-go') === 'home') { location.hash = '/'; toast('Home path set to ' + PATH[S.path].title + '.'); } else route();
   } else if (a === 'export') {
-    var blob = new Blob([JSON.stringify(S, null, 2)], { type: 'application/json' });
+    var meX = meGet(), outX = meX.n ? Object.assign({}, S, { me: meX }) : S;
+    var blob = new Blob([JSON.stringify(outX, null, 2)], { type: 'application/json' });
     var url = URL.createObjectURL(blob), link = document.createElement('a');
     link.href = url; link.download = 'marga-progress-' + dayKey() + '.json'; document.body.appendChild(link); link.click(); link.remove();
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
     toast('Progress exported.');
   } else if (a === 'reset') {
-    if (act.getAttribute('data-armed')) { S = fresh(); save(); renderChrome(); toast('Progress reset.'); route(); }
+    if (act.getAttribute('data-armed')) { S = fresh(); save(); renderChrome(); toast('Progress reset. Your callsign is kept.'); route(); }
     else { act.setAttribute('data-armed', '1'); act.textContent = 'Select again to confirm reset'; setTimeout(function () { if (act.isConnected) { act.removeAttribute('data-armed'); act.textContent = 'Reset all progress'; } }, 5000); }
   }
 });
@@ -1403,6 +1509,7 @@ if (typeof window.MargaCloudCompare === "function") window.MargaCloudCompare(api
     if (open) { var f = $('select', panel); if (f) f.focus(); } else if (b) b.focus();
   }
   actions.a11y = function () { setOpen(panel.hidden); };
+  actions.me = function (act) { meDialog(act); };
   panel.addEventListener('change', function (ev) {
     var id = ev.target.getAttribute('data-a11y-set');
     if (id) MargaA11y.set(id, ev.target.value);
