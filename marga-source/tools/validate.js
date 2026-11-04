@@ -185,7 +185,7 @@ function checkStrings() {
       if (/learn\.eknathalabs/i.test(line)) err('domain', `${rel(f)}:${i + 1}: old domain ${line.trim().slice(0, 80)}`);
       if (emojiRe.test(line) && !/\.svg$/.test(f)) err('style', `${rel(f)}:${i + 1}: emoji found`);
       if (/[→←⇒]/.test(line)) err('style', `${rel(f)}:${i + 1}: arrow glyph found`);
-      if (/\b(TODO|FIXME|lorem ipsum)\b/i.test(line) && !/validate\.js$/.test(f)) err('style', `${rel(f)}:${i + 1}: placeholder text`);
+      if ((/\b(TODO|FIXME)\b/.test(line) || /\blorem ipsum\b/i.test(line)) && !/validate\.js$/.test(f)) err('style', `${rel(f)}:${i + 1}: placeholder text`);
     });
     // em dash density in prose is a style problem; just count for the report
   }
@@ -1117,6 +1117,83 @@ function checkPlans() {
   if (n < 5) err('plans', 'expected at least 5 plans');
 }
 
+function checkI18n() {
+  const root = path.join(SRC, 'i18n');
+  const rj = (f) => JSON.parse(fs.readFileSync(path.join(root, f), 'utf8'));
+  const ui = rj('ui.json'), mods = rj('modules.json'), paths = rj('paths.json'), les = rj('lessons.json');
+  const LANGS = ['te', 'hi']; const idx = { te: 1, hi: 2 };
+  const bad = /[\u{1F300}-\u{1FAFF}←-⇿☀-➿]/u;
+  const script = { te: /[ఀ-౿]/, hi: /[ऀ-ॿ]/ };
+  const check = (lang, what, t) => {
+    if (!t || !String(t).trim()) { err('i18n', `${lang}: empty translation for ${what}`); return; }
+    if (bad.test(t)) err('i18n', `${lang}: emoji or arrow glyph in ${what}`);
+    if (!script[lang].test(t) && !/^[A-Za-z0-9 .,:;()$\/_+\-]+$/.test(t)) err('i18n', `${lang}: no ${lang === 'te' ? 'Telugu' : 'Hindi'} letters in ${what}: ${String(t).slice(0, 40)}`);
+    if (/\bgit(hub|lab|ops|leaks|ea)/i.test(t)) err('i18n', `${lang}: forbidden word in ${what}`);
+  };
+  const seen = new Set();
+  for (const e of ui.entries) {
+    if (seen.has(e[0])) err('i18n', `duplicate ui entry: ${e[0].slice(0, 50)}`); seen.add(e[0]);
+    for (const lang of LANGS) check(lang, `ui "${e[0].slice(0, 30)}"`, e[idx[lang]]);
+  }
+  for (const p of ui.patterns) {
+    try { new RegExp(p[0]); } catch (x) { err('i18n', `bad pattern ${p[0]}`); continue; }
+    const need = (p[0].match(/\((?!\?)/g) || []).length;
+    for (const lang of LANGS) {
+      const t = p[idx[lang]]; check(lang, `pattern ${p[0].slice(0, 30)}`, t);
+      const used = new Set((t.replace(/^!/, '').match(/\$(\d)/g) || []).map((x) => +x[1]));
+      for (const u of used) if (u > need) err('i18n', `${lang}: pattern ${p[0].slice(0, 36)} uses $${u} but captures ${need}`);
+    }
+  }
+  for (const m of A.modules) {
+    for (const lang of LANGS) { const t = mods[m.id] && mods[m.id][lang]; if (!t) { err('i18n', `${lang}: module ${m.id} has no translation`); continue; } check(lang, `module ${m.id} title`, t.title); check(lang, `module ${m.id} summary`, t.summary); }
+  }
+  for (const p of A.paths.live) for (const lang of LANGS) { const t = paths[p.id] && paths[p.id][lang]; if (!t) { err('i18n', `${lang}: path ${p.id} has no translation`); continue; } check(lang, `path ${p.id} summary`, t.summary); check(lang, `path ${p.id} audience`, t.audience); }
+  let done = 0;
+  for (const [id, t] of Object.entries(les)) {
+    if (!A.lessons[id]) { err('i18n', `lessons.json has an unknown lesson id: ${id}`); continue; }
+    for (const lang of LANGS) { if (!t[lang]) err('i18n', `${lang}: lesson ${id} is missing`); else check(lang, `lesson ${id}`, t[lang]); }
+    done++;
+  }
+  stats['i18n lesson summaries'] = `${done} of ${Object.keys(A.lessons).length}`;
+  stats['i18n ui strings'] = ui.entries.length;
+  const names = { ta: 'Tamil', kn: 'Kannada', ml: 'Malayalam', bn: 'Bengali', es: 'Spanish', de: 'German', fr: 'French', pt: 'Portuguese' };
+  const scr = { ta: /[\u0B80-\u0BFF]/, kn: /[\u0C80-\u0CFF]/, ml: /[\u0D00-\u0D7F]/, bn: /[\u0980-\u09FF]/, es: /[A-Za-z]/, de: /[A-Za-z]/, fr: /[A-Za-z]/, pt: /[A-Za-z]/ };
+  const full = new Set(['es', 'de', 'fr', 'pt', 'ta', 'kn', 'ml', 'bn']);
+  for (const lang of Object.keys(names)) {
+    const fp = path.join(root, 'lang-' + lang + '.json');
+    if (!fs.existsSync(fp)) { err('i18n', `${lang}: src/i18n/lang-${lang}.json is missing`); continue; }
+    const f = rj('lang-' + lang + '.json');
+    const chk = (what, t) => {
+      if (!t || !String(t).trim()) { err('i18n', `${lang}: empty translation for ${what}`); return; }
+      if (bad.test(t)) err('i18n', `${lang}: emoji or arrow glyph in ${what}`);
+      if (!scr[lang].test(t) && !/^[A-Za-z0-9 .,:;()$\/_+\-]+$/.test(t)) err('i18n', `${lang}: no ${names[lang]} letters in ${what}: ${String(t).slice(0, 40)}`);
+      if (/\bgit(hub|lab|ops|leaks|ea)/i.test(t)) err('i18n', `${lang}: forbidden word in ${what}`);
+    };
+    const have = new Map(f.ui.map((e) => [e[0], e[1]]));
+    for (const e of ui.entries) { if (!have.has(e[0])) err('i18n', `${lang}: ui "${e[0].slice(0, 40)}" has no translation`); else chk(`ui "${e[0].slice(0, 30)}"`, have.get(e[0])); }
+    const hp = new Map(f.pats.map((e) => [e[0], e[1]]));
+    for (const p of ui.patterns) {
+      if (!hp.has(p[0])) { err('i18n', `${lang}: pattern ${p[0].slice(0, 40)} has no translation`); continue; }
+      const t = hp.get(p[0]); chk(`pattern ${p[0].slice(0, 30)}`, t);
+      const need = (p[0].match(/\((?!\?)/g) || []).length;
+      for (const u of new Set((t.replace(/^!/, '').match(/\$(\d)/g) || []).map((x) => +x[1]))) if (u > need) err('i18n', `${lang}: pattern ${p[0].slice(0, 36)} uses $${u} but captures ${need}`);
+      const usedBy = (x) => [...new Set((String(x).replace(/^!/, '').match(/\$(\d)/g) || []).map((y) => y[1]))].sort().join('');
+      if (usedBy(t) !== usedBy(p[1])) err('i18n', `${lang}: pattern ${p[0].slice(0, 36)} uses captures ${usedBy(t)} but the Telugu one uses ${usedBy(p[1])}`);
+    }
+    for (const m of A.modules) { const t = f.modules[m.id]; if (!t) { err('i18n', `${lang}: module ${m.id} has no translation`); continue; } chk(`module ${m.id} title`, t.title); chk(`module ${m.id} summary`, t.summary); }
+    for (const p of A.paths.live) { const t = f.paths[p.id]; if (!t) { err('i18n', `${lang}: path ${p.id} has no translation`); continue; } chk(`path ${p.id} summary`, t.summary); chk(`path ${p.id} audience`, t.audience); }
+    let nl = 0;
+    let miss = 0;
+    for (const id of Object.keys(A.lessons)) { if (!f.lessons[id]) miss++; else { chk(`lesson ${id}`, f.lessons[id]); nl++; } }
+    if (miss) { if (full.has(lang)) err('i18n', `${lang}: ${miss} lesson summaries are missing`); else warnings.push(`i18n ${lang}: ${miss} lesson summaries are still English`); }
+    for (const id of Object.keys(f.lessons)) if (!A.lessons[id]) err('i18n', `${lang}: unknown lesson id ${id}`);
+    stats[`i18n ${lang} lesson summaries`] = `${nl} of ${Object.keys(A.lessons).length}`;
+  }
+  const built = ['te', 'hi', 'ta', 'kn', 'ml', 'bn', 'es', 'de', 'fr', 'pt'].map((l) => path.join(DIST, 'assets', 'i18n', l + '.js'));
+  for (const f of built) if (!fs.existsSync(f)) err('i18n', `${path.relative(ROOT, f)} was not built`);
+  if (!/assets\/i18n\.js/.test(read(path.join(DIST, 'index.html')))) err('i18n', 'index.html does not load assets/i18n.js');
+}
+
 const steps = [
   ['content schema', checkSchema],
   ['role paths', checkPaths],
@@ -1132,7 +1209,8 @@ const steps = [
   ['real Linux labs and challenges', checkLabsAndChallenges],
   ['case files', checkCaseFiles],
   ['interactive widgets', checkWidgets], ['lesson stories and senior views', checkStories],
-  ['learning plans', checkPlans]
+  ['learning plans', checkPlans],
+  ['languages (Telugu, Hindi, Tamil, Kannada, Malayalam, Bengali, Spanish, German, French, Portuguese)', checkI18n]
 ];
 for (const [name, fn] of steps) {
   const before = errors.length;

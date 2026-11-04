@@ -235,3 +235,52 @@ New skill: **System design for platform and SRE** (`system-design`, Advanced, re
 - **Real Linux labs on the home page**: a band with the lab count, kind chips and an Open button.
 - **100-day challenge for Site Reliability Engineers** (`#/plan/sre-100`, plan `sre-100` in `src/plans/plans.json`, generator `/home/claude/gen/r31/sre100.py`).
 - Caveats: scenarios, answers and cloud labs are machine-written and need a human read. `apt`, `dpkg`, `aws` and `az` are imitations; real output differs in details. Tested in headless Chromium only. A full e2e run takes over two hours.
+
+## Round 35: the merged design
+
+One theme layer, `src/app/theme.css`, loaded after `app.css` (the build appends it). It merges the strongest parts of twenty design samples:
+
+- Light: deep teal on a cool off-white, marigold highlights. Dark: midnight indigo with gold, and glowing skill nodes like stars.
+- The home page opens with the Telugu word for the path, set in a 2.8 KB subset of Noto Serif Telugu (`src/fonts/marga-te.woff2`, SIL Open Font License, licence beside it). It is decorative and hidden from screen readers.
+- Firmer buttons (48 px minimum), rounder cards, a marigold underline on the active nav item, tinted wrong-path cards, terminal-green code panels, a plain high-contrast print style.
+- Colours, radii and shapes only. No layout the tests rely on moves. To change the palette, edit the tokens at the top of `theme.css`.
+
+## Round 36: Telugu and Hindi
+
+A language picker sits in the top bar. The interface, module titles and summaries, role paths and all 358 lesson summaries are translated. Lesson titles, lesson bodies, code and terminals stay in English on purpose.
+
+- `src/app/i18n.js` swaps text in the browser by looking up the English string. A missing translation stays English, so nothing breaks. The choice is saved in `localStorage` key `ea.lang`.
+- Translations live in `src/i18n/`: `ui.json` (strings and patterns), `modules.json`, `paths.json`, `lessons.json`. `tools/i18n.js` builds them into `assets/i18n/<code>.js`, loaded on demand.
+- Noto Sans Telugu and Devanagari load only when those letters appear (`unicode-range`).
+- `node tools/validate.js` checks every module, live path and lesson has both languages, the scripts are right, and no emoji or arrows slip in.
+- The translations are machine-written. Have a Telugu and a Hindi reader review them before relying on them.
+- To add a language: add a column to the JSON files, a line to `LANGS` in `i18n.js`, and fonts if the script needs them.
+
+## Round 37: Tamil, Kannada, Malayalam and Bengali
+
+- The interface now offers seven languages: English, Telugu, Hindi, Tamil, Kannada, Malayalam and Bengali. Pick one from the Language menu in the header.
+- Fixed: the English home page no longer shows the Telugu brand word. The brand word appears only in the chosen language's own script.
+- Tamil, Kannada, Malayalam and Bengali each have one file, `src/i18n/lang-<code>.json`, holding the interface strings, patterns, module and path text, and lesson summaries.
+- Coverage: interface, modules and paths are complete in all four. Lesson summaries are complete in Telugu and Hindi, partial in Tamil (60 of 358) and not yet done in Kannada, Malayalam and Bengali; those fall back to English. The validator reports the count as a warning.
+- Lesson titles and bodies, code and terminals stay in English.
+- Translations are machine-written. Ask a native speaker to review them.
+- The header now folds the navigation into the Menu button whenever it would not fit.
+- Two accessibility fixes that affect English too: table wrappers are keyboard-focusable, and the search box has proper dark-mode contrast.
+
+## Round 38: Spanish, German, French and Portuguese
+
+- The interface now offers eleven languages. Added: Español, Deutsch, Français and Português (Brazil).
+- Each has one file, `src/i18n/lang-<code>.json`, with the interface strings, patterns (including singular forms), module and path text, and all 358 lesson summaries. The validator treats a missing lesson summary in these four languages as an error.
+- These four use the Latin alphabet, so no new fonts were needed. The brand word in the home hero stays hidden, as in English.
+- Lesson titles and bodies, code and terminals stay in English.
+- Fixes found while testing: the language menu is compact on phones so the header stays on one row; the Tamil and Malayalam brand word is smaller on phones; the demo-terminal header wraps on very narrow screens; the placeholder-text check no longer flags the Spanish and Portuguese word "todo".
+- Translations are machine-written. Ask a native speaker to review them.
+- Still partial: lesson summaries for Tamil (60 of 358), Kannada, Malayalam and Bengali (none yet) fall back to English.
+
+## Round 39: lesson summaries complete in every language
+
+- Tamil, Kannada, Malayalam and Bengali now have all 358 lesson summaries, so all 11 languages are complete (interface, patterns, modules, paths, lessons).
+- The validator treats a missing lesson summary as an error for every non-English language except Telugu and Hindi (which use their own files and were already complete).
+- Lesson titles, bodies and code stay in English by design. Technical terms and command names are not translated inside summaries.
+- Machine translations: ask a native reader to review before promoting any language as finished.
+- Known gap: at 320px, Tamil and German still scroll sideways slightly (doors chips and stats).

@@ -215,3 +215,13 @@ Round 32 last pass: new files src/app/crosslinks.js and src/app/cloudcompare.js 
 Round 33: delete the old `assets` folder before uploading, then upload everything in the zip. New script: `assets/learn.js` (learning dashboard). No new settings.
 
 Round 34: delete the old `assets` folder before uploading, then upload everything in the zip. New script: `assets/term-hw.js` (loaded on first use of a terminal lab, like the other engine files). The explainers data is now built from `src/explainers/*.json`, and the end-to-end tests are in `tools/e2e/*.part.js` (run them with `node tools/e2e.js` as before). No new settings.
+
+Round 35: delete the old `assets` folder before uploading, then upload everything in the zip. New file: `assets/fonts/marga-te.woff2` (the Telugu mark). The new theme is built into `assets/app.css`. No new settings.
+
+Round 36: delete the old `assets` folder before uploading, then upload everything in the zip. New files: `assets/i18n.js`, `assets/i18n/te.js`, `assets/i18n/hi.js` (loaded only when a reader picks that language) and the Telugu and Devanagari fonts in `assets/fonts/`. No new settings.
+
+Round 37: delete the old `assets` folder before uploading, then upload everything in the zip. New files: `assets/i18n/ta.js`, `kn.js`, `ml.js`, `bn.js` (loaded only when a reader picks that language) and the Noto Tamil, Kannada, Malayalam and Bengali fonts in `assets/fonts/`. No new settings.
+
+Round 38: delete the old `assets` folder before uploading, then upload everything in the zip. New files: `assets/i18n/es.js`, `de.js`, `fr.js`, `pt.js` (loaded only when a reader picks that language). No new fonts or settings.
+
+Round 39: delete the old `assets` folder before uploading, then upload everything in the zip. No new files; `assets/i18n/ta.js`, `kn.js`, `ml.js`, `bn.js` are larger because they now carry all lesson summaries.

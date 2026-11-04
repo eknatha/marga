@@ -18,7 +18,7 @@ const SRC = path.join(ROOT, 'src');
 const DIST = path.join(ROOT, 'dist');
 const DOMAIN = 'marga.eknathalabs.com';
 // GoatCounter site code for the visitor count (https://CODE.goatcounter.com). Empty string disables it.
-const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js', 'choose.js', 'skilllab.js', 'casefile.js', 'sdlab.js', 'widgets.js', 'diagrams.js', 'plans.js', 'replay.js', 'portfolio.js', 'guided.js', 'handbook.js', 'share.js', 'vmlinux.js', 'challenge-core.js', 'challenge.js', 'workshop.js', 'interviewlab.js', 'roadmap.js', 'searchpage.js', 'guide.js', 'explain-out.js', 'designs.js', 'crosslinks.js', 'cloudcompare.js', 'learn.js'];
+const EXTRA = ['i18n.js', 'voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js', 'choose.js', 'skilllab.js', 'casefile.js', 'sdlab.js', 'widgets.js', 'diagrams.js', 'plans.js', 'replay.js', 'portfolio.js', 'guided.js', 'handbook.js', 'share.js', 'vmlinux.js', 'challenge-core.js', 'challenge.js', 'workshop.js', 'interviewlab.js', 'roadmap.js', 'searchpage.js', 'guide.js', 'explain-out.js', 'designs.js', 'crosslinks.js', 'cloudcompare.js', 'learn.js'];
 // terminal lab engine: loaded only when a terminal lab is opened, but cached for offline use
 const ENGINE = ['term-fs.js', 'term-parse.js', 'term-exec.js', 'term-cmds.js', 'term-text.js', 'term-awk.js', 'term-jq.js', 'term-sys.js', 'term-net.js', 'term-k8s.js', 'term-docker.js', 'term-cloud.js', 'term-iac.js', 'term-helm.js', 'term-infra.js', 'term-hw.js', 'term-labs.js'];
 const COUNTER = process.env.MARGA_COUNTER !== undefined ? process.env.MARGA_COUNTER : 'marga-eknathalabs';
@@ -94,7 +94,7 @@ function makeMarkdown() {
         return `<blockquote>${quote}</blockquote>\n`;
       },
       table(header, body) {
-        return `<div class="table-wrap"><table><thead>${header}</thead><tbody>${body}</tbody></table></div>\n`;
+        return `<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead>${header}</thead><tbody>${body}</tbody></table></div>\n`;
       },
       link(href, title, text) {
         const ext = /^https?:\/\//.test(href);
@@ -589,6 +589,19 @@ function fontCss() {
 @font-face{font-family:"Atkinson Hyperlegible";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/atkinson-700.woff2) format("woff2")}
 @font-face{font-family:"OpenDyslexic";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/opendyslexic-400.woff2) format("woff2")}
 @font-face{font-family:"OpenDyslexic";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/opendyslexic-700.woff2) format("woff2")}
+@font-face{font-family:"Noto Sans Telugu";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/noto-sans-telugu-400.woff2) format("woff2");unicode-range:U+0C00-0C7F,U+200C-200D}
+@font-face{font-family:"Noto Sans Telugu";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/noto-sans-telugu-700.woff2) format("woff2");unicode-range:U+0C00-0C7F,U+200C-200D}
+@font-face{font-family:"Noto Sans Devanagari";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/noto-sans-devanagari-400.woff2) format("woff2");unicode-range:U+0900-097F,U+1CD0-1CFF,U+A8E0-A8FF,U+200C-200D}
+@font-face{font-family:"Noto Sans Devanagari";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/noto-sans-devanagari-700.woff2) format("woff2");unicode-range:U+0900-097F,U+1CD0-1CFF,U+A8E0-A8FF,U+200C-200D}
+@font-face{font-family:"Noto Sans Tamil";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/noto-sans-tamil-400.woff2) format("woff2");unicode-range:U+0B80-0BFF,U+200C-200D}
+@font-face{font-family:"Noto Sans Tamil";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/noto-sans-tamil-700.woff2) format("woff2");unicode-range:U+0B80-0BFF,U+200C-200D}
+@font-face{font-family:"Noto Sans Kannada";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/noto-sans-kannada-400.woff2) format("woff2");unicode-range:U+0C80-0CFF,U+200C-200D}
+@font-face{font-family:"Noto Sans Kannada";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/noto-sans-kannada-700.woff2) format("woff2");unicode-range:U+0C80-0CFF,U+200C-200D}
+@font-face{font-family:"Noto Sans Malayalam";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/noto-sans-malayalam-400.woff2) format("woff2");unicode-range:U+0D00-0D7F,U+200C-200D}
+@font-face{font-family:"Noto Sans Malayalam";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/noto-sans-malayalam-700.woff2) format("woff2");unicode-range:U+0D00-0D7F,U+200C-200D}
+@font-face{font-family:"Noto Sans Bengali";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/noto-sans-bengali-400.woff2) format("woff2");unicode-range:U+0980-09FF,U+200C-200D}
+@font-face{font-family:"Noto Sans Bengali";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/noto-sans-bengali-700.woff2) format("woff2");unicode-range:U+0980-09FF,U+200C-200D}
+@font-face{font-family:"Marga Telugu";font-style:normal;font-weight:800;font-display:swap;src:url(fonts/marga-te.woff2) format("woff2")}
 @font-face{font-family:"JetBrains Mono";font-style:normal;font-weight:100 800;font-display:swap;src:url(${fx('', 'jetbrains-mono.woff2')}) format("woff2-variations")}
 `;
 }
@@ -618,11 +631,12 @@ function main() {
     fs.copyFileSync(path.join(nm, rel), out);
   }
 
+  for (const f of ['marga-te.woff2', 'noto-sans-telugu-400.woff2', 'noto-sans-telugu-700.woff2', 'noto-sans-devanagari-400.woff2', 'noto-sans-devanagari-700.woff2', ...['tamil', 'kannada', 'malayalam', 'bengali'].flatMap((l) => [400, 700].map((w) => 'noto-sans-' + l + '-' + w + '.woff2'))]) fs.copyFileSync(path.join(SRC, 'fonts', f), path.join(DIST, 'assets', 'fonts', f));
   // optional reading fonts: copied, loaded only when a reader picks them, not precached
   const opt = { 'atkinson-400.woff2': '@fontsource/atkinson-hyperlegible/files/atkinson-hyperlegible-latin-400-normal.woff2', 'atkinson-700.woff2': '@fontsource/atkinson-hyperlegible/files/atkinson-hyperlegible-latin-700-normal.woff2', 'opendyslexic-400.woff2': '@fontsource/opendyslexic/files/opendyslexic-latin-400-normal.woff2', 'opendyslexic-700.woff2': '@fontsource/opendyslexic/files/opendyslexic-latin-700-normal.woff2' };
   for (const [name, rel] of Object.entries(opt)) fs.copyFileSync(path.join(ROOT, 'node_modules', rel), path.join(DIST, 'assets', 'fonts', name));
 
-  const css = fontCss() + read('app/app.css');
+  const css = fontCss() + read('app/app.css') + '\n' + read('app/theme.css');
   const js = read('app/app.js');
   // lesson bodies (html, toc, references, search text) are about half the data: they ship as one small file per skill and load when needed
   const chunks = {}; const slim = {};
@@ -633,8 +647,10 @@ function main() {
   const esc = (o) => JSON.stringify(o).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
   const chunkJs = {}; for (const [m, c] of Object.entries(chunks)) chunkJs[m] = '(function(m,c){var L=window.ACADEMY.lessons;for(var id in c){Object.assign(L[id],c[id]);}(window.ACADEMY_LOADED=window.ACADEMY_LOADED||{})[m]=1;})(' + JSON.stringify(m) + ',' + esc(c) + ');';
   const dataJs = 'window.ACADEMY=' + JSON.stringify({ domain: DOMAIN, counter: COUNTER, ...data, lessons: slim }).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029') + ';';
-  const ver = crypto.createHash('sha1').update(css + js + dataJs + Object.values(chunkJs).join('') + EXTRA.concat(ENGINE).map((f) => readApp(f)).join('')).digest('hex').slice(0, 8);
+  const i18n = require('./i18n').build(data, SRC);
+  const ver = crypto.createHash('sha1').update(css + js + dataJs + Object.values(i18n.out).join('') + Object.values(chunkJs).join('') + EXTRA.concat(ENGINE).map((f) => readApp(f)).join('')).digest('hex').slice(0, 8);
 
+  for (const [lang, txt] of Object.entries(i18n.out)) write('assets/i18n/' + lang + '.js', txt);
   write('assets/app.css', css);
   write('assets/app.js', js);
   EXTRA.concat(ENGINE).forEach((f) => write('assets/' + f, readApp(f)));
@@ -673,12 +689,12 @@ function main() {
   write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${SITE}${u}</loc><lastmod>${today}</lastmod></url>`).join('\n')}\n</urlset>\n`);
   write('manifest.webmanifest', JSON.stringify({
     name: 'MARGA by EknathaLabs', short_name: 'MARGA', start_url: './', scope: './', display: 'standalone',
-    background_color: '#F4F6FA', theme_color: '#0F2547',
+    background_color: '#F4F6FA', theme_color: '#0B2B2E',
     icons: [{ src: 'icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' }]
   }, null, 2));
   write('icon.svg', read('app/icon.svg'));
 
-  const precache = ['./', 'index.html', 'assets/app.css', 'assets/app.js', 'assets/data.js', ...Object.keys(chunkJs).map((m) => 'assets/lessons/' + m + '.js'), ...EXTRA.concat(ENGINE).map((f) => 'assets/' + f), 'icon.svg', 'manifest.webmanifest', 'cheatsheets/']
+  const precache = ['./', 'index.html', 'assets/app.css', 'assets/app.js', 'assets/data.js', ...Object.keys(i18n.out).map((l) => 'assets/i18n/' + l + '.js'), ...Object.keys(chunkJs).map((m) => 'assets/lessons/' + m + '.js'), ...EXTRA.concat(ENGINE).map((f) => 'assets/' + f), 'icon.svg', 'manifest.webmanifest', 'cheatsheets/']
     .concat(Object.keys(fonts).map((f) => 'assets/fonts/' + f))
     .concat(list.map((s) => `cheatsheets/${s.id}.html`));
   write('sw.js', read('app/sw.js').replace('{{VER}}', ver).replace('{{FILES}}', JSON.stringify(precache)));

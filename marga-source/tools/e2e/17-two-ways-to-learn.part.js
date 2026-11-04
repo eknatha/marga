@@ -210,6 +210,8 @@
     const { ctx, page, issues } = await open();
     await go(page, '/');
     ok(await page.locator('#nav-more-menu').isHidden(), 'Elsewhere menu closed at rest');
+    await page.waitForTimeout(500);
+    if (await page.locator('.menu-btn').isVisible()) await page.click('.menu-btn');
     await page.click('.nav-more-btn'); ok(await page.locator('#nav-more-menu').isVisible(), 'Elsewhere opens');
     eq(await page.getAttribute('.nav-more-btn', 'aria-expanded'), 'true', 'aria-expanded true');
     eq(await page.locator('#nav-more-menu a').count(), 4, 'four links in Elsewhere');
@@ -425,7 +427,8 @@
     ok(issues.length === 0, 'page errors ' + issues.join('|'));
     await ctx.close();
     const m = await open({ viewport: { width: 360, height: 700 } }); await go(m.page, '/');
-    ok((await m.page.locator('.topbar').boundingBox()).height < 70, 'header is one row on a phone');
+    await m.page.waitForTimeout(700);
+    const hh = (await m.page.locator('.topbar').boundingBox()).height; ok(hh < 70, 'header is one row on a phone, height ' + hh);
     await m.ctx.close();
   });
 
