@@ -160,6 +160,30 @@ New skill: **System design for platform and SRE** (`system-design`, Advanced, re
 - Like the other labs, these scenarios are machine-written and need a human read before you rely on them as teaching material.
 
 
+## Round 34
+
+- Two new skills in the skill tree and the role paths: Bare metal and datacenter (hardware, PXE provisioning, RAID and firmware, leaf-spine and bonding, running a fleet) and Service mesh and advanced Kubernetes networking (kube-proxy and CNI, network policy and eBPF, sidecars, mTLS and traffic management, troubleshooting). Each has 5 lessons, games, drills, interview questions, a cheat sheet, widgets, explainers, glossary terms, reading and 5 terminal labs. New simulators in `src/app/term-hw.js`: `ipmitool`, `smartctl`, `mdadm`, `istioctl`.
+- The five skills from Round 33 are raised to the same depth as the others: 12 explainers each (2 failure walkthroughs), 4 widgets each and 5 terminal labs each. The NEWER exemptions are gone from `tools/validate.js`.
+- Worked examples with wrong paths: a ```wrongpath fence (`@goal`, `@wrong`, `@result`, `@why`, `@right`, `@after`) shows the tempting wrong approach, what it really does, why, and the right way. Rendered in `build.js`. 45 lessons have one.
+- Multi-service labs: 10 terminal labs under the heading "Multi-service incidents" (`src/termlabs/multi.md`, stage `multi`). Each hides three faults in three layers, so fixing one shows the next.
+- Architecture walkthroughs: 24 (was 16). New: bare-metal fleet, private cloud on OpenStack, LLM inference platform, service mesh for 300 services, virtualization cluster with HA, managed Postgres platform, shared storage with Ceph, zero-downtime database migration.
+- Mock design interview: 18 prompts (was 12). After the self-score every prompt shows a model answer (`src/mockdesigns/<prompt>.md`): the one-minute answer, a diagram, every component explained with an Example, numbers to say aloud, failure table and follow-up questions. `validate` requires a model answer, a diagram, at least 5 components and an Example for each.
+- Large files split: the explainers data moved from one 557 KB script to JSON groups in `src/explainers/` (appended at build time), and `tools/e2e.js` is now a runner over 17 parts in `tools/e2e/*.part.js` (joined in order, so ONLY, SKIP and SHARD behave as before). `dist/assets/data.js` is generated output and stays one file.
+- Caveats: the content is machine-written and needs human review. The simulators model the tools; they are not the tools. The device check is Chromium emulation only.
+- Deploy: upload the whole contents of the zip and delete the old assets folder first. No new settings.
+
+## Round 33
+
+- Five new skills, placed in the skill tree and the role paths: Virtualization, Storage and filesystems, SQL performance and database operations, GPU/AI infrastructure and LLM serving, OpenStack and private cloud. Each has 5 lessons, games, drills, interview questions, a cheat sheet, widgets and reading. Their lab, explainer and widget minimums are lower than the older skills (see NEWER in tools/validate.js).
+- Terraform and Helm simulated terminals (term-iac.js, term-helm.js) and a Google Cloud simulation (gcloud in term-infra.js). The cloud compare page now has a Google Cloud column. 25 new labs, 154 in total.
+- Sources: every claim-heavy lesson needs at least 3 references (enforced by validate). Lessons show a numbered Sources list and a "How to check a claim" note.
+- Before and after: when a terminal lab passes, a side-by-side diff shows each file the fix changed.
+- Step-through diagrams: lesson diagrams have Back and Next buttons that walk the numbered arrows with one sentence each.
+- Learning dashboard at `#/dashboard` (src/app/learn.js): mastery per skill, weak spots, a streak that forgives one missed day, a weekly goal and a next best step. Reads only local progress.
+- Motion: a short confirmation on a pass and a fade for the diff. All of it is off under reduced motion or the motion setting.
+- Caveats: the content is machine-written and needs human review. The simulators model the tools; they are not the tools. The device check is Chromium emulation only.
+- Deploy: upload the whole contents of the zip, and delete the old assets folder first. New scripts: assets/learn.js.
+
 ## Round 30
 
 - **Real Linux lab now has 130 scenarios** (Beginner 36, Intermediate 42, Advanced 52). New kinds, filterable with the Kind menu on `#/linux` (`?topic=diagnose|multi|network|systemd|fix`): 12 **diagnose-only** labs (look around with real commands, type the cause in a box under the terminal; graded in the page against `accept` patterns, answers in `tools/vmanswers.json`), 10 **several-faults** labs (Advanced, 2 to 6 independent faults, all must be fixed), 11 **network** labs and 11 **systemd-style** labs.
@@ -188,6 +212,19 @@ New skill: **System design for platform and SRE** (`system-design`, Advanced, re
 - **Device check** (`node tools/devices.js`): seven phone and tablet profiles, light and dark, 15 pages: no overflow, no script errors, tap targets at least 24 px. Found and fixed: leaving Interview questions ran its setup code on the next page (script error on slow devices), and on phones the Elsewhere links were unreachable.
 - **Design boards added in a second pass** (`src/app/designs.js`, plus `vmlinux.js`, `plans.js`, CSS): Real Linux lab browser as cards (level, kind, minutes or Solved, Start lab); a 100-day grid on every plan of 28 days or more (done, today, review day, not yet; each cell jumps to its day); a winding skill map above each role roadmap; a progress share card on the Progress page (PNG drawn in the browser, optional name never stored); one-row header on phones; roadmap locked steps no longer use opacity (a contrast fix).
 - Caveats: this is Chromium emulation, not a physical phone, Safari or Firefox (those engines could not be installed here). Cloud labs, explain rules and goal pages are machine-written and need a human read.
+
+## Round 32, last pass
+
+- **Interview-to-lab links** (`src/app/crosslinks.js`): each interview answer lists up to two labs (terminal or Real Linux) that practise the same thing. Matching is a plain word-overlap score inside the same skill area, with a high bar, so many questions have no link on purpose. Not AI; some links will be loose.
+- **More simulated cloud labs**: 31 in all (8 new). The simulator gained `az role assignment delete` and `az vm delete`. Terminal labs total 129; `tools/terminal-verify.js` runs every start state, solution and variant.
+- **Explain this output for cloud commands**: `aws` and `az` now get specific notes (who you are, AccessDenied action and identity, security group and NSG rules, instance state, role assignments and scope, common error codes) instead of one generic line.
+- **Break it again is a different fault**: 19 labs carry a `vary:` header (a list of name maps). Each press of Break it again loads the next version (new bucket, instance or group names), so last time's commands do not work. A lab without `vary:` says it is the same fault.
+- **Share card**: three looks (Night, Paper, Dawn), wide or square, a cloud-lab count and a progress bar.
+- **Command cheat bar** in terminal labs and Real Linux labs (per subject; pressing a button types the command, it does not run it).
+- **Why did that fail?** appears after a failed command: did-you-mean for command names, sub-commands (kubectl, docker, git, systemctl, aws, az) and file names, plus the usual cause of permission and missing-operand errors. Edit-distance rules, not AI.
+- **Glossary hover cards inside labs** (the lesson cards already existed), and ten new cloud glossary terms (ARN, S3 bucket, public access block, resource group, subscription, NSG, role assignment, scope, resource lock, termination protection). Single common words such as scope are not auto-linked in lessons, to avoid wrong cards.
+- **Cloud compare** (`#/cloud-compare`, `src/app/cloudcompare.js`): 16 jobs in AWS and Azure side by side, the difference that bites, and the lab that practises it. Linked from the cloud stage and cloud lab pages. A hand-written table; the commands are written for the simulator and need real names in a real account.
+- Caveats: all text is machine-written and needs a human read; the simulators imitate the real tools and are not them.
 
 ## Round 31
 

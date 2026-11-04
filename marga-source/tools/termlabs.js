@@ -3,7 +3,7 @@
    A "@@ file /path [mode=644 owner=user group=user size=4G]" section defines one file. */
 const fs = require('fs');
 const path = require('path');
-const MODULES = ['linux', 'bash', 'networking', 'python', 'kubernetes', 'docker', 'cloud'];
+const MODULES = ['linux', 'bash', 'networking', 'python', 'kubernetes', 'docker', 'cloud', 'terraform', 'helm', 'virtualization', 'storage', 'sql-ops', 'gpu-serving', 'openstack', 'baremetal', 'service-mesh', 'multi'];
 function parseFile(file) {
   const text = fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
   const labs = []; let cur = null, sec = null;
@@ -28,6 +28,7 @@ function finish(raw) {
     engine: raw.engine || '', story: sec('story').trim(), goals: bullets(sec('goals')), hints: bullets(sec('hints')), explain: sec('explain').trim(), solution: sec('solution').replace(/\n+$/, '\n'),
     world: null, checks: null, files: raw.files.map(f => ({ path: f.path, m: f.opts.mode, o: f.opts.owner, g: f.opts.group, size: f.opts.size, data: f.text.replace(/\n$/, '') === '' && f.text === '\n' ? '' : f.text })), errors: []
   };
+  lab.vary = null; if (raw.vary) { try { lab.vary = JSON.parse(raw.vary); if (!Array.isArray(lab.vary) || lab.vary.some(m => !m || typeof m !== 'object' || Array.isArray(m))) throw new Error('must be a list of objects'); } catch (e) { lab.errors.push('vary is not valid: ' + e.message); lab.vary = null; } }
   try { lab.world = sec('world').trim() ? JSON.parse(sec('world')) : {}; } catch (e) { lab.errors.push('world is not valid JSON: ' + e.message); lab.world = {}; }
   try { lab.checks = JSON.parse(sec('checks')); } catch (e) { lab.errors.push('checks is not valid JSON: ' + e.message); lab.checks = []; }
   return lab;

@@ -18,9 +18,9 @@ const SRC = path.join(ROOT, 'src');
 const DIST = path.join(ROOT, 'dist');
 const DOMAIN = 'marga.eknathalabs.com';
 // GoatCounter site code for the visitor count (https://CODE.goatcounter.com). Empty string disables it.
-const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js', 'choose.js', 'skilllab.js', 'casefile.js', 'sdlab.js', 'widgets.js', 'diagrams.js', 'plans.js', 'replay.js', 'portfolio.js', 'guided.js', 'handbook.js', 'share.js', 'vmlinux.js', 'challenge-core.js', 'challenge.js', 'workshop.js', 'interviewlab.js', 'roadmap.js', 'searchpage.js', 'guide.js', 'explain-out.js', 'designs.js'];
+const EXTRA = ['voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js', 'choose.js', 'skilllab.js', 'casefile.js', 'sdlab.js', 'widgets.js', 'diagrams.js', 'plans.js', 'replay.js', 'portfolio.js', 'guided.js', 'handbook.js', 'share.js', 'vmlinux.js', 'challenge-core.js', 'challenge.js', 'workshop.js', 'interviewlab.js', 'roadmap.js', 'searchpage.js', 'guide.js', 'explain-out.js', 'designs.js', 'crosslinks.js', 'cloudcompare.js', 'learn.js'];
 // terminal lab engine: loaded only when a terminal lab is opened, but cached for offline use
-const ENGINE = ['term-fs.js', 'term-parse.js', 'term-exec.js', 'term-cmds.js', 'term-text.js', 'term-awk.js', 'term-jq.js', 'term-sys.js', 'term-net.js', 'term-k8s.js', 'term-docker.js', 'term-cloud.js', 'term-labs.js'];
+const ENGINE = ['term-fs.js', 'term-parse.js', 'term-exec.js', 'term-cmds.js', 'term-text.js', 'term-awk.js', 'term-jq.js', 'term-sys.js', 'term-net.js', 'term-k8s.js', 'term-docker.js', 'term-cloud.js', 'term-iac.js', 'term-helm.js', 'term-infra.js', 'term-hw.js', 'term-labs.js'];
 const COUNTER = process.env.MARGA_COUNTER !== undefined ? process.env.MARGA_COUNTER : 'marga-eknathalabs';
 const SITE = 'https://' + DOMAIN;
 
@@ -79,6 +79,7 @@ function makeMarkdown() {
         const lang = (info || '').split(/\s+/)[0];
         if (lang === 'console') return renderConsole(code);
         if (lang === 'predict') return renderPredict(code);
+        if (lang === 'wrongpath') return renderWrongPath(code);
         if (lang === 'diagram') return renderDiagram(code);
         const body = highlight(code, lang);
         return `<div class="code" data-lang="${esc(lang || 'text')}"><button class="copy" type="button" data-copy="${esc(code)}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">${body}</code></pre></div>\n`;
@@ -176,6 +177,15 @@ function parseCards(src, file) {
   return out;
 }
 
+/* Claim-heavy lessons carry many numbers, defaults, versions or incident details. They show a stronger Sources block and need more references. */
+function claimsOf(t) {
+  const nums = (t.match(/\b\d+(\.\d+)?\s?(GB|MB|KB|TB|ms|seconds|minutes|hours|days|percent|%|MiB|GiB|IOPS)\b/g) || []).length;
+  const vers = (t.match(/\bv?\d+\.\d+(\.\d+)?\b/g) || []).length;
+  const defs = (t.match(/\bdefaults?\b/gi) || []).length;
+  const inc = (t.match(/\bIncident:/g) || []).length;
+  const score = nums + Math.floor(vers / 2) + defs + 3 * inc;
+  return { nums, vers, defs, inc, heavy: score >= 15 };
+}
 function plain(html) {
   return html.replace(/<button[\s\S]*?<\/button>/g, ' ').replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/\s+/g, ' ').trim();
 }
@@ -195,6 +205,27 @@ function renderPredict(code) {
     `<label class="predict-l">Your guess<textarea rows="2" class="predict-guess" placeholder="Type what you expect, then reveal the answer."></textarea></label>` +
     `<button type="button" class="btn btn-primary" data-act="predict-reveal" aria-expanded="false">Reveal the answer</button>` +
     `<div class="predict-out" hidden><p class="predict-ans"><strong>Answer:</strong> ${esc(out)}</p>${why ? `<p>${esc(why)}</p>` : ''}</div></div>\n`;
+}
+
+/* ---------- worked example with a wrong path ---------- */
+function parseWrongPath(code) {
+  const out = { goal: '', wrong: '', result: '', why: '', right: '', after: '' };
+  let cur = null; const buf = {};
+  code.split('\n').forEach((ln) => {
+    const m = ln.match(/^@(goal|wrong|result|why|right|after)\b[ \t]*(.*)$/);
+    if (m) { cur = m[1]; buf[cur] = []; if (m[2]) buf[cur].push(m[2]); } else if (cur) buf[cur].push(ln);
+  });
+  Object.keys(out).forEach((k) => { out[k] = (buf[k] || []).join('\n').trim(); });
+  for (const k of ['goal', 'wrong', 'result', 'why', 'right']) if (!out[k]) throw new Error('wrongpath block needs an @' + k + ' section');
+  return out;
+}
+function renderWrongPath(code) {
+  const w = parseWrongPath(code);
+  return `<section class="wp" aria-label="Worked example with a wrong path"><h4 class="wp-h">Worked example: a tempting wrong path</h4>` +
+    `<p class="wp-goal"><strong>Goal.</strong> ${esc(w.goal)}</p>` +
+    `<div class="wp-step wp-bad"><p class="wp-tag">The tempting way</p><pre tabindex="0"><code>${esc(w.wrong)}</code></pre></div>` +
+    `<details class="wp-more"><summary>See what goes wrong</summary><pre tabindex="0"><code>${esc(w.result)}</code></pre><p class="wp-why"><strong>Why it fails.</strong> ${esc(w.why)}</p></details>` +
+    `<details class="wp-more"><summary>See the way that works</summary><div class="wp-step wp-good"><p class="wp-tag">The way that works</p><pre tabindex="0"><code>${esc(w.right)}</code></pre>${w.after ? `<p>${esc(w.after)}</p>` : ''}</div></details></section>\n`;
 }
 /* Component kinds give every diagram one visual language: the same colour, border and label for the same sort of part. */
 const DG_KINDS = {
@@ -274,7 +305,7 @@ function loadContent() {
       const html = marked.parse(md);
       lessons[id] = {
         id, module: mod.id, slug, title: meta.title, minutes: Number(meta.minutes || 10), summary: meta.summary || '', lv: LEVELS[id] || null,
-        html, toc: state.toc, quiz, cards, text: plain(html).slice(0, 4000)
+        html, toc: state.toc, quiz, cards, text: plain(html).slice(0, 4000), claims: claimsOf(plain(html))
       };
       mod.lessons.push(id);
     }
@@ -355,6 +386,23 @@ function loadContent() {
       for (const k of ['level', 'modules', 'lessons', 'summary']) if (!kv[k]) throw new Error(`walkthroughs/${f}: missing ${k}:`);
       const html = makeMarkdown().marked.parse(restParts.join('\n\n'));
       walkthroughs.push({ id: f.replace(/\.md$/, '').replace(/^\d+-/, ''), title: tm[1].trim(), level: kv.level, modules: kv.modules.split(',').map((x) => x.trim()), lessons: kv.lessons.split(',').map((x) => x.trim()), summary: kv.summary, html, text: plain(html) });
+    }
+  }
+
+  // Mock design interview model answers: src/mockdesigns/<prompt-id>.md -> "# Title", "prompt:" and "summary:", then a markdown body with a diagram
+  const mockdesigns = {};
+  const mdir = path.join(SRC, 'mockdesigns');
+  if (fs.existsSync(mdir)) {
+    for (const f of fs.readdirSync(mdir).filter((x) => x.endsWith('.md')).sort()) {
+      const raw = fs.readFileSync(path.join(mdir, f), 'utf8');
+      const tm = raw.match(/^# (.+)\n/);
+      if (!tm) throw new Error(`mockdesigns/${f}: needs a "# Title" first line`);
+      const [head, ...restParts] = raw.slice(tm[0].length).split(/\n\s*\n/);
+      const kv = {};
+      for (const line of head.split('\n')) { const m = line.match(/^([a-z]+):\s*(.+)$/); if (m) kv[m[1]] = m[2].trim(); }
+      if (!kv.prompt || !kv.summary) throw new Error(`mockdesigns/${f}: needs prompt: and summary:`);
+      const html = makeMarkdown().marked.parse(restParts.join('\n\n'));
+      mockdesigns[kv.prompt] = { title: tm[1].trim(), summary: kv.summary, html, text: plain(html) };
     }
   }
 
@@ -509,12 +557,22 @@ function loadContent() {
       for (const w of j) plans.push(w);
     }
   }
-  return { modules, paths, lessons, sheets, interview, cases, casefiles, widgets, plans, capstones, walkthroughs, reading, games, arch, drills, glossary, labs, termlabs, vmlabs, challenges, predicts: PREDICTS };
+  return { modules, paths, lessons, sheets, interview, cases, casefiles, widgets, plans, capstones, walkthroughs, mockdesigns, reading, games, arch, drills, glossary, labs, termlabs, vmlabs, challenges, predicts: PREDICTS };
 
 }
 
 /* ---------- output ---------- */
 const read = (p) => fs.readFileSync(path.join(SRC, p), 'utf8');
+/* Explainers live partly in src/explainers/*.json (one file per round or skill). They are appended to the explainers script at build time. */
+function readApp(f) {
+  const base = read('app/' + f);
+  if (f !== 'explainers.js') return base;
+  const dir = path.join(SRC, 'explainers');
+  if (!fs.existsSync(dir)) return base;
+  const extra = fs.readdirSync(dir).filter((n) => n.endsWith('.json')).sort().map((n) => JSON.parse(fs.readFileSync(path.join(dir, n), 'utf8')));
+  const all = [].concat(...extra);
+  return base + '\nwindow.MARGA_EXPLAINERS.push.apply(window.MARGA_EXPLAINERS, ' + JSON.stringify(all) + ');\n';
+}
 function write(p, content) {
   const full = path.join(DIST, p);
   fs.mkdirSync(path.dirname(full), { recursive: true });
@@ -575,11 +633,11 @@ function main() {
   const esc = (o) => JSON.stringify(o).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
   const chunkJs = {}; for (const [m, c] of Object.entries(chunks)) chunkJs[m] = '(function(m,c){var L=window.ACADEMY.lessons;for(var id in c){Object.assign(L[id],c[id]);}(window.ACADEMY_LOADED=window.ACADEMY_LOADED||{})[m]=1;})(' + JSON.stringify(m) + ',' + esc(c) + ');';
   const dataJs = 'window.ACADEMY=' + JSON.stringify({ domain: DOMAIN, counter: COUNTER, ...data, lessons: slim }).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029') + ';';
-  const ver = crypto.createHash('sha1').update(css + js + dataJs + Object.values(chunkJs).join('') + EXTRA.concat(ENGINE).map((f) => read('app/' + f)).join('')).digest('hex').slice(0, 8);
+  const ver = crypto.createHash('sha1').update(css + js + dataJs + Object.values(chunkJs).join('') + EXTRA.concat(ENGINE).map((f) => readApp(f)).join('')).digest('hex').slice(0, 8);
 
   write('assets/app.css', css);
   write('assets/app.js', js);
-  EXTRA.concat(ENGINE).forEach((f) => write('assets/' + f, read('app/' + f)));
+  EXTRA.concat(ENGINE).forEach((f) => write('assets/' + f, readApp(f)));
   // SQLite for the SQL playground (vendored sql.js 1.x browser build), loaded only when that page is opened
   write('assets/sql-wasm.js', fs.readFileSync(path.join(ROOT, 'node_modules/sql.js/dist/sql-wasm-browser.js'), 'utf8').split('\n').map((ln) => (/^\s*\/\//.test(ln) && /(\bgi\w+\.com|\bTO\w+:)/.test(ln) ? '// (comment removed)' : ln)).join('\n'));
   fs.copyFileSync(path.join(ROOT, 'node_modules/sql.js/dist/sql-wasm-browser.wasm'), path.join(DIST, 'assets/sql-wasm.wasm'));

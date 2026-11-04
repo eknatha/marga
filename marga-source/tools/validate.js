@@ -365,6 +365,10 @@ function checkCode() {
     } else if (lang === 'predict') {
       count('predict blocks');
       if (!/^Q: .+/m.test(b.code) || !/^\?\?\?\s*$/m.test(b.code)) msg = 'predict block needs a Q: line and a ??? separator';
+    } else if (lang === 'wrongpath') {
+      count('wrong-path examples');
+      for (const k of ['goal', 'wrong', 'result', 'why', 'right']) if (!new RegExp('^@' + k + '\\b', 'm').test(b.code)) msg = 'wrongpath block needs an @' + k + ' section';
+      if (!msg && b.code.length < 300) msg = 'wrongpath block is too short to teach anything';
     } else if (lang === 'diagram') {
       count('diagram blocks');
       if ((b.code.match(/^node:/gm) || []).length < 3) msg = 'diagram needs at least 3 nodes';
@@ -499,7 +503,7 @@ function checkBudgets() {
 
 
 // ---------------------------------------------------------------- 8. references, interview, promise, voice, print
-const REF_HOSTS = /^https:\/\/([a-z0-9-]+\.)*(kubernetes\.io|docker\.com|hashicorp\.com|terraform\.io|aws\.amazon\.com|microsoft\.com|azure\.com|prometheus\.io|sre\.google|python\.org|man7\.org|rfc-editor\.org|opentelemetry\.io|grafana\.com|helm\.sh|kernel\.org|gnu\.org|redhat\.com|ubuntu\.com|debian\.org|nginx\.org|openssh\.com|argoproj\.github\.io|cncf\.io|opencontainers\.org|github\.com|cloud\.google\.com|cloudflare\.com|iptables\.org|netfilter\.org|systemd\.io|freedesktop\.org|kubectl\.docs\.kubernetes\.io|kustomize\.io|pypa\.io|pytest\.org|readthedocs\.io|postgresql\.org|jenkins\.io|semver\.org|owasp\.org|nist\.gov|slsa\.dev|sigstore\.dev|open-policy-agent\.org|aquasec\.com|trivy\.dev|podman\.io|buildah\.io|etcd\.io|cni\.dev|istio\.io|envoyproxy\.io|linuxfoundation\.org|cisecurity\.org|google\.com|w3\.org|ietf\.org|letsencrypt\.org|github\.io|gitlab\.com|hashicorp\.github\.io|opengroup\.org|jq\.dev|jqlang\.github\.io|curl\.se|openssl\.org|lvm2\.sourceware\.org|sourceware\.org|kernel\.dk|brendangregg\.com|netflix\.github\.io|principlesofchaos\.org|litmuschaos\.io|chaos-mesh\.org|pagerduty\.com|atlassian\.com|dora\.dev|12factor\.net|martinfowler\.com|apache\.org|elastic\.co|fluentbit\.io|fluentd\.org|vector\.dev|jaegertracing\.io|loki\.io|thanos\.io|victoriametrics\.com|containerd\.io|continuousdelivery\.com|keepachangelog\.com|fluxcd\.io|keda\.sh|karpenter\.sh|cilium\.io|openfeature\.dev|selinuxproject\.org|shellcheck\.net|everything\.curl\.dev|jqlang\.org|amazonaws\.com|mozilla\.org|tcpdump\.org|wireshark\.org|wireguard\.com|nftables\.org|cisa\.gov|oauth\.net|openpolicyagent\.org|kyverno\.io|mitre\.org|opengroup\.org|sigstore\.dev|ansible\.com|redis\.io|mysql\.com|mongodb\.com|pgbouncer\.org|pgbackrest\.org|use-the-index-luke\.com|git-scm\.com|go\.dev|golang\.org|conventionalcommits\.org|trunkbaseddevelopment\.com|anthropic\.com|claude\.com|modelcontextprotocol\.io|json-schema\.org|mlflow\.org|kubeflow\.org|evidentlyai\.com)(\/|$)/;
+const REF_HOSTS = /^https:\/\/([a-z0-9-]+\.)*(tigera\.io|smb\.com|nvmexpress\.org|ibm\.com|canonical\.com|maas\.io|ipxe\.org|syslinux\.org|tftp-hpa\.org|intel\.com|supermicro\.com|dell\.com|opencomputeproject\.org|gateway-api\.sigs\.k8s\.io|linkerd\.io|smartmontools\.org|dmtf\.org|kubernetes\.io|docker\.com|hashicorp\.com|terraform\.io|aws\.amazon\.com|microsoft\.com|azure\.com|prometheus\.io|sre\.google|python\.org|man7\.org|rfc-editor\.org|opentelemetry\.io|grafana\.com|helm\.sh|kernel\.org|gnu\.org|redhat\.com|ubuntu\.com|debian\.org|nginx\.org|openssh\.com|argoproj\.github\.io|cncf\.io|opencontainers\.org|github\.com|cloud\.google\.com|cloudflare\.com|iptables\.org|netfilter\.org|systemd\.io|freedesktop\.org|kubectl\.docs\.kubernetes\.io|kustomize\.io|pypa\.io|pytest\.org|readthedocs\.io|postgresql\.org|jenkins\.io|semver\.org|owasp\.org|nist\.gov|slsa\.dev|sigstore\.dev|open-policy-agent\.org|aquasec\.com|trivy\.dev|podman\.io|buildah\.io|etcd\.io|cni\.dev|istio\.io|envoyproxy\.io|linuxfoundation\.org|cisecurity\.org|google\.com|w3\.org|ietf\.org|letsencrypt\.org|github\.io|gitlab\.com|hashicorp\.github\.io|opengroup\.org|jq\.dev|jqlang\.github\.io|curl\.se|openssl\.org|lvm2\.sourceware\.org|sourceware\.org|kernel\.dk|brendangregg\.com|netflix\.github\.io|principlesofchaos\.org|litmuschaos\.io|chaos-mesh\.org|pagerduty\.com|atlassian\.com|dora\.dev|12factor\.net|martinfowler\.com|apache\.org|elastic\.co|fluentbit\.io|fluentd\.org|vector\.dev|jaegertracing\.io|loki\.io|thanos\.io|victoriametrics\.com|containerd\.io|continuousdelivery\.com|keepachangelog\.com|fluxcd\.io|keda\.sh|karpenter\.sh|cilium\.io|openfeature\.dev|selinuxproject\.org|shellcheck\.net|everything\.curl\.dev|jqlang\.org|amazonaws\.com|mozilla\.org|tcpdump\.org|wireshark\.org|wireguard\.com|nftables\.org|cisa\.gov|oauth\.net|openpolicyagent\.org|kyverno\.io|mitre\.org|opengroup\.org|sigstore\.dev|ansible\.com|redis\.io|mysql\.com|mongodb\.com|pgbouncer\.org|pgbackrest\.org|use-the-index-luke\.com|git-scm\.com|go\.dev|golang\.org|conventionalcommits\.org|trunkbaseddevelopment\.com|anthropic\.com|claude\.com|modelcontextprotocol\.io|json-schema\.org|mlflow\.org|kubeflow\.org|evidentlyai\.com|libvirt\.org|qemu\.org|linux-kvm\.org|openvswitch\.org|ceph\.com|openstack\.org|proxmox\.com|nvidia\.com|huggingface\.co|vllm\.ai|xfs\.org)(\/|$)/;
 function checkExtras() {
   // official references on every lesson, module and sheet
   const checkRefs = (what, refs) => {
@@ -515,6 +519,7 @@ function checkExtras() {
     }
   };
   for (const [id, l] of Object.entries(lessons)) checkRefs('lesson ' + id, l.refs);
+  for (const [id, l] of Object.entries(lessons)) { if (l.claims && l.claims.heavy) { count('claim-heavy lessons'); if ((l.refs || []).length < 3) err('refs', `lesson ${id}: claim-heavy lessons (numbers, defaults, versions, incidents) need at least 3 sources`); } }
   for (const [id, s] of Object.entries(sheets)) checkRefs('sheet ' + id, s.refs);
   for (const m of modules) checkRefs('module ' + m.id, m.refs);
 
@@ -685,6 +690,25 @@ function checkPractice() {
       if (w.text.split(/\s+/).length < 450) warn('walkthroughs', `${t}: short`);
       if (FORBID.test(JSON.stringify(w))) err('walkthroughs', `${t}: forbidden word`);
     }
+  }
+  // mock design model answers
+  {
+    const sd = fs.readFileSync(path.join(SRC, 'app', 'sdlab.js'), 'utf8');
+    const ids = [...sd.matchAll(/^\s*\['([a-z0-9-]+)', '[^']+', '[^']*'\],?$/gm)].map((m) => m[1]);
+    const md = A.mockdesigns || {};
+    if (ids.length < 18) err('mockdesigns', `need at least 18 interview prompts, found ${ids.length}`);
+    for (const id of ids) {
+      count('mockdesigns');
+      const m = md[id];
+      if (!m) { err('mockdesigns', `prompt ${id}: no model answer in src/mockdesigns/${id}.md`); continue; }
+      if (!/class="dg"/.test(m.html)) err('mockdesigns', `${id}: needs a component diagram`);
+      const comps = m.html.split(/<h3[ >]/).slice(1);
+      if (comps.length < 5) err('mockdesigns', `${id}: explain at least 5 components, found ${comps.length}`);
+      comps.forEach((c, i) => { if (!/Example:/.test(c)) err('mockdesigns', `${id}: component ${i + 1} has no Example:`); });
+      for (const h of ['The answer in one minute', 'Every component, explained', 'What goes wrong']) if (!m.html.includes(h)) err('mockdesigns', `${id}: missing section ${h}`);
+      if (FORBID.test(JSON.stringify(m))) err('mockdesigns', `${id}: forbidden word`);
+    }
+    for (const id of Object.keys(md)) if (!ids.includes(id)) err('mockdesigns', `model answer ${id} has no prompt`);
   }
   // architecture studies
   if ((A.arch || []).length < 50) err('arch', `need at least 50 architecture studies, found ${(A.arch || []).length}`);
@@ -880,9 +904,9 @@ function checkTermLabs() {
   parsed.forEach((l) => (l.errors || []).forEach((m) => err('termlabs', `${l.id || l.title}: ${m}`)));
   if (labs.length !== parsed.length) err('termlabs', 'data.js does not match src/termlabs');
   const KNOWN = new Set(['file', 'contains', 'equals', 'mode', 'owner', 'unchanged', 'service', 'proc', 'disk', 'cron', 'ran', 'group', 'cmd']);
-  const MODS = ['linux', 'bash', 'networking', 'python', 'kubernetes', 'docker', 'cloud'], LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
+  const MODS = ['linux', 'bash', 'networking', 'python', 'kubernetes', 'docker', 'cloud', 'terraform', 'helm', 'virtualization', 'storage', 'sql-ops', 'gpu-serving', 'openstack', 'baremetal', 'service-mesh', 'multi'], LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
   const ids = new Set();
-  for (const m of MODS) if (labs.filter((l) => l.module === m).length < (['kubernetes', 'docker', 'cloud'].includes(m) ? 10 : 18)) err("termlabs", `${m}: need more labs`);
+  for (const m of MODS) if (labs.filter((l) => l.module === m).length < (['terraform', 'helm', 'virtualization', 'storage', 'sql-ops', 'gpu-serving', 'openstack', 'baremetal', 'service-mesh'].includes(m) ? 5 : m === 'multi' ? 10 : ['kubernetes', 'docker', 'cloud'].includes(m) ? 10 : 18)) err("termlabs", `${m}: need more labs`);
   for (const l of labs) {
     const w = l.id || l.title;
     if (!/^[a-z0-9-]+$/.test(l.id || '')) err('termlabs', `${w}: bad id`);
@@ -910,7 +934,7 @@ function checkTermLabs() {
     if (/TODO|FIXME|lorem ipsum/i.test(txt)) err('termlabs', `${w}: placeholder text`);
     if (/undefined|NaN|\[object Object\]/.test(`${l.title} ${l.summary} ${l.story} ${l.goals.join(' ')} ${l.hints.join(' ')} ${l.explain}`)) err('termlabs', `${w}: bad rendered text`);
   }
-  for (const f of ['term-fs', 'term-parse', 'term-exec', 'term-cmds', 'term-text', 'term-awk', 'term-jq', 'term-sys', 'term-net', 'term-k8s', 'term-docker', 'term-cloud', 'term-labs', 'termlabs-ui']) {
+  for (const f of ['term-fs', 'term-parse', 'term-exec', 'term-cmds', 'term-text', 'term-awk', 'term-jq', 'term-sys', 'term-net', 'term-k8s', 'term-docker', 'term-cloud', 'term-iac', 'term-helm', 'term-infra', 'term-hw', 'term-labs', 'termlabs-ui']) {
     const t = read(path.join(SRC, 'app', f + '.js'));
     if (FORBID.test(t)) err('termlabs', `${f}.js contains a forbidden word`);
     if (EMOJI.test(t) || ARROW.test(t)) err('termlabs', `${f}.js contains an emoji or arrow glyph`);
@@ -1047,7 +1071,7 @@ function checkWidgets() {
       if (!seen) E('no warning or failure verdict can be reached');
     }
   }
-  for (const m of modules) if ((perModule[m] || 0) < 4) err('widgets', `skill ${m} has ${perModule[m] || 0} widgets, needs at least 4`);
+  for (const m of modules) { const need = 4; if ((perModule[m] || 0) < need) err('widgets', `skill ${m} has ${perModule[m] || 0} widgets, needs at least ${need}`); }
   count('widgets', n);
   for (const [k, v] of Object.entries(perModule)) count('widgets in ' + k, v);
   const html = read(path.join(DIST, 'index.html'));

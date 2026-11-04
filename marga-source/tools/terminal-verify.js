@@ -37,6 +37,15 @@ async function verifyLab(lab) {
     let r;
     try { r = await verifyLab(lab); } catch (e) { r = { problems: ['crash: ' + (e.stack || e)], startPass: 0, total: 0 }; }
     lab.errors.forEach(e => r.problems.push(e));
+    if (lab.vary && !r.problems.length) {
+      for (let vi = 0; vi < lab.vary.length; vi++) {
+        const txt = JSON.stringify(lab);
+        Object.keys(lab.vary[vi]).forEach(k => { if (txt.indexOf(JSON.stringify(k).slice(1, -1)) < 0) r.problems.push('variant ' + (vi + 1) + ': "' + k + '" does not appear in the lab'); });
+        if (r.problems.length) break;
+        let vr; try { vr = await verifyLab(T.variantLab(lab, lab.vary[vi])); } catch (e) { vr = { problems: ['crash: ' + e] }; }
+        vr.problems.forEach(p => r.problems.push('variant ' + (vi + 1) + ': ' + p));
+      }
+    }
     if (r.problems.length) { bad++; console.log('FAIL ' + lab.id + '\n  - ' + r.problems.join('\n  - ')); }
     else console.log('ok   ' + lab.id + '  (start ' + r.startPass + '/' + r.total + ' checks pass, solution ' + r.total + '/' + r.total + ')');
   }
