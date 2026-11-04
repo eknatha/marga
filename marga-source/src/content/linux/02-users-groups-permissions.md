@@ -127,6 +127,22 @@ edge: cls | bits
 edge: bits | res
 ```
 
+```wrongpath
+@goal A deploy script cannot write to /srv/app, so make it work.
+@wrong
+chmod -R 777 /srv/app
+@result
+(no output: it works)
+$ ls -ld /srv/app
+drwxrwxrwx 5 root root 4096 Nov 4 09:10 /srv/app
+@why Mode 777 lets every user and every compromised process modify the code. It hides the real problem, that the deploy user is not the owner and is not in the owning group. The fault is fixed by identity, not by opening the door to everyone.
+@right
+sudo chown -R deploy:deploy /srv/app
+sudo chmod -R u=rwX,g=rX,o= /srv/app
+ls -ld /srv/app
+@after Give the directory to the user or group that needs it and keep others out. Check with the deploy user, not with root.
+```
+
 ## Common mistakes
 
 - Forgetting that every parent directory needs the execute bit

@@ -127,6 +127,22 @@ edge: dry | act
 edge: act | end
 ```
 
+```wrongpath
+@goal Delete old build directories inside a variable path.
+@wrong
+rm -rf $BUILD_DIR/*
+@result
+# BUILD_DIR was not set
+rm -rf /*
+rm: it is dangerous to operate recursively on /
+@why With an empty variable the path expands to /*. Unquoted variables also split on spaces. Missing safeguards turn a typo into data loss.
+@right
+set -euo pipefail
+: "${BUILD_DIR:?BUILD_DIR must be set}"
+find "$BUILD_DIR" -mindepth 1 -maxdepth 1 -mtime +7 -exec rm -rf -- {} +
+@after Fail when the variable is empty, quote every expansion and limit what the command can match.
+```
+
 ## Common mistakes
 
 - Cleaning up old data before confirming the new data is good

@@ -118,6 +118,27 @@ $ kubectl rollout status deployment/shop-api -n shop
 
 For a durable approach, many teams include a hash of the config in the Pod template (Helm and Kustomize can do this), so any config change automatically triggers a rolling update and the change is recorded as a new revision you can roll back.
 
+```wrongpath
+@goal Put the database password into the deployment manifest.
+@wrong
+env:
+- name: DB_PASSWORD
+  value: "S3cr3t!"
+@result
+(deploys fine)
+$ git log -p | grep S3cr3t
++ value: "S3cr3t!"
+@why The password is now in the repository, in every clone and in the history. Rotating it means rewriting history, and anyone with read access to the manifest has the secret.
+@right
+kubectl create secret generic db --from-literal=password="$DB_PASSWORD"
+# in the manifest
+env:
+- name: DB_PASSWORD
+  valueFrom:
+    secretKeyRef: {name: db, key: password}
+@after Reference a Secret, ideally filled by an external secret manager, and keep values out of Git.
+```
+
 ## Common mistakes
 
 - Treating Base64 as secure

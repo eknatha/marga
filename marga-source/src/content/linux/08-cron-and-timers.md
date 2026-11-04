@@ -121,6 +121,24 @@ $ sudo systemctl list-timers | grep certbot
 
 Use an absolute path or set PATH, log to a file the monitoring agent watches, run `renew --dry-run` in CI or weekly, and add an alert that fires when any certificate has fewer than 21 days left. Renewal should never depend on a human noticing an email.
 
+```wrongpath
+@goal Run a backup script every night at 02:00.
+@wrong
+crontab -e
+0 2 * * * backup.sh
+@result
+(no mail, no backup)
+$ ls /backups
+(empty)
+@why Cron runs with a minimal PATH and a different working directory, so backup.sh is not found. Nothing logs the failure because the output goes to local mail nobody reads.
+@right
+crontab -e
+0 2 * * * /opt/backup/backup.sh >>/var/log/backup.log 2>&1
+# check it ran
+grep CRON /var/log/syslog | tail -3
+@after Use full paths, send output to a log, and check after the first night that the file exists.
+```
+
 ## Common mistakes
 
 - Relying on the interactive PATH and environment

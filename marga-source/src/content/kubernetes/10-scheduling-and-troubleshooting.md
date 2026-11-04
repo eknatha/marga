@@ -101,6 +101,21 @@ $ kubectl describe node worker-1 | grep -A6 "Allocated resources"
 
 If the request of 8Gi is far larger than the workload needs, lower it. If it is genuinely needed, add capacity or let a cluster autoscaler add a node. Do not add a toleration for the GPU taint just to get scheduled, since that defeats the reason the taint exists.
 
+```wrongpath
+@goal A pod is Pending, so delete and recreate it.
+@wrong
+kubectl delete pod api-0 && kubectl apply -f api.yaml
+@result
+pod/api-0 created
+$ kubectl get pod api-0
+api-0   0/1   Pending
+@why The pod is Pending for a reason the scheduler already recorded, such as no node with enough memory. Recreating it asks the same question and gets the same answer.
+@right
+kubectl describe pod api-0 | sed -n "/Events/,\$p"
+kubectl describe nodes | grep -A6 Allocated
+@after Read the event message first, then change the requests, add capacity or fix the taint or selector it names.
+```
+
 ## Common mistakes
 
 - Reading `kubectl logs` without `--previous` after a crash

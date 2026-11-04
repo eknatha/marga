@@ -132,6 +132,23 @@ edge: ing | svc
 edge: svc | pod
 ```
 
+```wrongpath
+@goal The Service has no endpoints, so create endpoints by hand.
+@wrong
+kubectl apply -f endpoints.yaml  # lists the pod IPs
+@result
+service/web unchanged
+# a pod restarts and gets a new IP
+$ curl web
+curl: (7) Failed to connect
+@why Pod IPs change every time a pod is replaced. A hand-written Endpoints object cannot follow them. The real problem is that the Service selector does not match any ready pod.
+@right
+kubectl get svc web -o yaml | grep -A3 selector
+kubectl get pods --show-labels
+kubectl get endpoints web
+@after Make the selector match the pod labels and make the pods ready, and Kubernetes keeps the endpoints current.
+```
+
 ## Common mistakes
 
 - Mismatched labels between Service selector and Pods

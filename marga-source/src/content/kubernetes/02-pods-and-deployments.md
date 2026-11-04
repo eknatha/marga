@@ -133,6 +133,24 @@ No. It is removed from Service endpoints until it passes.
 > A failing readiness probe stops traffic. A failing liveness probe is what causes a restart.
 ```
 
+```wrongpath
+@goal A pod is misbehaving, so fix it by editing the pod.
+@wrong
+kubectl edit pod web-7d9f -n shop
+@result
+pod/web-7d9f edited
+# 10 minutes later the pod is replaced
+$ kubectl get pod web-7d9f
+Error from server (NotFound)
+@why A pod managed by a Deployment is disposable. The controller creates a new one from the template, so a manual edit is lost the next time the pod restarts or is rescheduled.
+@right
+kubectl get deploy web -n shop -o yaml > web.yaml
+# edit the template in web.yaml
+kubectl apply -f web.yaml -n shop
+kubectl rollout status deploy/web -n shop
+@after Change the Deployment so every replica follows, and keep the file in version control.
+```
+
 ## Common mistakes
 
 - No readiness probe, so traffic arrives before the app can handle it

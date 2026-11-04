@@ -133,6 +133,23 @@ No. A clean exit with code 0 is not a failure.
 > on-failure restarts for non-zero exit codes, signals and timeouts. Use Restart=always if it must run again after any exit.
 ```
 
+```wrongpath
+@goal A service is hanging, so restart it quickly.
+@wrong
+kill -9 $(pgrep -f myapp)
+@result
+$ systemctl status myapp
+  Active: inactive (dead)
+$ journalctl -u myapp | tail -2
+myapp: database file is locked, possible corruption
+@why SIGKILL gives the process no chance to flush data or release locks, and since the process was started by systemd outside its control, systemd does not know it is gone. Use the service manager, and ask nicely before forcing.
+@right
+sudo systemctl restart myapp
+systemctl status myapp
+journalctl -u myapp -n 20
+@after Use systemctl so shutdown hooks run and the state stays known. Keep kill -9 as the last step after a timeout.
+```
+
 ## Common mistakes
 
 - Editing a unit file and forgetting `systemctl daemon-reload`

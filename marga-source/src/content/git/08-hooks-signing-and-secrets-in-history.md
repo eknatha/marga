@@ -80,6 +80,25 @@ RunInstances   2026-01-04T02:11:09Z  region ap-south-1
 
 An access key was in a settings file, and someone had used it to start compute instances. The team revoked the key within minutes, terminated the instances and then rewrote the history. They installed push protection, added a pre-commit scan, moved secrets to a secret manager and made the CI role assumable with short-lived credentials so no static key exists to leak.
 
+```wrongpath
+@goal An API key was committed; remove it in a new commit.
+@wrong
+git rm config.env
+git commit -m "remove key"
+git push
+@result
+(pushed)
+$ git log -p | grep AKIA
++AWS_KEY=AKIA...
+@why The key is still in the history, so anyone who clones can read it. The key must be treated as leaked from the moment it was pushed.
+@right
+# 1 revoke and rotate the key at the provider first
+# 2 then rewrite history
+git filter-repo --path config.env --invert-paths
+git push --force-with-lease
+@after Revoke the key first, because rewriting history is cleanup and not a fix. Then prevent a repeat with a secret scanner hook.
+```
+
 ## Common mistakes
 
 - Rotating nothing and only deleting the file

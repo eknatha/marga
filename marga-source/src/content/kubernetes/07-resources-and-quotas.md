@@ -128,6 +128,26 @@ $ kubectl top pods -A --sort-by=cpu | head -5
 
 Right-size by lowering requests to match measured usage, using the Vertical Pod Autoscaler in recommendation mode as a guide. Meanwhile add nodes if the service is urgent. Prevent drift with quotas and a periodic review of requested versus used.
 
+```wrongpath
+@goal Pods keep getting OOMKilled, so remove the memory limit.
+@wrong
+# deployment.yaml
+resources: {}
+@result
+(pods stop being killed)
+# a week later
+$ kubectl describe node n3 | grep -i pressure
+MemoryPressure True
+@why With no limit one pod can use all the node memory and cause other pods and system processes to be evicted. The killing was the symptom of a limit that was too low, not the disease.
+@right
+kubectl top pod web-1 --containers
+# set requests near typical use and a limit above peak
+resources:
+  requests: {memory: 512Mi}
+  limits: {memory: 1Gi}
+@after Measure real usage, set a request and a sensible limit, and look for a leak if usage keeps growing.
+```
+
 ## Common mistakes
 
 - Setting memory limits far below real peak usage, causing OOM kills

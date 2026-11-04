@@ -98,6 +98,24 @@ sudo blkid /dev/sdc1          # copy the UUID into /etc/fstab
 
 Many servers use **LVM** so volumes can grow without repartitioning. Growing is a two-step process: extend the logical volume, then grow the filesystem (for ext4, `resize2fs`).
 
+```wrongpath
+@goal The / filesystem is 100 percent full; free space fast.
+@wrong
+rm -rf /var/log/*
+@result
+$ df -h /
+/dev/sda1 50G 50G 0 100% /
+$ systemctl status rsyslog
+Failed to open /var/log/syslog
+@why Deleting log files that a daemon still holds open frees no space, because the blocks stay allocated until the process closes the file. It also removes the evidence needed to learn why the disk filled.
+@right
+sudo du -xh / --max-depth=2 | sort -h | tail
+sudo lsof +L1
+sudo journalctl --vacuum-size=200M
+sudo truncate -s 0 /var/log/app/app.log
+@after Find the largest items first, truncate the open log instead of deleting it, and fix the cause such as missing rotation.
+```
+
 ## Common mistakes
 
 - Looking only at `df -h` and forgetting `df -i`

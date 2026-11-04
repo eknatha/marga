@@ -96,6 +96,24 @@ $ sudo sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/s
 
 Rotate every exposed key, remove old entries from `authorized_keys`, switch to `ProxyJump` so keys stay on laptops, and consider short-lived certificates or a cloud session manager so there are no long-lived keys at all.
 
+```wrongpath
+@goal Allow a colleague to log in to a server with SSH.
+@wrong
+# copy the private key by chat
+scp ~/.ssh/id_ed25519 colleague@db-1:/tmp/
+@result
+(works, the colleague can now log in as you)
+@why A private key identifies one person. Sending it means two people share one identity and the audit log can no longer say who did what. The key also now exists in chat history and in /tmp.
+@right
+# colleague runs on their laptop
+ssh-keygen -t ed25519
+# they send only the public key
+cat ~/.ssh/id_ed25519.pub
+# you add it for their account
+sudo -u colleague tee -a /home/colleague/.ssh/authorized_keys
+@after Share public keys only, one key per person, and remove access by deleting the line.
+```
+
 ## Common mistakes
 
 - Using password authentication on internet-facing hosts
