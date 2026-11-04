@@ -2037,6 +2037,35 @@ body.embed #main{padding-top:.5rem}
 .wp-more > summary { cursor: pointer; font-weight: 600; }
 .wp-more > * + * { margin-top: 8px; }
 
+/* Round 40: callsign, avatar and greeting (stored on this device only) */
+.me-av { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; color: #fff; font: 700 1.1rem/1 var(--sans); flex: none; }
+.me-av.sm { width: 28px; height: 28px; font-size: .9rem; }
+.me-av.lg { width: 56px; height: 56px; font-size: 1.5rem; }
+.me-btn { display: inline-flex; align-items: center; gap: 8px; padding: 4px 8px; min-height: 40px; }
+.me-btn .me-name { max-width: 9ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+@media (max-width: 1100px) { .me-btn .me-name { display: none; } }
+.greet { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin: 0 0 10px; color: var(--text); font-weight: 500; }
+.greet b { font-weight: 700; overflow-wrap: anywhere; }
+.greet-ask { color: var(--muted); font-weight: 400; }
+.linkish { background: none; border: 0; padding: 4px 2px; font: inherit; color: var(--link, var(--accent, currentColor)); text-decoration: underline; cursor: pointer; min-height: 32px; }
+.me-dlg { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 16px; }
+.me-back { position: absolute; inset: 0; background: rgba(8, 15, 30, .55); }
+.me-card { position: relative; width: min(460px, 100%); max-height: calc(100vh - 32px); overflow: auto; background: var(--surface); color: var(--text); border: 1px solid var(--line-strong); border-radius: 14px; padding: 20px 22px; box-shadow: 0 16px 48px rgba(0, 0, 0, .35); }
+.me-card h2 { margin: 0 0 6px; font-size: 1.25rem; }
+.me-prev { display: flex; align-items: center; gap: 12px; margin: 14px 0; }
+.me-prev-n { font-weight: 700; font-size: 1.1rem; overflow-wrap: anywhere; }
+.me-f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; margin-bottom: 14px; }
+.me-f input { font: 16px var(--sans); padding: 10px 12px; min-height: 44px; border-radius: 8px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--text); }
+.me-grp { margin-bottom: 14px; }
+.me-gl { display: block; font-weight: 600; margin-bottom: 6px; }
+.me-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.me-pick { background: transparent; border: 2px solid transparent; border-radius: 50%; padding: 2px; cursor: pointer; line-height: 0; }
+.me-pick.on { border-color: var(--text); }
+.me-pick:focus-visible { outline: 3px solid var(--focus, #1f6feb); outline-offset: 2px; }
+.me-sw span { display: block; width: 28px; height: 28px; border-radius: 50%; }
+.me-act { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+@media (max-width: 560px) { .topbar-in .me-btn { min-width: 40px; padding: 4px 6px; } }
+
 /* ===== Round 35 theme layer: the merged design =====
    Loaded after app.css. Tokens first, then components.
    Teal and marigold in light, midnight and gold in dark.
