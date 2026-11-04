@@ -1,0 +1,183 @@
+/* ===== Round 35 theme layer: the merged design =====
+   Loaded after app.css. Tokens first, then components.
+   Teal and marigold in light, midnight and gold in dark.
+   Everything here is colour, shape and type. No layout the tests rely on moves. */
+
+:root, :root[data-theme="light"] {
+  --paper: #F5F7F4;
+  --surface: #FFFFFF;
+  --ink: #0B2B2E;
+  --text: #1D3436;
+  --muted: #4B6567;
+  --line: #D5DEDB;
+  --line-strong: #AEBFBB;
+  --accent: #0E6F73;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E0F0EF;
+  --mark: #F2B544;
+  --mark-ink: #2B1D00;
+  --code-bg: #0C1612;
+  --code-line: #15261E;
+  --code-text: #D6F5DF;
+  --code-dim: #9CC9AE;
+  --r-card: 18px;
+  --r-ctl: 12px;
+  --shadow: 0 1px 2px rgba(11, 43, 46, .06), 0 8px 24px rgba(11, 43, 46, .05);
+}
+:root[data-theme="dark"] {
+  --paper: #080B1E;
+  --surface: #11162E;
+  --ink: #EEEBF8;
+  --text: #CDCBE4;
+  --muted: #A19FC6;
+  --line: #262C52;
+  --line-strong: #3C4478;
+  --accent: #F6D77A;
+  --accent-ink: #0B1030;
+  --accent-soft: #2A2A4D;
+  --mark: #F6D77A;
+  --mark-ink: #0B1030;
+  --pass: #5EE0B0; --pass-ink: #5EE0B0;
+  --code-bg: #060D0A;
+  --code-line: #12221A;
+  --shadow: none;
+}
+
+/* ---- type ---- */
+h1, h2, h3, h4 { letter-spacing: -.022em; }
+.lesson-head h1 { font-family: var(--serif); font-weight: 600; letter-spacing: -.02em; line-height: 1.1; }
+.prose { line-height: 1.75; }
+.prose h2 { font-family: var(--sans); letter-spacing: -.02em; }
+
+/* ---- controls ---- */
+.btn { min-height: 48px; border-radius: var(--r-ctl); font-weight: 700; padding-left: 20px; padding-right: 20px; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn-quiet { border-width: 2px; border-color: var(--ink); color: var(--ink); }
+.btn-quiet:hover { background: var(--accent-soft); }
+:root[data-theme="dark"] .btn-quiet { border-color: var(--line-strong); }
+.topnav a.on { box-shadow: inset 0 -3px 0 var(--mark); border-radius: 8px 8px 0 0; }
+.chip { border-radius: 999px; }
+
+/* ---- cards ---- */
+.card, .door, .tl-card, .cs-card, .vm-card, .fc-card, .tree-detail, .pipe-panel { border-radius: var(--r-card); }
+.card, .door, .tl-card { box-shadow: var(--shadow); }
+.role { border-radius: 14px; border-width: 2px; }
+.role.on { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+
+/* ---- home ---- */
+.hero2 { padding-top: 40px; }
+.hero-mark {
+  font-family: "Marga Telugu", "Noto Serif Telugu", "Noto Sans Telugu", "Noto Sans Devanagari", "Noto Sans Tamil", "Noto Sans Kannada", "Noto Sans Malayalam", "Noto Sans Bengali", "Nirmala UI", "Gautami", "Telugu MN", "Telugu Sangam MN", var(--serif);
+  font-weight: 800; font-size: clamp(4rem, 9vw, 7rem); line-height: 1.6; margin-bottom: -.12em !important; overflow: visible;
+  color: var(--accent); margin: 0 0 4px; letter-spacing: 0; user-select: none;
+}
+:root[data-theme="dark"] .hero-mark { color: var(--mark); text-shadow: 0 0 40px rgba(246, 215, 122, .25); }
+.hero2 h1 { font-size: clamp(2rem, 4vw, 2.9rem); font-weight: 700; }
+.hero-free { font-size: 1.2rem; }
+.hero-free strong { box-shadow: inset 0 -.45em 0 color-mix(in srgb, var(--mark) 55%, transparent); }
+.hero2 .actions .btn-primary { min-height: 56px; font-size: 1.1rem; padding-left: 26px; padding-right: 26px; }
+.stats { border-top: 2px solid var(--ink); border-bottom: 0; background: transparent; }
+:root[data-theme="dark"] .stats { border-top-color: var(--line-strong); }
+.stats b { color: var(--accent); }
+:root[data-theme="dark"] .stats b { color: var(--mark); }
+.today { border-radius: var(--r-card); }
+.today dd { color: var(--accent); }
+:root[data-theme="dark"] .today dd { color: var(--mark); }
+
+/* ---- skill map: stars on a night sky in dark, route markers in light ---- */
+.node a { border-radius: 16px; border-width: 2px; }
+.node .ring { width: 60px; height: 60px; }
+.node.s-pass .ring { box-shadow: 0 0 0 3px var(--pass-soft); }
+.node.s-ready a { border-color: var(--accent); background: color-mix(in srgb, var(--accent-soft) 55%, var(--surface)); }
+.node.s-lock a { border-style: dashed; border-color: var(--line-strong); }
+:root[data-theme="dark"] .node.s-pass .ring { box-shadow: 0 0 22px rgba(94, 224, 176, .45); }
+:root[data-theme="dark"] .node.s-ready .ring { box-shadow: 0 0 22px rgba(246, 215, 122, .5); }
+:root[data-theme="dark"] .pipe-panel, :root[data-theme="dark"] .tree-wrap {
+  background-image: radial-gradient(ellipse at 50% 0%, rgba(60, 68, 120, .45) 0, transparent 60%);
+}
+.tree-lines .ln { stroke-width: 2.5; }
+.tree-lines .ln.hl, .tree-lines .ln.hl.active, .tree-lines .ln.hl.done, .tree-lines .ln.hl.run { stroke: var(--mark); }
+:root[data-theme="light"] .tree-lines .ln.hl, :root[data-theme="light"] .tree-lines .ln.hl.active, :root[data-theme="light"] .tree-lines .ln.hl.done, :root[data-theme="light"] .tree-lines .ln.hl.run { stroke: var(--accent); }
+
+/* ---- lessons: margin-note feel, firm callouts, wrong-path cards ---- */
+.callout { border-radius: 14px; border-left-width: 5px; }
+.wp { border-radius: var(--r-card); border-width: 2px; }
+.wp-bad { background: var(--fail-soft); border-left: 5px solid var(--fail); border-radius: 12px; }
+.wp-good { background: var(--pass-soft); border-left: 5px solid var(--pass); border-radius: 12px; }
+.prose .code, .prose pre { border-radius: 14px; }
+
+/* ---- terminal labs and code: terminal green ---- */
+.term, .tl-term, .vm-term, .vmx-term { border-radius: 16px; }
+.term-hint { background: color-mix(in srgb, #F5C26B 14%, var(--code-bg)); }
+.tb .pr, .tb .ok { color: #6EE7A0; }
+.tl-keys button, .vm-keys button { min-height: 44px; border-radius: 10px; }
+
+/* ---- interviews, drills, flashcards ---- */
+.iv, .drill, .sd-wrap, .sdl { border-radius: var(--r-card); }
+.iv-big { color: var(--accent); }
+:root[data-theme="dark"] .iv-big { color: var(--mark); }
+.fc-card, .fc { border-radius: 24px; }
+.fc-face { font-weight: 700; }
+
+/* ---- progress ---- */
+.cs-bar, .sd-bar { border-radius: 999px; }
+.streak.on { background: color-mix(in srgb, var(--mark) 30%, var(--surface)); color: var(--ink); }
+:root[data-theme="dark"] .streak.on { background: color-mix(in srgb, var(--mark) 22%, var(--surface)); color: var(--mark); }
+
+/* ---- footer ---- */
+.foot { border-top: 2px solid var(--ink); }
+:root[data-theme="dark"] .foot { border-top-color: var(--line-strong); }
+
+/* ---- print: a cheat sheet or lesson prints as plain high-contrast pages ---- */
+@media print {
+  :root, :root[data-theme="dark"] { --paper: #fff; --surface: #fff; --ink: #000; --text: #111; --muted: #333; --line: #bbb; }
+  .topbar, .utilbar, .skip, #footer, #search-root, #a11y-root, .hero-mark { display: none !important; }
+  .card, .wp, .callout { break-inside: avoid; }
+}
+
+@media (max-width: 560px) {
+  .hero-mark { font-size: 4.5rem; }
+  .btn { min-height: 52px; }
+}
+@media (prefers-reduced-motion: reduce) { .hero-mark { text-shadow: none; } }
+
+/* ---- languages: Telugu and Hindi fonts load only when those letters appear ---- */
+:root, :root[data-theme="light"], :root[data-theme="dark"] {
+  --sans: "Bricolage Grotesque", "Noto Sans Telugu", "Noto Sans Devanagari", "Noto Sans Tamil", "Noto Sans Kannada", "Noto Sans Malayalam", "Noto Sans Bengali", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --serif: "Source Serif 4", "Noto Sans Telugu", "Noto Sans Devanagari", "Noto Sans Tamil", "Noto Sans Kannada", "Noto Sans Malayalam", "Noto Sans Bengali", "Iowan Old Style", Georgia, serif;
+}
+/* tight letter-spacing and short line-height break Indic conjuncts and vowel signs */
+html[data-lang="te"] *, html[data-lang="hi"] *, html[data-lang="ta"] *, html[data-lang="kn"] *, html[data-lang="ml"] *, html[data-lang="bn"] * { letter-spacing: 0 !important; }
+html[data-lang="te"] h1, html[data-lang="te"] h2, html[data-lang="te"] h3, html[data-lang="te"] h4, html[data-lang="hi"] h1, html[data-lang="hi"] h2, html[data-lang="hi"] h3, html[data-lang="hi"] h4, html[data-lang="ta"] h1, html[data-lang="ta"] h2, html[data-lang="ta"] h3, html[data-lang="ta"] h4, html[data-lang="kn"] h1, html[data-lang="kn"] h2, html[data-lang="kn"] h3, html[data-lang="kn"] h4, html[data-lang="ml"] h1, html[data-lang="ml"] h2, html[data-lang="ml"] h3, html[data-lang="ml"] h4, html[data-lang="bn"] h1, html[data-lang="bn"] h2, html[data-lang="bn"] h3, html[data-lang="bn"] h4 { line-height: 1.4; }
+html[data-lang="te"] body, html[data-lang="hi"] body, html[data-lang="ta"] body, html[data-lang="kn"] body, html[data-lang="ml"] body, html[data-lang="bn"] body { line-height: 1.7; }
+html[data-lang="te"] .btn, html[data-lang="hi"] .btn, html[data-lang="ta"] .btn, html[data-lang="kn"] .btn, html[data-lang="ml"] .btn, html[data-lang="bn"] .btn { line-height: 1.5; }
+.lang-pick { display: inline-flex; align-items: center; }
+.lang-pick select { min-height: 44px; padding: 0 28px 0 12px; border-radius: var(--r-ctl); border: 2px solid var(--line-strong); background: var(--surface); color: var(--ink); font: 600 .95rem var(--sans); cursor: pointer; }
+.lang-pick select:hover { border-color: var(--ink); }
+
+/* the top menu folds into the Menu button whenever it would not fit (i18n.js adds .nav-fold after measuring) */
+html.nav-fold .menu-btn { display: inline-flex; }
+html.nav-fold .search-btn span, html.nav-fold .search-btn kbd { display: none; }
+html.nav-fold .topnav { display: none; position: absolute; top: 60px; left: 0; right: 0; flex-direction: column; background: var(--surface); border-bottom: 1px solid var(--line); padding: 8px 20px 14px; margin: 0; z-index: 40; }
+html.nav-fold .topnav.open { display: flex; }
+html.nav-fold .topnav a { padding: 12px 10px; font-size: 1rem; }
+/* the brand word in another script belongs to those languages only; English shows the plain wordmark */
+html:not([data-lang]) .hero-mark, html[data-lang="en"] .hero-mark, html[data-lang="es"] .hero-mark, html[data-lang="de"] .hero-mark, html[data-lang="fr"] .hero-mark, html[data-lang="pt"] .hero-mark { display: none; }
+/* long Indic words in the home headline must fit their column */
+html[data-lang="te"] .hero2 h1, html[data-lang="hi"] .hero2 h1, html[data-lang="ta"] .hero2 h1, html[data-lang="kn"] .hero2 h1, html[data-lang="ml"] .hero2 h1, html[data-lang="bn"] .hero2 h1 { font-size: clamp(1.7rem, 3.2vw, 2.4rem); overflow-wrap: anywhere; hyphens: auto; }
+/* role tabs wrap instead of running off the page */
+.tabs { flex-wrap: wrap; max-width: 100%; }
+.tab { white-space: normal; text-align: left; }
+
+/* Phones: keep the header on one row with the language menu included. */
+@media (max-width: 520px) {
+  .lang-pick select { width: 4.6rem; padding: 0 18px 0 8px; font-size: .85rem; text-overflow: ellipsis; background-position: right 4px center; }
+  .topbar .tools { gap: 2px; flex-wrap: nowrap; }
+  .topbar .tools .btn { min-width: 44px; padding-left: 8px; padding-right: 8px; }
+  .topbar-in { gap: 8px; }
+}
+
+/* The Tamil and Malayalam brand words are longer, so they are set smaller on phones. */
+@media (max-width: 520px) {
+  html[data-lang="ta"] .hero-mark, html[data-lang="ml"] .hero-mark { font-size: 2.8rem; }
+}
