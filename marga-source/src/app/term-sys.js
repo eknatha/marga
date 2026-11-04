@@ -38,6 +38,8 @@ P.diskFor = function (abs) {
 };
 P.diskUsed = function (d) {
   var self = this, total = d.base;
+  /* space held by files that were deleted but are still open in a running process (lab worlds: proc.deleted = [{path, size}]) */
+  (this.procs || []).forEach(function (p) { (p.deleted || []).forEach(function (f) { if (self.diskFor(f.path) === d) total += parseSize(f.size); }); });
   (function walk(abs, n) {
     if (n.t === 'f') { total += sizeOf(n); return; }
     if (n.t !== 'd') return;
@@ -138,7 +140,12 @@ def('pgrep', function (a, io) {
   return hit ? 0 : 1;
 });
 def('lsof', function (a, io) {
-  var self = this; io.o('COMMAND   PID USER   FD   TYPE NODE NAME\n');
+  var self = this;
+  if (a.indexOf('+L1') >= 0) {
+    var rows = []; this.procs.forEach(function (p) { (p.deleted || []).forEach(function (f) { rows.push(pad(p.cmd.split(' ')[0].split('/').pop(), 9, true) + pad(p.pid, 5) + ' ' + pad(p.user, 6, true) + ' ' + pad(String(f.fd || 4) + 'w', 5, true) + 'REG ' + pad(String(parseSize(f.size)), 12) + '  0 ' + f.path + ' (deleted)\n'); }); });
+    io.o('COMMAND   PID USER   FD   TYPE        SIZE NLINK NAME\n' + rows.join('')); return rows.length ? 0 : 1;
+  }
+  io.o('COMMAND   PID USER   FD   TYPE NODE NAME\n');
   this.procs.forEach(function (p) { (p.ports || []).forEach(function (port) { io.o(pad(p.cmd.split(' ')[0].split('/').pop(), 9, true) + pad(p.pid, 5) + ' ' + pad(p.user, 6, true) + ' 3u  IPv4  TCP *:' + port + ' (LISTEN)\n'); }); });
   void self; return 0;
 }, { dir: '/usr/sbin' });
