@@ -284,3 +284,11 @@ A language picker sits in the top bar. The interface, module titles and summarie
 - Lesson titles, bodies and code stay in English by design. Technical terms and command names are not translated inside summaries.
 - Machine translations: ask a native reader to review before promoting any language as finished.
 - Known gap: at 320px, Tamil and German still scroll sideways slightly (doors chips and stats).
+
+## Round 40: callsign, avatar and greeting
+
+- Optional callsign (max 24 characters), avatar (initial or one of seven glyphs) and colour (eight, all pass contrast). Stored only in this browser under `ea.me`; no account, nothing is sent.
+- Header avatar button opens the dialog (focus trapped, Escape closes). The home page and Progress page greet by time of day ("Good morning, Name") with a Rename link; without a name they offer "Add a callsign".
+- Rename or change the avatar any time. "Remove callsign" asks twice. Reset all progress keeps the callsign.
+- Export includes the callsign and import restores it.
+- New greeting and dialog strings are English only for now; names are never translated.
