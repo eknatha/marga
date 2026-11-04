@@ -1179,5 +1179,355 @@
    "kind": "Book chapter",
    "why": "Lessons on automation that helps and automation that harms."
   }
+ ],
+ "virtualization": [
+  {
+   "t": "libvirt documentation",
+   "by": "libvirt project",
+   "u": "https://libvirt.org/docs.html",
+   "kind": "Reference",
+   "why": "The management layer behind virsh and most KVM tooling; start with the domain and network XML pages."
+  },
+  {
+   "t": "QEMU documentation",
+   "by": "QEMU project",
+   "u": "https://www.qemu.org/docs/master/",
+   "kind": "Reference",
+   "why": "Explains device models, disk images and migration, which every KVM guest relies on."
+  },
+  {
+   "t": "KVM documentation",
+   "by": "KVM project",
+   "u": "https://www.linux-kvm.org/page/Documentation",
+   "kind": "Reference",
+   "why": "The kernel hypervisor itself, with notes on features, tuning and known limits."
+  },
+  {
+   "t": "Linux kernel virtualization documentation",
+   "by": "Linux kernel community",
+   "u": "https://docs.kernel.org/virt/index.html",
+   "kind": "Reference",
+   "why": "Authoritative kernel documentation on KVM and related interfaces."
+  },
+  {
+   "t": "Open vSwitch documentation",
+   "by": "Open vSwitch project",
+   "u": "https://docs.openvswitch.org/en/latest/",
+   "kind": "Reference",
+   "why": "Shows how virtual switches handle VLANs and tunnels, useful when bridges are not enough."
+  },
+  {
+   "t": "AWS EC2 Virtualization 2017: Introducing Nitro",
+   "by": "Brendan Gregg",
+   "u": "https://www.brendangregg.com/blog/2017-11-29/aws-ec2-virtualization-2017.html",
+   "kind": "Article",
+   "why": "A clear account of how cloud hypervisors moved work to hardware and what that does to performance."
+  }
+ ],
+ "storage": [
+  {
+   "t": "ext4 documentation",
+   "by": "Linux kernel community",
+   "u": "https://docs.kernel.org/filesystems/ext4/index.html",
+   "kind": "Reference",
+   "why": "How ext4 lays out data, journals and metadata, the base for tuning and repair."
+  },
+  {
+   "t": "LVM2 resource page",
+   "by": "LVM2 project",
+   "u": "https://sourceware.org/lvm2/",
+   "kind": "Reference",
+   "why": "The home of LVM2 with manual pages and design notes for volumes, snapshots and thin pools."
+  },
+  {
+   "t": "Red Hat: Managing file systems",
+   "by": "Red Hat",
+   "u": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/managing_file_systems/",
+   "kind": "Guide",
+   "why": "Practical, tested procedures for ext4, XFS, LVM and mounts on enterprise Linux."
+  },
+  {
+   "t": "The Linux software RAID guide",
+   "by": "Linux kernel community",
+   "u": "https://docs.kernel.org/admin-guide/md.html",
+   "kind": "Reference",
+   "why": "Kernel documentation for md RAID, including rebuild behaviour and tuning."
+  },
+  {
+   "t": "Ceph documentation",
+   "by": "Ceph project",
+   "u": "https://docs.ceph.com/en/latest/",
+   "kind": "Reference",
+   "why": "Official architecture and operations guide for distributed block, file and object storage."
+  },
+  {
+   "t": "Linux Performance",
+   "by": "Brendan Gregg",
+   "u": "https://www.brendangregg.com/linuxperf.html",
+   "kind": "Articles and talks",
+   "why": "Maps each performance tool to the part of the system it shows, including disk I/O."
+  },
+  {
+   "t": "fstab manual page",
+   "by": "Linux man-pages project",
+   "u": "https://man7.org/linux/man-pages/man5/fstab.5.html",
+   "kind": "Reference",
+   "why": "The exact meaning of every field and option in /etc/fstab, including nofail."
+  }
+ ],
+ "sql-ops": [
+  {
+   "t": "PostgreSQL: Using EXPLAIN",
+   "by": "PostgreSQL project",
+   "u": "https://www.postgresql.org/docs/current/using-explain.html",
+   "kind": "Reference",
+   "why": "How to read plans and cost estimates, the starting point for every slow query."
+  },
+  {
+   "t": "PostgreSQL: Routine vacuuming",
+   "by": "PostgreSQL project",
+   "u": "https://www.postgresql.org/docs/current/routine-vacuuming.html",
+   "kind": "Reference",
+   "why": "Why vacuum exists, how bloat forms and how transaction age can cause trouble."
+  },
+  {
+   "t": "PostgreSQL: Explicit locking",
+   "by": "PostgreSQL project",
+   "u": "https://www.postgresql.org/docs/current/explicit-locking.html",
+   "kind": "Reference",
+   "why": "Table and row lock modes and which conflict, needed to reason about waits and deadlocks."
+  },
+  {
+   "t": "PostgreSQL: High availability and replication",
+   "by": "PostgreSQL project",
+   "u": "https://www.postgresql.org/docs/current/high-availability.html",
+   "kind": "Reference",
+   "why": "Options for standbys, failover and load balancing, with their trade-offs."
+  },
+  {
+   "t": "Use The Index, Luke",
+   "by": "Markus Winand",
+   "u": "https://use-the-index-luke.com/",
+   "kind": "Book online",
+   "why": "A clear explanation of how indexes work and how to design them for real queries."
+  },
+  {
+   "t": "PgBouncer documentation",
+   "by": "PgBouncer project",
+   "u": "https://www.pgbouncer.org/",
+   "kind": "Reference",
+   "why": "Pooling modes and settings for sharing a small number of server connections among many clients."
+  },
+  {
+   "t": "MySQL: Optimizing with EXPLAIN",
+   "by": "Oracle",
+   "u": "https://dev.mysql.com/doc/refman/8.0/en/using-explain.html",
+   "kind": "Reference",
+   "why": "The same discipline for MySQL, useful when your fleet is mixed."
+  }
+ ],
+ "gpu-serving": [
+  {
+   "t": "vLLM documentation",
+   "by": "vLLM project",
+   "u": "https://docs.vllm.ai/en/latest/",
+   "kind": "Reference",
+   "why": "Installation, serving options and metrics for a widely used LLM serving engine."
+  },
+  {
+   "t": "Text Generation Inference documentation",
+   "by": "Hugging Face",
+   "u": "https://huggingface.co/docs/text-generation-inference/index",
+   "kind": "Reference",
+   "why": "Another production serving stack, with quantisation and batching options to compare."
+  },
+  {
+   "t": "NVIDIA Triton Inference Server user guide",
+   "by": "NVIDIA",
+   "u": "https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/index.html",
+   "kind": "Guide",
+   "why": "Serving many model types behind one server, with batching and model repositories."
+  },
+  {
+   "t": "NVIDIA GPU Operator documentation",
+   "by": "NVIDIA",
+   "u": "https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/index.html",
+   "kind": "Guide",
+   "why": "How drivers, the container toolkit and device plugin are installed on Kubernetes nodes."
+  },
+  {
+   "t": "Kubernetes: Schedule GPUs",
+   "by": "Kubernetes project",
+   "u": "https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/",
+   "kind": "Guide",
+   "why": "How pods request GPUs through device plugins and resource limits."
+  },
+  {
+   "t": "NVIDIA DCGM documentation",
+   "by": "NVIDIA",
+   "u": "https://docs.nvidia.com/datacenter/dcgm/latest/index.html",
+   "kind": "Reference",
+   "why": "GPU health and metrics for monitoring fleets, including the exporter for Prometheus."
+  },
+  {
+   "t": "nvidia-smi documentation",
+   "by": "NVIDIA",
+   "u": "https://docs.nvidia.com/deploy/nvidia-smi/index.html",
+   "kind": "Reference",
+   "why": "Every field and query option of the standard GPU command line tool."
+  }
+ ],
+ "openstack": [
+  {
+   "t": "OpenStack documentation",
+   "by": "OpenStack community",
+   "u": "https://docs.openstack.org/",
+   "kind": "Reference",
+   "why": "The index to every service guide; start here to find the right release and project."
+  },
+  {
+   "t": "OpenStack Installation Guide",
+   "by": "OpenStack community",
+   "u": "https://docs.openstack.org/install-guide/",
+   "kind": "Guide",
+   "why": "A walk through a minimal deployment that shows how the services fit together."
+  },
+  {
+   "t": "OpenStack Operations Guide",
+   "by": "OpenStack community",
+   "u": "https://docs.openstack.org/operations-guide/",
+   "kind": "Guide",
+   "why": "Day-two advice on monitoring, logging, upgrades and troubleshooting."
+  },
+  {
+   "t": "Nova documentation",
+   "by": "OpenStack community",
+   "u": "https://docs.openstack.org/nova/latest/",
+   "kind": "Reference",
+   "why": "Compute concepts, scheduling and administration, including quotas and upgrades."
+  },
+  {
+   "t": "Neutron documentation",
+   "by": "OpenStack community",
+   "u": "https://docs.openstack.org/neutron/latest/",
+   "kind": "Reference",
+   "why": "Networking concepts, security groups, routers and provider networks."
+  },
+  {
+   "t": "Kolla-Ansible documentation",
+   "by": "OpenStack community",
+   "u": "https://docs.openstack.org/kolla-ansible/latest/",
+   "kind": "Guide",
+   "why": "A common way to deploy and operate OpenStack in containers."
+  },
+  {
+   "t": "Keystone documentation",
+   "by": "OpenStack community",
+   "u": "https://docs.openstack.org/keystone/latest/",
+   "kind": "Reference",
+   "why": "Identity, tokens, projects, roles and application credentials."
+  }
+ ],
+ "baremetal": [
+  {
+   "t": "Redfish standard",
+   "by": "DMTF",
+   "u": "https://www.dmtf.org/standards/redfish",
+   "kind": "Reference",
+   "why": "The modern REST API for managing servers; read the overview before scripting a BMC."
+  },
+  {
+   "t": "OpenStack Ironic documentation",
+   "by": "OpenStack community",
+   "u": "https://docs.openstack.org/ironic/latest/",
+   "kind": "Reference",
+   "why": "How bare metal is made to look like cloud instances, with the full deployment flow."
+  },
+  {
+   "t": "Open Compute Project",
+   "by": "OCP Foundation",
+   "u": "https://www.opencomputeproject.org/",
+   "kind": "Reference",
+   "why": "Open hardware designs for racks, power and servers used by large operators."
+  },
+  {
+   "t": "Linux RAID wiki",
+   "by": "Linux kernel community",
+   "u": "https://raid.wiki.kernel.org/",
+   "kind": "Guide",
+   "why": "Practical guidance on md RAID levels, rebuilds and recovery."
+  },
+  {
+   "t": "smartmontools documentation",
+   "by": "smartmontools project",
+   "u": "https://www.smartmontools.org/wiki/TocDoc",
+   "kind": "Reference",
+   "why": "How to read SMART attributes and schedule self-tests with smartctl and smartd."
+  },
+  {
+   "t": "Linux kernel: bonding",
+   "by": "Linux kernel community",
+   "u": "https://www.kernel.org/doc/html/latest/networking/bonding.html",
+   "kind": "Reference",
+   "why": "Every bonding mode and option, with the switch requirements for each."
+  },
+  {
+   "t": "RFC 7938: BGP in large-scale data centers",
+   "by": "IETF",
+   "u": "https://www.rfc-editor.org/rfc/rfc7938",
+   "kind": "Standard",
+   "why": "The design behind leaf-spine fabrics that run BGP between switches."
+  }
+ ],
+ "service-mesh": [
+  {
+   "t": "Istio documentation",
+   "by": "Istio project",
+   "u": "https://istio.io/latest/docs/",
+   "kind": "Reference",
+   "why": "The full reference for traffic management, security and operations, organised by task."
+  },
+  {
+   "t": "Kubernetes: Services, load balancing and networking",
+   "by": "Kubernetes project",
+   "u": "https://kubernetes.io/docs/concepts/services-networking/",
+   "kind": "Reference",
+   "why": "The model behind Services, Ingress, DNS and network policy that every mesh builds on."
+  },
+  {
+   "t": "Cilium documentation",
+   "by": "Cilium project",
+   "u": "https://docs.cilium.io/",
+   "kind": "Reference",
+   "why": "How an eBPF based CNI enforces policy, replaces kube-proxy and shows flows."
+  },
+  {
+   "t": "Envoy documentation",
+   "by": "Envoy project",
+   "u": "https://www.envoyproxy.io/docs/envoy/latest/",
+   "kind": "Reference",
+   "why": "The proxy inside Istio: listeners, clusters, retries and the meaning of response flags."
+  },
+  {
+   "t": "Linkerd documentation",
+   "by": "Linkerd project",
+   "u": "https://linkerd.io/2/overview/",
+   "kind": "Reference",
+   "why": "A lighter mesh with a different design, useful as a point of comparison."
+  },
+  {
+   "t": "Gateway API",
+   "by": "Kubernetes SIG Network",
+   "u": "https://gateway-api.sigs.k8s.io/",
+   "kind": "Reference",
+   "why": "The newer, role-based model for routing traffic into and across clusters."
+  },
+  {
+   "t": "Istio: Debugging",
+   "by": "Istio project",
+   "u": "https://istio.io/latest/docs/ops/diagnostic-tools/",
+   "kind": "Guide",
+   "why": "Step by step use of istioctl analyze, proxy-status and the proxy logs."
+  }
  ]
 }

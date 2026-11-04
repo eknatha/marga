@@ -1290,5 +1290,145 @@
  "aiops/debugging-and-investigating-aiops-output": {
   "s": "A friend guesses why the car will not start. Good guess, but you still look at the fuel gauge before calling a tow truck.",
   "i": "I treat AI output as a hypothesis: ask for evidence, test it against metrics and the timeline, keep a person approving actions, and record hits and misses."
+ },
+ "virtualization/what-virtualization-is-and-hypervisor-types": {
+  "s": "Virtualization lets one physical server run several separate virtual computers, so hardware is not wasted on one small job. A hypervisor is the program that keeps them apart.",
+  "i": "A hypervisor shares one machine between many guests. KVM turns Linux into one, QEMU emulates the devices, libvirt manages them, and virtio drivers keep disk and network fast. Always check that hardware virtualization is on."
+ },
+ "virtualization/cpu-memory-and-overcommit": {
+  "s": "A host can promise more CPU than it has, because guests seldom all work at once. The risk is that on a busy day they all wait, and you see it as steal time.",
+  "i": "vCPUs are host threads, memory is the tighter limit. Watch steal or ready time on CPU and any host swap on memory. Keep production databases near 1 to 1 and pin big guests to one NUMA node."
+ },
+ "virtualization/virtual-disks-snapshots-and-templates": {
+  "s": "A virtual machine's disk is a file. Thin files only grow as needed, and a snapshot starts a new file for later changes. Too many snapshots fill the storage.",
+  "i": "Disks are raw or qcow2 files. Thin provisioning saves space but overcommits storage. Snapshots add delta layers, so keep them short-lived, never treat them as backups, and alert on pool free space."
+ },
+ "virtualization/virtual-networking-bridges-and-vlans": {
+  "s": "A virtual machine plugs into a virtual switch. If the switch is set up wrongly, the machine has a cable but cannot reach anyone.",
+  "i": "Guests attach to bridges. Choose bridged for servers, NAT for tests. VLAN tags must be allowed on the uplink trunk. SR-IOV trades flexibility for speed."
+ },
+ "virtualization/live-migration-ha-and-troubleshooting": {
+  "s": "Live migration moves a running machine to another server without stopping it. High availability restarts machines on another server if one breaks.",
+  "i": "Live migration needs shared or copied storage, compatible CPUs and a fast network. HA needs fencing and quorum to avoid split brain. Plan N+1 capacity so a failed host's guests have somewhere to run."
+ },
+ "storage/block-file-and-object-storage": {
+  "s": "Storage comes in three kinds: a raw disk, shared folders, and an object store you reach over the web. Each is good at different jobs.",
+  "i": "Choose block, file or object by access pattern. Judge a disk by IOPS, throughput and latency, not only capacity. Measure with iostat and fio, and know a cloud volume's baseline and burst."
+ },
+ "storage/filesystems-ext4-xfs-and-mounts": {
+  "s": "A filesystem is the filing system on a disk. The most important job is mounting it the same way every boot, so the server always finds its data.",
+  "i": "Know ext4 and XFS. Mount by UUID, add nofail on data disks, and test every fstab change with mount -a. Check df -i as well as df -h when writes fail."
+ },
+ "storage/lvm-and-raid": {
+  "s": "LVM lets you add space to a volume while the server runs. RAID lets a disk break without losing data. Neither replaces a backup.",
+  "i": "LVM stacks PV, VG and LV so volumes can grow online; remember the filesystem must grow as well. RAID gives redundancy, not backup. Alert on degraded arrays and prefer RAID 6 or 10 for big disks."
+ },
+ "storage/network-storage-nfs-iscsi-and-ceph": {
+  "s": "Network storage lets many servers use the same data. If the network or storage server stops, everything that uses it can stop too.",
+  "i": "NFS shares files, iSCSI shares disks, Ceph spreads copies across servers. Use hard mounts for data, keep user IDs aligned, give iSCSI its own network with multipath, and keep Ceph below 85 percent full."
+ },
+ "storage/performance-backups-and-troubleshooting": {
+  "s": "A disk can be slow, full, or gone. First find out which. A full disk is sometimes full of a file you cannot see, because a program is still holding it open.",
+  "i": "Use iostat to find slow disks and df, du and lsof +L1 to find what fills a disk. Back up with the 3-2-1 rule, define RPO and RTO, and test restores."
+ },
+ "sql-ops/reading-explain-and-finding-slow-queries": {
+  "s": "When a database is slow, a few queries are usually to blame. EXPLAIN shows how the database runs one, so you can see whether it reads far too much.",
+  "i": "Rank queries by total time with pg_stat_statements, then read EXPLAIN ANALYZE. Look for seq scans on big tables, estimate versus actual rows, and spilled sorts. Change one thing and compare."
+ },
+ "sql-ops/indexes-that-help-and-indexes-that-hurt": {
+  "s": "An index is like the index of a book: it makes looking things up fast. But it must be updated whenever the book changes, so having too many slows writing.",
+  "i": "Design composite indexes with equality columns first, use partial and covering indexes where they fit, and review pg_stat_user_indexes for unused or duplicate indexes. Each index costs write speed."
+ },
+ "sql-ops/locks-deadlocks-and-long-transactions": {
+  "s": "Sometimes a query is slow because it is waiting for another one to finish. A forgotten open transaction can hold up everyone behind it.",
+  "i": "Find blockers with pg_stat_activity and pg_blocking_pids. Keep transactions short, set idle_in_transaction_session_timeout and lock_timeout, fix deadlocks by consistent lock order and retries."
+ },
+ "sql-ops/connections-pooling-and-capacity": {
+  "s": "A database can only handle so many connections. If every copy of the application opens many, the limit is reached quickly and new users are refused.",
+  "i": "Add up instances times pool size for every client. Use PgBouncer in transaction mode to multiplex clients, keep work_mem modest and raise it per job, and reserve connections for administrators."
+ },
+ "sql-ops/replication-lag-vacuum-and-day-two-operations": {
+  "s": "A database needs regular care: copies must stay up to date, old data must be cleaned out, and backups must really work.",
+  "i": "Monitor replication lag and slots, tune autovacuum for big tables, change schemas with CONCURRENTLY and short locks, and keep tested backups with WAL for point-in-time recovery."
+ },
+ "gpu-serving/gpu-basics-memory-and-what-limits-inference": {
+  "s": "A big language model has to fit in the graphics card's memory, and it also needs memory for every conversation it is handling. Memory runs out before anything else.",
+  "i": "Estimate memory as weights plus KV cache at peak load. Decode speed is bound by memory bandwidth, so batching and quantization raise throughput. Test quality when you compress."
+ },
+ "gpu-serving/serving-stacks-vllm-tgi-triton": {
+  "s": "A serving engine keeps the graphics card busy by mixing many users' requests together. It is the difference between one user and many users on the same hardware.",
+  "i": "Use an engine with continuous batching and paged cache, such as vLLM or TGI. Tune max-model-len, GPU memory utilization and parallelism, read the KV cache size at start-up, and cache weights on a volume."
+ },
+ "gpu-serving/gpus-on-kubernetes": {
+  "s": "Kubernetes treats a graphics card as a unit it hands to one pod at a time. Pods that ask for one wait until a card is free.",
+  "i": "Install the driver, runtime hook and device plugin. Request nvidia.com/gpu in limits as a whole number, taint GPU nodes, and read FailedScheduling messages. Use MIG for isolation and plan node shapes for multi-GPU jobs."
+ },
+ "gpu-serving/scaling-latency-and-cost": {
+  "s": "Users care how soon text starts and how fast it flows. Servers cost money all the time, so scale up when people wait and not when the CPU looks busy.",
+  "i": "Track TTFT, token speed and percentiles. Scale on waiting requests or cache use, not CPU. Cost per token is GPU price divided by tokens produced, so utilisation drives it."
+ },
+ "gpu-serving/monitoring-and-debugging-gpu-workloads": {
+  "s": "When a graphics card job misbehaves, look at the card itself: how full its memory is, how hot it is, and whether its drivers report errors.",
+  "i": "Use nvidia-smi and DCGM metrics. Look for memory exhaustion, throttling, XID and ECC errors, and hung collective operations. Do not treat GPU-Util as useful work."
+ },
+ "openstack/what-openstack-is-and-core-services": {
+  "s": "OpenStack is a set of programs that turn many ordinary servers into a private cloud. Each program does one job, such as machines, networks or disks.",
+  "i": "OpenStack is a private cloud built from services: Keystone for identity, Nova for compute, Neutron for networks, Glance for images, Cinder for disks. All depend on a database and a message queue."
+ },
+ "openstack/identity-projects-quotas-and-keystone": {
+  "s": "Before you can create anything, OpenStack asks who you are and which project the work belongs to. Each project has limits, called quotas.",
+  "i": "Keystone gives users roles on projects and issues tokens. Projects have quotas. 401 means authentication, 403 means policy. Use application credentials for automation."
+ },
+ "openstack/compute-flavors-images-and-scheduling": {
+  "s": "To create a server, OpenStack has to find a machine with enough free room. If none has, the new server ends up in an error state.",
+  "i": "Flavor plus image plus network makes a server. The scheduler and Placement pick a node. No valid host means no node passed every check: look at service state, free resources per node, aggregates and the scheduler log."
+ },
+ "openstack/neutron-networking-security-groups-and-floating-ips": {
+  "s": "Neutron gives each team its own virtual networks and firewalls. If you cannot reach a server, it is often a firewall rule or a missing public address.",
+  "i": "Neutron provides networks, subnets, ports and routers. Security groups only allow, floating IPs map public to private addresses. Debug from the inside out: boot log, port, security group, floating IP, router, service."
+ },
+ "openstack/operating-openstack-logs-upgrades-and-troubleshooting": {
+  "s": "Running a private cloud means knowing where each part writes its log and how to tell when the shared pieces are unhealthy.",
+  "i": "Follow the request id through the logs, check agents, queues and the database first, and reset stuck states only after comparing with the hypervisor. Back up before upgrades and keep headroom for host failure."
+ },
+ "baremetal/servers-racks-and-remote-management": {
+  "s": "A rack server is a normal computer in a flat box, with a small second computer inside that lets you switch it on, off and watch it from far away.",
+  "i": "Rack servers are limited by power and cooling more than space. The BMC, reached with IPMI or Redfish, manages power, console and the event log even when the host is dead."
+ },
+ "baremetal/provisioning-pxe-dhcp-and-images": {
+  "s": "A new server has nothing on its disks, so it asks the network for help, and the network tells it where to find an installer and an answer sheet.",
+  "i": "PXE boot is a chain: DHCP gives an address and the boot file location, TFTP or HTTP delivers the loader, and an installer reads an answer file. Image based tools like MAAS and Ironic make it repeatable."
+ },
+ "baremetal/disks-raid-firmware-and-burn-in": {
+  "s": "Disks wear out. RAID keeps a server running when one fails, and tests on new machines find weak parts before they hold anything important.",
+  "i": "RAID protects against disk failure but is not a backup. A degraded array is urgent until rebuilt. SMART and burn-in find bad drives and memory before they cause an outage."
+ },
+ "baremetal/datacenter-networking-leaf-spine-and-bonding": {
+  "s": "Racks connect through switches arranged so that any server reaches any other in a few hops, and each server uses two cables so one can fail.",
+  "i": "Leaf-spine fabrics give predictable paths for east-west traffic. Bonds join links; LACP needs both ends configured. Management traffic belongs on its own network."
+ },
+ "baremetal/operating-a-fleet-failures-lifecycle-and-capacity": {
+  "s": "When you own hundreds of machines, some part fails every week, so you need a routine for finding which part and replacing it safely.",
+  "i": "Read the BMC event log, SMART and counters before replacing anything. Drain, repair one thing, test, record. Plan spares, wipe retired disks, and roll out firmware in waves."
+ },
+ "service-mesh/kubernetes-networking-under-the-hood": {
+  "s": "Every pod gets its own address, and a Service is a steady name and address that passes traffic to whichever pods are alive right now.",
+  "i": "The CNI gives pods addresses and routes. Services use selectors to find endpoints, kube-proxy to forward, and CoreDNS to name them. Ingress and Gateway bring outside traffic in."
+ },
+ "service-mesh/cni-network-policy-and-ebpf": {
+  "s": "By default every pod can call every other pod. A network policy is a list of who is allowed in or out, and the network plugin has to enforce it.",
+  "i": "NetworkPolicy is additive and default-open until a pod is selected. The CNI must enforce it. eBPF in Cilium enforces by identity and replaces long iptables chains."
+ },
+ "service-mesh/what-a-service-mesh-is-and-how-it-works": {
+  "s": "A service mesh puts a helper beside every service that handles the network chores the same way for all of them, so teams do not each have to write them.",
+  "i": "A mesh has a data plane of proxies and a control plane that configures them and issues certificates. Sidecars are simple but costly; ambient lowers the cost. Use one for a clear need."
+ },
+ "service-mesh/mtls-and-traffic-management": {
+  "s": "The mesh can make every call private and checked, and send a small slice of traffic to a new version, just by changing configuration.",
+  "i": "mTLS uses workload identity and rotating certificates. PeerAuthentication sets the mode. VirtualService routes, DestinationRule defines subsets. Retries and timeouts need care to avoid storms."
+ },
+ "service-mesh/observing-and-troubleshooting-the-mesh": {
+  "s": "The helper beside each service writes down every call it sees, so you can tell which hop failed and why.",
+  "i": "Use proxy-status to check config sync, analyze to check configuration, and response flags in proxy logs to place the failure. Follow a fixed method before changing anything."
  }
 }
