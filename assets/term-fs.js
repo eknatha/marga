@@ -77,7 +77,7 @@ function Session(world, opts) {
   this.snapshotFiles = {};
   this.eachFile('/', function (p, n) { this.snapshotFiles[p] = n.d; });
   (function fix(n, c) { if (!n.mt) n.mt = c; if (n.t === 'd') for (var k in n.c) fix(n.c[k], c); })(this.root, this.clock);
-  for (var s in this.services) { var sv = this.services[s]; sv.loaded = this.readRaw(sv.unit); if (sv.state === 'active') this.spawnService(s); }
+  for (var s in this.services) { var sv = this.services[s]; sv.loaded = this.readRaw(sv.unit); if (sv.state === 'active') { var spid = this.spawnService(s); if (sv.deleted) { var sp = this.procs.filter(function (q) { return q.pid === spid; })[0]; if (sp) sp.deleted = JSON.parse(JSON.stringify(sv.deleted)); } } }
 }
 T.Session = Session;
 var P = Session.prototype;

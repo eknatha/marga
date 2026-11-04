@@ -403,7 +403,7 @@ def('aws', function (a, io) {
 
 /* ================================================================ Azure */
 function azHelp(io) {
-  io.o('Usage: az <group> <command> [options]\n\nCommands in this simulator:\n  account show\n  group list | show | delete\n  resource list\n  vm list | show | start | stop | deallocate\n  network nsg list | show\n  network nsg rule list | create | delete\n  storage account list | show | update\n  storage blob list\n  role assignment list | create\n\nOptions: -g/--resource-group, -n/--name, -o json|table|tsv|yaml, --query "JMESPATH". Add -d (--show-details) to vm list and show for the power state.\n');
+  io.o('Usage: az <group> <command> [options]\n\nCommands in this simulator:\n  account show\n  group list | show | delete\n  resource list\n  vm list | show | start | stop | deallocate | delete\n  network nsg list | show\n  network nsg rule list | create | delete\n  storage account list | show | update\n  storage blob list\n  role assignment list | create | delete\n\nOptions: -g/--resource-group, -n/--name, -o json|table|tsv|yaml, --query "JMESPATH". Add -d (--show-details) to vm list and show for the power state.\n');
 }
 function azErr(io, msg) { io.e('ERROR: ' + msg + '\n'); return 1; }
 function azTags(o) { var t = {}; fl(o, 'tags').forEach(function (x) { var m = /^([^=]+)=(.*)$/.exec(x); if (m) t[m[1]] = m[2]; }); return t; }
@@ -447,7 +447,13 @@ def('az', function (a, io) {
   if (g === 'vm') {
     var det = has(o, 'show-details');
     if (w[1] === 'list') { var vl = Z.vms.slice(); if (rgF && rgF !== true) { if (!rg(rgF)) { io.e('ERROR: (ResourceGroupNotFound) Resource group \'' + rgF + '\' could not be found.\nCode: ResourceGroupNotFound\n'); return 3; } vl = vl.filter(function (v) { return v.rg.toLowerCase() === rgF.toLowerCase(); }); } return out(vl.map(function (v) { return vmJson(v, det); })); }
-    if (['show', 'start', 'stop', 'deallocate'].indexOf(w[1]) < 0) return azErr(io, 'az vm ' + (w[1] || '') + ' is not part of this simulator (list, show, start, stop, deallocate).');
+    if (w[1] === 'delete') {
+      if (!needName() || !needRg()) return 2; var DV = Z.vms.filter(function (v) { return v.name === nameF && v.rg.toLowerCase() === rgF.toLowerCase(); })[0];
+      if (!DV) return notFound('virtualMachines', nameF, rgF);
+      if (!has(o, 'yes')) { io.e('Are you sure you want to perform this operation? (y/n): \nERROR: this simulator cannot ask. Add --yes to confirm the delete.\n'); return 1; }
+      Z.vms = Z.vms.filter(function (v) { return v !== DV; }); return 0;
+    }
+    if (['show', 'start', 'stop', 'deallocate'].indexOf(w[1]) < 0) return azErr(io, 'az vm ' + (w[1] || '') + ' is not part of this simulator (list, show, start, stop, deallocate, delete).');
     if (!needName() || !needRg()) return 2;
     var V = Z.vms.filter(function (v) { return v.name.toLowerCase() === nameF.toLowerCase() && v.rg.toLowerCase() === rgF.toLowerCase(); })[0]; if (!V) return notFound('virtualMachines', nameF, rgF);
     if (w[1] === 'show') return out(vmJson(V, det));
@@ -513,7 +519,14 @@ def('az', function (a, io) {
       if (Z.roles.some(function (r) { return r.assignee === asg && r.role === role && r.scope === scp; })) { io.e('ERROR: (RoleAssignmentExists) The role assignment already exists.\nCode: RoleAssignmentExists\n'); return 1; }
       var rr = { assignee: asg, role: role, scope: scp }; Z.roles.push(rr); return out({ principalName: asg, roleDefinitionName: role, scope: scp, type: 'Microsoft.Authorization/roleAssignments' });
     }
-    return azErr(io, 'az role assignment ' + (w[2] || '') + ' is not part of this simulator (list, create).');
+    if (w[2] === 'delete') {
+      var dasg = fv(o, 'assignee'), drole = fv(o, 'role'), dscp = fv(o, 'scope');
+      if ((!dasg || dasg === true) && (!drole || drole === true)) { io.e('ERROR: Please provide at least one of --assignee, --role or --scope to select the assignments to delete.\n'); return 2; }
+      var keep = Z.roles.filter(function (r) { return !((!dasg || dasg === true || r.assignee === dasg) && (!drole || drole === true || r.role === drole) && (!dscp || dscp === true || r.scope === dscp)); });
+      if (keep.length === Z.roles.length) { io.e('ERROR: No matched assignments were found to delete\n'); return 1; }
+      Z.roles = keep; return 0;
+    }
+    return azErr(io, 'az role assignment ' + (w[2] || '') + ' is not part of this simulator (list, create, delete).');
   }
   io.e('ERROR: \'' + w.slice(0, 2).join(' ') + '\' is not part of this simulator. Run az help to see what it supports.\n'); return 2;
 });

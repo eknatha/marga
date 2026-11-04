@@ -1938,3 +1938,88 @@ body.embed #main{padding-top:.5rem}
   .topbar-in .streak { display: none; }
   .search-btn, .menu-btn, .topbar-in .icon-btn, .topbar-in [data-act="theme"], .topbar-in [data-act="a11y"] { min-width: 40px; }
 }
+
+/* Round 32b: cheat bar, why-did-that-fail */
+.tl-why-row { padding: 0 14px 8px; }
+.tl-cheat { margin: 0 14px 10px; color: var(--code-text); }
+.tl-cheat summary { cursor: pointer; min-height: 40px; display: flex; align-items: center; font-weight: 600; }
+.tl-cheat-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px; margin: 6px 0; }
+.tl-cheat-list .btn { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; min-height: 44px; background: var(--code-line); color: var(--code-text); border-color: var(--code-line); }
+.tl-cheat-list .btn code { font-size: 12px; opacity: .85; white-space: normal; overflow-wrap: anywhere; background: none; padding: 0; color: inherit; }
+
+/* cloud compare */
+.cc-bar { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; margin-bottom: 16px; }
+.cc-row { border-top: 1px solid var(--line, #d8dde3); padding: 14px 0; }
+.cc-row h3 { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 8px; }
+.cc-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.cc-cols.one { grid-template-columns: 1fr; }
+.cc-cols h4 { margin: 0 0 4px; font-size: 14px; }
+.cc-cols pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 760px) { .cc-cols { grid-template-columns: 1fr; } }
+
+.sc-opts { display: flex; flex-wrap: wrap; gap: 12px 20px; }
+.sc-cv { max-width: 100%; height: auto; }
+.vm-cheat { color: var(--text, inherit); margin: 8px 0; }
+.vm-cheat .tl-cheat-list .btn { background: var(--card, transparent); color: var(--text, inherit); border-color: var(--line, #ccc); }
+
+/* Sources block on claim-heavy lessons */
+.refs-list { padding-left: 1.4em; }
+.refs-heavy { margin: 8px 0 12px; padding: 10px 12px; border-left: 4px solid var(--accent, #0b6b5d); background: var(--soft, rgba(11, 107, 93, 0.08)); border-radius: 4px; }
+.refs-how { margin-top: 8px; }
+.refs-how summary { cursor: pointer; font-weight: 600; }
+
+/* learning dashboard */
+.ld-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-bottom: 40px; }
+.ld-card { border: 1px solid var(--line, #d9d9d9); border-radius: 10px; padding: 16px 18px; background: var(--surface, transparent); }
+.ld-card h2 { margin-top: 0; font-size: 1.1rem; }
+.ld-wide { grid-column: 1 / -1; }
+.ld-big { font-size: 2rem; font-weight: 700; margin: 4px 0 8px; }
+.ld-big small { font-size: .9rem; font-weight: 400; }
+.ld-bar { display: block; height: 8px; border-radius: 4px; background: rgba(128,128,128,.25); overflow: hidden; }
+.ld-bar > span { display: block; height: 100%; background: currentColor; opacity: .75; border-radius: 4px; transition: width .6s ease; }
+.ld-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.ld-row { display: grid; grid-template-columns: minmax(120px, 1.2fr) 2fr 3.5em; gap: 4px 12px; align-items: center; }
+.ld-sub { grid-column: 1 / -1; }
+.ld-num { text-align: right; font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { .ld-bar > span { transition: none; } }
+
+/* before and after diff in labs */
+.tl-diff { margin-top: 18px; }
+.tl-diff-scroll { overflow-x: auto; border: 1px solid var(--line, #d9d9d9); border-radius: 8px; max-height: 340px; overflow-y: auto; }
+.tl-difft { border-collapse: collapse; width: 100%; table-layout: fixed; font-size: .82rem; }
+.tl-difft th { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line, #d9d9d9); position: sticky; top: 0; background: var(--bg, Canvas); }
+.tl-difft td { vertical-align: top; padding: 0 10px; width: 50%; }
+.tl-difft pre { margin: 0; white-space: pre-wrap; word-break: break-word; font: inherit; min-height: 1.3em; border: 0; background: none; padding: 0; }
+.tl-difft tr.chg td:first-child, .tl-difft tr.del td:first-child { background: rgba(200, 50, 50, .16); }
+.tl-difft tr.chg td:last-child, .tl-difft tr.add td:last-child { background: rgba(40, 160, 80, .18); }
+.tl-difft tr.gap td { text-align: center; opacity: .6; }
+
+/* step-through diagrams */
+.dg-step { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.dg-step .dg-say { flex: 1 1 220px; margin: 0; min-height: 1.4em; }
+.dg-step button:disabled { opacity: .45; }
+.dg[data-step] .dg-e:not(.hot) { opacity: .25; }
+.dg[data-step] .dg-e.hot .dg-line { stroke-width: 3; }
+
+/* motion with purpose: only where it confirms an action or shows a change of state */
+@keyframes mg-pass { 0% { transform: scale(.97); box-shadow: 0 0 0 0 rgba(40,160,80,.45); } 60% { transform: scale(1); box-shadow: 0 0 0 10px rgba(40,160,80,0); } 100% { box-shadow: 0 0 0 0 rgba(40,160,80,0); } }
+@keyframes mg-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.result.pass, .drill-res.ok { animation: mg-pass .7s ease-out 1; }
+.tl-diff { animation: mg-in .35s ease-out 1; }
+.dg-say { transition: opacity .2s; }
+@media (prefers-reduced-motion: reduce) { .result.pass, .drill-res.ok, .tl-diff { animation: none; } }
+:root[data-a-motion="off"] .result.pass, :root[data-a-motion="off"] .drill-res.ok, :root[data-a-motion="off"] .tl-diff, :root[data-a-motion="reduce"] .result.pass { animation: none; }
+.refs-list, .refs-list li, .refs-list a, .refs-list .host { overflow-wrap: anywhere; word-break: break-word; min-width: 0; }
+
+/* worked example with a wrong path */
+.wp { margin: 22px 0; padding: 16px 18px; border: 1px solid var(--line-strong, #999); border-left: 6px solid #b45309; border-radius: 12px; }
+.wp > * + * { margin-top: 10px; }
+.wp-h { margin: 0; font-size: 1rem; }
+.wp-goal { margin: 0; }
+.wp-tag { margin: 0 0 4px; font-weight: 700; font-size: .85rem; }
+.wp-bad .wp-tag { color: var(--fail, #b91c1c); }
+.wp-good .wp-tag { color: var(--pass-ink, #15803d); }
+.wp pre { margin: 0; overflow-x: auto; }
+.wp-more { border-top: 1px dashed var(--line, #ccc); padding-top: 8px; }
+.wp-more > summary { cursor: pointer; font-weight: 600; }
+.wp-more > * + * { margin-top: 8px; }

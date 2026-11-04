@@ -51,7 +51,7 @@ function eli() { return store('ea.eli') === '1'; }
 function glossApply() {
   var main = $('#main'); if (!main || !GLOSS.length) return;
   if (!G_RE) buildGlossRe();
-  var roots = $$('.prose, .case-body, .drill, .iv-a, .arch-body, #arch-body, .lede', main);
+  var roots = $$('.prose, .case-body, .drill, .iv-a, .arch-body, #arch-body, .lede, .tl-side, .vm-left', main);
   if (!roots.length) return;
   var seen = {}; $$('.gl', main).forEach(function (x) { seen[x.getAttribute('data-g')] = 1; });
   roots.forEach(function (root) {

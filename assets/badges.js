@@ -6,9 +6,16 @@
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 var CAUTION1 = 'Self-reported completion record from MARGA by EknathaLabs. Not a certification, degree or qualification.';
 var CAUTION2 = 'The verification code only checks that the name, badge and date match each other. It does not confirm identity.';
-var HUES = { 'system-design': 48, 'cloud-iam': 200, 'k8s-ops': 250, argocd: 28, llm: 262, prompting: 292, 'claude-skills': 20, mcp: 168, mlops: 142, aiops: 330, ai: 262, linux: 28, git: 12, go: 190, helm: 222, bash: 150, python: 52, networking: 195, docker: 212, cicd: 120, kubernetes: 235, terraform: 268, ansible: 352, cloud: 176, databases: 305, observability: 18, sre: 78, security: 332, devops: 215, devsecops: 332 };
+var HUES = { baremetal: 18, 'service-mesh': 175, 'system-design': 48, 'cloud-iam': 200, 'k8s-ops': 250, argocd: 28, llm: 262, prompting: 292, 'claude-skills': 20, mcp: 168, mlops: 142, aiops: 330, ai: 262, linux: 28, git: 12, go: 190, helm: 222, bash: 150, python: 52, networking: 195, docker: 212, cicd: 120, kubernetes: 235, terraform: 268, ansible: 352, cloud: 176, databases: 305, observability: 18, sre: 78, security: 332, devops: 215, devsecops: 332, virtualization: 160, storage: 38, 'sql-ops': 290, 'gpu-serving': 120, openstack: 8 };
 /* Each symbol is drawn on a 24 by 24 grid so the shape, not only the colour, tells badges apart. */
 var SYM = {
+  virtualization: '<rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 10h4v4h-4z"/>',
+  storage: '<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>',
+  'sql-ops': '<ellipse cx="10" cy="6" rx="6" ry="2.5"/><path d="M4 6v8c0 1.4 2.7 2.5 6 2.5M16 6v4"/><circle cx="17" cy="16" r="3"/><path d="M19.2 18.2L22 21"/>',
+  'gpu-serving': '<rect x="4" y="7" width="16" height="10" rx="1.5"/><path d="M8 7V4M12 7V4M16 7V4M8 20v-3M12 20v-3M16 20v-3"/><path d="M8 12h2l1-2 2 4 1-2h2"/>',
+  baremetal: '<rect x="3" y="4" width="18" height="5" rx="1"/><rect x="3" y="11" width="18" height="5" rx="1"/><path d="M7 6.5h.01M7 13.5h.01M3 19h18"/>',
+  'service-mesh': '<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8.5 6h7M7.5 8l3.5 8M16.5 8L13 16"/>',
+  openstack: '<path d="M7 17a4 4 0 0 1 0-8 5 5 0 0 1 9.6-1A4.5 4.5 0 0 1 17 17z"/><path d="M9 12h6M12 12v4"/>',
   'system-design': '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="8.5" y="14" width="7" height="7" rx="1"/><path d="M6.5 10v2h11v-2M12 12v2"/>',
   'cloud-iam': '<path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z"/><circle cx="12" cy="11" r="2"/><path d="M12 13v4"/>',
   'k8s-ops': '<path d="M12 2l8 4.5v9L12 20l-8-4.5v-9z"/><path d="M12 8v4l3 2M12 12L9 14"/>',

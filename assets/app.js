@@ -121,11 +121,13 @@ document.addEventListener('change', function (ev) {
   if (window.MargaA11y) { MargaA11y.set('print', t.value); MargaA11y.sync(); }
   Array.prototype.forEach.call(document.querySelectorAll('[data-print-style]'), function (x) { x.value = t.value; });
 });
-function refsHtml(list, heading) {
+function refsHtml(list, heading, claims) {
   if (!list || !list.length) return '';
-  return '<section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">' + (heading || 'Official references') + '</h2>' +
-    '<p class="small">Read the vendor and project documentation for the full, current detail.</p><ul>' +
-    list.map(function (r) { return '<li><a href="' + e(r.u) + '" target="_blank" rel="noopener">' + e(r.t) + '</a><span class="host">' + e(r.u.replace(/^https:\/\/([^\/]+).*$/, '$1')) + '</span></li>'; }).join('') + '</ul></section>';
+  var heavy = claims && claims.heavy;
+  var note = heavy ? '<p class="refs-heavy" role="note"><strong>This lesson makes many checkable claims.</strong> It contains ' + (claims.nums + claims.defs) + ' numbers and defaults' + (claims.vers > 5 ? ', ' + claims.vers + ' version-like details' : '') + (claims.inc ? ' and ' + claims.inc + ' incident account' + (claims.inc > 1 ? 's' : '') : '') + '. Defaults and limits change between releases, so confirm them in the sources below before you rely on them in production.</p>' : '<p class="small">Read the vendor and project documentation for the full, current detail.</p>';
+  return '<section class="refs' + (heavy ? ' heavy' : '') + '" aria-labelledby="refs-h"><h2 id="refs-h">' + (heading || 'Official references') + '</h2>' + note + '<ol class="refs-list">' +
+    list.map(function (r, i) { return '<li id="src-' + (i + 1) + '"><a href="' + e(r.u) + '" target="_blank" rel="noopener">' + e(r.t) + '</a><span class="host">' + e(r.u.replace(/^https:\/\/([^\/]+).*$/, '$1')) + '</span></li>'; }).join('') + '</ol>' +
+    (heavy ? '<details class="refs-how"><summary>How to check a claim</summary><ol><li>Find the number, default or command you want to confirm.</li><li>Open the source for your version and search for the setting by name.</li><li>Try it on a test system. A value you have measured beats a value you have read.</li></ol></details>' : '') + '</section>';
 }
 function voiceSlot() { return '<div id="voice-slot"></div>'; }
 function wireSay(root) {
@@ -489,7 +491,7 @@ function homeView() {
     '<div class="note-panel"><h3>Listen while you learn</h3><p>Every lesson, cheat sheet and interview answer can be read aloud. Pick any voice installed on your device from the Voice dropdown.</p></div></div></section>' +
 
     '<section class="band"><div class="wrap two"><div><h2>How a lesson works</h2><ol class="steps"><li><strong>Read.</strong> Each lesson explains why, then shows commands with their output.</li><li><strong>Check.</strong> Answer a short quiz. Pass it to mark the lesson done and unlock the next.</li><li><strong>Remember.</strong> Flip the flashcards now, and review them again later from the Review cards page.</li></ol></div>' +
-    '<div class="note-panel"><h3>Terminal labs</h3><p>Break-and-fix practice for Linux, Shell, Networking, Python, Kubernetes, Docker and the cloud (an imitation AWS and Azure account, no sign-up), in a simulated terminal in your browser, with automatic checks. It is a simulation, not a real server or cloud account. Labs for Terraform are still planned.</p><p><a href="#/terminal-labs">Open the terminal labs</a> | <a href="#/labs">What is planned</a></p></div></div></section>';
+    '<div class="note-panel"><h3>Terminal labs</h3><p>Break-and-fix practice for Linux, Shell, Networking, Python, Kubernetes, Docker, Terraform, Helm, the cloud (an imitation AWS, Azure and Google Cloud account, no sign-up), in a simulated terminal in your browser, with automatic checks. It is a simulation, not a real server or cloud account. Labs for Terraform are still planned.</p><p><a href="#/terminal-labs">Open the terminal labs</a> | <a href="#/labs">What is planned</a></p></div></div></section>';
   view.after = function () { armTree(); armTerm(); offlineChip(); };
 }
 
@@ -732,7 +734,7 @@ function lessonView(mid, slug) {
     lessonRail(l) +
     '<div class="actions lesson-tools">' + printBar() + '<button type="button" class="btn btn-quiet" data-act="read-toggle" aria-pressed="false">Reading mode</button></div>' + voiceSlot() +
     (window.MargaFeatures ? MargaFeatures.levelsHtml(l) : '') +
-    '<div class="lesson-grid"><div class="prose" id="prose">' + l.html + refsHtml(l.refs) + '</div>' + toc + '</div>' +
+    '<div class="lesson-grid"><div class="prose" id="prose">' + l.html + refsHtml(l.refs, 'Sources', l.claims) + '</div>' + toc + '</div>' +
     (window.MargaFeatures && MargaFeatures.realWorld ? MargaFeatures.realWorld(l) : '') + '<div id="tryit">' + (window.MargaExLinks ? MargaExLinks.lesson(id) : '') +
     (window.MargaWidgetLinks ? MargaWidgetLinks.lesson(id) : '') + '</div>' + takeaways(l) +
     '<section class="check" id="check" aria-labelledby="check-h"><h2 id="check-h">Lesson check</h2><div id="quiz"></div></section>' +
@@ -992,7 +994,7 @@ function ivListHtml(items) {
       '<h3 class="iv-q">' + e(x.q) + '</h3>' +
       '<p class="iv-meta"><span class="chip">' + e(MOD[x.module] ? MOD[x.module].title : x.module) + '</span><span class="chip lvl-' + x.level + '">' + e(LEVELS[x.level] || x.level) + '</span>' +
       (r === 'know' ? '<span class="chip pass">Known</span>' : r === 'review' ? '<span class="chip warn">Review</span>' : '') + '</p>' +
-      '<div class="iv-a" id="a-' + e(x.id) + '" hidden>' + x.html + '</div>' +
+      '<div class="iv-a" id="a-' + e(x.id) + '" hidden>' + x.html + (window.MargaCross ? MargaCross.html(x, e) : '') + '</div>' +
       '<div class="actions iv-tools"><button type="button" class="btn btn-quiet" data-act="iv-show" aria-expanded="false" aria-controls="a-' + e(x.id) + '">Show answer</button>' +
       '<button type="button" class="btn btn-quiet say" data-say="' + e(x.q + ' ' + x.text) + '">Read aloud</button>' +
       '<span class="iv-rate" hidden><button type="button" class="btn btn-quiet" data-act="iv-rate" data-r="review">Need review</button><button type="button" class="btn btn-primary" data-act="iv-rate" data-r="know">I know this</button></span></div></article>';
@@ -1359,6 +1361,7 @@ var api = {
   onAct: function (name, fn) { actions[name] = fn; }
 };
 window.MargaApp = api;
+if (window.MargaCross) MargaCross.init(api);
 if (typeof window.MargaExtras === 'function') window.MargaExtras(api);
 if (typeof window.MargaMore === 'function') window.MargaMore(api);
 if (typeof window.MargaLabs === 'function') window.MargaLabs(api);
@@ -1385,6 +1388,8 @@ if (typeof window.MargaRoadmap === 'function') window.MargaRoadmap(api);
 if (typeof window.MargaSearchPage === 'function') window.MargaSearchPage(api);
 if (typeof window.MargaGuide === "function") window.MargaGuide(api);
 if (typeof window.MargaDesigns === "function") window.MargaDesigns(api);
+if (typeof window.MargaLearn === "function") window.MargaLearn(api);
+if (typeof window.MargaCloudCompare === "function") window.MargaCloudCompare(api);
 
 /* ---------- accessibility panel ---------- */
 (function () {

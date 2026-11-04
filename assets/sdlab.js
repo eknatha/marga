@@ -259,7 +259,13 @@ var PROMPTS = [
   ['chat', 'Design a chat service with group conversations and message history.', ''],
   ['kv-store', 'Design a replicated key-value store.', 'system-design/quorum-leaders-and-split-brain'],
   ['cicd', 'Design a CI/CD platform used by 500 engineers.', ''],
-  ['lock', 'Design a distributed lock service.', 'system-design/quorum-leaders-and-split-brain']
+  ['lock', 'Design a distributed lock service.', 'system-design/quorum-leaders-and-split-brain'],
+  ['gpu-llm', 'Design an LLM inference platform on GPUs for 50 tenants.', 'gpu-serving/scaling-latency-and-cost'],
+  ['private-cloud', 'Design a private cloud on bare metal for 40 teams.', 'openstack/what-openstack-is-and-core-services'],
+  ['mesh-mtls', 'Design mutual TLS and traffic control for 300 services.', 'service-mesh/mtls-and-traffic-management'],
+  ['db-platform', 'Design a managed database platform for many teams.', 'sql-ops/connections-pooling-and-capacity'],
+  ['backup-dr', 'Design backup and disaster recovery for a company with a 15-minute RTO.', ''],
+  ['secrets', 'Design a secrets and identity platform for workloads.', '']
 ];
 function scoreSession(checks) { var n = 0, t = 0; PHASES.forEach(function (p) { p.checks.forEach(function (c, i) { t++; if (checks[p.id + i]) n++; }); }); return { n: n, t: t, pct: t ? Math.round(n * 100 / t) : 0 }; }
 function weakPhases(checks) { return PHASES.map(function (p) { var got = p.checks.filter(function (c, i) { return checks[p.id + i]; }).length; return { p: p, got: got }; }).filter(function (x) { return x.got < x.p.checks.length; }); }
@@ -293,6 +299,11 @@ function interviewWire() {
     $('#sdi-quit').addEventListener('click', function () { stopTimer(); run.hidden = true; setup.hidden = false; });
   }
   function tick() { if (!document.getElementById('sdi-clock')) { stopTimer(); return; } st.sec++; var p = PHASES[st.i], left = Math.round(p.min * st.scale * 60) - st.sec; var c = $('#sdi-clock'); c.textContent = mmss(left); c.classList.toggle('late', left < 0); }
+  function modelAnswer(id) {
+    var m = (A.D.mockdesigns || {})[id];
+    if (!m) return '';
+    return '<section class="calc sdi-model" id="sdi-model"><h2>Model answer</h2><p class="small">One good answer, with every component explained. Yours can differ; check that each part has a reason.</p><article class="prose arch">' + m.html + '</article></section>';
+  }
   function drawScore() {
     run.innerHTML = '<section class="calc"><h2>Score yourself</h2><p class="small">Tick what you actually did. Be strict; an interviewer would be.</p>' +
       PHASES.map(function (p) { return '<fieldset class="sdi-fs"><legend>' + e(p.name) + '</legend>' + p.checks.map(function (c, i) { return '<label class="opt-r"><input type="checkbox" data-k="' + p.id + i + '"> <span>' + e(c) + '</span></label>'; }).join('') + '</fieldset>'; }).join('') +
@@ -304,7 +315,8 @@ function interviewWire() {
       run.innerHTML = '<section class="calc" id="sdi-res"><h2>' + r.n + ' of ' + r.t + ' (' + r.pct + ' percent)</h2><p>' + (r.pct >= 80 ? 'A strong session. Repeat with a different prompt and a shorter clock.' : r.pct >= 50 ? 'A fair base. Work on the phases below, then try again.' : 'Keep the six steps in front of you and repeat. Short sessions help.') + '</p>' +
         (weak.length ? '<h3>Work on</h3><ul class="sdl-notes">' + weak.map(function (x) { return '<li>' + e(x.p.name) + ' (' + x.got + ' of ' + x.p.checks.length + '): <a href="' + A.hrefLesson(x.p.lesson) + '">review the lesson</a></li>'; }).join('') + '</ul>' : '<p>Every item ticked.</p>') +
         (st.prompt[2] ? '<p>Compare with the worked design: <a href="' + A.hrefLesson(st.prompt[2]) + '">open the lesson</a>.</p>' : '<p class="small">This prompt has no worked design yet. Use the six steps and the failure-mode tables from the worked designs as a guide.</p>') +
-        '<div class="actions"><button type="button" class="btn btn-primary" id="sdi-again">Another session</button></div></section>';
+        '<div class="actions"><button type="button" class="btn btn-primary" id="sdi-again">Another session</button></div></section>' +
+        (modelAnswer(st.prompt[0]) || '');
       $('#sdi-again').addEventListener('click', function () { run.hidden = true; setup.hidden = false; $('#sdi-go').focus(); });
     });
   }
