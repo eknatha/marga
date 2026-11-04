@@ -385,6 +385,104 @@
     "OpenTelemetry: traces",
     "https://opentelemetry.io/docs/concepts/signals/traces/"
    ]
+  ],
+  "virtualization": [
+   [
+    "libvirt documentation",
+    "https://libvirt.org/docs.html"
+   ],
+   [
+    "QEMU documentation",
+    "https://www.qemu.org/docs/master/"
+   ],
+   [
+    "KVM documentation",
+    "https://www.linux-kvm.org/page/Documentation"
+   ]
+  ],
+  "storage": [
+   [
+    "ext4 documentation",
+    "https://docs.kernel.org/filesystems/ext4/index.html"
+   ],
+   [
+    "LVM2 resource page",
+    "https://sourceware.org/lvm2/"
+   ],
+   [
+    "Red Hat: Managing file systems",
+    "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/managing_file_systems/"
+   ]
+  ],
+  "sql-ops": [
+   [
+    "PostgreSQL: Using EXPLAIN",
+    "https://www.postgresql.org/docs/current/using-explain.html"
+   ],
+   [
+    "PostgreSQL: Routine vacuuming",
+    "https://www.postgresql.org/docs/current/routine-vacuuming.html"
+   ],
+   [
+    "PostgreSQL: Explicit locking",
+    "https://www.postgresql.org/docs/current/explicit-locking.html"
+   ]
+  ],
+  "gpu-serving": [
+   [
+    "vLLM documentation",
+    "https://docs.vllm.ai/en/latest/"
+   ],
+   [
+    "Text Generation Inference documentation",
+    "https://huggingface.co/docs/text-generation-inference/index"
+   ],
+   [
+    "NVIDIA Triton Inference Server user guide",
+    "https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/index.html"
+   ]
+  ],
+  "openstack": [
+   [
+    "OpenStack documentation",
+    "https://docs.openstack.org/"
+   ],
+   [
+    "OpenStack Installation Guide",
+    "https://docs.openstack.org/install-guide/"
+   ],
+   [
+    "OpenStack Operations Guide",
+    "https://docs.openstack.org/operations-guide/"
+   ]
+  ],
+  "baremetal": [
+   [
+    "Redfish standard (DMTF)",
+    "https://www.dmtf.org/standards/redfish"
+   ],
+   [
+    "OpenStack Ironic documentation",
+    "https://docs.openstack.org/ironic/latest/"
+   ],
+   [
+    "Open Compute Project",
+    "https://www.opencomputeproject.org/"
+   ]
+  ],
+  "service-mesh": [
+   [
+    "Istio documentation",
+    "https://istio.io/latest/docs/"
+   ],
+   [
+    "Kubernetes: Services, load balancing and networking",
+    "https://kubernetes.io/docs/concepts/services-networking/"
+   ],
+   [
+    "Cilium documentation",
+    "https://docs.cilium.io/"
+   ]
   ]
  },
  "lessons": {
@@ -2008,6 +2106,10 @@
    [
     "Brendan Gregg: Linux Performance",
     "https://www.brendangregg.com/linuxperf.html"
+   ],
+   [
+    "RFC 9110: HTTP semantics",
+    "https://www.rfc-editor.org/rfc/rfc9110"
    ]
   ],
   "docker/buildkit-caching-and-multi-arch": [
@@ -2500,6 +2602,10 @@
    [
     "Multi-stage builds",
     "https://docs.docker.com/build/building/multi-stage/"
+   ],
+   [
+    "Docker: get started",
+    "https://docs.docker.com/get-started/"
    ]
   ],
   "docker/running-containers-in-production": [
@@ -2620,6 +2726,10 @@
    [
     "Google SRE workbook: Implementing SLOs",
     "https://sre.google/workbook/implementing-slos/"
+   ],
+   [
+    "SRE book: service level objectives",
+    "https://sre.google/sre-book/service-level-objectives/"
    ]
   ],
   "sre/disaster-recovery-exercises": [
@@ -2760,6 +2870,10 @@
    [
     "Semantic Versioning 2.0.0",
     "https://semver.org/"
+   ],
+   [
+    "Pro Git book",
+    "https://git-scm.com/book/en/v2"
    ]
   ],
   "git/hooks-signing-and-secrets-in-history": [
@@ -2910,6 +3024,10 @@
    [
     "helm install",
     "https://helm.sh/docs/helm/helm_install/"
+   ],
+   [
+    "Helm documentation",
+    "https://helm.sh/docs/"
    ]
   ],
   "helm/anatomy-of-a-chart": [
@@ -3590,6 +3708,10 @@
    [
     "SRE book contents",
     "https://sre.google/sre-book/table-of-contents/"
+   ],
+   [
+    "Amazon Builders' Library",
+    "https://aws.amazon.com/builders-library/"
    ]
   ],
   "system-design/caching-without-stampedes": [
@@ -3720,6 +3842,10 @@
    [
     "Automating safe, hands-off deployments",
     "https://aws.amazon.com/builders-library/automating-safe-hands-off-deployments/"
+   ],
+   [
+    "Site Reliability Engineering (SRE book)",
+    "https://sre.google/sre-book/table-of-contents/"
    ]
   ],
   "system-design/worked-design-the-status-page-that-survives": [
@@ -4068,6 +4194,496 @@
    [
     "Prometheus: querying basics",
     "https://prometheus.io/docs/prometheus/latest/querying/basics/"
+   ]
+  ],
+  "virtualization/what-virtualization-is-and-hypervisor-types": [
+   [
+    "KVM documentation",
+    "https://www.linux-kvm.org/page/Documentation"
+   ],
+   [
+    "libvirt documentation",
+    "https://libvirt.org/docs.html"
+   ],
+   [
+    "QEMU documentation",
+    "https://www.qemu.org/docs/master/"
+   ]
+  ],
+  "virtualization/cpu-memory-and-overcommit": [
+   [
+    "KVM: Documentation",
+    "https://www.linux-kvm.org/page/Documentation"
+   ],
+   [
+    "Linux kernel: KSM",
+    "https://docs.kernel.org/admin-guide/mm/ksm.html"
+   ],
+   [
+    "libvirt: NUMA tuning",
+    "https://libvirt.org/formatdomain.html#numa-node-tuning"
+   ]
+  ],
+  "virtualization/virtual-disks-snapshots-and-templates": [
+   [
+    "QEMU: disk images",
+    "https://www.qemu.org/docs/master/system/images.html"
+   ],
+   [
+    "libvirt: snapshots",
+    "https://libvirt.org/formatsnapshot.html"
+   ],
+   [
+    "cloud-init documentation",
+    "https://cloudinit.readthedocs.io/"
+   ]
+  ],
+  "virtualization/virtual-networking-bridges-and-vlans": [
+   [
+    "libvirt: networking",
+    "https://libvirt.org/formatnetwork.html"
+   ],
+   [
+    "Linux kernel: bridge",
+    "https://docs.kernel.org/networking/bridge.html"
+   ],
+   [
+    "Open vSwitch documentation",
+    "https://docs.openvswitch.org/en/latest/"
+   ]
+  ],
+  "virtualization/live-migration-ha-and-troubleshooting": [
+   [
+    "libvirt: migration",
+    "https://libvirt.org/migration.html"
+   ],
+   [
+    "QEMU: live migration",
+    "https://www.qemu.org/docs/master/devel/migration/main.html"
+   ],
+   [
+    "Proxmox VE documentation",
+    "https://pve.proxmox.com/pve-docs/"
+   ]
+  ],
+  "storage/block-file-and-object-storage": [
+   [
+    "Linux kernel: block layer",
+    "https://docs.kernel.org/block/index.html"
+   ],
+   [
+    "fio documentation",
+    "https://fio.readthedocs.io/en/latest/"
+   ],
+   [
+    "AWS: EBS volume types",
+    "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html"
+   ]
+  ],
+  "storage/filesystems-ext4-xfs-and-mounts": [
+   [
+    "ext4 documentation",
+    "https://docs.kernel.org/admin-guide/ext4.html"
+   ],
+   [
+    "XFS documentation",
+    "https://docs.kernel.org/filesystems/xfs/index.html"
+   ],
+   [
+    "fstab manual page",
+    "https://man7.org/linux/man-pages/man5/fstab.5.html"
+   ]
+  ],
+  "storage/lvm-and-raid": [
+   [
+    "LVM2 resource page",
+    "https://sourceware.org/lvm2/"
+   ],
+   [
+    "Linux RAID wiki and mdadm",
+    "https://docs.kernel.org/admin-guide/md.html"
+   ],
+   [
+    "Red Hat: configuring LVM",
+    "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/configuring_and_managing_logical_volumes/index"
+   ]
+  ],
+  "storage/network-storage-nfs-iscsi-and-ceph": [
+   [
+    "Linux NFS documentation",
+    "https://docs.kernel.org/admin-guide/nfs/index.html"
+   ],
+   [
+    "Ceph documentation",
+    "https://docs.ceph.com/en/latest/"
+   ],
+   [
+    "Red Hat: managing storage devices",
+    "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/managing_storage_devices/index"
+   ]
+  ],
+  "storage/performance-backups-and-troubleshooting": [
+   [
+    "iostat manual page",
+    "https://man7.org/linux/man-pages/man1/iostat.1.html"
+   ],
+   [
+    "lsof manual page",
+    "https://man7.org/linux/man-pages/man8/lsof.8.html"
+   ],
+   [
+    "Brendan Gregg: Linux performance",
+    "https://www.brendangregg.com/linuxperf.html"
+   ]
+  ],
+  "sql-ops/reading-explain-and-finding-slow-queries": [
+   [
+    "PostgreSQL: Using EXPLAIN",
+    "https://www.postgresql.org/docs/current/using-explain.html"
+   ],
+   [
+    "PostgreSQL: pg_stat_statements",
+    "https://www.postgresql.org/docs/current/pgstatstatements.html"
+   ],
+   [
+    "Use The Index, Luke",
+    "https://use-the-index-luke.com/"
+   ]
+  ],
+  "sql-ops/indexes-that-help-and-indexes-that-hurt": [
+   [
+    "PostgreSQL: Indexes",
+    "https://www.postgresql.org/docs/current/indexes.html"
+   ],
+   [
+    "PostgreSQL: Multicolumn indexes",
+    "https://www.postgresql.org/docs/current/indexes-multicolumn.html"
+   ],
+   [
+    "Use The Index, Luke",
+    "https://use-the-index-luke.com/"
+   ]
+  ],
+  "sql-ops/locks-deadlocks-and-long-transactions": [
+   [
+    "PostgreSQL: Explicit locking",
+    "https://www.postgresql.org/docs/current/explicit-locking.html"
+   ],
+   [
+    "PostgreSQL: Monitoring activity",
+    "https://www.postgresql.org/docs/current/monitoring-stats.html"
+   ],
+   [
+    "PostgreSQL: Server configuration, client connection defaults",
+    "https://www.postgresql.org/docs/current/runtime-config-client.html"
+   ]
+  ],
+  "sql-ops/connections-pooling-and-capacity": [
+   [
+    "PostgreSQL: Connections and authentication",
+    "https://www.postgresql.org/docs/current/runtime-config-connection.html"
+   ],
+   [
+    "PostgreSQL: Resource consumption",
+    "https://www.postgresql.org/docs/current/runtime-config-resource.html"
+   ],
+   [
+    "PgBouncer documentation",
+    "https://www.pgbouncer.org/config.html"
+   ]
+  ],
+  "sql-ops/replication-lag-vacuum-and-day-two-operations": [
+   [
+    "PostgreSQL: High availability and replication",
+    "https://www.postgresql.org/docs/current/high-availability.html"
+   ],
+   [
+    "PostgreSQL: Routine vacuuming",
+    "https://www.postgresql.org/docs/current/routine-vacuuming.html"
+   ],
+   [
+    "pgBackRest documentation",
+    "https://pgbackrest.org/user-guide.html"
+   ]
+  ],
+  "gpu-serving/gpu-basics-memory-and-what-limits-inference": [
+   [
+    "NVIDIA: CUDA documentation",
+    "https://docs.nvidia.com/cuda/"
+   ],
+   [
+    "Hugging Face: LLM inference optimization",
+    "https://huggingface.co/docs/transformers/llm_tutorial_optimization"
+   ],
+   [
+    "vLLM documentation",
+    "https://docs.vllm.ai/en/latest/"
+   ]
+  ],
+  "gpu-serving/serving-stacks-vllm-tgi-triton": [
+   [
+    "vLLM documentation",
+    "https://docs.vllm.ai/en/latest/"
+   ],
+   [
+    "Hugging Face: Text Generation Inference",
+    "https://huggingface.co/docs/text-generation-inference/index"
+   ],
+   [
+    "NVIDIA: Triton Inference Server",
+    "https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/index.html"
+   ]
+  ],
+  "gpu-serving/gpus-on-kubernetes": [
+   [
+    "Kubernetes: Schedule GPUs",
+    "https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/"
+   ],
+   [
+    "NVIDIA GPU Operator documentation",
+    "https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/index.html"
+   ],
+   [
+    "Kubernetes: Taints and tolerations",
+    "https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/"
+   ]
+  ],
+  "gpu-serving/scaling-latency-and-cost": [
+   [
+    "Kubernetes: Horizontal Pod Autoscaling",
+    "https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/"
+   ],
+   [
+    "KEDA documentation",
+    "https://keda.sh/docs/"
+   ],
+   [
+    "vLLM: Metrics",
+    "https://docs.vllm.ai/en/latest/serving/metrics.html"
+   ]
+  ],
+  "gpu-serving/monitoring-and-debugging-gpu-workloads": [
+   [
+    "NVIDIA: nvidia-smi",
+    "https://docs.nvidia.com/deploy/nvidia-smi/index.html"
+   ],
+   [
+    "NVIDIA: DCGM",
+    "https://docs.nvidia.com/datacenter/dcgm/latest/index.html"
+   ],
+   [
+    "NVIDIA: XID errors",
+    "https://docs.nvidia.com/deploy/xid-errors/index.html"
+   ]
+  ],
+  "openstack/what-openstack-is-and-core-services": [
+   [
+    "OpenStack documentation",
+    "https://docs.openstack.org/"
+   ],
+   [
+    "OpenStack: Install guide",
+    "https://docs.openstack.org/install-guide/"
+   ],
+   [
+    "OpenStack: Operations guide",
+    "https://docs.openstack.org/operations-guide/"
+   ]
+  ],
+  "openstack/identity-projects-quotas-and-keystone": [
+   [
+    "OpenStack: Keystone documentation",
+    "https://docs.openstack.org/keystone/latest/"
+   ],
+   [
+    "OpenStack: Quotas",
+    "https://docs.openstack.org/nova/latest/admin/quotas.html"
+   ],
+   [
+    "OpenStack: Application credentials",
+    "https://docs.openstack.org/keystone/latest/user/application_credentials.html"
+   ]
+  ],
+  "openstack/compute-flavors-images-and-scheduling": [
+   [
+    "OpenStack: Nova documentation",
+    "https://docs.openstack.org/nova/latest/"
+   ],
+   [
+    "OpenStack: Compute scheduler",
+    "https://docs.openstack.org/nova/latest/admin/scheduling.html"
+   ],
+   [
+    "OpenStack: Placement",
+    "https://docs.openstack.org/placement/latest/"
+   ]
+  ],
+  "openstack/neutron-networking-security-groups-and-floating-ips": [
+   [
+    "OpenStack: Neutron documentation",
+    "https://docs.openstack.org/neutron/latest/"
+   ],
+   [
+    "OpenStack: Security groups",
+    "https://docs.openstack.org/neutron/latest/admin/intro-os-networking.html"
+   ],
+   [
+    "OpenStack: Networking guide",
+    "https://docs.openstack.org/neutron/latest/admin/index.html"
+   ]
+  ],
+  "openstack/operating-openstack-logs-upgrades-and-troubleshooting": [
+   [
+    "OpenStack: Operations guide",
+    "https://docs.openstack.org/operations-guide/"
+   ],
+   [
+    "OpenStack: Kolla-Ansible documentation",
+    "https://docs.openstack.org/kolla-ansible/latest/"
+   ],
+   [
+    "OpenStack: Upgrade guides",
+    "https://docs.openstack.org/nova/latest/admin/upgrades.html"
+   ]
+  ],
+  "baremetal/servers-racks-and-remote-management": [
+   [
+    "Redfish standard (DMTF)",
+    "https://www.dmtf.org/standards/redfish"
+   ],
+   [
+    "Open Compute Project",
+    "https://www.opencomputeproject.org/"
+   ],
+   [
+    "ipmitool project",
+    "https://www.intel.com/content/www/us/en/products/docs/servers/ipmi/ipmi-second-gen-interface-spec-v2-rev1-1.html"
+   ]
+  ],
+  "baremetal/provisioning-pxe-dhcp-and-images": [
+   [
+    "Ubuntu autoinstall reference",
+    "https://canonical-subiquity.readthedocs.io/en/latest/intro-to-autoinstall.html"
+   ],
+   [
+    "iPXE documentation",
+    "https://ipxe.org/docs"
+   ],
+   [
+    "OpenStack Ironic documentation",
+    "https://docs.openstack.org/ironic/latest/"
+   ]
+  ],
+  "baremetal/disks-raid-firmware-and-burn-in": [
+   [
+    "Linux RAID wiki (kernel.org)",
+    "https://raid.wiki.kernel.org/"
+   ],
+   [
+    "smartmontools documentation",
+    "https://www.smartmontools.org/wiki/TocDoc"
+   ],
+   [
+    "NVMe specifications",
+    "https://nvmexpress.org/specifications/"
+   ]
+  ],
+  "baremetal/datacenter-networking-leaf-spine-and-bonding": [
+   [
+    "Linux kernel: bonding",
+    "https://www.kernel.org/doc/html/latest/networking/bonding.html"
+   ],
+   [
+    "Open Compute Project networking",
+    "https://www.opencomputeproject.org/"
+   ],
+   [
+    "RFC 7938: BGP in large datacenters",
+    "https://www.rfc-editor.org/rfc/rfc7938"
+   ]
+  ],
+  "baremetal/operating-a-fleet-failures-lifecycle-and-capacity": [
+   [
+    "Open Compute Project hardware management",
+    "https://www.opencomputeproject.org/"
+   ],
+   [
+    "Redfish standard (DMTF)",
+    "https://www.dmtf.org/standards/redfish"
+   ],
+   [
+    "Google SRE book: Managing incidents",
+    "https://sre.google/sre-book/managing-incidents/"
+   ]
+  ],
+  "service-mesh/kubernetes-networking-under-the-hood": [
+   [
+    "Kubernetes: Cluster networking",
+    "https://kubernetes.io/docs/concepts/cluster-administration/networking/"
+   ],
+   [
+    "Kubernetes: Service",
+    "https://kubernetes.io/docs/concepts/services-networking/service/"
+   ],
+   [
+    "Gateway API",
+    "https://gateway-api.sigs.k8s.io/"
+   ]
+  ],
+  "service-mesh/cni-network-policy-and-ebpf": [
+   [
+    "Kubernetes: Network Policies",
+    "https://kubernetes.io/docs/concepts/services-networking/network-policies/"
+   ],
+   [
+    "Cilium documentation",
+    "https://docs.cilium.io/"
+   ],
+   [
+    "Project Calico documentation",
+    "https://docs.tigera.io/calico/latest/about/"
+   ]
+  ],
+  "service-mesh/what-a-service-mesh-is-and-how-it-works": [
+   [
+    "Istio: Architecture",
+    "https://istio.io/latest/docs/ops/deployment/architecture/"
+   ],
+   [
+    "Linkerd documentation",
+    "https://linkerd.io/2/overview/"
+   ],
+   [
+    "Envoy documentation",
+    "https://www.envoyproxy.io/docs/envoy/latest/"
+   ]
+  ],
+  "service-mesh/mtls-and-traffic-management": [
+   [
+    "Istio: Traffic management",
+    "https://istio.io/latest/docs/concepts/traffic-management/"
+   ],
+   [
+    "Istio: Security",
+    "https://istio.io/latest/docs/concepts/security/"
+   ],
+   [
+    "Envoy: Circuit breaking",
+    "https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/circuit_breaking"
+   ]
+  ],
+  "service-mesh/observing-and-troubleshooting-the-mesh": [
+   [
+    "Istio: Debugging",
+    "https://istio.io/latest/docs/ops/diagnostic-tools/"
+   ],
+   [
+    "Envoy: Access logging response flags",
+    "https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage"
+   ],
+   [
+    "Google SRE book: Monitoring",
+    "https://sre.google/sre-book/monitoring-distributed-systems/"
    ]
   ]
  },
@@ -4474,6 +5090,96 @@
    [
     "Google SRE book: Monitoring distributed systems",
     "https://sre.google/sre-book/monitoring-distributed-systems/"
+   ]
+  ],
+  "virtualization": [
+   [
+    "libvirt documentation",
+    "https://libvirt.org/docs.html"
+   ],
+   [
+    "QEMU documentation",
+    "https://www.qemu.org/docs/master/"
+   ],
+   [
+    "KVM documentation",
+    "https://www.linux-kvm.org/page/Documentation"
+   ]
+  ],
+  "storage": [
+   [
+    "ext4 documentation",
+    "https://docs.kernel.org/filesystems/ext4/index.html"
+   ],
+   [
+    "LVM2 resource page",
+    "https://sourceware.org/lvm2/"
+   ],
+   [
+    "Red Hat: Managing file systems",
+    "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/managing_file_systems/"
+   ]
+  ],
+  "sql-ops": [
+   [
+    "PostgreSQL: Using EXPLAIN",
+    "https://www.postgresql.org/docs/current/using-explain.html"
+   ],
+   [
+    "PostgreSQL: Routine vacuuming",
+    "https://www.postgresql.org/docs/current/routine-vacuuming.html"
+   ],
+   [
+    "PostgreSQL: Explicit locking",
+    "https://www.postgresql.org/docs/current/explicit-locking.html"
+   ]
+  ],
+  "gpu-serving": [
+   [
+    "vLLM documentation",
+    "https://docs.vllm.ai/en/latest/"
+   ],
+   [
+    "Text Generation Inference documentation",
+    "https://huggingface.co/docs/text-generation-inference/index"
+   ],
+   [
+    "NVIDIA Triton Inference Server user guide",
+    "https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/index.html"
+   ]
+  ],
+  "openstack": [
+   [
+    "OpenStack documentation",
+    "https://docs.openstack.org/"
+   ],
+   [
+    "OpenStack Installation Guide",
+    "https://docs.openstack.org/install-guide/"
+   ],
+   [
+    "OpenStack Operations Guide",
+    "https://docs.openstack.org/operations-guide/"
+   ]
+  ],
+  "baremetal": [
+   [
+    "smartmontools documentation",
+    "https://www.smartmontools.org/wiki/TocDoc"
+   ],
+   [
+    "Linux RAID wiki (kernel.org)",
+    "https://raid.wiki.kernel.org/"
+   ]
+  ],
+  "service-mesh": [
+   [
+    "Istio: Diagnostic tools",
+    "https://istio.io/latest/docs/ops/diagnostic-tools/"
+   ],
+   [
+    "Kubernetes: Network Policies",
+    "https://kubernetes.io/docs/concepts/services-networking/network-policies/"
    ]
   ]
  }

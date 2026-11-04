@@ -124,6 +124,22 @@ One in three requests is slow.
 > Round robin ignores speed. Use least connections or a health check that tests real work to spot the slow server.
 ```
 
+```wrongpath
+@goal A service cannot be reached from outside; open it to everyone.
+@wrong
+# security group
+ingress 0-65535 0.0.0.0/0
+@result
+(it works)
+# next day
+unusual SSH logins from 14 countries
+@why Opening all ports to the internet exposes every listening service. Only the port that clients need, from the sources that need it, should be allowed.
+@right
+ingress 443 from 0.0.0.0/0
+ingress 22 from 203.0.113.0/24
+@after Allow the one port, restrict management ports to known addresses, and verify with a scan from outside.
+```
+
 ## Common mistakes
 
 - Setting the default policy to DROP before allowing SSH

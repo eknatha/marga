@@ -101,6 +101,22 @@ edge: root | ans
 edge: auth | ans
 ```
 
+```wrongpath
+@goal A site is unreachable, so edit /etc/hosts and move on.
+@wrong
+echo "203.0.113.9 api.example.com" | sudo tee -a /etc/hosts
+@result
+(your laptop works)
+# colleagues still see the failure; two weeks later the server moved
+curl: (7) connect timed out
+@why A hosts entry fixes only one machine, hides the real DNS fault and silently goes stale when the address changes.
+@right
+dig +short api.example.com
+dig +trace api.example.com | tail -5
+dig @8.8.8.8 +short api.example.com
+@after Find out which resolver or record is wrong and fix it there, so everyone benefits.
+```
+
 ## Common mistakes
 
 - Switching off the old server immediately after a DNS change
