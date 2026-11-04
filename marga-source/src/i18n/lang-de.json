@@ -1,0 +1,2130 @@
+{
+"ui": [
+[
+"Skip to content",
+"Zum Inhalt springen"
+],
+[
+"Free · No login · No ads · No cookies",
+"Kostenlos · Ohne Anmeldung · Ohne Werbung · Ohne Cookies"
+],
+[
+"Visitor count unavailable",
+"Besucherzähler nicht verfügbar"
+],
+[
+"Visitor count",
+"Besucherzähler"
+],
+[
+"Skills",
+"Fähigkeiten"
+],
+[
+"Skill trees",
+"Fähigkeitsbäume"
+],
+[
+"Practice",
+"Üben"
+],
+[
+"Real Linux labs",
+"Echte Linux-Labore"
+],
+[
+"Real Linux lab",
+"Echtes Linux-Labor"
+],
+[
+"Progress",
+"Fortschritt"
+],
+[
+"Your progress",
+"Dein Fortschritt"
+],
+[
+"Interview questions",
+"Interviewfragen"
+],
+[
+"About",
+"Über"
+],
+[
+"Elsewhere",
+"Anderswo"
+],
+[
+"Main",
+"Hauptmenü"
+],
+[
+"Menu",
+"Menü"
+],
+[
+"Search",
+"Suchen"
+],
+[
+"Search lessons and cheat sheets",
+"Lektionen und Spickzettel durchsuchen"
+],
+[
+"Language",
+"Sprache"
+],
+[
+"Switch to dark theme",
+"Zum dunklen Design wechseln"
+],
+[
+"Switch to light theme",
+"Zum hellen Design wechseln"
+],
+[
+"Reading and accessibility",
+"Lesen und Barrierefreiheit"
+],
+[
+"Reading and accessibility options",
+"Optionen für Lesen und Barrierefreiheit"
+],
+[
+"Show the skills in each path",
+"Die Fähigkeiten jedes Pfads anzeigen"
+],
+[
+"Question bank, opens in a new tab",
+"Fragensammlung, öffnet sich in einem neuen Tab"
+],
+[
+"Exam prep, opens in a new tab",
+"Prüfungsvorbereitung, öffnet sich in einem neuen Tab"
+],
+[
+"InterviewHub (opens in a new tab)",
+"InterviewHub (öffnet sich in einem neuen Tab)"
+],
+[
+"Certifications (opens in a new tab)",
+"Zertifizierungen (öffnet sich in einem neuen Tab)"
+],
+[
+"Certifications",
+"Zertifizierungen"
+],
+[
+"Case studies",
+"Fallstudien"
+],
+[
+"Real outages explained",
+"Echte Ausfälle erklärt"
+],
+[
+"Terminal labs",
+"Terminal-Labore"
+],
+[
+"Badges",
+"Abzeichen"
+],
+[
+"Glossary",
+"Glossar"
+],
+[
+"Cheat sheets",
+"Spickzettel"
+],
+[
+"Printable cheat sheets",
+"Druckbare Spickzettel"
+],
+[
+"Printable, with watermark",
+"Druckbar, mit Wasserzeichen"
+],
+[
+"Open content license",
+"Lizenz für offene Inhalte"
+],
+[
+"Progress is saved in this browser only.",
+"Der Fortschritt wird nur in diesem Browser gespeichert."
+],
+[
+"MARGA by EknathaLabs",
+"MARGA by EknathaLabs"
+],
+[
+"Close",
+"Schließen"
+],
+[
+"Close details",
+"Details schließen"
+],
+[
+"Choices apply to every page and are saved in this browser only.",
+"Die Einstellungen gelten für alle Seiten und werden nur in diesem Browser gespeichert."
+],
+[
+"Colour theme",
+"Farbdesign"
+],
+[
+"Match my device",
+"Wie mein Gerät"
+],
+[
+"Light",
+"Hell"
+],
+[
+"Dark",
+"Dunkel"
+],
+[
+"Reading mode",
+"Lesemodus"
+],
+[
+"On: narrow column, larger text, no side panels",
+"An: schmale Spalte, größere Schrift, keine Seitenleisten"
+],
+[
+"Text size",
+"Textgröße"
+],
+[
+"Large",
+"Groß"
+],
+[
+"Larger",
+"Größer"
+],
+[
+"Largest",
+"Am größten"
+],
+[
+"Standard",
+"Standard"
+],
+[
+"Font",
+"Schriftart"
+],
+[
+"Line spacing",
+"Zeilenabstand"
+],
+[
+"Relaxed",
+"Locker"
+],
+[
+"Loose",
+"Sehr locker"
+],
+[
+"Letter and word spacing",
+"Buchstaben- und Wortabstand"
+],
+[
+"Wide",
+"Weit"
+],
+[
+"Contrast",
+"Kontrast"
+],
+[
+"High contrast",
+"Hoher Kontrast"
+],
+[
+"Motion",
+"Bewegung"
+],
+[
+"Follow my device",
+"Wie mein Gerät"
+],
+[
+"Reduce animations",
+"Animationen reduzieren"
+],
+[
+"Links",
+"Links"
+],
+[
+"Always underlined",
+"Immer unterstrichen"
+],
+[
+"Keyboard focus",
+"Tastaturfokus"
+],
+[
+"Extra strong outline",
+"Extra starke Umrandung"
+],
+[
+"Print and Save as PDF style",
+"Stil für Druck und „Als PDF speichern“"
+],
+[
+"Print style",
+"Druckstil"
+],
+[
+"Light, saves ink",
+"Hell, spart Tinte"
+],
+[
+"Light, large type",
+"Hell, große Schrift"
+],
+[
+"Large type",
+"Große Schrift"
+],
+[
+"Highlight the text being read aloud",
+"Den vorgelesenen Text hervorheben"
+],
+[
+"On",
+"An"
+],
+[
+"Off",
+"Aus"
+],
+[
+"Reset to defaults",
+"Auf Standard zurücksetzen"
+],
+[
+"Spoken voice",
+"Sprechstimme"
+],
+[
+"Print",
+"Drucken"
+],
+[
+"Save as PDF",
+"Als PDF speichern"
+],
+[
+"Listen",
+"Anhören"
+],
+[
+"Pause",
+"Pause"
+],
+[
+"Stop",
+"Stopp"
+],
+[
+"Voice",
+"Stimme"
+],
+[
+"Speed",
+"Tempo"
+],
+[
+"No voices available",
+"Keine Stimmen verfügbar"
+],
+[
+"No voices found yet. If this stays empty, install a speech voice in your system settings.",
+"Noch keine Stimmen gefunden. Bleibt die Liste leer, installiere eine Sprachausgabe in den Systemeinstellungen."
+],
+[
+"Read aloud",
+"Vorlesen"
+],
+[
+"Copy commands",
+"Befehle kopieren"
+],
+[
+"Tell a friend",
+"Einem Freund erzählen"
+],
+[
+"Explain like I am new",
+"Erkläre es wie für Neulinge"
+],
+[
+"Adds a plain-words note after each technical term. Hover or focus any dotted term for its meaning.",
+"Fügt nach jedem Fachbegriff eine Erklärung in einfachen Worten hinzu. Fahre mit der Maus oder dem Fokus über einen gepunkteten Begriff, um seine Bedeutung zu sehen."
+],
+[
+"In plain words:",
+"In einfachen Worten:"
+],
+[
+"Learn to fix production before production breaks.",
+"Lerne, die Produktion zu reparieren, bevor sie kaputtgeht."
+],
+[
+"Free. Offline. No sign-up.",
+"Kostenlos. Offline. Ohne Anmeldung."
+],
+[
+"No payment, no ads.",
+"Keine Zahlung, keine Werbung."
+],
+[
+"Practical DevOps, cloud and SRE training from someone who runs production. Real incidents, real commands, no login, no ads.",
+"Praxisnahes Training in DevOps, Cloud und SRE von jemandem, der Produktion betreibt. Echte Vorfälle, echte Befehle, keine Anmeldung, keine Werbung."
+],
+[
+"Choose your role",
+"Wähle deine Rolle"
+],
+[
+"Find my path in 2 minutes",
+"Meinen Pfad in 2 Minuten finden"
+],
+[
+"No account needed. Start now. Progress stays in your browser on this device; export it to move it.",
+"Kein Konto nötig. Leg gleich los. Der Fortschritt bleibt in deinem Browser auf diesem Gerät; exportiere ihn, um ihn mitzunehmen."
+],
+[
+"Open it once, turn off wifi, and keep learning. Lessons, labs and widgets run from your device.",
+"Öffne es einmal, schalte das WLAN aus und lerne weiter. Lektionen, Labore und Widgets laufen auf deinem Gerät."
+],
+[
+"Ready to work offline",
+"Bereit für den Offline-Betrieb"
+],
+[
+"Reload once to enable offline",
+"Einmal neu laden, um Offline zu aktivieren"
+],
+[
+"Checking offline support",
+"Offline-Unterstützung wird geprüft"
+],
+[
+"Day streak",
+"Tage in Folge"
+],
+[
+"Lessons passed",
+"Bestandene Lektionen"
+],
+[
+"Best streak",
+"Beste Serie"
+],
+[
+"lessons with checks",
+"Lektionen mit Prüfungen"
+],
+[
+"real incidents",
+"echte Vorfälle"
+],
+[
+"troubleshooting drills",
+"Fehlersuche-Übungen"
+],
+[
+"interview answers",
+"Interviewantworten"
+],
+[
+"animated explainers",
+"animierte Erklärungen"
+],
+[
+"Pick a skill tree. Pass each check to unlock the next skill.",
+"Wähle einen Fähigkeitsbaum. Bestehe jede Prüfung, um die nächste Fähigkeit freizuschalten."
+],
+[
+"Each role is a tree of skills. A skill unlocks when the skills that lead into it are mastered.",
+"Jede Rolle ist ein Baum aus Fähigkeiten. Eine Fähigkeit wird frei, wenn du die Fähigkeiten beherrschst, die zu ihr führen."
+],
+[
+"Role paths",
+"Rollenpfade"
+],
+[
+"Start from zero",
+"Bei null anfangen"
+],
+[
+"Get a DevOps job",
+"Einen DevOps-Job bekommen"
+],
+[
+"Prepare for an interview",
+"Auf ein Interview vorbereiten"
+],
+[
+"Fix production faster",
+"Produktion schneller reparieren"
+],
+[
+"Ship code safely",
+"Code sicher ausliefern"
+],
+[
+"Automate the boring work",
+"Lästige Arbeit automatisieren"
+],
+[
+"Build with AI",
+"Mit KI bauen"
+],
+[
+"Build securely",
+"Sicher bauen"
+],
+[
+"Learn by skill",
+"Nach Fähigkeit lernen"
+],
+[
+"Build your own path",
+"Deinen eigenen Pfad bauen"
+],
+[
+"Today",
+"Heute"
+],
+[
+"Daily challenge",
+"Tägliche Aufgabe"
+],
+[
+"Mixed practice",
+"Gemischtes Üben"
+],
+[
+"Next up",
+"Als Nächstes"
+],
+[
+"In development",
+"In Entwicklung"
+],
+[
+"Planned",
+"Geplant"
+],
+[
+"Beginner",
+"Einsteiger"
+],
+[
+"Intermediate",
+"Fortgeschritten"
+],
+[
+"Advanced",
+"Experte"
+],
+[
+"Junior",
+"Junior"
+],
+[
+"Mid-level",
+"Mittlere Ebene"
+],
+[
+"Senior",
+"Senior"
+],
+[
+"mid",
+"mittel"
+],
+[
+"senior",
+"senior"
+],
+[
+"Goes with the lesson",
+"Gehört zur Lektion"
+],
+[
+"Ready",
+"Bereit"
+],
+[
+"Locked",
+"Gesperrt"
+],
+[
+"Mastered",
+"Gemeistert"
+],
+[
+"In progress",
+"In Arbeit"
+],
+[
+"Passed",
+"Bestanden"
+],
+[
+"Not done",
+"Nicht erledigt"
+],
+[
+"Not solved",
+"Nicht gelöst"
+],
+[
+"Not played",
+"Nicht gespielt"
+],
+[
+"Open",
+"Öffnen"
+],
+[
+"Test out",
+"Überspringen per Test"
+],
+[
+"Need review",
+"Wiederholung nötig"
+],
+[
+"I know this",
+"Das kann ich schon"
+],
+[
+"Show answer",
+"Antwort zeigen"
+],
+[
+"Prerequisites open it",
+"Voraussetzungen schalten es frei"
+],
+[
+"Start lab",
+"Labor starten"
+],
+[
+"(Terminal lab)",
+"(Terminal-Labor)"
+],
+[
+"(Terminal lab),",
+"(Terminal-Labor),"
+],
+[
+"(Real Linux lab)",
+"(Echtes Linux-Labor)"
+],
+[
+"(Real Linux lab),",
+"(Echtes Linux-Labor),"
+],
+[
+"Related practice:",
+"Passende Übungen:"
+],
+[
+"Related stages:",
+"Verwandte Etappen:"
+],
+[
+"Case file",
+"Falldatei"
+],
+[
+"What happened",
+"Was geschah"
+],
+[
+"Cause",
+"Ursache"
+],
+[
+"What changed",
+"Was sich geändert hat"
+],
+[
+"Lesson",
+"Lektion"
+],
+[
+"Lessons",
+"Lektionen"
+],
+[
+"Original source:",
+"Originalquelle:"
+],
+[
+"Open the full case file",
+"Die vollständige Falldatei öffnen"
+],
+[
+"Mark as read",
+"Als gelesen markieren"
+],
+[
+"Try it",
+"Probier es aus"
+],
+[
+"On this page",
+"Auf dieser Seite"
+],
+[
+"Lesson check",
+"Lektionsprüfung"
+],
+[
+"Flashcards",
+"Lernkarten"
+],
+[
+"Interactive",
+"Interaktiv"
+],
+[
+"Exercise",
+"Übung"
+],
+[
+"Study time",
+"Lernzeit"
+],
+[
+"Level",
+"Stufe"
+],
+[
+"Type",
+"Art"
+],
+[
+"Stage",
+"Etappe"
+],
+[
+"Paths",
+"Pfade"
+],
+[
+"Breadcrumb",
+"Brotkrumenpfad"
+],
+[
+"Support level",
+"Supportstufe"
+],
+[
+"Show",
+"Zeigen"
+],
+[
+"All",
+"Alle"
+],
+[
+"Clear filters",
+"Filter löschen"
+],
+[
+"All skills",
+"Alle Fähigkeiten"
+],
+[
+"All stages",
+"Alle Etappen"
+],
+[
+"Use",
+"Verwenden"
+],
+[
+"and",
+"und"
+],
+[
+"or",
+"oder"
+],
+[
+"Practises Every skill",
+"Übt jede Fähigkeit"
+],
+[
+"Practises Everyone",
+"Übt für alle"
+],
+[
+"Runs in your browser",
+"Läuft in deinem Browser"
+],
+[
+"Diagnose only",
+"Nur Diagnose"
+],
+[
+"Several faults",
+"Mehrere Fehler"
+],
+[
+"Fix it",
+"Repariere es"
+],
+[
+"starter",
+"Einstieg"
+],
+[
+"Newcomer",
+"Neuling"
+],
+[
+"Rank:",
+"Rang:"
+],
+[
+"skill points",
+"Fähigkeitspunkte"
+],
+[
+"Unlocks",
+"Schaltet frei"
+],
+[
+"Skill details",
+"Details zur Fähigkeit"
+],
+[
+"Key",
+"Legende"
+],
+[
+"Foundations",
+"Grundlagen"
+],
+[
+"Core skills",
+"Kernfähigkeiten"
+],
+[
+"Platform skills",
+"Plattformfähigkeiten"
+],
+[
+"Advanced skills",
+"Fortgeschrittene Fähigkeiten"
+],
+[
+"Mastery",
+"Meisterschaft"
+],
+[
+"Needs or unlocks the selected skill",
+"Wird von der gewählten Fähigkeit benötigt oder schaltet sie frei"
+],
+[
+"Select a skill to see what it needs and unlocks. Pass every lesson check in a skill to master it. Locked skills open when the skills that lead into them are mastered.",
+"Wähle eine Fähigkeit, um zu sehen, was sie braucht und was sie freischaltet. Bestehe alle Lektionsprüfungen einer Fähigkeit, um sie zu meistern. Gesperrte Fähigkeiten öffnen sich, wenn die Fähigkeiten gemeistert sind, die zu ihnen führen."
+],
+[
+"No prerequisites. A good place to start.",
+"Keine Voraussetzungen. Ein guter Startpunkt."
+],
+[
+"Skill route for DevOps Engineer",
+"Fähigkeitspfad für DevOps Engineer"
+],
+[
+"DevOps Engineer",
+"DevOps Engineer"
+],
+[
+"Cloud Engineer",
+"Cloud Engineer"
+],
+[
+"Site Reliability Engineer",
+"Site Reliability Engineer"
+],
+[
+"DevSecOps Engineer",
+"DevSecOps Engineer"
+],
+[
+"AI Engineer",
+"AI Engineer"
+],
+[
+"MLOps and AIOps Engineer",
+"MLOps and AIOps Engineer"
+],
+[
+"Platform Engineer",
+"Platform Engineer"
+],
+[
+"Build internal developer platforms, golden paths and self-service infrastructure.",
+"Baue interne Entwicklerplattformen, Golden Paths und Self-Service-Infrastruktur."
+],
+[
+"Kubernetes Administrator (CKA and CKS)",
+"Kubernetes-Administrator (CKA und CKS)"
+],
+[
+"A focused path for cluster administration and security certification practice.",
+"Ein gezielter Pfad für Cluster-Administration und die Vorbereitung auf die Sicherheitszertifizierung."
+],
+[
+"FinOps and cloud cost",
+"FinOps und Cloud-Kosten"
+],
+[
+"Measure, allocate and reduce cloud spend without hurting reliability.",
+"Cloud-Ausgaben messen, zuordnen und senken, ohne die Zuverlässigkeit zu gefährden."
+],
+[
+"Data platform engineer",
+"Dateninfrastruktur-Entwicklung"
+],
+[
+"Build pipelines, storage and governance for analytics and machine learning teams.",
+"Baue Pipelines, Speicher und Governance für Analyse- und Machine-Learning-Teams."
+],
+[
+"Subnet and CIDR playground",
+"Subnetz- und CIDR-Spielwiese"
+],
+[
+"YAML playground",
+"YAML-Spielwiese"
+],
+[
+"Python playground",
+"Python-Spielwiese"
+],
+[
+"Go playground",
+"Go-Spielwiese"
+],
+[
+"SQL for SREs",
+"SQL für SREs"
+],
+[
+"Skill-writing lab",
+"Skill-Schreiblabor"
+],
+[
+"Animated explainers",
+"Animierte Erklärungen"
+],
+[
+"Multi-service incidents",
+"Vorfälle über mehrere Dienste"
+],
+[
+"Real-world case studies",
+"Echte Fallstudien"
+],
+[
+"InterviewHub",
+"InterviewHub"
+],
+[
+"Reference",
+"Nachschlagewerk"
+],
+[
+"Up next",
+"Als Nächstes"
+],
+[
+"Practice this stage:",
+"Übe diese Etappe:"
+],
+[
+"Watch and study:",
+"Ansehen und lernen:"
+],
+[
+"Cheat sheet:",
+"Spickzettel:"
+],
+[
+"Get the handbook (PDF or web page)",
+"Das Handbuch holen (PDF oder Webseite)"
+],
+[
+"case studies",
+"Fallstudien"
+],
+[
+"flashcards",
+"Lernkarten"
+],
+[
+"days",
+"Tage"
+],
+[
+"Prerequisites",
+"Voraussetzungen"
+],
+[
+"What you will learn",
+"Was du lernst"
+],
+[
+"Start here",
+"Hier starten"
+],
+[
+"Continue",
+"Weiter"
+],
+[
+"Back",
+"Zurück"
+],
+[
+"Next",
+"Weiter"
+],
+[
+"Previous",
+"Vorherige"
+],
+[
+"Submit",
+"Absenden"
+],
+[
+"Check",
+"Prüfen"
+],
+[
+"Retry",
+"Nochmal versuchen"
+],
+[
+"Reset",
+"Zurücksetzen"
+],
+[
+"Hint",
+"Tipp"
+],
+[
+"Hints",
+"Tipps"
+],
+[
+"Solution",
+"Lösung"
+],
+[
+"Goals",
+"Ziele"
+],
+[
+"Copy",
+"Kopieren"
+],
+[
+"Copied",
+"Kopiert"
+],
+[
+"Download",
+"Herunterladen"
+],
+[
+"Share",
+"Teilen"
+],
+[
+"Export progress",
+"Fortschritt exportieren"
+],
+[
+"Import progress",
+"Fortschritt importieren"
+],
+[
+"Terminal lab",
+"Terminal-Labor"
+],
+[
+"Real Linux",
+"Echtes Linux"
+],
+[
+"Incident game",
+"Vorfallspiel"
+],
+[
+"Explainer",
+"Erklärung"
+],
+[
+"Architecture",
+"Architektur"
+],
+[
+"Try this lab",
+"Dieses Labor ausprobieren"
+],
+[
+"Watch the guided version",
+"Die geführte Version ansehen"
+],
+[
+"In this lesson",
+"In dieser Lektion"
+],
+[
+"Quiz",
+"Quiz"
+],
+[
+"Explain it to me like...",
+"Erkläre es mir wie..."
+],
+[
+"I am new to this",
+"Ich bin neu hier"
+],
+[
+"A practitioner",
+"Ein Praktiker"
+],
+[
+"Senior view",
+"Senior-Sicht"
+],
+[
+"In an interview",
+"Im Vorstellungsgespräch"
+],
+[
+"Common mistakes",
+"Häufige Fehler"
+],
+[
+"In the real world",
+"In der Praxis"
+],
+[
+"Watch it",
+"Ansehen"
+],
+[
+"All widgets",
+"Alle Widgets"
+],
+[
+"Key takeaways",
+"Wichtigste Erkenntnisse"
+],
+[
+"Start the check",
+"Prüfung starten"
+],
+[
+"Question",
+"Frage"
+],
+[
+"Select to show the answer",
+"Auswählen, um die Antwort zu zeigen"
+],
+[
+"Again",
+"Nochmal"
+],
+[
+"Got it",
+"Verstanden"
+],
+[
+"Do it yourself",
+"Mach es selbst"
+],
+[
+"Practise on a machine",
+"Auf einer Maschine üben"
+],
+[
+"What to do next",
+"Wie es weitergeht"
+],
+[
+"Take the lesson check",
+"Die Lektionsprüfung ablegen"
+],
+[
+"Pass it to unlock the next lesson.",
+"Bestehe sie, um die nächste Lektion freizuschalten."
+],
+[
+"Troubleshooting drill",
+"Fehlersuche-Übung"
+],
+[
+"Animated explainer",
+"Animierte Erklärung"
+],
+[
+"Post-mortem",
+"Nachbetrachtung"
+],
+[
+"Interview question",
+"Interviewfrage"
+],
+[
+"Official documentation for this stage",
+"Offizielle Dokumentation zu dieser Etappe"
+],
+[
+"Read the vendor and project documentation for the full, current detail.",
+"Lies die Dokumentation des Herstellers und des Projekts für alle aktuellen Einzelheiten."
+],
+[
+"Pass every lesson check to earn the",
+"Bestehe alle Lektionsprüfungen und verdiene das"
+],
+[
+"stage badge",
+"Etappenabzeichen"
+],
+[
+"Make the calls during a realistic outage and see what each choice leads to.",
+"Triff die Entscheidungen bei einem realistischen Ausfall und sieh, wohin jede Wahl führt."
+],
+[
+"Reading list",
+"Leseliste"
+],
+[
+"See the reading lists for every stage",
+"Die Leselisten aller Etappen ansehen"
+],
+[
+"Where this skill fits",
+"Wo diese Fähigkeit hineinpasst"
+],
+[
+"Test out of this skill",
+"Diese Fähigkeit per Test überspringen"
+],
+[
+"Open the labs for this stage",
+"Die Labore dieser Etappe öffnen"
+],
+[
+"Guide",
+"Leitfaden"
+],
+[
+"Guides",
+"Leitfäden"
+],
+[
+"Articles and talks",
+"Artikel und Vorträge"
+],
+[
+"Saved in this browser. Export a backup if you switch devices.",
+"In diesem Browser gespeichert. Exportiere eine Sicherung, wenn du das Gerät wechselst."
+],
+[
+"Share your progress",
+"Teile deinen Fortschritt"
+],
+[
+"Makes a picture on this device. Add a name if you like; it is not saved or sent anywhere.",
+"Erstellt ein Bild auf diesem Gerät. Gib auf Wunsch einen Namen ein; er wird nicht gespeichert oder gesendet."
+],
+[
+"Name on the card (optional)",
+"Name auf der Karte (optional)"
+],
+[
+"Look",
+"Aussehen"
+],
+[
+"Shape",
+"Form"
+],
+[
+"Wide (for links and posts)",
+"Breit (für Links und Beiträge)"
+],
+[
+"Square (for chat and feeds)",
+"Quadratisch (für Chats und Feeds)"
+],
+[
+"Download the card (PNG)",
+"Karte herunterladen (PNG)"
+],
+[
+"Open the learning dashboard",
+"Das Lern-Dashboard öffnen"
+],
+[
+"Current streak",
+"Aktuelle Serie"
+],
+[
+"Active days",
+"Aktive Tage"
+],
+[
+"Activity, last 12 weeks",
+"Aktivität der letzten 12 Wochen"
+],
+[
+"Completion by stage",
+"Fortschritt nach Etappe"
+],
+[
+"Your data",
+"Deine Daten"
+],
+[
+"Reset all progress",
+"Gesamten Fortschritt zurücksetzen"
+],
+[
+"Role skill trees",
+"Fähigkeitsbäume nach Rolle"
+],
+[
+"See each role as a roadmap",
+"Jede Rolle als Fahrplan ansehen"
+],
+[
+"All roles",
+"Alle Rollen"
+],
+[
+"role paths",
+"Rollenpfade"
+],
+[
+"build your own path",
+"baue deinen eigenen Pfad"
+],
+[
+"Prefer a guided order for a job role? See the",
+"Lieber eine geführte Reihenfolge für eine Berufsrolle? Sieh dir die"
+],
+[
+"Select to see details",
+"Auswählen, um Details zu sehen"
+]
+],
+"pats": [
+[
+"^1 lessons?$",
+"1 Lektion"
+],
+[
+"^Used in 1 paths?:$",
+"Verwendet in 1 Pfad:"
+],
+[
+"^Current streak 1 days?$",
+"Aktuelle Serie: 1 Tag"
+],
+[
+"^1 lessons?, about ([\\d.]+) h$",
+"1 Lektion, etwa $1 Std."
+],
+[
+"^(\\d+) lessons, (\\d+) stages$",
+"$1 Lektionen, $2 Etappen"
+],
+[
+"^About ([\\d.]+) h$",
+"Etwa $1 Std."
+],
+[
+"^(\\d+) animated explainers$",
+"$1 animierte Erklärungen"
+],
+[
+"^(\\d+) interactive widgets$",
+"$1 interaktive Widgets"
+],
+[
+"^(\\d+) architecture post-mortems$",
+"$1 Architektur-Nachbetrachtungen"
+],
+[
+"^(\\d+) failure and recovery stories$",
+"$1 Geschichten über Ausfälle und Wiederherstellung"
+],
+[
+"^\\((\\d+) watched\\), including$",
+"($1 angesehen), darunter"
+],
+[
+"^(.+) · (.+) · about (\\d+) minutes$",
+"$1 · $2 · etwa $3 Minuten"
+],
+[
+"^(\\d+) min$",
+"$1 Min."
+],
+[
+"^(\\d+) steps$",
+"$1 Schritte"
+],
+[
+"^(\\d+) questions$",
+"$1 Fragen"
+],
+[
+"^(\\d+) lessons?$",
+"$1 Lektionen"
+],
+[
+"^(\\d+) days$",
+"$1 Tage"
+],
+[
+"^(\\d+) min a day$",
+"$1 Min. pro Tag"
+],
+[
+"^([\\d.]+) h$",
+"$1 Std."
+],
+[
+"^(\\d+) percent complete$",
+"$1 Prozent abgeschlossen"
+],
+[
+"^(\\d+) of (\\d+) lessons passed$",
+"$1 von $2 Lektionen bestanden"
+],
+[
+"^(\\d+) of (\\d+) lessons$",
+"$1 von $2 Lektionen"
+],
+[
+"^(\\d+) of (\\d+) watched$",
+"$1 von $2 angesehen"
+],
+[
+"^\\((\\d+) of (\\d+) done\\)$",
+"($1 von $2 erledigt)"
+],
+[
+"^(\\d+) of (\\d+) solved$",
+"$1 von $2 gelöst"
+],
+[
+"^(\\d+) of (\\d+) skills mastered$",
+"$1 von $2 Fähigkeiten gemeistert"
+],
+[
+"^(\\d+) of (\\d+) lessons? passed$",
+"$1 von $2 Lektionen bestanden"
+],
+[
+"^of (\\d+)$",
+"von $1"
+],
+[
+"^Level (\\d+) of (\\d+)$",
+"Stufe $1 von $2"
+],
+[
+"^Level (\\d+)$",
+"Stufe $1"
+],
+[
+"^Question (\\d+) of (\\d+)$",
+"Frage $1 von $2"
+],
+[
+"^Current streak (\\d+) days?$",
+"Aktuelle Serie: $1 Tage"
+],
+[
+"^Current streak (\\d+) days?, best (\\d+) days?$",
+"Aktuelle Serie: $1 Tage, beste: $2 Tage"
+],
+[
+"^(\\d+) lessons?, about ([\\d.]+) h\\. No prerequisites\\. You can start here\\.$",
+"$1 Lektionen, etwa $2 Std. Keine Voraussetzungen. Du kannst hier anfangen."
+],
+[
+"^(\\d+) lessons?, about ([\\d.]+) h\\. Works best after$",
+"$1 Lektionen, etwa $2 Std. Passt am besten nach"
+],
+[
+"^(\\d+) lessons?, about ([\\d.]+) h$",
+"$1 Lektionen, etwa $2 Std."
+],
+[
+"^Used in (\\d+) paths?:$",
+"Verwendet in $1 Pfaden:"
+],
+[
+"^Show all (\\d+) skills$",
+"Alle $1 Fähigkeiten zeigen"
+],
+[
+"^All (\\d+) lessons$",
+"Alle $1 Lektionen"
+],
+[
+"^Version (.+)$",
+"Version $1"
+],
+[
+"^Start: (.+)$",
+"Starten: $1"
+],
+[
+"^Skill route for (.+)$",
+"Fähigkeitspfad für $1"
+],
+[
+"^(.+) skill tree$",
+"Fähigkeitsbaum: $1"
+],
+[
+"^Open the (.+) page$",
+"Die Seite „$1“ öffnen"
+],
+[
+"^Locked\\. Pass the check for \"(.+)\" first\\.$",
+"Gesperrt. Bestehe zuerst die Prüfung für „$1“."
+],
+[
+"^real Linux in your browser, (.+)$",
+"Echtes Linux in deinem Browser, $1"
+],
+[
+"^(.+), locked$",
+"$1, gesperrt"
+],
+[
+"^(.+), ready$",
+"$1, bereit"
+],
+[
+"^(.+), Ready to unlock skills, (\\d+) of (\\d+) lessons passed\\.(.*)$",
+"$1, bereit zum Freischalten von Fähigkeiten, $2 von $3 Lektionen bestanden.$4"
+],
+[
+"^Needs (.+)$",
+"Benötigt $1"
+],
+[
+"^Select to see details$",
+"Auswählen, um Details zu sehen"
+],
+[
+"^!(.+) and (.+)$",
+"$1 und $2"
+],
+[
+"^Lesson (\\d+) of (\\d+)$",
+"Lektion $1 von $2"
+],
+[
+"^Lesson (\\d+): (.+), (Locked|Up next|Ready|Passed)$",
+"Lektion $1: $2, $3"
+],
+[
+"^Part of your plan: (.+), day (\\d+) of (\\d+)$",
+"Teil deines Plans: $1, Tag $2 von $3"
+],
+[
+"^Written from (\\d+) official references, listed at the end of the lesson\\. Check them for the current detail\\.$",
+"Geschrieben nach $1 offiziellen Quellen, die am Ende der Lektion aufgelistet sind. Prüfe dort die aktuellen Einzelheiten."
+],
+[
+"^Used in (\\d+) role paths:$",
+"Verwendet in $1 Rollenpfaden:"
+],
+[
+"^(\\d+) questions\\. Answer (\\d+) correctly to pass and unlock the next lesson\\.$",
+"$1 Fragen. Beantworte $2 richtig, um zu bestehen und die nächste Lektion freizuschalten."
+],
+[
+"^Card (\\d+) of (\\d+)$",
+"Karte $1 von $2"
+],
+[
+"^All (\\d+) real Linux labs for this lesson$",
+"Alle $1 echten Linux-Labore zu dieser Lektion"
+],
+[
+"^(\\d+) break-and-fix labs for this stage, in a simulated terminal in your browser \\((\\d+) done\\)\\.$",
+"$1 Labore zum Kaputtmachen und Reparieren für diese Etappe, in einem simulierten Terminal in deinem Browser ($2 erledigt)."
+],
+[
+"^simulated terminal, (\\d+) min$",
+"simuliertes Terminal, $1 Min."
+],
+[
+"^(\\d+) skills, about ([\\d.]+) h of study\\.$",
+"$1 Fähigkeiten, etwa $2 Std. Lernzeit."
+]
+],
+"modules": {
+"linux": {
+"title": "Linux für Ingenieure",
+"summary": "Navigiere, sichere, paketiere, plane und analysiere einen Linux-Server so, wie es die Arbeit in der Produktion verlangt."
+},
+"git": {
+"title": "Git und Versionsverwaltung",
+"summary": "Verfolge Änderungen mit Git: Commits, Branches, Merging, Rebase, Remotes, Pull Requests, Tags, Hooks, große Repositories und die Wiederherstellung, wenn etwas schiefgeht."
+},
+"bash": {
+"title": "Shell-Skripte",
+"summary": "Schreibe Bash-Skripte, die laut scheitern, sicher laufen, JSON aus APIs auslesen und sich wiederholende Handarbeit ersetzen."
+},
+"python": {
+"title": "Python für Automatisierung",
+"summary": "Schreibe Python-Skripte für Dateien, Prozesse, HTTP-APIs und Cloud-SDKs, mit Tests und einem paketierten Kommandozeilenwerkzeug."
+},
+"networking": {
+"title": "Netzwerkgrundlagen",
+"summary": "Verstehe Adressen, DNS, HTTP, TLS und Firewalls gut genug, um jeden Verbindungsfehler zu beheben."
+},
+"docker": {
+"title": "Docker und Container",
+"summary": "Baue kleine, sichere Images, betreibe Anwendungen aus mehreren Containern und verstehe Registries, Laufzeiten und den OCI-Standard."
+},
+"cicd": {
+"title": "CI/CD und Auslieferung",
+"summary": "Entwirf Pipelines, die sicher bauen, testen und ausliefern, sichere die Lieferkette ab und deploye mit Rolling-, Canary- und deklarativer Auslieferung."
+},
+"kubernetes": {
+"title": "Kubernetes",
+"summary": "Betreibe Workloads auf Kubernetes, von Architektur und Netzwerk bis zu Helm, Autoskalierung, Operatoren, Cluster-Upgrades, RBAC, Fehlersuche und Prüfungsstrategie."
+},
+"terraform": {
+"title": "Terraform und Infrastruktur als Code",
+"summary": "Beschreibe Infrastruktur als Code, nutze fortgeschrittenes HCL, verwalte Zustand und Geheimnisse sicher und baue echte AWS- und Azure-Stacks."
+},
+"cloud": {
+"title": "Cloud-Plattformen: AWS und Azure",
+"summary": "Zentrale Konzepte im direkten Vergleich auf AWS und Azure: Identität, Netzwerke, DNS und CDN, Rechenleistung, Serverless, verwaltetes Kubernetes, Sicherheit, Monitoring und Kosten."
+},
+"observability": {
+"title": "Observability",
+"summary": "Instrumentiere Systeme mit Metriken, Logs und Traces, liefere sie mit OpenTelemetry aus, prüfe von außen und alarmiere bei dem, was Nutzer tatsächlich spüren."
+},
+"sre": {
+"title": "Site Reliability Engineering",
+"summary": "Definiere Zuverlässigkeit mit SLOs, reagiere auf Vorfälle, leiste Bereitschaftsdienst, plane Kapazität, übe den Ausfall und steuere Änderungen sicher."
+},
+"security": {
+"title": "DevSecOps und Sicherheit",
+"summary": "Baue Sicherheit in die Auslieferung ein: Bedrohungsmodellierung, Geheimnisse, Prüfungen von Pipeline und Lieferkette, Härtung von Containern und Kubernetes, Cloud-Identität und Reaktion auf Vorfälle."
+},
+"ansible": {
+"title": "Ansible und Konfigurationsmanagement",
+"summary": "Beschreibe Server in Inventaren und Playbooks, halte sie mit idempotenten Rollen konsistent, schütze Geheimnisse mit Vault und rolle Änderungen sicher aus."
+},
+"databases": {
+"title": "Datenbanken für Betreiber",
+"summary": "Betreibe relationale Datenbanken mit Zuversicht: SQL, Indizes und Pläne, Transaktionen, Backups, Replikation, sichere Migrationen, Caches und Triage bei Vorfällen."
+},
+"go": {
+"title": "Go für DevOps-Ingenieure",
+"summary": "Schreibe kleine, schnelle, zuverlässige Go-Dienste und Werkzeuge: Typen, Fehler, Interfaces, Goroutinen, Kontext, HTTP, Tests, Container und Debugging."
+},
+"helm": {
+"title": "Helm für Einsteiger",
+"summary": "Paketiere, konfiguriere, aktualisiere und setze Kubernetes-Anwendungen mit Helm zurück: Charts, Werte, Templates, Releases, Abhängigkeiten und Fehlersuche."
+},
+"cloud-iam": {
+"title": "Cloud-Sicherheit und IAM",
+"summary": "Steuere, wer und was in der Cloud was tun darf: Identitäten, Rollen und Richtlinien auf AWS und Azure, minimale Rechte, Geheimnisse und Schlüssel, private Netzwerke, Audit-Logs und die Fehlersuche bei Zugriffsfehlern."
+},
+"k8s-ops": {
+"title": "Kubernetes-Administration und Betrieb",
+"summary": "Betreibe Cluster, nicht nur Anwendungen: Control Plane und etcd, Backups, sichere Upgrades, RBAC, Node-Wartung, Quoten und Autoskalierung, Netzwerk- und Pod-Sicherheit und die Fehlersuche im Cluster."
+},
+"argocd": {
+"title": "Continuous Delivery mit Argo CD",
+"summary": "Liefere an Kubernetes aus, indem ein Controller den Sollzustand aus einem Repository zieht: Anwendungen, Sync und Drift, Helm und Kustomize, Umgebungen, Hooks, Zugriff und Fehlersuche."
+},
+"llm": {
+"title": "Grundlagen großer Sprachmodelle",
+"summary": "Verstehe, wie große Sprachmodelle in der Praxis funktionieren: Tokens, Kontextfenster, Sampling, Training, API-Aufrufe, Kosten, Latenz, Bewertung und Debugging."
+},
+"prompting": {
+"title": "Prompting und strukturierte Ausgabe",
+"summary": "Schreibe zuverlässige Prompts, gib Beispiele, bitte um schrittweises Denken, erhalte validiertes JSON zurück und versioniere und teste deine Prompts."
+},
+"claude-skills": {
+"title": "Claude Skills",
+"summary": "Verpacke Fachwissen als Skills, die Claude bei Bedarf lädt: SKILL.md, auslösende Beschreibungen, schrittweise Offenlegung, Skripte, Tests, Teilen und Sicherheit."
+},
+"mcp": {
+"title": "Werkzeugnutzung und MCP",
+"summary": "Lass Modelle Werkzeuge sicher aufrufen: Function Calling, die Schleife der Werkzeugnutzung, das Model Context Protocol, einen Server bauen, Berechtigungen und Prompt-Injection."
+},
+"system-design": {
+"title": "Systementwurf für Plattform und SRE",
+"summary": "Entwirf Systeme, die im Kleinen ausfallen: Abschätzung, Caching, Warteschlangen, Konsistenz, Quoren, Zellen, Shuffle Sharding, Lastabwurf, Multi-Region, Änderungssicherheit und durchgearbeitete Entwürfe, geprüft an echten Ausfällen."
+},
+"mlops": {
+"title": "MLOps: maschinelles Lernen in der Produktion",
+"summary": "Betreibe Modelle wie jedes andere Produktionssystem: Datenprüfungen, reproduzierbares Training, getestete Pipelines, ein Modellregister, sichere Releases, Bereitstellung und Drift-Überwachung mit einer Nachtrainingsschleife."
+},
+"aiops": {
+"title": "AIOps: Algorithmen für den Betrieb",
+"summary": "Nutze Statistik und maschinelles Lernen, um Systeme zu betreiben: Anomalieerkennung, Alarmkorrelation, Muster in Logs und Traces, Hinweise auf die Grundursache, Vorfallassistenten und sichere Selbstheilung."
+},
+"virtualization": {
+"title": "Virtualisierung",
+"summary": "Verstehe Hypervisoren, Überbuchung von CPU und Speicher, virtuelle Festplatten und Snapshots, virtuelle Netzwerke und Live-Migration und analysiere einen KVM-Host."
+},
+"storage": {
+"title": "Speicher und Dateisysteme",
+"summary": "Wähle zwischen Block-, Datei- und Objektspeicher, verwalte ext4 und XFS, LVM und RAID, NFS, iSCSI und Ceph und analysiere langsame oder volle Festplatten."
+},
+"sql-ops": {
+"title": "SQL-Leistung und Datenbankbetrieb",
+"summary": "Lies Abfragepläne, lege die richtigen Indizes an, löse Sperren auf, dimensioniere Verbindungspools und betreibe Replikation, Vacuum und den Alltagsbetrieb."
+},
+"gpu-serving": {
+"title": "GPU, KI-Infrastruktur und LLM-Bereitstellung",
+"summary": "Wisse, was die Inferenz auf einer GPU begrenzt, betreibe vLLM, TGI und Triton, plane GPUs auf Kubernetes und steuere Latenz und Kosten."
+},
+"openstack": {
+"title": "OpenStack und Private Cloud",
+"summary": "Betreibe eine Private Cloud: Keystone, Nova, Neutron, Cinder und Glance, Quoten, Scheduling, Netzwerk und Alltagsbetrieb."
+},
+"baremetal": {
+"title": "Bare Metal und Rechenzentrum",
+"summary": "Baue physische Server ein, stelle sie bereit und betreibe sie: BMC und IPMI, PXE-Bereitstellung, Festplatten und RAID, Leaf-Spine-Netzwerke und Flottenbetrieb."
+},
+"service-mesh": {
+"title": "Service Mesh und Kubernetes-Netzwerk",
+"summary": "Verstehe Pod-Netzwerke, CNI und Netzwerkrichtlinien und betreibe dann ein Service Mesh mit mTLS, Traffic-Routing und Fehlersuche."
+}
+},
+"paths": {
+"devops": {
+"summary": "Automatisiere den Weg vom Code in die Produktion: Linux, Bash und Python, Netzwerk, Container, Pipelines, Kubernetes, Infrastruktur als Code, Cloud und Monitoring.",
+"audience": "Systemadministratoren, Entwickler und Support-Ingenieure, die in DevOps-Rollen wechseln."
+},
+"cloud": {
+"summary": "Entwirf und betreibe Cloud-Infrastruktur auf AWS und Azure mit Netzwerk, Identität, Terraform, Serverless, Containern und Monitoring.",
+"audience": "Ingenieure, die Infrastruktur in öffentlichen Cloud-Konten aufbauen und betreiben."
+},
+"sre": {
+"summary": "Halte Dienste zuverlässig: zuerst Linux, Container und Cloud, dann Observability, SLOs, Bereitschaftsdienst, Vorfallreaktion, Kapazität und Chaos-Tests.",
+"audience": "Betriebs- und Plattform-Ingenieure, die für Verfügbarkeit und Bereitschaftsdienst verantwortlich sind."
+},
+"devsecops": {
+"summary": "Sichere Auslieferung vom Code bis zur Cloud: Kontrollen für Pipeline und Lieferkette, gehärtete Container und Cluster, Geheimnisse, Cloud-Identität und Reaktion auf Sicherheitsvorfälle.",
+"audience": "DevOps-, Plattform- und Sicherheitsingenieure, die für die Sicherheit dessen verantwortlich sind, was ausgeliefert wird."
+},
+"ai": {
+"summary": "Baue mit großen Sprachmodellen: wie sie funktionieren, Prompting und strukturierte Ausgabe, Claude Skills und Werkzeugnutzung mit dem Model Context Protocol, aufbauend auf Linux, Git, Python und Netzwerk.",
+"audience": "Entwickler und DevOps-Ingenieure, die KI-Funktionen sicher bauen, paketieren und betreiben wollen."
+},
+"mlops": {
+"summary": "Betreibe maschinelles Lernen und algorithmengestützten Betrieb in der Produktion: Container und Kubernetes, Pipelines, Observability, dann MLOps und AIOps.",
+"audience": "DevOps- und SRE-Ingenieure, die Data-Science-Teams unterstützen, und Dateningenieure, die Produktionsroutine brauchen."
+}
+},
+"lessons": {
+"linux/filesystem-and-navigation": "Lerne, wo auf einem Linux-Server was liegt, wie du es schnell findest und wie symbolische Links echte Deployment-Fehler verursachen.",
+"linux/users-groups-permissions": "Lies und setze Linux-Berechtigungen richtig und behebe die „Permission denied“-Fehler, die Deployments zum Scheitern bringen.",
+"linux/processes-and-services": "Untersuche und steuere Prozesse, sende die richtigen Signale und verwalte Dienste mit systemd-Units und journalctl.",
+"linux/disks-and-filesystems": "Miss die Belegung von Datenträgern und Inodes, finde heraus, was den Platz frisst, und kläre das Rätsel „Datenträger voll, aber nichts zu löschen“.",
+"linux/lvm-and-raid": "Erweitere Speicher ohne Ausfallzeit mit LVM, schütze dich mit mdadm-RAID vor Festplattenausfällen und wisse, welches Problem jedes davon löst.",
+"linux/package-management": "Installiere, aktualisiere, fixiere und prüfe Software mit apt und dnf, verstehe Repositories und Signaturen und halte Server ohne Überraschungen gepatcht.",
+"linux/ssh-and-remote-access": "Nutze schlüsselbasiertes SSH, konfiguriere Clients und Server sicher, tunnle Verkehr, springe über Bastion-Hosts und übertrage Dateien mit scp und rsync.",
+"linux/cron-and-timers": "Führe Aufgaben zeitgesteuert mit cron und systemd-Timern aus, vermeide die klassischen Umgebungsfallen und mache geplante Arbeit beobachtbar.",
+"linux/logs-and-troubleshooting": "Lies journald- und Dateilogs, korreliere Ereignisse nach Zeit und erkläre mit dem Kernel-Log rätselhafte Neustarts.",
+"linux/performance-triage": "Nutze Load Average, vmstat und iostat, um CPU-, Speicher- und Festplattenprobleme in unter fünf Minuten zu unterscheiden.",
+"linux/boot-and-kernel": "Verfolge den Bootvorgang von der Firmware bis zu systemd, untersuche und justiere den Kernel mit sysctl und Modulen und rette einen Server, der nicht bootet.",
+"linux/security-hardening": "Verkleinere die Angriffsfläche eines Linux-Servers mit minimalen Paketen, Firewall-Regeln, minimalen Rechten, SELinux oder AppArmor, Auditing und regelmäßigen Prüfungen.",
+"linux/namespaces-and-cgroups": "Verstehe die zwei Kernel-Funktionen hinter jedem Container: Namespaces, die begrenzen, was ein Prozess sehen kann, und cgroups, die begrenzen, was er nutzen darf, und untersuche sie mit einfachen Linux-Werkzeugen.",
+"linux/working-efficiently-in-the-terminal": "Arbeite schneller und mit weniger Fehlern dank Shell-Verlauf, Tastenkürzeln, tmux-Sitzungen, einem sicheren Editor-Setup, Aliasen und Dotfiles, die du zwischen Rechnern mitnehmen kannst.",
+"linux/time-ntp-and-timezones": "Halte Serveruhren mit NTP richtig, verstehe UTC im Vergleich zur Ortszeit und analysiere Fehler, die durch Uhrendrift entstehen.",
+"linux/systemd-overrides-targets-and-dependencies": "Ändere einen Dienst sicher mit Drop-in-Overrides, verstehe Reihenfolge und Abhängigkeiten und nutze Targets und Ressourceneinstellungen.",
+"linux/kernel-modules-sysctl-and-boot-parameters": "Lade und untersuche Kernelmodule, justiere den laufenden Kernel mit sysctl, setze Boot-Parameter und lies den Kernel-Ringpuffer.",
+"linux/processes-memory-and-the-oom-killer": "Verstehe virtuellen Speicher, Page Cache und Swap, lies free und /proc/meminfo richtig und untersuche einen Out-of-Memory-Abbruch.",
+"linux/system-calls-strace-and-perf": "Sieh, wie Programme über Systemaufrufe mit dem Kernel sprechen, verfolge sie mit strace und finde Hotspots mit perf.",
+"linux/filesystems-page-cache-and-io": "Verfolge einen Lese- und einen Schreibvorgang durch VFS und Page Cache, verstehe Writeback und fsync und analysiere langsame Festplatten mit iostat.",
+"linux/networking-in-the-kernel-sockets-and-conntrack": "Verstehe Sockets, Listen-Warteschlangen, TCP-Zustände und Connection Tracking und finde mit ss und conntrack Verbindungsprobleme.",
+"linux/debugging-a-sick-server": "Nutze eine feste Reihenfolge von Prüfungen (CPU, Speicher, Festplatte, Netzwerk, Logs), um herauszufinden, warum ein Server langsam ist oder ausfällt, und wisse, welcher Befehl welche Frage beantwortet.",
+"git/first-repository-and-commits": "Verstehe, was Versionskontrolle aufzeichnet, mache deine ersten Commits mit klarer Nachricht, lies den Verlauf und halte erzeugte Dateien mit .gitignore heraus.",
+"git/staging-undoing-and-stashing": "Wähle das passende Rückgängigmachen für die Lage: Änderungen verwerfen, aus dem Staging nehmen, den letzten Commit korrigieren, einen geteilten Commit umkehren oder Arbeit mit stash parken.",
+"git/branches-and-merging": "Lege für jede Aufgabe einen Branch an, führe sie per Fast-Forward oder Merge-Commit zurück und löse Konflikte ohne Panik.",
+"git/rebase-and-clean-history": "Nutze Rebase für einen linearen Verlauf, räume deine eigenen Commits mit interaktivem Rebase auf und kenne die Regel, wann man nicht rebased.",
+"git/remotes-fetch-pull-and-push": "Arbeite mit einem gemeinsamen Repository: klonen, mit fetch sehen, was sich geändert hat, mit pull aktualisieren, mit push veröffentlichen und verstehen, warum ein Push abgelehnt wird.",
+"git/team-workflows-pull-requests-and-reviews": "Wähle eine Branching-Strategie, arbeite mit kleinen, geprüften Pull Requests und schütze main mit erforderlichen Prüfungen.",
+"git/tags-releases-and-versioning": "Markiere Releases mit annotierten Tags, nummeriere sie mit semantischer Versionierung und handhabe Hotfixes und Changelogs.",
+"git/hooks-signing-and-secrets-in-history": "Fange Fehler mit Hooks ab, belege mit Signaturen, wer einen Commit gemacht hat, und reagiere richtig, wenn ein Geheimnis eingecheckt wurde.",
+"git/large-repositories-submodules-and-worktrees": "Halte große Repositories mit flachen und partiellen Klonen, Sparse Checkout und LFS schnell; wisse, wann Submodule passen; arbeite mit Worktrees an mehreren Branches gleichzeitig.",
+"git/debugging-git-problems": "Stelle verlorene Commits mit dem Reflog wieder her, finde mit bisect und blame den Commit, der etwas kaputtgemacht hat, und verstehe Detached HEAD und andere verwirrende Zustände.",
+"bash/script-basics": "Schreibe dein erstes zuverlässiges Bash-Skript: Shebang, Variablen, Quoting, Argumente, Exit-Codes und Befehlsersetzung.",
+"bash/control-flow-and-functions": "Nutze Bedingungen, Schleifen, case-Anweisungen und Funktionen, um einmalige Befehle in wiederverwendbare Werkzeuge zu verwandeln.",
+"bash/text-processing": "Zerlege Logs und Befehlsausgaben mit Pipes, grep, cut, sort, uniq, sed und awk, um Fragen in einer Zeile zu beantworten.",
+"bash/advanced-patterns": "Werte Optionen mit getopts aus, nutze Arrays und assoziative Arrays richtig, schreibe Here-Documents und kombiniere Befehle mit Prozesssubstitution.",
+"bash/apis-and-json": "Rufe REST-APIs von der Shell mit curl auf, verarbeite JSON mit jq, behandle Fehler und Paginierung und halte Geheimnisse aus dem Befehlsverlauf heraus.",
+"bash/safe-automation": "Lass Skripte mit dem strikten Modus laut scheitern, räume mit Traps auf, vermeide überlappende Läufe und plane sie mit cron oder systemd-Timern.",
+"bash/arrays-and-parameter-expansion": "Nutze Bash-Arrays und assoziative Arrays für Listen und Nachschlagen und die Parametererweiterung zum Kürzen, Ersetzen und für Standardwerte, ohne externe Programme aufzurufen.",
+"bash/building-and-testing-shell-tools": "Mache aus einem Skript ein kleines Werkzeug mit Optionen, Hilfetext, Exit-Codes und Tests mit getopts, shellcheck und bats und führe sie automatisch aus.",
+"bash/temporary-files-and-atomic-writes": "Lege temporäre Dateien sicher an, ersetze Dateien, ohne eine halb geschriebene Kopie zu hinterlassen, und verhindere, dass zwei Kopien eines Skripts gleichzeitig laufen.",
+"bash/portable-scripts-and-shellcheck": "Schreibe Skripte, die auf verschiedenen Systemen laufen, fange Fehler mit ShellCheck ab und halte sie für die nächste Person lesbar.",
+"bash/debugging-shell-scripts": "Verfolge ein Skript mit set -x, fange stille Fehler mit dem strikten Modus und shellcheck ab und finde heraus, warum ein Skript im Terminal funktioniert, aber unter cron oder CI scheitert.",
+"python/basics-and-environments": "Schreibe lesbares Python für Automatisierung, halte die Pakete jedes Projekts in einer virtuellen Umgebung getrennt und führe Skripte überall gleich aus.",
+"python/files-and-processes": "Lies und schreibe Dateien sicher mit pathlib, starte andere Programme mit subprocess, behandle Fehler ausdrücklich und protokolliere, was passiert ist.",
+"python/http-apis-and-json": "Rufe REST-APIs mit requests auf, parse und baue JSON, behandle Zeitüberschreitungen, Wiederholungen und Paginierung und halte Tokens aus deinem Code heraus.",
+"python/cloud-sdks": "Automatisiere AWS mit boto3 und Azure mit dessen Python-SDK, authentifiziere dich ohne fest eingebaute Schlüssel, blättere durch Ergebnisse und schreibe idempotente Skripte.",
+"python/testing-and-packaging": "Baue ein echtes CLI mit argparse, teste es mit pytest einschließlich Mocks und paketiere es, damit Kollegen es mit einem Befehl installieren können.",
+"python/concurrency-for-operations": "Führe viele Netzwerkaufrufe oder Befehle gleichzeitig aus mit Thread-Pools, asyncio und subprocess, mit Zeitlimits, Begrenzungen und Fehlerbehandlung, die Betriebsskripte schnell und sicher halten.",
+"python/writing-command-line-tools": "Baue ein klares, testbares Kommandozeilenwerkzeug mit argparse, strukturierter Ausgabe, Logging, Exit-Codes und Konfiguration aus der Umgebung, bereit zum Paketieren und Teilen.",
+"python/logging-for-scripts-and-services": "Ersetze print durch das logging-Modul: Ebenen, Formate, Handler, strukturierte Felder und Logs, die bei einem Vorfall helfen.",
+"python/yaml-csv-and-config-files": "Lies und schreibe die Datenformate des Betriebs sicher: YAML, CSV und INI, mit Validierung und ohne Überraschungen.",
+"python/debugging-python": "Lies Tracebacks von unten, nutze Logging und Debugger gut und finde hängende oder Ressourcen verlierende Skripte mit faulthandler und py-spy.",
+"networking/ip-addressing-and-subnets": "Lies die CIDR-Notation, teile Netzwerke in Subnetze und vermeide den Fehler überlappender Bereiche, der Cloud-Peering blockiert.",
+"networking/dns": "Verstehe, wie Namen zu Adressen werden, lies die Ausgabe von dig und plane DNS-Änderungen so, dass Nutzer nicht beim alten Server landen.",
+"networking/http-and-tls": "Lies HTTP-Anfragen und Statuscodes, miss mit curl jede Phase einer Anfrage und analysiere Zertifikatsfehler.",
+"networking/routing-and-nat": "Lies Routing-Tabellen, verfolge ein Paket über Subnetze, verstehe Standard-Gateways, Quell- und Ziel-NAT und behebe asymmetrische oder fehlende Routen.",
+"networking/troubleshooting-toolkit": "Behebe „Dienst A erreicht Dienst B nicht“ der Reihe nach und lerne, warum „Verbindung abgelehnt“ und „Zeitüberschreitung“ auf verschiedene Ursachen deuten.",
+"networking/firewalls-and-load-balancing": "Schreibe sichere Firewall-Regeln, verstehe Sicherheitsgruppen und analysiere Load Balancer, die gesunde Server als ausgefallen markieren.",
+"networking/vpn-and-tunnels": "Verbinde Netzwerke sicher mit WireGuard und IPsec, nutze SSH- und TLS-Tunnel und verstehe Cloud-Site-to-Site-VPN, Peering und private Endpunkte.",
+"networking/ipv6-essentials": "Lies und schreibe IPv6-Adressen, verstehe Präfixe, SLAAC, Neighbour Discovery und Dual-Stack-Betrieb und vermeide die häufigen Fehler bei Firewalls, DNS und Cloud-Netzwerken.",
+"networking/latency-mtu-and-network-performance": "Trenne Latenz von Bandbreite, verstehe das TCP-Verhalten auf langsamen oder verlustbehafteten Verbindungen, finde MTU-Probleme und miss den Durchsatz mit den richtigen Werkzeugen.",
+"networking/network-segmentation-and-security-groups": "Teile ein Netzwerk in Zonen, schreibe Firewall- und Sicherheitsgruppenregeln, die nur das Nötige erlauben, und überprüfe sie.",
+"networking/dhcp-arp-and-the-local-network": "Verstehe, wie ein Host eine Adresse bekommt, Nachbarn im eigenen Netz findet und was ausfällt, wenn einer der beiden Schritte scheitert.",
+"networking/debugging-network-problems": "Arbeite dich durch den Stack von der Verbindung über DNS, Routing und Ports bis TLS mit ping, dig, curl, ss und traceroute, damit du genau sagen kannst, welche Schicht defekt ist.",
+"docker/containers-and-images": "Verstehe, was ein Container wirklich ist, wie Image-Schichten funktionieren und warum das Festlegen von Image-Versionen „bei mir läuft es“ verhindert.",
+"docker/writing-dockerfiles": "Nutze Layer-Caching, mehrstufige Builds und einen Nicht-Root-Benutzer, um Images zu bauen, die schnell zu erstellen, klein und sicherer im Betrieb sind.",
+"docker/volumes-and-networking": "Bewahre Daten über die Lebensdauer eines Containers hinaus mit Volumes und Bind-Mounts auf und verbinde Container über Namen in benutzerdefinierten Netzwerken.",
+"docker/compose": "Beschreibe eine Anwendung, ihre Datenbank, Netzwerke, Volumes und Geheimnisse in einer Datei und lass Dienste auf echte Bereitschaft warten.",
+"docker/registries-and-supply-chain": "Lade Images in Registries hoch und herunter, vergib und fixiere Tags richtig, suche nach Schwachstellen, erzeuge ein SBOM und signiere Images, bevor sie in die Produktion gelangen.",
+"docker/runtimes-oci-and-podman": "Verstehe, was unterhalb von Docker einen Container ausführt, wie OCI-Standards Images portabel machen und wie Podman und containerd passen, einschließlich Rootless-Containern.",
+"docker/security-and-troubleshooting": "Härte Container mit minimalen Rechten, scanne Images und nutze Exit-Codes und die Ausgabe von inspect, um herauszufinden, warum ein Container gestorben ist.",
+"docker/buildkit-caching-and-multi-arch": "Mache Image-Builds schnell und wiederholbar mit Schichtreihenfolge, BuildKit-Cache-Mounts, Geheimnissen, die nicht in Schichten durchsickern, Remote-Caches und Images, die auf amd64 und arm64 laufen.",
+"docker/container-logging-and-resource-limits": "Logge auf die Standardausgabe, steuere das Log-Wachstum, füge sinnvolle Health-Checks hinzu und setze CPU-, Speicher- und Prozesslimits, die den Host schützen, ohne unerwartete Neustarts zu verursachen.",
+"docker/slim-images-and-faster-builds": "Verkleinere Container-Images mit dem richtigen Basis-Image, mehrstufigen Builds und sauberen Schichten und sieh nach, was in einem Image steckt.",
+"docker/running-containers-in-production": "Betreibe Container mit den Einstellungen, die die Produktion braucht: Nicht-Root-Benutzer, schreibgeschützte Dateisysteme, Health-Checks, Limits, Neustart-Richtlinie und geordnetes Herunterfahren.",
+"docker/debugging-containers": "Lies Exit-Codes, Logs und Ereignisse, untersuche die Konfiguration eines Containers und öffne eine Shell in einem fehlerhaften oder minimalen Image, ohne zu raten.",
+"cicd/pipeline-fundamentals": "Verstehe Continuous Integration, Delivery und Deployment, die Stufen einer gesunden Pipeline und die Prinzipien, die sie schnell und vertrauenswürdig halten.",
+"cicd/building-a-pipeline": "Schreibe ein deklaratives Jenkinsfile mit Build-, Test-, Scan- und Deploy-Stufen, handhabe Zugangsdaten sicher und lies Fehlschläge.",
+"cicd/testing-and-quality-gates": "Entscheide, welche Tests in einer Pipeline wo laufen, halte sie schnell und zuverlässig, gehe mit instabilen Tests um und mache Abdeckung, Linting und Sicherheitsprüfungen zu durchgesetzten Schranken.",
+"cicd/deployment-strategies": "Vergleiche Rolling-, Blue-Green- und Canary-Releases, trenne mit Feature-Flags Deployment von Release und plane Rollback und Datenbankänderungen.",
+"cicd/versioning-and-artifacts": "Baue einmal und befördere dasselbe Artefakt durch die Umgebungen, versioniere mit SemVer, speichere Artefakte und Caches richtig und halte einen Changelog und einen Rollback-Weg bereit.",
+"cicd/pipeline-security": "Schütze Geheimnisse, Runner und Abhängigkeiten in CI/CD, wende minimale Rechte auf Deploy-Zugangsdaten an, scanne Code und Images und wehre vergiftete Abhängigkeiten ab.",
+"cicd/declarative-delivery-with-argo-cd": "Verlagere das Deployment von Push zu Pull, wobei ein Controller im Cluster den Cluster fortlaufend an die gewünschte Konfiguration anpasst, die du speicherst und prüfst.",
+"cicd/release-management-and-feature-flags": "Trenne Deployment von Release mit Feature-Flags, entwirf Umgebungen und Freigaben passend zu deinem Risiko und verwalte Flags, Versionen und Rollbacks ohne Chaos.",
+"cicd/fast-pipelines-caching-parallelism-monorepos": "Verkürze die Pipeline-Zeit, indem du unabhängige Jobs parallel laufen lässt, Abhängigkeiten und Build-Ausgaben zwischenspeicherst, in einem Monorepo nur Geändertes ausführst und misst, wohin die Minuten gehen.",
+"cicd/reusable-pipelines-and-templates": "Hör auf, Pipeline-Dateien zwischen Repositories zu kopieren: teile Schritte als Templates, versioniere sie und halte Teams konsistent, ohne sie auszubremsen.",
+"cicd/environments-promotion-and-approvals": "Führe einen Build durch Test, Staging und Produktion mit den passenden Prüfungen, Freigaben und Aufzeichnungen für jeden Schritt.",
+"cicd/debugging-pipelines": "Reproduziere Pipeline-Fehler lokal, unterscheide echte von instabilen Fehlern, finde Umgebungsabweichungen sowie Cache- und Geheimnisprobleme und verhindere, dass ein schlechter Lauf ein Team blockiert.",
+"kubernetes/architecture": "Lerne die Control Plane und die Node-Komponenten, die deklarative Abgleichsschleife und wie man den Cluster-Zustand mit kubectl liest.",
+"kubernetes/pods-and-deployments": "Schreibe ein produktionsreifes Deployment mit Ressourcenanforderungen, Health-Probes und sicherem Rolling Update und mache es rückgängig, wenn es scheitert.",
+"kubernetes/services-and-ingress": "Gib wechselnden Pods mit Services eine stabile Adresse, verstehe Cluster-DNS, mache Anwendungen mit Ingress erreichbar und beschränke Verkehr mit NetworkPolicy.",
+"kubernetes/config-and-secrets": "Trenne Konfiguration von Images mit ConfigMaps und Secrets, wähle zwischen Umgebungsvariablen und eingehängten Dateien und gehe ehrlich mit Geheimnissen um.",
+"kubernetes/storage": "Speichere Daten dauerhaft mit PersistentVolumeClaims und StorageClasses und wisse, wann ein StatefulSet der richtige Controller ist.",
+"kubernetes/jobs-cronjobs-daemonsets": "Wähle den passenden Workload-Controller für Batch-Arbeit, geplante Aufgaben und Agenten pro Node und konfiguriere Wiederholungen, Nebenläufigkeit, Verlauf und Aufräumen.",
+"kubernetes/resources-and-quotas": "Dimensioniere Pods mit Requests und Limits, verstehe QoS-Klassen und OOM-Abbrüche und nutze LimitRange und ResourceQuota, um einen gemeinsamen Cluster fair zu halten.",
+"kubernetes/autoscaling": "Skaliere Pods nach CPU, Speicher und eigenen Metriken mit HPA, passe die Größe mit VPA an, skaliere mit ereignisgesteuerter Autoskalierung auf null und füge Nodes hinzu, wenn Pods nicht eingeplant werden können.",
+"kubernetes/rbac-and-security": "Vergib Zugriff mit minimalen Rechten über Roles und ServiceAccounts, teste ihn mit kubectl auth can-i und härte Pods mit securityContext.",
+"kubernetes/scheduling-and-troubleshooting": "Steuere mit Selektoren, Taints und Affinität, wo Pods laufen, und arbeite die häufigen Fehlerzustände in wiederholbarer Reihenfolge ab.",
+"kubernetes/helm-and-kustomize": "Paketiere und konfiguriere Kubernetes-Anwendungen mit Helm-Charts und Werten, überlagere Umgebungen mit Kustomize und veröffentliche, aktualisiere und setze sicher zurück.",
+"kubernetes/crds-and-operators": "Erweitere die Kubernetes-API mit CustomResourceDefinitions, verstehe die Abgleichsschleife des Controllers und betreibe Produktionssoftware mit Operatoren.",
+"kubernetes/cni-and-cluster-networking": "Verstehe, wie Pods IP-Adressen bekommen und sich über Nodes hinweg erreichen, was ein CNI-Plugin tut, wie kube-proxy Services umsetzt und wie man Verkehr mit NetworkPolicy isoliert.",
+"kubernetes/cluster-install-upgrade-etcd": "Richte einen Cluster mit kubeadm ein, aktualisiere ihn jeweils eine Nebenversion, sichere und stelle etcd wieder her und verwalte Zertifikate und Node-Wartung.",
+"kubernetes/cka-cks-exam-strategy": "Bereite dich auf die praktischen Kubernetes-Zertifizierungen vor mit einem Tempo-Setup, imperativen Befehlen und einem Zeitplan, und sieh, was jede Prüfung abdeckt.",
+"kubernetes/probes-metrics-and-logging": "Konfiguriere Liveness-, Readiness- und Startup-Probes richtig, sammle Ressourcen- und Anwendungsmetriken und liefere Logs aus, damit ein laufender Cluster sich selbst erklärt.",
+"kubernetes/service-mesh-and-mtls": "Verstehe, was ein Service Mesh einem Cluster hinzufügt, wie Datenebenen mit und ohne Sidecar arbeiten, wie gegenseitiges TLS und Verkehrsrichtlinien angewendet werden und wann sich ein Mesh nicht lohnt.",
+"kubernetes/network-policies-in-practice": "Beschränke, welche Pods mit welchen sprechen dürfen, beginnend mit „alles verbieten“, und teste die Regeln.",
+"kubernetes/statefulsets-and-running-databases": "Betreibe Workloads, die stabile Namen und eigenen Speicher brauchen, und entscheide ehrlich, wann man keine Datenbank auf Kubernetes betreiben sollte.",
+"kubernetes/debugging-kubernetes-workloads": "Folge einem festen Weg von Pending über CrashLoopBackOff, ImagePullBackOff und fehlschlagende Probes bis zu nicht erreichbaren Services mit describe, logs, Ereignissen, exec und flüchtigen Debug-Containern.",
+"terraform/iac-and-hcl-basics": "Verstehe, warum Infrastruktur in Dateien beschrieben wird, lerne den Terraform-Arbeitsablauf und lies die grundlegende HCL-Syntax.",
+"terraform/providers-and-resources": "Baue echte Infrastruktur mit Abhängigkeiten, frage bestehende Ressourcen mit Data Sources ab und nutze Lifecycle-Regeln und Meta-Argumente sicher.",
+"terraform/variables-and-outputs": "Mache Konfigurationen wiederverwendbar mit typisierten Variablen, Validierung, Locals und Outputs und halte sensible Werte aus deinen Dateien heraus.",
+"terraform/expressions-and-dynamic-blocks": "Erzeuge viele Ressourcen aus Daten mit count und for_each, wandle Werte mit for-Ausdrücken und Funktionen um und erzeuge verschachtelte Blöcke mit dynamic.",
+"terraform/state": "Verstehe, was der Terraform-State ist, speichere ihn remote mit Sperre und nutze import und State-Befehle, ohne etwas zu zerstören.",
+"terraform/modules": "Paketiere wiederverwendbare Infrastruktur als Module mit klaren Ein- und Ausgaben, versioniere sie und lege Umgebungen so an, dass Änderungen isoliert bleiben.",
+"terraform/secrets-and-sensitive-data": "Halte Passwörter und Schlüssel aus Code und Logs heraus, verstehe, dass der State Geheimnisse enthält, lies Geheimnisse zur Laufzeit aus einem Manager und sichere das State-Backend.",
+"terraform/aws-and-azure-end-to-end": "Baue dieselbe kleine Webplattform mit Terraform auf AWS und auf Azure, mit Netzwerk, Rechenleistung, Load Balancer und Datenbank, und vergleiche die entsprechenden Ressourcen.",
+"terraform/workflows-and-drift": "Führe Terraform sicher in einer Pipeline mit geprüften Plänen aus, erkenne und behebe Drift und ergänze automatische Prüfungen vor dem Apply.",
+"terraform/testing-terraform": "Fange Fehler früh mit Formatierung, Validierung, Linting, Richtlinienprüfungen, Plan-Assertions und echten Test-Deployments mit terraform test und Terratest ab, in einer Pipeline, die bezahlbar bleibt.",
+"terraform/environments-and-team-workflows": "Wähle zwischen Workspaces und Verzeichnissen für Umgebungen, teile den State auf, um den Schadensradius zu begrenzen, und richte geprüfte, automatisierte Plan- und Apply-Abläufe für ein Team ein.",
+"terraform/import-refactor-and-moved-blocks": "Hole bestehende Infrastruktur unter Terraform, benenne Ressourcen um und ordne sie neu, ohne sie zu zerstören, und belege es mit plan.",
+"terraform/large-configurations-and-performance": "Teile großen Terraform-Code in Stacks auf, die schnell geplant werden und klein scheitern, mit klaren Grenzen und Abhängigkeiten dazwischen.",
+"terraform/debugging-terraform": "Analysiere fehlgeschlagene Pläne und Anwendungen, State-Sperren, Drift, unerwartete Ersetzungen und Provider-Fehler mit TF_LOG, Plan-Ausgabe, State-Befehlen und import.",
+"cloud/cloud-fundamentals": "Lerne das gemeinsame Vokabular von AWS und Azure: Regionen, Verfügbarkeitszonen, das Modell der geteilten Verantwortung, Diensttypen und die Organisation von Konten.",
+"cloud/identity-and-access": "Steuere mit Rollen und Richtlinien, wer in AWS und Azure was tun darf, vermeide langlebige Schlüssel und behebe „Zugriff verweigert“-Fehler systematisch.",
+"cloud/virtual-networks": "Entwirf ein VPC oder VNet mit öffentlichen und privaten Subnetzen, Routing-Tabellen, Gateways und Sicherheitsregeln und finde heraus, warum eine Verbindung scheitert.",
+"cloud/compute-and-storage": "Wähle zwischen virtuellen Maschinen, Containern und Serverless, verstehe Objekt-, Block- und Dateispeicher und schütze Daten mit Versionierung und Backups.",
+"cloud/dns-and-cdn": "Hoste DNS-Zonen mit Route 53 und Azure DNS, wähle Routing-Richtlinien, setze ein CDN vor Anwendungen und verwalte Zertifikate und Cache-Verhalten.",
+"cloud/serverless": "Führe Code ohne Serververwaltung aus, verbinde Funktionen mit Warteschlangen, Speicher und APIs, verstehe Kaltstarts, Nebenläufigkeit und Limits und steuere Kosten und Fehler.",
+"cloud/kubernetes-on-cloud": "Erstelle und betreibe verwaltetes Kubernetes auf AWS und Azure, verbinde Workloads mit der Cloud-Identität, mache sie über Load Balancer erreichbar und plane Upgrades und Node-Gruppen.",
+"cloud/monitoring-and-logging": "Sammle Metriken, Logs und Audit-Spuren mit CloudWatch, CloudTrail, Azure Monitor und Log Analytics, frage sie ab, baue Alarme und halte Aufbewahrung und Kosten im Griff.",
+"cloud/security-and-governance": "Organisiere Konten und Abonnements, setze Leitplanken mit SCPs und Azure Policy durch, schütze Daten mit Verschlüsselung und Schlüsselverwaltung und erkenne Fehlkonfigurationen fortlaufend.",
+"cloud/managed-services-and-cost": "Nutze verwaltete Datenbanken, Warteschlangen und DNS gut, entwirf für Ausfälle über Zonen hinweg und halte die Ausgaben sichtbar und unter Kontrolle.",
+"cloud/high-availability-and-disaster-recovery": "Entwirf für Ausfälle auf Ebene von Instanz, Zone und Region, wähle zwischen Backup, Pilot Light, Warm Standby und Active-Active und belege Wiederherstellungsziele mit Tests.",
+"cloud/landing-zones-and-multi-account-strategy": "Ordne Cloud-Konten oder Abonnements in einer Hierarchie mit Leitplanken, zentralem Logging, Netzwerk und Identität, damit Teams innerhalb sicherer Grenzen schnell vorankommen.",
+"cloud/object-storage-and-data-lifecycle": "Nutze Objektspeicher gut: Klassen, Lifecycle-Regeln, Versionierung, Zugriffskontrolle und Schutz vor Löschung und Offenlegung.",
+"cloud/hybrid-connectivity-and-peering": "Verbinde Cloud-Netzwerke untereinander und mit einem Büro oder Rechenzentrum über Peering, VPN, dedizierte Leitungen und private Endpunkte und vermeide Adresskonflikte.",
+"cloud/debugging-cloud-outages": "Verfolge Cloud-Fehler über Identität, Netzwerkpfad, Kontingente und Dienstzustand mit Audit-Logs, Richtliniensimulation und Flow-Logs, statt zu raten.",
+"observability/observability-fundamentals": "Lerne den Unterschied zwischen Monitoring und Observability, die drei Signale Metriken, Logs und Traces sowie die Methoden RED und USE, um zu entscheiden, was gemessen wird.",
+"observability/metrics-and-prometheus": "Verstehe das Prometheus-Datenmodell, die Scrape-Konfiguration und die PromQL-Abfragen, die du täglich brauchst, einschließlich Raten, Aggregation und Histogrammen.",
+"observability/logs-and-traces": "Schreibe strukturierte Logs, die sich abfragen lassen, verfolge Anfragen über Dienste hinweg mit Traces und halte Menge und Kosten der Telemetrie im Griff.",
+"observability/log-pipelines": "Sammle, parse, ergänze und speichere Logs im großen Maßstab, wähle zwischen Loki und Elasticsearch, frage mit LogQL ab und steuere Menge, Aufbewahrung und Kosten.",
+"observability/opentelemetry": "Erzeuge Traces, Metriken und Logs mit einem herstellerneutralen Standard, ergänze automatische und manuelle Instrumentierung, leite Daten über den Collector und bewahre den Kontext über Dienste hinweg.",
+"observability/synthetic-and-blackbox-monitoring": "Miss die Verfügbarkeit aus Nutzersicht mit dem Prometheus Blackbox Exporter und synthetischen Prüfungen, prüfe HTTP, TCP, DNS und Zertifikate und alarmiere bei dem, was Nutzer tatsächlich erleben.",
+"observability/alerting-and-dashboards": "Alarmiere bei Symptomen, die für Nutzer zählen, schreibe Alarmregeln mit Alertmanager-Routing und gestalte Dashboards, die Fragen schnell beantworten.",
+"observability/red-use-and-golden-signals": "Wähle für jeden Dienst und jede Ressource die richtige kleine Menge an Metriken mit der RED-Methode, der USE-Methode und den vier goldenen Signalen und baue Dashboards, die Fragen schnell beantworten.",
+"observability/telemetry-cost-and-cardinality": "Halte Monitoring bezahlbar und schnell, indem du Metrik-Kardinalität, Log-Menge, Trace-Sampling und Aufbewahrung steuerst und die Kosten der Observability wie ein Budget verfolgst.",
+"observability/structured-logging-and-log-design": "Schreibe Logs, die leicht zu durchsuchen sind: strukturierte Felder, einheitliche Namen, Korrelations-IDs, sinnvolle Ebenen und keine Geheimnisse.",
+"observability/runbooks-and-dashboards-for-on-call": "Entwirf die wenigen Dashboards und Runbooks, die ein Bereitschaftsingenieur wirklich braucht, und halte sie aktuell.",
+"observability/debugging-with-telemetry": "Nutze Metriken, um zu erkennen, dass etwas nicht stimmt, Traces, um zu erkennen, wo, und Logs, um zu erkennen, warum, und lerne, das Monitoring selbst zu debuggen, wenn Daten fehlen.",
+"sre/slos-and-error-budgets": "Definiere Zuverlässigkeit in Zahlen, die Nutzern wichtig sind, setze Ziele, die Tempo und Stabilität ausbalancieren, und nutze Fehlerbudgets für Release-Entscheidungen.",
+"sre/incident-response": "Leite Vorfälle mit klaren Rollen, Schweregraden und Kommunikation, entschärfe zuerst und diagnostiziere danach und übergib sauber.",
+"sre/postmortems-and-toil": "Lerne aus Vorfällen ohne Schuldzuweisung, schreibe Nachbetrachtungen, die echte Verbesserungen bringen, und erkenne und beseitige Toil.",
+"sre/reliability-patterns": "Wende Zeitlimits, Wiederholungen mit Backoff, Circuit Breaker, Lastabwurf und Kapazitätsplanung an, damit ein ausfallender Teil nicht das ganze System mitreißt.",
+"sre/on-call": "Entwirf Bereitschaftspläne, Eskalation und Übergaben, schreibe Alarme und Runbooks, auf die man reagieren kann, miss die Pager-Last und halte die Rotation tragbar.",
+"sre/capacity-planning": "Prognostiziere die Nachfrage, finde die Grenzen eines Dienstes mit Lasttests, plane Reserven und N+1-Redundanz und verbinde Kapazität mit Kosten und Autoskalierung.",
+"sre/chaos-engineering-and-game-days": "Übe den Ausfall gezielt mit kontrollierten Experimenten und Game Days, teste Backups und Failover und setze Wiederherstellungsziele, die du tatsächlich belegt hast.",
+"sre/change-management-and-releases": "Mache Änderungen sicher und langweilig mit kleinen Chargen, Feature-Flags, Canary-Analyse, automatischem Rollback und Release-Richtlinien, die das Fehlerbudget berücksichtigen.",
+"sre/production-readiness-reviews": "Prüfe vor dem Start, dass ein Dienst für echte Nutzer bereit ist, mit Zuständigkeit, SLOs, Monitoring, Kapazität, Fehlermodi, Rollout, Runbooks und Sicherheit, in einer schlanken Prüfung, die Teams schätzen.",
+"sre/incident-communication-and-stakeholders": "Kommuniziere bei Ausfällen mit klaren Statusmeldungen, Schweregraden, einer internen Kanalstruktur, Kundennachrichten und einer ruhigen Übergabe, damit Verwirrung die technische Arbeit nicht bremst.",
+"sre/dependencies-and-third-party-risk": "Verstehe, wie deine Zuverlässigkeit von anderen Diensten abhängt, setze realistische Ziele und plane für deren Ausfälle.",
+"sre/disaster-recovery-exercises": "Plane, führe aus und lerne aus Wiederherstellungsübungen: RTO und RPO, Szenarien, sichere Durchführung und das Beheben dessen, was die Übung aufdeckt.",
+"sre/debugging-under-pressure": "Führe eine Vorfalluntersuchung mit Hypothesen, einer Änderung nach der anderen, Entschärfung vor der Grundursache, klaren Rollen und Notizen, die die Auswertung erleichtern.",
+"security/security-mindset-and-threat-modeling": "Bringe Sicherheit in jede Phase der Auslieferung, lerne das Vokabular des Risikos und nutze ein einfaches Bedrohungsmodell, um Probleme vor den Angreifern zu finden.",
+"security/secrets-management": "Halte Passwörter, Tokens und Schlüssel aus Code und Logs heraus, stelle kurzlebige Zugangsdaten aus, rotiere nach Plan und wisse genau, was zu tun ist, wenn eines durchsickert.",
+"security/securing-the-pipeline": "Ergänze CI um Scans für Abhängigkeiten, Code und Images, erstelle ein Inventar dessen, was du auslieferst, signiere Artefakte und schütze die Pipeline selbst als Angriffsziel.",
+"security/container-and-image-security": "Baue minimale Images, laufe als Nicht-Root-Benutzer mit entzogenen Capabilities, scanne und signiere und begrenze mit Laufzeitkontrollen, was ein kompromittierter Container tun kann.",
+"security/kubernetes-security": "Steuere mit RBAC, wer was darf, beschränke das Pod-Verhalten mit Sicherheitsstandards und Richtlinien, isoliere Verkehr mit Netzwerkrichtlinien und schütze Geheimnisse und die Control Plane.",
+"security/cloud-security-and-iam": "Entwirf Identitäten mit minimalen Rechten, schütze Daten mit Verschlüsselung und privaten Netzwerken, aktiviere Audit-Logging und prüfe Terraform und Cloud-Konten auf Fehlkonfigurationen.",
+"security/vulnerability-management-and-security-incidents": "Priorisiere Funde nach echtem Risiko, patche in vereinbarten Zeiten, erkenne Angriffe aus Logs und Signalen und leite einen Sicherheitsvorfall mit klaren Rollen und Beweisen.",
+"security/identity-authentication-and-zero-trust": "Verstehe, wie Anmeldung, Tokens und Multi-Faktor-Authentifizierung funktionieren, wende OAuth und OIDC sicher an, authentifiziere Dienste mit gegenseitigem TLS und entwirf mit Zero Trust statt mit einem vertrauenswürdigen Netzwerk.",
+"security/application-security-for-devops": "Erkenne die häufigsten Schwächen von Web und APIs, verstehe, wie Eingabevalidierung, Header und Ratenbegrenzung sie stoppen, und prüfe Code und Konfiguration auf riskante Muster.",
+"security/policy-as-code-and-compliance": "Verwandle Sicherheitsregeln in automatisch laufende Prüfungen, nutze Admission- und Pipeline-Richtlinien gegen Drift und sammle fortlaufend Nachweise für Audits statt Screenshots.",
+"security/network-and-edge-security": "Segmentiere Netzwerke, steuere ausgehenden Verkehr, schütze den Rand mit TLS, WAF und DDoS-Abwehr und sichere DNS und Zertifikate.",
+"security/ransomware-resilience-and-recovery": "Verstehe, wie Ransomware-Angriffe ablaufen, entwirf unveränderliche und isolierte Backups, übe die Wiederherstellung und verringere den Schadensradius, damit ein kompromittiertes Konto nicht alles verschlüsseln kann.",
+"security/detection-and-security-logging": "Entscheide, was protokolliert wird, zentralisiere und schütze es, schreibe Erkennungen, die zählen, verringere Fehlalarme und nutze Rahmenwerke wie ATT&CK, um Abdeckungslücken zu finden.",
+"security/encryption-and-key-management": "Nutze Verschlüsselung im Ruhezustand, bei der Übertragung und in Verwendung richtig, verwalte Schlüssel mit einem Schlüsselverwaltungsdienst, rotiere und trenne Aufgaben und vermeide die häufigen Fehler, die Verschlüsselung nutzlos machen.",
+"security/supply-chain-sboms-and-provenance": "Wisse, was in deiner Software steckt, belege, wo sie gebaut wurde, und prüfe Signaturen, bevor etwas in der Produktion läuft.",
+"security/cloud-incident-playbooks": "Bereite kurze Playbooks für die häufigen Cloud-Vorfälle vor: durchgesickerte Schlüssel, öffentlicher Speicher und kompromittierte Workloads.",
+"security/debugging-and-investigating-security-issues": "Sichte einen Alarm, sichere Beweise, verfolge eine verdächtige Aktion durch Audit-Logs und dämme sie ein, und behebe Sicherheitskontrollen, die legitime Arbeit blockieren.",
+"ansible/ansible-basics-inventory-and-ad-hoc": "Verstehe agentenlose Konfigurationsverwaltung, beschreibe deine Server in einem Inventar und führe einmalige Befehle und Module auf vielen Hosts aus.",
+"ansible/playbooks-tasks-and-idempotence": "Schreibe YAML-Playbooks mit Plays und Tasks, führe sie in den Modi check und diff sicher aus und verstehe, warum Idempotenz wichtig ist.",
+"ansible/variables-facts-and-templates": "Parametrisiere Playbooks mit Variablen, verstehe die Rangfolge, nutze gesammelte Facts und erzeuge Konfigurationsdateien mit Jinja2-Templates.",
+"ansible/handlers-conditionals-and-loops": "Steuere den Ablauf der Tasks mit when-Bedingungen, Schleifen, Handlern, die bei Änderung auslösen, block/rescue-Fehlerbehandlung und Tags.",
+"ansible/roles-and-collections": "Organisiere Automatisierung in Rollen mit Standardstruktur, installiere gemeinsame Collections und Anforderungen und halte Rollen klein und testbar.",
+"ansible/vault-secrets-and-safe-practice": "Halte Passwörter und Schlüssel mit Ansible Vault aus dem Klartext, verberge Geheimnisse in Logs, begrenze Rechteerweiterung und prüfe, was die Automatisierung erreichen kann.",
+"ansible/ansible-at-scale": "Rolle Änderungen sicher mit serial-Chargen und Limits aus, teste Rollen mit Linting und Molecule, skaliere Verbindungen und teile die Arbeit zwischen Terraform und Ansible.",
+"ansible/dynamic-inventory-for-cloud": "Lass Ansible Hosts per Tags aus der Cloud entdecken, statt eine handgeschriebene Liste zu pflegen.",
+"ansible/testing-and-linting-ansible": "Fange Fehler vor der Produktion ab mit ansible-lint, Syntaxprüfungen, Check-Modus, Molecule und Idempotenztests.",
+"ansible/debugging-ansible-runs": "Finde heraus, warum ein Playbook scheiterte, ein Host nicht erreichbar ist, eine Variable den falschen Wert hat oder ein Lauf langsam ist, mit Ausführlichkeit, debug, Schrittmodus und Logs.",
+"databases/relational-fundamentals-and-sql": "Verstehe Tabellen, Schlüssel und Beziehungen und lies und schreibe das SQL, mit dem Betreiber Daten prüfen, Größen kontrollieren und Probleme finden.",
+"databases/indexes-and-query-plans": "Wisse, was ein Index bewirkt und kostet, lies die EXPLAIN-Ausgabe, um sequenzielle Scans und schlechte Schätzungen zu finden, und lege den richtigen Index sicher auf einem Live-System an.",
+"databases/transactions-and-locking": "Lerne ACID, Isolationsstufen, wie Sperren und lange Transaktionen Stillstände verursachen und wie man Blockierungen und Deadlocks findet und auflöst.",
+"databases/backups-and-recovery": "Wähle zwischen logischen und physischen Backups, nutze WAL-Archivierung für Wiederherstellung zu einem Zeitpunkt, setze RPO- und RTO-Ziele und belege, dass Wiederherstellungen funktionieren.",
+"databases/replication-and-failover": "Verstehe Primär- und Replikat-Setups, synchrone und asynchrone Replikation, Replikationsverzögerung, Failover und Split Brain sowie Lese-Skalierung.",
+"databases/performance-and-connection-pooling": "Finde langsame Abfragen mit Statistiken, verstehe Speicher- und Cache-Verhalten, dimensioniere Verbindungen mit einem Pooler und erkenne Bloat- und Vacuum-Probleme.",
+"databases/safe-schema-migrations": "Ändere ein Live-Schema ohne Ausfälle mit dem Expand-and-Contract-Muster, Online-Änderungen an Indizes und Spalten, chargenweisen Nachfüllungen und Migrationswerkzeugen.",
+"databases/nosql-caches-and-choosing": "Vergleiche relationale, Key-Value-, Dokument-, Wide-Column- und Suchspeicher, verstehe Caches wie Redis und ihre Ausfallarten und entscheide unter Abwägung der Kompromisse.",
+"databases/postgres-vacuum-bloat-and-maintenance": "Verstehe, warum Postgres Vacuum braucht, wie man Bloat und lange Transaktionen erkennt und welche Wartung die Datenbank gesund hält.",
+"databases/schema-design-for-operations": "Wähle Schlüssel, Typen, Constraints und Tabellenaufbauten, die eine Datenbank schnell, sicher änderbar und einfach zu betreiben halten.",
+"databases/debugging-database-problems": "Sichte langsame, blockierte, volle oder nicht erreichbare Datenbanken mit einer festen Reihenfolge von Prüfungen, von Verbindungen und Sperren bis zu Festplatte, Replikation und Wiederherstellung.",
+"go/why-go-and-your-first-program": "Sieh, warum so viel Infrastruktursoftware in Go geschrieben ist, richte ein Modul ein, baue eine einzelne statische Binärdatei und nutze die Standardwerkzeuge.",
+"go/types-structs-slices-and-maps": "Nutze die zentralen Datentypen: Nullwerte, Slices, Maps und Structs mit Methoden, und vermeide die üblichen Überraschungen bei Slices und Maps.",
+"go/functions-errors-and-defer": "Behandle Fehler auf Go-Art: gib sie zurück, umhülle sie mit Kontext, untersuche sie und nutze defer zum Aufräumen.",
+"go/interfaces-and-packages": "Nutze kleine Interfaces, um Code zu entkoppeln und testbar zu machen, und gliedere ein Projekt in Pakete mit klaren Grenzen.",
+"go/goroutines-channels-and-sync": "Führe Arbeit nebenläufig mit Goroutinen aus, koordiniere mit Channels und WaitGroups, schütze gemeinsamen Zustand und finde Race Conditions früh.",
+"go/context-timeouts-and-cancellation": "Gib den Context durch deinen Code, damit Arbeit ein Zeitlimit haben, abgebrochen werden und sauber enden kann, wenn der Prozess zum Herunterfahren aufgefordert wird.",
+"go/http-services-and-json": "Baue einen kleinen HTTP-Dienst mit Handlern, Middleware, Health-Endpunkten und JSON und rufe andere Dienste sicher auf.",
+"go/testing-benchmarks-and-tooling": "Schreibe tabellengesteuerte Tests, miss die Abdeckung, benchmarke kritische Pfade und nutze die Prüfungen der Toolchain in CI.",
+"go/building-containers-and-cli-tools": "Liefere Go-Programme gut aus: eine klare Kommandozeilenschnittstelle, Versionsangaben, mehrstufige Builds und winzige, sichere Container-Images.",
+"go/debugging-go-programs": "Lies einen Go-Stacktrace, finde Goroutine-Lecks und Race Conditions und nutze pprof, um zu sehen, wohin Zeit und Speicher gehen.",
+"helm/what-helm-is-and-why-use-it": "Verstehe Charts, Releases und Repositories und sieh, wie Helm einen Haufen Kubernetes-YAML in ein installierbares, aktualisierbares Paket verwandelt.",
+"helm/installing-charts-and-values": "Finde Charts, lies ihre Standardwerte, überschreibe sie sicher mit Dateien und --set und zeige vorab, was installiert wird.",
+"helm/anatomy-of-a-chart": "Erstelle ein Chart mit helm create, verstehe jede Datei und wisse, was du behältst und was du löschst.",
+"helm/templates-and-the-go-template-language": "Schreibe Templates mit Werten, Bedingungen, Schleifen, Helfern und den gängigen Funktionen und vermeide Einrückungs- und Quoting-Fallen.",
+"helm/upgrade-rollback-and-release-history": "Aktualisiere Releases sicher mit wait und atomic, lies den Verlauf, kehre zu einer bekannten guten Revision zurück und deinstalliere sauber.",
+"helm/values-per-environment-and-secrets": "Ordne Werte-Dateien für Entwicklung, Staging und Produktion, validiere sie und handhabe Geheimnisse, ohne sie in die Versionsverwaltung einzuchecken.",
+"helm/dependencies-subcharts-and-registries": "Setze Charts aus Abhängigkeiten zusammen, paketiere und veröffentliche Charts in einer OCI-Registry und versioniere sie richtig.",
+"helm/debugging-helm-releases": "Analysiere fehlgeschlagene Installationen und Upgrades: Render-Fehler, festhängende Releases, Hook-Probleme und Drift, und prüfe Releases mit helm test.",
+"cloud-iam/identities-principals-and-permissions": "Lerne das Vokabular des Cloud-Zugriffs: wer fragt, was er darf, auf welcher Ressource und wie eine Entscheidung fällt.",
+"cloud-iam/aws-iam-policies-roles-and-assume-role": "Lies und schreibe AWS-IAM-Richtlinien, nutze für Workloads Rollen statt Benutzer und verstehe, wie Sitzungen und Grenzen zusammenwirken.",
+"cloud-iam/azure-entra-id-rbac-and-managed-identities": "Verstehe, wie Azure das Verzeichnis von den Ressourcenberechtigungen trennt, weise Rollen im richtigen Geltungsbereich zu und nutze verwaltete Identitäten.",
+"cloud-iam/least-privilege-and-access-reviews": "Verkleinere Berechtigungen auf das Nötige, mit Werkzeugen zum Finden ungenutzten Zugriffs, und halte sie durch regelmäßige Überprüfungen klein.",
+"cloud-iam/secrets-and-encryption-with-kms-and-key-vaults": "Speichere Geheimnisse in einem verwalteten Dienst, verstehe Schlüssel und Envelope-Verschlüsselung und rotiere Zugangsdaten ohne Ausfälle.",
+"cloud-iam/network-boundaries-and-private-access": "Begrenze die Angriffsfläche mit privaten Netzwerken, Sicherheitsgruppen, privaten Endpunkten und sinnvollen Standardwerten für Speicher und Datenbanken.",
+"cloud-iam/logging-detection-and-audit-trails": "Zeichne jede Aktion der Control Plane auf, schütze die Logs und baue Alarme für die Aktionen, die auf Probleme hindeuten.",
+"cloud-iam/debugging-access-denied-and-cloud-security-incidents": "Finde heraus, warum eine Anfrage abgelehnt wurde, behebe es, ohne zu viel freizugeben, und reagiere der Reihe nach auf einen Verdacht auf durchgesickerte Zugangsdaten.",
+"k8s-ops/the-control-plane-in-depth": "Wisse, was jede Komponente der Control Plane tut, wie eine Anfrage hindurchfließt und welche Ausfälle am wichtigsten sind.",
+"k8s-ops/etcd-backup-and-restore": "Erstelle einen geprüften Snapshot des Cluster-Zustands, stelle ihn wieder her und kenne die Grenzen dessen, was ein Backup schützt.",
+"k8s-ops/upgrading-clusters-safely": "Plane und führe ein Kubernetes-Versions-Upgrade durch: Reihenfolge der Komponenten, Versionsabweichung, veraltete APIs, Nodes und Rollback-Optionen.",
+"k8s-ops/rbac-and-service-accounts": "Gib Menschen und Workloads nur den Kubernetes-API-Zugriff, den sie brauchen, und prüfe, wer was darf.",
+"k8s-ops/nodes-draining-taints-and-capacity": "Warte Nodes ohne Ausfallzeit, steuere die Platzierung mit Taints und Affinität und plane die Kapazität.",
+"k8s-ops/resource-quotas-limits-and-autoscaling": "Teile einen Cluster fair mit Requests, Limits, Quoten und LimitRanges und skaliere Pods und Nodes automatisch.",
+"k8s-ops/network-policies-and-pod-security": "Beschränke den Pod-zu-Pod-Verkehr mit Netzwerkrichtlinien und das, was Container tun dürfen, mit den Pod Security Standards.",
+"k8s-ops/debugging-cluster-and-node-problems": "Finde die Ursache für NotReady-Nodes, Pending-Pods, Evictions und einen langsamen API-Server mit einer geordneten Checkliste.",
+"argocd/pull-based-delivery-and-the-repository-as-source-of-truth": "Verstehe, warum viele Teams einen Controller im Cluster den Sollzustand aus einem Repository ziehen lassen, statt dass eine Pipeline Änderungen hineinschiebt.",
+"argocd/installing-argo-cd-and-the-application-resource": "Installiere Argo CD in einem Cluster, melde dich an und beschreibe eine Anwendung mit der Custom Resource Application.",
+"argocd/sync-health-and-drift": "Lies Sync- und Health-Status, wähle manuelle oder automatische Synchronisierung und verstehe Prune und Self-Heal.",
+"argocd/helm-and-kustomize-with-argo-cd": "Liefere Helm-Charts und Kustomize-Overlays aus, setze Werte pro Umgebung und verstehe, dass Argo CD rendert, statt zu installieren.",
+"argocd/environments-app-of-apps-and-applicationsets": "Organisiere viele Anwendungen und Umgebungen mit einem Repository-Aufbau, dem App-of-Apps-Muster und ApplicationSets.",
+"argocd/hooks-sync-waves-and-progressive-delivery": "Ordne Ressourcen in einer Synchronisierung, führe Jobs davor und danach aus und rolle schrittweise mit Canary- und Blue-Green-Strategien aus.",
+"argocd/access-projects-secrets-and-multi-cluster": "Begrenze mit Projekten und RBAC, wer was darf, halte Geheimnisse aus dem Repository und liefere an mehr als einen Cluster aus.",
+"argocd/debugging-argo-cd": "Finde heraus, warum eine Anwendung nicht synchronisiert, OutOfSync bleibt oder auf Degraded fällt und was in welcher Reihenfolge zu prüfen ist.",
+"llm/what-an-llm-is-and-how-it-predicts-tokens": "Sieh ein großes Sprachmodell als Vorhersager des nächsten Tokens und verstehe, was das für seine Stärken und Schwächen bedeutet.",
+"llm/tokens-context-windows-and-limits": "Zähle Tokens, verstehe, was ein Kontextfenster füllt, und entwirf rund um die Grenzen für Ein- und Ausgabe.",
+"llm/sampling-temperature-and-determinism": "Verstehe, wie das nächste Token gewählt wird, was Temperatur und Top-p ändern und wie man wiederholbares Verhalten von einem Zufallssystem erhält.",
+"llm/training-fine-tuning-and-where-knowledge-comes-from": "Lerne, wie ein Modell zu seinem Wissen kommt, warum es einen Stichtag hat und wie man ihm Fakten gibt, die es nicht kennt.",
+"llm/calling-an-llm-api": "Mache einen ersten API-Aufruf, verstehe Nachrichten und Rollen, streame Antworten, behandle Fehler und Ratenlimits und halte Schlüssel sicher.",
+"llm/cost-latency-and-caching": "Schätze, was eine Funktion kostet, verstehe die Bestandteile der Latenz und senke beides durch Modellwahl, Prompt-Entwurf und Caching.",
+"llm/choosing-and-evaluating-models": "Baue aus deiner eigenen Aufgabe einen kleinen Testsatz, vergleiche damit Modelle und Prompts und verlasse dich nicht allein auf öffentliche Benchmarks.",
+"llm/debugging-llm-applications": "Untersuche eine schlechte Antwort Schritt für Schritt: erfasse die genaue Eingabe, trenne Probleme bei Abruf, Prompt, Modell und Parsing und behebe sie mit Tests.",
+"prompting/anatomy-of-a-good-prompt": "Schreibe Prompts mit klarer Aufgabe, Kontext, Randbedingungen und Ausgabeformat und lerne, Mehrdeutigkeit zu beseitigen, bevor du dem Modell die Schuld gibst.",
+"prompting/examples-and-few-shot-prompting": "Zeige dem Modell mit wenigen guten Beispielen, was du willst, wähle sie gut und vermeide die Fallen, die Ausgaben die Beispiele abschreiben lassen.",
+"prompting/reasoning-and-step-by-step-prompts": "Wisse, wann es Antworten verbessert, ein Modell in Schritten denken zu lassen, wie sich erweitertes Denken unterscheidet und wie das Denken nicht in die Ausgaben gelangt, die du parst.",
+"prompting/system-prompts-roles-and-context-layout": "Ordne einen Prompt mit Systemnachricht, markierten Abschnitten und langen Dokumenten dort, wo das Modell sie am besten nutzt.",
+"prompting/structured-output-json-and-schemas": "Erhalte maschinenlesbare Antworten von einem Modell mit klaren Schemas, werkzeugbasierter oder schemabeschränkter Ausgabe und striktem Parsing.",
+"prompting/validating-repairing-and-retrying-outputs": "Prüfe die Modellausgabe mit Code, wiederhole mit Rückmeldung, repariere, was sich sicher reparieren lässt, und gib den Rest an einen Menschen.",
+"prompting/prompt-versioning-and-testing": "Speichere Prompts als versionierte Dateien, prüfe Änderungen, lass sie in CI gegen einen Bewertungssatz laufen und rolle sicher aus und zurück.",
+"prompting/debugging-bad-prompts": "Untersuche falsche, inkonsistente oder unsichere Ausgaben: vereinfachen, isolieren, vergleichen und mit Belegen beheben.",
+"claude-skills/what-a-claude-skill-is": "Verstehe Skills als Ordner mit Anweisungen, Skripten und Ressourcen, die Claude lädt, wenn eine Aufgabe sie braucht, und wann ein Skill das richtige Werkzeug ist.",
+"claude-skills/anatomy-of-a-skill-folder": "Lege einen Skill an: SKILL.md mit Kopf und Hauptteil, Referenzdateien, Vorlagen und Skripte, mit Namensregeln und sauberer Struktur.",
+"claude-skills/writing-descriptions-that-trigger": "Schreibe das eine Feld, das entscheidet, ob ein Skill je benutzt wird: sage, was er tut, wann man ihn nutzt und mit den Wörtern, die Menschen wirklich verwenden.",
+"claude-skills/progressive-disclosure-and-structure": "Lade in jeder Phase nur das Nötige: zuerst Metadaten, dann SKILL.md, dann verlinkte Dateien und Skripte, damit der Kontext klein und die Antworten fokussiert bleiben.",
+"claude-skills/scripts-and-deterministic-steps": "Nutze mitgelieferte Skripte für exakte Arbeit, schreibe sie so, dass Claude sie ausführen und ihre Ausgabe lesen kann, und halte sie sicher ausführbar.",
+"claude-skills/testing-and-evaluating-a-skill": "Teste Auslösung, Ausgabequalität und Kosten mit einem festen Aufgabensatz, vergleiche mit und ohne den Skill und bewahre die Ergebnisse über die Zeit.",
+"claude-skills/sharing-versioning-and-skill-security": "Teile Skills mit einem Team, versioniere sie und prüfe sie wie Code: Skills können Anweisungen und Skripte enthalten, die mit echtem Zugriff laufen.",
+"claude-skills/debugging-skills-that-do-not-trigger-or-misbehave": "Untersuche einen Skill, der nie lädt, zur falschen Zeit lädt oder lädt und ignoriert wird: prüfe Auffindbarkeit, Beschreibung, Struktur, Konflikte und Ausgabe.",
+"mcp/why-tools-and-what-mcp-is": "Sieh, warum ein Modell Werkzeuge braucht, um zu handeln und Fakten zu holen, und wie das Model Context Protocol die Anbindung von Werkzeugen und Daten an KI-Anwendungen standardisiert.",
+"mcp/function-calling-and-tool-schemas": "Beschreibe einem Modell ein Werkzeug mit Namen, klarer Beschreibung und JSON-Schema und entwirf Werkzeuge, die Modelle richtig verwenden.",
+"mcp/the-tool-use-loop": "Setze den Zyklus aus Anfrage, Werkzeugaufruf und Werkzeugergebnis richtig um, behandle Fehler und parallele Aufrufe und setze der Schleife Grenzen.",
+"mcp/mcp-architecture-hosts-clients-servers-transports": "Verstehe den Verbindungslebenszyklus, JSON-RPC-Nachrichten, die Transporte stdio und HTTP und die Fähigkeiten, die jede Seite anbietet.",
+"mcp/building-an-mcp-server-in-python": "Baue einen kleinen Server mit dem Python-SDK, stelle Werkzeuge mit Typhinweisen und Docstrings bereit, teste ihn mit einem Inspector und verbinde ihn mit einem Host.",
+"mcp/resources-prompts-and-other-primitives": "Wisse, wann Daten als Ressourcen oder wiederverwendbare Prompts statt als Werkzeuge bereitgestellt werden sollten und wie Clients sie nutzen.",
+"mcp/permissions-auth-and-prompt-injection-defence": "Begrenze, was Werkzeuge tun dürfen, authentifiziere entfernte Server richtig, frage zu den richtigen Zeitpunkten nach Freigabe und entwirf gegen Prompt-Injection.",
+"mcp/debugging-tool-use-and-mcp": "Untersuche Fehler auf jeder Ebene: Server, Verbindung, Werkzeugdefinitionen, Entscheidungen des Modells und die Schleife.",
+"system-design/the-design-method-and-estimation": "Eine wiederholbare Reihenfolge für jede Entwurfsfrage: klären, schätzen, skizzieren, vertiefen, kaputtmachen und dann die Kompromisse benennen.",
+"system-design/caching-without-stampedes": "Wo Caches helfen, wie Invalidierung und TTLs schiefgehen und wie man verhindert, dass ein kalter Cache die dahinterliegende Datenbank erdrückt.",
+"system-design/queues-retries-and-idempotency": "Entkopple mit Warteschlangen, wiederhole ohne Stürme auszulösen und mache Operationen gefahrlos wiederholbar.",
+"system-design/consistency-and-availability-in-practice": "Was CAP und PACELC für echte Entscheidungen bedeuten und wie man pro Datenstück eine Konsistenzstufe wählt.",
+"system-design/quorum-leaders-and-split-brain": "Wie Gruppen von Maschinen sich einigen, warum ungerade Zahlen wichtig sind und wie Fencing verhindert, dass zwei Leader Daten beschädigen.",
+"system-design/clocks-time-and-ordering": "Warum man Wanduhren nicht zum Ordnen von Ereignissen vertrauen kann und was man stattdessen nutzt.",
+"system-design/partitioning-sharding-and-consistent-hashing": "Verteile Daten auf Nodes, bevor einem der Platz ausgeht, wähle einen Partitionsschlüssel und vermeide heiße Schlüssel und schmerzhafte Neuverteilungen.",
+"system-design/storage-engines-and-replication-topologies": "Wie sich B-Bäume und LSM-Bäume unterscheiden, welche Kompromisse Leader-Follower-, Multi-Leader- und leaderlose Replikation eingehen und wie Datenspeicher von innen ausfallen.",
+"system-design/backup-restore-and-object-storage-design": "Entwirf Backups, die du tatsächlich wiederhergestellt hast, schütze sie vor dem Fehler, der das Original erwischt hat, und nutze Objektspeicher für das, was er gut kann.",
+"system-design/failure-domains-cells-and-bulkheads": "Teile ein System so, dass ein Fehler nur einen begrenzten Teil erreichen kann, mit Zonen, Zellen und Schotten.",
+"system-design/blast-radius-and-shuffle-sharding": "Miss, wie weit ein Fehler reichen kann, und nutze Shuffle Sharding, damit ein schlechter Client oder eine schlechte Anfrage dem Rest nicht schaden kann.",
+"system-design/graceful-degradation-and-circuit-breakers": "Halte den Kern am Laufen, wenn eine Abhängigkeit langsam ist oder ausfällt: schnell scheitern, weniger liefern und sanft erholen.",
+"system-design/rate-limiting-and-load-shedding": "Schütze einen Dienst vor Überlast mit Limits am Rand, fairer Aufteilung zwischen Aufrufern und Lastabwurf, der nützliche Arbeit am Laufen hält.",
+"system-design/multi-region-and-global-traffic": "Wähle zwischen Aktiv-Passiv und Aktiv-Aktiv, setze RTO und RPO und lenke Verkehr mit DNS und Anycast, ohne neue Einzelpunkte zu schaffen.",
+"system-design/config-and-control-plane-change-safety": "Behandle Konfiguration, Funktionsdaten und Pushes an die Control Plane wie Deployments, mit Validierung, Staging und einem Weg zurück.",
+"system-design/hidden-dependencies-and-single-points": "Zeichne auf, was dein Dienst wirklich braucht, einschließlich der Werkzeuge, mit denen du ihn reparierst, und finde die Einzelpunkte, bevor ein Ausfall es tut.",
+"system-design/observability-by-design": "Entscheide, was ein System dir sagen muss, bevor es ausfällt: SLIs im Entwurf, goldene Signale, Tracing und Monitoring, das den Ausfall überlebt.",
+"system-design/security-and-identity-by-design": "Entwirf für minimale Rechte, kurzlebige Zugangsdaten, Isolation und wiederherstellbare Geheimnisse, ausgehend davon, wie echte Einbrüche abliefen.",
+"system-design/capacity-planning-and-cost-trade-offs": "Plane Reserven anhand von Messungen, behandle Kosten als Entwurfseingabe und wisse, welche Einsparungen still Zuverlässigkeit verbrauchen.",
+"system-design/worked-design-global-api-at-four-nines": "Entwirf eine öffentliche API für 99,99 Prozent Verfügbarkeit durchgängig, mit Zellen, Regionen, sicherem Rollout und Degradierung, und prüfe sie an echten Ausfällen.",
+"system-design/worked-design-the-status-page-that-survives": "Entwirf das kleine System, das funktionieren muss, wenn alles andere ausgefallen ist, und lerne, einen Entwurf nach einem Ausfall zu prüfen.",
+"system-design/worked-design-a-url-shortener": "Der klassische leselastige Entwurf, von Schätzungen über Schlüsselerzeugung, Caching und heiße Links bis zu Missbrauch und Ausfallarten.",
+"system-design/worked-design-a-rate-limiter-service": "Entwirf einen gemeinsamen Limiter für ein API-Gateway: Algorithmus, Zustand, Konsistenz, Verhalten bei Ausfall und wie man damit keinen Ausfall verursacht.",
+"system-design/worked-design-a-notification-fan-out-system": "Liefere ein Ereignis an Millionen Geräte aus, mit Fan-out-Strategien, Prioritätswarteschlangen, Anbieterlimits, Deduplizierung und Wiederholungskontrolle.",
+"system-design/worked-design-a-metrics-and-log-pipeline": "Nimm Telemetrie im großen Maßstab auf, speichere und befrage sie, ohne dass die Pipeline zum Ausfall wird, mit Kardinalität, Gegendruck und Aufbewahrung.",
+"system-design/worked-design-a-multi-tenant-kubernetes-platform": "Teile Cluster sicher zwischen Teams: Isolationsstufen, Quoten, Upgrades, Netzwerk und wie die eigenen Abhängigkeiten der Plattform nicht zum Ausfall werden.",
+"system-design/worked-design-an-authoritative-dns-service": "Entwirf den Namensdienst, von dem alles andere abhängt: Anycast, Sicherheit der Zonendaten, DDoS-Widerstandsfähigkeit und die Disziplin, nicht alles auf einmal zu ändern.",
+"system-design/worked-design-a-chat-and-messaging-service": "Ein Rundgang durch den Entwurf eines Chats: Verbindungen, Zustellgarantien, Reihenfolge, Präsenz und was passiert, wenn ein Node oder eine Region ausfällt.",
+"system-design/worked-design-a-news-feed-and-timeline": "Entwirf einen Feed für ein soziales Produkt: Fan-out beim Schreiben gegenüber dem Lesen, Ranking, populäre Konten und Cache-Ausfälle.",
+"system-design/worked-design-video-upload-and-streaming": "Vom Upload bis zur Wiedergabe: Upload in Blöcken, Transcodier-Warteschlangen, Speicherstufen und ein CDN, mit den Ausfallarten jeder Stufe.",
+"system-design/worked-design-a-distributed-key-value-store": "Partitionierung, Replikation, Quorum-Lese- und -Schreibzugriffe und Fehlerbehandlung, zu einem Speicher zusammengefügt.",
+"system-design/worked-design-a-payments-ledger": "Korrekte Geldbewegung: doppelte Buchführung, idempotente Anfragen, Transaktionen und Abstimmung, entworfen, um Wiederholungen und Ausfälle zu überstehen.",
+"system-design/worked-design-search-autocomplete": "Schlage Vervollständigungen in wenigen Millisekunden vor: Präfixindizes, Ranking, Aktualität und wie man unter Last elegant degradiert.",
+"mlops/what-mlops-is-and-how-ml-systems-fail": "Ein Modell ist nur ein kleiner Teil eines Machine-Learning-Systems. Diese Lektion zeigt die Teile drumherum und die stillen Wege, auf denen sie in der Produktion ausfallen.",
+"mlops/data-and-feature-pipelines-for-ml": "Modelle sind nur so zuverlässig wie die Daten, die sie speisen. Lerne Datenvalidierung, Versionierung und wie man Trainings- und Serving-Merkmale gleich hält.",
+"mlops/experiment-tracking-and-reproducibility": "Halte fest, was jedes Modell hervorgebracht hat, damit du Läufe vergleichen, ein Ergebnis wiederholen und eine Entscheidung später erklären kannst.",
+"mlops/training-pipelines-and-testing-models-in-ci": "Mache aus dem Training eine automatisierte, getestete Pipeline, mit Prüfungen von Daten, Code und Modellqualität, bevor etwas veröffentlicht wird.",
+"mlops/model-registry-packaging-and-safe-releases": "Speichere Modelle mit ihrem Verlauf, paketiere sie für die Bereitstellung und veröffentliche mit Schattentests, Canaries und schnellem Rollback.",
+"mlops/serving-models-batch-online-and-streaming": "Wähle, wie Vorhersagen erzeugt werden, und dimensioniere den Dienst für Latenz, Durchsatz und Kosten.",
+"mlops/monitoring-drift-and-retraining": "Erkenne, wenn sich Daten oder die Welt verändert haben, miss die Modellqualität, wenn Labels spät eintreffen, und trainiere sicher nach.",
+"mlops/debugging-ml-systems-in-production": "Eine Checkliste von unten nach oben für ein Modell, das in der Produktion falsch, langsam oder stumm ist: erst die Daten, dann die Merkmale, dann das Modell, dann die Bereitstellung.",
+"aiops/what-aiops-is-and-is-not": "AIOps wendet Statistik und maschinelles Lernen auf Betriebsdaten an. Lerne, was es kann, was nicht und wie man ein Werkzeug ehrlich beurteilt.",
+"aiops/anomaly-detection-on-metrics": "Lerne einfache Basislinien, Saisonalität und Schwellwerte, bevor du zu komplexen Modellen greifst, und wie du Fehlalarme niedrig hältst.",
+"aiops/alert-correlation-and-noise-reduction": "Fasse zusammengehörige Alarme zu einem Vorfall zusammen, entferne Duplikate und nutze Abhängigkeiten, um die Quelle eines Alarmsturms zu finden.",
+"aiops/logs-and-traces-finding-patterns-with-ml": "Fasse Logzeilen zu Vorlagen zusammen, erkenne neue oder seltene Meldungen und verknüpfe Verhaltensänderungen mit Deployments.",
+"aiops/root-cause-hints-and-incident-assistants": "Ordne wahrscheinliche Ursachen anhand von Änderungen und Abhängigkeiten, und nutze Sprachmodelle zum sicheren Zusammenfassen, während ein Mensch das Sagen behält.",
+"aiops/safe-automation-and-auto-remediation": "Automatisiere Routinekorrekturen mit Limits, Freigaben und Rollbacks, damit Automatisierung Toil verringert, ohne zur Ursache des nächsten Ausfalls zu werden.",
+"aiops/debugging-and-investigating-aiops-output": "Wie man die Antworten eines KI-Assistenten bei einem Vorfall prüft: Belege bestätigen, die Behauptung gegen Daten testen und einen Menschen für die Aktion verantwortlich halten.",
+"virtualization/what-virtualization-is-and-hypervisor-types": "Verstehe, wie ein physischer Server viele virtuelle Maschinen betreibt und worin sich KVM, VMware, Hyper-V und Proxmox unterscheiden.",
+"virtualization/cpu-memory-and-overcommit": "Lerne, wie vCPUs und Speicher zwischen Gästen geteilt werden, was Überbuchung bedeutet und wie man einen überfüllten Host erkennt.",
+"virtualization/virtual-disks-snapshots-and-templates": "Lerne Festplattenabbild-Formate, Thin Provisioning, wie Snapshot-Ketten wachsen und wie Vorlagen und Klone Zeit sparen.",
+"virtualization/virtual-networking-bridges-and-vlans": "Sieh, wie Gäste über Bridges, NAT und VLANs Netzwerkzugang bekommen und wie man herausfindet, warum ein Gast keine Verbindung hat.",
+"virtualization/live-migration-ha-and-troubleshooting": "Verstehe, wie Gäste ohne Unterbrechung zwischen Hosts wechseln, wie HA sie nach einem Ausfall neu startet und wie man gängige Fehler analysiert.",
+"storage/block-file-and-object-storage": "Unterscheide die drei Speicherarten und lerne die Zahlen, auf die es ankommt: Kapazität, IOPS, Durchsatz und Latenz.",
+"storage/filesystems-ext4-xfs-and-mounts": "Vergleiche ext4, XFS und andere, hänge einen Datenträger sicher ein und vermeide die fstab-Fehler, die einen Server am Booten hindern.",
+"storage/lvm-and-raid": "Erweitere Volumes online mit LVM, verstehe RAID-Stufen und ihre Kompromisse und gehe ruhig mit einer ausgefallenen Festplatte um.",
+"storage/network-storage-nfs-iscsi-and-ceph": "Sieh, wie Speicher über das Netzwerk mit NFS und iSCSI geteilt wird und was ein verteiltes System wie Ceph hinzufügt.",
+"storage/performance-backups-and-troubleshooting": "Finde heraus, warum eine Festplatte langsam oder voll ist, verstehe df im Vergleich zu du und entwirf Backups, die du tatsächlich wiederhergestellt hast.",
+"sql-ops/reading-explain-and-finding-slow-queries": "Finde die Abfragen, die am meisten kosten, lies einen EXPLAIN-Plan und unterscheide einen fehlenden Index von veralteten Statistiken.",
+"sql-ops/indexes-that-help-and-indexes-that-hurt": "Entwirf zusammengesetzte, partielle und abdeckende Indizes und finde ungenutzte oder doppelte, die Schreibzugriffe bremsen.",
+"sql-ops/locks-deadlocks-and-long-transactions": "Finde heraus, was was blockiert, verstehe Idle-in-Transaction-Sitzungen und Deadlocks und setze Zeitlimits, die die Datenbank schützen.",
+"sql-ops/connections-pooling-and-capacity": "Verstehe, warum zu viele Verbindungen schaden, wie ein Pooler wie PgBouncer hilft und wie man Speicher und Limits dimensioniert.",
+"sql-ops/replication-lag-vacuum-and-day-two-operations": "Überwache die Replikation, verstehe Autovacuum und Bloat und führe Änderungen und Backups so aus, dass die Datenbank gesund bleibt.",
+"gpu-serving/gpu-basics-memory-and-what-limits-inference": "Ermittle, wie viel GPU-Speicher ein Modell braucht und warum die Texterzeugung mehr von der Speicherbandbreite als von der Rechenleistung begrenzt wird.",
+"gpu-serving/serving-stacks-vllm-tgi-triton": "Vergleiche die wichtigsten LLM-Serving-Werkzeuge, verstehe Continuous Batching und Paged Attention und lies die Flags, auf die es ankommt.",
+"gpu-serving/gpus-on-kubernetes": "Plane GPU-Workloads mit dem Device Plugin, verstehe, warum GPUs ganze Einheiten sind, und lies die Meldungen von Pending-Pods.",
+"gpu-serving/scaling-latency-and-cost": "Miss, was Nutzer spüren (TTFT und Token-Geschwindigkeit), skaliere nach dem richtigen Signal und berechne die Kosten eines Tokens.",
+"gpu-serving/monitoring-and-debugging-gpu-workloads": "Lies nvidia-smi, nutze DCGM-Metriken und analysiere Out-of-Memory-Fehler, Drosselung, hängende Multi-GPU-Jobs und ausgefallene Karten.",
+"openstack/what-openstack-is-and-core-services": "Sieh, wie OpenStack aus einzelnen Diensten eine Private Cloud baut und wie jeder davon etwas entspricht, das du von AWS kennst.",
+"openstack/identity-projects-quotas-and-keystone": "Verstehe Benutzer, Projekte, Rollen und Tokens, wie Quoten ein Projekt begrenzen und wie man einen Authentifizierungsfehler liest.",
+"openstack/compute-flavors-images-and-scheduling": "Verstehe, wie Nova einen Host für einen Server wählt, und analysiere Server, die mit „No valid host was found“ im Zustand ERROR hängen.",
+"openstack/neutron-networking-security-groups-and-floating-ips": "Verfolge ein Paket von einem Server ins Internet und repariere einen Server, den du nicht per SSH erreichst.",
+"openstack/operating-openstack-logs-upgrades-and-troubleshooting": "Finde schnell das richtige Log, rette festhängende Server und Volumes und plane Upgrades und Kapazität für eine Private Cloud.",
+"baremetal/servers-racks-and-remote-management": "Lerne, was in einem Rack-Server steckt, wie Racks mit Strom versorgt und gekühlt werden und wie man eine Maschine über ihren BMC aus der Ferne verwaltet.",
+"baremetal/provisioning-pxe-dhcp-and-images": "Verfolge einen neuen Server vom Einschalten bis zu einem laufenden Betriebssystem mit PXE, DHCP, TFTP und automatisierter Installation und lerne, warum jeder Schritt scheitern kann.",
+"baremetal/disks-raid-firmware-and-burn-in": "Verstehe Laufwerkstypen, Software- und Hardware-RAID, SMART-Gesundheit, Firmware und die Burn-in-Tests, die defekte Hardware abfangen, bevor sie Daten trägt.",
+"baremetal/datacenter-networking-leaf-spine-and-bonding": "Sieh, wie Racks über Top-of-Rack-Switches in einem Leaf-Spine-Fabric verbunden sind und wie Bonding, VLANs und ein getrenntes Management-Netz Server erreichbar halten.",
+"baremetal/operating-a-fleet-failures-lifecycle-and-capacity": "Analysiere häufige Hardware-Ausfälle, plane das Leben eines Servers vom Rack bis zur Ausmusterung und halte genug Reservekapazität und Ersatzteile vor.",
+"service-mesh/kubernetes-networking-under-the-hood": "Verfolge ein Paket von einem Pod zum anderen: Pod-Netzwerk, CNI, Services, kube-proxy, CoreDNS und wie Ingress und die Gateway API den Verkehr hereinbringen.",
+"service-mesh/cni-network-policy-and-ebpf": "Wähle ein CNI, verstehe, was eine NetworkPolicy erlaubt und verbietet, und sieh, wo eBPF die Funktionsweise des Kubernetes-Netzwerks verändert.",
+"service-mesh/what-a-service-mesh-is-and-how-it-works": "Verstehe das Problem, das ein Mesh löst, die Sidecar- und Ambient-Modelle, Control Plane und Data Plane und wann man keines einsetzen sollte.",
+"service-mesh/mtls-and-traffic-management": "Schalte gegenseitiges TLS ein, leite Verkehr gewichtet für Canaries und setze Zeitlimits, Wiederholungen und Circuit Breaking mit VirtualService und DestinationRule.",
+"service-mesh/observing-and-troubleshooting-the-mesh": "Lies Mesh-Metriken und Traces, prüfe die Konfigurationssynchronisierung mit istioctl und entschlüssele die häufigen 503- und Verbindungsfehler."
+}
+}
