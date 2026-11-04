@@ -104,6 +104,24 @@ $ ls -la /backups/nightly | tail -3
 
 The company recovered data from a staging copy that was six hours old. Many teams have been in a similar position, and the lesson is the same: monitor backup size and age, and restore regularly.
 
+```wrongpath
+@goal We have nightly backups, so we are safe.
+@wrong
+# cron
+0 2 * * * pg_dump shop > /backup/shop.sql
+@result
+(runs every night for a year)
+# during a disaster
+psql shop < shop.sql
+ERROR: unexpected end of file
+@why Nobody ever restored the file. The dump was truncated when the disk was full, and the job still reported success. A backup is only proven by a restore.
+@right
+pg_dump -Fc shop > /backup/shop.dump && pg_restore --list /backup/shop.dump >/dev/null
+# weekly: restore to a scratch database and compare counts
+createdb scratch && pg_restore -d scratch /backup/shop.dump
+@after Check the exit status, verify the file, restore on a schedule and alert when it fails.
+```
+
 ## Common mistakes
 
 - Backups on the same disk or account as the database

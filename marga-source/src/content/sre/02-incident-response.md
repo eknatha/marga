@@ -109,6 +109,25 @@ edge: mit | rev
 edge: com | rev
 ```
 
+```wrongpath
+@goal The site is down, so every engineer investigates on their own.
+@wrong
+# #general
+"I am looking at the database"
+"I am restarting the cache"
+"I deployed a fix"
+@result
+Two people restarted the cache twice. The deploy overlapped the restart. The outage grew from 10 to 50 minutes.
+@why Without a single coordinator, people duplicate work, make conflicting changes and nobody knows the current state. Change itself is a common cause of making incidents worse.
+@right
+# declare an incident
+Incident commander: Asha
+Ops lead: Ben (runs changes)
+Comms: Chen (updates every 15 min)
+# one channel, one timeline, one change at a time
+@after Name an incident commander, split roles, make one change at a time and write down what was done.
+```
+
 ## Common mistakes
 
 - Debugging before mitigating

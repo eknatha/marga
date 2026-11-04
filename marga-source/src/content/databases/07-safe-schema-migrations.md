@@ -112,6 +112,25 @@ $ kubectl logs deploy/shop | grep -c 'column "customer_name" does not exist'
 
 The team adopted expand and contract for all renames, added a rule that migrations must work with both the old and new code versions, and tested that rule in staging by running the previous release against the new schema.
 
+```wrongpath
+@goal Add a NOT NULL column with a default to a 200 million row table at peak.
+@wrong
+ALTER TABLE orders ADD COLUMN region text NOT NULL DEFAULT 'eu';
+@result
+(waits)
+$ select pid, wait_event from pg_stat_activity;
+ 20 sessions waiting on a lock on orders
+@why On older versions the statement rewrites the whole table while holding an exclusive lock, and every other query queues behind it. The queue grows into an outage.
+@right
+SET lock_timeout = '3s';
+ALTER TABLE orders ADD COLUMN region text;
+-- backfill in batches
+UPDATE orders SET region = 'eu' WHERE id BETWEEN 1 AND 100000 AND region IS NULL;
+-- later
+ALTER TABLE orders ALTER COLUMN region SET NOT NULL;
+@after Add the column nullable, backfill in small batches, then add the constraint, with a lock timeout so the change fails safely.
+```
+
 ## Common mistakes
 
 - Running a table rewrite at peak time

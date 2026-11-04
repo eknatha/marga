@@ -74,6 +74,21 @@ shop-web-6c9d7b8f4-hq2lm   0/1   CrashLoopBackOff   5   4m
 
 Without --wait, Helm returned as soon as the manifests were accepted. The pipeline marked the deployment green, and nobody checked the pods. The team added --atomic --wait --timeout 5m to every upgrade, a post-deploy smoke test, and an alert on pods not ready, so a bad release now rolls back by itself within minutes.
 
+```wrongpath
+@goal An upgrade failed; uninstall and install again.
+@wrong
+helm uninstall shop -n prod && helm install shop ./chart -n prod
+@result
+release "shop" uninstalled
+# volumes and secrets created by the chart are gone; users lost sessions
+@why Uninstalling removes the release and its resources, possibly including persistent data, and causes downtime. Helm keeps a history so you can go back to the last good revision.
+@right
+helm history shop -n prod
+helm rollback shop 4 -n prod
+helm status shop -n prod
+@after Roll back to the last good revision, find the cause with helm diff or the failed hook, and then upgrade again.
+```
+
 ## Common mistakes
 
 - Upgrading without --wait or --atomic
