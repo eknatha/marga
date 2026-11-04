@@ -1,0 +1,22 @@
+{
+ "gpu-basics-memory-and-what-limits-inference": {
+  "r": "A 13B model loaded on a 24 GB card and crashed under real traffic. The cache for many long prompts used the remaining memory. Lower context limits, fewer concurrent requests and a larger card fixed it.",
+  "x": "Capacity plan = weights + KV cache per token × context × concurrency + overhead. Prefill is compute bound, decode is bandwidth bound. Choose precision by measured quality, not by what fits."
+ },
+ "serving-stacks-vllm-tgi-triton": {
+  "r": "A two-GPU server performed like one. vLLM had been started without tensor parallelism, so it used only the first card. Adding the flag split the model, enlarged the cache and about doubled throughput.",
+  "x": "Choose the engine by model, hardware and skills, then tune from measurements on realistic traffic. Watch per-GPU utilization and cache size, pin versions, and keep weights on persistent storage with proper readiness probes."
+ },
+ "gpus-on-kubernetes": {
+  "r": "A four-GPU job stayed Pending though eight GPUs were free. They were spread over four nodes with two each, and a pod must fit on one node. A pool of 8-GPU nodes for large jobs solved it.",
+  "x": "GPU scheduling is bin packing on expensive nodes. Taint pools, scale them from zero, choose node shapes for the largest job, prefer MIG over time-slicing for production, and pin driver and operator versions together."
+ },
+ "scaling-latency-and-cost": {
+  "r": "A launch spike caused timeouts while the autoscaler saw 12 percent CPU, because the work was on the GPU and 211 requests waited. Scaling on waiting requests, warm replicas and faster start-up fixed it.",
+  "x": "Pick SLOs for TTFT and token rate, scale on queue depth and cache pressure, keep warm capacity for slow starts, and compare self-hosted cost per million tokens against hosted APIs at realistic utilisation."
+ },
+ "monitoring-and-debugging-gpu-workloads": {
+  "r": "A four-GPU training job showed full utilization for six hours without progress. One worker had been evicted and the others waited for it inside NCCL. A job timeout and alert on running workers now fail it fast.",
+  "x": "Debug in order: visibility, memory and holders, thermals and clocks, XID and ECC in the kernel log, rank health and network, version compatibility. Alert on progress signals such as step rate, not only on utilization."
+ }
+}

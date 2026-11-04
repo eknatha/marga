@@ -102,6 +102,23 @@ edge: ctr | net
 edge: net | host
 ```
 
+```wrongpath
+@goal Share data between two containers by using the container IP.
+@wrong
+docker run -d --name db postgres
+docker inspect db | grep IPAddress
+# app uses 172.17.0.2
+@result
+(works, then after a restart)
+connection to 172.17.0.2 failed
+@why Container IPs change on every restart. Name resolution on a user-defined network is stable and independent of the address.
+@right
+docker network create appnet
+docker run -d --network appnet --name db postgres
+docker run -d --network appnet -e DB_HOST=db myapp
+@after Put both containers on a user-defined network and use the container name.
+```
+
 ## Common mistakes
 
 - Keeping database files inside the container

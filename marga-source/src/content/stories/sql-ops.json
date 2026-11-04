@@ -1,0 +1,22 @@
+{
+ "reading-explain-and-finding-slow-queries": {
+  "r": "A checkout query went from 5 ms to 4 seconds overnight. After a big import the statistics were two weeks old, so the planner expected 3 rows but found 118 000 and chose a nested loop. ANALYZE fixed it in seconds.",
+  "x": "Separate causes that look alike: a missing index shows a seq scan with many removed rows, stale statistics show a large estimate gap. Measure total cost per query, keep before and after plans, and add indexes concurrently."
+ },
+ "indexes-that-help-and-indexes-that-hurt": {
+  "r": "A nightly import grew from 20 minutes to 5 hours over a year. The events table had 23 indexes totalling twice the table size. Removing thirteen unused or duplicate ones brought it under an hour.",
+  "x": "Treat the index set as shared state with an owner. Review it on a schedule, remove unused and redundant indexes using statistics covering a full cycle, and prefer partial or covering indexes over broad ones."
+ },
+ "locks-deadlocks-and-long-transactions": {
+  "r": "A one-line ALTER TABLE froze checkout for four minutes. It queued for a strong lock behind a long report, and every later insert queued behind it. A lock_timeout and moving the report to a replica prevented a repeat.",
+  "x": "A queued DDL statement is a hidden global lock. Always set lock_timeout and retry in quiet windows, cap idle-in-transaction and statement time, offload reports to replicas, and fix deadlocks with ordering and retry logic."
+ },
+ "connections-pooling-and-capacity": {
+  "r": "After a deploy the database refused connections for ten minutes. Seventeen API pods with a pool of 10, doubled during the rolling update, hit max_connections. PgBouncer in transaction mode, smaller pools and a limited surge fixed it.",
+  "x": "Capacity is a budget: sum all pool sizes including deploy surge and batch jobs against max_connections minus reserved slots. Put a pooler in front, constrain session features, and size work_mem per workload, not globally."
+ },
+ "replication-lag-vacuum-and-day-two-operations": {
+  "r": "New orders were missing for several minutes on a lagging standby, then the primary ran out of disk. An unused replication slot held 412 GB of WAL after a reporting replica was switched off. Dropping the slot freed the disk.",
+  "x": "Day-two work is monitoring and discipline: lag and slot alerts, per-table autovacuum tuning, backward-compatible migrations with lock timeouts, and scheduled restore tests against RPO and RTO."
+ }
+}

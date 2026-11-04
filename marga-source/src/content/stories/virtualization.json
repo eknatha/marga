@@ -1,0 +1,22 @@
+{
+ "what-virtualization-is-and-hypervisor-types": {
+  "r": "A team could not start any guest on a new server. The image was blamed for an hour. The real cause was a firmware setting: hardware virtualization was off, so the kvm module could not load. After they enabled it, every guest started.",
+  "x": "Treat the hypervisor as a stack: CPU features, kvm, QEMU, libvirt. Faults at the bottom hide behind errors at the top, so check lsmod and /proc/cpuinfo before touching guest images, and use virtio drivers by default."
+ },
+ "cpu-memory-and-overcommit": {
+  "r": "Web guests slowed every Monday at 09:00 while their own graphs showed low CPU. Steal time was 41 percent: a weekly report batch shared the same host. Moving the batch guests and setting a 3 to 1 vCPU limit fixed it.",
+  "x": "Guest metrics lie about contention. Alert on steal or ready time and on host swap, set overcommit ratios per cluster by workload class, and keep latency-sensitive guests on hosts with headroom and NUMA-aligned sizes."
+ },
+ "virtual-disks-snapshots-and-templates": {
+  "r": "A storage pool went from 60 percent to full in two days. A backup tool made an hourly snapshot of a database guest and never deleted them. Merging the old snapshots freed 180 GiB, and a retention rule plus an 80 percent alert were added.",
+  "x": "Snapshot chains trade space and read speed for a rollback point. Enforce retention in the tool that creates them, monitor pool allocation against capacity including thin overcommit, and test restores from real backups, not snapshots."
+ },
+ "virtual-networking-bridges-and-vlans": {
+  "r": "A new guest got no DHCP address and the DHCP server was blamed. The guest was on VLAN 40 but the uplink trunk carried only VLANs 20 and 30. Adding VLAN 40 to the trunk fixed it.",
+  "x": "Debug virtual networks hop by hop: guest NIC, vnet port, bridge, uplink, switch. Check VLAN membership on each, keep MACs unique across clones, and document which networks are bridged, routed or NAT."
+ },
+ "live-migration-ha-and-troubleshooting": {
+  "r": "Draining one host for patching failed to migrate a guest because the target was almost out of memory, and HA then restarted two guests on it, exhausting memory. The team capped host memory use at 80 percent and drained one host at a time.",
+  "x": "Design clusters for the failure case: N+1 capacity counted in memory, a common CPU model, reliable fencing and quorum. Check the six basics (virtualization, memory, storage, disk files, network, steal) before blaming a guest."
+ }
+}

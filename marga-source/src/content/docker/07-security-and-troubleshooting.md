@@ -93,6 +93,22 @@ CONTAINER ID   NAME   CPU %   MEM USAGE / LIMIT   MEM %    NET I/O
 
 Memory sits at 97% of the 512 MiB limit. Two honest options exist. If the service legitimately needs more memory under load, raise the limit after checking peak usage. If memory grows steadily until it dies, you have a leak: capture a heap profile or trend memory in your metrics, fix the code, and keep the limit as a safety net. Raising the limit repeatedly without watching the trend only delays the next kill. Also set a restart policy such as `--restart unless-stopped` so a crash does not become an outage, while still alerting on restart counts so you notice.
 
+```wrongpath
+@goal The container needs to bind to port 80, so run it as root and privileged.
+@wrong
+docker run --privileged -u 0 -p 80:80 myapp
+@result
+(works)
+$ docker inspect myapp | grep -i privileged
+"Privileged": true
+@why A privileged container has nearly the same access as the host. A bug in the app becomes a host compromise. Binding port 80 needs only one capability, or a port above 1024 behind a mapping.
+@right
+docker run -u 1000 -p 80:8080 myapp
+# or, if the app must bind low ports
+docker run --cap-drop ALL --cap-add NET_BIND_SERVICE myapp
+@after Drop privileges, map a high port to 80, and add only the single capability that is needed.
+```
+
 ## Common mistakes
 
 - Running with `--privileged` or mounting the Docker socket

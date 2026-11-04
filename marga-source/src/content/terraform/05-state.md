@@ -111,6 +111,23 @@ State can be overwritten or corrupted, losing track of resources.
 > Use a backend with locking so a second apply waits or fails.
 ```
 
+```wrongpath
+@goal The state file is out of date, so edit it by hand.
+@wrong
+vim terraform.tfstate
+@result
+(saved)
+$ terraform plan
+Error: state snapshot was created by a different serial
+@why The state is a machine format with a serial number and checksums. Manual edits are easy to get wrong and are not locked, so a teammate may overwrite them.
+@right
+terraform state list
+terraform state show aws_instance.web
+terraform import aws_instance.web i-0abc123
+terraform state mv aws_instance.old aws_instance.web
+@after Use the state commands, which lock and validate, and keep a backup of the state before any change.
+```
+
 ## Common mistakes
 
 - Keeping state in a repository or on a laptop

@@ -1,0 +1,22 @@
+{
+ "kubernetes-networking-under-the-hood": {
+  "r": "Calls to an external API took five seconds, but only from pods, because ndots:5 made the resolver try several cluster search suffixes first. Ending the name with a dot fixed it.",
+  "x": "Read the endpoints, then the labels, then DNS. Most Kubernetes network problems are one of those three."
+ },
+ "cni-network-policy-and-ebpf": {
+  "r": "A security review found a database reachable from every namespace even though a NetworkPolicy existed, because the cluster ran Flannel, which does not enforce policy at all.",
+  "x": "Pick a CNI that enforces policy, observe traffic first, allow DNS, add allows before default deny, and test that blocked traffic is really blocked."
+ },
+ "what-a-service-mesh-is-and-how-it-works": {
+  "r": "After a control plane upgrade some proxies stayed on old config and returned 503s. Rolling the upgrade slowly and checking proxy-status avoided it later.",
+  "x": "Adopt a mesh for a specific need, restart workloads after enabling injection, check proxy-status, and roll upgrades slowly."
+ },
+ "mtls-and-traffic-management": {
+  "r": "Retries at three layers turned a slow database into a full storefront outage, because each user request became dozens of calls. Limiting retries to one layer and adding outlier detection fixed it.",
+  "x": "Migrate with PERMISSIVE then STRICT, create DestinationRules before VirtualServices, run istioctl analyze, and keep retries at one layer."
+ },
+ "observing-and-troubleshooting-the-mesh": {
+  "r": "Checkout failed even though every pod was Running, because 40 proxies were STALE after the control plane ran out of memory. istioctl proxy-status found the cause in seconds.",
+  "x": "Check config sync first, read the flag, check endpoints and policies, and run more than one control plane replica."
+ }
+}

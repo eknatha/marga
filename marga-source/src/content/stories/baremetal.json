@@ -1,0 +1,22 @@
+{
+ "servers-racks-and-remote-management": {
+  "r": "Four servers shut off at noon because one power feed failed and the other could not carry the whole rack. The extra servers had been added without counting the load on a single feed.",
+  "x": "Plan each rack so one feed can carry everything, keep the BMC on a separate protected network, and always read the event log before you power cycle."
+ },
+ "provisioning-pxe-dhcp-and-images": {
+  "r": "Servers already in service rebooted into the installer and wiped themselves because the PXE server began answering every machine, and network boot was first in their boot order.",
+  "x": "Debug in order: DHCP, file transfer, loader, installer. Answer only machines marked for build, and put the disk first in the boot order once a machine is deployed."
+ },
+ "disks-raid-firmware-and-burn-in": {
+  "r": "A RAID 5 array lost a second disk during a rebuild because all its disks came from one batch and wore out together. The team moved to RAID 6 and mixed batches.",
+  "x": "Replace failed disks quickly, watch SMART, never treat RAID as a backup, and burn in new servers before they take load."
+ },
+ "datacenter-networking-leaf-spine-and-bonding": {
+  "r": "A server lost network for a few seconds every ten minutes because one cable was loose. The bond kept traffic flowing, which hid the fault, and only the switch log showed the link flapping up and down.",
+  "x": "Configure bonding on both ends, separate the management network, label cables, and alert on link state changes."
+ },
+ "operating-a-fleet-failures-lifecycle-and-capacity": {
+  "r": "A firmware update pushed to 120 servers at once left 30 unreachable because older BMCs needed an intermediate version. A visit to the datacentre followed. Later updates went in waves of five.",
+  "x": "Use the evidence the hardware already records, change one thing at a time, stage firmware updates, and keep spares and inventory accurate."
+ }
+}

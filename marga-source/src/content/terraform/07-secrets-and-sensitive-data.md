@@ -131,6 +131,28 @@ $ aws secretsmanager get-secret-value --secret-id 'rds!db-abc123' --query Secret
 
 After rotation, remove the literal from code, mark the variable `sensitive`, delete or redact the log and artifact, and add a pre-commit secret scanner plus a pipeline check that fails when credentials patterns appear. Prefer managed passwords so there is nothing to commit.
 
+```wrongpath
+@goal Pass the database password as a plain variable with a default.
+@wrong
+variable "db_password" {
+  default = "S3cr3t!"
+}
+@result
+$ git grep S3cr3t
+variables.tf:  default = "S3cr3t!"
+$ cat terraform.tfstate | grep S3cr3t
+"password": "S3cr3t!"
+@why The secret is in the code and also in the state, in clear text. Marking the variable sensitive hides it from output but does not stop the state from holding it, so the state needs protection too.
+@right
+variable "db_password" {
+  type      = string
+  sensitive = true
+}
+# value from the environment
+export TF_VAR_db_password="$(vault kv get -field=pw secret/db)"
+@after Supply secrets at run time, mark them sensitive, and store state in an encrypted backend with tight access.
+```
+
 ## Common mistakes
 
 - Believing `sensitive = true` encrypts the state

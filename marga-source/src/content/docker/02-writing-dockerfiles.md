@@ -134,6 +134,24 @@ No. It remains in the earlier layer and can be extracted.
 > Layers are additive. Use build secrets or a multi-stage build so the secret never lands in a layer.
 ```
 
+```wrongpath
+@goal Build an image fast: copy everything then install.
+@wrong
+FROM node:20
+COPY . /app
+RUN npm ci
+@result
+Step 3/3: RUN npm ci   (4 min, every build)
+@why Copying the whole tree first means any source change invalidates the cache before the install, so dependencies reinstall on every build.
+@right
+FROM node:20
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+@after Copy the dependency files first, install, and copy the source last so the slow layer stays cached.
+```
+
 ## Common mistakes
 
 - Copying the whole source tree before installing dependencies

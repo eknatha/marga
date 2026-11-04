@@ -114,6 +114,21 @@ edge: app | drift
 edge: drift | pr
 ```
 
+```wrongpath
+@goal Production drifted from the code; run apply to fix it now.
+@wrong
+terraform apply -auto-approve
+@result
+Apply complete! Resources: 3 added, 2 changed, 4 destroyed.
+@why Auto-approve skips the review of the plan. Four resources were destroyed, and nobody checked whether they held data. Drift may also have been a deliberate emergency change.
+@right
+terraform plan -out=tf.plan
+terraform show tf.plan | less
+# review destroy lines, then
+terraform apply tf.plan
+@after Always read the plan, apply the saved plan, and decide for each drift whether to change the code or revert the resource.
+```
+
 ## Common mistakes
 
 - Applying a fresh plan that differs from the one reviewed

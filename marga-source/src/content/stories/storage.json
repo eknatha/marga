@@ -1,0 +1,22 @@
+{
+ "block-file-and-object-storage": {
+  "r": "A report job went from ten minutes to two hours after a move to a cheaper volume. The new volume was a throughput HDD type, but the database did small random reads and the disk sat at 99.8 percent busy. An SSD volume fixed it.",
+  "x": "Match the volume to the access pattern. Check IOPS and latency limits in the provider's volume types, watch await and utilization with iostat, and test with fio on a scratch volume of the same type before migrating."
+ },
+ "filesystems-ext4-xfs-and-mounts": {
+  "r": "A server stayed in emergency mode after a reboot because a UUID in fstab was typed with one character missing and the line had no nofail. The team now copies UUIDs from blkid, adds nofail and runs mount -a before leaving.",
+  "x": "Treat fstab as boot-critical code: review it, use UUIDs, nofail for non-root data, and test with mount -a. Monitor inode use beside byte use, and keep a console or rescue path for the day a mount blocks boot."
+ },
+ "lvm-and-raid": {
+  "r": "A RAID 5 array lost a second disk while rebuilding. The first failure was a week old and its alert went to a mailbox nobody read. The team restored from backup and rebuilt as RAID 6 with working alerts.",
+  "x": "Redundancy is only as good as the time to notice and repair. Alert on degraded state, keep hot spares, size rebuild windows for the disk size, prefer double parity or mirrors for large disks, and keep backups on separate systems."
+ },
+ "network-storage-nfs-iscsi-and-ceph": {
+  "r": "Rebooting one NFS server hung thirty application servers because their mounts were hard, and even df hung monitoring. Service resumed after twelve minutes. The team made the exports highly available and put timeouts on checks.",
+  "x": "Every network mount is a dependency that can hang a host. Make storage servers redundant, put timeouts in monitoring and scripts, use multipath for block access, and watch Ceph capacity and degraded placement groups."
+ },
+ "performance-backups-and-troubleshooting": {
+  "r": "A disk alert fired at 100 percent but du found only 3.4 GB. A rotated log file had been deleted while the Java process kept writing, and it held 44 GB. Restarting the service freed the space and rotation was fixed with copytruncate.",
+  "x": "Work in order: device, mount, space and inodes, then latency. Reconcile df and du, find deleted-but-open files, size backups by RPO and RTO, keep an immutable copy off-site, and schedule restore drills."
+ }
+}

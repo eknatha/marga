@@ -1,0 +1,22 @@
+{
+ "what-openstack-is-and-core-services": {
+  "r": "Nova, Neutron and Cinder all reported errors at once. The real fault was the message queue, stopped after its disk filled with logs. Freeing the disk and restarting it restored everything.",
+  "x": "Know the service map and the shared dependencies. A cluster of unrelated errors points to RabbitMQ or the database. Run three controllers, monitor queue and database health, and plan regular upgrades."
+ },
+ "identity-projects-quotas-and-keystone": {
+  "r": "A pipeline began failing with 401 at 08:00. A 90-day password policy had expired the service account's password at midnight. The team moved to an application credential and exempted service users from password expiry.",
+  "x": "Separate people from automation, scope credentials to a project, and keep clocks in sync. Treat quota errors as capacity governance, and never grant admin just to clear a 403."
+ },
+ "compute-flavors-images-and-scheduling": {
+  "r": "A 16 GB server would not boot though 200 GB was free in total. Each node had under 8 GB free, so none could hold it. Operators freed one node and reserved an aggregate of large hosts for big flavors.",
+  "x": "Capacity is per node, not total. Check compute service state, per-host usage in Placement and the scheduler log for filter counts, tune allocation ratios per aggregate, and delete stale ERROR servers."
+ },
+ "neutron-networking-security-groups-and-floating-ips": {
+  "r": "An engineer at home could not SSH to a server that colleagues reached. The security group allowed SSH only from the office range. Adding a /32 rule for the home address fixed it without opening SSH to the world.",
+  "x": "Debug layer by layer. Keep security groups narrow, reference groups instead of addresses where you can, put management access behind a bastion or VPN, and know whether networks are provider or self-service."
+ },
+ "operating-openstack-logs-upgrades-and-troubleshooting": {
+  "r": "A volume stuck in detaching blocked a migration because its compute node was down. Operators checked that the guest was not running elsewhere, restored the node and retried the detach, instead of just resetting the state.",
+  "x": "Operations is evidence first: request ids, service and agent liveness, queue depth, Galera quorum. Treat state resets as database edits, upgrade release by release with tested restores, and plan capacity for N+1 per flavor class."
+ }
+}
