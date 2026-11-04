@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>"GPU, AI infrastructure and LLM serving" cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content=""Memory sums, nvidia-smi, vLLM flags, Kubernetes GPU scheduling and the metrics that explain slow or failing inference."">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/gpu-serving.html">
+<meta property="og:title" content=""GPU, AI infrastructure and LLM serving" cheat sheet">
+<meta property="og:description" content=""Memory sums, nvidia-smi, vLLM flags, Kubernetes GPU scheduling and the metrics that explain slow or failing inference."">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/gpu-serving.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=dfe017aa">
+<script src="../assets/a11y.js?v=dfe017aa"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>"GPU, AI infrastructure and LLM serving" cheat sheet</h1>
+    <p class="lede">"Memory sums, nvidia-smi, vLLM flags, Kubernetes GPU scheduling and the metrics that explain slow or failing inference."</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button><label class="print-style no-print"><span>Print style</span><select id="print-style" aria-label="Print and Save as PDF style"><option value="light">Light</option><option value="dark">Dark</option><option value="large">Large type</option></select></label></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="memory-sum">Memory sum</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Item</th>
+<th>Rule of thumb</th>
+</tr>
+</thead><tbody><tr>
+<td>Weights, 16-bit</td>
+<td>parameters x 2 bytes (7B is about 14 GB)</td>
+</tr>
+<tr>
+<td>Weights, 8-bit</td>
+<td>parameters x 1 byte</td>
+</tr>
+<tr>
+<td>Weights, 4-bit</td>
+<td>parameters x 0.5 byte</td>
+</tr>
+<tr>
+<td>KV cache</td>
+<td>grows with context length x concurrent requests</td>
+</tr>
+<tr>
+<td>Overhead</td>
+<td>leave 10 to 20 percent free</td>
+</tr>
+</tbody></table></div>
+<h2 id="look-at-the-gpu">Look at the GPU</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="nvidia-smi
+nvidia-smi --query-gpu=name,memory.used,memory.total,utilization.gpu,temperature.gpu --format=csv
+nvidia-smi dmon -c 5
+nvidia-smi topo -m" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">nvidia-smi
+nvidia-smi --query-gpu=name,memory.used,memory.total,utilization.gpu,temperature.gpu --format=csv
+nvidia-smi dmon -c 5
+nvidia-smi topo -m</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>High memory use with low utilisation usually means the GPU is waiting for the CPU or the network, not that it is busy.</p>
+</aside>
+<h2 id="serve-with-vllm">Serve with vLLM</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="vllm serve meta-llama/Llama-3.1-8B-Instruct \
+  --max-model-len 8192 \
+  --gpu-memory-utilization 0.90 \
+  --tensor-parallel-size 1
+curl localhost:8000/v1/models
+curl localhost:8000/metrics | grep -E &quot;num_requests|cache_usage&quot;" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">vllm serve meta-llama/Llama-3.1-8B-Instruct \
+  --max-model-len 8192 \
+  --gpu-memory-utilization 0.90 \
+  --tensor-parallel-size 1
+curl localhost:8000/v1/models
+curl localhost:8000/metrics | grep -E <span class="hljs-string">&quot;num_requests|cache_usage&quot;</span></code></pre></div>
+<div class="table-wrap"><table><thead><tr>
+<th>Flag</th>
+<th>Effect</th>
+</tr>
+</thead><tbody><tr>
+<td><code>--max-model-len</code></td>
+<td>longest context, drives KV cache size</td>
+</tr>
+<tr>
+<td><code>--gpu-memory-utilization</code></td>
+<td>share of GPU memory the engine may use</td>
+</tr>
+<tr>
+<td><code>--tensor-parallel-size</code></td>
+<td>split the model over N GPUs</td>
+</tr>
+</tbody></table></div>
+<h2 id="kubernetes">Kubernetes</h2>
+<div class="code" data-lang="yaml"><button class="copy" type="button" data-copy="resources:
+  limits:
+    nvidia.com/gpu: 1
+tolerations:
+- key: nvidia.com/gpu
+  operator: Exists
+  effect: NoSchedule" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-attr">resources:</span>
+  <span class="hljs-attr">limits:</span>
+    <span class="hljs-attr">nvidia.com/gpu:</span> <span class="hljs-number">1</span>
+<span class="hljs-attr">tolerations:</span>
+<span class="hljs-bullet">-</span> <span class="hljs-attr">key:</span> <span class="hljs-string">nvidia.com/gpu</span>
+  <span class="hljs-attr">operator:</span> <span class="hljs-string">Exists</span>
+  <span class="hljs-attr">effect:</span> <span class="hljs-string">NoSchedule</span></code></pre></div>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl describe node gpu-1 | grep -A3 &quot;nvidia.com/gpu&quot;
+kubectl get pods -A -o wide | grep -i nvidia
+kubectl describe pod llm-0 | tail -15" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubectl describe node gpu-1 | grep -A3 <span class="hljs-string">&quot;nvidia.com/gpu&quot;</span>
+kubectl get pods -A -o wide | grep -i nvidia
+kubectl describe pod llm-0 | <span class="hljs-built_in">tail</span> -15</code></pre></div>
+<h2 id="signals-to-watch">Signals to watch</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Metric</th>
+<th>Meaning</th>
+</tr>
+</thead><tbody><tr>
+<td>time to first token</td>
+<td>how long users wait to see output</td>
+</tr>
+<tr>
+<td>tokens per second</td>
+<td>generation speed</td>
+</tr>
+<tr>
+<td>requests waiting</td>
+<td>demand above capacity</td>
+</tr>
+<tr>
+<td>KV cache usage</td>
+<td>near 100 percent means queueing and evictions</td>
+</tr>
+<tr>
+<td>GPU memory and utilisation</td>
+<td>fit and efficiency</td>
+</tr>
+<tr>
+<td>Xid errors in dmesg</td>
+<td>hardware or driver faults</td>
+</tr>
+</tbody></table></div>
+<h2 id="quick-gpu-checks">Quick GPU checks</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="nvidia-smi --query-gpu=name,memory.used,memory.total,utilization.gpu,temperature.gpu --format=csv
+nvidia-smi dmon -c 3
+kubectl describe node gpu-1 | grep -A3 nvidia.com/gpu
+kubectl logs deploy/llm --tail=50" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">nvidia-smi --query-gpu=name,memory.used,memory.total,utilization.gpu,temperature.gpu --format=csv
+nvidia-smi dmon -c 3
+kubectl describe node gpu-1 | grep -A3 nvidia.com/gpu
+kubectl logs deploy/llm --<span class="hljs-built_in">tail</span>=50</code></pre></div>
+<h2 id="test-a-server">Test a server</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="curl -s localhost:8000/v1/models
+curl -s localhost:8000/v1/chat/completions -H &quot;Content-Type: application/json&quot; -d '{&quot;model&quot;:&quot;m&quot;,&quot;messages&quot;:[{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:&quot;hi&quot;}],&quot;max_tokens&quot;:16}'
+curl -s localhost:8000/metrics | grep num_requests" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">curl -s localhost:8000/v1/models
+curl -s localhost:8000/v1/chat/completions -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> -d <span class="hljs-string">&#x27;{&quot;model&quot;:&quot;m&quot;,&quot;messages&quot;:[{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:&quot;hi&quot;}],&quot;max_tokens&quot;:16}&#x27;</span>
+curl -s localhost:8000/metrics | grep num_requests</code></pre></div>
+<h2 id="cautions">Cautions</h2>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p>Setting <code>--gpu-memory-utilization</code> near 1.0 leaves no room for spikes and invites out-of-memory crashes.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>nvidia-smi --gpu-reset</code> and driver changes interrupt every process on the card. Drain the node first.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Autoscaling a model server on CPU use does not work, as the work happens on the GPU. Use queue depth or latency.</p>
+</aside>
+<aside class="callout callout-caution"><div class="callout-title">Caution</div><p>A long context grows the KV cache for every request. Set a maximum that fits your memory.</p>
+</aside>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://docs.vllm.ai/en/latest/" target="_blank" rel="noopener">vLLM documentation</a><span class="host">docs.vllm.ai</span></li><li><a href="https://huggingface.co/docs/text-generation-inference/index" target="_blank" rel="noopener">Text Generation Inference documentation</a><span class="host">huggingface.co</span></li><li><a href="https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/index.html" target="_blank" rel="noopener">NVIDIA Triton Inference Server user guide</a><span class="host">docs.nvidia.com</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="../#/interview">Interview questions</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=dfe017aa"></script>
+<script src="../assets/counter.js?v=dfe017aa"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+(function(){var ps=document.getElementById('print-style');if(!ps)return;ps.value=document.documentElement.getAttribute('data-a-print')||'light';ps.addEventListener('change',function(){if(window.MargaA11y){MargaA11y.set('print',ps.value);}else{document.documentElement.setAttribute('data-a-print',ps.value);}});})();
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

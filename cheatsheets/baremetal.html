@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>"Bare metal and datacenter" cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content=""Remote management, provisioning, disks and RAID, bonding and the first checks on a sick server."">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/baremetal.html">
+<meta property="og:title" content=""Bare metal and datacenter" cheat sheet">
+<meta property="og:description" content=""Remote management, provisioning, disks and RAID, bonding and the first checks on a sick server."">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/baremetal.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=dfe017aa">
+<script src="../assets/a11y.js?v=dfe017aa"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>"Bare metal and datacenter" cheat sheet</h1>
+    <p class="lede">"Remote management, provisioning, disks and RAID, bonding and the first checks on a sick server."</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button><label class="print-style no-print"><span>Print style</span><select id="print-style" aria-label="Print and Save as PDF style"><option value="light">Light</option><option value="dark">Dark</option><option value="large">Large type</option></select></label></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="talk-to-the-bmc">Talk to the BMC</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="ipmitool -H BMC_IP -U USER -P PASS chassis power status
+ipmitool -H BMC_IP -U USER -P PASS chassis power cycle
+ipmitool -H BMC_IP -U USER -P PASS sel elist
+ipmitool -H BMC_IP -U USER -P PASS sensor list" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">ipmitool -H BMC_IP -U USER -P PASS chassis power status
+ipmitool -H BMC_IP -U USER -P PASS chassis power cycle
+ipmitool -H BMC_IP -U USER -P PASS sel elist
+ipmitool -H BMC_IP -U USER -P PASS sensor list</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>power cycle</code> and <code>power off</code> cut power at once. Drain the host first unless it is already hung.</p>
+</aside>
+<h2 id="check-disks">Check disks</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="lsblk -f
+sudo smartctl -H /dev/sda
+sudo smartctl -a /dev/sda | grep -E &quot;Reallocated|Pending|Power_On&quot;
+cat /proc/mdstat
+sudo mdadm --detail /dev/md0" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">lsblk -f
+<span class="hljs-built_in">sudo</span> smartctl -H /dev/sda
+<span class="hljs-built_in">sudo</span> smartctl -a /dev/sda | grep -E <span class="hljs-string">&quot;Reallocated|Pending|Power_On&quot;</span>
+<span class="hljs-built_in">cat</span> /proc/mdstat
+<span class="hljs-built_in">sudo</span> mdadm --detail /dev/md0</code></pre></div>
+<h2 id="replace-a-failed-raid-member">Replace a failed RAID member</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="sudo mdadm /dev/md0 --fail /dev/sdb
+sudo mdadm /dev/md0 --remove /dev/sdb
+sudo mdadm /dev/md0 --add /dev/sdc
+watch cat /proc/mdstat" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-built_in">sudo</span> mdadm /dev/md0 --fail /dev/sdb
+<span class="hljs-built_in">sudo</span> mdadm /dev/md0 --remove /dev/sdb
+<span class="hljs-built_in">sudo</span> mdadm /dev/md0 --add /dev/sdc
+watch <span class="hljs-built_in">cat</span> /proc/mdstat</code></pre></div>
+<h2 id="network-and-bonding">Network and bonding</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="cat /proc/net/bonding/bond0
+ip -s link show bond0
+ethtool eno1 | grep -E &quot;Speed|Link detected&quot;
+dmesg | grep -i bond" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-built_in">cat</span> /proc/net/bonding/bond0
+ip -s <span class="hljs-built_in">link</span> show bond0
+ethtool eno1 | grep -E <span class="hljs-string">&quot;Speed|Link detected&quot;</span>
+dmesg | grep -i bond</code></pre></div>
+<h2 id="pxe-problems">PXE problems</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="sudo journalctl -u dnsmasq -f
+grep -E &quot;dhcp-boot|next-server|filename&quot; /etc/dnsmasq.conf
+sudo tcpdump -ni eth0 port 67 or port 68 or port 69" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-built_in">sudo</span> journalctl -u dnsmasq -f
+grep -E <span class="hljs-string">&quot;dhcp-boot|next-server|filename&quot;</span> /etc/dnsmasq.conf
+<span class="hljs-built_in">sudo</span> tcpdump -ni eth0 port 67 or port 68 or port 69</code></pre></div>
+<h2 id="a-sick-server-checklist">A sick server checklist</h2>
+<ol>
+<li>Drain the workloads.</li>
+<li>Read the BMC event log, SMART, kernel log and switch counters.</li>
+<li>Decide which part is at fault. Do not swap parts at random.</li>
+<li>Change one thing, test, record it by asset tag.</li>
+</ol>
+<h2 id="quick-inventory">Quick inventory</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="lscpu | head -5
+free -h
+lsblk -o NAME,SIZE,MODEL,SERIAL
+dmidecode -s system-serial-number
+ip -br link" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">lscpu | <span class="hljs-built_in">head</span> -5
+free -h
+lsblk -o NAME,SIZE,MODEL,SERIAL
+dmidecode -s system-serial-number
+ip -br <span class="hljs-built_in">link</span></code></pre></div>
+<h2 id="cautions">Cautions</h2>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>ipmitool chassis power off</code> and <code>power cycle</code> cut power with no clean shutdown. Drain the workload first, and check you have the right BMC address.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Never run <code>mdadm --zero-superblock</code> or <code>--create</code> on a disk that still holds data. Check <code>mdadm --detail</code> and <code>lsblk</code> first.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>A BMC on a shared or routable network is an entry point to the machine. Keep it on an isolated management network and change default passwords.</p>
+</aside>
+<aside class="callout callout-caution"><div class="callout-title">Caution</div><p>Replacing a failed disk starts a rebuild that reads every other disk. Confirm the backup works before you pull the disk.</p>
+</aside>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://www.smartmontools.org/wiki/TocDoc" target="_blank" rel="noopener">smartmontools documentation</a><span class="host">www.smartmontools.org</span></li><li><a href="https://raid.wiki.kernel.org/" target="_blank" rel="noopener">Linux RAID wiki (kernel.org)</a><span class="host">raid.wiki.kernel.org</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="../#/interview">Interview questions</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=dfe017aa"></script>
+<script src="../assets/counter.js?v=dfe017aa"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+(function(){var ps=document.getElementById('print-style');if(!ps)return;ps.value=document.documentElement.getAttribute('data-a-print')||'light';ps.addEventListener('change',function(){if(window.MargaA11y){MargaA11y.set('print',ps.value);}else{document.documentElement.setAttribute('data-a-print',ps.value);}});})();
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

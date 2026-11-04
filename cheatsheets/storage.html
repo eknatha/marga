@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>"Storage and filesystems" cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content=""Disks, filesystems, LVM, RAID, network storage and the commands that explain a full, slow or missing volume."">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/storage.html">
+<meta property="og:title" content=""Storage and filesystems" cheat sheet">
+<meta property="og:description" content=""Disks, filesystems, LVM, RAID, network storage and the commands that explain a full, slow or missing volume."">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/storage.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=dfe017aa">
+<script src="../assets/a11y.js?v=dfe017aa"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>"Storage and filesystems" cheat sheet</h1>
+    <p class="lede">"Disks, filesystems, LVM, RAID, network storage and the commands that explain a full, slow or missing volume."</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button><label class="print-style no-print"><span>Print style</span><select id="print-style" aria-label="Print and Save as PDF style"><option value="light">Light</option><option value="dark">Dark</option><option value="large">Large type</option></select></label></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="see-what-is-there">See what is there</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="lsblk -f
+blkid
+df -hT
+df -i
+findmnt
+mount | column -t
+du -xh --max-depth=1 /var | sort -h | tail" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">lsblk -f
+blkid
+<span class="hljs-built_in">df</span> -hT
+<span class="hljs-built_in">df</span> -i
+findmnt
+mount | column -t
+<span class="hljs-built_in">du</span> -xh --max-depth=1 /var | <span class="hljs-built_in">sort</span> -h | <span class="hljs-built_in">tail</span></code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p><code>df</code> and <code>du</code> can disagree. A deleted file that a process still holds open uses space until it closes.</p>
+</aside>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="lsof +L1" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">lsof +L1</code></pre></div>
+<h2 id="filesystems">Filesystems</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="mkfs.ext4 /dev/sdb1
+mkfs.xfs /dev/sdb1
+mount /dev/sdb1 /data
+umount /data
+tune2fs -l /dev/sdb1 | head
+xfs_info /data
+fsck -n /dev/sdb1     # check, no changes" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">mkfs.ext4 /dev/sdb1
+mkfs.xfs /dev/sdb1
+mount /dev/sdb1 /data
+umount /data
+tune2fs -l /dev/sdb1 | <span class="hljs-built_in">head</span>
+xfs_info /data
+fsck -n /dev/sdb1     <span class="hljs-comment"># check, no changes</span></code></pre></div>
+<p>fstab line:</p>
+<div class="code" data-lang="text"><button class="copy" type="button" data-copy="UUID=7c1d...  /data  xfs  defaults,nofail  0  0" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">UUID=7c1d...  /data  xfs  defaults,nofail  0  0</code></pre></div>
+<p>Test with <code>mount -a</code> before you reboot.</p>
+<h2 id="lvm">LVM</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="pvs; vgs; lvs
+pvcreate /dev/sdc
+vgextend vg0 /dev/sdc
+lvextend -r -L +20G /dev/vg0/data   # -r grows the filesystem too
+resize2fs /dev/vg0/data             # ext4
+xfs_growfs /data                    # XFS, takes the mount point" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">pvs; vgs; lvs
+pvcreate /dev/sdc
+vgextend vg0 /dev/sdc
+lvextend -r -L +20G /dev/vg0/data   <span class="hljs-comment"># -r grows the filesystem too</span>
+resize2fs /dev/vg0/data             <span class="hljs-comment"># ext4</span>
+xfs_growfs /data                    <span class="hljs-comment"># XFS, takes the mount point</span></code></pre></div>
+<p>XFS can grow but not shrink.</p>
+<h2 id="raid">RAID</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="cat /proc/mdstat
+mdadm --detail /dev/md0
+mdadm /dev/md0 --add /dev/sdd1" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-built_in">cat</span> /proc/mdstat
+mdadm --detail /dev/md0
+mdadm /dev/md0 --add /dev/sdd1</code></pre></div>
+<h2 id="performance">Performance</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="iostat -x 1
+iotop -o
+vmstat 1" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">iostat -x 1
+iotop -o
+vmstat 1</code></pre></div>
+<p>Watch <code>%util</code>, <code>await</code> and queue size, not only throughput.</p>
+<h2 id="network-storage">Network storage</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="showmount -e server
+mount -t nfs4 server:/export /mnt
+nfsstat -m
+iscsiadm -m session
+ceph status" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">showmount -e server
+mount -t nfs4 server:/export /mnt
+nfsstat -m
+iscsiadm -m session
+ceph status</code></pre></div>
+<h2 id="quick-diagnosis">Quick diagnosis</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Symptom</th>
+<th>First look</th>
+</tr>
+</thead><tbody><tr>
+<td>Full but nothing to delete</td>
+<td><code>df -i</code>, <code>lsof +L1</code></td>
+</tr>
+<tr>
+<td>Read-only filesystem</td>
+<td><code>dmesg</code>, <code>mount</code>, disk errors</td>
+</tr>
+<tr>
+<td>Slow</td>
+<td><code>iostat -x</code>, queue and latency</td>
+</tr>
+<tr>
+<td>Boot stops after mount change</td>
+<td><code>journalctl -xb</code>, fstab UUID, <code>nofail</code></td>
+</tr>
+</tbody></table></div>
+<h2 id="cautions">Cautions</h2>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p><code>mkfs</code> and <code>wipefs</code> destroy the data on a device. Check the name with <code>lsblk</code> and <code>blkid</code> every time.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Shrinking a filesystem or logical volume in the wrong order loses data. XFS cannot shrink at all.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>A wrong line in /etc/fstab can stop boot. Use UUIDs and <code>nofail</code>, and run <code>mount -a</code> before rebooting.</p>
+</aside>
+<aside class="callout callout-caution"><div class="callout-title">Caution</div><p>RAID is not a backup. A deleted file is deleted on every disk.</p>
+</aside>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://docs.kernel.org/filesystems/ext4/index.html" target="_blank" rel="noopener">ext4 documentation</a><span class="host">docs.kernel.org</span></li><li><a href="https://sourceware.org/lvm2/" target="_blank" rel="noopener">LVM2 resource page</a><span class="host">sourceware.org</span></li><li><a href="https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/managing_file_systems/" target="_blank" rel="noopener">Red Hat: Managing file systems</a><span class="host">docs.redhat.com</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="../#/interview">Interview questions</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=dfe017aa"></script>
+<script src="../assets/counter.js?v=dfe017aa"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+(function(){var ps=document.getElementById('print-style');if(!ps)return;ps.value=document.documentElement.getAttribute('data-a-print')||'light';ps.addEventListener('change',function(){if(window.MargaA11y){MargaA11y.set('print',ps.value);}else{document.documentElement.setAttribute('data-a-print',ps.value);}});})();
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

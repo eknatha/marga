@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>"Service mesh and Kubernetes networking" cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content=""Check Services and endpoints, DNS, network policy, sidecars, sync and the response flags in proxy logs."">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/service-mesh.html">
+<meta property="og:title" content=""Service mesh and Kubernetes networking" cheat sheet">
+<meta property="og:description" content=""Check Services and endpoints, DNS, network policy, sidecars, sync and the response flags in proxy logs."">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/service-mesh.html">
+<meta name="theme-color" content="#0F2547">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=dfe017aa">
+<script src="../assets/a11y.js?v=dfe017aa"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>"Service mesh and Kubernetes networking" cheat sheet</h1>
+    <p class="lede">"Check Services and endpoints, DNS, network policy, sidecars, sync and the response flags in proxy logs."</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button><label class="print-style no-print"><span>Print style</span><select id="print-style" aria-label="Print and Save as PDF style"><option value="light">Light</option><option value="dark">Dark</option><option value="large">Large type</option></select></label></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="service-and-endpoints">Service and endpoints</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl get svc,endpoints web -n shop
+kubectl get svc web -n shop -o jsonpath='{.spec.selector}'
+kubectl get pods -n shop --show-labels
+kubectl get endpointslices -n shop" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubectl get svc,endpoints web -n shop
+kubectl get svc web -n shop -o jsonpath=<span class="hljs-string">&#x27;{.spec.selector}&#x27;</span>
+kubectl get pods -n shop --show-labels
+kubectl get endpointslices -n shop</code></pre></div>
+<h2 id="dns-from-a-pod">DNS from a pod</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl exec -n shop deploy/web -- cat /etc/resolv.conf
+kubectl exec -n shop deploy/web -- nslookup db.shop
+kubectl logs -n kube-system -l k8s-app=kube-dns --tail=20" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubectl <span class="hljs-built_in">exec</span> -n shop deploy/web -- <span class="hljs-built_in">cat</span> /etc/resolv.conf
+kubectl <span class="hljs-built_in">exec</span> -n shop deploy/web -- nslookup db.shop
+kubectl logs -n kube-system -l k8s-app=kube-dns --<span class="hljs-built_in">tail</span>=20</code></pre></div>
+<h2 id="network-policy">Network policy</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl get networkpolicy -n shop
+kubectl describe networkpolicy default-deny -n shop
+kubectl exec -n shop deploy/web -- curl -s -m 2 http://db:5432" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubectl get networkpolicy -n shop
+kubectl describe networkpolicy default-deny -n shop
+kubectl <span class="hljs-built_in">exec</span> -n shop deploy/web -- curl -s -m 2 http://db:5432</code></pre></div>
+<aside class="callout callout-tip"><div class="callout-title">Tip</div><p>A timeout where you expect a refusal often means a policy is dropping packets.</p>
+</aside>
+<h2 id="mesh-health">Mesh health</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="istioctl version
+istioctl proxy-status
+istioctl analyze -n shop
+kubectl get pods -n shop
+kubectl label namespace shop istio-injection=enabled
+kubectl rollout restart deployment -n shop" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">istioctl version
+istioctl proxy-status
+istioctl analyze -n shop
+kubectl get pods -n shop
+kubectl label namespace shop istio-injection=enabled
+kubectl rollout restart deployment -n shop</code></pre></div>
+<h2 id="proxy-logs-and-flags">Proxy logs and flags</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kubectl logs web-7d -c istio-proxy --tail=20" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kubectl logs web-7d -c istio-proxy --<span class="hljs-built_in">tail</span>=20</code></pre></div>
+<div class="table-wrap"><table><thead><tr>
+<th>Flag</th>
+<th>Meaning</th>
+</tr>
+</thead><tbody><tr>
+<td>UF</td>
+<td>Upstream connection failure</td>
+</tr>
+<tr>
+<td>UH</td>
+<td>No healthy upstream</td>
+</tr>
+<tr>
+<td>NR</td>
+<td>No route configured</td>
+</tr>
+<tr>
+<td>UC</td>
+<td>Upstream connection terminated</td>
+</tr>
+<tr>
+<td>URX</td>
+<td>Retry limit exceeded</td>
+</tr>
+</tbody></table></div>
+<h2 id="method-for-a-failing-call">Method for a failing call</h2>
+<ol>
+<li>Find the first failing hop.</li>
+<li><code>istioctl proxy-status</code>: is the config SYNCED?</li>
+<li><code>istioctl analyze</code>: is the config valid?</li>
+<li>Read the response flag.</li>
+<li>Check endpoints, then policies (PeerAuthentication, AuthorizationPolicy).</li>
+<li>Call the pod IP directly to take the mesh out of the picture.</li>
+</ol>
+<h2 id="quick-mesh-checks">Quick mesh checks</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="istioctl analyze -n shop
+istioctl proxy-status
+istioctl proxy-config clusters POD.shop | head
+kubectl get peerauthentication,authorizationpolicy -A" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">istioctl analyze -n shop
+istioctl proxy-status
+istioctl proxy-config clusters POD.shop | <span class="hljs-built_in">head</span>
+kubectl get peerauthentication,authorizationpolicy -A</code></pre></div>
+<h2 id="cautions">Cautions</h2>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p>Switching a namespace to STRICT mTLS rejects every client without a sidecar. Use PERMISSIVE first and check what is still plaintext.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Retries at several layers multiply load. Keep one layer of retries and set a budget, or a slowdown becomes an outage.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Weights in a VirtualService must add up to 100, and every subset must exist in a DestinationRule, or requests fail with 503.</p>
+</aside>
+<aside class="callout callout-caution"><div class="callout-title">Caution</div><p>A default-deny network policy blocks DNS too. Allow egress to kube-dns or every lookup will fail.</p>
+</aside>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://istio.io/latest/docs/ops/diagnostic-tools/" target="_blank" rel="noopener">Istio: Diagnostic tools</a><span class="host">istio.io</span></li><li><a href="https://kubernetes.io/docs/concepts/services-networking/network-policies/" target="_blank" rel="noopener">Kubernetes: Network Policies</a><span class="host">kubernetes.io</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="../#/interview">Interview questions</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=dfe017aa"></script>
+<script src="../assets/counter.js?v=dfe017aa"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+(function(){var ps=document.getElementById('print-style');if(!ps)return;ps.value=document.documentElement.getAttribute('data-a-print')||'light';ps.addEventListener('change',function(){if(window.MargaA11y){MargaA11y.set('print',ps.value);}else{document.documentElement.setAttribute('data-a-print',ps.value);}});})();
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>
