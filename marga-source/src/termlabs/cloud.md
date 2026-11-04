@@ -6,6 +6,7 @@ minutes: 10
 lesson: cloud/identity-and-access
 engine: Simulated AWS command line and account
 summary: An upload to the reports bucket is refused because the shell is using the wrong AWS profile. Find out who you are and use the right profile.
+vary: [{"shop-reports": "shop-exports", "report.csv": "totals.csv"}, {"shop-reports": "shop-ledgers", "report.csv": "daily.csv"}]
 @@ story
 You are copying the nightly report to the shop-reports bucket. The command fails with Access Denied, yet your teammate ran the same command an hour ago and it worked. Nothing is wrong with the bucket. Something is wrong with who you are when you run the command.
 @@ goals
@@ -55,6 +56,7 @@ minutes: 12
 lesson: cloud/object-storage-and-data-lifecycle
 engine: Simulated AWS command line and account
 summary: A customer-exports bucket is readable by anyone. Close it with the ACL and the public access block, and keep the data.
+vary: [{"customer-exports": "client-archives"}, {"customer-exports": "partner-feeds"}]
 @@ story
 A security scan says the bucket customer-exports is public. It holds files that must never be readable without a login. The team still needs the files, so deleting the bucket is not an answer.
 @@ goals
@@ -107,6 +109,7 @@ minutes: 8
 lesson: cloud/compute-and-storage
 engine: Simulated AWS command line and account
 summary: Nothing answers on the web server. Check the instance state and start it.
+vary: [{"i-0aa1": "i-0ab7", "web-1": "api-1"}, {"i-0aa1": "i-0ac9", "web-1": "shop-1"}]
 @@ story
 The shop site is down. The load balancer says the only target is unhealthy. Before you look at logs, check whether the machine is even running.
 @@ goals
@@ -150,6 +153,7 @@ minutes: 12
 lesson: cloud/virtual-networks
 engine: Simulated AWS command line and account
 summary: The bastion host runs, but SSH from the office never connects. Open port 22 to the office address only.
+vary: [{"203.0.113.7": "198.51.100.23", "i-0cc3": "i-0cd4"}, {"203.0.113.7": "192.0.2.45", "i-0cc3": "i-0ce5"}]
 @@ story
 The bastion instance is running, but ssh from the office times out. A timeout (not a refusal) points at a firewall dropping packets. The office has the fixed address 203.0.113.7. Opening port 22 to the whole internet would pass a quick test and fail every audit.
 @@ goals
@@ -745,6 +749,7 @@ minutes: 12
 lesson: cloud/virtual-networks
 engine: Simulated AWS command line and account
 summary: The MySQL port on the database security group allows the whole internet. Close it and allow the app subnet only.
+vary: [{"10.0.1.0/24": "10.0.5.0/24"}, {"10.0.1.0/24": "10.0.7.0/24", "db-1": "db-2"}]
 @@ story
 A scan found that port 3306 on the database accepts connections from 0.0.0.0/0. The shop app lives in the subnet 10.0.1.0/24 and must keep working. SSH from the admin network 10.0.0.0/16 must also stay.
 @@ goals
@@ -799,6 +804,7 @@ minutes: 10
 lesson: cloud/managed-services-and-cost
 engine: Simulated AWS command line and account
 summary: Dev servers run all night and cost money. Stop the running ones tagged env=dev and leave production alone.
+vary: [{"web-dev": "app-dev", "batch-dev": "etl-dev", "i-0i01": "i-0j11", "i-0i02": "i-0j12"}]
 @@ story
 Finance asked to switch off the development servers outside working hours. Machines are told apart by the tag env. Stop only the running machines with env=dev. One dev machine is already stopped. Do not touch env=prod.
 @@ goals
@@ -850,6 +856,7 @@ minutes: 8
 lesson: cloud/object-storage-and-data-lifecycle
 engine: Simulated AWS command line and account
 summary: An upload fails with NoSuchBucket. The name is one letter off. Find the real bucket and upload there.
+vary: [{"shop-backups-prod": "shop-archives-prod", "shop-backup-prod": "shop-archive-prod", "dump.sql": "orders.sql"}]
 @@ story
 You try to upload the database dump to s3://shop-backup-prod/ and get NoSuchBucket. Do not create a bucket with that name. Somebody already made the right one, and a new bucket would split your backups in two places.
 @@ goals
@@ -898,6 +905,7 @@ minutes: 15
 lesson: cloud/security-and-governance
 engine: Simulated AWS command line and account
 summary: The report-job role carries AdministratorAccess. Give it only the policy it needs and keep what it already uses.
+vary: [{"report-job": "billing-job", "ConfigBucketRead": "SettingsRead"}]
 @@ story
 The role report-job runs a nightly report. Someone attached AdministratorAccess to make an error go away. The job only needs to read the config bucket and to keep writing its logs. Replace the broad policy with the right narrow one without breaking the logging.
 @@ goals
@@ -952,6 +960,7 @@ minutes: 8
 lesson: cloud/object-storage-and-data-lifecycle
 engine: Simulated AWS command line and account
 summary: Two temporary files fill the uploads bucket. Delete only the files whose names start with tmp- and keep the rest.
+vary: [{"shop-uploads": "shop-media", "keep-orders.csv": "keep-invoices.csv", "customer-7.png": "customer-9.png"}]
 @@ story
 The shop-uploads bucket has two leftover files from a failed import. Their names start with tmp-. Real customer files sit next to them. Delete the two temporary files and nothing else.
 @@ goals
@@ -1004,6 +1013,7 @@ minutes: 12
 lesson: cloud/virtual-networks
 engine: Simulated Azure command line and subscription
 summary: The network security group allows SSH from anywhere. Replace that rule with one that allows only the office address.
+vary: [{"198.51.100.4": "203.0.113.88", "rg-bastion": "rg-jump", "nsg-bastion": "nsg-jump"}]
 @@ story
 A review found that nsg-bastion lets anyone on the internet try SSH. The office has the fixed address 198.51.100.4. Replace the open rule with a rule for that address only. Keep the final deny rule.
 @@ goals
@@ -1058,6 +1068,7 @@ minutes: 8
 lesson: cloud/compute-and-storage
 engine: Simulated Azure command line and subscription
 summary: Two staging VMs were deallocated for the weekend. Start them both and leave the database VM as it is.
+vary: [{"rg-staging": "rg-qa", "web-1": "web-2", "api-1": "api-2"}]
 @@ story
 It is Monday. The staging environment in rg-staging is down because web-1 and api-1 are deallocated. The database VM db-1 is running and must not be restarted.
 @@ goals
@@ -1110,6 +1121,7 @@ minutes: 12
 lesson: cloud/identity-and-access
 engine: Simulated Azure command line and subscription
 summary: A contractor needs to look at the app resources. Give Reader on the resource group rg-app only, not on the subscription.
+vary: [{"dev@example.com": "temp@example.com", "rg-app": "rg-portal"}]
 @@ story
 dev@example.com is a contractor who must see the resources in rg-app, but not change them and not see anything else in the subscription. Assign the built-in Reader role at the scope of that resource group.
 @@ goals
@@ -1144,4 +1156,638 @@ A role assignment has three parts: who, which role, and where. The where, called
 @@ solution
 az group show -n rg-app --query id -o tsv
 az role assignment create --assignee dev@example.com --role Reader --scope /subscriptions/11111111-2222-3333-4444-555555555555/resourceGroups/rg-app
+
+
+## Remove the contractor's access
+id: cl-aws-revoke-contractor
+module: cloud
+level: Intermediate
+minutes: 10
+lesson: cloud/security-and-governance
+engine: Simulated AWS command line and account
+summary: A contractor finished last week but their office address can still reach SSH. Remove that one rule and keep every other rule.
+vary: [{"198.51.100.50": "203.0.113.77", "sg-app": "sg-portal"}]
+@@ story
+The contract with an outside team ended. Their fixed address 198.51.100.50 can still open SSH on sg-app. Remove exactly that rule. The public web rule and the admin network rule must stay.
+@@ goals
+- Read the rules of sg-app.
+- Remove the SSH rule for 198.51.100.50/32.
+- Keep the public HTTPS rule and the admin network rule.
+@@ hints
+- `aws ec2 describe-security-groups --group-ids sg-app` lists every rule with its source.
+- `aws ec2 revoke-security-group-ingress --group-id sg-app --protocol tcp --port 22 --cidr 198.51.100.50/32`
+- Revoke needs the same protocol, port and source as the rule. A different source removes a different rule.
+- Read the rules again afterwards.
+@@ world
+{"cloud": {"aws": {"instances": [{"id": "i-0m01", "state": "running", "tags": {"Name": "app-1"}, "sgs": ["sg-app"]}], "sgs": [{"id": "sg-app", "name": "app", "ingress": [{"proto": "tcp", "from": 443, "to": 443, "cidr": "0.0.0.0/0"}, {"proto": "tcp", "from": 22, "to": 22, "cidr": "10.0.0.0/16"}, {"proto": "tcp", "from": 22, "to": 22, "cidr": "198.51.100.50/32"}]}]}}}
+@@ checks
+[
+ {
+  "t": "cmd",
+  "run": "aws ec2 describe-security-groups --group-ids sg-app --query \"SecurityGroups[].IpPermissions[].IpRanges[].CidrIp\" --output text",
+  "code": 0,
+  "label": "the contractor address is gone",
+  "notOut": "198\\.51\\.100\\.50"
+ },
+ {
+  "t": "cmd",
+  "run": "aws ec2 describe-security-groups --group-ids sg-app --query \"SecurityGroups[].IpPermissions[].IpRanges[].CidrIp\" --output text",
+  "code": 0,
+  "label": "the admin network rule is kept",
+  "out": "10\\.0\\.0\\.0/16"
+ },
+ {
+  "t": "cmd",
+  "run": "aws ec2 describe-security-groups --group-ids sg-app --query \"SecurityGroups[].IpPermissions[].IpRanges[].CidrIp\" --output text",
+  "code": 0,
+  "label": "the public HTTPS rule is kept",
+  "out": "0\\.0\\.0\\.0/0"
+ }
+]
+@@ explain
+Access that was given for a job should end with the job. Rules are removed by naming exactly what was added, so read the list first and revoke one rule at a time. A tag or a note on each rule saying who it was for would have made this a one-line task.
+@@ solution
+aws ec2 describe-security-groups --group-ids sg-app
+aws ec2 revoke-security-group-ingress --group-id sg-app --protocol tcp --port 22 --cidr 198.51.100.50/32
+
+
+## Which server is flooding the network
+id: cl-aws-find-ip-stop
+module: cloud
+level: Intermediate
+minutes: 12
+lesson: cloud/compute-and-storage
+engine: Simulated AWS command line and account
+summary: Monitoring names an address, not a server. Find the instance behind it and stop only that one.
+vary: [{"10.0.2.37": "10.0.2.91", "batch-x": "report-x", "i-0k02": "i-0k09"}]
+@@ story
+The network team reports that the host 10.0.2.37 sends a flood of traffic. They gave you the address only. Find the instance that owns it and stop it. The other two servers must keep running.
+@@ goals
+- Find which instance has the private address 10.0.2.37.
+- Stop that instance.
+- Leave the other instances running.
+@@ hints
+- `aws ec2 describe-instances --query 'Reservations[].Instances[].[InstanceId,PrivateIpAddress,State.Name]' --output text` prints one line per instance.
+- Match the address to an id before you stop anything.
+- `aws ec2 stop-instances --instance-ids ID`
+@@ world
+{"cloud": {"aws": {"instances": [{"id": "i-0k01", "state": "running", "ip": "10.0.2.15", "tags": {"Name": "web-a"}}, {"id": "i-0k02", "state": "running", "ip": "10.0.2.37", "tags": {"Name": "batch-x"}}, {"id": "i-0k03", "state": "running", "ip": "10.0.2.52", "tags": {"Name": "web-b"}}]}}}
+@@ checks
+[
+ {
+  "t": "cmd",
+  "run": "aws ec2 describe-instances --instance-ids i-0k02 --query \"Reservations[].Instances[].State.Name\" --output text",
+  "code": 0,
+  "label": "the instance with that address is stopped",
+  "out": "stopped"
+ },
+ {
+  "t": "cmd",
+  "run": "aws ec2 describe-instances --instance-ids i-0k01 --query \"Reservations[].Instances[].State.Name\" --output text",
+  "code": 0,
+  "label": "web-a keeps running",
+  "out": "running"
+ },
+ {
+  "t": "cmd",
+  "run": "aws ec2 describe-instances --instance-ids i-0k03 --query \"Reservations[].Instances[].State.Name\" --output text",
+  "code": 0,
+  "label": "web-b keeps running",
+  "out": "running"
+ }
+]
+@@ explain
+Alerts and logs usually give an address, and the cloud console shows names and ids. The skill is translating between them with a filtered list. Always map the address to an id and read the line twice before you stop anything, because a wrong stop is a second outage.
+@@ solution
+aws ec2 describe-instances --query 'Reservations[].Instances[].[InstanceId,PrivateIpAddress,State.Name]' --output text
+aws ec2 stop-instances --instance-ids i-0k02
+
+
+## Create a bucket named after the account
+id: cl-aws-account-bucket
+module: cloud
+level: Beginner
+minutes: 8
+lesson: cloud/object-storage-and-data-lifecycle
+engine: Simulated AWS command line and account
+summary: The team names log buckets logs- followed by the account number. Find the number and create the bucket.
+vary: [{"123456789012": "210987654321"}]
+@@ story
+Bucket names are shared by every AWS customer, so your team adds the account number to make log bucket names unique: logs-ACCOUNTID. You do not remember the account number. Ask the command line who you are, then create the bucket.
+@@ goals
+- Find the account number.
+- Create a bucket named logs- followed by that number.
+- Leave the existing bucket alone.
+@@ hints
+- `aws sts get-caller-identity` shows Account, UserId and Arn.
+- `aws sts get-caller-identity --query Account --output text` prints only the number.
+- `aws s3 mb s3://logs-ACCOUNTID` creates a bucket.
+@@ world
+{"cloud": {"aws": {"account": "123456789012", "buckets": {"shop-data": {"objects": {"a.txt": "x"}}}}}}
+@@ checks
+[
+ {
+  "t": "cmd",
+  "run": "aws s3 ls",
+  "code": 0,
+  "label": "the log bucket exists",
+  "out": "logs-123456789012"
+ },
+ {
+  "t": "cmd",
+  "run": "aws s3 ls",
+  "code": 0,
+  "label": "the existing bucket is untouched",
+  "out": "shop-data"
+ }
+]
+@@ explain
+Names that must be globally unique are often built from something unique to you, such as the account number. sts get-caller-identity is the first command to run in any unfamiliar shell, because every later command runs as that identity in that account.
+@@ solution
+aws sts get-caller-identity --query Account --output text
+aws s3 mb s3://logs-123456789012
+
+
+## Upload this month's files to the right folder
+id: cl-aws-upload-prefix
+module: cloud
+level: Beginner
+minutes: 8
+lesson: cloud/object-storage-and-data-lifecycle
+engine: Simulated AWS command line and account
+summary: Two reports must go into the 2026/11/ folder of the reports bucket. Object storage has no folders, only key prefixes.
+vary: [{"shop-reports": "shop-finance", "sales.csv": "orders.csv", "refunds.csv": "returns.csv"}]
+@@ story
+Finance wants sales.csv and refunds.csv from this month in the shop-reports bucket under 2026/11/. October's files are already under 2026/10/. Upload both files with the right key prefix and leave the old ones alone.
+@@ goals
+- Upload sales.csv to s3://shop-reports/2026/11/.
+- Upload refunds.csv to the same prefix.
+- Do not change the October files.
+@@ hints
+- `aws s3 ls s3://shop-reports/` shows what is already there.
+- `aws s3 cp sales.csv s3://shop-reports/2026/11/` ends with a slash, so the file name is added to the key.
+- Run the same command for the second file.
+@@ file /home/user/sales.csv
+m,t
+11,5200
+
+@@ file /home/user/refunds.csv
+m,t
+11,95
+
+@@ world
+{"cloud": {"aws": {"buckets": {"shop-reports": {"objects": {"2026/10/sales.csv": "m,t\n10,4800\n", "2026/10/refunds.csv": "m,t\n10,120\n"}}}}}}
+@@ checks
+[
+ {
+  "t": "cmd",
+  "run": "aws s3 ls s3://shop-reports/2026/11/",
+  "code": 0,
+  "label": "sales.csv is in the November folder",
+  "out": "sales\\.csv"
+ },
+ {
+  "t": "cmd",
+  "run": "aws s3 ls s3://shop-reports/2026/11/",
+  "code": 0,
+  "label": "refunds.csv is in the November folder",
+  "out": "refunds\\.csv"
+ },
+ {
+  "t": "cmd",
+  "run": "aws s3 ls s3://shop-reports/2026/10/",
+  "code": 0,
+  "label": "October is untouched",
+  "out": "2026/10/sales\\.csv"
+ }
+]
+@@ explain
+S3 has no real folders. A folder is just a shared beginning of the object key, called a prefix. A trailing slash on the destination tells the command to append the file name to it. Listing with the prefix shows what lives under it.
+@@ solution
+aws s3 cp sales.csv s3://shop-reports/2026/11/
+aws s3 cp refunds.csv s3://shop-reports/2026/11/
+
+
+## SSH is open to the world on two groups
+id: cl-aws-sg-ssh-everywhere
+module: cloud
+level: Advanced
+minutes: 15
+lesson: cloud/security-and-governance
+engine: Simulated AWS command line and account
+summary: Two security groups accept SSH from anywhere. Close that on both, allow the management network instead, and keep the web and batch ports.
+@@ story
+A review found SSH open to 0.0.0.0/0 on sg-web and on sg-batch. Remove those two rules. Admins connect from the management network 10.0.0.0/16, so allow SSH from there on both groups. Port 443 on sg-web must stay public and port 8080 on sg-batch must stay for the internal network.
+@@ goals
+- List the rules of both security groups.
+- Remove SSH from 0.0.0.0/0 on sg-web and sg-batch.
+- Allow SSH from 10.0.0.0/16 on both.
+- Keep 443 public on sg-web and 8080 on sg-batch.
+@@ hints
+- `aws ec2 describe-security-groups --group-ids sg-web sg-batch` shows both.
+- `aws ec2 revoke-security-group-ingress --group-id sg-web --protocol tcp --port 22 --cidr 0.0.0.0/0`
+- `aws ec2 authorize-security-group-ingress --group-id sg-web --protocol tcp --port 22 --cidr 10.0.0.0/16`
+- Repeat both commands for sg-batch. Port 443 also uses 0.0.0.0/0, so check the port in every command you run.
+@@ world
+{"cloud": {"aws": {"sgs": [{"id": "sg-web", "name": "web", "ingress": [{"proto": "tcp", "from": 443, "to": 443, "cidr": "0.0.0.0/0"}, {"proto": "tcp", "from": 22, "to": 22, "cidr": "0.0.0.0/0"}]}, {"id": "sg-batch", "name": "batch", "ingress": [{"proto": "tcp", "from": 8080, "to": 8080, "cidr": "10.0.0.0/16"}, {"proto": "tcp", "from": 22, "to": 22, "cidr": "0.0.0.0/0"}]}]}}}
+@@ checks
+[
+ {
+  "t": "cmd",
+  "run": "aws ec2 describe-security-groups --group-ids sg-web --query \"SecurityGroups[].IpPermissions[]|[?FromPort=='22'].IpRanges[].CidrIp\" --output text",
+  "code": 0,
+  "label": "sg-web allows SSH only from the management network",
+  "out": "10\\.0\\.0\\.0/16",
+  "notOut": "0\\.0\\.0\\.0/0"
+ },
+ {
+  "t": "cmd",
+  "run": "aws ec2 describe-security-groups --group-ids sg-batch --query \"SecurityGroups[].IpPermissions[]|[?FromPort=='22'].IpRanges[].CidrIp\" --output text",
+  "code": 0,
+  "label": "sg-batch allows SSH only from the management network",
+  "out": "10\\.0\\.0\\.0/16",
+  "notOut": "0\\.0\\.0\\.0/0"
+ },
+ {
+  "t": "cmd",
+  "run": "aws ec2 describe-security-groups --group-ids sg-web --query \"SecurityGroups[].IpPermissions[]|[?FromPort=='443'].IpRanges[].CidrIp\" --output text",
+  "code": 0,
+  "label": "HTTPS stays public on sg-web",
+  "out": "0\\.0\\.0\\.0/0"
+ },
+ {
+  "t": "cmd",
+  "run": "aws ec2 describe-security-groups --group-ids sg-batch --query \"SecurityGroups[].IpPermissions[]|[?FromPort=='8080'].IpRanges[].CidrIp\" --output text",
+  "code": 0,
+  "label": "port 8080 stays on sg-batch",
+  "out": "10\\.0\\.0\\.0/16"
+ }
+]
+@@ explain
+The same source address can appear on very different rules, so a fix has to name the port as well as the source. Doing the add before the remove keeps administrators connected during the change. Always list the rules again at the end and check each port, not only the overall picture.
+@@ solution
+aws ec2 authorize-security-group-ingress --group-id sg-web --protocol tcp --port 22 --cidr 10.0.0.0/16
+aws ec2 revoke-security-group-ingress --group-id sg-web --protocol tcp --port 22 --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress --group-id sg-batch --protocol tcp --port 22 --cidr 10.0.0.0/16
+aws ec2 revoke-security-group-ingress --group-id sg-batch --protocol tcp --port 22 --cidr 0.0.0.0/0
+
+
+## Delete only the retired VMs
+id: cl-az-vm-delete-decom
+module: cloud
+level: Intermediate
+minutes: 12
+lesson: cloud/managed-services-and-cost
+engine: Simulated Azure command line and subscription
+summary: Two VMs are tagged for decommission. Delete exactly those, keep the resource group and the live VM.
+vary: [{"rg-legacy": "rg-old", "old-app": "retired-app", "old-db": "retired-db", "keep-app": "live-app"}]
+@@ story
+The legacy resource group rg-legacy holds two VMs tagged decommission=true and one live VM. Delete the two tagged ones. Do not delete the resource group, because the live VM and its settings are in it.
+@@ goals
+- List the VMs in rg-legacy with their decommission tag.
+- Delete every VM tagged decommission=true.
+- Keep the live VM and the resource group.
+@@ hints
+- `az vm list -g rg-legacy --query "[].[name,tags.decommission]" -o tsv` shows each VM and its tag.
+- `az vm delete -g rg-legacy -n NAME --yes` deletes one VM.
+- Do not delete the group. Deleting a group deletes everything in it.
+@@ world
+{"cloud": {"az": {"groups": [{"name": "rg-legacy", "location": "westeurope"}], "vms": [{"name": "old-app", "rg": "rg-legacy", "state": "stopped", "tags": {"decommission": "true"}}, {"name": "old-db", "rg": "rg-legacy", "state": "deallocated", "tags": {"decommission": "true"}}, {"name": "keep-app", "rg": "rg-legacy", "state": "running", "tags": {"decommission": "false"}}]}}}
+@@ checks
+[
+ {
+  "t": "cmd",
+  "run": "az vm list -g rg-legacy --query \"[].name\" -o tsv",
+  "code": 0,
+  "label": "old-app is gone",
+  "notOut": "old-app"
+ },
+ {
+  "t": "cmd",
+  "run": "az vm list -g rg-legacy --query \"[].name\" -o tsv",
+  "code": 0,
+  "label": "old-db is gone",
+  "notOut": "old-db"
+ },
+ {
+  "t": "cmd",
+  "run": "az vm list -g rg-legacy --query \"[].name\" -o tsv",
+  "code": 0,
+  "label": "the live VM is kept",
+  "out": "keep-app"
+ },
+ {
+  "t": "cmd",
+  "run": "az group list --query \"[].name\" -o tsv",
+  "code": 0,
+  "label": "the resource group is kept",
+  "out": "rg-legacy"
+ }
+]
+@@ explain
+Deleting a single resource is narrower than deleting its group. Choose by tag, not by name, list again after each delete and stop if the list is not what you expected. Cost tools and tags exist so that these decisions are written down before the day you act on them.
+@@ solution
+az vm list -g rg-legacy --query '[].[name,tags.decommission]' -o tsv
+az vm delete -g rg-legacy -n old-app --yes
+az vm delete -g rg-legacy -n old-db --yes
+
+
+## A contractor still has Owner
+id: cl-az-remove-owner
+module: cloud
+level: Intermediate
+minutes: 12
+lesson: cloud/identity-and-access
+engine: Simulated Azure command line and subscription
+summary: Remove the contractor's Owner role on the subscription but keep their Reader role on one group.
+vary: [{"contractor@example.com": "vendor@example.com", "ops@example.com": "admin@example.com"}]
+@@ story
+contractor@example.com was given Owner on the whole subscription for a one-day fix and also has Reader on rg-app, which they still need. Remove only the Owner assignment. ops@example.com is Owner too and must keep it.
+@@ goals
+- List the role assignments for contractor@example.com.
+- Delete the Owner assignment for that person.
+- Keep their Reader assignment and ops@example.com's Owner role.
+@@ hints
+- `az role assignment list --assignee contractor@example.com -o table` shows both assignments.
+- `az role assignment delete --assignee contractor@example.com --role Owner` removes only Owner.
+- A command without --role would remove every assignment for that person.
+@@ world
+{"cloud": {"az": {"groups": [{"name": "rg-app", "location": "westeurope"}], "roles": [{"assignee": "contractor@example.com", "role": "Owner", "scope": "/subscriptions/11111111-2222-3333-4444-555555555555"}, {"assignee": "contractor@example.com", "role": "Reader", "scope": "/subscriptions/11111111-2222-3333-4444-555555555555/resourceGroups/rg-app"}, {"assignee": "ops@example.com", "role": "Owner", "scope": "/subscriptions/11111111-2222-3333-4444-555555555555"}]}}}
+@@ checks
+[
+ {
+  "t": "cmd",
+  "run": "az role assignment list --assignee contractor@example.com --query \"[].roleDefinitionName\" -o tsv",
+  "code": 0,
+  "label": "the contractor no longer has Owner",
+  "notOut": "Owner"
+ },
+ {
+  "t": "cmd",
+  "run": "az role assignment list --assignee contractor@example.com --query \"[].roleDefinitionName\" -o tsv",
+  "code": 0,
+  "label": "the contractor keeps Reader",
+  "out": "Reader"
+ },
+ {
+  "t": "cmd",
+  "run": "az role assignment list --assignee ops@example.com --query \"[].roleDefinitionName\" -o tsv",
+  "code": 0,
+  "label": "ops keeps Owner",
+  "out": "Owner"
+ }
+]
+@@ explain
+Owner can change access for everyone, so it is the most dangerous role to leave behind. Delete assignments with the narrowest filter that names exactly one: person plus role plus scope. A delete with only the person removes everything that person has, which is the usual way to lock someone out by mistake.
+@@ solution
+az role assignment list --assignee contractor@example.com -o table
+az role assignment delete --assignee contractor@example.com --role Owner
+
+
+## Close the public files on both clouds
+id: cl-multi-public-audit
+module: cloud
+level: Intermediate
+minutes: 15
+lesson: cloud/security-and-governance
+engine: Simulated AWS and Azure command lines and accounts
+summary: One public bucket in AWS and one public storage account in Azure hold the same team files. Make both private.
+vary: [{"team-files": "hr-files", "teamfiles": "hrfiles", "rg-team": "rg-hr"}]
+@@ story
+An audit lists two public resources for the same team: the S3 bucket team-files and the Azure storage account teamfiles. Make both private without deleting any data.
+@@ goals
+- Make the S3 bucket team-files private.
+- Turn off public blob access on the storage account teamfiles.
+- Keep the files.
+@@ hints
+- `aws s3api put-bucket-acl --bucket team-files --acl private`
+- `az storage account update -g rg-team -n teamfiles --allow-blob-public-access false`
+- Check each with get-bucket-policy-status and with az storage account show.
+@@ world
+{"cloud": {"aws": {"buckets": {"team-files": {"acl": "public-read", "objects": {"plan.pdf": "x"}}}}, "az": {"groups": [{"name": "rg-team", "location": "westeurope"}], "storage": [{"name": "teamfiles", "rg": "rg-team", "publicBlob": true, "tls": "TLS1_2"}]}}}
+@@ checks
+[
+ {
+  "t": "cmd",
+  "run": "aws s3api get-bucket-policy-status --bucket team-files --query \"PolicyStatus.IsPublic\" --output text",
+  "code": 0,
+  "label": "the S3 bucket is no longer public",
+  "out": "False"
+ },
+ {
+  "t": "cmd",
+  "run": "az storage account show -g rg-team -n teamfiles --query \"allowBlobPublicAccess\" -o tsv",
+  "code": 0,
+  "label": "public blob access is off on Azure",
+  "out": "False|false"
+ },
+ {
+  "t": "cmd",
+  "run": "aws s3 ls s3://team-files/",
+  "code": 0,
+  "label": "the files are kept",
+  "out": "plan\\.pdf"
+ }
+]
+@@ explain
+The same risk has a different switch on each cloud: an ACL and a public access block on AWS, an account setting on Azure. A good audit finds the risk, then fixes each platform with its own control and checks the result with its own read command.
+@@ solution
+aws s3api put-bucket-acl --bucket team-files --acl private
+az storage account update -g rg-team -n teamfiles --allow-blob-public-access false
+
+## The VM is missing in the wrong project
+id: cl-gcp-wrong-project
+module: cloud
+level: Beginner
+minutes: 8
+lesson: cloud/cloud-fundamentals
+engine: Simulated Google Cloud command line and project
+summary: gcloud says the VM does not exist because the command line points at the dev project. Switch to production and start it.
+@@ story
+A teammate says web-1 is stopped, and you cannot even find it. Nothing is deleted. Your gcloud is set to shop-dev, but the server lives in shop-prod. Check the active project, switch it and start the server.
+@@ goals
+- Find which project gcloud is using.
+- Switch to the project that contains web-1.
+- Start web-1 and see it RUNNING.
+@@ hints
+- `gcloud config get-value project` prints the active project, and `gcloud projects list` shows what you can use.
+- `gcloud config set project shop-prod` changes the default.
+- `gcloud compute instances start web-1 --zone europe-west1-b` starts it.
+@@ world
+{"more": {"gcp": {"project": "shop-dev", "account": "asha@example.com", "projects": [{"id": "shop-dev", "name": "Shop Dev", "number": "100000000001", "bindings": []}, {"id": "shop-prod", "name": "Shop Prod", "number": "100000000002", "bindings": []}], "instances": [{"project": "shop-prod", "name": "web-1", "zone": "europe-west1-b", "machineType": "e2-small", "internalIp": "10.132.0.4", "externalIp": "34.0.0.10", "status": "TERMINATED"}, {"project": "shop-dev", "name": "scratch-1", "zone": "europe-west1-b", "machineType": "e2-micro", "internalIp": "10.132.0.9", "status": "RUNNING"}], "firewalls": [], "buckets": []}}}
+@@ checks
+[
+ {
+  "t": "cmd",
+  "run": "gcloud config get-value project",
+  "code": 0,
+  "label": "gcloud uses shop-prod",
+  "out": "shop-prod"
+ },
+ {
+  "t": "cmd",
+  "run": "gcloud compute instances list --format='value(name,status)'",
+  "code": 0,
+  "label": "web-1 is running",
+  "out": "web-1\\s+RUNNING"
+ }
+]
+@@ explain
+Every gcloud command acts on one project, taken from the --project flag or the active configuration. A resource that is invisible is often just in another project. Check the project first, before you suspect permissions or deletion. In production work, many teams show the project in the shell prompt.
+@@ solution
+gcloud config get-value project
+gcloud projects list
+gcloud config set project shop-prod
+gcloud compute instances start web-1 --zone europe-west1-b
+gcloud compute instances list
+
+
+## SSH to the bastion times out
+id: cl-gcp-ssh-firewall
+module: cloud
+level: Intermediate
+minutes: 12
+lesson: cloud/virtual-networks
+engine: Simulated Google Cloud command line and project
+summary: The bastion VM runs, but SSH is blocked by the VPC firewall. Allow port 22 from the office address only.
+@@ story
+SSH to bastion-1 times out from the office. The VM is running, so a firewall rule is dropping the traffic. The office address is 203.0.113.7. Add a narrow rule; opening port 22 to the internet is not acceptable.
+@@ goals
+- List the firewall rules and confirm that none allows port 22.
+- Create allow-ssh-office for tcp:22 from 203.0.113.7/32.
+- Do not open 0.0.0.0/0.
+@@ hints
+- `gcloud compute firewall-rules list` shows the rules and what they allow.
+- `gcloud compute firewall-rules create NAME --allow tcp:22 --source-ranges RANGE` creates one.
+- Use --source-ranges 203.0.113.7/32 to allow a single address.
+@@ world
+{"more": {"gcp": {"project": "shop-prod", "account": "asha@example.com", "projects": [{"id": "shop-dev", "name": "Shop Dev", "number": "100000000001", "bindings": []}, {"id": "shop-prod", "name": "Shop Prod", "number": "100000000002", "bindings": []}], "instances": [{"project": "shop-prod", "name": "bastion-1", "zone": "europe-west1-b", "machineType": "e2-micro", "internalIp": "10.132.0.2", "externalIp": "34.0.0.22", "status": "RUNNING"}], "firewalls": [{"project": "shop-prod", "name": "default-allow-internal", "network": "default", "direction": "INGRESS", "priority": 65534, "allowed": [{"protocol": "tcp", "ports": ["0-65535"]}], "sourceRanges": ["10.128.0.0/9"]}, {"project": "shop-prod", "name": "allow-https", "network": "default", "direction": "INGRESS", "priority": 1000, "allowed": [{"protocol": "tcp", "ports": ["443"]}], "sourceRanges": ["0.0.0.0/0"]}], "buckets": []}}}
+@@ checks
+[
+ {
+  "t": "cmd",
+  "run": "gcloud compute firewall-rules list --filter=name=allow-ssh-office --format='value(name,sourceRanges)'",
+  "code": 0,
+  "label": "the rule allows only the office address",
+  "out": "allow-ssh-office\\s+203\\.0\\.113\\.7/32"
+ },
+ {
+  "t": "cmd",
+  "run": "gcloud compute firewall-rules list --filter=name=allow-ssh-office --format='value(sourceRanges)'",
+  "code": 0,
+  "label": "port 22 is not open to the world",
+  "notOut": "0\\.0\\.0\\.0/0"
+ }
+]
+@@ explain
+GCP firewall rules belong to the VPC network and match by direction, ports and source ranges. A timeout, not a refusal, means packets are dropped on the way. The cleanest fix is a rule scoped to one address or to a target tag, and a better long-term design is Identity-Aware Proxy or a VPN, so nobody needs a public SSH port.
+@@ solution
+gcloud compute firewall-rules list
+gcloud compute firewall-rules create allow-ssh-office --allow tcp:22 --source-ranges 203.0.113.7/32
+gcloud compute firewall-rules list
+
+
+## A contractor still has Owner
+id: cl-gcp-remove-owner
+module: cloud
+level: Intermediate
+minutes: 10
+lesson: cloud/identity-and-access
+engine: Simulated Google Cloud command line and project
+summary: A finished contractor is an Owner on the production project. Remove the role and give read access instead.
+@@ story
+The contract ended last week, but contractor@example.com is still an Owner on shop-prod. Remove that binding and grant the viewer role instead so they can still read dashboards during handover. Leave ops@example.com exactly as it is.
+@@ goals
+- Read the IAM policy of shop-prod.
+- Remove roles/owner from the contractor.
+- Add roles/viewer for the contractor and leave ops@example.com as Owner.
+@@ hints
+- `gcloud projects get-iam-policy shop-prod` lists bindings by role.
+- `gcloud projects remove-iam-policy-binding shop-prod --member=user:contractor@example.com --role=roles/owner`.
+- `gcloud projects add-iam-policy-binding shop-prod --member=user:contractor@example.com --role=roles/viewer`.
+@@ world
+{"more": {"gcp": {"project": "shop-prod", "account": "asha@example.com", "projects": [{"id": "shop-dev", "name": "Shop Dev", "number": "100000000001", "bindings": []}, {"id": "shop-prod", "name": "Shop Prod", "number": "100000000002", "bindings": [{"role": "roles/owner", "members": ["user:ops@example.com", "user:contractor@example.com"]}]}], "instances": [], "firewalls": [], "buckets": []}}}
+@@ checks
+[
+ {
+  "t": "cmd",
+  "run": "gcloud projects get-iam-policy shop-prod --format=json",
+  "code": 0,
+  "label": "the contractor is no longer an Owner",
+  "notOut": "roles/owner\"\\s*,\\s*\"members\":\\s*\\[[^\\]]*contractor"
+ },
+ {
+  "t": "cmd",
+  "run": "gcloud projects get-iam-policy shop-prod --format=json",
+  "code": 0,
+  "label": "the contractor is a viewer",
+  "out": "roles/viewer\"\\s*,\\s*\"members\":\\s*\\[[^\\]]*contractor"
+ },
+ {
+  "t": "cmd",
+  "run": "gcloud projects get-iam-policy shop-prod --format=json",
+  "code": 0,
+  "label": "ops is still an Owner",
+  "out": "roles/owner\"\\s*,\\s*\"members\":\\s*\\[[^\\]]*ops@example\\.com"
+ }
+]
+@@ explain
+IAM bindings pair a member with a role on a resource. Owner is the broadest basic role and almost never right for a contractor. Remove it, grant the least role that works and review access when a contract ends. Access reviews and expiry conditions turn this from memory work into a routine.
+@@ solution
+gcloud projects get-iam-policy shop-prod
+gcloud projects remove-iam-policy-binding shop-prod --member=user:contractor@example.com --role=roles/owner
+gcloud projects add-iam-policy-binding shop-prod --member=user:contractor@example.com --role=roles/viewer
+gcloud projects get-iam-policy shop-prod
+
+
+## A Cloud Storage bucket is public
+id: cl-gcp-public-bucket
+module: cloud
+level: Beginner
+minutes: 10
+lesson: cloud/object-storage-and-data-lifecycle
+engine: Simulated Google Cloud command line and project
+summary: allUsers can read the exports bucket. Turn on public access prevention so nobody can make it public again.
+@@ story
+A scanner found that gs://customer-exports grants read access to allUsers. Customer data must not be public. Enforce public access prevention on the bucket and keep the bucket itself.
+@@ goals
+- Describe the bucket and find the allUsers grant.
+- Enforce public access prevention.
+- Keep the bucket.
+@@ hints
+- `gcloud storage buckets describe gs://customer-exports` shows its IAM and settings.
+- `gcloud storage buckets update gs://customer-exports --public-access-prevention` enforces it.
+- Describe the bucket again to confirm that allUsers is gone.
+@@ world
+{"more": {"gcp": {"project": "shop-prod", "account": "asha@example.com", "projects": [{"id": "shop-dev", "name": "Shop Dev", "number": "100000000001", "bindings": []}, {"id": "shop-prod", "name": "Shop Prod", "number": "100000000002", "bindings": []}], "instances": [], "firewalls": [], "buckets": [{"project": "shop-prod", "name": "customer-exports", "location": "EUROPE-WEST1", "iam": [{"role": "roles/storage.objectViewer", "members": ["allUsers"]}]}]}}}
+@@ checks
+[
+ {
+  "t": "cmd",
+  "run": "gcloud storage buckets describe gs://customer-exports",
+  "code": 0,
+  "label": "prevention is enforced",
+  "out": "enforced"
+ },
+ {
+  "t": "cmd",
+  "run": "gcloud storage buckets describe gs://customer-exports",
+  "code": 0,
+  "label": "allUsers has no access",
+  "notOut": "allUsers"
+ },
+ {
+  "t": "cmd",
+  "run": "gcloud storage buckets list --format='value(name)'",
+  "code": 0,
+  "label": "the bucket still exists",
+  "out": "customer-exports"
+ }
+]
+@@ explain
+Public access prevention blocks any grant to allUsers or allAuthenticatedUsers on a bucket, whatever IAM says. It is the Cloud Storage equivalent of the S3 block public access setting. An organisation policy can enforce it for every bucket in a folder or project.
+@@ solution
+gcloud storage buckets describe gs://customer-exports
+gcloud storage buckets update gs://customer-exports --public-access-prevention
+gcloud storage buckets describe gs://customer-exports
 

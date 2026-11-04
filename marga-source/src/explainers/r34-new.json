@@ -1,0 +1,1280 @@
+[
+ {
+  "id": "x-bm-feeds",
+  "module": "baremetal",
+  "lesson": "baremetal/servers-racks-and-remote-management",
+  "title": "Two power feeds, one server",
+  "summary": "How redundant power keeps a server up when a feed fails.",
+  "actors": [
+   "Feed A",
+   "Feed B",
+   "Power supply 1",
+   "Power supply 2",
+   "Server"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Feed A powers PSU 1",
+    "n": "Power supply 1 takes mains power from feed A and shares the load with the second supply."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Feed B powers PSU 2",
+    "n": "Power supply 2 takes power from feed B, a separate line from a separate breaker."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Load is shared",
+    "n": "The server draws current from both supplies, each carrying about half of the load."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Feed A fails",
+    "n": "A breaker trips or maintenance cuts feed A, so power supply 1 loses its input."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "PSU 2 takes over",
+    "n": "Power supply 2 now carries the whole load alone and the server keeps running."
+   },
+   {
+    "f": 4,
+    "t": 4,
+    "l": "BMC logs redundancy lost",
+    "n": "The management controller writes a redundancy lost event so operators know one feed is gone."
+   }
+  ]
+ },
+ {
+  "id": "x-bm-bmc-cycle",
+  "module": "baremetal",
+  "lesson": "baremetal/servers-racks-and-remote-management",
+  "title": "Power cycling a hung server with the BMC",
+  "summary": "From a dead SSH session to a running server without leaving your desk.",
+  "actors": [
+   "Operator",
+   "BMC",
+   "Host OS",
+   "Hardware"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 2,
+    "l": "SSH times out",
+    "n": "The operator tries to log in. The host operating system has hung, so nothing answers."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Ask the BMC for status",
+    "n": "ipmitool chassis power status goes to the BMC on its own network port, which still works."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Power is on",
+    "n": "The BMC reports that power is on, so the hardware is up but the operating system is stuck."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Read the event log",
+    "n": "ipmitool sel list shows recent hardware events, such as memory or temperature alarms."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Power cycle",
+    "n": "ipmitool chassis power cycle asks the BMC to cut and restore power to the server."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Hardware restarts",
+    "n": "The BMC switches power off and on and the server boots from its disk again."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Host answers again",
+    "n": "SSH works once the operating system is back, and the operator records the cause from the event log."
+   }
+  ]
+ },
+ {
+  "id": "x-bm-pxe",
+  "module": "baremetal",
+  "lesson": "baremetal/provisioning-pxe-dhcp-and-images",
+  "title": "A PXE boot step by step",
+  "summary": "How a blank server finds and loads its installer from the network.",
+  "actors": [
+   "Server NIC",
+   "DHCP server",
+   "TFTP server",
+   "Installer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "DHCP discover",
+    "n": "The server has no disk to boot from, so its network card broadcasts a request for an address."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Offer with next-server",
+    "n": "The DHCP server answers with an address, the next-server and the name of the boot file."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Fetch the boot loader",
+    "n": "The firmware downloads the boot loader, such as grubx64.efi, from the TFTP server."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Send loader and config",
+    "n": "TFTP sends the loader, which then asks for its configuration file and the kernel."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Start the installer",
+    "n": "The loader starts the kernel and ramdisk, which run the installer with an answer file."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Install unattended",
+    "n": "The installer partitions the disks, installs packages and reboots into the new system."
+   }
+  ]
+ },
+ {
+  "id": "x-bm-kickstart",
+  "module": "baremetal",
+  "lesson": "baremetal/provisioning-pxe-dhcp-and-images",
+  "title": "An unattended install with an answer file",
+  "summary": "What the installer reads so that nobody has to answer questions.",
+  "actors": [
+   "Installer",
+   "Answer file server",
+   "Disks",
+   "Config management"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fetch the answer file",
+    "n": "The installer downloads a kickstart or autoinstall file from a web server named on the kernel line."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Settings arrive",
+    "n": "The file describes the disk layout, packages, users and network settings for this class of server."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Partition and format",
+    "n": "The installer creates the partitions, filesystems and RAID arrays that the file asks for."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Install packages",
+    "n": "A minimal set of packages is written to disk, and the boot loader is installed."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Register for configuration",
+    "n": "A first-boot step contacts the configuration tool so the machine gets its specific settings."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Machine becomes specific",
+    "n": "Ansible or Puppet applies roles, so the generic install turns into a database or web server."
+   }
+  ]
+ },
+ {
+  "id": "x-bm-image",
+  "module": "baremetal",
+  "lesson": "baremetal/provisioning-pxe-dhcp-and-images",
+  "title": "Deploying an image with Ironic",
+  "summary": "Writing a prepared disk image to a bare metal node.",
+  "actors": [
+   "Operator",
+   "Ironic",
+   "BMC",
+   "Node",
+   "Image store"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request a deploy",
+    "n": "The operator asks for a node with an image and a configuration drive, as if creating a cloud server."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Power on through the BMC",
+    "n": "Ironic uses the node BMC to set network boot and power the machine on."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Node boots an agent",
+    "n": "The node boots a small agent image from the network that waits for instructions."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Agent downloads the image",
+    "n": "The agent pulls the requested disk image from the image store and writes it to the disk."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Switch to disk boot",
+    "n": "Ironic changes the boot device to disk and reboots the node."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Node is active",
+    "n": "cloud-init applies the keys and hostname, and the operator logs in to a running server."
+   }
+  ]
+ },
+ {
+  "id": "x-bm-rebuild",
+  "module": "baremetal",
+  "lesson": "baremetal/disks-raid-firmware-and-burn-in",
+  "title": "A RAID 1 rebuild",
+  "summary": "From a failed disk to a healthy mirror.",
+  "actors": [
+   "Monitoring",
+   "Operator",
+   "mdadm",
+   "Old disk",
+   "New disk"
+  ],
+  "steps": [
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Disk marked faulty",
+    "n": "mdadm drops the failing disk from the array, which becomes degraded but keeps serving data."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Alert fires",
+    "n": "Monitoring alerts on a degraded array so someone acts before a second disk fails."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Confirm with SMART",
+    "n": "The operator checks the disk with smartctl and sees failed health and reallocated sectors."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Remove the faulty disk",
+    "n": "mdadm removes the failed device from the array, and the disk is pulled from the bay."
+   },
+   {
+    "f": 1,
+    "t": 4,
+    "l": "Add the new disk",
+    "n": "The replacement is inserted and added to the array with mdadm --add."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Copy the mirror",
+    "n": "mdadm copies every block from the surviving disk to the new one while the array stays online."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Array is clean",
+    "n": "The state returns to clean and the operator closes the alert with a note in the inventory."
+   }
+  ]
+ },
+ {
+  "id": "x-bm-smart",
+  "module": "baremetal",
+  "lesson": "baremetal/disks-raid-firmware-and-burn-in",
+  "title": "Reading a SMART warning",
+  "summary": "How a disk reports its own decline before it fails.",
+  "actors": [
+   "Disk",
+   "smartd",
+   "Monitoring",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Sectors go bad",
+    "n": "The disk finds sectors it cannot read and remaps some to its spare area."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "smartd polls attributes",
+    "n": "The smartd service reads the SMART attributes every half hour and compares them with thresholds."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Reallocated count rises",
+    "n": "The count of reallocated sectors rises across several polls, so smartd sends a warning."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Ticket is raised",
+    "n": "Monitoring turns the warning into a ticket for the datacentre team with the serial number."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Check the details",
+    "n": "The operator runs smartctl -a and sees pending sectors as well, a sign of a dying disk."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Replace before failure",
+    "n": "The disk is replaced in a planned window, long before it takes the array down."
+   }
+  ]
+ },
+ {
+  "id": "x-bm-lacp",
+  "module": "baremetal",
+  "lesson": "baremetal/datacenter-networking-leaf-spine-and-bonding",
+  "title": "How an LACP bond forms",
+  "summary": "Two cables become one logical link.",
+  "actors": [
+   "Server eno1",
+   "Server eno2",
+   "Switch port 1",
+   "Switch port 2"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 2,
+    "l": "LACP packets leave",
+    "n": "The server sends LACP messages on each link saying that it wants to form an aggregate."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Second link too",
+    "n": "The second interface does the same toward its own switch port."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Switch answers",
+    "n": "Both switch ports are in one port channel and reply with matching keys."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Keys match",
+    "n": "The server sees the same partner key on both links and groups them into one bond."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Traffic is hashed",
+    "n": "Each flow is assigned to one link by a hash of addresses and ports, which keeps packets in order."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Many flows use both",
+    "n": "With many connections, the load spreads across both links."
+   }
+  ]
+ },
+ {
+  "id": "x-bm-leafspine",
+  "module": "baremetal",
+  "lesson": "baremetal/datacenter-networking-leaf-spine-and-bonding",
+  "title": "A packet across a leaf-spine fabric",
+  "summary": "Three hops between racks.",
+  "actors": [
+   "Server A",
+   "Leaf 1",
+   "Spine",
+   "Leaf 2",
+   "Server B"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Frame to the top-of-rack",
+    "n": "Server A sends its packet to the leaf switch at the top of its rack."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Choose a spine",
+    "n": "The leaf has equal-cost routes to every spine and picks one by hashing the flow."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Spine forwards",
+    "n": "The spine knows which leaf holds the destination subnet and sends the packet there."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Leaf delivers",
+    "n": "Leaf 2 delivers the packet to server B in its rack."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Reply may use another spine",
+    "n": "The return path can take a different spine, which spreads load evenly."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Add capacity",
+    "n": "Adding a spine adds a new path for every flow without changing any server."
+   }
+  ]
+ },
+ {
+  "id": "x-bm-dimm",
+  "module": "baremetal",
+  "lesson": "baremetal/operating-a-fleet-failures-lifecycle-and-capacity",
+  "title": "Replacing a failing DIMM",
+  "summary": "The routine for one sick server.",
+  "actors": [
+   "Monitoring",
+   "Operator",
+   "Scheduler",
+   "Server",
+   "Vendor"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "ECC alert",
+    "n": "Monitoring shows repeated correctable ECC errors from one memory slot."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Drain the host",
+    "n": "The operator cordons the server so workloads move to other machines first."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Read the event log",
+    "n": "ipmitool sel elist confirms the same DIMM slot in every event and the operator notes it."
+   },
+   {
+    "f": 1,
+    "t": 4,
+    "l": "Order the part",
+    "n": "The vendor ships a replacement under warranty, or a spare is taken from on-site stock."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Swap and test",
+    "n": "The DIMM is replaced and a memory test runs for a short period to prove the fix."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Return to service",
+    "n": "The host is uncordoned and the repair is recorded against its asset tag."
+   }
+  ]
+ },
+ {
+  "id": "x-bm-fail-feed",
+  "module": "baremetal",
+  "kind": "failure",
+  "lesson": "baremetal/servers-racks-and-remote-management",
+  "title": "Failure and recovery: a rack loses both feeds",
+  "summary": "Why redundancy failed and how it was restored.",
+  "actors": [
+   "Feed A",
+   "Feed B",
+   "Rack servers",
+   "On-call",
+   "Facilities"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Feed A fails",
+    "n": "A breaker trips on feed A, as the design allows for."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Feed B takes the rack",
+    "n": "Feed B alone now carries every server, but the load is above its rated capacity."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Feed B trips",
+    "n": "The breaker on feed B opens because the rack draws more than one feed can supply."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Four servers go dark",
+    "n": "Monitoring shows servers lost at the same moment, with BMC events for lost power."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Call facilities",
+    "n": "On-call confirms that both feeds are down and asks facilities to reset the breakers."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Power restored",
+    "n": "Facilities reset the breakers and the servers boot, but the rack is still overloaded."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Fix the cause",
+    "n": "The team moves servers out of the rack until one feed can carry the whole load, and adds a power budget to the capacity plan."
+   }
+  ]
+ },
+ {
+  "id": "x-bm-fail-reinstall",
+  "module": "baremetal",
+  "kind": "failure",
+  "lesson": "baremetal/provisioning-pxe-dhcp-and-images",
+  "title": "Failure and recovery: nodes in service reinstall themselves",
+  "summary": "Why a reboot wiped running servers.",
+  "actors": [
+   "Node",
+   "PXE server",
+   "Operator",
+   "Monitoring",
+   "Inventory"
+  ],
+  "steps": [
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Upgrade the PXE server",
+    "n": "The operator updates the provisioning stack and its DHCP configuration changes."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "It answers everyone",
+    "n": "The new configuration offers a boot file to every machine, not only machines marked for build."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "A node reboots",
+    "n": "A routine kernel update reboots a running node, which has network boot first in its boot order."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Installer is offered",
+    "n": "The PXE server sends the installer, which repartitions and wipes the disks."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Alerts fire",
+    "n": "Monitoring shows nodes disappearing and returning as empty machines."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Stop the damage",
+    "n": "The operator stops the DHCP service and sets the boot order to disk first through the BMC."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Rebuild and prevent",
+    "n": "Affected nodes are rebuilt from images, and the PXE server now answers only nodes marked as build in inventory."
+   }
+  ]
+ },
+ {
+  "id": "x-sm-pod2pod",
+  "module": "service-mesh",
+  "lesson": "service-mesh/kubernetes-networking-under-the-hood",
+  "title": "A packet from one pod to another",
+  "summary": "The path on a Kubernetes cluster with a CNI.",
+  "actors": [
+   "Pod A",
+   "Node 1",
+   "Network",
+   "Node 2",
+   "Pod B"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Leaves through its veth",
+    "n": "Pod A sends the packet out of its virtual ethernet pair into the network namespace of node 1."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Route lookup",
+    "n": "Node 1 looks up the destination pod address and finds that it belongs to a pod range on node 2."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Send over the network",
+    "n": "The CNI forwards the packet to node 2, either routed directly or wrapped in a VXLAN tunnel."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Arrive at node 2",
+    "n": "Node 2 receives the packet, unwraps it if needed and finds the local route to pod B."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Deliver to Pod B",
+    "n": "The packet enters pod B through its veth pair with the original source address intact."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Reply returns",
+    "n": "Pod B answers and the same steps run in reverse, with no NAT in between."
+   }
+  ]
+ },
+ {
+  "id": "x-sm-service",
+  "module": "service-mesh",
+  "lesson": "service-mesh/kubernetes-networking-under-the-hood",
+  "title": "From a Service name to a pod",
+  "summary": "DNS, ClusterIP and kube-proxy working together.",
+  "actors": [
+   "Client pod",
+   "CoreDNS",
+   "kube-proxy rules",
+   "Pod 1",
+   "Pod 2"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Resolve web.shop",
+    "n": "The client asks CoreDNS for web.shop.svc.cluster.local."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "ClusterIP returned",
+    "n": "CoreDNS answers with the Service ClusterIP, a virtual address that no machine owns."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Connect to the ClusterIP",
+    "n": "The client opens a connection and the node rules match the destination address."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Pick an endpoint",
+    "n": "The rules choose one ready endpoint at random and rewrite the destination to the pod address."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Reach the pod",
+    "n": "The connection goes to pod 1. Later connections may go to pod 2."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Response returns",
+    "n": "The reply is rewritten back so the client believes it talked to the ClusterIP."
+   }
+  ]
+ },
+ {
+  "id": "x-sm-ingress",
+  "module": "service-mesh",
+  "lesson": "service-mesh/kubernetes-networking-under-the-hood",
+  "title": "A request through an Ingress",
+  "summary": "Traffic from the internet to a pod.",
+  "actors": [
+   "Browser",
+   "Load balancer",
+   "Ingress controller",
+   "Service",
+   "Pod"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request arrives",
+    "n": "The browser sends an HTTPS request to the public address of the load balancer."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Forward to the controller",
+    "n": "The load balancer passes the connection to one ingress controller pod running on a node."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Match host and path",
+    "n": "The controller finishes TLS and matches the host and path against the Ingress rules."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Route to the Service",
+    "n": "It sends the request to the Service named in the rule, using its endpoints directly."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Reach a ready pod",
+    "n": "One ready pod receives the request and builds the response."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Response returns",
+    "n": "The answer goes back along the same path to the browser."
+   }
+  ]
+ },
+ {
+  "id": "x-sm-netpol",
+  "module": "service-mesh",
+  "lesson": "service-mesh/cni-network-policy-and-ebpf",
+  "title": "How a network policy decides",
+  "summary": "What the CNI checks for each new connection.",
+  "actors": [
+   "Client pod",
+   "CNI datapath",
+   "Policy rules",
+   "Server pod"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Open a connection",
+    "n": "The client pod sends a SYN packet toward the server pod."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Look up the identity",
+    "n": "The datapath finds the labels of the source pod and the destination pod."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Evaluate rules",
+    "n": "The policy engine checks whether any rule allows this source, port and protocol."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Allowed: forward",
+    "n": "If a rule matches, the packet is delivered and the connection is tracked."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Denied: drop",
+    "n": "If no rule matches and the destination has a default deny, the packet is silently dropped."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Client times out",
+    "n": "Because the packet is dropped, the client sees a timeout and not a refusal."
+   }
+  ]
+ },
+ {
+  "id": "x-sm-inject",
+  "module": "service-mesh",
+  "lesson": "service-mesh/what-a-service-mesh-is-and-how-it-works",
+  "title": "How a sidecar gets injected",
+  "summary": "Labelling a namespace and creating a pod.",
+  "actors": [
+   "Operator",
+   "API server",
+   "Injector webhook",
+   "Pod"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Label the namespace",
+    "n": "The operator sets istio-injection=enabled on the namespace."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Create or restart a pod",
+    "n": "A deployment creates a new pod, because existing pods are never changed."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Call the webhook",
+    "n": "The API server sends the pod definition to the mutating admission webhook of the mesh."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Add the proxy",
+    "n": "The webhook adds an init container to redirect traffic and the istio-proxy sidecar container."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Pod starts with two containers",
+    "n": "The pod starts with the app and the proxy, and shows 2/2 ready."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Proxy receives config",
+    "n": "The proxy connects to the control plane and gets its listeners, routes and certificates."
+   }
+  ]
+ },
+ {
+  "id": "x-sm-mtls",
+  "module": "service-mesh",
+  "lesson": "service-mesh/mtls-and-traffic-management",
+  "title": "A mutual TLS handshake between sidecars",
+  "summary": "Identity on both sides of one call.",
+  "actors": [
+   "App A",
+   "Proxy A",
+   "Proxy B",
+   "App B",
+   "istiod"
+  ],
+  "steps": [
+   {
+    "f": 4,
+    "t": 1,
+    "l": "Certificates issued",
+    "n": "istiod gave each proxy a short-lived certificate tied to its service account."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Plain call to localhost",
+    "n": "App A sends an ordinary HTTP request. The traffic is redirected to its own proxy."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Start TLS",
+    "n": "Proxy A opens a TLS connection to proxy B and presents its certificate."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Present and verify",
+    "n": "Proxy B presents its certificate, and both sides check the other against the mesh root."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Decrypt and deliver",
+    "n": "Proxy B decrypts the request and passes it to app B on localhost, with the caller identity attached."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Response returns encrypted",
+    "n": "The reply travels back through both proxies and is encrypted on the wire."
+   }
+  ]
+ },
+ {
+  "id": "x-sm-canary",
+  "module": "service-mesh",
+  "lesson": "service-mesh/mtls-and-traffic-management",
+  "title": "A canary release with weights",
+  "summary": "Sending ten percent of traffic to version 2.",
+  "actors": [
+   "Client",
+   "Proxy",
+   "VirtualService",
+   "Reviews v1",
+   "Reviews v2"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request leaves the client",
+    "n": "The client calls the reviews service. Its proxy intercepts the request."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Look up the route",
+    "n": "The proxy consults the route rules it received for the host reviews."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "90 and 10",
+    "n": "The rule says ninety percent to subset v1 and ten percent to subset v2."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Most go to v1",
+    "n": "Nine out of ten requests are sent to pods labelled version v1."
+   },
+   {
+    "f": 1,
+    "t": 4,
+    "l": "Some go to v2",
+    "n": "One in ten requests reaches version 2, where errors and latency are watched."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Raise the weight",
+    "n": "If metrics stay healthy, the operator edits the weights step by step until v2 takes all traffic."
+   }
+  ]
+ },
+ {
+  "id": "x-sm-retry",
+  "module": "service-mesh",
+  "lesson": "service-mesh/mtls-and-traffic-management",
+  "title": "Timeouts and retries on one call",
+  "summary": "What the proxy does when a backend is slow.",
+  "actors": [
+   "Client",
+   "Proxy",
+   "Backend 1",
+   "Backend 2"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request starts a timer",
+    "n": "The proxy sets an overall timeout of two seconds for the request."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "First attempt",
+    "n": "The first try goes to backend 1 with a per-try timeout of 500 milliseconds."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "No answer in time",
+    "n": "The per-try timeout passes without a reply, so the proxy gives up on this attempt."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Retry elsewhere",
+    "n": "A retry is sent to backend 2, a different endpoint, with a short random delay."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Answer arrives",
+    "n": "Backend 2 replies in time and the proxy returns the response."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Client sees success",
+    "n": "The client only sees a slightly slower success and never knew of the failed attempt."
+   }
+  ]
+ },
+ {
+  "id": "x-sm-outlier",
+  "module": "service-mesh",
+  "lesson": "service-mesh/mtls-and-traffic-management",
+  "title": "Outlier detection ejects a bad pod",
+  "summary": "Circuit breaking at the endpoint level.",
+  "actors": [
+   "Proxy",
+   "Pod 1",
+   "Pod 2",
+   "Pod 3"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Traffic spreads",
+    "n": "The proxy sends requests round-robin to three healthy pods."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Pod 1 starts failing",
+    "n": "Pod 1 returns server errors on several consecutive requests."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Threshold reached",
+    "n": "After five consecutive 5xx errors the proxy marks pod 1 as an outlier."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Eject for a while",
+    "n": "Pod 1 is removed from the pool for thirty seconds, and no new requests are sent to it."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Others take the load",
+    "n": "Pods 2 and 3 handle all traffic, so users no longer see the errors."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Try again later",
+    "n": "After the ejection time the pod is tried again. If it fails it is ejected for longer."
+   }
+  ]
+ },
+ {
+  "id": "x-sm-push",
+  "module": "service-mesh",
+  "lesson": "service-mesh/observing-and-troubleshooting-the-mesh",
+  "title": "How configuration reaches the proxies",
+  "summary": "From kubectl apply to an updated route.",
+  "actors": [
+   "Operator",
+   "API server",
+   "istiod",
+   "Proxy"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Apply a VirtualService",
+    "n": "The operator applies a routing rule, and the API server stores it."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "istiod watches",
+    "n": "The control plane notices the change through its watch on the API server."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Compute proxy config",
+    "n": "istiod translates the rule into Envoy listeners, routes, clusters and endpoints."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Push over xDS",
+    "n": "It sends the new configuration to every affected proxy over a long-lived gRPC stream."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Proxy acknowledges",
+    "n": "The proxy accepts or rejects the update and tells istiod."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Check sync",
+    "n": "istioctl proxy-status shows SYNCED when the proxy has acknowledged the latest version."
+   }
+  ]
+ },
+ {
+  "id": "x-sm-fail-strict",
+  "module": "service-mesh",
+  "kind": "failure",
+  "lesson": "service-mesh/observing-and-troubleshooting-the-mesh",
+  "title": "Failure and recovery: STRICT mTLS breaks a caller",
+  "summary": "A plain text client meets a strict destination.",
+  "actors": [
+   "Platform team",
+   "Reviews proxy",
+   "Web (no sidecar)",
+   "Monitoring",
+   "On-call"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Set mode STRICT",
+    "n": "The platform team applies a PeerAuthentication in strict mode for the shop namespace."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Plain text call",
+    "n": "The web pod has no sidecar, because it started before injection was enabled, so it calls in plain text."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Connection reset",
+    "n": "The reviews proxy requires mTLS and resets the connection before any request is read."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "503 alerts fire",
+    "n": "Monitoring shows a spike in 503 errors on the storefront with response flag UF."
+   },
+   {
+    "f": 4,
+    "t": 1,
+    "l": "Check the flag and policy",
+    "n": "On-call reads the proxy log, sees UF, and finds the recent PeerAuthentication change."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Roll back to PERMISSIVE",
+    "n": "The mode is set back to permissive, which accepts both kinds of traffic, and errors stop."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Fix the cause",
+    "n": "The web deployment is restarted so it gets a sidecar, then the mode is set to strict again safely."
+   }
+  ]
+ },
+ {
+  "id": "x-sm-fail-retry",
+  "module": "service-mesh",
+  "kind": "failure",
+  "lesson": "service-mesh/mtls-and-traffic-management",
+  "title": "Failure and recovery: a retry storm",
+  "summary": "How retries turned a slowdown into an outage.",
+  "actors": [
+   "Storefront",
+   "Orders",
+   "Inventory",
+   "Database",
+   "On-call"
+  ],
+  "steps": [
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Database slows",
+    "n": "A heavy report makes the database answer in seconds instead of milliseconds."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Inventory times out and retries",
+    "n": "Inventory times out and retries its query three times for each request."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Orders retries too",
+    "n": "Orders times out on inventory and retries three times, so each request becomes nine queries."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Storefront retries again",
+    "n": "The storefront repeats the pattern and the database sees twenty-seven queries per user request."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Database overloaded",
+    "n": "The database falls over under the multiplied load, and every service fails."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Cut retries and shed load",
+    "n": "On-call removes inner retries, sets per-try timeouts and a retry budget, and enables outlier detection."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "Recovery",
+    "n": "Once the load drops back to normal, the database recovers and the services return."
+   }
+  ]
+ }
+]

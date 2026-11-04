@@ -1,0 +1,2365 @@
+[
+ {
+  "id": "dns-lookup",
+  "module": "networking",
+  "lesson": "networking/dns",
+  "title": "How a DNS lookup works",
+  "summary": "What happens between typing a name and getting an IP address.",
+  "actors": [
+   "Browser",
+   "Resolver",
+   "Root server",
+   "TLD server",
+   "Authoritative server"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Check caches",
+    "n": "The browser and the operating system look in their own caches first. If the answer is there and has not expired, the lookup ends here."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Where is app.example.com?",
+    "n": "The browser asks the recursive resolver, usually run by your network or ISP, to find the answer on its behalf."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Who handles .com?",
+    "n": "The resolver has no cached answer, so it asks a root server. Roots do not know the address, but they know who runs each top-level domain."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Ask the .com servers",
+    "n": "The root server replies with a referral to the servers for .com."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Who handles example.com?",
+    "n": "The resolver asks a .com server about example.com."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Ask example.com name servers",
+    "n": "The TLD server replies with the name servers that are responsible for example.com."
+   },
+   {
+    "f": 1,
+    "t": 4,
+    "l": "What is app.example.com?",
+    "n": "The resolver asks the authoritative server, which holds the real records."
+   },
+   {
+    "f": 4,
+    "t": 1,
+    "l": "A record: 203.0.113.10 (TTL 300)",
+    "n": "The authoritative server answers with the IP address and a TTL. The TTL says how many seconds the answer may be cached."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "203.0.113.10",
+    "n": "The resolver caches the answer for the TTL and returns it. The browser can now open a connection."
+   }
+  ]
+ },
+ {
+  "id": "tcp-handshake",
+  "module": "networking",
+  "lesson": "networking/latency-mtu-and-network-performance",
+  "title": "The TCP three-way handshake",
+  "summary": "How two machines agree to talk before any data moves.",
+  "actors": [
+   "Client",
+   "Server"
+  ],
+  "steps": [
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Listening on port 443",
+    "n": "The server has a program bound to a port and waiting for connections."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "SYN, seq=100",
+    "n": "The client sends a SYN packet with a starting sequence number. It means: I want to connect, and I will number my bytes from here."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "SYN-ACK, seq=300, ack=101",
+    "n": "The server agrees. It acknowledges the client number (ack=101) and sends its own starting sequence number."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "ACK, ack=301",
+    "n": "The client acknowledges the server number. The connection is now established in both directions."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Data: GET / HTTP/1.1",
+    "n": "Application data can flow. Every byte is numbered, so lost packets are noticed and sent again."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "ACK + response data",
+    "n": "The server acknowledges what it got and sends its reply."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "FIN",
+    "n": "When finished, one side sends FIN to close its direction. The other side acknowledges, then sends its own FIN."
+   }
+  ]
+ },
+ {
+  "id": "tls-handshake",
+  "module": "networking",
+  "lesson": "networking/http-and-tls",
+  "title": "The TLS 1.3 handshake",
+  "summary": "How a browser checks who it is talking to and sets up encryption.",
+  "actors": [
+   "Browser",
+   "Web server",
+   "Certificate authority"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "ClientHello + key share",
+    "n": "The browser lists the cipher suites it supports and sends its half of a key exchange. It also sends the server name it wants (SNI)."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "ServerHello + key share",
+    "n": "The server picks a cipher suite and sends its half of the key exchange. Both sides can now work out the same secret keys without ever sending them."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Certificate (encrypted)",
+    "n": "From here on the handshake is encrypted. The server sends its certificate, which names the site and carries a signature from a certificate authority."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Is this signature valid?",
+    "n": "The browser checks the chain up to a certificate authority it already trusts, the dates, and that the name matches. This check uses built-in trust, not a live call; it is shown here to make the idea visible."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "CertificateVerify + Finished",
+    "n": "The server proves it holds the private key for the certificate by signing the handshake. Finished confirms nothing was changed on the way."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Finished",
+    "n": "The browser confirms the handshake too. The connection is encrypted and the server is identified."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Encrypted HTTP request",
+    "n": "Application data now travels encrypted with the session keys. A certificate that expires or does not match is why you see browser warnings."
+   }
+  ]
+ },
+ {
+  "id": "pod-scheduling",
+  "module": "kubernetes",
+  "lesson": "kubernetes/scheduling-and-troubleshooting",
+  "title": "What happens when you create a pod",
+  "summary": "From kubectl apply to a running container.",
+  "actors": [
+   "kubectl",
+   "API server",
+   "etcd",
+   "Scheduler",
+   "Kubelet"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "kubectl apply -f pod.yaml",
+    "n": "kubectl sends the object to the API server. The API server is the only component that talks to the cluster database."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Authenticate, authorise, validate",
+    "n": "The API server checks who you are, whether you may create pods, and whether the object is valid. Admission controllers may change or reject it."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Store the pod",
+    "n": "The pod is saved in etcd with no node assigned. Its phase is Pending."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Watch: unscheduled pods?",
+    "n": "The scheduler watches the API server for pods that have no node."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Filter and score nodes",
+    "n": "The scheduler removes nodes that cannot fit the pod (not enough CPU, taints, affinity) and scores the rest."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Bind pod to node-2",
+    "n": "The scheduler writes the chosen node name back through the API server."
+   },
+   {
+    "f": 4,
+    "t": 1,
+    "l": "Watch: pods for my node",
+    "n": "The kubelet on node-2 sees a pod assigned to it."
+   },
+   {
+    "f": 4,
+    "t": 4,
+    "l": "Pull image, start containers",
+    "n": "The kubelet asks the container runtime to pull the image and start the containers, then runs the probes."
+   },
+   {
+    "f": 4,
+    "t": 1,
+    "l": "Status: Running, Ready",
+    "n": "The kubelet reports status back. Once the readiness probe passes, Services start sending traffic to the pod."
+   }
+  ]
+ },
+ {
+  "id": "rolling-update",
+  "module": "kubernetes",
+  "lesson": "kubernetes/pods-and-deployments",
+  "title": "A rolling update of a Deployment",
+  "summary": "How Kubernetes replaces pods without downtime.",
+  "actors": [
+   "You",
+   "Deployment",
+   "New ReplicaSet",
+   "Old ReplicaSet",
+   "Service"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Change image to v2",
+    "n": "You update the pod template in the Deployment. Any change to the template starts a rollout."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Create ReplicaSet v2 (0 pods)",
+    "n": "The Deployment controller creates a new ReplicaSet for the new template and keeps the old one."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Scale up by maxSurge (1 pod)",
+    "n": "With maxSurge 25 percent the new ReplicaSet may add extra pods above the desired count."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Send traffic once Ready",
+    "n": "The Service only sends traffic to a new pod after its readiness probe passes. A failing probe stops the rollout here, which protects users."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Scale down by maxUnavailable",
+    "n": "Once new pods are ready, the old ReplicaSet is scaled down, never below the minimum available count."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Repeat until v2 is complete",
+    "n": "Steps of scale up and scale down repeat until every pod runs the new version and the old ReplicaSet has zero pods."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "kubectl rollout undo",
+    "n": "The old ReplicaSet is kept so a rollback is fast: scale it back up and scale the new one down."
+   }
+  ]
+ },
+ {
+  "id": "terraform-workflow",
+  "module": "terraform",
+  "lesson": "terraform/iac-and-hcl-basics",
+  "title": "The Terraform workflow",
+  "summary": "Write, plan, apply, and where state fits in.",
+  "actors": [
+   "You",
+   "Terraform",
+   "State file",
+   "Cloud API"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "terraform init",
+    "n": "Terraform downloads the providers and modules that the code needs and configures the state backend."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "terraform plan",
+    "n": "You ask what would change. Terraform reads your code to find the desired state."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Read the recorded state",
+    "n": "Terraform loads the state file, which records which real resources it already manages. With a remote backend it also takes a lock."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Refresh: what exists now?",
+    "n": "Terraform asks the cloud API for the current settings of the resources in the state, so it notices drift."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Compare and build a plan",
+    "n": "Desired state is compared with the real state. The plan lists each resource as create, update in place, replace or destroy."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Plan: 2 to add, 1 to change, 0 to destroy",
+    "n": "You review the plan. Read the destroy and replace lines most carefully."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "terraform apply (approve)",
+    "n": "You approve. Terraform runs the plan in dependency order and in parallel where it can."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Create and update resources",
+    "n": "Terraform calls the cloud API for each change."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Save the new state",
+    "n": "The results are written to the state file and the lock is released. The state now matches reality again."
+   }
+  ]
+ },
+ {
+  "id": "cicd-pipeline",
+  "module": "cicd",
+  "lesson": "cicd/pipeline-fundamentals",
+  "title": "A change travelling through a pipeline",
+  "summary": "From a code push to production, and where it can stop.",
+  "actors": [
+   "Developer",
+   "Repository",
+   "CI runner",
+   "Registry",
+   "Production"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Push a branch, open a review",
+    "n": "The change is pushed and reviewed by a colleague. Branch rules can require passing checks before merging."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Trigger the pipeline",
+    "n": "The push starts a pipeline on a runner, a clean machine or container that has only what the job needs."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Lint, unit tests, security scan",
+    "n": "Fast checks run first so that obvious problems fail early and cheaply. A failure stops the pipeline and tells the author."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Build the artifact",
+    "n": "The code is built once into an artifact, such as a container image, tagged with the commit ID."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Push image: app:3f9c2a1",
+    "n": "The artifact goes to a registry. The same artifact is promoted through every environment, never rebuilt."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Deploy to staging, run smoke tests",
+    "n": "The artifact is deployed to a staging environment and tested end to end."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Canary: 5 percent of traffic",
+    "n": "In production a small share of traffic gets the new version while error rate and latency are watched."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Healthy: promote to 100 percent",
+    "n": "If the numbers stay good the rollout continues. If not, the pipeline rolls back automatically."
+   }
+  ]
+ },
+ {
+  "id": "linux-boot",
+  "module": "linux",
+  "lesson": "linux/boot-and-kernel",
+  "title": "How a Linux server boots",
+  "summary": "From power on to a login prompt.",
+  "actors": [
+   "Firmware",
+   "Bootloader",
+   "Kernel",
+   "systemd",
+   "Services"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Power-on self test",
+    "n": "The firmware (UEFI or BIOS) checks the hardware, finds memory and devices, and decides which disk to boot from."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Start the bootloader",
+    "n": "The firmware loads the bootloader, such as GRUB, from the boot disk. The bootloader can show a menu of kernels."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Load kernel and initramfs",
+    "n": "The bootloader loads the chosen kernel and a small temporary filesystem called the initramfs into memory and hands control to the kernel."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Detect hardware, mount root",
+    "n": "The kernel starts its drivers. The initramfs holds the drivers needed to find and mount the real root filesystem, for example on LVM or an encrypted disk."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Start PID 1",
+    "n": "The kernel starts the first process, systemd, with process ID 1. Every other process is a child of it."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Read units, reach the default target",
+    "n": "systemd reads its unit files and works out the order in which to start things so that the target, such as multi-user, is reached."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Start services in parallel",
+    "n": "Networking, logging, SSH and your applications start, in parallel where dependencies allow. A failed unit can be seen with systemctl --failed."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "Login prompt ready",
+    "n": "When the target is reached the machine is up. The command systemd-analyze blame shows which units took the longest."
+   }
+  ]
+ },
+ {
+  "id": "linux-permissions",
+  "module": "linux",
+  "lesson": "linux/users-groups-permissions",
+  "title": "How Linux decides if you may open a file",
+  "summary": "The checks behind \"Permission denied\".",
+  "actors": [
+   "Process",
+   "Kernel",
+   "Path",
+   "File owner and mode"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "open(\"/srv/app/data.txt\", read)",
+    "n": "A process asks the kernel to open a file. The kernel acts for the process using its user ID and group IDs."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Walk each directory in the path",
+    "n": "To reach the file the process needs the execute (search) bit on every directory along the path: /, /srv and /srv/app. A missing x on one directory is a common cause of denied access."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Directories allow passage",
+    "n": "If any directory refuses, the open fails here with Permission denied, before the file itself is even looked at."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Read owner, group and mode",
+    "n": "The kernel reads the file owner, group and mode bits, for example 640: owner read and write, group read, others nothing."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Pick one class only",
+    "n": "If the user is the owner, only the owner bits apply. Otherwise if the group matches, only the group bits apply. Otherwise the others bits apply. The first match decides."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Other layers: ACLs, SELinux, mounts",
+    "n": "Access control lists, SELinux or AppArmor, and read-only mounts can still refuse a request that the mode bits allow."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "File descriptor, or EACCES",
+    "n": "If every check passes, the process gets a file descriptor. Otherwise it gets the error that programs show as Permission denied. Use namei -l on the path to see each step."
+   }
+  ]
+ },
+ {
+  "id": "linux-process",
+  "module": "linux",
+  "lesson": "linux/processes-and-services",
+  "title": "A process starts, runs and is stopped",
+  "summary": "fork, exec, signals and why SIGTERM comes before SIGKILL.",
+  "actors": [
+   "Shell",
+   "Kernel",
+   "New process",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "fork()",
+    "n": "The shell asks the kernel to copy itself. The copy, the child, has a new process ID and starts with the same memory contents."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Child process created",
+    "n": "The kernel creates the child. The parent shell normally waits for it to finish unless the command ends with an ampersand."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "exec(\"/usr/bin/myapp\")",
+    "n": "The child asks the kernel to replace its memory with the program myapp. The process ID stays the same but the program is new."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Running: reads, writes, waits",
+    "n": "The program runs, opens files, and may spend most of its time waiting for input or the disk. The kernel shares the CPU between processes."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "kill PID (SIGTERM)",
+    "n": "An operator sends SIGTERM, a polite request to stop. A well-written program catches it, finishes current work, closes files and exits."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Clean up and exit(0)",
+    "n": "The program shuts down gracefully. If it ignores SIGTERM it keeps running."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "kill -9 PID (SIGKILL)",
+    "n": "SIGKILL cannot be caught or ignored: the kernel removes the process at once. Nothing is cleaned up, so use it only after SIGTERM has had time to work."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Exit status to the parent",
+    "n": "The kernel tells the parent the exit status. The shell stores it in $?. If a parent never collects it, the child stays as a zombie entry."
+   }
+  ]
+ },
+ {
+  "id": "bash-expansion",
+  "module": "bash",
+  "lesson": "bash/arrays-and-parameter-expansion",
+  "title": "How the shell reads a command line",
+  "summary": "Why quoting matters: expansion, splitting and globbing.",
+  "actors": [
+   "You type",
+   "Shell",
+   "Program"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "rm $dir/*.log",
+    "n": "You type a command containing a variable and a wildcard. The shell, not the program, processes these first."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Expand variables",
+    "n": "The shell replaces $dir with its value, for example /var/app logs. If the value contains a space it becomes part of the text."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Split into words",
+    "n": "Without quotes the shell splits the result on spaces, so one variable can become two arguments. This is how a path with a space deletes the wrong thing."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Expand wildcards (globbing)",
+    "n": "Each word with * or ? is replaced with the matching file names. If nothing matches, bash passes the pattern through unchanged."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Run rm with the final arguments",
+    "n": "Only now does the program start. It never sees the variable or the wildcard, only the final list of words."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Safer: rm -- \"$dir\"/*.log",
+    "n": "Quote variables so they stay one word, and use -- so a name starting with a dash is not read as an option."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Check with echo or set -x",
+    "n": "Put echo in front of a dangerous command, or run with set -x, to see exactly what the shell is about to run."
+   }
+  ]
+ },
+ {
+  "id": "bash-pipeline",
+  "module": "bash",
+  "lesson": "bash/text-processing",
+  "title": "A pipeline and its exit codes",
+  "summary": "What set -euo pipefail changes.",
+  "actors": [
+   "Script",
+   "curl",
+   "jq",
+   "wc"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "set -euo pipefail",
+    "n": "The script turns on three safety options: stop on a failing command (-e), treat unset variables as errors (-u), and make a pipeline fail if any part fails (pipefail)."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "curl -s $URL | jq .items[] | wc -l",
+    "n": "The shell starts all three commands at once and connects the output of each to the input of the next with pipes."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "curl sends the response body",
+    "n": "Data flows from curl to jq as it arrives. Nothing is stored in a file in between."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "curl fails: exit code 22",
+    "n": "Suppose the server returns an error and curl exits non-zero. By default a pipeline reports only the exit code of its last command."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "jq passes on empty output",
+    "n": "jq gets nothing, prints nothing, and exits 0. wc then counts zero lines and exits 0 too."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Without pipefail: status 0",
+    "n": "The pipeline looks successful because wc succeeded, and the script carries on with a wrong count of zero."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "With pipefail: status 22",
+    "n": "The pipeline now returns the failure of curl, and set -e stops the script at that line. Check ${PIPESTATUS[@]} to see every status."
+   }
+  ]
+ },
+ {
+  "id": "python-import",
+  "module": "python",
+  "lesson": "python/basics-and-environments",
+  "title": "How Python finds a module",
+  "summary": "The import path, virtual environments and the wrong-version problem.",
+  "actors": [
+   "Your script",
+   "Import system",
+   "sys.path folders",
+   "Virtual environment"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "import requests",
+    "n": "Your script asks to import a module. Python first checks whether it was already imported, which is stored in sys.modules."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Not loaded yet: build the search list",
+    "n": "Python uses sys.path, an ordered list of folders: the script folder first, then the standard library, then site-packages."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Look in each folder in order",
+    "n": "The first folder that contains requests (a file or a package folder) wins. A file of your own named requests.py next to the script would shadow the real library."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "site-packages of the active environment",
+    "n": "When a virtual environment is active, its site-packages is on the path, not the system one. That is why a package installed in one environment is missing in another."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Found: version 2.32",
+    "n": "Python reads the file, runs it once, and stores the module object in sys.modules for later imports."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Module is ready to use",
+    "n": "Your script can now call requests.get. A second import returns the same object quickly without running the file again."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "ModuleNotFoundError",
+    "n": "If no folder has the module you get this error. Check which python and which pip are in use, and run python -m pip so they match."
+   }
+  ]
+ },
+ {
+  "id": "python-retry",
+  "module": "python",
+  "lesson": "python/http-apis-and-json",
+  "title": "An API call with a timeout and retry",
+  "summary": "How a robust client treats slow and failing services.",
+  "actors": [
+   "Your code",
+   "HTTP client",
+   "API server"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "get(url, timeout=5)",
+    "n": "Always set a timeout. Without one a request can wait forever and hang the whole program."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Send the request",
+    "n": "The client opens a connection and sends the HTTP request."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "503 Service Unavailable",
+    "n": "The server is overloaded and answers with a temporary error. A 503 or a timeout is worth retrying; a 400 or 404 is not."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Raise an exception",
+    "n": "raise_for_status turns the bad response into an exception that your try and except block can catch."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Wait 1 s, then 2 s, then 4 s, plus jitter",
+    "n": "Wait longer after each failure and add a small random amount. This stops many clients from retrying at the same instant."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Retry, up to a limit",
+    "n": "Retry a small, fixed number of times. Only retry operations that are safe to repeat, or that use an idempotency key."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "200 OK with data",
+    "n": "The server has recovered and the call succeeds."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Give up with a clear error",
+    "n": "After the last attempt, raise an error that says what failed and how many times it was tried, so the failure shows up in logs."
+   }
+  ]
+ },
+ {
+  "id": "lb-request",
+  "module": "networking",
+  "lesson": "networking/firewalls-and-load-balancing",
+  "title": "A web request through a load balancer",
+  "summary": "DNS, TLS, health checks and the path to a healthy server.",
+  "actors": [
+   "Browser",
+   "Load balancer",
+   "Server A",
+   "Server B",
+   "Database"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "HTTPS request to shop.example.com",
+    "n": "After DNS and the TLS handshake, the browser sends its request to the address of the load balancer."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "End TLS, pick a healthy target",
+    "n": "The load balancer decrypts the request and chooses a backend that is passing its health checks, for example by round robin or least connections."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Health check to Server B fails",
+    "n": "Server B did not answer its recent health checks, so it is taken out of rotation and gets no new traffic."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Forward to Server A",
+    "n": "The request goes to Server A with headers such as X-Forwarded-For so the application still knows the real client address."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Query the data",
+    "n": "The application reads from the database and builds the page."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Rows returned",
+    "n": "The database answers. Slow queries here show up as high latency for the user."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "200 OK, response body",
+    "n": "Server A returns the response to the load balancer."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Encrypted response",
+    "n": "The load balancer encrypts the response and returns it. If every backend were unhealthy the user would see a 502 or 503 from the load balancer instead."
+   }
+  ]
+ },
+ {
+  "id": "docker-build",
+  "module": "docker",
+  "lesson": "docker/writing-dockerfiles",
+  "title": "How a Docker image is built and cached",
+  "summary": "Layers, the build cache and why instruction order matters.",
+  "actors": [
+   "Dockerfile",
+   "Builder",
+   "Layer cache",
+   "Registry"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "FROM python:3.12-slim",
+    "n": "The builder pulls the base image. Its layers become the bottom of your image."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "COPY requirements.txt, then RUN pip install",
+    "n": "Copy only the dependency list first. If that file is unchanged, the installed dependencies come straight from the cache."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Cache hit for both layers",
+    "n": "The cache key is the instruction plus the content it depends on. Nothing changed, so the slow install step is skipped."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "COPY . /app",
+    "n": "Now your source code is copied. It changes on every commit, so this layer is rebuilt, and so is every layer after it."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Cache miss from here on",
+    "n": "Putting rarely changing steps first and fast changing steps last keeps builds fast. Putting COPY . before pip install would reinstall everything on each change."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "CMD sets the start command",
+    "n": "CMD and ENTRYPOINT add metadata, not a new filesystem. They say what runs when a container starts."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Push app:3f9c2a1",
+    "n": "The image is pushed to the registry. Only layers that the registry does not already have are uploaded."
+   }
+  ]
+ },
+ {
+  "id": "docker-run",
+  "module": "docker",
+  "lesson": "docker/runtimes-oci-and-podman",
+  "title": "What docker run does",
+  "summary": "From a command to an isolated process.",
+  "actors": [
+   "docker CLI",
+   "Docker daemon",
+   "Registry",
+   "Container runtime",
+   "Kernel"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "docker run -p 8080:80 nginx",
+    "n": "The command line tool sends the request to the Docker daemon, which does the actual work."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Is the image here already?",
+    "n": "The daemon looks in its local image store first."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Pull nginx:latest",
+    "n": "If it is missing, the daemon pulls the image layers from the registry. A pinned tag is more repeatable than latest."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Create and start the container",
+    "n": "The daemon asks the container runtime to create a container from the image, adding a thin writable layer on top."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Namespaces, cgroups, network",
+    "n": "The kernel gives the process its own view of processes, network and filesystem (namespaces) and limits on CPU and memory (cgroups)."
+   },
+   {
+    "f": 1,
+    "t": 4,
+    "l": "Publish host port 8080 to 80",
+    "n": "A rule forwards traffic arriving on host port 8080 to port 80 inside the container."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Container running: nginx is PID 1",
+    "n": "The container is just a process on the host with restricted views. When that main process exits, the container stops."
+   }
+  ]
+ },
+ {
+  "id": "bluegreen-deploy",
+  "module": "cicd",
+  "lesson": "cicd/deployment-strategies",
+  "title": "Blue-green deployment",
+  "summary": "Two copies of production and an instant switch.",
+  "actors": [
+   "Users",
+   "Router",
+   "Blue (v1)",
+   "Green (v2)"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "All traffic goes to blue",
+    "n": "Blue is the live version. Users reach it through a router or load balancer."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "100 percent to blue (v1)",
+    "n": "The current version serves everything while green does not receive any user traffic."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Deploy v2 to green",
+    "n": "The new version is deployed to an identical green environment next to blue, using the same artifact that was tested."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Smoke tests on green",
+    "n": "Tests and a few internal users check green with real configuration while no customers are affected."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Switch the router to green",
+    "n": "The router moves traffic from blue to green in one change. Plan for database changes that both versions can work with."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Green serves users",
+    "n": "Users now get v2. Watch error rate and latency closely during the first minutes."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Rollback: switch back to blue",
+    "n": "If something is wrong, switching back is as fast as the switch forward, because blue is still running. Remove blue only after green has proved stable."
+   }
+  ]
+ },
+ {
+  "id": "k8s-service",
+  "module": "kubernetes",
+  "lesson": "kubernetes/services-and-ingress",
+  "title": "How a request reaches a pod through a Service",
+  "summary": "ClusterIP, endpoints and kube-proxy.",
+  "actors": [
+   "Client pod",
+   "Cluster DNS",
+   "Service",
+   "kube-proxy rules",
+   "Backend pod"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Resolve payments.shop.svc",
+    "n": "The client pod asks cluster DNS for the name of the Service."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Answer: ClusterIP 10.96.12.7",
+    "n": "DNS returns the stable virtual IP of the Service. This address does not belong to any single pod."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Connect to 10.96.12.7:80",
+    "n": "The client sends traffic to the Service address, which is the same however many pods exist."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Endpoints are matched by label",
+    "n": "The Service selects pods by labels. Only pods whose readiness probe passes are listed as endpoints."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Rules rewrite the destination",
+    "n": "On every node kube-proxy (or an eBPF datapath) installs rules that pick one endpoint and change the destination address to that pod."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Forward to 10.244.1.9:8080",
+    "n": "The packet reaches one backend pod. The next connection may reach a different pod."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Response returns",
+    "n": "The pod answers and the reply returns through the same translation. If a Service has no endpoints, check that its selector matches the pod labels."
+   }
+  ]
+ },
+ {
+  "id": "k8s-hpa",
+  "module": "kubernetes",
+  "lesson": "kubernetes/autoscaling",
+  "title": "Autoscaling with the HPA",
+  "summary": "How pods are added when load rises.",
+  "actors": [
+   "Metrics server",
+   "HPA controller",
+   "Deployment",
+   "Scheduler",
+   "Cluster autoscaler"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Collect CPU use from the kubelets",
+    "n": "The metrics server gathers resource usage of every pod. The HPA needs CPU requests to be set, because it works on a percentage of the request."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Read metrics every 15 seconds",
+    "n": "The Horizontal Pod Autoscaler asks for current usage of the pods it manages."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Average is 90 percent, target is 60",
+    "n": "It computes desired replicas as current replicas times current value divided by target, rounded up. For 4 pods that gives 6."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Scale the Deployment to 6",
+    "n": "The HPA changes the replica count. A stabilization window stops it from scaling down too fast after a spike."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Two new pods need nodes",
+    "n": "The Deployment creates the pods and the scheduler tries to place them."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Pods stay Pending: no room",
+    "n": "If every node is full the pods wait, which is when the cluster autoscaler can add a node."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "New node joins, pods run",
+    "n": "Adding a node takes minutes, so keep some headroom or scale on a leading signal for sudden traffic."
+   }
+  ]
+ },
+ {
+  "id": "terraform-lock",
+  "module": "terraform",
+  "lesson": "terraform/state",
+  "title": "Two engineers apply at once: state locking",
+  "summary": "Why remote state needs a lock.",
+  "actors": [
+   "Engineer A",
+   "Engineer B",
+   "Remote backend",
+   "Cloud API"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 2,
+    "l": "terraform apply: take the lock",
+    "n": "Engineer A starts an apply. Terraform asks the backend for a lock on the state before it reads anything."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Lock granted",
+    "n": "The backend records who holds the lock and since when. With a bucket backend a separate lock table or lock file does this."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "terraform apply: take the lock",
+    "n": "Engineer B starts an apply on the same state a few seconds later."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Refused: state is locked by A",
+    "n": "B sees an error with the lock owner and time. Without locking, both would plan from the same old state and one could overwrite the other."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "A creates and changes resources",
+    "n": "A applies the plan to the cloud API."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Write new state and release the lock",
+    "n": "The new state is saved first and then the lock is released."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "B tries again and plans from fresh state",
+    "n": "B now plans from the updated state, so the plan includes A's changes. Use force-unlock only when you are sure that the first run has died."
+   }
+  ]
+ },
+ {
+  "id": "aws-iam",
+  "module": "cloud",
+  "lesson": "cloud/identity-and-access",
+  "title": "How a cloud request is authorised (IAM)",
+  "summary": "Identity, policy evaluation and temporary credentials.",
+  "actors": [
+   "Application",
+   "Security token service",
+   "IAM policy engine",
+   "Storage service"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Assume the role \"report-reader\"",
+    "n": "Instead of a stored password, the application asks for temporary credentials for a role. The workload identity proves who it is."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Short-lived keys, expire in 1 hour",
+    "n": "The token service returns a key, a secret and a session token that expire. Leaked temporary keys are far less harmful than permanent ones."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "GetObject reports/may.csv (signed)",
+    "n": "The application calls the storage service and signs the request with the temporary credentials."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Ask: may this role do this?",
+    "n": "The service asks the policy engine to evaluate the request: who, which action, which resource, and which conditions."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Evaluate all policies",
+    "n": "Everything is denied by default. An explicit Deny anywhere wins. Otherwise at least one Allow, from an identity or resource policy, must match."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Allow",
+    "n": "The role policy allows s3:GetObject on that bucket prefix, and no deny applies, so the request is permitted."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Object returned, or 403 AccessDenied",
+    "n": "With an Allow the data is returned. Otherwise the caller gets AccessDenied, and the audit log records the attempt."
+   }
+  ]
+ },
+ {
+  "id": "cloud-autoscale",
+  "module": "cloud",
+  "lesson": "cloud/compute-and-storage",
+  "title": "An auto scaling group reacts to load",
+  "summary": "Scale out, health replacement and scale in.",
+  "actors": [
+   "Load balancer",
+   "Monitoring",
+   "Auto scaling group",
+   "Instances"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Traffic rises",
+    "n": "More requests per instance push CPU or request count above the target you set."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Alarm: average CPU above 60 percent",
+    "n": "Monitoring evaluates the metric over several periods so that a short spike does not trigger a scale-out."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Policy: add 2 instances",
+    "n": "A target tracking or step policy tells the group how many instances it should have."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Launch from the template",
+    "n": "The group launches instances from a launch template, spread across availability zones."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Pass health checks, join the pool",
+    "n": "A new instance receives traffic only after it passes the load balancer health check. A slow start time prevents overload on a cold instance."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "One instance fails its check",
+    "n": "If an instance becomes unhealthy, the group terminates it and launches a replacement to keep the desired capacity."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Load falls: scale in after a cooldown",
+    "n": "Scale in is slower and more careful than scale out. Instances finish in-flight requests (connection draining) before they stop."
+   }
+  ]
+ },
+ {
+  "id": "cloud-multi-az",
+  "module": "cloud",
+  "lesson": "cloud/high-availability-and-disaster-recovery",
+  "title": "A zone fails: multi-AZ database failover",
+  "summary": "What a standby does and how long the gap lasts.",
+  "actors": [
+   "Application",
+   "DNS endpoint",
+   "Primary (zone A)",
+   "Standby (zone B)"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Connect to db.example.internal",
+    "n": "The application always uses one DNS name, never an instance address."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Name points to the primary",
+    "n": "In normal operation the name resolves to the primary in zone A."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Replicate every write",
+    "n": "A managed multi-AZ database copies each committed write to the standby in another zone, so little or no data is lost."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Zone A fails",
+    "n": "A power or network failure takes the primary offline. Detection takes a short time."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Promote the standby",
+    "n": "The service decides that the primary is gone and promotes the standby to be the new primary. This often takes one to two minutes."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Name now points to zone B",
+    "n": "The DNS record changes. Applications with long-lived DNS caches or open connections may need to reconnect."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Reconnect and retry",
+    "n": "Applications must retry with backoff for the gap. A new standby is built in the background to restore redundancy."
+   }
+  ]
+ },
+ {
+  "id": "prometheus-alert",
+  "module": "observability",
+  "lesson": "observability/alerting-and-dashboards",
+  "title": "From a metric to a page",
+  "summary": "Scrape, store, evaluate, route and notify.",
+  "actors": [
+   "Application",
+   "Prometheus",
+   "Alertmanager",
+   "On-call engineer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Expose /metrics",
+    "n": "The application publishes counters and histograms, such as the total number of requests by status code."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Scrape every 15 seconds",
+    "n": "Prometheus pulls the metrics from each target on a schedule and stores them as time series."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Evaluate the alert rule",
+    "n": "A rule such as the error ratio above 2 percent for 5 minutes is checked at every evaluation interval. The for clause avoids alerts on brief blips."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Alert is firing",
+    "n": "When the rule has been true long enough, Prometheus sends the alert with its labels to Alertmanager."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Group, deduplicate, silence",
+    "n": "Alertmanager groups related alerts into one notification, drops duplicates and respects silences and inhibition rules."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Page the on-call",
+    "n": "A notification goes to the on-call tool by phone or chat according to routing labels such as team and severity."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Acknowledge, then open the runbook",
+    "n": "The engineer acknowledges the page and follows the runbook linked in the alert annotations. Good pages say what users feel and what to check first."
+   }
+  ]
+ },
+ {
+  "id": "distributed-trace",
+  "module": "observability",
+  "lesson": "observability/logs-and-traces",
+  "title": "A distributed trace across services",
+  "summary": "How one request is followed from service to service.",
+  "actors": [
+   "Gateway",
+   "Orders service",
+   "Payments service",
+   "Trace backend"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Create trace ID 4bf9...",
+    "n": "The first service creates a trace ID and a root span that records the start time and the operation name."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Call with a traceparent header",
+    "n": "The trace ID and the parent span ID travel in an HTTP header, as in the W3C Trace Context standard."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Orders: new child span",
+    "n": "The service starts a child span with the same trace ID and records its own timing and attributes."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Call payments, header passed on",
+    "n": "Every hop must pass the header on. One service that drops it breaks the trace into two pieces."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Payments: slow database call, 1.8 s",
+    "n": "A child span for the database query shows where the time went. The span shows the problem is in the database call, not in the network."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Spans are exported",
+    "n": "Each service sends its finished spans, usually through an OpenTelemetry collector, to the trace backend. Sampling keeps cost down."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Assemble the waterfall",
+    "n": "The backend joins spans by trace ID into one waterfall view, so an engineer can click from an alert to the exact slow request."
+   }
+  ]
+ },
+ {
+  "id": "log-pipeline",
+  "module": "observability",
+  "lesson": "observability/log-pipelines",
+  "title": "How logs get from an app to a search box",
+  "summary": "Collect, parse, ship, index and query.",
+  "actors": [
+   "Application",
+   "Node agent",
+   "Log store",
+   "Engineer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Write JSON lines to stdout",
+    "n": "In containers the application writes one structured event per line to standard output and does not manage log files itself."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "The runtime stores the stream",
+    "n": "The container runtime saves the output on the node, and an agent such as Fluent Bit tails those files."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Parse and add labels",
+    "n": "The agent parses each line and adds labels such as namespace, pod and version. Drop secrets and personal data here before they leave the node."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Ship in batches with retries",
+    "n": "The agent sends batches to the log store and buffers on disk if the store is slow, so a short outage does not lose logs."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Index and keep for 14 days",
+    "n": "The store indexes the data and applies retention. Indexing every field is costly, so many stores index only labels."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Query: error and trace ID",
+    "n": "During an incident the engineer searches by label and time range, and by trace ID to find the logs for one request."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Matching lines returned",
+    "n": "Results come back in time order. A good log line has a level, a message, and an ID that links to the trace."
+   }
+  ]
+ },
+ {
+  "id": "incident-response",
+  "module": "sre",
+  "lesson": "sre/incident-response",
+  "title": "The life of an incident",
+  "summary": "Detect, respond, mitigate, learn.",
+  "actors": [
+   "Monitoring",
+   "On-call",
+   "Incident commander",
+   "Customers",
+   "Team"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Alert: checkout errors 8 percent",
+    "n": "Monitoring detects the problem from a user-facing signal and pages the on-call engineer."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Acknowledge, assess impact",
+    "n": "The on-call checks dashboards, decides how many users are affected, and sets a severity."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Declare an incident, name a commander",
+    "n": "For a serious problem, one person takes the role of incident commander. They coordinate and do not debug, so that work stays organised."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Assign roles, open one channel",
+    "n": "Operators work the problem, a scribe records the timeline, and a communications lead updates others on a regular schedule."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "Post a status update",
+    "n": "Customers are told what is known and when to expect the next update, even when the cause is not known yet."
+   },
+   {
+    "f": 4,
+    "t": 4,
+    "l": "Mitigate first: roll back the release",
+    "n": "Stop the harm before finding the root cause. Rollback, failover or turning off a feature flag is usually quicker than a fix."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Confirm recovery on the same graphs",
+    "n": "Check that the user-facing signal returns to normal, then resolve the incident and tell customers."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Blameless postmortem, actions with owners",
+    "n": "Within days the team writes up the timeline, causes and follow-ups. Good actions change the system, have an owner and a date."
+   }
+  ]
+ },
+ {
+  "id": "error-budget-policy",
+  "module": "sre",
+  "lesson": "sre/slos-and-error-budgets",
+  "title": "An error budget decides the release pace",
+  "summary": "How a 99.9 percent SLO turns into decisions.",
+  "actors": [
+   "Users",
+   "Monitoring",
+   "Error budget",
+   "Product team",
+   "SRE team"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Requests succeed or fail",
+    "n": "The SLI is the share of requests that succeed. Monitoring counts good and bad events continuously."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "SLO 99.9 percent over 30 days",
+    "n": "The target allows 0.1 percent failure, about 43 minutes of full outage or the same number of failed requests."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Budget remaining: 70 percent",
+    "n": "The remaining budget is shown on a dashboard. Plenty left means the team can take risk."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Ship features, run experiments",
+    "n": "While budget remains, releases and risky changes continue at full speed. Reliability is not an end in itself."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "A bad release burns 40 percent",
+    "n": "A fast burn rate raises an alert long before the window ends, for example when budget is consumed 14 times faster than allowed."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Budget nearly spent: policy applies",
+    "n": "The agreed policy now applies: slow or pause risky launches and put the time into reliability work."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "Fix reliability, budget recovers",
+    "n": "As the window moves forward and failures fall out of it, the budget recovers and normal release pace returns."
+   }
+  ]
+ },
+ {
+  "id": "retry-storm",
+  "module": "sre",
+  "lesson": "sre/reliability-patterns",
+  "title": "A retry storm, and how to stop it",
+  "summary": "Why naive retries turn a blip into an outage.",
+  "actors": [
+   "Clients",
+   "Service",
+   "Database"
+  ],
+  "steps": [
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Database slows down",
+    "n": "A maintenance task makes the database slower. Requests to the service start to time out."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Timeouts: clients retry 3 times",
+    "n": "Every client that times out retries immediately. The load on the service becomes up to four times the normal load."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Retries pile onto the database",
+    "n": "The extra requests go to the already slow database, so more of them time out."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Overloaded: it cannot recover",
+    "n": "Even after the original cause ends, the retry load keeps the database busy. The system stays down on its own load."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fix: exponential backoff and jitter",
+    "n": "Clients wait longer after each failure and add random delay, which spreads the retries out over time."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Fix: retry budget and circuit breaker",
+    "n": "Limit retries to a small share of traffic. A circuit breaker stops calling a failing dependency for a short time and fails fast."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Shed load, return 503 early",
+    "n": "A service that rejects excess requests quickly protects itself and recovers sooner than one that tries to serve everything."
+   }
+  ]
+ },
+ {
+  "id": "ssh-login",
+  "module": "linux",
+  "lesson": "linux/ssh-and-remote-access",
+  "title": "How an SSH login works",
+  "summary": "Key exchange, host check and key-based sign-in.",
+  "actors": [
+   "Your laptop",
+   "sshd on the server",
+   "PAM and shell"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Open TCP port 22",
+    "n": "The client connects to the server. Both sides send the protocol version they support."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Server sends its host key",
+    "n": "The server proves who it is with its host key. The client compares it with the entry in known_hosts."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Check known_hosts",
+    "n": "A new key asks for your confirmation. A changed key triggers a loud warning, because it can mean a different machine or an attack."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Agree on session keys",
+    "n": "Both sides run a key exchange and derive keys that only they know. All traffic from now on is encrypted."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Offer your public key",
+    "n": "The client offers a public key. The server looks for it in ~/.ssh/authorized_keys of the target user."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Challenge to prove the private key",
+    "n": "The server sends a challenge that only the matching private key can sign. The private key never leaves your laptop."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Account and policy checks",
+    "n": "PAM checks that the account is valid and not locked, and applies limits. Wrong file permissions on ~/.ssh make the server ignore your key."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Shell starts, session is open",
+    "n": "The server starts the login shell for the user. Use ssh -v to see each of these stages when a login fails."
+   }
+  ]
+ },
+ {
+  "id": "cron-run",
+  "module": "bash",
+  "lesson": "bash/safe-automation",
+  "title": "A cron job runs, and why it behaves differently",
+  "summary": "The small environment of scheduled jobs.",
+  "actors": [
+   "cron daemon",
+   "Shell (sh)",
+   "Your script",
+   "Mail or log"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Every minute: read the crontab",
+    "n": "The cron daemon wakes up each minute and checks whether any entry matches the current time."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "30 2 * * * /opt/backup.sh",
+    "n": "At 02:30 it starts a shell. This is a plain sh with a minimal environment, not your login shell."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Small PATH, no profile files",
+    "n": "Your .bashrc and .profile are not read, and PATH is short. A command that works in your terminal can be missing here."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Run the script",
+    "n": "Use absolute paths for commands and files, and set the variables the script needs at its top."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Script writes output",
+    "n": "Anything printed goes to the owner by mail, or is lost if mail is not set up. Redirect to a log file with >> backup.log 2>&1."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Two runs overlap",
+    "n": "If a run is still going when the next one starts, you get two copies. Guard with flock -n /tmp/backup.lock."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Exit status, then alert",
+    "n": "Cron does not alert on failure by itself. Have the script report success or failure to a monitoring check."
+   }
+  ]
+ },
+ {
+  "id": "exit-codes",
+  "module": "bash",
+  "lesson": "bash/script-basics",
+  "title": "Exit codes and how a script decides what to do",
+  "summary": "From a failed command to the exit of the script.",
+  "actors": [
+   "Script",
+   "Command",
+   "Shell variables"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Run grep -q ready status.txt",
+    "n": "Every command ends with an exit status. Zero means success. Any other number means some kind of failure."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Status stored in $?",
+    "n": "The shell puts the status of the last command into $?. It changes after every command, so read it at once."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "if grep ...; then ...",
+    "n": "An if statement tests the exit status directly. You do not need to compare $? to 0."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Status 1 means no match",
+    "n": "For grep, 1 means no match and 2 means an error. The meaning of numbers belongs to each program, so read its manual."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "set -e stops on an unexpected failure",
+    "n": "With set -e the script stops on the first failing command that is not part of a test. It is a safety net, not full error handling."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "trap runs the cleanup",
+    "n": "A trap on EXIT or ERR removes temp files and reports where the script failed."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "exit 3 tells the caller why",
+    "n": "Choose clear exit codes and document them. A caller such as cron, CI or another script reads them to decide what to do next."
+   }
+  ]
+ },
+ {
+  "id": "python-boto3",
+  "module": "python",
+  "lesson": "python/cloud-sdks",
+  "title": "How boto3 finds credentials and calls AWS",
+  "summary": "The credential chain and a signed request.",
+  "actors": [
+   "Your script",
+   "boto3 credential chain",
+   "STS or metadata service",
+   "AWS API"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "boto3.client(\"s3\")",
+    "n": "You create a client without passing keys. boto3 looks for credentials in a fixed order."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Check environment variables first",
+    "n": "AWS_ACCESS_KEY_ID and related variables win if they are set. A forgotten variable can send you to the wrong account."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Then shared files and profiles",
+    "n": "Next come ~/.aws/credentials and config, including AWS_PROFILE and SSO profiles."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Then the role of the machine",
+    "n": "On EC2, ECS or EKS the chain asks the metadata service or a web identity token for short-lived credentials."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Temporary keys returned",
+    "n": "The service returns keys with an expiry time. boto3 refreshes them before they expire."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "list_objects_v2 (signed)",
+    "n": "The request is signed with the credentials, so the server can check who sent it and that nobody changed it."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Response or ClientError",
+    "n": "You get data, or a ClientError with a code such as AccessDenied. Use sts get_caller_identity to see which identity was used."
+   }
+  ]
+ },
+ {
+  "id": "python-container-signal",
+  "module": "python",
+  "lesson": "python/files-and-processes",
+  "title": "A Python service in a container and SIGTERM",
+  "summary": "Graceful shutdown during a deployment.",
+  "actors": [
+   "Orchestrator",
+   "Container runtime",
+   "Python service",
+   "In-flight requests"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Rolling update: stop the old pod",
+    "n": "The orchestrator asks the runtime to stop the container, after it removes it from the load balancer."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "SIGTERM to PID 1",
+    "n": "The runtime sends SIGTERM to the main process of the container. With a shell wrapper the signal may never reach Python."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Signal handler sets a flag",
+    "n": "Register signal.signal(SIGTERM, handler). The handler stops accepting new work and sets a flag."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Finish current requests",
+    "n": "The service completes the requests it has already started, and closes connections and files."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Exit with code 0",
+    "n": "When the work is done the process exits cleanly, and the container stops quickly."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "After the grace period: SIGKILL",
+    "n": "If the process is still running when terminationGracePeriodSeconds ends, it is killed at once and requests are cut off."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Use exec form for the entrypoint",
+    "n": "Write CMD [\"python\", \"app.py\"] so Python is PID 1 and receives the signal. Add an init such as tini if you spawn children."
+   }
+  ]
+ },
+ {
+  "id": "docker-network",
+  "module": "docker",
+  "lesson": "docker/volumes-and-networking",
+  "title": "Container to container networking",
+  "summary": "Bridge networks, DNS names and published ports.",
+  "actors": [
+   "Browser on the host",
+   "Published port rule",
+   "web container",
+   "db container",
+   "Embedded DNS"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "localhost:8080",
+    "n": "The browser connects to a port on the host. Docker has a rule that forwards it to a container."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Forward to web:80",
+    "n": "The rule rewrites the destination to the IP address of the web container on the bridge network."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Resolve \"db\"",
+    "n": "On a user-defined network, containers find each other by name. The built-in DNS server at 127.0.0.11 answers."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "db is 172.19.0.3",
+    "n": "The name resolves to the current address of the db container. The address can change, so use the name."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Connect to db:5432",
+    "n": "The traffic stays inside the network. The database port does not need to be published to the host."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Query result",
+    "n": "The database answers. Keeping the database off the host ports means that only the web container can reach it."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "HTML response",
+    "n": "The web container sends the page back through the published port. On the default bridge network, name lookup does not work, so create your own network."
+   }
+  ]
+ },
+ {
+  "id": "docker-multistage",
+  "module": "docker",
+  "lesson": "docker/slim-images-and-faster-builds",
+  "title": "A multi-stage build gives a small image",
+  "summary": "Build in one stage, ship only what you need.",
+  "actors": [
+   "Dockerfile",
+   "Build stage",
+   "Final stage",
+   "Registry"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "FROM golang:1.23 AS build",
+    "n": "The first stage has the full compiler and tools. It can be large, and it never ships."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Download dependencies, compile",
+    "n": "Copy go.mod and download modules first so the cache is used, then copy the source and build a static binary."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "FROM gcr.io/distroless/static",
+    "n": "The second stage starts from a tiny base image with no shell and no package manager."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "COPY --from=build /app /app",
+    "n": "Only the binary is copied. Compilers, source code and build caches stay behind in the first stage."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "USER nonroot, ENTRYPOINT",
+    "n": "Run as a non-root user. A smaller image has fewer packages that can have vulnerabilities."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Push 20 MB instead of 900 MB",
+    "n": "The registry stores only the final stage. Pulls are faster and scale-out is quicker."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Debug with --target build",
+    "n": "docker build --target build gives you the first stage, with all the tools, when you need to investigate."
+   }
+  ]
+ },
+ {
+  "id": "canary-release",
+  "module": "cicd",
+  "lesson": "cicd/deployment-strategies",
+  "title": "Canary release with automatic checks",
+  "summary": "Send 5 percent of traffic to the new version and watch.",
+  "actors": [
+   "Pipeline",
+   "Router",
+   "Stable v1",
+   "Canary v2",
+   "Metrics"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Deploy v2 beside v1",
+    "n": "The new version runs next to the stable one. At first it receives no user traffic."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Route 5 percent to v2",
+    "n": "The router sends a small share of requests to the canary. Real users and real data test the release."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "Compare error rate and latency",
+    "n": "Metrics for v2 are compared with v1 over the same period. The comparison matters more than an absolute number."
+   },
+   {
+    "f": 0,
+    "t": 4,
+    "l": "Gate: healthy for 10 minutes?",
+    "n": "The pipeline reads the metrics and decides. Define the pass rule before the release, not during it."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Raise to 25, 50, then 100 percent",
+    "n": "If the checks pass, the share grows in steps, with a pause and a check at each step."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Failure: route 0 percent to v2",
+    "n": "If errors rise, the router sends all traffic back to v1 at once. Only a small share of users saw the problem."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Retire v1 after a soak period",
+    "n": "Keep the old version for a while after 100 percent so that you can roll back quickly."
+   }
+  ]
+ },
+ {
+  "id": "pr-checks",
+  "module": "cicd",
+  "lesson": "cicd/building-a-pipeline",
+  "title": "What happens when you open a pull request",
+  "summary": "Checks, review and a protected main branch.",
+  "actors": [
+   "Developer",
+   "CI system",
+   "Reviewer",
+   "Main branch"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Open a pull request",
+    "n": "The change triggers the pipeline. It runs in a clean environment on the proposed result of the merge."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Lint, unit tests, build",
+    "n": "Fast checks run first, so a mistake is reported in minutes and slower checks do not run for nothing."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Security and dependency scans",
+    "n": "Scans look for known vulnerabilities and for secrets in the change. A failure blocks the merge."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Report status on the pull request",
+    "n": "The developer sees red or green checks and a link to the logs. A flaky test hurts trust, so fix or remove it."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Review the change",
+    "n": "A person reads the change for design, risk and clarity. Small changes get better reviews."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Branch protection allows merge",
+    "n": "The main branch requires passing checks and an approval. Nobody pushes to it directly."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Build once, release the artifact",
+    "n": "After the merge the pipeline builds the artifact once, tags it with the commit, and passes it on to later stages."
+   }
+  ]
+ },
+ {
+  "id": "k8s-crashloop",
+  "module": "kubernetes",
+  "lesson": "kubernetes/debugging-kubernetes-workloads",
+  "title": "Why a pod ends in CrashLoopBackOff",
+  "summary": "Restarts, back-off and where to look.",
+  "actors": [
+   "kubelet",
+   "Container",
+   "Pod status",
+   "You"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Start the container",
+    "n": "The kubelet starts the container with the command and environment from the pod spec."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Process exits with an error",
+    "n": "The program stops, for example because a setting is missing or a dependency refuses it. Exit code 1 is an application error, 137 is a kill, often out of memory."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Restart policy: start again",
+    "n": "With restartPolicy Always, the kubelet starts the container again."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Wait longer each time",
+    "n": "Waits grow: 10 s, 20 s, 40 s up to 5 minutes. The status shows CrashLoopBackOff while it waits."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "kubectl describe pod",
+    "n": "Events and Last State show the exit code and reason such as OOMKilled or Error."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "kubectl logs --previous",
+    "n": "The logs of the crashed run show the real error. Plain logs may show the new, empty container."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Fix config, memory or probes",
+    "n": "Common causes are a missing variable or secret, a memory limit that is too low, or a liveness probe that kills a slow start. Use a startup probe for slow starts."
+   }
+  ]
+ }
+]

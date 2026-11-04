@@ -1,0 +1,979 @@
+[
+ {
+  "id": "f-aiops-storm",
+  "module": "aiops",
+  "kind": "failure",
+  "lesson": "aiops/alert-correlation-and-noise-reduction",
+  "title": "Failure and recovery: an alert storm with no grouping",
+  "summary": "Wall of alerts, slow cause.",
+  "actors": [
+   "Storage",
+   "Services",
+   "Pager",
+   "Engineer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Disk fills up",
+    "n": "A shared storage volume reaches 100 percent."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Services fail",
+    "n": "Twenty-nine services that use the volume begin to fail."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Alerts flood in",
+    "n": "Two hundred alerts reach the pager in ten minutes."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Engineer reads them",
+    "n": "The engineer spends the early minutes reading alerts one by one."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Find the disk",
+    "n": "The common dependency is finally spotted and space is freed."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Services recover",
+    "n": "The failing services recover and the dependent alerts clear."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Add grouping",
+    "n": "Stable labels, grouping by dependency and inhibition rules are added for next time."
+   }
+  ]
+ },
+ {
+  "id": "f-aiops-cleanup",
+  "module": "aiops",
+  "kind": "failure",
+  "lesson": "aiops/safe-automation-and-auto-remediation",
+  "title": "Failure and recovery: a cleanup that deleted too much",
+  "summary": "Automation without guardrails.",
+  "actors": [
+   "Rule",
+   "Disk",
+   "Services",
+   "Team"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Triggered by a disk alert",
+    "n": "A cleanup rule runs when the disk is nearly full."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Empty variable",
+    "n": "A path variable is empty, so the delete scope is far wider than intended."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Data disappears",
+    "n": "Files other services need are deleted and errors begin."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Use the kill switch",
+    "n": "The team stops all automation with one control."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Restore from backup",
+    "n": "The latest snapshot is mounted and files are restored and verified."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Add preconditions",
+    "n": "The rule now aborts on an empty target and deletes only inside a named directory."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Add limits and a dry run",
+    "n": "Action limits, a dry run, verification and an audit log are added to every rule."
+   }
+  ]
+ },
+ {
+  "id": "x-virt-boot",
+  "module": "virtualization",
+  "lesson": "virtualization/what-virtualization-is-and-hypervisor-types",
+  "title": "How a guest starts on KVM",
+  "summary": "From virsh start to a running guest.",
+  "actors": [
+   "Admin",
+   "libvirt",
+   "QEMU",
+   "KVM in the kernel",
+   "Guest OS"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "virsh start web-1",
+    "n": "The admin asks libvirt to start the guest defined in its XML file, which lists CPUs, memory, disks and network interfaces."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Check resources",
+    "n": "libvirt checks that the disks exist, the network is defined and the host has memory to give the guest."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Launch QEMU",
+    "n": "libvirt starts a QEMU process with the devices from the definition. QEMU provides the virtual hardware."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Create the virtual CPUs",
+    "n": "QEMU asks the kernel KVM module for a virtual machine and virtual CPUs, which run guest code directly on the real CPU."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Attach disks and network",
+    "n": "QEMU opens the disk image and connects the virtual network card to the bridge on the host."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Run the firmware and boot",
+    "n": "The virtual CPUs begin executing firmware, which loads the guest kernel from the virtual disk."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Guest is up",
+    "n": "The guest gets an address and answers on the network. From the host it is one QEMU process with its own memory."
+   }
+  ]
+ },
+ {
+  "id": "x-virt-migrate",
+  "module": "virtualization",
+  "lesson": "virtualization/live-migration-ha-and-troubleshooting",
+  "title": "A live migration",
+  "summary": "Copy memory while the guest keeps running.",
+  "actors": [
+   "Admin",
+   "Source host",
+   "Destination host",
+   "Guest"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Start migration",
+    "n": "The admin asks the source host to migrate the guest to the destination, over shared storage or with disk copy."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Prepare destination",
+    "n": "The destination starts an empty guest of the same shape and waits for memory pages to arrive."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Copy all memory",
+    "n": "The source copies every memory page to the destination while the guest keeps running."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Guest dirties pages",
+    "n": "The running guest changes some pages, so they must be copied again in later rounds."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Copy dirty pages",
+    "n": "Each round copies fewer pages if the network is faster than the guest writes. The rounds stop when the rest is small."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Pause and finish",
+    "n": "The source pauses the guest for a moment, sends the last pages and CPU state, and the destination resumes it."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Guest runs on the destination",
+    "n": "The guest continues with its address and sessions. The source releases its memory."
+   }
+  ]
+ },
+ {
+  "id": "f-virt-pool",
+  "module": "virtualization",
+  "kind": "failure",
+  "lesson": "virtualization/virtual-disks-snapshots-and-templates",
+  "title": "Failure and recovery: a pool full of snapshots",
+  "summary": "Overlays grow until the pool fills and guests pause.",
+  "actors": [
+   "Guest",
+   "Storage pool",
+   "Monitoring",
+   "On-call engineer",
+   "Hypervisor"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Guests write data",
+    "n": "Each guest with snapshots writes changes into an overlay file, which grows with every write."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Pool fills quietly",
+    "n": "Twelve snapshot chains grow for a week and the pool passes 90 percent with no alert."
+   },
+   {
+    "f": 1,
+    "t": 4,
+    "l": "A write fails",
+    "n": "A guest write cannot allocate a block, so the hypervisor gets an error from the pool."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Guests pause",
+    "n": "To protect data the hypervisor pauses affected guests with an I/O error. Users see hung services."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Alert arrives",
+    "n": "Application monitoring reports failures. The on-call engineer sees paused guests, not the cause."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Find the cause",
+    "n": "virsh pool-info shows no space left and virsh snapshot-list shows old snapshots on every guest."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Free space safely",
+    "n": "After confirming backups, the engineer deletes the oldest snapshots one guest at a time and watches the pool."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Resume guests",
+    "n": "With free space, the guests resume. Later the team adds snapshot expiry and an alert at 80 percent."
+   }
+  ]
+ },
+ {
+  "id": "x-sto-write",
+  "module": "storage",
+  "lesson": "storage/filesystems-ext4-xfs-and-mounts",
+  "title": "A write from program to disk",
+  "summary": "Cache, journal and device.",
+  "actors": [
+   "Program",
+   "Page cache",
+   "Filesystem",
+   "Block layer",
+   "Disk"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "write() call",
+    "n": "The program writes bytes. The kernel copies them into the page cache and the call returns quickly."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Mark pages dirty",
+    "n": "The pages are dirty: newer in memory than on disk. They will be written later in the background."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "fsync() call",
+    "n": "A database calls fsync to demand that the data is safe on disk before it carries on."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Write the journal",
+    "n": "The filesystem first records the intended change in its journal so a crash can be repaired."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Send blocks",
+    "n": "The filesystem hands the data blocks to the block layer, which queues and merges requests."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Device writes",
+    "n": "The disk stores the blocks, and a flush makes sure its own cache is on stable media."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "fsync returns",
+    "n": "Only now does the call return. A crash after this point cannot lose the data."
+   }
+  ]
+ },
+ {
+  "id": "x-sto-lvm",
+  "module": "storage",
+  "lesson": "storage/lvm-and-raid",
+  "title": "Growing a volume online",
+  "summary": "Add space without unmounting.",
+  "actors": [
+   "Admin",
+   "Volume group",
+   "Logical volume",
+   "Filesystem"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Check free extents",
+    "n": "The admin runs vgs to see whether the volume group has free space, and adds a new disk with vgextend if not."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "lvextend -r",
+    "n": "The command enlarges the logical volume by taking free extents from the group."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Tell the filesystem",
+    "n": "With the resize option the tool runs the filesystem growth for you after the volume has grown."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Grow online",
+    "n": "ext4 or XFS adds the new space to its structures while it stays mounted and in use."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "More space shows",
+    "n": "df now shows the larger size, and applications carry on without restarting."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Confirm",
+    "n": "The admin checks lsblk, df and the application logs, and records the change."
+   }
+  ]
+ },
+ {
+  "id": "f-sto-fstab",
+  "module": "storage",
+  "kind": "failure",
+  "lesson": "storage/filesystems-ext4-xfs-and-mounts",
+  "title": "Failure and recovery: a bad fstab line stops boot",
+  "summary": "One wrong UUID sends the server to emergency mode.",
+  "actors": [
+   "Admin",
+   "fstab",
+   "systemd",
+   "Console"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Add a mount line",
+    "n": "The admin adds a data disk to fstab, copying the UUID by hand and making one character wrong."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Reboot",
+    "n": "The server is restarted without testing the file with mount -a."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Read fstab",
+    "n": "During boot systemd turns every line into a mount unit, including the new one."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Device not found",
+    "n": "The UUID matches no device, so the mount unit waits and then fails."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Emergency mode",
+    "n": "Because the mount is required, boot stops and the console shows an emergency prompt."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Read the log",
+    "n": "The admin reads journalctl -xb and sees the failed dependency for the data mount."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fix the entry",
+    "n": "Root is remounted read-write and the UUID is corrected from blkid, then mount -a runs without errors."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Reboot and harden",
+    "n": "The server boots normally. The team adds nofail to optional mounts and tests fstab before reboots."
+   }
+  ]
+ },
+ {
+  "id": "x-sql-plan",
+  "module": "sql-ops",
+  "lesson": "sql-ops/reading-explain-and-finding-slow-queries",
+  "title": "How a query is planned and run",
+  "summary": "Parse, plan, execute.",
+  "actors": [
+   "Client",
+   "Parser",
+   "Planner",
+   "Executor",
+   "Storage"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Send SQL",
+    "n": "The client sends the statement text to the server."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Parse and check",
+    "n": "The parser checks syntax and that the tables and columns exist."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Plan",
+    "n": "The planner uses table statistics to estimate rows and cost for several plans."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Choose the cheapest",
+    "n": "It picks an index scan or a sequential scan, and a join order, based on the estimates."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Run the plan",
+    "n": "The executor runs the chosen steps, asking storage for rows."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Read data",
+    "n": "Storage returns pages from memory or disk, and rows are filtered and joined."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Return rows",
+    "n": "Results go back to the client. EXPLAIN ANALYZE shows estimated against actual rows for each step."
+   }
+  ]
+ },
+ {
+  "id": "x-sql-pool",
+  "module": "sql-ops",
+  "lesson": "sql-ops/connections-pooling-and-capacity",
+  "title": "A pooler shares connections",
+  "summary": "Many clients, few connections.",
+  "actors": [
+   "Clients",
+   "Pooler",
+   "Database"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Many clients connect",
+    "n": "Hundreds of application connections arrive at the pooler, most of them idle at any moment."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Wait for a turn",
+    "n": "The pooler keeps a small set of server connections and queues requests when all are busy."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Lend a connection",
+    "n": "In transaction mode it lends a server connection only for one transaction."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Run and return",
+    "n": "The database runs the transaction and the connection goes back to the pool at commit."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Reply to the client",
+    "n": "The client sees its answer and its next transaction may use a different server connection."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Wait time is the signal",
+    "n": "If wait time for a free connection grows, demand is above capacity and you need to act."
+   }
+  ]
+ },
+ {
+  "id": "f-sql-conn",
+  "module": "sql-ops",
+  "kind": "failure",
+  "lesson": "sql-ops/locks-deadlocks-and-long-transactions",
+  "title": "Failure and recovery: idle transactions fill the connection limit",
+  "summary": "Stuck sessions block new requests at peak.",
+  "actors": [
+   "API",
+   "Database",
+   "Monitoring",
+   "On-call engineer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Begin a transaction",
+    "n": "A handler starts a transaction and then calls a slow external service before it commits."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Slot stays held",
+    "n": "The session sits idle in transaction and keeps its connection slot and sometimes locks."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Traffic grows",
+    "n": "At peak more handlers do the same until nearly all slots are used by idle sessions."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "New requests fail",
+    "n": "The database refuses new connections with too many connections and users see errors."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Alert fires",
+    "n": "Error rate alerts page the on-call engineer who sees connection errors."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Group by state",
+    "n": "pg_stat_activity grouped by state shows most sessions are idle in transaction from one service."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "End stuck sessions",
+    "n": "The engineer terminates the oldest idle sessions to restore service and notes the owner."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Fix the code",
+    "n": "The team moves the external call out of the transaction, adds a timeout and a pooler, and alerts on pool wait."
+   }
+  ]
+ },
+ {
+  "id": "x-gpu-req",
+  "module": "gpu-serving",
+  "lesson": "gpu-serving/serving-stacks-vllm-tgi-triton",
+  "title": "One request through an LLM server",
+  "summary": "From prompt to streamed tokens.",
+  "actors": [
+   "Client",
+   "Server",
+   "Scheduler",
+   "GPU"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Send a prompt",
+    "n": "The client calls the API with a prompt and settings such as the maximum tokens."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Tokenise",
+    "n": "The server turns text into tokens. This runs on the CPU and can limit speed if it is slow."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Queue the request",
+    "n": "The scheduler places the request in the waiting queue until there is room in the KV cache."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Prefill",
+    "n": "The GPU processes the whole prompt in parallel and fills the KV cache. This sets the time to first token."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Decode token by token",
+    "n": "Each step produces one token for every request in the batch, reading the weights and the cache."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Stream tokens",
+    "n": "Tokens are sent back as they are produced, and the request leaves the batch when it finishes."
+   }
+  ]
+ },
+ {
+  "id": "x-gpu-k8s",
+  "module": "gpu-serving",
+  "lesson": "gpu-serving/gpus-on-kubernetes",
+  "title": "How a pod gets a GPU",
+  "summary": "From resource request to device.",
+  "actors": [
+   "Pod spec",
+   "Scheduler",
+   "Node",
+   "Device plugin",
+   "Container"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request nvidia.com/gpu",
+    "n": "The pod asks for one GPU as a resource limit."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Filter nodes",
+    "n": "The scheduler keeps only nodes that advertise a free GPU and whose taints the pod tolerates."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Bind the pod",
+    "n": "The pod is assigned to a node and the kubelet takes over."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Allocate a device",
+    "n": "The kubelet asks the device plugin for a GPU and receives its device paths and settings."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Expose the GPU",
+    "n": "The container runtime mounts the GPU device files and driver libraries into the container."
+   },
+   {
+    "f": 4,
+    "t": 4,
+    "l": "Run nvidia-smi",
+    "n": "Inside the container nvidia-smi lists the GPU and the model server can use it."
+   }
+  ]
+ },
+ {
+  "id": "f-gpu-oom",
+  "module": "gpu-serving",
+  "kind": "failure",
+  "lesson": "gpu-serving/monitoring-and-debugging-gpu-workloads",
+  "title": "Failure and recovery: the model server crashes under load",
+  "summary": "Cache runs out and a long request breaks it.",
+  "actors": [
+   "User",
+   "Server",
+   "GPU",
+   "Monitoring",
+   "Engineer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Heavy traffic arrives",
+    "n": "Several users send long prompts at once after a product launch."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Cache fills",
+    "n": "Each request needs KV cache, and the cache usage rises towards 100 percent."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Allocation fails",
+    "n": "A new request needs a block that is not free and the GPU raises an out of memory error."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Requests fail",
+    "n": "The server returns errors or restarts, and users see timeouts."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Alert pages the engineer",
+    "n": "Alerts for restarts and error rate fire. Time to first token had been climbing for an hour."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "Read the metrics",
+    "n": "The engineer sees cache usage near 100 percent and a long waiting queue before the crash."
+   },
+   {
+    "f": 4,
+    "t": 1,
+    "l": "Limit and scale",
+    "n": "The engineer lowers the maximum context length and concurrency and adds a replica."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "Add an early alert",
+    "n": "The team alerts on cache usage above 85 percent and on queue time so it can scale before a crash."
+   }
+  ]
+ },
+ {
+  "id": "x-os-boot",
+  "module": "openstack",
+  "lesson": "openstack/compute-flavors-images-and-scheduling",
+  "title": "Booting a server in OpenStack",
+  "summary": "From API call to ACTIVE.",
+  "actors": [
+   "User",
+   "Nova API",
+   "Scheduler",
+   "Compute node",
+   "Neutron and Glance"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "openstack server create",
+    "n": "The user sends a token with the request. Nova checks it, checks quota and records the server in the database."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Ask the scheduler",
+    "n": "A message on the queue asks the scheduler to choose a host."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Filter and weigh",
+    "n": "Placement shows hosts with room, filters remove unsuitable ones, and the best is chosen."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Send to the node",
+    "n": "The chosen compute node receives the build request through the message queue."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Get image and network",
+    "n": "The node downloads the image from Glance and asks Neutron for a port with an address."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Start the guest",
+    "n": "The node starts the guest through libvirt and the state moves from BUILD to ACTIVE."
+   }
+  ]
+ },
+ {
+  "id": "x-os-packet",
+  "module": "openstack",
+  "lesson": "openstack/neutron-networking-security-groups-and-floating-ips",
+  "title": "A packet from the internet to a server",
+  "summary": "Floating IP, router and security group.",
+  "actors": [
+   "Client",
+   "Router",
+   "Security group",
+   "Server"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Connect to the floating IP",
+    "n": "The client sends traffic to the public address of the floating IP."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Translate the address",
+    "n": "The router maps the floating IP to the private address of the server using NAT."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Check the rules",
+    "n": "The port security group is checked for an ingress rule matching protocol, port and source."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Allow or drop",
+    "n": "If a rule allows it, the packet reaches the server. Otherwise it is dropped without a reply."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Server firewall",
+    "n": "The operating system firewall inside the server also has to allow the connection."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Reply goes back",
+    "n": "The reply is translated back to the floating IP and returned to the client."
+   }
+  ]
+ },
+ {
+  "id": "f-os-rabbit",
+  "module": "openstack",
+  "kind": "failure",
+  "lesson": "openstack/what-openstack-is-and-core-services",
+  "title": "Failure and recovery: the message queue stops",
+  "summary": "Every service reports errors at once.",
+  "actors": [
+   "Users",
+   "Nova and Neutron",
+   "RabbitMQ",
+   "Monitoring",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Disk fills on the controller",
+    "n": "Logs fill the disk where RabbitMQ stores its data, and the broker stops accepting messages."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Services cannot send messages",
+    "n": "Nova, Neutron and Cinder cannot talk to each other through the queue."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Requests fail",
+    "n": "New servers, ports and volumes fail or hang, and users see many different errors."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Many alerts fire together",
+    "n": "Monitoring shows errors in every service at the same time, a sign of a shared dependency."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Check the queue",
+    "n": "rabbitmqctl cluster_status fails and the disk on the controller is full."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Free space and restart",
+    "n": "The operator removes old logs, restarts RabbitMQ and checks that the cluster is healthy."
+   },
+   {
+    "f": 4,
+    "t": 1,
+    "l": "Verify services",
+    "n": "compute service list and network agent list show every service up again."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "Prevent a repeat",
+    "n": "The team adds disk alerts and queue depth monitoring and moves logs off the controller disk."
+   }
+  ]
+ }
+]

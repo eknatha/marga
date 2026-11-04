@@ -1,0 +1,2120 @@
+[
+ {
+  "id": "x-go-interface-satisfaction",
+  "module": "go",
+  "lesson": "go/interfaces-and-packages",
+  "title": "How a Go type satisfies an interface",
+  "summary": "No implements keyword.",
+  "actors": [
+   "Interface",
+   "Type",
+   "Compiler",
+   "Caller"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Define the interface",
+    "n": "The interface lists the methods a caller needs."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Write the type",
+    "n": "A type defines methods with matching names and signatures."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Check at compile time",
+    "n": "The compiler checks the type has every method, with no declaration needed."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Accept the interface",
+    "n": "The caller's function takes the interface, so it accepts any matching type."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Swap in a fake",
+    "n": "A test passes a small fake type that has the same methods."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Mismatch fails early",
+    "n": "A missing method is reported as a compile error."
+   }
+  ]
+ },
+ {
+  "id": "x-go-cli-exit",
+  "module": "go",
+  "lesson": "go/building-containers-and-cli-tools",
+  "title": "A Go command-line tool",
+  "summary": "Flags, work and exit codes.",
+  "actors": [
+   "User",
+   "flag package",
+   "main",
+   "os.Exit"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Pass flags",
+    "n": "The user runs the tool with flags such as a timeout and a path."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Parse",
+    "n": "The flag package parses values and prints usage for mistakes."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Run the work",
+    "n": "main calls a function that returns an error instead of exiting inside it."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Choose an exit code",
+    "n": "main maps errors to exit codes in one place."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Exit",
+    "n": "The process ends with a status that scripts can test."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Print errors to stderr",
+    "n": "Messages go to standard error so output stays clean."
+   }
+  ]
+ },
+ {
+  "id": "x-net-arp-lookup",
+  "module": "networking",
+  "lesson": "networking/dhcp-arp-and-the-local-network",
+  "title": "How ARP finds a MAC address",
+  "summary": "Local delivery on a subnet.",
+  "actors": [
+   "Host A",
+   "Switch",
+   "Host B",
+   "ARP cache"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Check the cache",
+    "n": "Host A looks for host B's MAC address in its ARP cache."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Broadcast a question",
+    "n": "Nothing is cached, so A broadcasts who has this IP address."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Switch floods",
+    "n": "The switch sends the broadcast to every port in the subnet."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Host B replies",
+    "n": "Host B answers directly with its MAC address."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Cache the answer",
+    "n": "Host A stores the mapping for a short time."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Send the frame",
+    "n": "The frame goes to host B's MAC address through the switch."
+   }
+  ]
+ },
+ {
+  "id": "x-net-nat-translation",
+  "module": "networking",
+  "lesson": "networking/routing-and-nat",
+  "title": "How NAT rewrites a connection",
+  "summary": "Private addresses reaching the internet.",
+  "actors": [
+   "Private host",
+   "NAT gateway",
+   "Translation table",
+   "Server"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Send a packet",
+    "n": "A private host sends a packet to a public server."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Create a mapping",
+    "n": "The gateway records the private address and port against a public port."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Rewrite and forward",
+    "n": "The source address is changed to the gateway's public address."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Reply returns",
+    "n": "The server answers to the gateway's public address and port."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Look up the mapping",
+    "n": "The gateway finds which private host owns that port."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Rewrite back",
+    "n": "The destination is changed to the private host and the packet is delivered."
+   }
+  ]
+ },
+ {
+  "id": "x-docker-bind-vs-volume",
+  "module": "docker",
+  "lesson": "docker/volumes-and-networking",
+  "title": "Bind mount and volume",
+  "summary": "Where container data lives.",
+  "actors": [
+   "Container",
+   "Bind mount",
+   "Volume",
+   "Host"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Mount a host folder",
+    "n": "A bind mount maps an existing host path into the container."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Edits are shared",
+    "n": "Changes inside and outside the container appear in both places."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Mount a volume",
+    "n": "A named volume is managed by Docker and mounted at a path."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Stored by Docker",
+    "n": "Data lives in Docker's own area, independent of the container."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Remove the container",
+    "n": "The volume remains with its data until it is removed explicitly."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Beware permissions",
+    "n": "Host paths bring host ownership and permissions into the container."
+   }
+  ]
+ },
+ {
+  "id": "x-docker-image-scan",
+  "module": "docker",
+  "lesson": "docker/registries-and-supply-chain",
+  "title": "Scanning an image before it ships",
+  "summary": "Catch known flaws early.",
+  "actors": [
+   "Build",
+   "Scanner",
+   "Registry",
+   "Policy"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Build the image",
+    "n": "The pipeline builds the image from the Dockerfile."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Scan",
+    "n": "The scanner compares installed packages with a database of known vulnerabilities."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Apply a policy",
+    "n": "The policy fails the build for critical flaws with an available fix."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Fix",
+    "n": "The team updates the base image or package and rebuilds."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Push",
+    "n": "The clean image is pushed to the registry."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Rescan regularly",
+    "n": "New flaws are published daily, so stored images are scanned again."
+   }
+  ]
+ },
+ {
+  "id": "x-cicd-manual-approval",
+  "module": "cicd",
+  "lesson": "cicd/environments-promotion-and-approvals",
+  "title": "A pipeline with approval",
+  "summary": "A gate before production.",
+  "actors": [
+   "Pipeline",
+   "Staging",
+   "Approver",
+   "Production"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Deploy to staging",
+    "n": "The pipeline deploys the build and runs tests automatically."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Tests pass",
+    "n": "Results are attached to the run."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Request approval",
+    "n": "The pipeline pauses and notifies the approver with the change and test results."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Approve",
+    "n": "The approver reviews and approves, and the decision is recorded."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Deploy to production",
+    "n": "The same artifact that was tested is deployed."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Verify",
+    "n": "A health check confirms the release, and the pipeline reports success."
+   }
+  ]
+ },
+ {
+  "id": "x-cicd-rollback-artifact",
+  "module": "cicd",
+  "lesson": "cicd/versioning-and-artifacts",
+  "title": "Rolling back by redeploying an artifact",
+  "summary": "Previous version, same process.",
+  "actors": [
+   "Pipeline",
+   "Artifact store",
+   "Production",
+   "Monitor"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Release v42",
+    "n": "The pipeline deploys build 42 to production."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Spot errors",
+    "n": "The monitor shows error rates rising after the release."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Trigger rollback",
+    "n": "The on-call engineer starts the rollback job with the previous version number."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fetch v41",
+    "n": "The pipeline retrieves the stored v41 artifact, not a rebuild."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Redeploy",
+    "n": "v41 is deployed with the same process as any release."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Recover",
+    "n": "Error rates return to normal and the team investigates v42 calmly."
+   }
+  ]
+ },
+ {
+  "id": "x-k8s-statefulset-order",
+  "module": "kubernetes",
+  "lesson": "kubernetes/statefulsets-and-running-databases",
+  "title": "How a StatefulSet starts pods",
+  "summary": "Stable names and order.",
+  "actors": [
+   "StatefulSet controller",
+   "Pod 0",
+   "Pod 1",
+   "Volume"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Create pod 0",
+    "n": "The controller creates pod 0 first with a stable name."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Attach storage",
+    "n": "Pod 0 gets its own volume claim that persists."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Wait until ready",
+    "n": "The controller waits for pod 0 to be Running and Ready."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Create pod 1",
+    "n": "Only after pod 0 is ready is pod 1 created."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Own volume",
+    "n": "Pod 1 receives a separate volume claim."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Replace in place",
+    "n": "A failed pod returns with the same name and the same volume."
+   }
+  ]
+ },
+ {
+  "id": "x-k8s-node-failure",
+  "module": "kubernetes",
+  "lesson": "kubernetes/scheduling-and-troubleshooting",
+  "title": "A node fails",
+  "summary": "Rescheduling workloads.",
+  "actors": [
+   "Node",
+   "Node controller",
+   "Deployment controller",
+   "Scheduler"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Node stops responding",
+    "n": "Power loss stops the kubelet heartbeats."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Mark unreachable",
+    "n": "After the grace period the node is marked NotReady and tainted."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Evict after the timeout",
+    "n": "Pods on the node are removed from the API after their toleration expires."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Create replacements",
+    "n": "The Deployment's ReplicaSet creates new pods to restore the count."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Place them",
+    "n": "The scheduler assigns the new pods to healthy nodes."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Service recovers",
+    "n": "Traffic goes to the new pods once they are ready."
+   }
+  ]
+ },
+ {
+  "id": "x-helm-diff-before-upgrade",
+  "module": "helm",
+  "lesson": "helm/upgrade-rollback-and-release-history",
+  "title": "Checking a change with helm diff",
+  "summary": "See before you apply.",
+  "actors": [
+   "Engineer",
+   "helm diff",
+   "Cluster",
+   "Release"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Prepare the change",
+    "n": "The engineer updates values or the chart version."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Read the live release",
+    "n": "The diff plugin reads the manifest of the current release."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Render the new manifest",
+    "n": "The new chart and values are rendered locally."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Show the differences",
+    "n": "Lines are shown for each changed object."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Review",
+    "n": "The engineer checks image tags, replicas and resources."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Upgrade",
+    "n": "Only then does helm upgrade run, with the diff attached to the review."
+   }
+  ]
+ },
+ {
+  "id": "x-helm-repo-version",
+  "module": "helm",
+  "lesson": "helm/dependencies-subcharts-and-registries",
+  "title": "Choosing a chart version",
+  "summary": "From repository index to release.",
+  "actors": [
+   "Engineer",
+   "Repository index",
+   "Chart",
+   "Cluster"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Update the index",
+    "n": "helm repo update downloads the list of available chart versions."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Search versions",
+    "n": "helm search shows several versions of the chart."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Pin one",
+    "n": "The engineer chooses an exact version, not the latest."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Pull and inspect",
+    "n": "The chart is pulled and its values and templates reviewed."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Install",
+    "n": "The release is installed with the pinned version and recorded."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Upgrade deliberately",
+    "n": "New versions are adopted by a reviewed change."
+   }
+  ]
+ },
+ {
+  "id": "x-terraform-workspaces",
+  "module": "terraform",
+  "lesson": "terraform/environments-and-team-workflows",
+  "title": "Workspaces and separate state",
+  "summary": "Two ways to separate environments.",
+  "actors": [
+   "Engineer",
+   "Workspace",
+   "State file",
+   "Environment"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Select a workspace",
+    "n": "The engineer chooses a workspace named staging."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Use its state",
+    "n": "Each workspace has its own state in the same backend."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Apply",
+    "n": "Resources for staging are created from the same code."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Switch to production",
+    "n": "A second workspace uses another state, easy to confuse with the first."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Prefer separate directories",
+    "n": "Many teams use separate configurations and backends for clearer boundaries and permissions."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Check before apply",
+    "n": "The plan header shows which environment is targeted."
+   }
+  ]
+ },
+ {
+  "id": "x-terraform-failed-apply",
+  "module": "terraform",
+  "lesson": "terraform/workflows-and-drift",
+  "title": "Recovering from a failed apply",
+  "summary": "Half-created infrastructure.",
+  "actors": [
+   "Terraform",
+   "Cloud API",
+   "State",
+   "Engineer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Apply",
+    "n": "Terraform creates resources one by one."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "One call fails",
+    "n": "The cloud rejects a request, for example due to a quota."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Save progress",
+    "n": "The state records the resources created before the error."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Read the error",
+    "n": "The engineer reads the message and fixes the cause, such as raising the quota."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Run apply again",
+    "n": "The next apply continues from the saved state."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Check the plan",
+    "n": "The plan shows only the remaining work and no duplicates."
+   }
+  ]
+ },
+ {
+  "id": "x-ansible-handlers",
+  "module": "ansible",
+  "lesson": "ansible/handlers-conditionals-and-loops",
+  "title": "Handlers and notifications",
+  "summary": "Restart only when something changed.",
+  "actors": [
+   "Playbook",
+   "Task",
+   "Handler",
+   "Service"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Run the task",
+    "n": "A task updates the configuration file."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Detect a change",
+    "n": "The file differs, so the task reports changed."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Notify",
+    "n": "The task notifies the restart handler."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Run other tasks",
+    "n": "The play continues with later tasks."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Run handlers at the end",
+    "n": "The restart runs once, after the tasks that needed it."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "No change, no restart",
+    "n": "On a second run nothing changes and the service is not touched."
+   }
+  ]
+ },
+ {
+  "id": "x-ansible-dynamic-inventory",
+  "module": "ansible",
+  "lesson": "ansible/dynamic-inventory-for-cloud",
+  "title": "Dynamic inventory from the cloud",
+  "summary": "Hosts found at run time.",
+  "actors": [
+   "Playbook",
+   "Inventory plugin",
+   "Cloud API",
+   "Hosts"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Ask for inventory",
+    "n": "The playbook run starts with an inventory plugin."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Query the cloud",
+    "n": "The plugin lists servers with their tags."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Return the list",
+    "n": "The cloud returns servers and metadata."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Build groups",
+    "n": "Hosts are grouped by tag such as web or db."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Run on the group",
+    "n": "The play targets the web group and connects to those hosts."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Always current",
+    "n": "New servers are included next run and deleted servers disappear."
+   }
+  ]
+ },
+ {
+  "id": "x-cloud-health-check",
+  "module": "cloud",
+  "lesson": "cloud/high-availability-and-disaster-recovery",
+  "title": "A load balancer health check",
+  "summary": "Only healthy targets get traffic.",
+  "actors": [
+   "Load balancer",
+   "Target A",
+   "Target B",
+   "Users"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Probe",
+    "n": "The load balancer requests the health path from each target."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Healthy",
+    "n": "Target A returns 200 and stays in rotation."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Probe B",
+    "n": "Target B is probed in the same way on the same path."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Unhealthy",
+    "n": "Target B returns errors repeatedly."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Remove",
+    "n": "After the threshold, target B receives no new traffic."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Users unaffected",
+    "n": "Requests go to target A while B is repaired and re-added."
+   }
+  ]
+ },
+ {
+  "id": "x-cloud-budget-alert",
+  "module": "cloud",
+  "lesson": "cloud/managed-services-and-cost",
+  "title": "A cost budget alert",
+  "summary": "Catch a bill spike early.",
+  "actors": [
+   "Billing data",
+   "Budget",
+   "Alert",
+   "Team"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Collect costs",
+    "n": "Usage and cost data is collected daily by tag."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Compare with budget",
+    "n": "The service compares spend with the monthly budget."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Cross a threshold",
+    "n": "Forecast spend passes 80 percent of the budget."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Notify",
+    "n": "The team receives an alert naming the service and the tag."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Investigate",
+    "n": "They find idle large servers left running."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Fix and prevent",
+    "n": "They remove the servers and add scheduled shutdown for test environments."
+   }
+  ]
+ },
+ {
+  "id": "x-obs-slo-dashboard-reading",
+  "module": "observability",
+  "lesson": "observability/alerting-and-dashboards",
+  "title": "How an SLO is computed",
+  "summary": "From events to a budget.",
+  "actors": [
+   "Requests",
+   "Metrics",
+   "Query",
+   "Dashboard"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Count requests",
+    "n": "Every request increments total and error counters."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Query a window",
+    "n": "A query computes the good request ratio over 30 days."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Compare with the target",
+    "n": "The ratio is compared with the 99.9 percent objective."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Show the budget",
+    "n": "The dashboard displays the error budget remaining."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Show the burn rate",
+    "n": "A second panel shows how fast the budget is being used."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Decide",
+    "n": "The team slows releases if the budget is nearly spent."
+   }
+  ]
+ },
+ {
+  "id": "x-obs-trace-id-logs",
+  "module": "observability",
+  "lesson": "observability/logs-and-traces",
+  "title": "Linking logs and traces",
+  "summary": "One ID across tools.",
+  "actors": [
+   "Gateway",
+   "Service",
+   "Log search",
+   "Trace view"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Create a trace ID",
+    "n": "The gateway creates an ID and passes it in a header."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Log with the ID",
+    "n": "The service writes the ID in every log line."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Send spans",
+    "n": "The service also sends spans with the same ID to the tracing backend."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Search logs",
+    "n": "An engineer searches logs for the ID."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Open the trace",
+    "n": "The trace view shows the same request and where it was slow."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Fix with evidence",
+    "n": "Logs show the error and the trace shows the slow call that caused it."
+   }
+  ]
+ },
+ {
+  "id": "x-sre-capacity-planning",
+  "module": "sre",
+  "lesson": "sre/capacity-planning",
+  "title": "Capacity planning from a trend",
+  "summary": "Plan before you run out.",
+  "actors": [
+   "Metrics",
+   "Forecast",
+   "Plan",
+   "Review"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Collect usage",
+    "n": "Weekly peaks for CPU, memory and storage are collected."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Fit a trend",
+    "n": "A forecast projects when usage will reach 80 percent."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Add headroom",
+    "n": "The plan adds a margin for failures and launches."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Schedule the work",
+    "n": "The purchase or scale-up is scheduled before the date, with lead time."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Review monthly",
+    "n": "The forecast is compared with actual growth."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Adjust",
+    "n": "Differences change the plan, not only the numbers."
+   }
+  ]
+ },
+ {
+  "id": "x-sre-oncall-handoff",
+  "module": "sre",
+  "lesson": "sre/on-call",
+  "title": "An on-call handoff",
+  "summary": "Passing context safely.",
+  "actors": [
+   "Outgoing engineer",
+   "Notes",
+   "Incoming engineer",
+   "Alerts"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Write the notes",
+    "n": "The outgoing engineer lists open issues, recent changes and risky tasks."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Share",
+    "n": "The notes are shared in the handoff meeting or channel."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Ask questions",
+    "n": "The incoming engineer asks about anything unclear."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Review alerts",
+    "n": "Together they check open alerts and silences."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Confirm",
+    "n": "The incoming engineer confirms ownership and the pager is switched."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Stay reachable",
+    "n": "The outgoing engineer remains available for a short overlap."
+   }
+  ]
+ },
+ {
+  "id": "x-security-dependency-scan",
+  "module": "security",
+  "lesson": "security/securing-the-pipeline",
+  "title": "Scanning dependencies",
+  "summary": "Known flaws in libraries.",
+  "actors": [
+   "Developer",
+   "Pipeline",
+   "Scanner",
+   "Advisory data"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Open a pull request",
+    "n": "The change updates dependencies."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Run the scanner",
+    "n": "The pipeline lists direct and indirect dependencies."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Compare",
+    "n": "Versions are matched against known vulnerability data."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Report findings",
+    "n": "A critical flaw with a fixed version is found."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Update",
+    "n": "The developer upgrades to the fixed version."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Pass",
+    "n": "The scan is clean and the pull request can merge."
+   }
+  ]
+ },
+ {
+  "id": "x-security-rotate-credential",
+  "module": "security",
+  "lesson": "security/secrets-management",
+  "title": "Rotating a credential",
+  "summary": "Replace without an outage.",
+  "actors": [
+   "Secret store",
+   "Service A",
+   "Database",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Create the new secret",
+    "n": "The operator creates version 2 while version 1 remains valid."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Add the new password",
+    "n": "The database accepts both passwords for now."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Read the new version",
+    "n": "Service A reloads the secret and starts using version 2."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Verify",
+    "n": "Logs show all instances connected with the new password."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Retire the old",
+    "n": "Version 1 is removed from the database."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Record",
+    "n": "The date and owner are recorded for the next rotation."
+   }
+  ]
+ },
+ {
+  "id": "x-db-write-ahead-log",
+  "module": "databases",
+  "lesson": "databases/backups-and-recovery",
+  "title": "Write-ahead logging",
+  "summary": "Durability before the data file.",
+  "actors": [
+   "Client",
+   "Database",
+   "Log",
+   "Data files"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Commit",
+    "n": "The client commits a transaction."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Write the log",
+    "n": "The change is appended to the write-ahead log and flushed."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Acknowledge",
+    "n": "Only after the log is safe is the commit confirmed."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Update data later",
+    "n": "The data files are updated in the background."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Crash",
+    "n": "The server loses power before data files are written."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Replay",
+    "n": "On restart the log is replayed so committed changes are restored."
+   }
+  ]
+ },
+ {
+  "id": "x-db-connection-exhaustion",
+  "module": "databases",
+  "lesson": "databases/performance-and-connection-pooling",
+  "title": "Running out of connections",
+  "summary": "Why a pool and a limit matter.",
+  "actors": [
+   "Application",
+   "Pool",
+   "Database",
+   "Alert"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Traffic grows",
+    "n": "More application instances start, each opening its own connections."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Reach the limit",
+    "n": "The database hits its maximum number of connections."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Refuse new connections",
+    "n": "New requests fail with too many connections."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Alert",
+    "n": "An alert fires on connection use above 80 percent."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Add a pooler",
+    "n": "A pooler shares a small number of server connections among many clients."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Set pool sizes",
+    "n": "Each application gets a limit so the total stays under the cap."
+   }
+  ]
+ },
+ {
+  "id": "x-llm-cheaper-model",
+  "module": "llm",
+  "lesson": "llm/choosing-and-evaluating-models",
+  "title": "Choosing a cheaper model for simple steps",
+  "summary": "Match model to task.",
+  "actors": [
+   "Router",
+   "Small model",
+   "Large model",
+   "Evaluation"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Collect examples",
+    "n": "Real requests are labelled by difficulty."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Try the small model",
+    "n": "Simple classification is run on the cheaper model."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Measure",
+    "n": "The evaluation set shows the pass rate matches the larger model on this step."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Keep the large model",
+    "n": "Hard reasoning steps stay on the more capable model."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Route",
+    "n": "The router sends each step to the cheapest model that passes."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Recheck",
+    "n": "The evaluation runs again on every model or prompt change."
+   }
+  ]
+ },
+ {
+  "id": "x-llm-batch-processing",
+  "module": "llm",
+  "lesson": "llm/cost-latency-and-caching",
+  "title": "Batch processing",
+  "summary": "Non-urgent work at lower cost.",
+  "actors": [
+   "Job",
+   "Batch API",
+   "Model",
+   "Results"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Collect requests",
+    "n": "A nightly job gathers ten thousand summaries to produce."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Submit as a batch",
+    "n": "The requests are sent as one batch with IDs."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Process later",
+    "n": "The provider processes them within a time window at a lower price."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Poll for status",
+    "n": "The job checks the batch status periodically."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Download results",
+    "n": "Results are returned with the same IDs."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Match and validate",
+    "n": "Each result is matched to its request and validated, and failures are retried."
+   }
+  ]
+ },
+ {
+  "id": "x-prompting-tags-data",
+  "module": "prompting",
+  "lesson": "prompting/system-prompts-roles-and-context-layout",
+  "title": "Separating data from instructions",
+  "summary": "Tags keep roles clear.",
+  "actors": [
+   "Instructions",
+   "Document",
+   "Prompt",
+   "Model"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Write the task",
+    "n": "The instructions say what to do with the document."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Wrap the data",
+    "n": "The document is placed inside tags marked as data."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Send",
+    "n": "The prompt contains instructions first, then the tagged document."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Treat tags as data",
+    "n": "The model summarises the content and does not follow orders written inside it."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Not a guarantee",
+    "n": "Tags help but do not replace limiting what the system can do."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Validate",
+    "n": "The output is validated in code before anything uses it."
+   }
+  ]
+ },
+ {
+  "id": "x-prompting-ab-compare",
+  "module": "prompting",
+  "lesson": "prompting/prompt-versioning-and-testing",
+  "title": "Comparing two prompt versions",
+  "summary": "Decide with data.",
+  "actors": [
+   "Version A",
+   "Version B",
+   "Evaluation set",
+   "Decision"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Run version A",
+    "n": "The saved cases are run through version A several times."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Run version B",
+    "n": "The same cases are run through version B."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Score",
+    "n": "Checks in code score format, facts and forbidden content."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Compare",
+    "n": "Pass rates, cost and latency are compared per case type."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Choose",
+    "n": "The better version is released gradually."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Keep the cases",
+    "n": "Failures become new cases for the future."
+   }
+  ]
+ },
+ {
+  "id": "x-skills-reference-on-demand",
+  "module": "claude-skills",
+  "lesson": "claude-skills/progressive-disclosure-and-structure",
+  "title": "Loading a reference file on demand",
+  "summary": "Only when a step needs it.",
+  "actors": [
+   "Request",
+   "SKILL.md",
+   "Reference file",
+   "Claude"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Skill triggers",
+    "n": "The request matches the skill and the body loads."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Follow the workflow",
+    "n": "The steps run; most requests never need the long reference."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "A step needs detail",
+    "n": "A step says to read the rules file for invoices over a limit."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Open the file",
+    "n": "Claude reads the single file named by the step."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Use the detail",
+    "n": "The rules are applied to the task."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Stay lean",
+    "n": "Other requests never pay for the reference in context."
+   }
+  ]
+ },
+ {
+  "id": "x-skills-version-update",
+  "module": "claude-skills",
+  "lesson": "claude-skills/sharing-versioning-and-skill-security",
+  "title": "Updating a skill",
+  "summary": "Change with tests.",
+  "actors": [
+   "Author",
+   "Test tasks",
+   "Repository",
+   "Team"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Edit the skill",
+    "n": "The author improves a description or step."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Run the tasks",
+    "n": "The saved tasks are run before and after."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Compare",
+    "n": "Results show better quality and no new false triggers."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Bump the version",
+    "n": "The change is merged with a changelog entry and a new version."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Roll out",
+    "n": "The team installs the new version from the repository."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Report problems",
+    "n": "A missed request is added to the test tasks for next time."
+   }
+  ]
+ },
+ {
+  "id": "x-mcp-resource-template",
+  "module": "mcp",
+  "lesson": "mcp/resources-prompts-and-other-primitives",
+  "title": "Reading a resource by URI",
+  "summary": "Data the application attaches.",
+  "actors": [
+   "User",
+   "Host",
+   "MCP server",
+   "Backend"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Pick a document",
+    "n": "The user selects a runbook in the host's attachment menu."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Read the resource",
+    "n": "The host asks the server to read the resource by its URI."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Fetch",
+    "n": "The server loads the runbook from the backend."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Return content",
+    "n": "The text is returned as the resource contents."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Attach",
+    "n": "The host adds it to the model's context for the conversation."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Respect size",
+    "n": "Large documents are summarised or limited to save context."
+   }
+  ]
+ },
+ {
+  "id": "x-mcp-tracing-calls",
+  "module": "mcp",
+  "lesson": "mcp/debugging-tool-use-and-mcp",
+  "title": "Tracing tool calls",
+  "summary": "Make agent runs debuggable.",
+  "actors": [
+   "Agent",
+   "Tool",
+   "Trace store",
+   "Engineer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Create a run ID",
+    "n": "Each conversation gets a run ID and each call a step number."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Call a tool",
+    "n": "The agent calls a tool with arguments."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Log the step",
+    "n": "The call, duration, result size and errors are stored with the run ID."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Repeat",
+    "n": "Later steps are logged in order."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Investigate",
+    "n": "An engineer opens the trace for a wrong answer."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Find the cause",
+    "n": "They see the tool returned an empty result and the agent gave up."
+   }
+  ]
+ },
+ {
+  "id": "f-linux-disk-full",
+  "module": "linux",
+  "kind": "failure",
+  "lesson": "linux/disks-and-filesystems",
+  "title": "Failure and recovery: a full disk stops a service",
+  "summary": "Logs fill /var, writes fail, and the fix has two parts.",
+  "actors": [
+   "Service",
+   "Filesystem",
+   "Operator",
+   "Logrotate"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Normal writes",
+    "n": "The service writes a little log data each second and the filesystem has plenty of free space."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Logs grow",
+    "n": "A debug flag left on triples the log volume and nobody notices for days."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Disk fills",
+    "n": "The filesystem reaches one hundred percent and the next write returns no space left on device."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Symptom",
+    "n": "Requests start failing and the service logs an error about being unable to write its own state."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Check usage",
+    "n": "The operator runs df -h to find the full filesystem and du -xh to find the biggest directories."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Find held files",
+    "n": "lsof shows a deleted log file still held open, so deleting it freed no space until the process restarts."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Fix",
+    "n": "Truncate the log, restart the service to release the file, and turn the debug flag off."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Prevent",
+    "n": "Logrotate with size limits and a disk usage alert at eighty percent keeps it from recurring."
+   }
+  ]
+ },
+ {
+  "id": "f-linux-oom-kill",
+  "module": "linux",
+  "kind": "failure",
+  "lesson": "linux/processes-memory-and-the-oom-killer",
+  "title": "Failure and recovery: the OOM killer ends the wrong process",
+  "summary": "Memory runs out and the kernel picks a victim.",
+  "actors": [
+   "Application",
+   "Kernel",
+   "Operator",
+   "Monitoring"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Allocate memory",
+    "n": "The application keeps asking for more memory as a cache grows without a size limit."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Memory pressure",
+    "n": "Free memory and page cache are used up and swap, if any, fills."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "OOM kill",
+    "n": "The kernel scores processes and ends the one with the highest score, which is the large database process."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Alert fires",
+    "n": "A process-restart alert fires and the operator sees the database vanished at the same moment."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Read the log",
+    "n": "dmesg or journalctl -k shows Out of memory: Killed process with the process name and its memory use."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Find the cause",
+    "n": "The real culprit is the cache with no limit, not the database that was killed."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Fix",
+    "n": "Cap the cache size, set a memory limit with systemd, and protect the database with a lower oom score."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Verify",
+    "n": "Memory graphs stay flat, no new kill messages appear, and the database stays up for a full day."
+   }
+  ]
+ },
+ {
+  "id": "f-git-force-push",
+  "module": "git",
+  "kind": "failure",
+  "lesson": "git/branches-and-merging",
+  "title": "Failure and recovery: a force push overwrites a teammate's work",
+  "summary": "Lost commits are usually still recoverable.",
+  "actors": [
+   "Developer",
+   "Remote",
+   "Teammate",
+   "Reflog"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Shared branch",
+    "n": "Two people work on the same branch and the remote has three commits from the teammate."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Rewrite history",
+    "n": "The developer rebases locally and runs a plain force push because the normal push was rejected."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Remote moves",
+    "n": "The remote branch now points at the developer's history and the teammate's commits are no longer on it."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Symptom",
+    "n": "The teammate's next pull reports a diverged history and the commits seem to be gone."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Look locally",
+    "n": "The teammate's own clone still has the commits and git reflog lists them by position."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Restore",
+    "n": "Create a branch at the lost commit with git branch rescue and push it so the work is safe."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Merge it back",
+    "n": "The developer rebases onto the rescue branch and pushes again, without losing either set of changes."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Prevent",
+    "n": "Protect shared branches and use force-with-lease instead of a plain force push."
+   }
+  ]
+ },
+ {
+  "id": "f-git-secret-committed",
+  "module": "git",
+  "kind": "failure",
+  "lesson": "git/hooks-signing-and-secrets-in-history",
+  "title": "Failure and recovery: a secret reaches the repository",
+  "summary": "Rotating the secret matters more than rewriting history.",
+  "actors": [
+   "Developer",
+   "Repository",
+   "Scanner",
+   "Security"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Commit a config",
+    "n": "A developer commits a file that contains a real access key and pushes it to the shared repository."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Scan finds it",
+    "n": "A scheduled scanner finds a string that matches the key pattern in the latest commit."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Alert",
+    "n": "The scanner opens a finding and the security team is told which key and which commit."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Revoke first",
+    "n": "The key is revoked and a new one issued before anything else, because anyone who cloned has the old one."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Rewrite history",
+    "n": "The file is removed from all commits with a history rewrite tool and the repository is force pushed."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Clean clones",
+    "n": "Everyone re-clones or resets, since old clones and forks still hold the secret."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Move the secret",
+    "n": "The new key is read from a secret manager at runtime and the file now holds only a placeholder."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Prevent",
+    "n": "A pre-commit hook and a push check block the pattern before it reaches the remote."
+   }
+  ]
+ },
+ {
+  "id": "f-bash-unset-variable",
+  "module": "bash",
+  "kind": "failure",
+  "lesson": "bash/safe-automation",
+  "title": "Failure and recovery: an unset variable deletes the wrong path",
+  "summary": "A tiny script bug becomes a large deletion.",
+  "actors": [
+   "Script",
+   "Shell",
+   "Filesystem",
+   "Reviewer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "The script",
+    "n": "A cleanup script runs rm -rf with a variable named BUILD_DIR followed by a slash."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Variable empty",
+    "n": "A typo means BUILD_DIR was never set, so the shell expands it to an empty string."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Dangerous path",
+    "n": "The command becomes rm -rf slash, and only the protection of the system saves the whole machine."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Damage",
+    "n": "Files under directories the user owns are deleted before the command is stopped."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Review",
+    "n": "A reviewer asks why the script did not stop when the variable was empty."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fix the script",
+    "n": "Add set -u so unset variables are an error, and use the expansion that fails when the value is empty."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Guard",
+    "n": "Check that the path starts with the expected directory and exists before any delete."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Recover",
+    "n": "Restore from backup and add a dry run option that only prints what would be removed."
+   }
+  ]
+ },
+ {
+  "id": "f-bash-partial-write",
+  "module": "bash",
+  "kind": "failure",
+  "lesson": "bash/temporary-files-and-atomic-writes",
+  "title": "Failure and recovery: a half-written file is read by another job",
+  "summary": "Atomic writes prevent torn reads.",
+  "actors": [
+   "Writer",
+   "Temp file",
+   "Reader",
+   "Filesystem"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Write directly",
+    "n": "A job writes its report straight to the final file name over a few seconds."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Read too early",
+    "n": "A second job reads the same file in the middle of the write."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Truncated data",
+    "n": "The reader gets half the lines and builds a wrong summary without any error."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Spot it",
+    "n": "Numbers in the summary do not match, and the file modified time is within the reader's run."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fix: temp file",
+    "n": "The writer creates a temporary file in the same directory and writes everything there."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Fix: rename",
+    "n": "A rename onto the final name is atomic, so the reader sees either the old file or the complete new one."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Clean up",
+    "n": "A trap removes the temp file if the script fails, so no stale partial files remain."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Verify",
+    "n": "Re-running both jobs together always gives a complete report."
+   }
+  ]
+ }
+]

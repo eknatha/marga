@@ -1,0 +1,2173 @@
+[
+ {
+  "id": "f-mcp-tool-timeout",
+  "module": "mcp",
+  "kind": "failure",
+  "lesson": "mcp/debugging-tool-use-and-mcp",
+  "title": "Failure and recovery: a tool call times out",
+  "summary": "Bound the wait and report clearly.",
+  "actors": [
+   "Agent",
+   "Host",
+   "MCP server",
+   "Backend"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Call",
+    "n": "The agent asks the host to call a search tool provided by an MCP server."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Forward",
+    "n": "The host forwards the request to the server, which queries a slow backend."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Backend hangs",
+    "n": "The backend takes much longer than expected and the server keeps waiting."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Timeout",
+    "n": "The host reaches its time limit and returns an error to the agent."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Agent reacts",
+    "n": "A good agent reports the failure and tries a smaller query, while a bad one repeats the call forever."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Diagnose",
+    "n": "Server logs with a request id show the backend latency and where time was spent."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Fix",
+    "n": "Add a timeout and a limit on results in the server, and a clear error message the model can use."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Verify",
+    "n": "The agent recovers within its retry limit and gives the user an honest answer."
+   }
+  ]
+ },
+ {
+  "id": "f-mcp-prompt-injection",
+  "module": "mcp",
+  "kind": "failure",
+  "lesson": "mcp/permissions-auth-and-prompt-injection-defence",
+  "title": "Failure and recovery: a tool result tries to give orders",
+  "summary": "Treat tool output as data, not instructions.",
+  "actors": [
+   "User",
+   "Agent",
+   "Tool",
+   "Policy"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Task",
+    "n": "A user asks the agent to summarise a web page using a fetch tool."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Fetch",
+    "n": "The tool returns the page text, and it contains hidden text telling the assistant to send private data away."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Injection",
+    "n": "The text looks like an instruction and the model may follow it as if the user had written it."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Block",
+    "n": "A policy layer denies any call to a send tool that the user did not request."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Ask",
+    "n": "The agent shows the user what the page asked for and asks whether to proceed."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Contain",
+    "n": "Tool output is marked as untrusted content, and tools run with the minimum permissions."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Log",
+    "n": "The attempt is logged with the source address so the page can be reported."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Verify",
+    "n": "A test page with hidden commands is now ignored and the summary stays accurate."
+   }
+  ]
+ },
+ {
+  "id": "sd-design-method",
+  "module": "system-design",
+  "lesson": "system-design/the-design-method-and-estimation",
+  "title": "The design method in order",
+  "summary": "Clarify, estimate, sketch, deep-dive, break it, state the trade-offs.",
+  "actors": [
+   "Designer",
+   "Requirements",
+   "Numbers",
+   "Design"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Clarify",
+    "n": "Ask who uses the system, what must never be wrong, and what the availability target is, before drawing anything."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "SLO and constraints",
+    "n": "The answer might be 99.99 percent with no duplicate payments and reads that may be five seconds stale."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Estimate",
+    "n": "Convert users and behaviour into requests per second, storage and bandwidth using round numbers and a 3x peak factor."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Which number crosses a limit?",
+    "n": "Find the figure that passes a threshold, such as one node capacity, because that is where the design must change."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Sketch",
+    "n": "Draw the smallest design that meets the numbers: entry point, services, data store, queue where needed."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Deep-dive the risk",
+    "n": "Design the data store, the rollout and the failover path properly, since that is where the risk sits."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Walk the failure modes",
+    "n": "For each box ask what happens when it is slow, down, wrong or overloaded, and record the answer."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "State the trade-offs",
+    "n": "Say what the design gives up, such as cost or latency, so reviewers can challenge the choice."
+   }
+  ]
+ },
+ {
+  "id": "sd-cache-stampede",
+  "module": "system-design",
+  "lesson": "system-design/caching-without-stampedes",
+  "title": "A cache stampede and its defence",
+  "summary": "Many misses on one key, and how coalescing stops them.",
+  "actors": [
+   "Clients",
+   "Cache",
+   "Coalescer",
+   "Database"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "GET popular-key",
+    "n": "Thousands of requests read a hot key from the cache and get fast answers."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "TTL expires",
+    "n": "The key reaches its expiry time and is removed from the cache."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Burst of misses",
+    "n": "Many requests arrive at the same moment and all find nothing in the cache."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Ask to refill",
+    "n": "Without coalescing every request would go to the database; with it they are handed to one refill."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "One query",
+    "n": "Only the first request queries the database for the row while the others wait for its result."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Row returned",
+    "n": "The database answers once, so its load stays flat instead of spiking."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Fill cache with jittered TTL",
+    "n": "The value is stored with a randomised TTL so related keys do not all expire together next time."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Everyone gets the value",
+    "n": "Waiting requests are answered from the freshly filled cache."
+   }
+  ]
+ },
+ {
+  "id": "sd-retry-idempotency",
+  "module": "system-design",
+  "lesson": "system-design/queues-retries-and-idempotency",
+  "title": "A retry that does not charge twice",
+  "summary": "Timeout, backoff with jitter and an idempotency key.",
+  "actors": [
+   "Client",
+   "API",
+   "Payment store"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "POST /charge with key K1",
+    "n": "The client sends the request with a unique idempotency key generated for this operation."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Charge and store K1",
+    "n": "The server applies the charge and records key K1 with the result in the same transaction."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Response lost",
+    "n": "The response is lost on the network, so the client sees a timeout and does not know if it worked."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Wait with backoff and jitter",
+    "n": "The client waits a randomised, growing delay so many clients do not retry at the same moment."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Retry with key K1",
+    "n": "The client repeats the same request with the same key."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Look up K1",
+    "n": "The server finds the key already recorded and does not charge again."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Return stored result",
+    "n": "The client receives the original result, and the customer is charged exactly once."
+   }
+  ]
+ },
+ {
+  "id": "sd-replication-lag",
+  "module": "system-design",
+  "lesson": "system-design/consistency-and-availability-in-practice",
+  "title": "A stale read after a write",
+  "summary": "Replication lag and read-your-writes.",
+  "actors": [
+   "User",
+   "App",
+   "Primary",
+   "Replica"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Save profile",
+    "n": "The user changes their email address and submits the form."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Write to primary",
+    "n": "The application writes the change to the primary database, which confirms it."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Replicate (async)",
+    "n": "The primary sends the change to the replica, which takes a little time to apply it."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Reload page",
+    "n": "The user reloads the page a moment later and the application chooses a replica for the read."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Read from replica",
+    "n": "The replica has not yet applied the change, so it returns the old email address."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Fix: read primary after write",
+    "n": "For a short window after a write the application reads from the primary, or waits for a version token."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Fresh data shown",
+    "n": "The user sees their own change, which is the read-your-writes guarantee."
+   }
+  ]
+ },
+ {
+  "id": "sd-leader-election",
+  "module": "system-design",
+  "lesson": "system-design/quorum-leaders-and-split-brain",
+  "title": "Leader election with a quorum",
+  "summary": "How followers elect a new leader after the old one stops.",
+  "actors": [
+   "Leader",
+   "Follower A",
+   "Follower B"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Heartbeat",
+    "n": "The leader sends regular heartbeats to its followers to show it is alive."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Leader stops",
+    "n": "The leader crashes or is cut off, and heartbeats stop arriving."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Timeout fires first",
+    "n": "Follower A has a randomised election timeout and is the first to notice the silence."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Request vote, term 2",
+    "n": "Follower A becomes a candidate for a new term and asks the others for votes."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Vote granted",
+    "n": "Follower B has not voted in this term and grants its vote."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Majority reached",
+    "n": "Two of three is a majority, so Follower A becomes leader without needing the old leader."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Heartbeat, term 2",
+    "n": "The new leader announces itself; any message from the old term will now be rejected."
+   }
+  ]
+ },
+ {
+  "id": "sd-fencing",
+  "module": "system-design",
+  "lesson": "system-design/quorum-leaders-and-split-brain",
+  "title": "Fencing stops a stale leader",
+  "summary": "A paused leader wakes up and is rejected by the resource.",
+  "actors": [
+   "Old leader",
+   "Lock service",
+   "New leader",
+   "Storage"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Acquire lock, token 33",
+    "n": "The first leader gets the lock and a fencing token of 33."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Long pause",
+    "n": "The process freezes in a garbage collection or a VM pause and cannot renew its lease."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Lease expires, token 34",
+    "n": "The lock service gives the lock to a new leader with the higher token 34."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Write with token 34",
+    "n": "The new leader writes to storage, which records that it has seen token 34."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Wakes up",
+    "n": "The old leader resumes and still believes that it holds the lock."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Write with token 33",
+    "n": "The old leader attempts to write using its stale token."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Rejected: 33 is lower than 34",
+    "n": "Storage refuses the write, so the stale leader cannot corrupt data."
+   }
+  ]
+ },
+ {
+  "id": "sd-circuit-breaker",
+  "module": "system-design",
+  "lesson": "system-design/graceful-degradation-and-circuit-breakers",
+  "title": "A circuit breaker opening and closing",
+  "summary": "Closed, open and half-open states protecting a caller.",
+  "actors": [
+   "Caller",
+   "Breaker",
+   "Dependency"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Call",
+    "n": "The caller sends a request through the breaker, which starts closed and lets it pass."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Forward",
+    "n": "The dependency is slow and the call times out; the breaker counts a failure."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Failure rate over threshold",
+    "n": "When more than half of recent calls fail or are slow, the breaker opens."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Call while open",
+    "n": "New calls fail immediately without waiting for a timeout, and the caller uses its fallback."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Fallback result",
+    "n": "The caller shows a default or cached result and keeps its threads free."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Cool-down ends: half-open",
+    "n": "After the cool-down the breaker allows a few trial calls through."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Trial call succeeds",
+    "n": "The dependency answers quickly, so the breaker closes and traffic ramps back."
+   }
+  ]
+ },
+ {
+  "id": "sd-token-bucket",
+  "module": "system-design",
+  "lesson": "system-design/rate-limiting-and-load-shedding",
+  "title": "Token bucket and shedding",
+  "summary": "How a limiter allows bursts and sheds the excess.",
+  "actors": [
+   "Client",
+   "Gateway",
+   "Bucket",
+   "Service"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request",
+    "n": "A client sends a request to the gateway."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Take a token",
+    "n": "The gateway asks the bucket for a token; the bucket refills at a steady rate up to a maximum."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Token granted",
+    "n": "A token is available, so the request is allowed, including short bursts up to the bucket size."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Forward to service",
+    "n": "The service handles the request within its concurrency limit."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Burst of requests",
+    "n": "The client sends far more than its rate and the bucket runs empty."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "429 with Retry-After",
+    "n": "The gateway rejects cheaply and tells the client when to try again, before any expensive work."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Back off with jitter",
+    "n": "The client waits a randomised delay, so retries do not arrive together."
+   }
+  ]
+ },
+ {
+  "id": "sd-cell-routing",
+  "module": "system-design",
+  "lesson": "system-design/failure-domains-cells-and-bulkheads",
+  "title": "Routing a customer to a cell",
+  "summary": "One thin router, many independent cells.",
+  "actors": [
+   "Customer",
+   "Router",
+   "Cell 3",
+   "Cell 7"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request for customer 4812",
+    "n": "The request arrives at the thin router with the customer identifier."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Look up home cell",
+    "n": "The router maps the customer to cell 3 using a small, replicated table."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Forward to cell 3",
+    "n": "Everything for this customer runs inside cell 3: services, queue and data."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Response",
+    "n": "Cell 3 answers without calling any other cell."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Cell 7 fails",
+    "n": "A bad host pool takes cell 7 down; it serves about a tenth of customers."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Customer 4812 unaffected",
+    "n": "Requests for customers in other cells continue normally, so the blast radius is bounded."
+   }
+  ]
+ },
+ {
+  "id": "sd-shuffle-shard",
+  "module": "system-design",
+  "lesson": "system-design/blast-radius-and-shuffle-sharding",
+  "title": "Shuffle sharding in action",
+  "summary": "Each customer gets a small random set of workers.",
+  "actors": [
+   "Bad customer",
+   "Router",
+   "Workers",
+   "Other customer"
+  ],
+  "steps": [
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Assign subsets",
+    "n": "The router gives each customer a random subset of workers, for example two out of eight."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Sends poison request",
+    "n": "The bad customer sends a request that crashes whichever worker handles it."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Hits workers 2 and 5",
+    "n": "Only the two workers in this customer subset can ever receive its requests."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Workers 2 and 5 crash",
+    "n": "The damage is contained to two workers, however often the request is retried."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Other customer request",
+    "n": "Another customer has workers 1 and 5, so only one of its workers is affected."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Retry on worker 1",
+    "n": "The router retries on the surviving worker in the subset and the customer still gets service."
+   }
+  ]
+ },
+ {
+  "id": "f-sd-doubled-file",
+  "module": "system-design",
+  "kind": "failure",
+  "lesson": "system-design/config-and-control-plane-change-safety",
+  "title": "Failure and recovery: a doubled file crashes every proxy",
+  "summary": "A generated file passes a size limit and is pushed everywhere.",
+  "actors": [
+   "Generator",
+   "Control plane",
+   "Proxies",
+   "Operators"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Query changes behaviour",
+    "n": "A database permissions change makes the query return duplicate rows, so the generated file doubles in size."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Publish with no size check",
+    "n": "The file is published without any bound or shape check against what the proxy can accept."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Push to every proxy",
+    "n": "The control plane replicates the file to the whole fleet within minutes, with no staging."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Limit exceeded, crash",
+    "n": "Each proxy loads the file, finds more features than its fixed limit and aborts instead of keeping the old file."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Errors everywhere",
+    "n": "Traffic fails across the fleet and the symptoms look like an attack, which slows diagnosis."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Stop the push, restore last good",
+    "n": "Operators halt generation and distribute a known good file, then restart the proxies."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Add guards",
+    "n": "Add a size and shape check before publish, staged rollout with a bake time, a loader that keeps the last good file and a global kill switch."
+   }
+  ]
+ },
+ {
+  "id": "f-sd-survivor-overload",
+  "module": "system-design",
+  "kind": "failure",
+  "lesson": "system-design/multi-region-and-global-traffic",
+  "title": "Failure and recovery: the surviving region overloads",
+  "summary": "Two regions at 60 percent each, and one fails.",
+  "actors": [
+   "Users",
+   "Traffic steering",
+   "Region A",
+   "Region B"
+  ],
+  "steps": [
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Region A fails",
+    "n": "A database and network fault takes the whole region out of service."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Health checks fail",
+    "n": "The steering layer marks region A unhealthy and moves its share of traffic."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "All traffic to region B",
+    "n": "Region B was at 60 percent and now receives its own load plus region A load."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Demand at 120 percent",
+    "n": "Capacity is exceeded, queues grow and latency passes client timeouts."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Retries add load",
+    "n": "Clients retry the failures, so the survivor is busier and almost no useful work completes."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Shed by priority",
+    "n": "Region B rejects low priority work with 429 and Retry-After, keeping login and payments fast."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Scale out and recover",
+    "n": "Capacity is added in region B while limits hold, and error rates fall back toward normal."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Fix the design",
+    "n": "Plan headroom for the lost share, drill the failover, and ramp traffic back into region A in steps."
+   }
+  ]
+ },
+ {
+  "id": "sd-consistent-hashing",
+  "module": "system-design",
+  "lesson": "system-design/partitioning-sharding-and-consistent-hashing",
+  "title": "Consistent hashing adds a node",
+  "summary": "Only a slice of keys moves when a node joins.",
+  "actors": [
+   "Client",
+   "Ring",
+   "Node A",
+   "Node B",
+   "New node"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Lookup key K",
+    "n": "The client hashes the key to a point on the ring."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Next node clockwise",
+    "n": "The key belongs to the first node found clockwise, here node A."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Another key goes to B",
+    "n": "Other keys land on other nodes, so each node holds a slice of the ring."
+   },
+   {
+    "f": 4,
+    "t": 1,
+    "l": "New node joins",
+    "n": "A new node takes positions on the ring, using several virtual nodes for even load."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Move a slice",
+    "n": "Only keys between the new node and its predecessor move, about one Nth of the data."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Same lookup again",
+    "n": "Most keys are still on the same nodes, so caches stay warm and there is no storm."
+   }
+  ]
+ },
+ {
+  "id": "sd-backup-restore",
+  "module": "system-design",
+  "lesson": "system-design/backup-restore-and-object-storage-design",
+  "title": "Backup, point-in-time restore and timing",
+  "summary": "From a base copy and a log to a verified restore.",
+  "actors": [
+   "Database",
+   "Backup store",
+   "Operator",
+   "Clean environment"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Base copy and log shipping",
+    "n": "A periodic base copy is stored with a continuous log of changes in an independent account."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Mistake at 14:00",
+    "n": "A table is dropped by mistake; replicas copy the drop within seconds."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Choose a restore time",
+    "n": "The operator picks 13:59 as the restore point using the change log."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Restore base copy",
+    "n": "The base copy is restored into a clean environment, which takes the longest part of the time."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Replay log to 13:59",
+    "n": "Changes are replayed up to just before the mistake."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Verify",
+    "n": "Row counts, checksums and an application smoke test confirm the data is right."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Record the time",
+    "n": "The real elapsed time is compared with the RTO and the gap is filed as work."
+   }
+  ]
+ },
+ {
+  "id": "sd-shared-secret-scope",
+  "module": "system-design",
+  "lesson": "system-design/security-and-identity-by-design",
+  "title": "Short-lived workload credentials",
+  "summary": "A workload gets scoped, expiring access.",
+  "actors": [
+   "Workload",
+   "Identity provider",
+   "Secret manager",
+   "Storage"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Prove identity",
+    "n": "The workload presents its platform identity, not a copied key."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Short-lived token",
+    "n": "The provider issues a token that expires in minutes and is scoped to this workload."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Request secret",
+    "n": "The workload asks the secret manager for only the secret it needs."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Secret returned and logged",
+    "n": "The manager returns the secret and records who accessed it and when."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Read one bucket",
+    "n": "The token allows reading only the one bucket and prefix it needs."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Other bucket denied",
+    "n": "A request for a different bucket is refused, so a compromise reaches little."
+   }
+  ]
+ },
+ {
+  "id": "f-sd-restore-too-slow",
+  "module": "system-design",
+  "kind": "failure",
+  "lesson": "system-design/backup-restore-and-object-storage-design",
+  "title": "Failure and recovery: the backup that could not meet the RTO",
+  "summary": "A destructive change meets a restore nobody had timed.",
+  "actors": [
+   "Operator",
+   "Primary database",
+   "Backup store",
+   "Business"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Destructive change",
+    "n": "A script deletes data in the primary and replicas copy the deletion."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Start the restore",
+    "n": "The team restores last night full backup and expects it to be quick."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Hours of copying",
+    "n": "Moving the data takes 2 hours 41 minutes against a 60 minute target."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Pressure rises",
+    "n": "The business cannot work and asks for an estimate that nobody can give with confidence."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Replay the log",
+    "n": "After the base restore, the log is replayed to just before the mistake, losing nothing."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Verify and reopen",
+    "n": "Checks pass and the service reopens, hours later than the target."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Fix the design",
+    "n": "Add snapshots or a warm standby, keep point-in-time recovery, and time a restore every month."
+   }
+  ]
+ },
+ {
+  "id": "x-mlops-parts",
+  "module": "mlops",
+  "lesson": "mlops/what-mlops-is-and-how-ml-systems-fail",
+  "title": "The parts around the model",
+  "summary": "Where a production ML system really lives.",
+  "actors": [
+   "Data source",
+   "Pipeline",
+   "Model",
+   "Service"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Collect data",
+    "n": "Raw events and records are collected from products and other systems."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Check and clean",
+    "n": "The pipeline validates the data and removes records that break the rules."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Train a model",
+    "n": "The cleaned data is turned into features and used to train and evaluate a model."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Package and serve",
+    "n": "The approved model is packaged and served as an API or a batch job."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Feed back outcomes",
+    "n": "Real outcomes flow back as new data, so the system can learn again."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Monitor everything",
+    "n": "Inputs, predictions and quality are watched, not only speed and errors."
+   }
+  ]
+ },
+ {
+  "id": "x-mlops-skew",
+  "module": "mlops",
+  "lesson": "mlops/what-mlops-is-and-how-ml-systems-fail",
+  "title": "Training-serving skew",
+  "summary": "Same name, different calculation.",
+  "actors": [
+   "Notebook",
+   "Training job",
+   "Serving code",
+   "Model"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Compute a feature",
+    "n": "A data scientist computes days since login with one library in a notebook."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Train on it",
+    "n": "The model learns with that exact calculation."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Reimplement it",
+    "n": "An engineer rewrites the feature in the service using hours instead of days."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Send different values",
+    "n": "The service sends values that look nothing like the training data."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Return poor answers",
+    "n": "The model answers confidently but wrongly, and no error is raised."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Share one definition",
+    "n": "The fix is one feature definition used by both training and serving."
+   }
+  ]
+ },
+ {
+  "id": "x-mlops-validate",
+  "module": "mlops",
+  "lesson": "mlops/data-and-feature-pipelines-for-ml",
+  "title": "Validating a batch before training",
+  "summary": "A bad batch should stop the pipeline.",
+  "actors": [
+   "Source",
+   "Validator",
+   "Pipeline",
+   "Owner"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Deliver a batch",
+    "n": "A new daily table arrives for training."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Run the checks",
+    "n": "Row counts, freshness, nulls, ranges and allowed values are tested."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Raise an alert",
+    "n": "A check fails because one column is mostly null, and the owner is alerted."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Stop the pipeline",
+    "n": "The pipeline does not train on the bad batch."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Fix upstream",
+    "n": "The owner finds the upstream change and corrects it."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Resume with good data",
+    "n": "A corrected batch passes and the pipeline continues."
+   }
+  ]
+ },
+ {
+  "id": "x-mlops-pit",
+  "module": "mlops",
+  "lesson": "mlops/data-and-feature-pipelines-for-ml",
+  "title": "Point-in-time feature join",
+  "summary": "Use only what was known at the time.",
+  "actors": [
+   "Events",
+   "Feature table",
+   "Join",
+   "Training set"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Pick an event",
+    "n": "An event with a label and a timestamp is taken as a training row."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Offer feature values",
+    "n": "The feature table holds many values for each customer over time."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Find the right time",
+    "n": "The join picks the latest value at or before the event time."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Write the row",
+    "n": "The row contains only information that existed at the moment of the prediction."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Avoid leakage",
+    "n": "Future information never enters, so test scores match production."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Repeat for every event",
+    "n": "The same rule applies to every row, so the whole set is leak-free."
+   }
+  ]
+ },
+ {
+  "id": "x-mlops-tracking",
+  "module": "mlops",
+  "lesson": "mlops/experiment-tracking-and-reproducibility",
+  "title": "A tracked training run",
+  "summary": "Every run leaves a full record.",
+  "actors": [
+   "Engineer",
+   "Training job",
+   "Tracker",
+   "Registry"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Start a run",
+    "n": "The engineer starts training from a code commit and a data version."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Log parameters",
+    "n": "The job records parameters, seed and environment to the tracker."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Train and evaluate",
+    "n": "The model trains and is scored on a fixed evaluation set."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Log metrics and files",
+    "n": "Metrics, per-group results and the model file are stored with the run."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Compare runs",
+    "n": "The engineer compares runs in a table on the same data and metric."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Promote the best",
+    "n": "The chosen run is registered, with a link back to its full record."
+   }
+  ]
+ },
+ {
+  "id": "x-mlops-gate",
+  "module": "mlops",
+  "lesson": "mlops/training-pipelines-and-testing-models-in-ci",
+  "title": "An evaluation gate",
+  "summary": "Compare with production before release.",
+  "actors": [
+   "Pipeline",
+   "Candidate",
+   "Gate",
+   "Registry"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Train a candidate",
+    "n": "The scheduled pipeline trains a new candidate model."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Send it to the gate",
+    "n": "The candidate is scored on a fixed evaluation set."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Compare with production",
+    "n": "The gate compares the candidate with the live model, overall and by group."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Report the result",
+    "n": "The gate reports pass or fail with the numbers behind it."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Register on pass",
+    "n": "Only a passing candidate is registered for staging."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Block on a regression",
+    "n": "A drop for any named group fails the gate and stops the release."
+   }
+  ]
+ },
+ {
+  "id": "x-mlops-ci",
+  "module": "mlops",
+  "lesson": "mlops/training-pipelines-and-testing-models-in-ci",
+  "title": "Tests for code, data and model",
+  "summary": "Three layers of checks.",
+  "actors": [
+   "Developer",
+   "CI",
+   "Data check",
+   "Model test"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Push a change",
+    "n": "A developer changes feature code and pushes it."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Run unit tests",
+    "n": "Small tests check that feature functions return expected values."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Run data checks",
+    "n": "A sample of data is validated against the schema and expectations."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Run model tests",
+    "n": "The model must load, accept its input shape and meet a minimum quality bar."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Run behaviour tests",
+    "n": "Small input changes should not flip answers and hard cases should still work."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Report to the developer",
+    "n": "The change merges only if every layer passes."
+   }
+  ]
+ },
+ {
+  "id": "x-mlops-canary",
+  "module": "mlops",
+  "lesson": "mlops/model-registry-packaging-and-safe-releases",
+  "title": "Shadow, then canary",
+  "summary": "Release in small, watched steps.",
+  "actors": [
+   "Registry",
+   "New model",
+   "Traffic router",
+   "Monitor"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Promote to staging",
+    "n": "The new version is promoted with its image digest and lineage."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Shadow traffic",
+    "n": "A copy of real requests goes to the new model, and its answers are only logged."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Compare answers",
+    "n": "The monitor compares its answers and latency with the live model."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Start a small canary",
+    "n": "A small share of real traffic is served by the new model."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Watch quality",
+    "n": "Errors, latency and a quality proxy are checked before widening."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Promote in steps",
+    "n": "Traffic is raised in steps while the previous version stays ready."
+   }
+  ]
+ },
+ {
+  "id": "x-mlops-serving",
+  "module": "mlops",
+  "lesson": "mlops/serving-models-batch-online-and-streaming",
+  "title": "Dynamic batching",
+  "summary": "A short wait raises throughput.",
+  "actors": [
+   "Clients",
+   "Batcher",
+   "Model",
+   "Autoscaler"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Requests arrive",
+    "n": "Several requests arrive within a few milliseconds."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Wait briefly",
+    "n": "The batcher waits up to its limit to collect more requests."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Run one batch",
+    "n": "The model processes the group in one pass, which is cheaper per item."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Return results",
+    "n": "Each client receives its own answer."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Watch queue and latency",
+    "n": "The autoscaler watches concurrent requests and latency, not only CPU."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Add replicas",
+    "n": "More replicas are added early, keeping a warm minimum because models load slowly."
+   }
+  ]
+ },
+ {
+  "id": "x-mlops-drift",
+  "module": "mlops",
+  "lesson": "mlops/monitoring-drift-and-retraining",
+  "title": "From drift signal to retrain",
+  "summary": "Detect, decide and retrain safely.",
+  "actors": [
+   "Monitor",
+   "On-call",
+   "Pipeline",
+   "Registry"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Compare with training",
+    "n": "The monitor compares live features and predictions with a training reference."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Open a ticket",
+    "n": "A sustained shift over several hours opens a ticket, not a page."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Investigate",
+    "n": "The engineer checks upstream changes and quality on important groups."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Trigger a retrain",
+    "n": "If the shift is real, a retrain starts with fresh, validated data."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Pass the gate",
+    "n": "The new model passes the same gate and staged release as any other."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Reset the reference",
+    "n": "The new training data becomes the reference for future drift checks."
+   }
+  ]
+ },
+ {
+  "id": "f-mlops-silent",
+  "module": "mlops",
+  "kind": "failure",
+  "lesson": "mlops/what-mlops-is-and-how-ml-systems-fail",
+  "title": "Failure and recovery: a model that decayed unseen",
+  "summary": "Quiet decay found by the business.",
+  "actors": [
+   "Model",
+   "Monitoring",
+   "Business",
+   "Team"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Serve normally",
+    "n": "The model answers fast with no errors for months."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Behaviour changes",
+    "n": "Customer behaviour drifts and the predictions slowly get worse."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Nothing fires",
+    "n": "Latency and error dashboards stay green, so no alert is raised."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Business notices",
+    "n": "Conversions fall and the business team reports it six weeks later."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Find the cause",
+    "n": "The team finds that no input or quality checks exist."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Roll back and retrain",
+    "n": "The last good model is restored and a fresh one is trained and tested."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Add monitoring",
+    "n": "Input checks, prediction drift and a monthly quality report against a baseline are added."
+   }
+  ]
+ },
+ {
+  "id": "f-mlops-badretrain",
+  "module": "mlops",
+  "kind": "failure",
+  "lesson": "mlops/training-pipelines-and-testing-models-in-ci",
+  "title": "Failure and recovery: a retrain that shipped a regression",
+  "summary": "An automatic release with no group gate.",
+  "actors": [
+   "Pipeline",
+   "Registry",
+   "Support",
+   "Team"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Retrain on schedule",
+    "n": "The weekly job trains and promotes its result automatically."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Users are affected",
+    "n": "New customers get poor results, while the overall metric barely moves."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Tickets arrive",
+    "n": "Support reports the problem and the team starts investigating."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Roll back",
+    "n": "The registry stage is moved back to the previous version in one step."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Find the cause",
+    "n": "A data fault lowered quality for one group, and the gate only checked the average."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Add a group gate",
+    "n": "The gate now compares named groups and blocks any candidate that is worse."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Release in stages",
+    "n": "Future retrains go through shadow and canary stages before full release."
+   }
+  ]
+ },
+ {
+  "id": "x-aiops-baseline",
+  "module": "aiops",
+  "lesson": "aiops/what-aiops-is-and-is-not",
+  "title": "Measure before you buy",
+  "summary": "A baseline decides whether a tool helped.",
+  "actors": [
+   "Team",
+   "Data",
+   "Tool trial",
+   "Review"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Collect the baseline",
+    "n": "The team measures alerts per incident, time to acknowledge and false pages."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fix telemetry first",
+    "n": "Labels, service names and change records are cleaned up."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Trial beside current practice",
+    "n": "The tool runs for a few weeks alongside the current process."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Compare numbers",
+    "n": "Results are compared with the baseline, not with opinion."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Decide",
+    "n": "The tool stays if noise and time to cause improve."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Review again",
+    "n": "The numbers are reviewed every quarter, so decay is noticed."
+   }
+  ]
+ },
+ {
+  "id": "x-aiops-seasonal",
+  "module": "aiops",
+  "lesson": "aiops/anomaly-detection-on-metrics",
+  "title": "A seasonal baseline",
+  "summary": "Compare with the same time last week.",
+  "actors": [
+   "Metric",
+   "Baseline",
+   "Detector",
+   "On-call"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Collect history",
+    "n": "The metric is stored for several weeks."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Build the pattern",
+    "n": "The baseline learns the shape of each hour and day of the week."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Receive a new value",
+    "n": "A new Monday 9am value arrives."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Compare like with like",
+    "n": "The detector compares it with earlier Monday 9am values, not the previous hour."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Require duration",
+    "n": "The deviation must last several minutes before it counts."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Alert if real",
+    "n": "Only a sustained, large deviation reaches the on-call engineer."
+   }
+  ]
+ },
+ {
+  "id": "x-aiops-correlate",
+  "module": "aiops",
+  "lesson": "aiops/alert-correlation-and-noise-reduction",
+  "title": "Correlating a storm",
+  "summary": "Many alerts, one incident.",
+  "actors": [
+   "Alerts",
+   "Correlator",
+   "Dependency map",
+   "On-call"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Alerts pour in",
+    "n": "Two hundred alerts arrive from thirty services within minutes."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Deduplicate",
+    "n": "Identical alerts collapse into one with a count."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Look up dependencies",
+    "n": "The correlator checks which services share a failing dependency."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Find the common source",
+    "n": "Twenty-nine services depend on one storage volume that is also unhealthy."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Open one incident",
+    "n": "One incident is raised with the volume on top and dependants folded below."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Fix the source",
+    "n": "The engineer frees space, and the dependent alerts clear by themselves."
+   }
+  ]
+ },
+ {
+  "id": "x-aiops-inhibit",
+  "module": "aiops",
+  "lesson": "aiops/alert-correlation-and-noise-reduction",
+  "title": "Inhibition rules",
+  "summary": "A bigger alert mutes smaller ones.",
+  "actors": [
+   "Source alert",
+   "Alert manager",
+   "Warnings",
+   "On-call"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Node down fires",
+    "n": "A critical alert says a node is down."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Pod warnings fire",
+    "n": "Many warning alerts fire for pods on that node."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Match the labels",
+    "n": "The rule matches alerts on the same cluster and node."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Mute the warnings",
+    "n": "The warnings are inhibited while the node alert is active."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Page once",
+    "n": "The engineer gets one page about the real fault."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Resume on recovery",
+    "n": "When the node returns, inhibition ends and warnings flow normally again."
+   }
+  ]
+ },
+ {
+  "id": "x-aiops-templates",
+  "module": "aiops",
+  "lesson": "aiops/logs-and-traces-finding-patterns-with-ml",
+  "title": "Log templates",
+  "summary": "Millions of lines become a short list.",
+  "actors": [
+   "Log lines",
+   "Template builder",
+   "Report",
+   "Engineer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Stream of lines",
+    "n": "Millions of lines arrive with different values inside similar messages."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Replace variable parts",
+    "n": "Numbers, ids and names are replaced by placeholders."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Count templates",
+    "n": "Each template is counted per minute, per version and per host."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Show new templates",
+    "n": "The report lists templates that did not exist before the release."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Check growth",
+    "n": "The engineer looks at templates whose rate is rising fast."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Read examples",
+    "n": "A few real lines are read to confirm what the template means."
+   }
+  ]
+ },
+ {
+  "id": "x-aiops-trace",
+  "module": "aiops",
+  "lesson": "aiops/logs-and-traces-finding-patterns-with-ml",
+  "title": "Comparing slow traces",
+  "summary": "Find the step that grew.",
+  "actors": [
+   "Request",
+   "Trace store",
+   "Compare tool",
+   "Engineer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Requests are traced",
+    "n": "Each request is recorded with timed steps called spans."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Pick slow and typical",
+    "n": "The engineer selects the slowest requests and a typical sample."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Compare span durations",
+    "n": "The tool compares the time spent in each service and call."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Highlight the difference",
+    "n": "One database call is much longer in the slow requests."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Check the path",
+    "n": "A retry that did not exist before appears in the slow traces."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Link to a change",
+    "n": "The retry started right after a configuration push."
+   }
+  ]
+ },
+ {
+  "id": "x-aiops-hints",
+  "module": "aiops",
+  "lesson": "aiops/root-cause-hints-and-incident-assistants",
+  "title": "Ranking change hints",
+  "summary": "Evidence beside every suggestion.",
+  "actors": [
+   "Change log",
+   "Dependency map",
+   "Ranker",
+   "On-call"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 2,
+    "l": "List recent changes",
+    "n": "Deployments, flags and config pushes before the first symptom are collected."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Add dependency health",
+    "n": "The ranker checks which dependencies started failing first."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Score each candidate",
+    "n": "Each change is scored by time gap, graph distance and size of anomaly."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Show hints with reasons",
+    "n": "The engineer sees ranked hints with the evidence for each."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Confirm",
+    "n": "The engineer checks the timeline and confirms or rejects the top hint."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Record the outcome",
+    "n": "The real cause is recorded, so hint accuracy can be measured."
+   }
+  ]
+ },
+ {
+  "id": "x-aiops-assistant",
+  "module": "aiops",
+  "lesson": "aiops/root-cause-hints-and-incident-assistants",
+  "title": "Assistant with guardrails",
+  "summary": "Summaries, not decisions.",
+  "actors": [
+   "Responder",
+   "Assistant",
+   "Incident data",
+   "Production"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Ask for a summary",
+    "n": "The responder asks for a status update and the likely runbook."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Read allowed data",
+    "n": "The assistant sees only data the policy allows."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Answer with sources",
+    "n": "It writes a summary and quotes the lines it relied on."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Check the quotes",
+    "n": "The responder checks the sources before trusting the summary."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Make the change",
+    "n": "Only the responder approves and runs any change to production."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Log the exchange",
+    "n": "Every question and answer is logged for later review."
+   }
+  ]
+ },
+ {
+  "id": "x-aiops-remediate",
+  "module": "aiops",
+  "lesson": "aiops/safe-automation-and-auto-remediation",
+  "title": "A guarded auto-fix",
+  "summary": "Check, act, verify, escalate.",
+  "actors": [
+   "Alert",
+   "Automation",
+   "Service",
+   "On-call"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Alert fires",
+    "n": "A worker queue has stalled for ten minutes."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Check preconditions",
+    "n": "The rule confirms the alert is active and no deployment is running."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Check the limits",
+    "n": "It checks the action budget, the cooldown and the number of targets."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Restart the worker",
+    "n": "The rule restarts one deployment and writes an audit entry."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Verify",
+    "n": "After five minutes it checks that the queue depth has dropped."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Escalate if not fixed",
+    "n": "If verification fails, the automation stops and pages a person."
+   }
+  ]
+ },
+ {
+  "id": "x-aiops-levels",
+  "module": "aiops",
+  "lesson": "aiops/safe-automation-and-auto-remediation",
+  "title": "From suggestion to unattended",
+  "summary": "Earn trust in stages.",
+  "actors": [
+   "Rule",
+   "Engineer",
+   "Audit log",
+   "Kill switch"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Suggest only",
+    "n": "The rule posts the action it would take and waits."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Approve with one click",
+    "n": "The engineer approves, and the rule runs the action."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Log every action",
+    "n": "Each action is recorded with the reason and how to undo it."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Review the record",
+    "n": "After many correct decisions, the team reviews the audit log."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Allow unattended runs",
+    "n": "The safest cases are allowed to run without approval."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Keep the kill switch",
+    "n": "One control can still stop all automation at any time."
+   }
+  ]
+ }
+]

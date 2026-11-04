@@ -1,0 +1,2562 @@
+[
+ {
+  "id": "f-python-unhandled-timeout",
+  "module": "python",
+  "kind": "failure",
+  "lesson": "python/http-apis-and-json",
+  "title": "Failure and recovery: a request with no timeout hangs a script",
+  "summary": "One slow API stalls a whole job.",
+  "actors": [
+   "Script",
+   "HTTP client",
+   "API",
+   "Scheduler"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Normal call",
+    "n": "A nightly script calls an API with the requests library and finishes in seconds."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "API slows",
+    "n": "The API stops answering and keeps the connection open without sending data."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Wait forever",
+    "n": "The call has no timeout, so it waits and the script never reaches its next line."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Symptom",
+    "n": "The scheduler reports the job still running hours later and the next run is skipped or overlaps."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Diagnose",
+    "n": "Stack dump or py-spy shows the thread blocked in a socket read inside the client."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fix",
+    "n": "Set a connect and read timeout on every call and catch the timeout error."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Retry safely",
+    "n": "Retry with a small backoff and a limit, then fail clearly with a message and a non-zero exit code."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Verify",
+    "n": "The scheduler shows the job ending within its time limit even when the API is down."
+   }
+  ]
+ },
+ {
+  "id": "f-python-wrong-environment",
+  "module": "python",
+  "kind": "failure",
+  "lesson": "python/basics-and-environments",
+  "title": "Failure and recovery: the wrong Python environment breaks a deploy",
+  "summary": "Works on my machine, fails on the server.",
+  "actors": [
+   "Developer",
+   "Server",
+   "Package index",
+   "Virtualenv"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Works locally",
+    "n": "The script runs fine on a laptop where the packages were installed globally over time."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Deploy",
+    "n": "The script is copied to a server without a lock file or a recorded list of packages."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Import error",
+    "n": "The server reports a missing module, and after installing it, a newer version behaves differently."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Symptom",
+    "n": "The job fails with ModuleNotFoundError, then with a changed function signature."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Investigate",
+    "n": "pip freeze on both machines shows different versions and which python is used is not the same."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Fix",
+    "n": "Create a virtualenv, pin versions in a requirements file with hashes, and install from it."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Automate",
+    "n": "The deploy step creates the environment from the lock file, so every machine is the same."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Verify",
+    "n": "A fresh server runs the script with the same versions and the same results."
+   }
+  ]
+ },
+ {
+  "id": "f-net-dns-stale",
+  "module": "networking",
+  "kind": "failure",
+  "lesson": "networking/dns",
+  "title": "Failure and recovery: a stale DNS answer sends traffic to the old server",
+  "summary": "Cached records outlive a cutover.",
+  "actors": [
+   "Client",
+   "Resolver",
+   "Authoritative DNS",
+   "Old server"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Normal lookup",
+    "n": "A client asks a resolver for the service name and receives an address with a long time to live."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Cutover",
+    "n": "The team moves the service to a new address and updates the record at the authoritative server."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Cache holds",
+    "n": "The resolver keeps serving the old answer until the cached time to live runs out."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Symptom",
+    "n": "Some users reach the old server, which is draining, and see errors while others work fine."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Diagnose",
+    "n": "dig shows different answers from different resolvers and the remaining time to live in each."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Fix",
+    "n": "Wait for the time to live, or flush the caches you control, and keep the old server serving until then."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Next time",
+    "n": "Lower the time to live a day before a planned cutover and raise it again afterwards."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Verify",
+    "n": "dig from several resolvers returns the new address and the old server sees no more traffic."
+   }
+  ]
+ },
+ {
+  "id": "f-net-mtu-blackhole",
+  "module": "networking",
+  "kind": "failure",
+  "lesson": "networking/latency-mtu-and-network-performance",
+  "title": "Failure and recovery: a smaller path MTU drops large packets",
+  "summary": "Small requests work, large ones hang.",
+  "actors": [
+   "Client",
+   "Router",
+   "Tunnel",
+   "Server"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Normal path",
+    "n": "Packets of 1500 bytes travel from client to server over ordinary links."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Tunnel added",
+    "n": "A VPN tunnel is added on the path and its overhead lowers the usable packet size to about 1400 bytes."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Drop",
+    "n": "A large packet with the do not fragment bit cannot fit and the router drops it, but the message back is blocked."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Symptom",
+    "n": "Pings and small requests work, but a large download or a TLS handshake stalls and times out."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Diagnose",
+    "n": "ping with a set size and the do not fragment flag finds the largest size that passes."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Fix",
+    "n": "Lower the MTU on the tunnel interface or clamp the segment size so packets fit."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Allow messages",
+    "n": "Permit the needed ICMP messages so path discovery can work for other traffic."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Verify",
+    "n": "Large transfers complete at normal speed and the handshake no longer hangs."
+   }
+  ]
+ },
+ {
+  "id": "f-docker-restart-loop",
+  "module": "docker",
+  "kind": "failure",
+  "lesson": "docker/debugging-containers",
+  "title": "Failure and recovery: a container restarts in a loop",
+  "summary": "The exit code points at the cause.",
+  "actors": [
+   "Orchestrator",
+   "Container",
+   "Image",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Start",
+    "n": "The orchestrator starts a new container from the latest image tag."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Crash",
+    "n": "The main process exits right after start with a non-zero exit code."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Restart",
+    "n": "The restart policy starts it again and again, with a growing delay between attempts."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Symptom",
+    "n": "The status shows restarting or crash loop and the service is never ready."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Read logs",
+    "n": "docker logs shows a missing environment variable that the new image now requires."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Check exit code",
+    "n": "Code 1 points at the application and 137 would point at memory limits being hit."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Fix",
+    "n": "Provide the variable or roll back to the previous image tag that worked."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Verify",
+    "n": "The container stays running, passes its health check, and the restart count stops increasing."
+   }
+  ]
+ },
+ {
+  "id": "f-docker-rate-limit",
+  "module": "docker",
+  "kind": "failure",
+  "lesson": "docker/registries-and-supply-chain",
+  "title": "Failure and recovery: an image pull hits the registry rate limit",
+  "summary": "Builds stall on a public registry.",
+  "actors": [
+   "CI runner",
+   "Registry",
+   "Mirror",
+   "Team"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Normal pulls",
+    "n": "The pipeline pulls base images from a public registry without logging in."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Many builds",
+    "n": "A busy day produces many builds from the same shared address."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Limit reached",
+    "n": "The registry returns too many requests and refuses further pulls for a few hours."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Symptom",
+    "n": "Builds fail at the pull step with a rate limit message, even though the code did not change."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Confirm",
+    "n": "The response headers show the remaining pulls and the time when the limit resets."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Fix now",
+    "n": "Log in with a registry account to raise the limit, or retry after the reset."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Fix for good",
+    "n": "Mirror the needed base images into a private registry or pull through a cache."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Verify",
+    "n": "Builds pull from the private registry and no longer depend on the public limit."
+   }
+  ]
+ },
+ {
+  "id": "f-cicd-bad-deploy",
+  "module": "cicd",
+  "kind": "failure",
+  "lesson": "cicd/deployment-strategies",
+  "title": "Failure and recovery: a bad release is caught by a canary",
+  "summary": "Small blast radius, fast rollback.",
+  "actors": [
+   "Pipeline",
+   "Canary",
+   "Monitoring",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Build and test",
+    "n": "The pipeline builds the release and all tests pass, so it is approved for production."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Canary start",
+    "n": "Only five percent of traffic is routed to the new version while ninety five stays on the old one."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Metrics flow",
+    "n": "The canary reports errors and latency, and monitoring compares them with the old version."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Threshold breach",
+    "n": "The canary error rate is ten times higher than the baseline for three minutes in a row."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Automatic abort",
+    "n": "The pipeline stops the rollout and sends all traffic back to the old version without waiting for a person."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Investigate",
+    "n": "The operator reads the canary logs and finds a missing database column the new code expects."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Fix forward",
+    "n": "A migration is added and tested, and a new release is built."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Verify",
+    "n": "The next canary stays within thresholds, so the rollout moves from five percent to fifty and then to everyone."
+   }
+  ]
+ },
+ {
+  "id": "f-cicd-flaky-pipeline",
+  "module": "cicd",
+  "kind": "failure",
+  "lesson": "cicd/testing-and-quality-gates",
+  "title": "Failure and recovery: a flaky test erodes trust in the pipeline",
+  "summary": "Retries hide the problem, quarantine fixes it.",
+  "actors": [
+   "Developer",
+   "Pipeline",
+   "Test",
+   "Tracker"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Green most days",
+    "n": "The pipeline passes on most runs and developers merge without thinking about it."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Random failure",
+    "n": "One test fails about one run in ten with a timing error that has nothing to do with the change."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Rerun habit",
+    "n": "Developers press the rerun button until it passes and stop reading the failures."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Cost",
+    "n": "Each rerun adds ten minutes, and a real failure is dismissed as just the flaky one."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Measure",
+    "n": "A report of pass and fail by test over the last fifty runs shows which test is flaky."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Quarantine",
+    "n": "The flaky test is moved to a separate non-blocking job with an owner and a due date."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Fix",
+    "n": "The test waits for a condition instead of a fixed sleep, and its shared state is isolated."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Restore",
+    "n": "The test returns to the blocking set and the failure rate is tracked to stay at zero."
+   }
+  ]
+ },
+ {
+  "id": "f-k8s-crashloop",
+  "module": "kubernetes",
+  "kind": "failure",
+  "lesson": "kubernetes/debugging-kubernetes-workloads",
+  "title": "Failure and recovery: a pod stuck in CrashLoopBackOff",
+  "summary": "Read the events and the previous logs.",
+  "actors": [
+   "Kubelet",
+   "Pod",
+   "API server",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Create",
+    "n": "A deployment rollout creates new pods with a changed config map reference."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Start fails",
+    "n": "The container starts, the application exits with an error, and the kubelet records the exit code."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Back off",
+    "n": "The kubelet restarts the container with growing delays, and the status becomes CrashLoopBackOff."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Symptom",
+    "n": "kubectl get pods shows a growing restart count and the pod never becomes ready."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Describe",
+    "n": "kubectl describe pod shows the last state, the exit code and events about back-off restarting."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Previous logs",
+    "n": "kubectl logs with the previous flag shows the application complaining about a missing config key."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Fix",
+    "n": "Correct the config map key, apply it, and roll the deployment so the pods pick it up."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Verify",
+    "n": "Pods become ready, the restart count stays at zero, and the rollout reports successfully rolled out."
+   }
+  ]
+ },
+ {
+  "id": "f-k8s-service-no-endpoints",
+  "module": "kubernetes",
+  "kind": "failure",
+  "lesson": "kubernetes/services-and-ingress",
+  "title": "Failure and recovery: a Service has no endpoints",
+  "summary": "Selectors and labels must match.",
+  "actors": [
+   "Client",
+   "Service",
+   "Pods",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Working service",
+    "n": "A Service selects pods by the label app equals web and traffic reaches them."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Relabel",
+    "n": "A change renames the pod label to app equals website but leaves the Service selector unchanged."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Mismatch",
+    "n": "The Service now matches zero pods, so its list of endpoints becomes empty."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Symptom",
+    "n": "Clients get connection refused or timeouts even though every pod is running and ready."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Check endpoints",
+    "n": "kubectl get endpoints shows none for the Service, which points at the selector."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Compare labels",
+    "n": "kubectl get pods with show-labels and the Service selector show different values."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Fix",
+    "n": "Make the selector and pod labels match, and prefer one shared label set in a single template."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Verify",
+    "n": "Endpoints list the pod addresses and requests reach the pods again."
+   }
+  ]
+ },
+ {
+  "id": "f-k8sops-etcd-quorum",
+  "module": "k8s-ops",
+  "kind": "failure",
+  "lesson": "k8s-ops/etcd-backup-and-restore",
+  "title": "Failure and recovery: etcd loses quorum",
+  "summary": "Restore from a snapshot, then bring members back.",
+  "actors": [
+   "Control plane",
+   "etcd",
+   "Backup",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Healthy cluster",
+    "n": "Three etcd members agree on every write and the API server answers quickly."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Members fail",
+    "n": "Two of three members are lost together when a rack fails, and quorum needs two."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Writes stop",
+    "n": "The API server cannot write, so kubectl commands time out and no new pods can be scheduled."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Symptom",
+    "n": "Existing pods keep running, but nothing changes, and the API server logs say etcd is unavailable."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Locate backup",
+    "n": "The operator finds the latest snapshot and checks its date and size."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Restore",
+    "n": "A snapshot is restored into a new data directory and a fresh cluster of members is started from it."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Rejoin",
+    "n": "The API servers point at the restored members and nodes reconnect."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Verify",
+    "n": "kubectl shows the expected objects, the member list is healthy, and a new snapshot is taken."
+   }
+  ]
+ },
+ {
+  "id": "f-k8sops-upgrade-skew",
+  "module": "k8s-ops",
+  "kind": "failure",
+  "lesson": "k8s-ops/upgrading-clusters-safely",
+  "title": "Failure and recovery: an upgrade breaks workloads",
+  "summary": "Remove deprecated APIs before upgrading.",
+  "actors": [
+   "Operator",
+   "Control plane",
+   "Nodes",
+   "Workloads"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Plan",
+    "n": "The operator reads the release notes and plans a minor version upgrade, one version at a time."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Upgrade control plane",
+    "n": "The control plane is upgraded first and starts serving the newer API version."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Removed API",
+    "n": "A manifest uses an API version that was removed, so applying it now returns an error."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Symptom",
+    "n": "A deployment pipeline fails to apply, and a controller using the old API stops reconciling."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Find usages",
+    "n": "A scan of the manifests and the API server metrics lists clients still calling deprecated APIs."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Fix",
+    "n": "Update the manifests to the supported API version and redeploy the affected workloads."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Continue",
+    "n": "Nodes are drained and upgraded one at a time, with the drain respecting disruption budgets."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Verify",
+    "n": "All nodes report the new version and every workload is ready."
+   }
+  ]
+ },
+ {
+  "id": "f-tf-state-lock",
+  "module": "terraform",
+  "kind": "failure",
+  "lesson": "terraform/state",
+  "title": "Failure and recovery: a stuck state lock blocks every plan",
+  "summary": "Unlock safely, only when no run is active.",
+  "actors": [
+   "Engineer",
+   "Terraform",
+   "State backend",
+   "Pipeline"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Normal run",
+    "n": "Terraform locks the remote state, plans, applies, and releases the lock."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Crash",
+    "n": "The apply is interrupted when the runner is killed, so the lock is never released."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Next plan",
+    "n": "An engineer runs plan and sees an error that the state is locked by another operation."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Check",
+    "n": "The lock info shows a run id and a time, and the pipeline shows no active run."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Confirm",
+    "n": "The engineer checks that no apply is really running before touching the lock."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Unlock",
+    "n": "terraform force-unlock with the lock id releases it, and the person records why it was done."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Plan again",
+    "n": "A new plan shows whether the interrupted apply left a partial change to review."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Prevent",
+    "n": "Add a timeout and retries to the runner and keep applies in one serialised pipeline job."
+   }
+  ]
+ },
+ {
+  "id": "f-tf-drift",
+  "module": "terraform",
+  "kind": "failure",
+  "lesson": "terraform/workflows-and-drift",
+  "title": "Failure and recovery: a manual change causes drift",
+  "summary": "Plan finds it and code decides what is right.",
+  "actors": [
+   "Engineer",
+   "Console",
+   "Terraform",
+   "State"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "In sync",
+    "n": "The code, the state and the real resources all agree and the plan shows no changes."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Manual edit",
+    "n": "During an incident someone widens a security group rule in the console."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Drift exists",
+    "n": "The real resource now differs from the state and from the code."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Scheduled plan",
+    "n": "A nightly plan reports one change that would remove the new rule."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Decide",
+    "n": "The team asks whether the manual change should stay or be removed."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Keep",
+    "n": "If it should stay, update the code so it matches and run the plan to confirm no changes."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Revert",
+    "n": "If not, apply to restore the declared value, and note it in the incident record."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Prevent",
+    "n": "Restrict console edits and run the drift plan on a schedule with alerts."
+   }
+  ]
+ },
+ {
+  "id": "f-cloud-region-outage",
+  "module": "cloud",
+  "kind": "failure",
+  "lesson": "cloud/high-availability-and-disaster-recovery",
+  "title": "Failure and recovery: a region outage and a failover",
+  "summary": "Rehearsed failover turns a disaster into a drill.",
+  "actors": [
+   "User",
+   "DNS",
+   "Primary region",
+   "Standby region"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Normal",
+    "n": "Traffic goes through DNS to the primary region and the standby receives replicated data."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Region fails",
+    "n": "A power and network failure makes the primary region unavailable to users."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Health check",
+    "n": "Health checks from outside the region fail three times in a row."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Failover",
+    "n": "DNS answers change to the standby region, or a traffic manager moves users, within the record's time to live."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Promote data",
+    "n": "The standby database is promoted and the application config points at it."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Users recover",
+    "n": "New requests succeed in the standby region after a short interruption."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Failback",
+    "n": "When the primary is healthy again, data is synced back before traffic is moved in a quiet window."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Review",
+    "n": "The measured recovery time is compared with the target and the runbook is updated."
+   }
+  ]
+ },
+ {
+  "id": "f-cloud-cost-spike",
+  "module": "cloud",
+  "kind": "failure",
+  "lesson": "cloud/managed-services-and-cost",
+  "title": "Failure and recovery: an unexpected cloud bill",
+  "summary": "Budgets and tags find the owner fast.",
+  "actors": [
+   "Budget alert",
+   "Cost report",
+   "Owner",
+   "Resource"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Normal spend",
+    "n": "Daily spend follows the usual pattern and stays below the monthly budget line."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Runaway resource",
+    "n": "A test job leaves a large cluster running and a log bucket with no lifecycle rule grows daily."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Alert",
+    "n": "A budget alert fires at eighty percent of the month on day twelve."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Break down",
+    "n": "The cost report grouped by tag and service shows one project accounting for most of the rise."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Owner confirms",
+    "n": "The tag points at the owner who confirms the cluster is not needed."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Stop the cost",
+    "n": "The cluster is deleted and the bucket gets an expiry rule for old data."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Prevent",
+    "n": "Tags become mandatory, budgets get alerts per team, and idle resources are reported weekly."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Verify",
+    "n": "Daily spend returns to the normal line the next day."
+   }
+  ]
+ },
+ {
+  "id": "f-iam-access-denied",
+  "module": "cloud-iam",
+  "kind": "failure",
+  "lesson": "cloud-iam/debugging-access-denied-and-cloud-security-incidents",
+  "title": "Failure and recovery: debugging an AccessDenied error",
+  "summary": "Work out which layer said no.",
+  "actors": [
+   "Engineer",
+   "Identity",
+   "Policy engine",
+   "Resource"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Request",
+    "n": "A deployment role calls an action on a storage bucket and the call returns AccessDenied."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Identity policy",
+    "n": "The engineer checks that the role's own policy allows the action on that exact resource."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Resource policy",
+    "n": "The bucket policy has an explicit deny for requests that do not come through the private endpoint."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Boundaries",
+    "n": "A permissions boundary or an organisation policy can also remove permissions, so they are checked too."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Find the layer",
+    "n": "The decision log shows an explicit deny in the bucket policy, and an explicit deny always wins."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Fix",
+    "n": "Route the call through the private endpoint, or update the policy condition for this role."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Retry",
+    "n": "The same call now succeeds, and the change is made in code, not in the console."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Keep least privilege",
+    "n": "The fix adds one condition and no wildcard, and the access review notes it."
+   }
+  ]
+ },
+ {
+  "id": "f-iam-leaked-key",
+  "module": "cloud-iam",
+  "kind": "failure",
+  "lesson": "cloud-iam/logging-detection-and-audit-trails",
+  "title": "Failure and recovery: a leaked access key",
+  "summary": "Revoke first, investigate second.",
+  "actors": [
+   "Attacker",
+   "Key",
+   "Audit log",
+   "Security team"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Key leaks",
+    "n": "A long-lived access key is pushed into a public repository by mistake."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Abuse",
+    "n": "Within minutes, a bot uses the key to start large instances in many regions."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Detection",
+    "n": "A usage anomaly alert and the audit log show unusual calls from an unknown address."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Revoke",
+    "n": "The security team deactivates the key at once, before anything else is done."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Investigate",
+    "n": "The audit log lists every call made with that key and the resources created."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Clean up",
+    "n": "Unwanted resources are deleted, and any new credentials created by the attacker are removed."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Replace",
+    "n": "The workload moves to short-lived role credentials so there is no long-lived key to leak."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Prevent",
+    "n": "Secret scanning, least-privilege roles and cost alerts shorten the time to notice next time."
+   }
+  ]
+ },
+ {
+  "id": "f-obs-alert-storm",
+  "module": "observability",
+  "kind": "failure",
+  "lesson": "observability/alerting-and-dashboards",
+  "title": "Failure and recovery: an alert storm buries the real problem",
+  "summary": "Group and route so one cause is one page.",
+  "actors": [
+   "Service",
+   "Alertmanager",
+   "On-call",
+   "Dashboard"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "One root cause",
+    "n": "A database slows down and fifty services that depend on it start timing out."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Fifty alerts",
+    "n": "Each service fires its own alert and the on-call phone receives fifty pages in two minutes."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Overwhelm",
+    "n": "The responder cannot tell which alert is the cause and which are the effects."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Group",
+    "n": "Alerts are grouped by cluster and dependency so a single message shows the common cause."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Inhibit",
+    "n": "A rule suppresses the downstream alerts while the database alert is firing."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Find cause",
+    "n": "The dashboard for the database shows slow queries and connection saturation."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Fix",
+    "n": "Raise the pool and kill the long query, and services recover without any change to the services."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Verify",
+    "n": "Alerts resolve in order, the page count is one, and the rules are kept for the next time."
+   }
+  ]
+ },
+ {
+  "id": "f-obs-high-cardinality",
+  "module": "observability",
+  "kind": "failure",
+  "lesson": "observability/telemetry-cost-and-cardinality",
+  "title": "Failure and recovery: high cardinality crashes the metrics server",
+  "summary": "One label can create millions of series.",
+  "actors": [
+   "Application",
+   "Prometheus",
+   "Dashboard",
+   "Engineer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Normal metrics",
+    "n": "A request counter carries labels for method and status code, giving a few dozen series."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "New label",
+    "n": "A change adds the user id as a label so that debugging a single user is easier."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Series explode",
+    "n": "Every user becomes a new series, and memory use climbs with each scrape."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Symptom",
+    "n": "Dashboards slow down, queries time out, and the server is killed for running out of memory."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Find it",
+    "n": "A query for the series count by metric name shows one metric with millions of series."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Remove",
+    "n": "The label is dropped in code and relabelling drops it at scrape time right away."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Keep detail",
+    "n": "Per-user data goes to logs or traces, which are built for high cardinality."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Prevent",
+    "n": "A limit on series per target and a review check on new labels stop it next time."
+   }
+  ]
+ },
+ {
+  "id": "f-sre-error-budget",
+  "module": "sre",
+  "kind": "failure",
+  "lesson": "sre/slos-and-error-budgets",
+  "title": "Failure and recovery: the error budget runs out",
+  "summary": "Reliability work takes priority.",
+  "actors": [
+   "Service",
+   "SLO tracker",
+   "Product team",
+   "SRE"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Budget set",
+    "n": "A ninety nine point nine percent target gives the service forty three minutes of errors per month."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Bad release",
+    "n": "A release causes errors for thirty minutes and a second incident adds fifteen more."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Budget gone",
+    "n": "The tracker shows the monthly budget fully used on day nineteen, with eleven days still to go."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Policy",
+    "n": "The agreed policy says feature releases pause and reliability work comes first until the budget recovers."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Review",
+    "n": "The SRE and product team list the causes and choose the fixes that remove the most risk."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Fix",
+    "n": "Add a canary step, a rollback test, and a timeout fix for the slow dependency."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Resume",
+    "n": "Releases restart when the rolling window shows budget back, with the new checks in place."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Verify",
+    "n": "The next month ends with budget left and fewer pages."
+   }
+  ]
+ },
+ {
+  "id": "f-sre-bad-change",
+  "module": "sre",
+  "kind": "failure",
+  "lesson": "sre/incident-response",
+  "title": "Failure and recovery: a bad change during an incident",
+  "summary": "Recent changes are the first suspect.",
+  "actors": [
+   "Responder",
+   "Change log",
+   "Service",
+   "Incident lead"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Alert",
+    "n": "Error rates rise at 10:02 and the responder starts an incident."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Roles",
+    "n": "The incident lead assigns a responder, a communicator and a note taker."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Ask what changed",
+    "n": "The change log shows a config rollout at 10:00 to the same service."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Hypothesis",
+    "n": "The rollout is the leading suspect because the timing and the affected service match."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Mitigate",
+    "n": "Roll back the config first, since a rollback is quicker and safer than diagnosing under pressure."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Recovery",
+    "n": "Error rates fall within three minutes, which confirms the hypothesis."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Follow up",
+    "n": "The team writes down the timeline, and the cause is found later in calm conditions."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Improve",
+    "n": "Staged rollouts and an automatic rollback on error spikes become action items."
+   }
+  ]
+ },
+ {
+  "id": "f-sec-ransomware",
+  "module": "security",
+  "kind": "failure",
+  "lesson": "security/ransomware-resilience-and-recovery",
+  "title": "Failure and recovery: ransomware and a clean restore",
+  "summary": "Immutable backups decide the outcome.",
+  "actors": [
+   "Attacker",
+   "Servers",
+   "Backups",
+   "Response team"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Foothold",
+    "n": "A stolen password for a remote access account gives the attacker a way into the network."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Spread",
+    "n": "The attacker moves between servers and gains an administrator account."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Backups targeted",
+    "n": "The attacker tries to delete backups, but the immutable copies cannot be changed before their retention date."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Encrypt",
+    "n": "Files are encrypted and a ransom note appears on the servers."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Contain",
+    "n": "The response team isolates affected network segments and disables the stolen accounts."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Restore",
+    "n": "Clean systems are rebuilt from known good images and data is restored from the immutable backup."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Harden",
+    "n": "Multi-factor authentication, network segmentation and tested restore times are put in place."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Review",
+    "n": "The timeline and gaps become action items, and the restore time is compared with the target."
+   }
+  ]
+ },
+ {
+  "id": "f-sec-vuln-patch",
+  "module": "security",
+  "kind": "failure",
+  "lesson": "security/vulnerability-management-and-security-incidents",
+  "title": "Failure and recovery: a critical vulnerability is announced",
+  "summary": "Know where it runs, then patch by priority.",
+  "actors": [
+   "Advisory",
+   "Inventory",
+   "Team",
+   "Pipeline"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Advisory",
+    "n": "A critical flaw is announced in a widely used library, with a fix released the same day."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Find usage",
+    "n": "The software inventory lists every service and image that includes the vulnerable version."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Prioritise",
+    "n": "Internet-facing services go first, then internal ones, and unused images are removed."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Patch",
+    "n": "The dependency is updated and the pipeline rebuilds and tests each affected service."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Deploy",
+    "n": "Fixed versions are rolled out in stages, with the same checks as any release."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Verify",
+    "n": "A rescan shows no remaining vulnerable versions in running workloads."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Communicate",
+    "n": "The team records what was affected, when it was fixed and what monitoring watched meanwhile."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Improve",
+    "n": "An automatic dependency update and a scan on every build cut the time next time."
+   }
+  ]
+ },
+ {
+  "id": "f-ans-partial-failure",
+  "module": "ansible",
+  "kind": "failure",
+  "lesson": "ansible/playbooks-tasks-and-idempotence",
+  "title": "Failure and recovery: a playbook fails halfway across a fleet",
+  "summary": "Idempotent tasks make re-running safe.",
+  "actors": [
+   "Operator",
+   "Ansible",
+   "Hosts",
+   "Load balancer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Run",
+    "n": "The operator runs a playbook that updates the configuration on twenty web servers."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Rolling batch",
+    "n": "Without a batch limit, all hosts restart their service at nearly the same moment."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Error",
+    "n": "A template contains a typo, and the service fails to start on every host that applied it."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Outage",
+    "n": "The load balancer sees every back end as unhealthy and the site is down."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Stop",
+    "n": "The operator stops the play and uses the previous config from version control to restore service."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fix",
+    "n": "Correct the template, run a syntax check, and use check mode with diff before applying."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Re-run",
+    "n": "Idempotent tasks skip hosts that are already correct and only change what is still wrong."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Prevent",
+    "n": "Use serial batches and a failure threshold so one bad host stops the run early."
+   }
+  ]
+ },
+ {
+  "id": "f-ans-vault-password",
+  "module": "ansible",
+  "kind": "failure",
+  "lesson": "ansible/vault-secrets-and-safe-practice",
+  "title": "Failure and recovery: a lost Vault password",
+  "summary": "Plan secret recovery before you need it.",
+  "actors": [
+   "Operator",
+   "Vault file",
+   "Secret store",
+   "Playbook"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Encrypted vars",
+    "n": "Secrets for the playbooks are stored in an encrypted vault file."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Password gone",
+    "n": "The one engineer who knew the vault password leaves and the password was only on their laptop."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Failure",
+    "n": "The playbook cannot decrypt the file and every deploy fails with a decryption error."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Look for copies",
+    "n": "The team checks the secret store and the pipeline for a stored copy of the password."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Recover",
+    "n": "If a copy exists, it is used to re-key the vault with a new password stored in the secret store."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Last resort",
+    "n": "If none exists, every secret in the file must be rotated at its source and the file recreated."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Prevent",
+    "n": "The password is held in the shared secret manager with two named owners and an access log."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Verify",
+    "n": "A fresh clone of the repository decrypts and runs in the pipeline using the stored password."
+   }
+  ]
+ },
+ {
+  "id": "f-db-replica-lag",
+  "module": "databases",
+  "kind": "failure",
+  "lesson": "databases/replication-and-failover",
+  "title": "Failure and recovery: replica lag serves stale data",
+  "summary": "Reads from a replica can be behind.",
+  "actors": [
+   "Application",
+   "Primary",
+   "Replica",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Normal",
+    "n": "The application writes to the primary and reads from a replica a few milliseconds behind."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Heavy write",
+    "n": "A bulk update runs on the primary and produces a large amount of change data quickly."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Lag grows",
+    "n": "The replica applies changes more slowly and falls minutes behind."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Symptom",
+    "n": "Users save a change and then see the old value, and support calls say it did not save."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Measure",
+    "n": "The replica lag metric and replication status show the delay and the slow apply thread."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Mitigate",
+    "n": "Send reads that must see the latest write to the primary and pause the bulk job."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Fix",
+    "n": "Break the job into small batches and give the replica more resources for applying changes."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Verify",
+    "n": "Lag stays under a second during the next bulk job and read-your-write cases work."
+   }
+  ]
+ },
+ {
+  "id": "f-db-long-transaction",
+  "module": "databases",
+  "kind": "failure",
+  "lesson": "databases/transactions-and-locking",
+  "title": "Failure and recovery: a long transaction blocks the table",
+  "summary": "One idle transaction can stall writers.",
+  "actors": [
+   "Session A",
+   "Session B",
+   "Lock manager",
+   "DBA"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Open transaction",
+    "n": "A tool opens a transaction, updates a row and then sits idle without committing."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Lock held",
+    "n": "The row lock stays held for as long as the transaction is open."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Others wait",
+    "n": "Another session tries to update the same row and waits in the lock queue."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Pile up",
+    "n": "More sessions queue behind it and the connection pool fills with waiting requests."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Find blocker",
+    "n": "The DBA queries the lock views and finds the idle transaction at the head of the chain."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Resolve",
+    "n": "The blocking session is ended, which rolls it back and releases the lock."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Fix the cause",
+    "n": "Set an idle in transaction timeout and make the tool commit or roll back promptly."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Verify",
+    "n": "The queue clears, requests complete, and the lock wait graph is empty."
+   }
+  ]
+ },
+ {
+  "id": "f-go-goroutine-leak",
+  "module": "go",
+  "kind": "failure",
+  "lesson": "go/context-timeouts-and-cancellation",
+  "title": "Failure and recovery: a goroutine leak grows memory",
+  "summary": "Every goroutine needs a way to stop.",
+  "actors": [
+   "Handler",
+   "Goroutine",
+   "Channel",
+   "Profiler"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request",
+    "n": "Each request starts a goroutine that sends its result on an unbuffered channel."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Early return",
+    "n": "The handler times out and returns before it reads from the channel."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Blocked forever",
+    "n": "The goroutine waits to send and nothing will ever receive, so it never exits."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Growth",
+    "n": "Memory and the goroutine count climb with every timed-out request until the pod is killed."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Diagnose",
+    "n": "A goroutine profile shows thousands stuck at the same channel send line."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fix",
+    "n": "Pass a context, use a buffered channel or select on the context so the goroutine can stop."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Test",
+    "n": "A test checks that the goroutine count returns to its starting value after a timeout."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Verify",
+    "n": "The goroutine count stays flat under load and the pod no longer restarts."
+   }
+  ]
+ },
+ {
+  "id": "f-go-nil-map",
+  "module": "go",
+  "kind": "failure",
+  "lesson": "go/functions-errors-and-defer",
+  "title": "Failure and recovery: a nil map write panics a service",
+  "summary": "A panic should not take down everything.",
+  "actors": [
+   "Request",
+   "Handler",
+   "Recover",
+   "Logs"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request",
+    "n": "A handler builds a response using a map declared with var and never created."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Write",
+    "n": "The handler writes a key to the nil map, and Go raises a panic."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Crash",
+    "n": "With no recovery, the panic ends the whole process and every in-flight request fails."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Symptom",
+    "n": "The service restarts, and the logs show a stack trace pointing at the map assignment."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Find it",
+    "n": "The stack trace names the file and line, and the map was never initialised with make."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Fix",
+    "n": "Create the map with make before writing to it, or return an error when input is missing."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Contain",
+    "n": "A recover in middleware turns an unexpected panic into a 500 response and a logged stack."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Verify",
+    "n": "A test with empty input passes, and the service stays up under the same request."
+   }
+  ]
+ },
+ {
+  "id": "f-helm-failed-upgrade",
+  "module": "helm",
+  "kind": "failure",
+  "lesson": "helm/upgrade-rollback-and-release-history",
+  "title": "Failure and recovery: a failed Helm upgrade and rollback",
+  "summary": "The release history is your safety net.",
+  "actors": [
+   "Operator",
+   "Helm",
+   "Cluster",
+   "Release history"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Upgrade",
+    "n": "The operator runs helm upgrade with a new image tag and a changed values file."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Apply",
+    "n": "Helm renders the templates and applies the changes, and the new pods fail their readiness probe."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Failed status",
+    "n": "The release is marked failed and the old pods are still serving because of the rolling update."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Look",
+    "n": "helm status and helm history show the failed revision and the last good revision."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Find cause",
+    "n": "kubectl describe on the pods shows the readiness probe path changed in the new chart version."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Roll back",
+    "n": "helm rollback to the last good revision restores the previous manifests as a new revision."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fix the chart",
+    "n": "Correct the probe path, test with helm template and a dry run, then upgrade again."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Prevent",
+    "n": "Use atomic with a timeout so a failed upgrade rolls back automatically."
+   }
+  ]
+ },
+ {
+  "id": "f-helm-values-typo",
+  "module": "helm",
+  "kind": "failure",
+  "lesson": "helm/values-per-environment-and-secrets",
+  "title": "Failure and recovery: a values typo is silently ignored",
+  "summary": "Schema validation catches mistakes early.",
+  "actors": [
+   "Engineer",
+   "Values file",
+   "Chart",
+   "Cluster"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Set a value",
+    "n": "The engineer sets replicaCont instead of replicaCount in the production values file."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Render",
+    "n": "The chart does not know that key, so it ignores it and uses the default of one replica."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Deploy",
+    "n": "The release succeeds, so there is no error message to warn anyone."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Symptom",
+    "n": "Under load the service has one pod and falls over, while the values file looks right."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Compare",
+    "n": "helm get values and helm template show the rendered replica count is one."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fix",
+    "n": "Correct the key, and add a values schema file so unknown keys fail at install time."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Review",
+    "n": "A diff check between rendered environments is added to the pipeline."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Verify",
+    "n": "The release shows the expected replicas and a bad key now fails with a clear message."
+   }
+  ]
+ },
+ {
+  "id": "f-argo-outofsync-loop",
+  "module": "argocd",
+  "kind": "failure",
+  "lesson": "argocd/sync-health-and-drift",
+  "title": "Failure and recovery: Argo CD syncs and then flips back",
+  "summary": "Two controllers fight over one field.",
+  "actors": [
+   "Repository",
+   "Argo CD",
+   "Cluster",
+   "Autoscaler"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Desired state",
+    "n": "The repository says replicas is two and Argo CD syncs it to the cluster."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Autoscaler acts",
+    "n": "The horizontal autoscaler changes replicas to five because of load."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Drift seen",
+    "n": "Argo CD compares and marks the application OutOfSync because replicas differs."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Self-heal",
+    "n": "With self-heal on, Argo CD sets replicas back to two and the autoscaler sets it to five again."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Loop",
+    "n": "The application flips between the two states and the history fills with syncs."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Diagnose",
+    "n": "The diff shows only the replicas field, which points at two owners for one field."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fix",
+    "n": "Remove replicas from the manifest, or tell Argo CD to ignore that field in the application."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Verify",
+    "n": "The application stays Synced and Healthy while the autoscaler changes the count."
+   }
+  ]
+ },
+ {
+  "id": "f-argo-bad-sync-rollback",
+  "module": "argocd",
+  "kind": "failure",
+  "lesson": "argocd/debugging-argo-cd",
+  "title": "Failure and recovery: a bad commit reaches the cluster",
+  "summary": "Revert in the repository, not in the cluster.",
+  "actors": [
+   "Developer",
+   "Repository",
+   "Argo CD",
+   "Cluster"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Merge",
+    "n": "A change with a wrong image tag is merged to the main branch of the config repository."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Auto sync",
+    "n": "Argo CD sees the new commit and applies it to the cluster within minutes."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Degraded",
+    "n": "The pods cannot pull the image and the application becomes Degraded."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Alert",
+    "n": "An alert shows the health status and the sync revision that caused it."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Revert",
+    "n": "The developer reverts the commit in the repository, which keeps the history honest."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Resync",
+    "n": "Argo CD syncs the reverted state and the old pods become the desired state again."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Healthy",
+    "n": "Pods run, the application shows Synced and Healthy, and traffic is normal."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Prevent",
+    "n": "A required review and a preview environment catch a bad tag before it is merged."
+   }
+  ]
+ },
+ {
+  "id": "f-llm-context-overflow",
+  "module": "llm",
+  "kind": "failure",
+  "lesson": "llm/tokens-context-windows-and-limits",
+  "title": "Failure and recovery: the prompt overflows the context window",
+  "summary": "Long input is cut or rejected.",
+  "actors": [
+   "User",
+   "Application",
+   "Model",
+   "Logs"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Short chats",
+    "n": "Early conversations fit easily in the model context window and answers are accurate."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Long chat",
+    "n": "A long conversation with pasted documents grows past the window limit."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Truncation",
+    "n": "The application silently drops the oldest messages to make the request fit."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Symptom",
+    "n": "The model forgets earlier instructions and answers as if they were never given."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Diagnose",
+    "n": "Logs of token counts show the request was trimmed and the system instructions were among the dropped parts."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Fix",
+    "n": "Keep instructions pinned, summarise older turns, and retrieve only the relevant document parts."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Guard",
+    "n": "Count tokens before sending and warn or compact when the request nears the limit."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Verify",
+    "n": "A long conversation test keeps following the original instructions to the end."
+   }
+  ]
+ },
+ {
+  "id": "f-llm-hallucinated-answer",
+  "module": "llm",
+  "kind": "failure",
+  "lesson": "llm/debugging-llm-applications",
+  "title": "Failure and recovery: a confident wrong answer",
+  "summary": "Ground answers in sources and check them.",
+  "actors": [
+   "User",
+   "Application",
+   "Model",
+   "Knowledge base"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Question",
+    "n": "A user asks about an internal policy that the model was never trained on."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "No context",
+    "n": "The application sends the question without any policy text."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Guess",
+    "n": "The model produces a fluent, specific answer that is not true."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Impact",
+    "n": "The user follows the wrong guidance, and the error is only noticed later."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Diagnose",
+    "n": "Reviewing the prompt shows there was no source text, so the answer could not have been grounded."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Fix",
+    "n": "Retrieve the relevant policy passages and instruct the model to answer only from them and to say when unsure."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Show sources",
+    "n": "The answer cites the passages so a user can check them."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Evaluate",
+    "n": "A test set of questions with known answers measures how often the system now cites correctly."
+   }
+  ]
+ },
+ {
+  "id": "f-prompt-format-drift",
+  "module": "prompting",
+  "kind": "failure",
+  "lesson": "prompting/validating-repairing-and-retrying-outputs",
+  "title": "Failure and recovery: the model stops returning valid JSON",
+  "summary": "Validate, repair, and retry.",
+  "actors": [
+   "Application",
+   "Model",
+   "Validator",
+   "Logs"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Works",
+    "n": "A prompt asks for JSON and the model has returned valid JSON in every test."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Slight change",
+    "n": "The model adds a short sentence before the JSON on some responses."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Parse error",
+    "n": "The application's JSON parser fails and the request returns a server error."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Symptom",
+    "n": "An error rate of a few percent appears with no code change on the application side."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Diagnose",
+    "n": "Logged raw outputs show the extra text and a trailing comma in a few cases."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Repair",
+    "n": "Use structured output with a schema, validate every response, and retry once with the error message."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Fallback",
+    "n": "If it still fails, return a clear error or a safe default and log the sample."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Verify",
+    "n": "The error rate returns to near zero, and failures are visible in a dashboard."
+   }
+  ]
+ },
+ {
+  "id": "f-prompt-regression",
+  "module": "prompting",
+  "kind": "failure",
+  "lesson": "prompting/prompt-versioning-and-testing",
+  "title": "Failure and recovery: a prompt edit breaks a working case",
+  "summary": "Test prompts like code.",
+  "actors": [
+   "Author",
+   "Prompt",
+   "Test set",
+   "Reviewer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Improve",
+    "n": "An author rewrites a prompt to fix one complaint and sees that example improve."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "No tests",
+    "n": "There is no test set, so no one checks the other twenty common cases."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Release",
+    "n": "The new prompt goes live and handles the complaint well."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Symptom",
+    "n": "A week later, support finds that refund requests are now answered in the wrong format."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Find the change",
+    "n": "Prompt version history shows the edit and the date that matches the first bad answer."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Fix",
+    "n": "Revert to the previous version and build a test set from real cases that includes the complaint."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Gate",
+    "n": "Every prompt change runs the test set and the reviewer sees what got better and what got worse."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Verify",
+    "n": "The next edit passes all cases, with the previous failure now a permanent test."
+   }
+  ]
+ },
+ {
+  "id": "f-skill-never-triggers",
+  "module": "claude-skills",
+  "kind": "failure",
+  "lesson": "claude-skills/writing-descriptions-that-trigger",
+  "title": "Failure and recovery: a skill never triggers",
+  "summary": "The description decides when it loads.",
+  "actors": [
+   "User",
+   "Claude",
+   "Skill",
+   "Author"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request",
+    "n": "A user asks for a task that the skill was written to handle."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Match",
+    "n": "Claude reads the skill descriptions and the description is vague, so it does not match the request."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Skipped",
+    "n": "Claude answers without the skill and the output ignores the team conventions."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Symptom",
+    "n": "The author expects the skill to run, yet the transcript shows it was never loaded."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Diagnose",
+    "n": "Comparing the description with real requests shows missing words that users actually use."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Fix",
+    "n": "Rewrite the description to say what it does and when to use it, with the trigger phrases."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Test",
+    "n": "Try ten phrasings, including ones that should not trigger, and record which load the skill."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Verify",
+    "n": "The skill loads on the right requests and stays quiet on the others."
+   }
+  ]
+ },
+ {
+  "id": "f-skill-overbroad",
+  "module": "claude-skills",
+  "kind": "failure",
+  "lesson": "claude-skills/debugging-skills-that-do-not-trigger-or-misbehave",
+  "title": "Failure and recovery: an overbroad skill triggers on everything",
+  "summary": "Narrow scope and add a boundary.",
+  "actors": [
+   "User",
+   "Claude",
+   "Skill",
+   "Author"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Install",
+    "n": "A skill for writing release notes is installed with a short generic description."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Unrelated ask",
+    "n": "A user asks for a meeting summary and the skill loads anyway."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Wrong format",
+    "n": "The skill's template makes the summary read like release notes."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Symptom",
+    "n": "Users complain that unrelated answers now follow a strange structure."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Diagnose",
+    "n": "The description says documents and writing, which matches almost any request."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Fix",
+    "n": "Narrow the description to release notes for software changes and add when not to use it."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Test",
+    "n": "Run requests that should and should not trigger and check each outcome."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Verify",
+    "n": "Meeting summaries are normal again and release notes use the template."
+   }
+  ]
+ }
+]

@@ -1,0 +1,2181 @@
+[
+ {
+  "id": "x-sec-threat-model",
+  "module": "security",
+  "lesson": "security/security-mindset-and-threat-modeling",
+  "title": "A quick threat model session",
+  "summary": "Four questions applied to one feature.",
+  "actors": [
+   "Team",
+   "Diagram",
+   "Threat list",
+   "Backlog"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Draw the data flow",
+    "n": "The team draws users, services, data stores and the lines between them, marking trust boundaries."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Ask what can go wrong",
+    "n": "For each boundary crossing the team asks how it could be spoofed, tampered with, read or overloaded."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Write the threats down",
+    "n": "Each realistic threat gets a short sentence, such as a user changing an id in the URL to read another account."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Rank by impact and likelihood",
+    "n": "A simple high, medium or low ranking decides what to deal with first."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Choose a response for each",
+    "n": "Fix, reduce, accept or transfer. Every accepted risk has a named owner."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Revisit when the design changes",
+    "n": "New features and integrations change the diagram, so the model is updated rather than filed away."
+   }
+  ]
+ },
+ {
+  "id": "x-sec-dependency-scan",
+  "module": "security",
+  "lesson": "security/securing-the-pipeline",
+  "title": "Handling a vulnerable dependency",
+  "summary": "From a scanner finding to a safe release.",
+  "actors": [
+   "Scanner",
+   "Engineer",
+   "Package registry",
+   "Pipeline"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Report a finding",
+    "n": "The scanner reports that a library version has a known vulnerability, with a severity score."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Check if it matters",
+    "n": "The engineer checks if the vulnerable code is actually used and reachable. Severity alone is not the whole story."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Find a fixed version",
+    "n": "The registry shows a patched version, and the release notes say if the update is compatible."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Update and test",
+    "n": "The version is raised in the lock file, and the test suite runs to catch breaking changes."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Scan again",
+    "n": "The pipeline repeats the scan on the new build and confirms the finding is gone."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Ship within the agreed time",
+    "n": "The fix is released within the time the policy sets for that severity, and an exception is recorded if it cannot be."
+   }
+  ]
+ },
+ {
+  "id": "git-three-areas",
+  "module": "git",
+  "lesson": "git/first-repository-and-commits",
+  "title": "From edit to commit",
+  "summary": "How a change moves through the working tree, staging area and repository.",
+  "actors": [
+   "Working tree",
+   "Staging area",
+   "Repository"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Edit backup.sh",
+    "n": "You change a file in your working tree. Git notices the difference but has not saved anything yet."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "git status",
+    "n": "Status lists the file as modified but not staged, so it would not be part of a commit right now."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "git add backup.sh",
+    "n": "The change is copied into the staging area, the draft of the next commit."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Edit notes.txt",
+    "n": "A second unrelated change stays in the working tree because you did not stage it."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "git commit -m \"Add retry\"",
+    "n": "Only the staged change becomes a permanent snapshot with a message, author and parent commit."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "New commit 3f9c2ab",
+    "n": "The branch pointer moves forward to the new commit, and the history grows by one step."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "notes.txt still modified",
+    "n": "The unstaged change is untouched, ready to become a separate commit with its own message."
+   }
+  ]
+ },
+ {
+  "id": "git-branch-ff-merge",
+  "module": "git",
+  "lesson": "git/branches-and-merging",
+  "title": "Branch and fast-forward merge",
+  "summary": "Create a branch, commit on it and merge it back when main has not moved.",
+  "actors": [
+   "Developer",
+   "main",
+   "feature/retry"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "main at commit B",
+    "n": "The history is A, B and main points to B. You start from here."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "git switch -c feature/retry",
+    "n": "A new pointer feature/retry is created at B. No files are copied, so it is instant."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Commit C",
+    "n": "You commit on the feature branch. The pointer feature/retry moves to C while main stays at B."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Commit D",
+    "n": "A second commit moves feature/retry to D. The work is isolated from main."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "git switch main",
+    "n": "HEAD moves to main and the working files return to the state of B."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "git merge feature/retry",
+    "n": "Main has not moved since the branch point, so Git only moves the main pointer forward to D."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Fast-forward complete",
+    "n": "History is a straight line A, B, C, D and no merge commit was created."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "git branch -d feature/retry",
+    "n": "The merged branch label is deleted. The commits remain because main points to them."
+   }
+  ]
+ },
+ {
+  "id": "git-merge-conflict",
+  "module": "git",
+  "lesson": "git/branches-and-merging",
+  "title": "Resolving a merge conflict",
+  "summary": "Two branches change the same line and Git asks you to decide.",
+  "actors": [
+   "Developer",
+   "Git",
+   "File"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "git merge feature/retry",
+    "n": "You ask Git to merge the feature branch into main, which also changed the same file."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Both sides changed line 12",
+    "n": "Git compares each branch with the common ancestor and finds two different edits to the same line."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Conflict markers written",
+    "n": "The file now contains the markers with your version above the equals line and theirs below it."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "CONFLICT, merge stopped",
+    "n": "Git reports the file and stops. The merge is in progress and git status shows both modified."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Edit to final content",
+    "n": "You decide the correct result, often a combination, and remove every marker line from the file."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "git add config/backup.conf",
+    "n": "Adding the file tells Git that this conflict is resolved."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "git commit",
+    "n": "Git creates the merge commit with two parents, finishing the merge."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Run the tests",
+    "n": "A textually clean merge can still be logically wrong, so you test the combined result before pushing."
+   }
+  ]
+ },
+ {
+  "id": "git-rebase-replay",
+  "module": "git",
+  "lesson": "git/rebase-and-clean-history",
+  "title": "Rebase replays your commits",
+  "summary": "Update a feature branch on the latest main by replaying commits.",
+  "actors": [
+   "Developer",
+   "Feature branch",
+   "main"
+  ],
+  "steps": [
+   {
+    "f": 2,
+    "t": 2,
+    "l": "main moved ahead",
+    "n": "While you worked, teammates merged two new commits to main, so your branch is based on old code."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "git rebase origin/main",
+    "n": "You ask Git to rebase. It remembers your commits, which are C and D."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Move to tip of main",
+    "n": "Git sets your branch to the latest main commit, temporarily without your work."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Replay C as C prime",
+    "n": "The change of C is applied on top of main, creating a new commit with a different hash."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Replay D as D prime",
+    "n": "The change of D is applied next. If a conflict occurs, Git stops and asks you to resolve it."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "History is linear",
+    "n": "Your branch now looks as if you started from the latest main, with no merge commit."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Force push with lease",
+    "n": "The rewritten branch must replace the remote copy, so you use force-with-lease on your own branch only."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Rule",
+    "n": "Never rebase commits that other people have already pulled, because their copies would no longer match."
+   }
+  ]
+ },
+ {
+  "id": "git-fetch-vs-pull",
+  "module": "git",
+  "lesson": "git/remotes-fetch-pull-and-push",
+  "title": "Fetch compared with pull",
+  "summary": "What each command changes on your machine.",
+  "actors": [
+   "You",
+   "Local branch main",
+   "origin/main",
+   "Remote server"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 3,
+    "l": "git fetch origin",
+    "n": "You ask the server for new commits. Nothing in your working files changes."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Update origin/main",
+    "n": "The remote-tracking branch moves to the latest known server commit. This pointer is read-only."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "git log main..origin/main",
+    "n": "You inspect what arrived before deciding how to integrate it."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "git merge --ff-only origin/main",
+    "n": "If your main has no extra commits it moves forward to match. Otherwise Git refuses safely."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "git pull",
+    "n": "Pull is fetch followed by merge or rebase in one command, so the integration is automatic."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Possible merge commit",
+    "n": "If both sides had new commits, a plain pull creates a merge commit that you did not ask for."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "pull.ff only",
+    "n": "Setting pull.ff to only makes pull fail instead of surprising you, which pushes you to decide on purpose."
+   }
+  ]
+ },
+ {
+  "id": "git-push-rejected",
+  "module": "git",
+  "lesson": "git/remotes-fetch-pull-and-push",
+  "title": "A rejected push",
+  "summary": "Why a push fails and how to fix it without force.",
+  "actors": [
+   "You",
+   "Local branch",
+   "Remote branch"
+  ],
+  "steps": [
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Colleague pushes commit X",
+    "n": "While you worked, the remote branch received a new commit that you do not have."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "git push",
+    "n": "You try to publish your commits to the remote branch."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Rejected, non-fast-forward",
+    "n": "The remote branch has history that yours does not include, so a plain push would lose commit X."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "git fetch",
+    "n": "You download the remote state to see exactly what is different."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "git rebase origin/branch",
+    "n": "You replay your commits on top of the colleague work, resolving conflicts if any."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Run the tests",
+    "n": "You check that the combined code works, because both changes are now together."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "git push",
+    "n": "The push is now a fast-forward of the remote branch, so the server accepts it."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Do not use force",
+    "n": "A forced push would have discarded commit X. Force-with-lease is only for your own rewritten branches."
+   }
+  ]
+ },
+ {
+  "id": "git-pull-request-flow",
+  "module": "git",
+  "lesson": "git/team-workflows-pull-requests-and-reviews",
+  "title": "A pull request from start to merge",
+  "summary": "The path of a change through branch, review, checks and merge.",
+  "actors": [
+   "Author",
+   "Branch",
+   "Reviewer",
+   "CI checks",
+   "main"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Create feature branch",
+    "n": "You branch from the latest main and make small commits with clear messages."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Push and open a pull request",
+    "n": "The branch goes to the remote and a pull request describes what changed, why and how it was tested."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Checks start",
+    "n": "The pipeline runs lint, tests and security scans on the proposed result and reports status on the pull request."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Review comments",
+    "n": "The reviewer reads the change for correctness, safety and clarity and asks for changes where needed."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fix and re-request",
+    "n": "You push more commits or amend, the checks run again, and you ask for another look."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Approve",
+    "n": "With checks green and the required approvals given, the merge button becomes available."
+   },
+   {
+    "f": 1,
+    "t": 4,
+    "l": "Merge",
+    "n": "The platform merges by the chosen policy, squash, rebase or merge commit, into the protected main branch."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "Deploy pipeline",
+    "n": "The merged commit triggers the build of one artifact that moves through the environments."
+   }
+  ]
+ },
+ {
+  "id": "git-revert-shared",
+  "module": "git",
+  "lesson": "git/staging-undoing-and-stashing",
+  "title": "Reverting a shared commit",
+  "summary": "Undo a bad change on main without rewriting history.",
+  "actors": [
+   "Team",
+   "main",
+   "Revert commit",
+   "Production"
+  ],
+  "steps": [
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Errors increase",
+    "n": "After a deploy the error rate rises and the on-call engineer links it to the latest change."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Identify the bad commit",
+    "n": "git log shows the commit 7d1e0aa merged an hour ago, and others have already pulled it."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "git revert 7d1e0aa",
+    "n": "Git creates a new commit that applies the opposite change. Old history stays untouched."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Explain in the message",
+    "n": "The revert commit says why it exists and links the incident, so future readers understand."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Merge through the normal process",
+    "n": "The revert is reviewed and checked quickly, then merged, and everyone pulls it like any other commit."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Deploy the revert",
+    "n": "The pipeline builds and deploys the fixed state, and the error rate returns to normal."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fix properly later",
+    "n": "The original change is fixed on a new branch and re-applied with tests that cover the failure."
+   }
+  ]
+ },
+ {
+  "id": "git-reflog-recover",
+  "module": "git",
+  "lesson": "git/debugging-git-problems",
+  "title": "Recovering a lost commit",
+  "summary": "Use the reflog after a hard reset.",
+  "actors": [
+   "You",
+   "Branch main",
+   "Reflog",
+   "Recovery branch"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "git reset --hard origin/main",
+    "n": "Your branch now points to a different commit, and the work you had committed seems to be gone."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "git log shows less",
+    "n": "The commit from yesterday is not listed because no branch points to it any more."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "git reflog",
+    "n": "The reflog lists every place HEAD pointed, including the commit from before the reset."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Find 7be3f10",
+    "n": "You identify the entry that says commit: Tune ingress timeouts and copy its hash."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "git branch rescue 7be3f10",
+    "n": "A new branch label is created at that commit, which makes it reachable again."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Commit is safe",
+    "n": "Garbage collection only removes unreachable commits, so a branch protects the work."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Merge or cherry-pick",
+    "n": "You bring the rescued work back into main with a merge or cherry-pick."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Limit",
+    "n": "Uncommitted edits were never saved by Git, so the reflog cannot bring them back."
+   }
+  ]
+ },
+ {
+  "id": "git-bisect",
+  "module": "git",
+  "lesson": "git/debugging-git-problems",
+  "title": "Finding the bad commit with bisect",
+  "summary": "A binary search through 200 commits.",
+  "actors": [
+   "You",
+   "Git",
+   "Test script"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "git bisect start",
+    "n": "You begin a bisect session and tell Git a bad commit (current) and a good one (v1.3.0)."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Checks out the middle",
+    "n": "Git picks the commit halfway between good and bad, leaving about 100 commits to examine."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Run the test",
+    "n": "Your script or a manual check shows whether this commit has the bug."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "git bisect bad",
+    "n": "The bug is present here, so the first bad commit is in the earlier half. The range halves."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Halve again",
+    "n": "Git checks out a new middle commit, and the process repeats with 50, 25, 12 commits and so on."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "git bisect good",
+    "n": "The test passes on this one, so the problem was introduced later. The range keeps shrinking."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "First bad commit found",
+    "n": "After about eight steps Git prints the commit that introduced the bug and its message."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "git bisect reset",
+    "n": "You return to your original branch and use the finding to write the fix and a regression test."
+   }
+  ]
+ },
+ {
+  "id": "git-secret-response",
+  "module": "git",
+  "lesson": "git/hooks-signing-and-secrets-in-history",
+  "title": "A secret was committed",
+  "summary": "The correct order of actions after a credential reaches the repository.",
+  "actors": [
+   "Scanner",
+   "Engineer",
+   "Cloud account",
+   "Repository",
+   "Team"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Alert: key in config file",
+    "n": "The scanner flags an access key in a commit. You assume it is already copied."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Revoke and rotate",
+    "n": "You deactivate the key in the cloud account at once and issue a new one to the service."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Review audit logs",
+    "n": "You search for activity with the old key: new users, new keys, instances, data reads."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Remove persistence",
+    "n": "Anything the attacker created is deleted, and affected secrets are rotated."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Rewrite history",
+    "n": "git filter-repo removes the file from all commits, and the cleaned history is force-pushed."
+   },
+   {
+    "f": 1,
+    "t": 4,
+    "l": "Tell the team",
+    "n": "Everyone re-clones or resets, because old clones and forks still contain the secret."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Add prevention",
+    "n": "Push protection, pipeline scanning and a secret manager are enabled so the same mistake is blocked."
+   },
+   {
+    "f": 1,
+    "t": 4,
+    "l": "Write a short review",
+    "n": "The team records what happened and what changed, without blaming a person."
+   }
+  ]
+ },
+ {
+  "id": "git-stash-hotfix",
+  "module": "git",
+  "lesson": "git/staging-undoing-and-stashing",
+  "title": "Stash, hotfix and return",
+  "summary": "Pause half-done work to ship an urgent fix.",
+  "actors": [
+   "You",
+   "Stash",
+   "hotfix branch",
+   "main"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Half-done work",
+    "n": "You have uncommitted edits on a feature branch when an urgent bug report arrives."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "git stash push -m \"retry logic\"",
+    "n": "Your tracked changes are saved in the stash and the working tree is clean again."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "git switch -c hotfix/disk-alert main",
+    "n": "A new branch starts from main so the fix is isolated from your unfinished feature."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Fix, test, commit",
+    "n": "You make the smallest correct change, run the tests and commit with a clear message."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Merge through review",
+    "n": "The hotfix goes through a pull request and is merged to main, then deployed."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "git switch feature/retry",
+    "n": "You return to your feature branch, which does not yet contain the hotfix."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "git stash pop",
+    "n": "The saved edits come back into the working tree and the stash entry is removed."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Update the feature branch",
+    "n": "You rebase or merge main so your feature also has the fix before you continue."
+   }
+  ]
+ },
+ {
+  "id": "git-release-tag-hotfix",
+  "module": "git",
+  "lesson": "git/tags-releases-and-versioning",
+  "title": "Tag a release and ship a hotfix",
+  "summary": "Annotated tags, artifacts and a fix for an older version.",
+  "actors": [
+   "Developer",
+   "main",
+   "Tag",
+   "CI",
+   "hotfix branch"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Merge release work",
+    "n": "The release changes are merged to main and the tests pass."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "git tag -a v1.4.0",
+    "n": "An annotated tag marks the exact release commit with a message and the tagger."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Pipeline builds from the tag",
+    "n": "CI builds one artifact from the tag and stamps the version and the commit hash into it."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Deploy that artifact",
+    "n": "The same artifact is promoted through the environments, so production runs exactly what was tested."
+   },
+   {
+    "f": 0,
+    "t": 4,
+    "l": "Bug found in 1.4.0",
+    "n": "A defect is reported. You branch from the tag, not from main, so you fix only that version."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Tag v1.4.1",
+    "n": "After the fix and tests, a new annotated tag is created. The old tag v1.4.0 is never moved."
+   },
+   {
+    "f": 4,
+    "t": 1,
+    "l": "Cherry-pick to main",
+    "n": "The fix commit is copied to main, so the next release does not bring the bug back."
+   }
+  ]
+ },
+ {
+  "id": "git-shallow-sparse",
+  "module": "git",
+  "lesson": "git/large-repositories-submodules-and-worktrees",
+  "title": "Faster clones for CI",
+  "summary": "Shallow, partial and sparse clones cut the pipeline start time.",
+  "actors": [
+   "CI job",
+   "Remote repository",
+   "Local copy"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Full clone",
+    "n": "A normal clone downloads every commit and file version, which for a large repository takes minutes."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "7 GB received",
+    "n": "All history arrives even though the job only builds the current code of one service."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Shallow clone with depth 1",
+    "n": "The job asks for only the latest commit, so far fewer objects are transferred."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Partial clone with blob none",
+    "n": "File contents are downloaded only when needed, instead of every version of every file."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Sparse checkout of one folder",
+    "n": "Only the service folder and shared libraries appear in the working tree."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Build starts in seconds",
+    "n": "The first build step runs after a clone that takes seconds instead of minutes."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Deepen only if needed",
+    "n": "If a tool needs history, such as git describe, the job fetches more commits before it runs."
+   }
+  ]
+ },
+ {
+  "id": "x-go-build-run",
+  "module": "go",
+  "lesson": "go/why-go-and-your-first-program",
+  "title": "From go build to a running program",
+  "summary": "How source files become one static binary and start running.",
+  "actors": [
+   "Developer",
+   "go command",
+   "Compiler and linker",
+   "Binary"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "go build ./cmd/api",
+    "n": "The go command reads go.mod to find the module and the packages that the program imports."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Resolve dependencies",
+    "n": "Dependencies come from the module cache, and go.sum checksums are verified so downloaded code matches what was recorded."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Compile packages",
+    "n": "Each package is compiled once and cached, so a rebuild only recompiles what changed."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Link into one executable",
+    "n": "The linker joins your code, dependencies and the Go runtime into one file with no separate runtime to install."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Write the binary",
+    "n": "The result is a single file, static when CGO is disabled, which runs on a minimal container image."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "./api",
+    "n": "Starting the file runs the runtime first, which sets up the scheduler and memory manager, then calls main."
+   }
+  ]
+ },
+ {
+  "id": "x-go-goroutine-scheduler",
+  "module": "go",
+  "lesson": "go/goroutines-channels-and-sync",
+  "title": "How goroutines are scheduled",
+  "summary": "How many goroutines share a few operating system threads.",
+  "actors": [
+   "Your code",
+   "Go scheduler",
+   "OS thread",
+   "Run queue"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "go handle(req)",
+    "n": "The go statement creates a goroutine with a small stack and hands it to the scheduler."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Put it on a run queue",
+    "n": "New goroutines wait on a queue attached to a logical processor, ready to run."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Assign to a thread",
+    "n": "The scheduler lets an operating system thread pick a goroutine and run it until it blocks or is preempted."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Goroutine blocks on I/O",
+    "n": "When a goroutine waits for a network read, the thread does not wait with it."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Park it, run another",
+    "n": "The scheduler parks the blocked goroutine and runs the next one from the queue on the same thread."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Wake on ready",
+    "n": "When the network data arrives, the goroutine becomes runnable again and continues where it stopped."
+   }
+  ]
+ },
+ {
+  "id": "x-go-channel-handoff",
+  "module": "go",
+  "lesson": "go/goroutines-channels-and-sync",
+  "title": "Channels hand off values safely",
+  "summary": "How an unbuffered channel synchronises a sender and a receiver.",
+  "actors": [
+   "Producer",
+   "Channel",
+   "Consumer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Compute a result",
+    "n": "The producer goroutine finishes some work and has a value ready."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "ch <- result",
+    "n": "The send blocks on an unbuffered channel until a receiver is ready, so both sides meet."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "result := <-ch",
+    "n": "The consumer reaches the receive and the value is handed over directly."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Value delivered",
+    "n": "Both goroutines continue. The hand-off also guarantees that writes before the send are visible after the receive."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "close(ch)",
+    "n": "The producer closes the channel when it has nothing more to send."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "range ends",
+    "n": "The consumer loop over the channel finishes when it is closed and empty, so it can exit cleanly."
+   }
+  ]
+ },
+ {
+  "id": "x-go-context-cancel",
+  "module": "go",
+  "lesson": "go/context-timeouts-and-cancellation",
+  "title": "Cancelling work with context",
+  "summary": "How one cancellation stops every goroutine a request started.",
+  "actors": [
+   "Handler",
+   "Context",
+   "Worker A",
+   "Worker B"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "WithTimeout(ctx, 2s)",
+    "n": "The handler derives a context with a deadline from the request context and defers cancel."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Start worker A with ctx",
+    "n": "Each worker receives the context as its first parameter."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Start worker B with ctx",
+    "n": "Both workers share the same cancellation signal."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Deadline passes",
+    "n": "After two seconds the context closes its Done channel and records the reason."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Done channel closed",
+    "n": "Worker A sees ctx.Done in its select and stops waiting on the slow call."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Done channel closed",
+    "n": "Worker B stops too, so no goroutine is left running for a request that has already failed."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Return error",
+    "n": "The handler returns a timeout error to the client and the resources are released."
+   }
+  ]
+ },
+ {
+  "id": "x-go-http-request",
+  "module": "go",
+  "lesson": "go/http-services-and-json",
+  "title": "A request through net/http",
+  "summary": "How a Go server routes and answers one HTTP request.",
+  "actors": [
+   "Client",
+   "Server",
+   "Mux",
+   "Handler"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "GET /orders/42",
+    "n": "The client connects and sends the request. The server runs each connection in its own goroutine."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Parse request",
+    "n": "net/http parses the method, path, headers and creates a request with a context."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Match route",
+    "n": "The mux finds the handler registered for the method and path pattern."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Call handler",
+    "n": "The handler reads the path value, checks input and calls the store with the request context."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Encode JSON",
+    "n": "The handler sets the content type and writes the encoded response, handling encoding errors."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "200 OK + body",
+    "n": "The response goes back. If the client disconnects, the request context is cancelled."
+   }
+  ]
+ },
+ {
+  "id": "x-go-graceful-shutdown",
+  "module": "go",
+  "lesson": "go/context-timeouts-and-cancellation",
+  "title": "Graceful shutdown",
+  "summary": "How a Go service finishes in-flight requests before exiting.",
+  "actors": [
+   "Orchestrator",
+   "Service",
+   "Server",
+   "In-flight request"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "SIGTERM",
+    "n": "The orchestrator asks the service to stop, usually with a grace period before killing it."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Mark not ready",
+    "n": "The readiness endpoint starts failing so the load balancer stops sending new requests."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Server.Shutdown(ctx)",
+    "n": "Shutdown closes listeners and waits for active requests, up to a deadline."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Finish response",
+    "n": "The in-flight request completes normally and the connection closes."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Cancel background work",
+    "n": "A root context is cancelled so workers flush and stop."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Exit 0",
+    "n": "The process exits cleanly before the grace period ends, with no dropped requests."
+   }
+  ]
+ },
+ {
+  "id": "x-go-error-wrapping",
+  "module": "go",
+  "lesson": "go/functions-errors-and-defer",
+  "title": "Wrapping and checking errors",
+  "summary": "How context is added to an error without losing the cause.",
+  "actors": [
+   "Low-level code",
+   "Service layer",
+   "Handler",
+   "Logger"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "os.Open fails",
+    "n": "The standard library returns an error that wraps the system error for a missing file."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "return err",
+    "n": "The service layer receives it and does not hide it."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "fmt.Errorf(\"load config: %w\", err)",
+    "n": "Wrapping with the %w verb adds context and keeps the original error inside."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Return wrapped error",
+    "n": "The handler receives an error whose message shows the full path of the failure."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "errors.Is(err, fs.ErrNotExist)",
+    "n": "The handler can still test for the original cause through the wrapping."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Log once with context",
+    "n": "The error is logged at the edge with request details instead of at every layer."
+   }
+  ]
+ },
+ {
+  "id": "x-go-test-table",
+  "module": "go",
+  "lesson": "go/testing-benchmarks-and-tooling",
+  "title": "A table-driven test run",
+  "summary": "How go test runs many cases of one function.",
+  "actors": [
+   "go test",
+   "Test function",
+   "Subtest",
+   "Result"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Find TestParse",
+    "n": "go test builds the package with its test files and calls each function that starts with Test."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Define cases table",
+    "n": "The test holds a slice of cases with a name, input and expected output."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "t.Run(case.name)",
+    "n": "Each case runs as a subtest, so failures name the exact case."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Compare got and want",
+    "n": "The subtest checks the result and calls t.Errorf when it differs."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Pass or fail per case",
+    "n": "Results are collected per subtest and shown with -v."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "-race and -cover",
+    "n": "Adding flags checks data races and reports which lines the tests touched."
+   }
+  ]
+ },
+ {
+  "id": "x-go-race-condition",
+  "module": "go",
+  "lesson": "go/goroutines-channels-and-sync",
+  "title": "A data race and its fix",
+  "summary": "How two goroutines corrupt a counter and how a mutex fixes it.",
+  "actors": [
+   "Goroutine A",
+   "Counter",
+   "Goroutine B",
+   "Mutex"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Read count = 5",
+    "n": "Goroutine A reads the value before incrementing."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Read count = 5",
+    "n": "Goroutine B reads the same value at the same moment."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Write count = 6",
+    "n": "Goroutine A writes six back to the counter."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Write count = 6",
+    "n": "B also writes six, so one increment is lost. This is a data race."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Lock before change",
+    "n": "With a mutex, A takes the lock first and B has to wait."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Read 6, write 7",
+    "n": "After A unlocks, B sees six and writes seven. Run go test -race to catch the unsafe version."
+   }
+  ]
+ },
+ {
+  "id": "x-go-container-build",
+  "module": "go",
+  "lesson": "go/building-containers-and-cli-tools",
+  "title": "A multi-stage Go image",
+  "summary": "How a Go program ends up in a tiny container.",
+  "actors": [
+   "Dockerfile",
+   "Build stage",
+   "Final stage",
+   "Registry"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "FROM golang AS build",
+    "n": "The first stage has the full toolchain needed to compile."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Copy go.mod, download modules",
+    "n": "Copying the module files first lets Docker reuse the download layer when only code changes."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "CGO_ENABLED=0 go build",
+    "n": "The program is compiled into a static binary with no external libraries."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "COPY --from=build /app",
+    "n": "Only the binary is copied into the final image."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "USER nonroot",
+    "n": "The final image runs as a non-root user on a minimal base such as distroless."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Push image",
+    "n": "The result is tens of megabytes, which pulls and starts quickly."
+   }
+  ]
+ },
+ {
+  "id": "x-go-pprof-profile",
+  "module": "go",
+  "lesson": "go/debugging-go-programs",
+  "title": "Profiling a slow Go service",
+  "summary": "How pprof shows where CPU time goes.",
+  "actors": [
+   "Engineer",
+   "Service",
+   "pprof endpoint",
+   "Flame graph"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Notice high CPU",
+    "n": "Dashboards show the service using more CPU for the same traffic."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Fetch 30 s profile",
+    "n": "The engineer requests a CPU profile from the internal debug port during load."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Sample stacks",
+    "n": "The runtime samples call stacks about 100 times per second for the duration."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Render flame graph",
+    "n": "Wide boxes show functions that use the most time."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Find JSON encoding in a loop",
+    "n": "The widest box is repeated encoding of the same value, which can be cached."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fix and compare",
+    "n": "After the change a new profile shows the box gone and CPU use down."
+   }
+  ]
+ },
+ {
+  "id": "x-go-goroutine-leak",
+  "module": "go",
+  "lesson": "go/debugging-go-programs",
+  "title": "How a goroutine leaks",
+  "summary": "How an abandoned sender blocks forever and memory grows.",
+  "actors": [
+   "Handler",
+   "Worker goroutine",
+   "Channel",
+   "Metrics"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Start worker",
+    "n": "The handler starts a goroutine that will send its result on an unbuffered channel."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Timeout, return",
+    "n": "The handler gives up after a timeout and returns an error to the client."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Worker finishes later",
+    "n": "The slow call completes after the handler is gone."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Send blocks",
+    "n": "The send waits for a receiver that will never come."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Goroutine count rises",
+    "n": "Every timed-out request leaves one blocked goroutine, so memory grows steadily."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fix with ctx and buffer",
+    "n": "Using select on ctx.Done and a buffer of one lets the worker exit and the count stays flat."
+   }
+  ]
+ },
+ {
+  "id": "x-go-modules-checksum",
+  "module": "go",
+  "lesson": "go/interfaces-and-packages",
+  "title": "Modules and go.sum",
+  "summary": "How Go verifies dependencies.",
+  "actors": [
+   "Developer",
+   "go.mod",
+   "Module proxy",
+   "go.sum"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "go get example.com/lib@v1.4.0",
+    "n": "A dependency is added with an exact version in go.mod."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Download module",
+    "n": "The go command fetches the module, usually through a proxy."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Record hash",
+    "n": "The content hash is written to go.sum."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Commit both files",
+    "n": "Both files are committed so every machine builds the same code."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Later build compares",
+    "n": "On another machine, the downloaded content must match the recorded hash."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Mismatch fails the build",
+    "n": "If the content differs, the build stops, which protects against tampered or changed modules."
+   }
+  ]
+ },
+ {
+  "id": "x-helm-install-flow",
+  "module": "helm",
+  "lesson": "helm/what-helm-is-and-why-use-it",
+  "title": "What helm install does",
+  "summary": "From command to objects running in the cluster.",
+  "actors": [
+   "Engineer",
+   "Helm CLI",
+   "Kubernetes API",
+   "Release Secret"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "helm install shop-web ./chart -f prod.yaml",
+    "n": "The command names the release, the chart and the values files."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Merge values",
+    "n": "Chart defaults, values files and --set flags are merged in order of priority."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Render templates",
+    "n": "The templates are rendered into plain Kubernetes manifests using the merged values."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Send manifests",
+    "n": "Helm sends the rendered objects to the API server using your kubeconfig."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Store revision 1",
+    "n": "The release record with chart, values and manifest is stored as a Secret in the namespace."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Pods start",
+    "n": "The cluster creates the objects and pods start. helm status shows the release as deployed."
+   }
+  ]
+ },
+ {
+  "id": "x-helm-upgrade-atomic",
+  "module": "helm",
+  "lesson": "helm/upgrade-rollback-and-release-history",
+  "title": "An atomic upgrade that rolls back",
+  "summary": "How --atomic protects a release from a bad rollout.",
+  "actors": [
+   "Pipeline",
+   "Helm",
+   "Cluster",
+   "Release history"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "helm upgrade --atomic --wait",
+    "n": "The pipeline asks for an upgrade that must become healthy before it counts as done."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Create revision 5",
+    "n": "Helm records a new revision as pending-upgrade."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Apply new manifests",
+    "n": "The Deployment is updated and new pods start with the new image."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Readiness probe fails",
+    "n": "The new pods never become ready, because the app crashes on startup."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Timeout reached, roll back",
+    "n": "After the timeout Helm re-applies the manifest of revision 4."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Exit with error",
+    "n": "The pipeline fails while the site keeps serving the old version."
+   }
+  ]
+ },
+ {
+  "id": "x-helm-values-merge",
+  "module": "helm",
+  "lesson": "helm/values-per-environment-and-secrets",
+  "title": "How values are merged",
+  "summary": "Which setting wins when several sources provide the same key.",
+  "actors": [
+   "Chart values.yaml",
+   "values-prod.yaml",
+   "--set flag",
+   "Final values"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 3,
+    "l": "replicaCount: 2",
+    "n": "The chart supplies a default for every setting it supports."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "replicaCount: 4",
+    "n": "The environment file overrides the default for production."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "replicaCount=6",
+    "n": "A --set flag on the command line has the highest priority and wins."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "hosts: [a, b]",
+    "n": "The chart default list has two hosts."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "hosts: [c]",
+    "n": "The environment list replaces the whole default list, not just one item."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "helm get values -a",
+    "n": "After installing, this command shows exactly which values were used."
+   }
+  ]
+ },
+ {
+  "id": "x-helm-template-render",
+  "module": "helm",
+  "lesson": "helm/templates-and-the-go-template-language",
+  "title": "Rendering a template",
+  "summary": "How curly braces become YAML.",
+  "actors": [
+   "values.yaml",
+   "Template file",
+   "Template engine",
+   "Manifest"
+  ],
+  "steps": [
+   {
+    "f": 1,
+    "t": 1,
+    "l": "replicas: {{ .Values.replicaCount }}",
+    "n": "The template contains a placeholder for the value."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "replicaCount: 4",
+    "n": "The engine reads the value from the merged settings."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Evaluate pipes and functions",
+    "n": "Functions such as default, quote and toYaml transform values."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Trim whitespace",
+    "n": "Dashes in braces remove blank lines and keep the indentation valid."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "replicas: 4",
+    "n": "The result is a plain Kubernetes manifest with no braces left."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "helm template shows it",
+    "n": "Running helm template prints the result so you can check it before applying."
+   }
+  ]
+ },
+ {
+  "id": "x-helm-rollback",
+  "module": "helm",
+  "lesson": "helm/upgrade-rollback-and-release-history",
+  "title": "Rolling back a release",
+  "summary": "How a rollback creates a new revision from an older one.",
+  "actors": [
+   "Engineer",
+   "Helm",
+   "Release history",
+   "Cluster"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "helm history shop-web",
+    "n": "The engineer lists revisions and finds the last good one, revision 7."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Read revision 7",
+    "n": "Helm loads the stored manifest and values of that revision."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "helm rollback shop-web 7 --wait",
+    "n": "The rollback command is issued and waits for readiness."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Apply old manifest",
+    "n": "The objects are patched back to the state described in revision 7."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Record revision 9",
+    "n": "A new revision is stored. History only grows."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Pods ready",
+    "n": "The previous version serves traffic again. Data changes are not undone."
+   }
+  ]
+ },
+ {
+  "id": "x-helm-secret-leak",
+  "module": "helm",
+  "lesson": "helm/values-per-environment-and-secrets",
+  "title": "Why secrets do not belong in values",
+  "summary": "Where a password in values ends up.",
+  "actors": [
+   "Developer",
+   "Repository",
+   "Helm release",
+   "Reader"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Commit values-prod.yaml",
+    "n": "A password is committed in a values file."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Stays in history",
+    "n": "Deleting the line later does not remove it from past commits and clones."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "helm upgrade -f values-prod.yaml",
+    "n": "The value is passed to the chart and stored in the release Secret."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "helm get values",
+    "n": "Anyone who can read the release Secret can print the password."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Rotate the password",
+    "n": "Treat the secret as exposed and change it."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Use existingSecret",
+    "n": "The chart now takes only the name of a Secret created by a secret manager."
+   }
+  ]
+ },
+ {
+  "id": "x-helm-dependency-update",
+  "module": "helm",
+  "lesson": "helm/dependencies-subcharts-and-registries",
+  "title": "Updating chart dependencies",
+  "summary": "How a subchart is pinned and fetched.",
+  "actors": [
+   "Chart.yaml",
+   "helm dependency update",
+   "Repository",
+   "Chart.lock"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "dependencies: redis 19.6.2",
+    "n": "The chart lists the dependency with a version and a repository."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Download the chart",
+    "n": "Helm fetches the exact version from the repository or registry."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Save into charts/",
+    "n": "The package is stored in the charts folder of your chart."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Write digest",
+    "n": "The lock file records the exact version and a digest."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Commit Chart.lock",
+    "n": "Committing the lock keeps builds repeatable."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "helm dependency build",
+    "n": "CI rebuilds from the lock and does not pick up unreviewed updates."
+   }
+  ]
+ },
+ {
+  "id": "x-helm-oci-publish",
+  "module": "helm",
+  "lesson": "helm/dependencies-subcharts-and-registries",
+  "title": "Publishing a chart to an OCI registry",
+  "summary": "From chart folder to a versioned package.",
+  "actors": [
+   "Developer",
+   "Helm",
+   "Registry",
+   "Cluster"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "helm package ./chart",
+    "n": "The chart is packed into a versioned .tgz file."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "helm registry login",
+    "n": "Helm authenticates to the registry."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "helm push chart.tgz oci://...",
+    "n": "The package is uploaded as an OCI artifact next to container images."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Store immutable version",
+    "n": "The registry keeps the version and can sign or scan it."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "helm install oci://...",
+    "n": "A cluster pipeline pulls the exact version."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Return the chart",
+    "n": "The pipeline now installs the same package that was reviewed."
+   }
+  ]
+ },
+ {
+  "id": "x-helm-hook-migration",
+  "module": "helm",
+  "lesson": "helm/upgrade-rollback-and-release-history",
+  "title": "A pre-upgrade migration hook",
+  "summary": "How a Job runs before the new version starts.",
+  "actors": [
+   "Helm",
+   "Hook Job",
+   "Database",
+   "Deployment"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Start upgrade",
+    "n": "Helm renders all templates, including those marked as hooks."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Run pre-upgrade Job",
+    "n": "The hook Job is created before the other objects are changed."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Apply schema change",
+    "n": "The Job runs the migration against the database."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Job completed",
+    "n": "Helm waits for the Job and continues only if it succeeded."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Update Deployment",
+    "n": "Now the new application version is rolled out."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Delete policy removes Job",
+    "n": "A delete policy cleans up the finished Job. A failed hook stops the whole upgrade."
+   }
+  ]
+ },
+ {
+  "id": "x-helm-pending-upgrade",
+  "module": "helm",
+  "lesson": "helm/upgrade-rollback-and-release-history",
+  "title": "A release stuck in pending-upgrade",
+  "summary": "How an interrupted job blocks later deployments.",
+  "actors": [
+   "Pipeline",
+   "Helm",
+   "Release history",
+   "On-call engineer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "helm upgrade starts",
+    "n": "The pipeline begins an upgrade."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Record pending-upgrade",
+    "n": "Helm stores the new revision in a pending state."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Runner is killed",
+    "n": "The CI runner is terminated before Helm finishes."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Next run",
+    "n": "A later pipeline run starts another upgrade."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "another operation is in progress",
+    "n": "Helm refuses because the last revision never finished."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "helm rollback to deployed revision",
+    "n": "The engineer rolls back to the last deployed revision, which resets the state, and the next upgrade works."
+   }
+  ]
+ },
+ {
+  "id": "x-helm-test-hook",
+  "module": "helm",
+  "lesson": "helm/debugging-helm-releases",
+  "title": "Running helm test",
+  "summary": "How a smoke test pod checks a release.",
+  "actors": [
+   "Engineer",
+   "Helm",
+   "Test pod",
+   "Application"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "helm test shop-web",
+    "n": "After a deploy, the engineer or pipeline asks Helm to run the chart tests."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Create test pod",
+    "n": "Helm creates the Pod marked with the test hook."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "curl the service",
+    "n": "The test pod calls the application the way a client would."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "200 OK",
+    "n": "A healthy application answers."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Exit 0",
+    "n": "The pod exits successfully and Helm reports the test as passed."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Pipeline continues",
+    "n": "A failed test fails the job and can trigger a rollback."
+   }
+  ]
+ }
+]

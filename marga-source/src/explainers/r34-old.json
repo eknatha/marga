@@ -1,0 +1,2352 @@
+[
+ {
+  "id": "x-virt-kvm-trap",
+  "module": "virtualization",
+  "lesson": "virtualization/what-virtualization-is-and-hypervisor-types",
+  "title": "How a guest instruction runs on KVM",
+  "summary": "Most instructions run directly on the CPU; a few leave the guest.",
+  "actors": [
+   "Guest code",
+   "CPU",
+   "KVM module",
+   "QEMU"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Run directly",
+    "n": "Ordinary instructions in the guest, such as arithmetic, run on the real CPU at full speed."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Privileged instruction",
+    "n": "The guest tries something only a kernel may do, such as touching a hardware register."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Hardware exit",
+    "n": "The CPU stops the guest and hands control to the KVM module in the host kernel (a VM exit)."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Handle simple cases",
+    "n": "KVM deals with simple causes itself, such as a timer or a page fault, and resumes the guest."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Device access goes to QEMU",
+    "n": "If the guest touched a virtual device such as a disk controller, KVM passes the request to QEMU."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Resume the guest",
+    "n": "QEMU emulates the device, KVM re-enters the guest and it continues as if real hardware answered."
+   }
+  ]
+ },
+ {
+  "id": "x-virt-vcpu",
+  "module": "virtualization",
+  "lesson": "virtualization/cpu-memory-and-overcommit",
+  "title": "Steal time on an oversubscribed host",
+  "summary": "Why a guest feels slow although its own load is low.",
+  "actors": [
+   "Guest vCPU",
+   "Host scheduler",
+   "Other guests",
+   "Monitoring"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Guest has work",
+    "n": "The guest wants to run a thread and its virtual CPU becomes ready."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Other guests also ready",
+    "n": "Many other guests on the same cores are also busy, so more vCPUs want time than there are cores."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Another vCPU runs",
+    "n": "The host scheduler runs a different guest vCPU first, and the first one waits in the queue."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Guest finally runs",
+    "n": "After a delay the guest vCPU gets a core. The guest sees time pass without its code running."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Steal time is reported",
+    "n": "The guest kernel counts the wait as steal time, shown as st in top and vmstat."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Rebalance guests",
+    "n": "The operator moves a guest to another host or lowers the vCPU to core ratio, and steal time falls."
+   }
+  ]
+ },
+ {
+  "id": "x-virt-snapshot",
+  "module": "virtualization",
+  "lesson": "virtualization/virtual-disks-snapshots-and-templates",
+  "title": "A qcow2 snapshot chain",
+  "summary": "How writes after a snapshot go to a new layer.",
+  "actors": [
+   "Guest",
+   "Base image",
+   "Overlay",
+   "Admin"
+  ],
+  "steps": [
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Take a snapshot",
+    "n": "The admin takes a snapshot. The current disk image becomes read-only."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Create an overlay",
+    "n": "A new overlay file is created that records only the blocks that change from now on."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Guest writes",
+    "n": "All new writes from the guest go to the overlay, so the base image stays untouched."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Reads check the overlay first",
+    "n": "A read looks in the overlay and falls back to the base image for blocks never changed."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Overlay grows",
+    "n": "The longer the guest runs, the more blocks the overlay holds, and a chain of overlays slows reads."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Commit or delete",
+    "n": "The admin merges the overlay back with a block commit or deletes the snapshot, which frees the space."
+   }
+  ]
+ },
+ {
+  "id": "x-virt-bridge",
+  "module": "virtualization",
+  "lesson": "virtualization/virtual-networking-bridges-and-vlans",
+  "title": "Traffic through a Linux bridge",
+  "summary": "From guest to physical network.",
+  "actors": [
+   "Guest NIC",
+   "tap device",
+   "Bridge br0",
+   "Physical NIC",
+   "Switch"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Guest sends a frame",
+    "n": "The guest virtual NIC writes a frame that appears on a tap device on the host."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Bridge learns the source",
+    "n": "The bridge records that the guest MAC address lives behind this tap port."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Look up the destination",
+    "n": "The bridge checks its table. Unknown or outside addresses go out of the uplink."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Forward to the uplink",
+    "n": "The frame is sent to the physical NIC that is attached to the bridge."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Leaves the host",
+    "n": "The frame reaches the physical switch, which forwards it on its VLAN."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Reply returns",
+    "n": "The reply comes back through the same ports and the bridge delivers it to the right tap."
+   }
+  ]
+ },
+ {
+  "id": "x-virt-vlan",
+  "module": "virtualization",
+  "lesson": "virtualization/virtual-networking-bridges-and-vlans",
+  "title": "A VLAN tag on a trunk",
+  "summary": "Two networks over one cable.",
+  "actors": [
+   "Guest A (VLAN 10)",
+   "Guest B (VLAN 20)",
+   "Host bridge",
+   "Trunk port",
+   "Switch"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Guest A sends untagged",
+    "n": "Guest A sends a normal frame. It does not know about VLANs."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Bridge adds tag 10",
+    "n": "The host bridge port for guest A is assigned VLAN 10, so the frame is tagged 10 on the way out."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Guest B is tagged 20",
+    "n": "The same happens for guest B with VLAN 20, over the same uplink."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "One cable, two networks",
+    "n": "Both tagged frames leave through the trunk port that carries VLANs 10 and 20."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Switch separates traffic",
+    "n": "The switch keeps VLAN 10 and VLAN 20 apart, so A and B cannot reach each other without a router."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Return traffic is untagged",
+    "n": "On the way back the host removes the tag and delivers the frame to the correct guest."
+   }
+  ]
+ },
+ {
+  "id": "x-virt-precopy",
+  "module": "virtualization",
+  "lesson": "virtualization/live-migration-ha-and-troubleshooting",
+  "title": "Why a migration does not converge",
+  "summary": "A busy guest dirties memory faster than the network copies it.",
+  "actors": [
+   "Source host",
+   "Guest",
+   "Network",
+   "Destination host"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Copy round one",
+    "n": "The source starts copying every memory page of the guest to the destination."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Guest keeps writing",
+    "n": "A busy database writes to memory the whole time, so pages already copied become stale again."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Copy dirty pages",
+    "n": "Round two copies only the pages changed in round one, over the same network link."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Link is the limit",
+    "n": "If the guest dirties pages faster than the link can carry them, each round is as large as the last."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Migration stalls",
+    "n": "The migration never reaches the small final step, and the operator sees it still running after minutes."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Throttle or compress",
+    "n": "The admin enables auto-converge to slow the guest or compression, and the final switch can finish."
+   }
+  ]
+ },
+ {
+  "id": "x-virt-ha",
+  "module": "virtualization",
+  "lesson": "virtualization/live-migration-ha-and-troubleshooting",
+  "title": "HA restarts guests after a host dies",
+  "summary": "What a cluster does when a host fails.",
+  "actors": [
+   "Failed host",
+   "Cluster manager",
+   "Fencing device",
+   "Surviving host",
+   "Guest"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Heartbeats stop",
+    "n": "The cluster manager stops receiving heartbeats from the host."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Wait, then suspect",
+    "n": "After a timeout it marks the host as suspect, since a network cut would look the same."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Fence the host",
+    "n": "It cuts power to the host through a fencing device, so the old guests cannot still be writing to the disks."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Fencing confirmed",
+    "n": "The fencing device reports success, which is the only safe signal that the guests are really stopped."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Restart guests elsewhere",
+    "n": "The manager restarts the guests on surviving hosts using the shared storage."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Guests are back",
+    "n": "Each guest boots again, with a short outage, and the operator investigates the dead host."
+   }
+  ]
+ },
+ {
+  "id": "x-virt-template",
+  "module": "virtualization",
+  "lesson": "virtualization/virtual-disks-snapshots-and-templates",
+  "title": "Cloning from a template",
+  "summary": "How a new guest starts from a golden image.",
+  "actors": [
+   "Admin",
+   "Template image",
+   "Clone overlay",
+   "New guest"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Prepare a template",
+    "n": "The admin builds a clean guest, removes machine-specific data and keeps it as a read-only template."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Create a linked clone",
+    "n": "A new overlay is created that uses the template as its backing file, which takes seconds."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Boot the new guest",
+    "n": "The new guest boots from the overlay and reads unchanged blocks from the template."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "First boot setup",
+    "n": "cloud-init sets the hostname, keys and network, so the clone becomes a distinct machine."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Writes stay local",
+    "n": "All changes go to the clone overlay, so the template is never modified by guests."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Update the template",
+    "n": "A patched template is built later and new clones use it, while old ones keep their old base."
+   }
+  ]
+ },
+ {
+  "id": "x-virt-fail-pool",
+  "module": "virtualization",
+  "kind": "failure",
+  "lesson": "virtualization/virtual-disks-snapshots-and-templates",
+  "title": "Failure and recovery: the pool fills and guests pause",
+  "summary": "Old snapshots consume the storage pool.",
+  "actors": [
+   "Guests",
+   "Storage pool",
+   "Monitoring",
+   "Operator",
+   "Snapshots"
+  ],
+  "steps": [
+   {
+    "f": 4,
+    "t": 1,
+    "l": "Snapshots grow",
+    "n": "Snapshots taken weeks ago keep growing as guests write, and nobody reviews them."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Pool reaches 98 percent",
+    "n": "Free space shrinks until the pool has almost nothing left for new writes."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Writes fail",
+    "n": "A guest tries to write a new block, the host cannot allocate space, and the guest is paused with an I/O error."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Alert fires too late",
+    "n": "Monitoring alerts only on the guest pause, because pool usage had no threshold alert."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Find the biggest snapshots",
+    "n": "The operator lists snapshots per guest with the hypervisor tools and finds two old ones."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Delete the stale ones",
+    "n": "Using the proper command merges or drops the chain safely, and the pool gains free space."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Resume and prevent",
+    "n": "Guests are resumed, and the team adds pool usage alerts and a snapshot expiry policy."
+   }
+  ]
+ },
+ {
+  "id": "x-st-write",
+  "module": "storage",
+  "lesson": "storage/filesystems-ext4-xfs-and-mounts",
+  "title": "A write through the page cache",
+  "summary": "Why data is not on disk when write returns.",
+  "actors": [
+   "Application",
+   "Page cache",
+   "Filesystem journal",
+   "Disk"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "write() returns fast",
+    "n": "The application writes data and the kernel stores it in the page cache in memory, then returns."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Data marked dirty",
+    "n": "The pages are marked dirty and wait for a later flush, so a power cut now would lose them."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "fsync is requested",
+    "n": "A careful program calls fsync to demand that the data and metadata reach stable storage."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Journal first",
+    "n": "The filesystem writes the intent to its journal so a crash can be recovered consistently."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Flush to disk",
+    "n": "The journal and data blocks are written to the device, which may have its own cache."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "fsync returns",
+    "n": "Only now does the call return, so the application knows the data should survive a power loss."
+   }
+  ]
+ },
+ {
+  "id": "x-st-mount",
+  "module": "storage",
+  "lesson": "storage/filesystems-ext4-xfs-and-mounts",
+  "title": "What happens at boot when fstab is wrong",
+  "summary": "A bad line in /etc/fstab and a stuck boot.",
+  "actors": [
+   "systemd",
+   "fstab",
+   "Missing disk",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Read fstab",
+    "n": "At boot systemd reads /etc/fstab and creates a mount unit for each line."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Look for the device",
+    "n": "One line names a device by /dev/sdb1, but after a hardware change the name has moved."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Device not found",
+    "n": "systemd waits for the device until a timeout of about ninety seconds and then marks the mount failed."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Dependent services fail",
+    "n": "Services that need that mount are skipped and the system drops into emergency mode."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Fix with a UUID",
+    "n": "The operator edits the line to use UUID=... from blkid, and adds nofail for non-critical mounts."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Boot continues",
+    "n": "mount -a succeeds without errors, and the machine starts normally after a reboot."
+   }
+  ]
+ },
+ {
+  "id": "x-st-lvm-extend",
+  "module": "storage",
+  "lesson": "storage/lvm-and-raid",
+  "title": "Growing a logical volume online",
+  "summary": "Add space to a mounted filesystem without downtime.",
+  "actors": [
+   "Admin",
+   "Volume group",
+   "Logical volume",
+   "Filesystem"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Check free extents",
+    "n": "vgs shows free space in the volume group. If none, a new disk must be added to the group first."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Extend the volume",
+    "n": "lvextend -L +20G adds twenty gigabytes of extents to the logical volume."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Device is larger",
+    "n": "The block device is bigger now, but the filesystem on it still thinks it has the old size."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Grow the filesystem",
+    "n": "resize2fs for ext4 or xfs_growfs for XFS expands the filesystem while it stays mounted."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Space appears",
+    "n": "df -h now shows the extra capacity and applications keep running throughout."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Record the change",
+    "n": "The admin notes the new size and checks that the volume group still has headroom."
+   }
+  ]
+ },
+ {
+  "id": "x-st-raid5",
+  "module": "storage",
+  "lesson": "storage/lvm-and-raid",
+  "title": "Writing to RAID 5 and the write penalty",
+  "summary": "Why small writes cost four I/Os.",
+  "actors": [
+   "Application",
+   "RAID controller",
+   "Data disk",
+   "Parity disk"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Small write arrives",
+    "n": "The application changes one block in the array."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Read old data",
+    "n": "The controller must first read the old data block from its disk."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Read old parity",
+    "n": "It also reads the old parity block for that stripe."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Compute new parity",
+    "n": "New parity is old parity XOR old data XOR new data, calculated in memory."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Write data",
+    "n": "The new data block is written to the data disk."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Write parity",
+    "n": "The new parity block is written, giving four I/Os for one logical write, which is the write penalty."
+   }
+  ]
+ },
+ {
+  "id": "x-st-nfs",
+  "module": "storage",
+  "lesson": "storage/network-storage-nfs-iscsi-and-ceph",
+  "title": "An NFS mount and a read",
+  "summary": "From open to bytes.",
+  "actors": [
+   "Client app",
+   "NFS client",
+   "Network",
+   "NFS server",
+   "Export"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "open() on a mounted path",
+    "n": "The application opens a file under /mnt/shared as if it were local."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "LOOKUP request",
+    "n": "The NFS client sends a request to the server asking for the file handle of that name."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Check export and permissions",
+    "n": "The server checks the export rules and the file permissions for the caller."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Handle returned",
+    "n": "The server replies with a file handle that identifies the file on the server."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "READ request",
+    "n": "A read of a range of bytes goes to the server, over TCP, and may be cached on the client."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Data returned",
+    "n": "The bytes arrive and the application sees them. A slow network shows up as slow reads."
+   }
+  ]
+ },
+ {
+  "id": "x-st-ceph",
+  "module": "storage",
+  "lesson": "storage/network-storage-nfs-iscsi-and-ceph",
+  "title": "Ceph places an object",
+  "summary": "No central lookup table.",
+  "actors": [
+   "Client",
+   "CRUSH map",
+   "Primary OSD",
+   "Replica OSDs"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Compute placement",
+    "n": "The client hashes the object name to a placement group and uses CRUSH to find which OSDs hold it."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Write to the primary",
+    "n": "No central server is asked. The client talks directly to the primary OSD for that group."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Replicate",
+    "n": "The primary sends the write to the replica OSDs on other hosts, as the failure domain rules require."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Replicas acknowledge",
+    "n": "Each replica confirms that the data is safely stored."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Acknowledge the client",
+    "n": "Only after all replicas respond does the primary tell the client the write is complete."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "OSD fails later",
+    "n": "If an OSD dies, CRUSH recomputes placement and the cluster copies data to restore the replica count."
+   }
+  ]
+ },
+ {
+  "id": "x-st-df-du",
+  "module": "storage",
+  "lesson": "storage/performance-backups-and-troubleshooting",
+  "title": "df says full but du disagrees",
+  "summary": "A deleted file that is still open.",
+  "actors": [
+   "Operator",
+   "df",
+   "du",
+   "Process",
+   "Filesystem"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Check free space",
+    "n": "df -h shows the volume at 100 percent used."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Look for big files",
+    "n": "du -sh finds only a fraction of that space in visible files."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Numbers disagree",
+    "n": "The gap means space is held by something that is not in any directory."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "List deleted open files",
+    "n": "lsof +L1 shows a log file that was deleted while a process still has it open."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Space is held",
+    "n": "The kernel cannot free the blocks until the last process closes the file descriptor."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Restart or truncate",
+    "n": "Restarting the process, or truncating through /proc, releases the space and df drops."
+   }
+  ]
+ },
+ {
+  "id": "x-st-backup",
+  "module": "storage",
+  "lesson": "storage/performance-backups-and-troubleshooting",
+  "title": "A backup you can restore",
+  "summary": "The restore test is part of the backup.",
+  "actors": [
+   "Scheduler",
+   "Backup job",
+   "Backup store",
+   "Restore test",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Run nightly",
+    "n": "The scheduler starts the backup job at night when load is low."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Copy and verify",
+    "n": "The job copies data to the backup store and checks the size and checksums."
+   },
+   {
+    "f": 1,
+    "t": 4,
+    "l": "Report status",
+    "n": "The job sends a result with size and duration, and an alert fires if it is missing."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Weekly restore test",
+    "n": "Once a week another job restores a sample into a scratch system."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Check the content",
+    "n": "The test opens the restored database or files and compares counts with the source."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Report the result",
+    "n": "A failed restore raises an alert, so a backup that cannot be restored is found early."
+   }
+  ]
+ },
+ {
+  "id": "x-st-fail-inodes",
+  "module": "storage",
+  "kind": "failure",
+  "lesson": "storage/filesystems-ext4-xfs-and-mounts",
+  "title": "Failure and recovery: out of inodes",
+  "summary": "Creating files fails although space is free.",
+  "actors": [
+   "Application",
+   "Filesystem",
+   "Operator",
+   "Cleanup job",
+   "Monitoring"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Millions of small files",
+    "n": "A service writes one tiny file per request into a single directory."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Inodes run out",
+    "n": "The filesystem has free blocks but every inode is used, so it cannot describe a new file."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Writes fail",
+    "n": "The application sees no space left on device errors while df -h shows 40 percent free."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Alert fires",
+    "n": "Errors reach monitoring, but disk usage looks fine, which confuses the first responder."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Check inodes",
+    "n": "df -i shows 100 percent of inodes used, which explains the failure."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Clean up old files",
+    "n": "The operator removes expired files in batches and finds the directory that holds millions of them."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Prevent a repeat",
+    "n": "The team adds inode alerts, changes the app to a directory tree or object storage, and sizes inodes at mkfs."
+   }
+  ]
+ },
+ {
+  "id": "x-sq-plan",
+  "module": "sql-ops",
+  "lesson": "sql-ops/reading-explain-and-finding-slow-queries",
+  "title": "How the planner picks a plan",
+  "summary": "From SQL text to a chosen strategy.",
+  "actors": [
+   "Client",
+   "Parser",
+   "Planner",
+   "Statistics",
+   "Executor"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Send the query",
+    "n": "The client sends SQL. The parser checks the syntax and builds a tree of the request."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Hand over the tree",
+    "n": "The planner receives the tree and lists possible ways to run it, such as index scan or full scan."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Ask for statistics",
+    "n": "It reads table statistics for row counts and value distributions to estimate the cost of each way."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Pick the cheapest",
+    "n": "The plan with the lowest estimated cost wins, even if the estimate is wrong."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Run the plan",
+    "n": "The executor runs it step by step and returns rows to the client."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Compare estimate and actual",
+    "n": "EXPLAIN ANALYZE shows both. A big gap points to stale statistics."
+   }
+  ]
+ },
+ {
+  "id": "x-sq-index",
+  "module": "sql-ops",
+  "lesson": "sql-ops/indexes-that-help-and-indexes-that-hurt",
+  "title": "An index lookup versus a scan",
+  "summary": "Why the same query takes 4 ms or 4 seconds.",
+  "actors": [
+   "Query",
+   "Planner",
+   "Index",
+   "Table"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Filter by customer_id",
+    "n": "The query asks for the orders of one customer from a table of fifty million rows."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "No index: scan",
+    "n": "Without an index the planner must read every row of the table and test each one."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "With an index: search",
+    "n": "With an index on customer_id the planner descends a small tree to the matching entries."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Fetch matching rows",
+    "n": "Only the few rows found are fetched from the table."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Fast answer",
+    "n": "A handful of reads returns in milliseconds, instead of reading the whole table."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Cost on writes",
+    "n": "Every insert and update must also update the index, which is why unneeded indexes hurt."
+   }
+  ]
+ },
+ {
+  "id": "x-sq-deadlock",
+  "module": "sql-ops",
+  "lesson": "sql-ops/locks-deadlocks-and-long-transactions",
+  "title": "A deadlock between two transactions",
+  "summary": "Each waits for a lock held by the other.",
+  "actors": [
+   "Transaction A",
+   "Transaction B",
+   "Row 1",
+   "Row 2",
+   "Database"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 2,
+    "l": "A locks row 1",
+    "n": "Transaction A updates row 1 and holds a lock on it."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "B locks row 2",
+    "n": "Transaction B updates row 2 and holds a lock on it."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "A wants row 2",
+    "n": "Transaction A now tries to update row 2 and waits for B."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "B wants row 1",
+    "n": "Transaction B tries to update row 1 and waits for A, so neither can continue."
+   },
+   {
+    "f": 4,
+    "t": 4,
+    "l": "Detect the cycle",
+    "n": "After a short timeout the database finds the cycle of waits."
+   },
+   {
+    "f": 4,
+    "t": 1,
+    "l": "Abort one",
+    "n": "It aborts one transaction with a deadlock error, the other proceeds, and the application retries the failed one."
+   }
+  ]
+ },
+ {
+  "id": "x-sq-pool",
+  "module": "sql-ops",
+  "lesson": "sql-ops/connections-pooling-and-capacity",
+  "title": "A pooler in front of the database",
+  "summary": "Many clients, few server connections.",
+  "actors": [
+   "App instances",
+   "PgBouncer",
+   "Database",
+   "Monitoring"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Hundreds of clients connect",
+    "n": "Each app instance opens many connections, far more than the database should hold."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Pool shares connections",
+    "n": "The pooler keeps a small number of server connections and hands them out per transaction."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Few connections reach the database",
+    "n": "The database sees twenty active connections instead of five hundred."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Queries return",
+    "n": "Results flow back through the pooler to the right client."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Waiting clients queue",
+    "n": "When all server connections are busy, new requests wait briefly rather than overloading the database."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Watch the queue",
+    "n": "Monitoring tracks waiting clients and pool usage, a sign of capacity limits."
+   }
+  ]
+ },
+ {
+  "id": "x-sq-repl",
+  "module": "sql-ops",
+  "lesson": "sql-ops/replication-lag-vacuum-and-day-two-operations",
+  "title": "Replication lag builds up",
+  "summary": "A replica falls behind the primary.",
+  "actors": [
+   "Primary",
+   "WAL stream",
+   "Replica",
+   "Reader app"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Primary writes WAL",
+    "n": "Every change is written to the write-ahead log and streamed to the replica."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Replica replays",
+    "n": "The replica applies the log records in order to stay current."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "A long query blocks replay",
+    "n": "A long reporting query on the replica holds old row versions that replay must wait for."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "WAL piles up",
+    "n": "New log records arrive faster than they are applied, and lag grows to minutes."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Readers see old data",
+    "n": "The application reads stale values from the replica and users report missing changes."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Fix the cause",
+    "n": "Moving heavy reports elsewhere or tuning conflict settings lets replay catch up and lag fall."
+   }
+  ]
+ },
+ {
+  "id": "x-sq-vacuum",
+  "module": "sql-ops",
+  "lesson": "sql-ops/replication-lag-vacuum-and-day-two-operations",
+  "title": "Vacuum reclaims dead rows",
+  "summary": "Updates leave old versions behind.",
+  "actors": [
+   "Application",
+   "Table",
+   "Autovacuum",
+   "Planner"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "UPDATE creates a new row version",
+    "n": "PostgreSQL writes a new version and keeps the old one for transactions that may still need it."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Dead rows pile up",
+    "n": "Once no transaction needs the old versions they are dead but still take space."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Autovacuum wakes up",
+    "n": "When dead rows pass a threshold, autovacuum scans the table and marks that space reusable."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Update statistics",
+    "n": "It also refreshes statistics so the planner makes good choices."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Space is reused",
+    "n": "New rows fit into the freed space and the table stops growing."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Long transactions block it",
+    "n": "An old open transaction prevents cleanup, so bloat grows even when vacuum runs."
+   }
+  ]
+ },
+ {
+  "id": "x-sq-migrate",
+  "module": "sql-ops",
+  "lesson": "sql-ops/indexes-that-help-and-indexes-that-hurt",
+  "title": "Adding an index without blocking writes",
+  "summary": "CREATE INDEX CONCURRENTLY step by step.",
+  "actors": [
+   "Operator",
+   "Database",
+   "Table",
+   "Writers"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Start a concurrent build",
+    "n": "The operator runs CREATE INDEX CONCURRENTLY, which does not take a lock that blocks writes."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "First scan",
+    "n": "The database scans the table once and builds the index while writers continue."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Writers keep going",
+    "n": "Inserts and updates run normally, and their changes are recorded for the next pass."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Second scan",
+    "n": "A second pass adds the changes made during the first scan."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Wait for old transactions",
+    "n": "The build waits for transactions that started before it, then marks the index valid."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Verify and use",
+    "n": "The operator checks the index is valid and confirms the plan now uses it."
+   }
+  ]
+ },
+ {
+  "id": "x-sq-fail-conn",
+  "module": "sql-ops",
+  "kind": "failure",
+  "lesson": "sql-ops/connections-pooling-and-capacity",
+  "title": "Failure and recovery: connections exhausted",
+  "summary": "Every afternoon the API starts failing.",
+  "actors": [
+   "API pods",
+   "Database",
+   "Monitoring",
+   "Operator",
+   "Pooler"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Traffic peak opens connections",
+    "n": "At 15:00 traffic rises and each pod opens more connections to handle it."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Slots run out",
+    "n": "The database reaches max_connections and refuses new ones with a reserved-slots error."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Requests fail",
+    "n": "The API returns errors, and retries open even more connections, making it worse."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Alerts fire",
+    "n": "Monitoring shows errors and a database connection count at its limit."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Find who holds them",
+    "n": "pg_stat_activity shows most connections idle in transaction from one service."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Add a pooler and fix the leak",
+    "n": "A pooler caps server connections and the service is fixed to close transactions promptly."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Alert on usage",
+    "n": "The team alerts on connection usage at 80 percent so the next rise is seen before errors."
+   }
+  ]
+ },
+ {
+  "id": "x-gp-request",
+  "module": "gpu-serving",
+  "lesson": "gpu-serving/serving-stacks-vllm-tgi-triton",
+  "title": "One LLM request through a serving stack",
+  "summary": "From prompt to streamed tokens.",
+  "actors": [
+   "Client",
+   "Server",
+   "Scheduler",
+   "GPU",
+   "KV cache"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Send a prompt",
+    "n": "The client sends a prompt and starts waiting for a streaming response."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Queue the request",
+    "n": "The server tokenises the prompt and adds it to the scheduler queue."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Prefill",
+    "n": "The GPU processes all prompt tokens in parallel and builds the key and value tensors."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Store the KV cache",
+    "n": "Those tensors are kept in GPU memory so later tokens need not recompute them."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Decode token by token",
+    "n": "Each step generates one token using the cache and streams it to the client."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Free the cache at the end",
+    "n": "When the answer finishes, the cache memory is released for other requests."
+   }
+  ]
+ },
+ {
+  "id": "x-gp-batching",
+  "module": "gpu-serving",
+  "lesson": "gpu-serving/serving-stacks-vllm-tgi-triton",
+  "title": "Continuous batching",
+  "summary": "New requests join a running batch.",
+  "actors": [
+   "Request A",
+   "Request B",
+   "Scheduler",
+   "GPU"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 2,
+    "l": "A is running",
+    "n": "Request A is generating tokens as part of the current batch."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "B arrives",
+    "n": "Request B arrives while A is still running."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Static batching would wait",
+    "n": "A static batcher would make B wait until the whole batch finished, wasting time."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Add B at the next step",
+    "n": "Continuous batching adds B to the batch at the very next decode step."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "A finishes early",
+    "n": "When A finishes, its slot is freed at once and a waiting request can use it."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "GPU stays busy",
+    "n": "The GPU always has a full batch, so throughput is much higher at similar latency."
+   }
+  ]
+ },
+ {
+  "id": "x-gp-sched",
+  "module": "gpu-serving",
+  "lesson": "gpu-serving/gpus-on-kubernetes",
+  "title": "Scheduling a pod onto a GPU",
+  "summary": "From a resource request to a running container.",
+  "actors": [
+   "Pod spec",
+   "Scheduler",
+   "Device plugin",
+   "Node",
+   "Container"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request nvidia.com/gpu: 1",
+    "n": "The pod asks for one GPU in its resource limits."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Plugin advertises GPUs",
+    "n": "The device plugin on each GPU node reports how many GPUs it has to the kubelet."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Find a node with capacity",
+    "n": "The scheduler picks a node with a free GPU and all other requirements met."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Allocate a device",
+    "n": "The kubelet asks the device plugin to allocate a specific GPU for the pod."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Mount device and libraries",
+    "n": "The container runtime exposes the GPU device and driver libraries inside the container."
+   },
+   {
+    "f": 4,
+    "t": 4,
+    "l": "Workload sees the GPU",
+    "n": "nvidia-smi inside the container lists the GPU, and the model can load."
+   }
+  ]
+ },
+ {
+  "id": "x-gp-tp",
+  "module": "gpu-serving",
+  "lesson": "gpu-serving/gpu-basics-memory-and-what-limits-inference",
+  "title": "Tensor parallelism across GPUs",
+  "summary": "One model split over two cards.",
+  "actors": [
+   "Request",
+   "GPU 0",
+   "GPU 1",
+   "Interconnect"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Model too big for one card",
+    "n": "The weights do not fit in the memory of a single GPU."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Split each layer",
+    "n": "Every layer is divided, so GPU 0 and GPU 1 each hold half of its weights."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Compute a half",
+    "n": "Both GPUs compute their half of the layer at the same time on the same input."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Exchange partial results",
+    "n": "They combine the halves with an all-reduce over the interconnect after each layer."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Link speed matters",
+    "n": "On a slow link the exchange dominates, which is why NVLink is preferred inside one node."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Output token",
+    "n": "After the last layer a token is produced, with some cost in communication for the benefit of fitting the model."
+   }
+  ]
+ },
+ {
+  "id": "x-gp-autoscale",
+  "module": "gpu-serving",
+  "lesson": "gpu-serving/scaling-latency-and-cost",
+  "title": "Scaling on queue depth",
+  "summary": "Why CPU is the wrong signal for a GPU service.",
+  "actors": [
+   "Requests",
+   "Metrics",
+   "Autoscaler",
+   "Replicas"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Load rises",
+    "n": "More requests arrive and replicas start to queue them."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "GPU utilisation is already high",
+    "n": "The GPU shows high use even at modest load, so it tells little about spare capacity."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Queue length rises",
+    "n": "The number of waiting requests and the time to first token increase."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Autoscaler reads the queue",
+    "n": "The autoscaler uses queue depth or latency as its scaling signal."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Add a replica",
+    "n": "A new replica is scheduled, but loading a model can take minutes."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Latency recovers",
+    "n": "Once the new replica is ready the queue drains, and warm spare capacity avoids the delay next time."
+   }
+  ]
+ },
+ {
+  "id": "x-gp-quant",
+  "module": "gpu-serving",
+  "lesson": "gpu-serving/gpu-basics-memory-and-what-limits-inference",
+  "title": "Quantisation to fit a model",
+  "summary": "Trading precision for memory.",
+  "actors": [
+   "Model weights",
+   "Quantiser",
+   "GPU memory",
+   "Evaluation"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 2,
+    "l": "16-bit weights do not fit",
+    "n": "A 70-billion parameter model needs about 140 GB at 16 bits, more than one card holds."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Reduce the precision",
+    "n": "The quantiser stores weights in 8 or 4 bits, shrinking the memory by two to four times."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Fits with room for the cache",
+    "n": "The smaller weights leave GPU memory for the KV cache and more concurrent requests."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Measure the quality",
+    "n": "The team runs evaluation prompts and compares answers with the full-precision model."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Pick the lowest safe precision",
+    "n": "If quality loss is acceptable, the quantised model is used, otherwise a milder format is chosen."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Throughput improves",
+    "n": "Smaller weights also mean less memory traffic, so tokens per second often rise."
+   }
+  ]
+ },
+ {
+  "id": "x-gp-cold",
+  "module": "gpu-serving",
+  "lesson": "gpu-serving/scaling-latency-and-cost",
+  "title": "A cold start of a model replica",
+  "summary": "Why a new pod takes minutes to serve.",
+  "actors": [
+   "Scheduler",
+   "Node",
+   "Pod",
+   "Model store",
+   "GPU"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Pod is scheduled",
+    "n": "The scheduler places the pod on a node with a free GPU."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Pull the image",
+    "n": "The node pulls a container image of several gigabytes, which is slow the first time."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Download the weights",
+    "n": "The server downloads tens of gigabytes of model weights from storage."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Load into GPU memory",
+    "n": "The weights are copied into GPU memory and the server compiles its kernels."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Readiness probe passes",
+    "n": "Only now does the pod report ready and receive traffic."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Speed it up",
+    "n": "Baking weights into a cache volume or a node-local disk shortens the next start."
+   }
+  ]
+ },
+ {
+  "id": "x-gp-monitor",
+  "module": "gpu-serving",
+  "lesson": "gpu-serving/monitoring-and-debugging-gpu-workloads",
+  "title": "Reading GPU health signals",
+  "summary": "What the metrics say about a slow service.",
+  "actors": [
+   "Operator",
+   "DCGM metrics",
+   "GPU",
+   "Serving logs"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Open the GPU dashboard",
+    "n": "The operator looks at utilisation, memory use, temperature and clocks."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Memory near the limit",
+    "n": "Memory use sits at 98 percent, so the KV cache has no room for more requests."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Clocks are throttled",
+    "n": "The clock speed has dropped because of temperature, which lowers throughput."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Check serving logs",
+    "n": "The logs show requests waiting in the queue and some preempted for lack of cache space."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Decide the fix",
+    "n": "Lower the maximum context length, add a replica or cool the node, depending on the signal."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Confirm after the change",
+    "n": "Latency and queue length drop, and the memory graph leaves a safe margin."
+   }
+  ]
+ },
+ {
+  "id": "x-gp-fail-oom",
+  "module": "gpu-serving",
+  "kind": "failure",
+  "lesson": "gpu-serving/gpu-basics-memory-and-what-limits-inference",
+  "title": "Failure and recovery: CUDA out of memory",
+  "summary": "A model server crashes on a long prompt.",
+  "actors": [
+   "Client",
+   "Server",
+   "GPU",
+   "Monitoring",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Long prompt arrives",
+    "n": "A user sends a prompt with a very long context."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "KV cache grows",
+    "n": "The cache for that request grows with the context and competes with other requests for memory."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Memory runs out",
+    "n": "The GPU raises a CUDA out of memory error and the process dies."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Restart loop alert",
+    "n": "Monitoring shows the pod restarting and requests failing with 503."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Compare model and limits",
+    "n": "The operator compares the weights, cache size and max context against the card memory."
+   },
+   {
+    "f": 4,
+    "t": 1,
+    "l": "Lower limits",
+    "n": "The server is configured with a smaller max context and a GPU memory utilisation cap below 100 percent."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "Alert on memory",
+    "n": "The team adds memory headroom alerts and a request limit, so one long prompt cannot take the service down."
+   }
+  ]
+ },
+ {
+  "id": "x-os-boot2",
+  "module": "openstack",
+  "lesson": "openstack/compute-flavors-images-and-scheduling",
+  "title": "Booting a server in OpenStack",
+  "summary": "From API call to ACTIVE.",
+  "actors": [
+   "User",
+   "Nova API",
+   "Scheduler",
+   "Compute node",
+   "Neutron and Cinder"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "openstack server create",
+    "n": "The user asks for a server with an image, a flavor and a network. The token is checked first."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Scheduler picks a host",
+    "n": "The scheduler asks Placement which hosts have enough CPU, memory and disk and picks one."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Message to the compute node",
+    "n": "A message over the queue tells the chosen node to build the instance."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Network and volume",
+    "n": "The node asks Neutron for a port and Cinder for any volume, then downloads the image."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Libvirt starts the guest",
+    "n": "Nova calls libvirt, which starts the virtual machine with the requested resources."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Status ACTIVE",
+    "n": "The server reports ACTIVE. If any step fails, it shows ERROR with a fault message."
+   }
+  ]
+ },
+ {
+  "id": "x-os-token",
+  "module": "openstack",
+  "lesson": "openstack/identity-projects-quotas-and-keystone",
+  "title": "Authenticating with Keystone",
+  "summary": "Getting and using a token.",
+  "actors": [
+   "Client",
+   "Keystone",
+   "Nova",
+   "Policy"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Send credentials",
+    "n": "The client sends user, password, domain and project to Keystone."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Check them",
+    "n": "Keystone validates the credentials and the role assignment on the project."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Return a token and catalog",
+    "n": "A scoped token and the service catalog with endpoint addresses come back."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Call Nova with the token",
+    "n": "The client calls the Nova endpoint and presents the token in a header."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Validate the token",
+    "n": "Nova (through middleware) asks Keystone whether the token is valid and for which project and roles."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Check policy",
+    "n": "The policy decides whether those roles may perform the action, then Nova carries it out."
+   }
+  ]
+ },
+ {
+  "id": "x-os-secgroup",
+  "module": "openstack",
+  "lesson": "openstack/neutron-networking-security-groups-and-floating-ips",
+  "title": "Traffic to a floating IP",
+  "summary": "Following an SSH connection.",
+  "actors": [
+   "Client",
+   "Router NAT",
+   "Security group",
+   "Server"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Connect to the floating IP",
+    "n": "The client opens an SSH connection to the public floating IP address."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Translate the address",
+    "n": "The Neutron router maps the floating IP to the private address of the server."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Check ingress rules",
+    "n": "The packet is checked against the security group rules attached to the port."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Rule allows or drops",
+    "n": "If no rule allows port 22 from the client, the packet is silently dropped and SSH times out."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Allowed: deliver",
+    "n": "With a matching rule the packet reaches the server and sshd answers."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Reply returns",
+    "n": "Stateful tracking lets the reply go back through the router with the floating IP as its source."
+   }
+  ]
+ },
+ {
+  "id": "x-os-quota",
+  "module": "openstack",
+  "lesson": "openstack/identity-projects-quotas-and-keystone",
+  "title": "A quota stops a request",
+  "summary": "The request is refused before any host is chosen.",
+  "actors": [
+   "User",
+   "Nova API",
+   "Quota check",
+   "Admin"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request 8 cores",
+    "n": "The user creates a server needing 8 cores."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Check usage against limits",
+    "n": "Nova counts the project usage, 16 of 20 cores, and adds the new request."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Limit exceeded",
+    "n": "The total of 24 is above 20, so the check fails."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "403 Quota exceeded",
+    "n": "The user gets a quota exceeded error that is a rule, not a fault."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Ask or clean up",
+    "n": "The user either deletes unused servers or asks an admin for a higher limit."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Raise the quota",
+    "n": "The admin raises the cores limit for the project and the request can succeed."
+   }
+  ]
+ },
+ {
+  "id": "x-os-upgrade",
+  "module": "openstack",
+  "lesson": "openstack/operating-openstack-logs-upgrades-and-troubleshooting",
+  "title": "A rolling upgrade",
+  "summary": "Controller by controller.",
+  "actors": [
+   "Operator",
+   "Controller 1",
+   "Controller 2",
+   "Compute nodes",
+   "Database"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Read release notes",
+    "n": "The operator reads the notes for the upgrade path and database migrations."
+   },
+   {
+    "f": 0,
+    "t": 4,
+    "l": "Back up the database",
+    "n": "A full backup is taken and tested, because migrations cannot always be reversed."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Upgrade the first controller",
+    "n": "The services on controller 1 are upgraded and the database schema is migrated."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Second controller still serves",
+    "n": "Controller 2 keeps serving API calls with the older code during the change."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Upgrade compute nodes in waves",
+    "n": "Compute agents are upgraded a few at a time, with checks that guests keep running."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Verify services",
+    "n": "Service lists, test servers and logs confirm that every component runs the new version."
+   }
+  ]
+ },
+ {
+  "id": "x-os-volume",
+  "module": "openstack",
+  "lesson": "openstack/compute-flavors-images-and-scheduling",
+  "title": "Attaching a Cinder volume",
+  "summary": "Block storage to a running server.",
+  "actors": [
+   "User",
+   "Cinder",
+   "Nova",
+   "Compute node",
+   "Server"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Create a volume",
+    "n": "The user asks Cinder for a 100 GB volume, and the backend (such as Ceph) allocates it."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Attach to the server",
+    "n": "The user asks Nova to attach the volume to a running server."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Get connection info",
+    "n": "Nova asks Cinder how to reach the volume, for example the Ceph pool and image."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Compute node connects",
+    "n": "The node connects to the backend and presents the volume to libvirt."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Guest sees a new disk",
+    "n": "A block device such as /dev/vdb appears inside the server."
+   },
+   {
+    "f": 4,
+    "t": 4,
+    "l": "Format and mount",
+    "n": "The user creates a filesystem and mounts it, and the data now lives on the volume, not the server disk."
+   }
+  ]
+ },
+ {
+  "id": "x-os-migrate",
+  "module": "openstack",
+  "lesson": "openstack/operating-openstack-logs-upgrades-and-troubleshooting",
+  "title": "Evacuating a failed compute node",
+  "summary": "Moving servers off a dead host.",
+  "actors": [
+   "Monitoring",
+   "Operator",
+   "Nova",
+   "Dead node",
+   "Healthy node"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Node reported down",
+    "n": "Monitoring shows nova-compute down on one node and its servers unreachable."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Confirm it is really down",
+    "n": "The operator checks the service list and the BMC, and powers the node off to avoid two copies running."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Evacuate",
+    "n": "nova evacuate rebuilds each server on another host using shared storage or the same image."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Servers rebuilt",
+    "n": "Healthy nodes start the servers, which keep their addresses and volumes."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Repair the node",
+    "n": "The failed node is repaired or replaced before returning to service."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Enable it again",
+    "n": "nova-compute is enabled on the repaired node and scheduling resumes."
+   }
+  ]
+ },
+ {
+  "id": "x-os-image",
+  "module": "openstack",
+  "lesson": "openstack/compute-flavors-images-and-scheduling",
+  "title": "Image caching on compute nodes",
+  "summary": "Why the second boot is faster.",
+  "actors": [
+   "Glance",
+   "Compute node",
+   "Cache",
+   "Server"
+  ],
+  "steps": [
+   {
+    "f": 1,
+    "t": 0,
+    "l": "First boot needs the image",
+    "n": "The node asks Glance for the image because it has no local copy."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Download",
+    "n": "Glance streams the image over the network, which takes time for a large image."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Store in the cache",
+    "n": "Nova keeps the base image in a local cache directory on the node."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Create the instance disk",
+    "n": "The instance disk is a copy or an overlay on top of the cached base image."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Second boot uses the cache",
+    "n": "A later boot of the same image finds it in the cache and starts much faster."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Old images are cleaned",
+    "n": "Unused cached images are removed after a period, so disk space is reclaimed."
+   }
+  ]
+ },
+ {
+  "id": "x-os-fail-nohost",
+  "module": "openstack",
+  "kind": "failure",
+  "lesson": "openstack/compute-flavors-images-and-scheduling",
+  "title": "Failure and recovery: No valid host was found",
+  "summary": "A server goes to ERROR at scheduling time.",
+  "actors": [
+   "User",
+   "Nova",
+   "Scheduler",
+   "Placement",
+   "Admin"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Create a large server",
+    "n": "The user requests a flavor with 64 GB of memory."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Scheduler asks Placement",
+    "n": "The scheduler asks for hosts that can fit the request."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "No host fits",
+    "n": "Placement returns no candidates, because no node has enough free memory in one piece."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Fail the request",
+    "n": "The scheduler gives up and the server goes to ERROR with No valid host was found."
+   },
+   {
+    "f": 0,
+    "t": 4,
+    "l": "Report the error",
+    "n": "The user reports the failure and the admin reads the fault in server show."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "Check capacity",
+    "n": "The admin compares free memory per hypervisor and finds the largest block is 48 GB."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Fix and retry",
+    "n": "The admin adds a node or the user picks a smaller flavor, and the retry succeeds."
+   }
+  ]
+ },
+ {
+  "id": "x-sq-explain-analyze",
+  "module": "sql-ops",
+  "lesson": "sql-ops/reading-explain-and-finding-slow-queries",
+  "title": "Finding the slow step in a plan",
+  "summary": "Reading EXPLAIN ANALYZE from the inside out.",
+  "actors": [
+   "Operator",
+   "EXPLAIN ANALYZE",
+   "Plan node",
+   "Fix"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Run with ANALYZE",
+    "n": "The operator runs EXPLAIN (ANALYZE, BUFFERS) so the query really executes and timings are real."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Read the innermost nodes first",
+    "n": "Each node shows actual time and rows; the deepest nodes feed the ones above."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Compare estimate and actual rows",
+    "n": "A node that expected 10 rows but returned 2 million shows bad statistics."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Spot the expensive node",
+    "n": "A sequential scan on a large table with a filter that removes most rows takes most of the time."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Choose a fix",
+    "n": "Add an index, rewrite the filter, or run ANALYZE so the planner sees real distributions."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Run it again",
+    "n": "The new plan shows an index scan and a fall in time, which confirms the fix."
+   }
+  ]
+ }
+]

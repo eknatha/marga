@@ -1,0 +1,2042 @@
+[
+ {
+  "id": "x-helm-diff-drift",
+  "module": "helm",
+  "lesson": "helm/upgrade-rollback-and-release-history",
+  "title": "Detecting drift before an upgrade",
+  "summary": "How a diff shows changes made outside Helm.",
+  "actors": [
+   "Engineer",
+   "helm diff",
+   "Stored release",
+   "Live cluster"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "helm diff upgrade",
+    "n": "Before applying, the engineer asks what would change."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Read last manifest",
+    "n": "The plugin loads the manifest of the stored release."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Read live objects",
+    "n": "It also reads the objects as they are in the cluster."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Render new manifest",
+    "n": "The new chart and values are rendered."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Show differences",
+    "n": "The output shows a replica count that someone edited by hand, plus the planned changes."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Decide",
+    "n": "The engineer decides whether to keep or overwrite the manual change and records it in version control."
+   }
+  ]
+ },
+ {
+  "id": "x-linux-syscall",
+  "module": "linux",
+  "lesson": "linux/system-calls-strace-and-perf",
+  "title": "A system call, step by step",
+  "summary": "How a program asks the kernel to read a file.",
+  "actors": [
+   "Program",
+   "C library",
+   "Kernel",
+   "Disk"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "read(fd, buf, 4096)",
+    "n": "The program calls a library function and does not touch the hardware itself."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Trap into the kernel",
+    "n": "The library puts the call number in a register and executes an instruction that switches the CPU to kernel mode."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Check descriptor and permissions",
+    "n": "The kernel finds the open file from the descriptor and checks that reading is allowed."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Cache miss: read block",
+    "n": "If the page cache does not hold the data, the kernel asks the disk for it."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Data arrives",
+    "n": "The block is placed in the page cache and the process is woken."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Return bytes read",
+    "n": "The kernel copies the data to the program buffer and switches back to user mode. strace shows this exchange."
+   }
+  ]
+ },
+ {
+  "id": "x-linux-oom-kill",
+  "module": "linux",
+  "lesson": "linux/processes-memory-and-the-oom-killer",
+  "title": "How the OOM killer acts",
+  "summary": "What happens when memory runs out.",
+  "actors": [
+   "Application",
+   "Kernel allocator",
+   "Reclaim",
+   "OOM killer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request more memory",
+    "n": "The application touches new pages and the kernel needs physical memory for them."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Free page cache, swap pages",
+    "n": "The kernel first reclaims cache and swaps out cold pages."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Nothing left to reclaim",
+    "n": "If reclaim fails, allocation cannot succeed."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Invoke OOM killer",
+    "n": "The kernel scores processes by memory use and their oom_score_adj."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "SIGKILL the victim",
+    "n": "The chosen process is killed immediately and cannot clean up."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Log the decision",
+    "n": "dmesg shows the killed process, its memory use and a table of candidates."
+   }
+  ]
+ },
+ {
+  "id": "x-linux-page-cache-write",
+  "module": "linux",
+  "lesson": "linux/filesystems-page-cache-and-io",
+  "title": "A write and fsync",
+  "summary": "Why a write can return before data is on disk.",
+  "actors": [
+   "Application",
+   "Page cache",
+   "Kernel flusher",
+   "Disk"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "write(fd, data)",
+    "n": "The application writes and the kernel copies the data into a page of the cache."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Return immediately",
+    "n": "The call returns quickly while the page is marked dirty."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "fsync(fd)",
+    "n": "The application asks that its data reach stable storage."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Start writeback",
+    "n": "The dirty pages are handed to the flusher."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Write blocks and flush",
+    "n": "The device receives the data and flushes its own cache."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "fsync returns",
+    "n": "Only now is the data safe against power loss. This is why databases are limited by disk latency."
+   }
+  ]
+ },
+ {
+  "id": "x-linux-boot-kernel",
+  "module": "linux",
+  "lesson": "linux/boot-and-kernel",
+  "title": "From power on to login",
+  "summary": "The main stages of a Linux boot.",
+  "actors": [
+   "Firmware",
+   "Bootloader",
+   "Kernel",
+   "systemd"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Self-test and find boot device",
+    "n": "The firmware tests hardware and chooses a boot entry."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Load the bootloader",
+    "n": "GRUB or a similar loader starts from the boot partition."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Load kernel and initramfs",
+    "n": "The bootloader loads the kernel with its command line and a small temporary root filesystem."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Initialise hardware, mount root",
+    "n": "The kernel loads drivers, assembles storage and mounts the real root filesystem."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Start PID 1",
+    "n": "The kernel starts systemd as the first process."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Reach the default target",
+    "n": "systemd starts services in dependency order until the login prompt or network services are ready."
+   }
+  ]
+ },
+ {
+  "id": "x-linux-conntrack-full",
+  "module": "linux",
+  "lesson": "linux/networking-in-the-kernel-sockets-and-conntrack",
+  "title": "A full connection tracking table",
+  "summary": "Why new connections fail while CPU is idle.",
+  "actors": [
+   "Client",
+   "NAT gateway",
+   "conntrack table",
+   "Kernel log"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "New connection",
+    "n": "A client opens a connection through the gateway."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Create tracking entry",
+    "n": "The kernel needs a table entry to track and translate the flow."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Table at the limit",
+    "n": "The table already holds nf_conntrack_max entries."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "table full, dropping packet",
+    "n": "The kernel drops the packet and logs a message."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Retry and time out",
+    "n": "The client sees timeouts although the application servers are idle."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Raise limit, cut timeouts",
+    "n": "The operator raises the limit with memory in mind and shortens timeouts."
+   }
+  ]
+ },
+ {
+  "id": "x-linux-sysctl-persist",
+  "module": "linux",
+  "lesson": "linux/kernel-modules-sysctl-and-boot-parameters",
+  "title": "Changing a kernel setting for good",
+  "summary": "Runtime change versus persistent change.",
+  "actors": [
+   "Engineer",
+   "sysctl",
+   "Running kernel",
+   "/etc/sysctl.d"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "sysctl -w net.core.somaxconn=4096",
+    "n": "The engineer changes the value on the running system."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Kernel updates the value",
+    "n": "The new limit applies immediately to new listeners."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Reboot later",
+    "n": "On reboot, the change is not remembered."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Old default returns",
+    "n": "The kernel boots with its built-in default and the problem comes back."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Write 90-net.conf",
+    "n": "The engineer saves the setting in a file under /etc/sysctl.d."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "sysctl --system",
+    "n": "Reloading applies it now and the file applies it at every boot."
+   }
+  ]
+ },
+ {
+  "id": "x-bash-pipeline",
+  "module": "bash",
+  "lesson": "bash/text-processing",
+  "title": "How a pipeline runs",
+  "summary": "Processes connected by pipes.",
+  "actors": [
+   "Shell",
+   "grep",
+   "sort",
+   "uniq"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Parse the line",
+    "n": "The shell splits the command line at pipe characters."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Start grep",
+    "n": "The shell starts each command as a process and connects standard output to the next input."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Start sort",
+    "n": "All commands run at the same time, linked by pipes."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Stream matching lines",
+    "n": "Data flows from grep into sort as it is produced."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Sorted lines to uniq",
+    "n": "sort needs all input before it can output, then uniq counts duplicates."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Exit status",
+    "n": "The pipeline returns the status of the last command unless pipefail is set."
+   }
+  ]
+ },
+ {
+  "id": "x-python-requests-retry",
+  "module": "python",
+  "lesson": "python/http-apis-and-json",
+  "title": "A request with retry and backoff",
+  "summary": "How a script survives a flaky API.",
+  "actors": [
+   "Script",
+   "HTTP client",
+   "API",
+   "Timer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "get(url, timeout=5)",
+    "n": "The script sets a timeout so it never waits forever."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Request",
+    "n": "The client sends the request over the network with the timeout set."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "503 Service Unavailable",
+    "n": "The API reports a temporary problem."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Wait 1 s plus jitter",
+    "n": "The client waits before trying again, with random jitter."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Retry",
+    "n": "The second attempt is sent after the pause to give the API time to recover."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "200 OK",
+    "n": "The result is returned. After a few failures the client stops and raises a clear error."
+   }
+  ]
+ },
+ {
+  "id": "x-net-http-keepalive",
+  "module": "networking",
+  "lesson": "networking/http-and-tls",
+  "title": "Keep-alive connections",
+  "summary": "Why reusing a connection saves time.",
+  "actors": [
+   "Client",
+   "Server",
+   "Handshake",
+   "Pool"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 2,
+    "l": "First request: TCP and TLS",
+    "n": "A new connection needs a TCP handshake and a TLS handshake before data."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "GET /a",
+    "n": "The first request is sent over the new connection."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "200 + Connection kept",
+    "n": "The server keeps the connection open."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Return to pool",
+    "n": "The client keeps the connection in a pool."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "GET /b on same connection",
+    "n": "The next request skips the handshakes and starts at once."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Idle timeout closes it",
+    "n": "Unused connections are closed by timeouts. Middleboxes may close them earlier."
+   }
+  ]
+ },
+ {
+  "id": "x-net-load-balancer-failover",
+  "module": "networking",
+  "lesson": "networking/firewalls-and-load-balancing",
+  "title": "Failing over with a health check",
+  "summary": "How a load balancer stops sending to a broken server.",
+  "actors": [
+   "Client",
+   "Load balancer",
+   "Server A",
+   "Server B"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request",
+    "n": "A client sends a request to the load balancer address."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Forward to A",
+    "n": "The balancer picks a healthy server."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Health check fails",
+    "n": "Server A stops answering the check path."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Mark A unhealthy",
+    "n": "After several failures the balancer removes A from rotation."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Next request",
+    "n": "New requests keep arriving while server A is still broken."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Forward to B",
+    "n": "Traffic goes to the remaining healthy server until A passes checks again."
+   }
+  ]
+ },
+ {
+  "id": "x-docker-container-start",
+  "module": "docker",
+  "lesson": "docker/containers-and-images",
+  "title": "What docker run does",
+  "summary": "From image to running process.",
+  "actors": [
+   "CLI",
+   "Docker daemon",
+   "Registry",
+   "Kernel"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "docker run -p 8080:80 web",
+    "n": "The CLI sends the request to the daemon."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Pull missing layers",
+    "n": "If the image is not local, the daemon downloads the layers."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Create container filesystem",
+    "n": "Layers are stacked read-only with a writable layer on top."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Set up namespaces and cgroups",
+    "n": "The kernel isolates processes, network and mounts and applies resource limits."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Start the process",
+    "n": "The image command becomes process 1 in the container."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Port mapped",
+    "n": "Traffic to host port 8080 reaches port 80 in the container."
+   }
+  ]
+ },
+ {
+  "id": "x-cicd-canary",
+  "module": "cicd",
+  "lesson": "cicd/deployment-strategies",
+  "title": "A canary release",
+  "summary": "Sending a small share of traffic to the new version.",
+  "actors": [
+   "Pipeline",
+   "Router",
+   "Stable version",
+   "Canary version"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Deploy canary",
+    "n": "The pipeline starts the new version beside the old one."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Send 5 percent",
+    "n": "The router sends a small share of traffic to the canary."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Watch errors and latency",
+    "n": "Metrics from the canary are compared with the stable version."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Healthy",
+    "n": "If the canary meets the targets, the pipeline continues."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Increase to 50, then 100",
+    "n": "Traffic is shifted in steps with checks between them."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Roll back if worse",
+    "n": "If error rates rise, traffic returns to the stable version at once."
+   }
+  ]
+ },
+ {
+  "id": "x-k8s-rolling-update",
+  "module": "kubernetes",
+  "lesson": "kubernetes/pods-and-deployments",
+  "title": "A rolling update",
+  "summary": "How a Deployment replaces pods without downtime.",
+  "actors": [
+   "Engineer",
+   "Deployment",
+   "New pods",
+   "Old pods"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Set new image",
+    "n": "The engineer changes the image in the Deployment."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Create one new pod",
+    "n": "The controller adds a pod with the new template, within maxSurge."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Readiness passes",
+    "n": "The new pod receives traffic only after its readiness probe succeeds."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Terminate one old pod",
+    "n": "An old pod is stopped, within maxUnavailable."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Repeat",
+    "n": "The controller continues in small steps until all pods are new."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Rollout complete",
+    "n": "kubectl rollout status reports success. A failing probe stops the rollout and keeps old pods."
+   }
+  ]
+ },
+ {
+  "id": "x-k8s-crashloop",
+  "module": "kubernetes",
+  "lesson": "kubernetes/debugging-kubernetes-workloads",
+  "title": "Why a pod is in CrashLoopBackOff",
+  "summary": "How restarts slow down after repeated failure.",
+  "actors": [
+   "kubelet",
+   "Container",
+   "API server",
+   "Engineer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Start container",
+    "n": "The kubelet starts the container."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Process exits with an error",
+    "n": "The application stops because of bad configuration."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Restart after delay",
+    "n": "The kubelet restarts it after a short delay."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Exits again",
+    "n": "The same error repeats on every start because nothing has changed."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Report CrashLoopBackOff",
+    "n": "The delay grows up to five minutes and the pod status shows the back-off."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "kubectl logs --previous",
+    "n": "The engineer reads the last run logs and describe events to find the cause."
+   }
+  ]
+ },
+ {
+  "id": "x-tf-plan-apply",
+  "module": "terraform",
+  "lesson": "terraform/workflows-and-drift",
+  "title": "Plan and apply",
+  "summary": "How Terraform compares code, state and reality.",
+  "actors": [
+   "Engineer",
+   "Terraform",
+   "State file",
+   "Cloud API"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "terraform plan",
+    "n": "The engineer asks what would change."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Read state",
+    "n": "Terraform loads what it believes exists."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Refresh real resources",
+    "n": "It queries the cloud for the current settings."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Show the plan",
+    "n": "The plan lists additions, changes and destroys for review."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "terraform apply",
+    "n": "After approval, Terraform makes the calls."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Update state",
+    "n": "The state is written with the new resource IDs."
+   }
+  ]
+ },
+ {
+  "id": "x-cloud-iam-assume-role",
+  "module": "cloud",
+  "lesson": "cloud/identity-and-access",
+  "title": "Assuming a role",
+  "summary": "How a service gets temporary credentials.",
+  "actors": [
+   "Service",
+   "Identity service",
+   "Role policy",
+   "Resource"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request a role",
+    "n": "The service asks to assume a role."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Check trust policy",
+    "n": "The trust policy says who may assume the role."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Allowed",
+    "n": "The check passes because the caller identity is on the trust list."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Temporary credentials",
+    "n": "The service receives credentials that expire soon."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Call the resource",
+    "n": "The service calls the resource with them."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Allowed by permissions",
+    "n": "The permission policy of the role limits what succeeds. No long-term keys are stored."
+   }
+  ]
+ },
+ {
+  "id": "x-obs-trace-request",
+  "module": "observability",
+  "lesson": "observability/logs-and-traces",
+  "title": "One request traced across services",
+  "summary": "How a trace connects spans.",
+  "actors": [
+   "User",
+   "Gateway",
+   "Orders service",
+   "Database"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request",
+    "n": "The user request reaches the gateway, which creates a trace ID."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Call with trace header",
+    "n": "The ID travels in a header to the next service."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Query",
+    "n": "The orders service starts a span for its database query."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Slow result",
+    "n": "The query takes 900 ms, far longer than the other steps."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Response",
+    "n": "The span ends and the response returns."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Trace shows the slow span",
+    "n": "In the trace view, the long database span is clearly the cause."
+   }
+  ]
+ },
+ {
+  "id": "x-sre-error-budget-spending",
+  "module": "sre",
+  "lesson": "sre/slos-and-error-budgets",
+  "title": "Spending an error budget",
+  "summary": "How an SLO guides release decisions.",
+  "actors": [
+   "Team",
+   "SLO",
+   "Error budget",
+   "Release process"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Set 99.9 percent",
+    "n": "The team agrees on a target for successful requests."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Allow 0.1 percent errors",
+    "n": "The remaining allowance is the error budget for the period."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Incident burns 60 percent",
+    "n": "An outage uses most of the budget."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Slow down risky changes",
+    "n": "With little budget left, the team focuses on reliability work."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Fix causes",
+    "n": "Work is prioritised on the causes of the outage."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Budget recovers",
+    "n": "When the period resets or the budget is healthy, normal releases continue."
+   }
+  ]
+ },
+ {
+  "id": "x-sec-secret-rotation",
+  "module": "security",
+  "lesson": "security/secrets-management",
+  "title": "Rotating a leaked secret",
+  "summary": "The order of actions after a secret leaks.",
+  "actors": [
+   "Responder",
+   "Secret manager",
+   "Service",
+   "Audit log"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Revoke the old secret",
+    "n": "The first step makes the leaked value useless."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Create a new secret",
+    "n": "A new value is generated in the secret manager."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Service reads new value",
+    "n": "Services fetch the new secret at the next refresh or restart."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Check usage logs",
+    "n": "The responder looks for use of the old secret from unknown addresses."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Clean history",
+    "n": "Copies in repositories and tickets are removed."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Prevent a repeat",
+    "n": "Scanning, shorter lifetimes and review of the cause close the incident."
+   }
+  ]
+ },
+ {
+  "id": "x-ansible-playbook-run",
+  "module": "ansible",
+  "lesson": "ansible/playbooks-tasks-and-idempotence",
+  "title": "A playbook run",
+  "summary": "How Ansible changes servers over SSH.",
+  "actors": [
+   "Control node",
+   "Inventory",
+   "Web server",
+   "Handler"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "ansible-playbook site.yml",
+    "n": "The control node reads the playbook and selects hosts from the inventory."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Hosts web1, web2",
+    "n": "The inventory returns the matching hosts and variables."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Gather facts over SSH",
+    "n": "Ansible connects and collects information about each server."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Run tasks",
+    "n": "Each task is a module with a desired state, run on every host."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Config changed: notify",
+    "n": "A changed file notifies a handler."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Restart once at end",
+    "n": "The handler restarts the service once. A second run reports no changes, which shows idempotence."
+   }
+  ]
+ },
+ {
+  "id": "x-db-replication-lag",
+  "module": "databases",
+  "lesson": "databases/replication-and-failover",
+  "title": "Replication and lag",
+  "summary": "Why a read replica may return old data.",
+  "actors": [
+   "Application",
+   "Primary",
+   "Replica",
+   "Log"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Write order",
+    "n": "The application writes to the primary."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Append to log",
+    "n": "The primary records the change in its log."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Ship the log",
+    "n": "The replica receives and applies the changes."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Read immediately",
+    "n": "A read on the replica comes before the change is applied."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Old value",
+    "n": "The application sees stale data. This delay is called replication lag."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Read from primary when needed",
+    "n": "Read-your-writes cases use the primary or wait for the replica."
+   }
+  ]
+ },
+ {
+  "id": "x-git-cherry-pick",
+  "module": "git",
+  "lesson": "git/rebase-and-clean-history",
+  "title": "Cherry-pick a fix",
+  "summary": "Copying one commit to another branch.",
+  "actors": [
+   "Developer",
+   "main",
+   "release branch",
+   "Reviewer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fix merged on main",
+    "n": "The fix is committed and reviewed on main first."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "git switch release/3.2",
+    "n": "The developer switches to the release branch."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "git cherry-pick abc1234",
+    "n": "Git creates a new commit with the same change on top of the branch."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Resolve conflicts if any",
+    "n": "If the surrounding code differs, the developer edits and continues."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Open a pull request",
+    "n": "The release change is reviewed like any other."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Merge and tag",
+    "n": "After checks pass, the fix is merged and a patch release is tagged."
+   }
+  ]
+ },
+ {
+  "id": "x-llm-tokenization",
+  "module": "llm",
+  "lesson": "llm/what-an-llm-is-and-how-it-predicts-tokens",
+  "title": "How text becomes tokens",
+  "summary": "What the model reads and what you are billed for.",
+  "actors": [
+   "Your app",
+   "Tokenizer",
+   "Model",
+   "Billing"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Send text",
+    "n": "Your application sends the prompt as ordinary text."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Split into tokens",
+    "n": "The tokenizer cuts the text into small pieces, roughly four characters of English each."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Map to numbers",
+    "n": "Each token becomes an ID number that the model can process."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Process the sequence",
+    "n": "The model reads all token IDs together and builds context from them."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Count usage",
+    "n": "Input and output tokens are counted for the request."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Report usage",
+    "n": "The response includes token counts, which you log to track cost and limits."
+   }
+  ]
+ },
+ {
+  "id": "x-llm-next-token-loop",
+  "module": "llm",
+  "lesson": "llm/what-an-llm-is-and-how-it-predicts-tokens",
+  "title": "The next-token loop",
+  "summary": "How one answer is produced one token at a time.",
+  "actors": [
+   "Prompt",
+   "Model",
+   "Sampler",
+   "Output"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Read the prompt",
+    "n": "The model receives all prompt tokens as its starting context."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Score every token",
+    "n": "It computes a probability for every possible next token."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Pick one",
+    "n": "The sampler chooses a token based on the probabilities and the temperature setting."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Append the token",
+    "n": "The chosen token is added to the output."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Feed it back",
+    "n": "The new token becomes part of the context for the next step."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Stop",
+    "n": "The loop ends at an end token or the length limit, and the stop reason is reported."
+   }
+  ]
+ },
+ {
+  "id": "x-llm-context-window",
+  "module": "llm",
+  "lesson": "llm/tokens-context-windows-and-limits",
+  "title": "Filling the context window",
+  "summary": "Why long chats and big documents run into a limit.",
+  "actors": [
+   "System prompt",
+   "Chat history",
+   "Documents",
+   "Model"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Fixed instructions",
+    "n": "The system prompt is sent first on every request and always uses space."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "History grows",
+    "n": "Each turn adds the question and the answer, so the history gets longer."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Add documents",
+    "n": "Retrieved text or files are added and may take thousands of tokens."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Reserve output space",
+    "n": "Room for the answer must remain, because input and output share the window."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Limit reached",
+    "n": "If the total is too large the request fails or older parts must be removed."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Trim or summarise",
+    "n": "Your application removes or summarises old turns so the important parts still fit."
+   }
+  ]
+ },
+ {
+  "id": "x-llm-temperature",
+  "module": "llm",
+  "lesson": "llm/sampling-temperature-and-determinism",
+  "title": "What temperature changes",
+  "summary": "How the same prompt can give different answers.",
+  "actors": [
+   "Model scores",
+   "Low temperature",
+   "High temperature",
+   "Your test"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Probabilities",
+    "n": "The model gives each candidate token a probability, such as 60, 25 and 15 percent."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Sharpen",
+    "n": "A low temperature makes the likely token even more likely."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Stable results",
+    "n": "Answers are nearly the same each run, which suits extraction and classification."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Flatten",
+    "n": "A high temperature gives unlikely tokens a better chance."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Varied results",
+    "n": "Answers differ between runs, which suits brainstorming but is harder to test."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Test the property",
+    "n": "Even at low temperature you check required properties over several runs, not exact text."
+   }
+  ]
+ },
+ {
+  "id": "x-llm-stateless-chat",
+  "module": "llm",
+  "lesson": "llm/calling-an-llm-api",
+  "title": "Why the API forgets",
+  "summary": "How a chat works when the API is stateless.",
+  "actors": [
+   "User",
+   "Your app",
+   "Model API",
+   "Database"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Ask question one",
+    "n": "The user sends the first message."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Call with message one",
+    "n": "Your application sends the system prompt and message one."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Return answer one",
+    "n": "The model replies and keeps nothing about the exchange."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Store the turn",
+    "n": "Your application saves both messages in its database."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Ask question two",
+    "n": "The user sends a follow-up that depends on the first answer."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Resend all history",
+    "n": "Your application sends the earlier messages plus the new one, which is why the model seems to remember."
+   }
+  ]
+ },
+ {
+  "id": "x-llm-streaming",
+  "module": "llm",
+  "lesson": "llm/calling-an-llm-api",
+  "title": "Streaming a response",
+  "summary": "How tokens reach the screen before the answer is finished.",
+  "actors": [
+   "Browser",
+   "Your server",
+   "Model API",
+   "Parser"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Open request",
+    "n": "The browser asks for an answer and keeps the connection open."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Request a stream",
+    "n": "The server calls the API with streaming turned on."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Send small events",
+    "n": "The API sends text pieces as soon as they are produced."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Forward pieces",
+    "n": "The server passes each piece to the browser, which shows it at once."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Final event",
+    "n": "A last event carries the stop reason and the usage counts."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Parse after completion",
+    "n": "Structured data is parsed only when the full reply has arrived and the stop reason is normal."
+   }
+  ]
+ },
+ {
+  "id": "x-llm-prompt-caching",
+  "module": "llm",
+  "lesson": "llm/cost-latency-and-caching",
+  "title": "Prompt caching",
+  "summary": "How a repeated prefix becomes cheaper and faster.",
+  "actors": [
+   "Request one",
+   "Cache",
+   "Request two",
+   "Billing"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Mark a stable prefix",
+    "n": "The first request puts a long, unchanging manual at the start of the prompt."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Store the prefix",
+    "n": "The provider stores the processed prefix for a short time."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Pay full price once",
+    "n": "The first request is billed at the normal input rate plus a small write cost."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Send the same prefix",
+    "n": "The second request begins with exactly the same text."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Reuse",
+    "n": "The stored work is reused, so the answer starts sooner."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Pay less",
+    "n": "The reused tokens are billed at a lower rate, and the usage report shows cache reads."
+   }
+  ]
+ },
+ {
+  "id": "x-llm-rate-limit-backoff",
+  "module": "llm",
+  "lesson": "llm/calling-an-llm-api",
+  "title": "Handling a rate limit",
+  "summary": "Why retrying at once makes things worse.",
+  "actors": [
+   "Worker",
+   "Model API",
+   "Backoff timer",
+   "Alert"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Send a burst",
+    "n": "A batch job sends many requests at once."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Return 429",
+    "n": "The API answers with a rate limit error and may include a retry-after time."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Wait",
+    "n": "The worker waits for the longer of the retry-after time and a growing delay."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Add jitter",
+    "n": "A small random amount is added so workers do not all retry together."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Retry",
+    "n": "The worker tries again with lower concurrency."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Alert on persistent errors",
+    "n": "If failures continue, an alert warns the team instead of looping forever."
+   }
+  ]
+ },
+ {
+  "id": "x-llm-grounded-answer",
+  "module": "llm",
+  "lesson": "llm/training-fine-tuning-and-where-knowledge-comes-from",
+  "title": "A grounded answer with retrieval",
+  "summary": "How supplying facts reduces invented answers.",
+  "actors": [
+   "Question",
+   "Search index",
+   "Prompt builder",
+   "Model"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Question arrives",
+    "n": "A customer asks about the returns policy."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Retrieve passages",
+    "n": "The index returns the few most relevant policy passages."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Build the prompt",
+    "n": "The passages are placed in tags with the question and a rule to answer only from them."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Answer with quotes",
+    "n": "The model answers and quotes the sentence it used."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Show sources",
+    "n": "The reply links to the source passages so the customer can check."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Monitor retrieval",
+    "n": "Known test questions confirm that the right passage is still found after each update."
+   }
+  ]
+ },
+ {
+  "id": "x-llm-truncated-reply",
+  "module": "llm",
+  "lesson": "llm/tokens-context-windows-and-limits",
+  "title": "A reply cut off by the limit",
+  "summary": "Why JSON sometimes fails to parse.",
+  "actors": [
+   "Request",
+   "Model",
+   "Stop reason",
+   "Parser"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Ask for a long report",
+    "n": "The request asks for a large JSON document with a small output limit."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Generate tokens",
+    "n": "The model writes tokens until the limit is reached."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Stop early",
+    "n": "The reply ends in the middle of a string and the stop reason says max_tokens."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Skip the check",
+    "n": "A careless pipeline sends the text straight to the parser."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Parse error",
+    "n": "The parser fails because the JSON is unfinished."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Check first",
+    "n": "A good pipeline reads the stop reason, raises the limit or shortens the task, and tries again."
+   }
+  ]
+ },
+ {
+  "id": "x-llm-choose-technique",
+  "module": "llm",
+  "lesson": "llm/training-fine-tuning-and-where-knowledge-comes-from",
+  "title": "Prompt, retrieve or fine-tune",
+  "summary": "How to choose how to give a model what it needs.",
+  "actors": [
+   "Problem",
+   "Prompt",
+   "Retrieval",
+   "Fine-tuning"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Start with the prompt",
+    "n": "Clear instructions and examples solve many problems cheaply."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Measure",
+    "n": "An evaluation set shows whether the prompt is good enough."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Add retrieval for facts",
+    "n": "If the answer needs private or changing facts, retrieve them at request time."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Measure again",
+    "n": "Check that answers are correct and cite the retrieved text."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Fine-tune for behaviour",
+    "n": "Training helps with a stable style or format that prompting cannot achieve."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Compare cost and risk",
+    "n": "Compare quality gain with data work and maintenance, and keep the evaluation as the judge."
+   }
+  ]
+ },
+ {
+  "id": "x-llm-eval-in-ci",
+  "module": "llm",
+  "lesson": "llm/choosing-and-evaluating-models",
+  "title": "Evaluation in CI",
+  "summary": "How a model or prompt change is checked before release.",
+  "actors": [
+   "Developer",
+   "CI pipeline",
+   "Evaluation set",
+   "Model API"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Open a pull request",
+    "n": "A change to a prompt or model version is proposed."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Load the cases",
+    "n": "The pipeline loads saved realistic inputs with expected properties."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Run each case",
+    "n": "Each case is sent to the model, several times where variation matters."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Score results",
+    "n": "Checks in code score format, required facts and forbidden content."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Compare to threshold",
+    "n": "The pass rate is compared with the last release and a minimum."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Block or allow",
+    "n": "The pull request fails with the failing cases listed if the rate drops."
+   }
+  ]
+ },
+ {
+  "id": "x-llm-incident-trace",
+  "module": "llm",
+  "lesson": "llm/debugging-llm-applications",
+  "title": "Investigating a bad answer",
+  "summary": "How stored traces explain a wrong answer.",
+  "actors": [
+   "User report",
+   "Trace store",
+   "Engineer",
+   "Evaluation set"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Report a wrong answer",
+    "n": "A user shares the time and the question that went wrong."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Find the trace",
+    "n": "The engineer finds the stored prompt, retrieved text, parameters and model version."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Read what the model saw",
+    "n": "The needed fact is missing from the retrieved text."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Form a hypothesis",
+    "n": "The index was not updated after the document changed."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Add the case",
+    "n": "The question is added to the evaluation set with the expected fact."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Fix and monitor",
+    "n": "The index job is repaired and an alert watches for stale documents."
+   }
+  ]
+ },
+ {
+  "id": "x-prompting-anatomy",
+  "module": "prompting",
+  "lesson": "prompting/anatomy-of-a-good-prompt",
+  "title": "Parts of a good prompt",
+  "summary": "What each piece of a prompt is for.",
+  "actors": [
+   "Author",
+   "Prompt",
+   "Model",
+   "Reviewer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "State the task",
+    "n": "One clear sentence says what the model must produce."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Add the audience",
+    "n": "Saying who reads the result sets tone and detail."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Supply the material",
+    "n": "The text to work on is wrapped in tags so it is not mixed with instructions."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Set constraints",
+    "n": "Limits such as length and what to avoid are written as measurable rules."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Specify the format",
+    "n": "The exact output shape is described, with an example if needed."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Review on real inputs",
+    "n": "The reviewer checks answers on varied real examples, not one sample."
+   }
+  ]
+ },
+ {
+  "id": "x-prompting-few-shot",
+  "module": "prompting",
+  "lesson": "prompting/examples-and-few-shot-prompting",
+  "title": "How examples steer output",
+  "summary": "Why a few good examples beat a long description.",
+  "actors": [
+   "Author",
+   "Examples",
+   "Model",
+   "Evaluation set"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Pick varied cases",
+    "n": "Choose three to five realistic inputs that cover normal, borderline and unknown cases."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Write ideal outputs",
+    "n": "Each example shows the exact output format and wording wanted."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Place in the prompt",
+    "n": "The examples are added in a consistent layout before the real input."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Imitate the pattern",
+    "n": "The model copies the format and the decision style from the examples."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Test on unseen inputs",
+    "n": "Cases that are not in the prompt measure whether the pattern generalises."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Rebalance",
+    "n": "If one label is over-predicted, examples are rebalanced and definitions added."
+   }
+  ]
+ },
+ {
+  "id": "x-prompting-reasoning",
+  "module": "prompting",
+  "lesson": "prompting/reasoning-and-step-by-step-prompts",
+  "title": "Reasoning before answering",
+  "summary": "When step-by-step thinking helps and when it costs.",
+  "actors": [
+   "Task",
+   "Direct prompt",
+   "Reasoning prompt",
+   "Evaluation set"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Try a direct answer",
+    "n": "The model answers a multi-step question in one go."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Measure accuracy",
+    "n": "The evaluation set shows many mistakes on steps in the middle."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Ask for steps first",
+    "n": "The prompt asks the model to work through the steps before the final answer."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Measure again",
+    "n": "Accuracy rises, but tokens and delay also rise."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Separate the answer",
+    "n": "The final answer is placed in its own tag so code can extract it."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Choose by data",
+    "n": "Simple lookups stay direct, and hard tasks keep the reasoning step."
+   }
+  ]
+ },
+ {
+  "id": "x-prompting-system-layout",
+  "module": "prompting",
+  "lesson": "prompting/system-prompts-roles-and-context-layout",
+  "title": "Layout of a system prompt",
+  "summary": "Where rules, data and user text belong.",
+  "actors": [
+   "System message",
+   "Context block",
+   "User message",
+   "Model"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Role and rules",
+    "n": "Stable instructions about role, boundaries and style go first."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Output contract",
+    "n": "The required output format and error behaviour are stated clearly."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Reference data",
+    "n": "Documents are added in tags and marked as data, not instructions."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "User request",
+    "n": "The actual question comes last, close to where the answer begins."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Answer within rules",
+    "n": "The model uses the rules, the data and the question together."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "No secrets",
+    "n": "Secrets and permission checks stay in code, because prompt text can often be revealed."
+   }
+  ]
+ }
+]
