@@ -447,7 +447,7 @@ function homeView() {
   var tools = [['#/subnet', 'Subnet and CIDR', 'Split networks, plan VLSM, merge routes.'], ['#/playground/yaml', 'YAML playground', 'Find errors and risky Kubernetes settings.'], ['#/playground/python', 'Python playground', 'Run Python with built-in tests.'], ['#/playground/go', 'Go playground', '50 Go exercises run on the Go Playground.'], ['#/playground/hcl', 'Terraform playground', '50 HCL exercises checked in the browser.'], ['#/playground/sql', 'SQL for SREs', '50 SQL exercises on a real SQLite engine.'], ['#/explainers', 'Animated explainers', 'DNS, TLS, pods, rolling updates and more.'], ['#/skill-lab', 'Skill-writing lab', 'Write a SKILL.md and check its header, description, size and safety.']];
   view.html =
     '<section class="hero hero2"><div class="wrap hero-grid2">' +
-    '<div class="hero-copy"><h1>Learn to fix production before production breaks.</h1>' +
+    '<div class="hero-copy"><div class="hero-mark" lang="te" aria-hidden="true">మార్గ</div><h1>Learn to fix production before production breaks.</h1>' +
     '<p class="hero-free"><strong>Free. Offline. No sign-up.</strong> No payment, no ads.</p>' +
     '<p class="hero-proof small"><span class="chip" id="off-chip">Checking offline support</span> Open it once, turn off wifi, and keep learning. Lessons, labs and widgets run from your device.</p>' +
     '<p class="lede">Practical DevOps, cloud and SRE training from someone who runs production. Real incidents, real commands, no login, no ads.</p>' +
