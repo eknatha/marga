@@ -2,7 +2,7 @@
 company: Facebook
 year: 2021
 area: Network and DNS
-modules: networking, cloud, sre, aiops
+modules: networking, cloud, sre, aiops, baremetal
 source: Meta engineering | https://engineering.fb.com/2021/10/05/networking-traffic/outage-details/
 what: In October 2021 Facebook, Instagram and WhatsApp were unreachable for about six hours. Even internal tools and badge access stopped working, which slowed recovery.
 cause: A maintenance command to assess backbone capacity unintentionally disconnected the data centers from each other. A bug in the audit tool failed to stop it. DNS servers saw that they could not reach the data centers and withdrew their BGP routes, so the outside world could no longer find Facebook.
@@ -24,7 +24,7 @@ lesson: A latent bug can wait for the right input. Detect quickly, be able to ro
 company: Roblox
 year: 2021
 area: Cloud outage
-modules: cloud, observability, sre, databases, aiops
+modules: cloud, observability, sre, databases, aiops, sql-ops, openstack
 source: Roblox blog | https://corp.roblox.com/newsroom/2021/10/roblox-return-to-service-10-28-10-31-2021
 what: In late October 2021 Roblox was unavailable for around three days, affecting millions of players.
 cause: The Consul service discovery cluster degraded under heavy load after a new streaming feature was enabled and a storage performance issue in the underlying database. Roblox's monitoring also depended on Consul, so engineers could not see well.
@@ -101,7 +101,7 @@ lesson: Use safe string functions where you can, set time limits on regexes, and
 company: Instapaper
 year: 2017
 area: Database
-modules: linux, cloud, sre, databases
+modules: linux, cloud, sre, databases, storage, sql-ops
 source: Instapaper blog | https://medium.com/making-instapaper/instapaper-outage-cause-recovery-3c32a7e9cc5f
 what: In February 2017 Instapaper was unavailable for more than a day. Users could not read saved articles.
 cause: The main database reached the maximum file size of its file system, which was about 2 TB on the ext3 file system the instances were using. Writes then failed and could not be fixed in place.

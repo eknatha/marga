@@ -2,7 +2,7 @@
 company: Sentry
 year: 2015
 area: Databases
-modules: linux, observability, sre, databases
+modules: linux, observability, sre, databases, sql-ops
 source: Sentry engineering blog | https://blog.sentry.io/transaction-id-wraparound-in-postgres
 what: On Monday 20 July 2015 the hosted Sentry service was down for most of the US working day because its main Postgres database stopped accepting writes.
 cause: Postgres uses a limited counter for transaction IDs and needs routine vacuuming to recycle them. A write-heavy workload and very large tables let autovacuum fall behind. When the counter neared its limit, Postgres halted writes on purpose to avoid corrupting data visibility. One autovacuum run also failed without a clear log message.
@@ -13,7 +13,7 @@ lesson: Monitor the age of transaction IDs and the progress of autovacuum before
 company: Mailchimp (Mandrill)
 year: 2019
 area: Databases
-modules: sre, observability, linux, databases
+modules: sre, observability, linux, databases, sql-ops
 source: Mailchimp write-up | https://mailchimp.com/what-we-learned-from-the-recent-mandrill-outage/
 what: From 4 February 2019 Mandrill, the transactional email service of Mailchimp, was impaired for about 41 hours and queues took until 6 February to return to normal.
 cause: One database shard received more writes than the others because of uneven hashing. Autovacuum fell behind, so the shard hit the Postgres transaction ID limit and entered safety shutdown. The risk had been noted three months earlier but judged not urgent. Retried writes added load, queued jobs filled the disks of application servers, and the first error was buried in unrelated log noise.
@@ -24,7 +24,7 @@ lesson: A known and deferred risk is a scheduled outage; alert on it, and keep l
 company: Zalando
 year: 2019
 area: Kubernetes
-modules: kubernetes, networking, observability, k8s-ops
+modules: kubernetes, networking, observability, k8s-ops, service-mesh
 source: Zalando post-mortem | https://kubernetes-on-aws.readthedocs.io/en/latest/postmortems/jan-2019-dns-outage.html
 what: On 7 January 2019 product pages of the Zalando fashion store returned errors for more than an hour because DNS stopped working in one Kubernetes cluster.
 cause: The cluster DNS pods had a low memory limit. A burst of retries after a downstream timeout raised the number of DNS lookups, which were multiplied by the default search domain setting and by a service that did not cache lookups. The DNS pods ran out of memory, restarted and could not recover under the load. In-cluster monitoring also depended on DNS, so the on-call engineer was paged late.
@@ -35,7 +35,7 @@ lesson: Cluster DNS is shared infrastructure that needs limits, caching and moni
 company: Preply
 year: 2020
 area: Kubernetes
-modules: kubernetes, networking, linux, k8s-ops
+modules: kubernetes, networking, linux, k8s-ops, service-mesh
 source: Preply engineering post-mortem | https://medium.com/preply-engineering/dns-postmortem-e169efd45afd
 what: On 28 February 2020 some services in a production cluster had a partial DNS failure for about 26 minutes and roughly 15,000 events were dropped.
 cause: The autoscaler for the cluster DNS reduced the pods from three to two during low load. The node network proxy then failed to remove a stale connection tracking entry, so some traffic kept going to a pod that no longer existed. The team suspected a known conntrack issue but could not confirm it.
@@ -57,7 +57,7 @@ lesson: Automation must refuse actions that cross failure domains, and the tools
 company: Google Cloud
 year: 2022
 area: Cloud infrastructure
-modules: cloud, sre, linux
+modules: cloud, sre, linux, virtualization, openstack, baremetal
 source: Google Cloud incident report | https://status.cloud.google.com/incidents/fmEL9i2fArADKawkZAa2
 what: During a record heatwave on 19 July 2022 Google Cloud lost capacity in one zone of its London region. Most services recovered after about 18 hours, and some instances needed about 35 hours.
 cause: Several redundant cooling systems failed at the same time as extreme outside temperatures, so part of the zone was powered down to protect hardware. A routing change made during the response briefly isolated all three zones instead of one. About a third of the virtual machines and disks in the zone were affected, and some needed manual recovery.
@@ -79,7 +79,7 @@ lesson: Treat configuration as code with staged rollout and fast rollback, and k
 company: GoCardless
 year: 2017
 area: Databases
-modules: linux, sre, observability, databases
+modules: linux, sre, observability, databases, sql-ops
 source: GoCardless incident review | https://gocardless.com/blog/incident-review-api-and-dashboard-outage-on-10th-october/
 what: On 10 October 2017 the API and dashboard of a payments company were down for 1 hour and 50 minutes.
 cause: The primary Postgres node failed when a RAID array lost three disks. The cluster automation then failed to promote a replica because a cluster setting, a restricted virtual address and a crash of a Postgres process on the replica coincided. A recovery that should have taken one or two minutes took almost two hours.
@@ -178,7 +178,7 @@ lesson: Prefer small, reversible steps over a big cutover, test with real volume
 company: Honeycomb
 year: 2024
 area: Observability and storage
-modules: observability, linux, cloud
+modules: observability, linux, cloud, storage
 source: Honeycomb engineering blog | https://www.honeycomb.io/blog/bitten-by-a-kafka-bug-postmortem
 what: In May 2024 engineers noticed that one Kafka broker read eight times more from disk than the other eight brokers and peaked above the rated limit of its device. There was no customer impact yet.
 cause: After an upgrade, tiered storage metadata files had grown to hundreds of megabytes because the cleanup of metadata for segments deleted long ago was not enabled. One partition kept records of about six million deleted segments. Diagnosis needed kernel tracing because normal metrics did not show which files were read.

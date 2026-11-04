@@ -2,7 +2,7 @@
 company: Anthropic
 year: 2025
 area: AI systems
-modules: llm, prompting, mcp, mlops, aiops
+modules: llm, prompting, mcp, mlops, aiops, gpu-serving
 source: Anthropic engineering post-mortem | https://www.anthropic.com/engineering/a-postmortem-of-three-recent-issues
 what: Between August and early September 2025 some Claude users saw lower quality answers, including odd characters in output, because of three separate infrastructure bugs that overlapped in time.
 cause: A routing error sent some requests to servers configured for a different context window, a misconfiguration on some accelerators corrupted token choice, and a compiler bug affected how top candidates were selected. Each bug hit a different share of traffic, so reports looked inconsistent and the checks in place did not catch the drops.
@@ -13,7 +13,7 @@ lesson: Model quality can fall because of ordinary infrastructure bugs, so run y
 company: OpenAI
 year: 2023
 area: AI systems
-modules: llm, python
+modules: llm, python, gpu-serving
 source: OpenAI incident write-up | https://openai.com/index/march-20-chatgpt-outage/
 what: On 20 March 2023 ChatGPT was taken offline for a few hours after some users could see titles of other users' conversations, and a small share of paying subscribers could see limited payment details of others.
 cause: A bug in an open source Redis client library used by the service could leave a connection in a corrupted state when a request was cancelled at the wrong moment. The next user of that shared connection then received data meant for someone else.

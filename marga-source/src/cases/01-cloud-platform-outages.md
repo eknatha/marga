@@ -2,7 +2,7 @@
 company: Amazon Web Services
 year: 2017
 area: Cloud outage
-modules: cloud, bash, sre, system-design, aiops
+modules: cloud, bash, sre, system-design, aiops, storage
 source: AWS post-event summary | https://aws.amazon.com/message/41926/
 what: While debugging a slow billing system, an engineer ran a command meant to remove a few servers from an S3 subsystem. S3 in the busiest US region stopped serving requests for about four hours, and many sites that depend on it failed with it.
 cause: The command took a larger set of servers than intended, including those for the index and placement subsystems. The tool had no minimum-capacity limit, and restarting those subsystems at that scale took far longer than expected.
@@ -35,7 +35,7 @@ lesson: Your monitoring and your recovery tools must not depend on the network t
 company: Amazon Web Services
 year: 2011
 area: Cloud outage
-modules: cloud, sre, system-design
+modules: cloud, sre, system-design, storage, virtualization
 source: AWS post-event summary | https://aws.amazon.com/message/65648/
 what: A network change during a capacity upgrade started a multi-day problem with EBS volumes in one US-East availability zone. Many customers lost access to volumes and could not create new ones.
 cause: Traffic was shifted onto a lower-capacity network. Storage nodes lost contact with their replicas and all tried to re-mirror at once, exhausting free capacity and overloading the control plane.
@@ -112,7 +112,7 @@ lesson: Ship new code paths behind flags, handle empty data, and make restarts s
 company: Microsoft
 year: 2018
 area: Cloud outage
-modules: cloud, sre, system-design
+modules: cloud, sre, system-design, virtualization, storage
 source: Azure post-incident review | https://azure.status.microsoft/en-us/status/history/
 what: In September 2018 a lightning strike near a data center in South Central US caused a voltage surge that took cooling units offline. Servers shut down to protect themselves and many Azure services were disrupted, some for more than a day.
 cause: The surge damaged power and cooling equipment. Temperatures rose, and storage and network hardware shut down. Some dependent services, such as Azure Active Directory, were also affected because their redundancy was not sufficient.
@@ -145,7 +145,7 @@ lesson: Configuration is code. Validate it, deploy it in stages, and make sure t
 company: Microsoft
 year: 2012
 area: Time and dates
-modules: cloud, python, sre, system-design
+modules: cloud, python, sre, system-design, virtualization
 source: Azure blog summary | https://azure.microsoft.com/en-us/blog/summary-of-windows-azure-service-disruption-on-feb-29th-2012/
 what: On 29 February 2012 virtual machines could not start in many Azure regions. An attempt to fix it caused further problems, and the disruption lasted many hours.
 cause: The guest agent created certificates valid for one year by adding one to the year number. On leap day this produced 29 February 2013, which does not exist, so certificate creation failed and machines were marked unhealthy.
@@ -178,7 +178,7 @@ lesson: A fix for congestion can create more. Know where your traffic will go be
 company: Cloudflare
 year: 2022
 area: Configuration change
-modules: networking, cloud, sre, system-design
+modules: networking, cloud, sre, system-design, baremetal
 source: Cloudflare blog | https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/
 what: In June 2022 Cloudflare lost traffic in 19 of its busiest data centers for over an hour, which affected many popular sites.
 cause: A change that restructured network configuration to improve resilience reordered a rule in a router policy. In the affected locations, this caused routes to be withdrawn, so traffic could not enter.
@@ -189,7 +189,7 @@ lesson: Roll changes out to the lowest-risk places first, and keep the ability t
 company: Cloudflare
 year: 2023
 area: Cloud outage
-modules: cloud, sre, system-design
+modules: cloud, sre, system-design, openstack, baremetal
 source: Cloudflare blog | https://blog.cloudflare.com/post-mortem-on-cloudflare-control-plane-and-analytics-outage/
 what: In November 2023 the Cloudflare dashboard and APIs were unavailable or degraded for many hours after a power problem at the data center that hosts its main control plane. Traffic to customer sites kept flowing.
 cause: Power failed at the facility. Cloudflare's high-availability design had not been fully tested, and some services had an unexpected dependency on the failed site, so failover did not work as planned.
@@ -266,7 +266,7 @@ lesson: Plan for the best case as well as the worst, test scaling limits and quo
 company: Toyota
 year: 2023
 area: Capacity and scaling
-modules: linux, cloud, sre, system-design
+modules: linux, cloud, sre, system-design, storage
 source: Toyota newsroom | https://global.toyota/en/newsroom/
 what: In August 2023 Toyota halted all of its Japanese assembly lines for about a day because its system for ordering parts stopped working.
 cause: During maintenance, servers ran out of disk space. The backup system used the same data store and had the same limit, so failing over to it did not help.
