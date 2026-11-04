@@ -1,8 +1,17 @@
 /* MARGA terminal engine, part 10: building a lab session and evaluating its checks. */
 (function () {
 'use strict';
-var T = (typeof module === 'object' && module.exports) ? require('./term-cloud.js') : window.MargaTerm;
+var T = (typeof module === 'object' && module.exports) ? require('./term-hw.js') : window.MargaTerm;
 
+/* A variant of a lab: every name in the map is replaced by its new name everywhere in the lab (story, goals, hints, files, world, checks, solution). */
+T.variantLab = function (lab, map) {
+  var pairs = Object.keys(map).map(function (k) { return [k, map[k]]; });
+  pairs.slice().forEach(function (p) { if (p[0].indexOf('.') >= 0) pairs.push([p[0].replace(/\./g, '\\.'), p[1].replace(/\./g, '\\.')]); });
+  pairs.sort(function (a, b) { return b[0].length - a[0].length; });
+  var txt = JSON.stringify(lab);
+  pairs.forEach(function (p) { var f = JSON.stringify(p[0]).slice(1, -1), t = JSON.stringify(p[1]).slice(1, -1); txt = txt.split(f).join(t); });
+  var out = JSON.parse(txt); out.vary = lab.vary; return out;
+};
 T.newLab = function (lab, opts) {
   var w = JSON.parse(JSON.stringify(lab.world || {}));
   w.files = (w.files || []).concat(lab.files.map(function (f) { return { path: f.path, data: f.data, m: f.m, o: f.o, g: f.g, size: f.size }; }));
