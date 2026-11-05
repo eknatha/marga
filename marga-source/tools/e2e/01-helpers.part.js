@@ -8,6 +8,7 @@
       if (/\/counter\//.test(u)) return route.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: opts.counterBody || '{"count":"1 234"}' });
       hits.push(u); return route.fulfill({ status: 200, contentType: 'image/gif', body: Buffer.from('R0lGODlhAQABAAAAACw=', 'base64') });
     });
+    if (!opts.fresh) await ctx.addInitScript(() => { try { if (!localStorage.getItem('ea.me')) localStorage.setItem('ea.me', JSON.stringify({ n: 'Tester', c: 0, a: 'i' })); } catch (e) { /* ignore */ } });
     const page = await ctx.newPage();
     const issues = [];
     page.on('console', (m) => { if (m.type() === 'error') issues.push(`console: ${m.text()}`); });

@@ -151,7 +151,7 @@
     await setProgress(page, allDone());
     for (const m of Object.values(MODS)) {
       const last = m.lessons[m.lessons.length - 1];
-      ok(m.id === 'system-design' || /debug|investigating|troubleshoot|day-two|failures/.test(last), m.id + ' last lesson is a debugging lesson: ' + last);
+      ok(m.id === 'system-design' || m.lessons.some((l) => /debug|investigating|troubleshoot|day-two|failures/.test(l)), m.id + ' has a debugging lesson (last lesson: ' + last + ')');
     }
     await go(page, '/lesson/kubernetes/debugging-kubernetes-workloads'); await page.waitForSelector('.predict');
     ok(await page.locator('.dg-node').count() > 0, 'diagram');

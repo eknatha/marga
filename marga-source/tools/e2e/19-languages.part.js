@@ -3,7 +3,7 @@
     const { ctx, page, issues } = await open();
     await go(page, '/');
     await page.waitForSelector('#lang-pick');
-    eq(await page.$$eval('#lang-pick option', (o) => o.map((x) => x.value).join(',')), 'en,te,hi,ta,kn,ml,bn,es,de,fr,pt', 'eleven languages offered');
+    eq(await page.$$eval('#lang-pick option', (o) => o.map((x) => x.value).join(',')), 'en,te,hi,ta,kn,ml,bn,es,de,fr,pt,mr', 'twelve languages offered');
     await page.selectOption('#lang-pick', 'te');
     await page.waitForFunction(() => document.documentElement.lang === 'te');
     ok(/[ఀ-౿]/.test(await page.textContent('.topnav')), 'nav is in Telugu');
@@ -29,7 +29,7 @@
     const { ctx, page, issues } = await open();
     await go(page, '/'); await page.waitForSelector('#lang-pick');
     eq(await page.evaluate(() => getComputedStyle(document.querySelector('.hero-mark')).display), 'none', 'no foreign-script word on the English home');
-    const ranges = { te: /[\u0C00-\u0C7F]/, hi: /[\u0900-\u097F]/, ta: /[\u0B80-\u0BFF]/, kn: /[\u0C80-\u0CFF]/, ml: /[\u0D00-\u0D7F]/, bn: /[\u0980-\u09FF]/ };
+    const ranges = { te: /[\u0C00-\u0C7F]/, hi: /[\u0900-\u097F]/, ta: /[\u0B80-\u0BFF]/, kn: /[\u0C80-\u0CFF]/, ml: /[\u0D00-\u0D7F]/, bn: /[\u0980-\u09FF]/, mr: /[\u0900-\u097F]/ };
     for (const [code, re] of Object.entries(ranges)) {
       await page.selectOption('#lang-pick', code);
       await page.waitForFunction((c) => document.documentElement.lang === c, code);

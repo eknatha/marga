@@ -1156,9 +1156,9 @@ function checkI18n() {
   }
   stats['i18n lesson summaries'] = `${done} of ${Object.keys(A.lessons).length}`;
   stats['i18n ui strings'] = ui.entries.length;
-  const names = { ta: 'Tamil', kn: 'Kannada', ml: 'Malayalam', bn: 'Bengali', es: 'Spanish', de: 'German', fr: 'French', pt: 'Portuguese' };
-  const scr = { ta: /[\u0B80-\u0BFF]/, kn: /[\u0C80-\u0CFF]/, ml: /[\u0D00-\u0D7F]/, bn: /[\u0980-\u09FF]/, es: /[A-Za-z]/, de: /[A-Za-z]/, fr: /[A-Za-z]/, pt: /[A-Za-z]/ };
-  const full = new Set(['es', 'de', 'fr', 'pt', 'ta', 'kn', 'ml', 'bn']);
+  const names = { ta: 'Tamil', kn: 'Kannada', ml: 'Malayalam', bn: 'Bengali', es: 'Spanish', de: 'German', fr: 'French', pt: 'Portuguese', mr: 'Marathi' };
+  const scr = { ta: /[\u0B80-\u0BFF]/, kn: /[\u0C80-\u0CFF]/, ml: /[\u0D00-\u0D7F]/, bn: /[\u0980-\u09FF]/, es: /[A-Za-z]/, de: /[A-Za-z]/, fr: /[A-Za-z]/, pt: /[A-Za-z]/, mr: /[\u0900-\u097F]/ };
+  const full = new Set(['es', 'de', 'fr', 'pt', 'ta', 'kn', 'ml', 'bn', 'mr']);
   for (const lang of Object.keys(names)) {
     const fp = path.join(root, 'lang-' + lang + '.json');
     if (!fs.existsSync(fp)) { err('i18n', `${lang}: src/i18n/lang-${lang}.json is missing`); continue; }
@@ -1189,7 +1189,7 @@ function checkI18n() {
     for (const id of Object.keys(f.lessons)) if (!A.lessons[id]) err('i18n', `${lang}: unknown lesson id ${id}`);
     stats[`i18n ${lang} lesson summaries`] = `${nl} of ${Object.keys(A.lessons).length}`;
   }
-  const built = ['te', 'hi', 'ta', 'kn', 'ml', 'bn', 'es', 'de', 'fr', 'pt'].map((l) => path.join(DIST, 'assets', 'i18n', l + '.js'));
+  const built = ['te', 'hi', 'ta', 'kn', 'ml', 'bn', 'es', 'de', 'fr', 'pt', 'mr'].map((l) => path.join(DIST, 'assets', 'i18n', l + '.js'));
   for (const f of built) if (!fs.existsSync(f)) err('i18n', `${path.relative(ROOT, f)} was not built`);
   if (!/assets\/i18n\.js/.test(read(path.join(DIST, 'index.html')))) err('i18n', 'index.html does not load assets/i18n.js');
 }

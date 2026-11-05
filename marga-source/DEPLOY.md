@@ -227,3 +227,7 @@ Round 38: delete the old `assets` folder before uploading, then upload everythin
 Round 39: delete the old `assets` folder before uploading, then upload everything in the zip. No new files; `assets/i18n/ta.js`, `kn.js`, `ml.js`, `bn.js` are larger because they now carry all lesson summaries.
 
 Round 40: delete the old `assets` folder before uploading, then upload everything in the zip. No new files or settings.
+
+Round 41: delete the old `assets` folder before uploading, then upload everything in the zip. No new files or settings.
+
+Round 42: delete the old `assets` folder before uploading, then upload everything in the zip. No new files or settings.

@@ -159,6 +159,7 @@
     const errs = [];
     page.on('pageerror', (e) => errs.push(e.message));
     await page.goto(BASE + '/#/lesson/linux/filesystem-and-navigation');
+    await page.waitForSelector('#me-dlg .me-card'); await page.fill('#me-name', 'Temp'); await page.click('[data-me=save]'); await page.waitForSelector('#me-dlg', { state: 'detached' });
     await page.waitForSelector('#qstart');
     await takeQuiz(page, 'linux/filesystem-and-navigation', 0);
     await page.waitForSelector('.result.pass');

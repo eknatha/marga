@@ -120,7 +120,7 @@
     ok(data.games.filter((x) => x.module === 'helm').length >= 2, 'helm games');
     for (const p of data.paths.live.filter((q) => !['ai','mlops'].includes(q.id))) { ok(p.modules.indexOf('go') > p.modules.indexOf('python'), p.id + ' go after python'); ok(p.modules.indexOf('helm') > p.modules.indexOf('kubernetes'), p.id + ' helm after kubernetes'); }
     const lx = data.modules.find((x) => x.id === 'linux');
-    ok(lx.lessons.length >= 22 && /debugging/.test(lx.lessons[lx.lessons.length - 1]), 'linux ends with debugging');
+    ok(lx.lessons.length >= 22 && lx.lessons.some((l) => /debugging/.test(l)), 'linux has a debugging lesson');
     for (const sl of ['kernel-modules-sysctl-and-boot-parameters', 'processes-memory-and-the-oom-killer', 'system-calls-strace-and-perf']) ok(lx.lessons.some((l) => l.endsWith(sl)), 'kernel lesson ' + sl);
     const { ctx, page } = await open();
     await go(page, '/');

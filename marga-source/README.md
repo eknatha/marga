@@ -292,3 +292,32 @@ A language picker sits in the top bar. The interface, module titles and summarie
 - Rename or change the avatar any time. "Remove callsign" asks twice. Reset all progress keeps the callsign.
 - Export includes the callsign and import restores it.
 - New greeting and dialog strings are English only for now; names are never translated.
+
+## Round 41: callsign is required on first visit
+
+- First visit (no `ea.me` in localStorage): a full-screen "Choose your callsign" gate opens over whatever page was requested. There is no Cancel, no Escape and no backdrop dismiss; the page behind is `inert`.
+- **Suggest one** fills a random handle such as `quiet-kernel-42`; avatar and colour are pre-picked at random. Validation is 2 to 24 characters, shown inline.
+- Deep links are kept: after **Start learning** the requested page is shown.
+- Returning visitors with a stored callsign never see the gate. Visitors who already had progress but no callsign see it once.
+- "Remove callsign" is gone; the dialog is now **Change callsign** (same dialog, with Cancel). Resetting progress keeps the callsign.
+- If storage is blocked the name is kept in memory for the session, so the gate never loops.
+- Privacy line shown in the dialog: "Privacy Assured: Feel free to use your name or a preferred alias. This identity token remains local to your active session and is never stored on external databases."
+- Header: callsign name text hides below 1400px and the avatar button is compact there (it overflowed in Bengali at 1280px with the visitor counter).
+- Tests: `tools/e2e/20-callsign.part.js`; the `open()` helper pre-seeds a callsign unless `{ fresh: true }`.
+
+## Round 42: seven new topic areas, Marathi, translated gate
+
+- 42 new lessons inside existing modules (400 lessons in total, 1,600 quiz questions):
+  - Linux troubleshooting playbook (6): `linux/23`-`28`
+  - Python for SRE automation (6): `python/11`-`16`
+  - DNS, TLS and PKI deep dive (6): `networking/13`-`18`
+  - Cloud cost and FinOps (6): `cloud/16`-`21`
+  - Disaster recovery and backups (6): `storage/06`-`11`
+  - Virtualization operations (3): `virtualization/06`-`08`; OpenStack operations (3): `openstack/06`-`08`
+  - Soft skills for senior roles (6): `sre/14`-`19`
+- Every new lesson has references, levels, story fields, and a summary in all 11 non-English languages.
+- Marathi (`mr`) added as the 12th language: `src/i18n/lang-mr.json` (interface, patterns, modules, paths, all 400 lesson summaries).
+- The callsign gate, privacy line, errors, toast and header label are translated in every language (38 strings and 3 patterns added to each language file).
+- Fix: saving a callsign (or resetting progress) while a non-English language was active left the page in English until the next navigation. The language picker was re-inserted with a synchronous run that discarded the pending DOM records. It now queues the work.
+- Tests: `tools/e2e/20-callsign.part.js` checks the gate in all 12 languages; `19-languages.part.js` includes Marathi.
+

@@ -5,7 +5,7 @@ const path = require('path');
 
 const LANGS = ['te', 'hi'];
 /* later languages keep one file each: src/i18n/lang-<code>.json = { ui: [[en, tr]], pats: [[regex, tr]], modules: {id: {title, summary}}, paths: {id: {summary, audience}}, lessons: {id: tr} } */
-const MORE = ['ta', 'kn', 'ml', 'bn', 'es', 'de', 'fr', 'pt'];
+const MORE = ['ta', 'kn', 'ml', 'bn', 'es', 'de', 'fr', 'pt', 'mr'];
 const ALL = LANGS.concat(MORE);
 const readJson = (root, f, dflt) => { const p = path.join(root, 'i18n', f); return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : dflt; };
 

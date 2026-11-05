@@ -27,6 +27,7 @@
 
   await test('copy buttons put the command text on the clipboard', async () => {
     const ctx = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'], serviceWorkers: 'block' });
+    await ctx.addInitScript(() => { try { localStorage.setItem('ea.me', JSON.stringify({ n: 'Tester', c: 0, a: 'i' })); } catch (e) { /* ignore */ } });
     const page = await ctx.newPage();
     await page.goto(BASE + '/#/lesson/linux/filesystem-and-navigation');
     await page.waitForSelector('.code .copy');
