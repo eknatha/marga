@@ -126,10 +126,10 @@
     }
   });
 
-  await test('learning plans: seven plans (five of 30 days and two 100-day challenges), current day open, ticks persist and clear, phone width, axe in both themes', async () => {
+  await test('learning plans: nine plans (five of 30 days, two of 60 and two 100-day challenges), current day open, ticks persist and clear, phone width, axe in both themes', async () => {
     for (const dark of [false, true]) {
       const { ctx, page, issues } = await open({ dark }); await go(page, '/plans'); await page.waitForSelector('.plan-card');
-      eq(await page.locator('.plan-card').count(), 7, 'seven plans');
+      eq(await page.locator('.plan-card').count(), 9, 'nine plans');
       await nav(page, '/plan/sre-30'); await page.waitForSelector('.plan-day');
       eq(await page.locator('.plan-day').count(), 30, '30 days');
       eq(await page.locator('.plan-day.current[open]').count(), 1, 'current day open');
@@ -144,7 +144,7 @@
         eq(after, 0, 'clear removes ticks');
       }
       await page.addScriptTag({ content: AXE });
-      for (const r of ['/plans', '/plan/kubernetes-30', '/plan/devops-100', '/plan/sre-100']) {
+      for (const r of ['/plans', '/plan/kubernetes-30', '/plan/devops-100', '/plan/sre-100', '/plan/sre-60', '/plan/devops-60']) {
         await nav(page, '/practice'); await nav(page, r); await page.waitForSelector('.plan-card, .plan-day');
         const v = await page.evaluate(async () => (await window.axe.run(document, { resultTypes: ['violations'] })).violations.filter((x) => x.impact === 'serious' || x.impact === 'critical').map((x) => x.id));
         eq(v.length, 0, (dark ? 'dark ' : 'light ') + r + ' ' + v.join(','));
@@ -235,7 +235,7 @@
     await page.waitForSelector('.ex-list a');
     eq(await page.locator('.ex-list a').count(), data.modules.length, 'one handbook per skill');
     await nav(page, '/handbook/aiops'); await page.waitForSelector('#hb-dl');
-    eq(await page.locator('.hb-lesson').count(), 7, 'aiops lessons in the handbook');
+    eq(await page.locator('.hb-lesson').count(), 12, 'aiops lessons in the handbook');
     ok(await page.locator('#hb-doc .hb-gloss dt').count() >= 4, 'glossary in the handbook');
     ok(await page.locator('#hb-doc [id]').count() === 0, 'no duplicate ids from reused lessons');
     const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#hb-dl')]);

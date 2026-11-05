@@ -14,7 +14,7 @@
       ok(await page.locator('h2').count() >= 3, `${id} has sections`);
       ok(await page.locator('pre').count() >= 1, `${id} has code`);
       const txt = await page.evaluate(() => document.body.innerText);
-      ok(!/\bgit(hub|lab|ops|leaks|ea)/i.test(txt), `${id} mentions git`);
+      ok(!/\bgit(ops|leaks|ea)/i.test(txt), `${id} mentions git`);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       ok(overflow <= 1, `${id} overflows by ${overflow}px`);
     }

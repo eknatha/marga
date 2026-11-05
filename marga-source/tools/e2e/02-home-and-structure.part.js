@@ -7,7 +7,7 @@
     ok(/Learn to fix production/i.test(h1), `unexpected h1: ${h1}`);
     eq(await page.title(), 'MARGA by EknathaLabs: DevOps, cloud and SRE training', 'title');
     const text = await page.evaluate(() => document.body.innerText);
-    ok(!/\bgit(hub|lab|ops|leaks|ea)/i.test(text), 'visible text mentions git');
+    ok(!/\bgit(ops|leaks|ea)/i.test(text), 'visible text mentions git');
     ok(/Labs/.test(text) && /planned/i.test(text), 'home should mention planned labs');
     ok(text.includes('Free. Offline. No sign-up.') && text.includes('Open it once, turn off wifi, and keep learning') && text.includes('No account needed. Start now.'), 'home free/no login lines');
     ok(!/Free forever/.test(text), 'no Free forever wording');

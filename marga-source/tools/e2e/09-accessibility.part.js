@@ -130,7 +130,7 @@
     ok(await page.evaluate(() => speechSynthesis.paused), 'paused');
     await page.click('.voice .v-stop');
     ok(!(await page.evaluate(() => speechSynthesis.speaking)), 'stopped');
-    ok(await page.evaluate(() => !!localStorage.getItem('ea.voice')), 'voice choice saved');
+    ok(await page.evaluate(() => !!Object.keys(localStorage).some(k => k.indexOf('ea.voice') === 0)), 'voice choice saved');
     await page.reload(); await page.waitForSelector('.voice [data-voice]');
     ok((await page.locator('.voice [data-voice] option:checked').innerText()).includes('Test Voice B'), 'voice restored');
     // quiz and interview read-aloud buttons

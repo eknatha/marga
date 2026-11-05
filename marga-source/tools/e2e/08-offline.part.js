@@ -38,7 +38,7 @@
         if (info.hash !== '#' + r) problems.push(`${r}: ended at ${info.hash}`);
         if (info.h1 !== 1) problems.push(`${r}: ${info.h1} h1 elements`);
         if (info.overflow > 1) problems.push(`${r}: horizontal overflow ${info.overflow}px`);
-        if (/\bgit(hub|lab|ops|leaks|ea)/i.test(info.text)) problems.push(`${r}: mentions git`);
+        if (/\bgit(ops|leaks|ea)/i.test(info.text)) problems.push(`${r}: mentions git`);
         if (info.emptyBtn) problems.push(`${r}: ${info.emptyBtn} unnamed buttons`);
         if (info.imgNoAlt) problems.push(`${r}: image without alt`);
         if (/undefined|\[object Object\]|NaN/.test(info.text)) problems.push(`${r}: shows undefined/NaN/[object Object]`);

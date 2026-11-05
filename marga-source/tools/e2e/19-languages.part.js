@@ -3,7 +3,7 @@
     const { ctx, page, issues } = await open();
     await go(page, '/');
     await page.waitForSelector('#lang-pick');
-    eq(await page.$$eval('#lang-pick option', (o) => o.map((x) => x.value).join(',')), 'en,te,hi,ta,kn,ml,bn,es,de,fr,pt,mr', 'twelve languages offered');
+    eq(await page.$$eval('#lang-pick option', (o) => o.map((x) => x.value).join(',')), 'en,te,hi,ta,kn,ml,bn,es,de,fr,pt,mr,id,gu,ru', 'fifteen languages offered');
     await page.selectOption('#lang-pick', 'te');
     await page.waitForFunction(() => document.documentElement.lang === 'te');
     ok(/[ఀ-౿]/.test(await page.textContent('.topnav')), 'nav is in Telugu');
@@ -29,7 +29,7 @@
     const { ctx, page, issues } = await open();
     await go(page, '/'); await page.waitForSelector('#lang-pick');
     eq(await page.evaluate(() => getComputedStyle(document.querySelector('.hero-mark')).display), 'none', 'no foreign-script word on the English home');
-    const ranges = { te: /[\u0C00-\u0C7F]/, hi: /[\u0900-\u097F]/, ta: /[\u0B80-\u0BFF]/, kn: /[\u0C80-\u0CFF]/, ml: /[\u0D00-\u0D7F]/, bn: /[\u0980-\u09FF]/, mr: /[\u0900-\u097F]/ };
+    const ranges = { te: /[\u0C00-\u0C7F]/, hi: /[\u0900-\u097F]/, ta: /[\u0B80-\u0BFF]/, kn: /[\u0C80-\u0CFF]/, ml: /[\u0D00-\u0D7F]/, bn: /[\u0980-\u09FF]/, mr: /[\u0900-\u097F]/, gu: /[\u0A80-\u0AFF]/, ru: /[\u0400-\u04FF]/ };
     for (const [code, re] of Object.entries(ranges)) {
       await page.selectOption('#lang-pick', code);
       await page.waitForFunction((c) => document.documentElement.lang === c, code);
@@ -40,7 +40,7 @@
       ok(re.test(await page.textContent('.roles')), code + ': role cards are translated');
       eq(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1), true, code + ': no sideways scroll');
     }
-    const latin = { es: 'Aprende', de: 'Lerne', fr: 'Apprenez', pt: 'Aprenda' };
+    const latin = { es: 'Aprende', de: 'Lerne', fr: 'Apprenez', pt: 'Aprenda', id: 'Belajar' };
     for (const [code, word] of Object.entries(latin)) {
       await page.selectOption('#lang-pick', code);
       await page.waitForFunction((c) => document.documentElement.lang === c, code);

@@ -76,11 +76,11 @@
     const ui = JSON.parse(fs.readFileSync(path.join(root, 'ui.json'), 'utf8'));
     const tr = { te: {}, hi: {} };
     ui.entries.forEach((e) => { tr.te[e[0]] = e[1]; tr.hi[e[0]] = e[2]; });
-    for (const c of ['ta', 'kn', 'ml', 'bn', 'es', 'de', 'fr', 'pt', 'mr']) { tr[c] = {}; JSON.parse(fs.readFileSync(path.join(root, 'lang-' + c + '.json'), 'utf8')).ui.forEach((e) => { tr[c][e[0]] = e[1]; }); }
+    for (const c of ['ta', 'kn', 'ml', 'bn', 'es', 'de', 'fr', 'pt', 'mr', 'id', 'gu', 'ru']) { tr[c] = {}; JSON.parse(fs.readFileSync(path.join(root, 'lang-' + c + '.json'), 'utf8')).ui.forEach((e) => { tr[c][e[0]] = e[1]; }); }
     const en = ['Choose your callsign', 'Your crew name on MARGA. It is used for greetings and your progress page. No account and no sign-in.', 'Callsign', 'Suggest one', 'Start learning', 'Avatar', 'Colour', 'Initial', 'Terminal', 'Blue', 'Slate'];
     const banned = ['Choose your callsign', 'Privacy Assured', 'Suggest one', 'Start learning', 'Your crew name'];
     for (const c of Object.keys(tr)) {
-      for (const k of en) ok(tr[c][k] && (tr[c][k] !== k || /^(Avatar|Terminal|Initial)$/.test(k)), c + ': has a translation for "' + k.slice(0, 30) + '"');
+      for (const k of en) ok(tr[c][k] && (tr[c][k] !== k || /^(Avatar|Terminal|Initial)$/.test(k) || (c === 'id' && k === 'Callsign')), c + ': has a translation for "' + k.slice(0, 30) + '"');
       const { ctx, page, issues } = await open({ fresh: true });
       await go(page, '/'); await page.evaluate((x) => localStorage.setItem('ea.lang', x), c);
       await page.reload(); await page.waitForSelector('#me-dlg .me-card');

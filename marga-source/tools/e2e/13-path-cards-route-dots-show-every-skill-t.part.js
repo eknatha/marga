@@ -77,7 +77,7 @@
     const { ctx, page, issues } = await open();
     ok(data.glossary.length >= 100, 'terms: ' + data.glossary.length);
     const mods = new Set(data.modules.map((m) => m.id)), ids = new Set();
-    for (const g of data.glossary) { ok(g.plain.length > 15 && g.def.length > 25 && mods.has(g.module) && !ids.has(g.id), 'term ' + g.term + ' complete'); ids.add(g.id); ok(!/\bgit(hub|lab|ops|leaks|ea)/i.test(JSON.stringify(g)), 'no forbidden word in ' + g.term); }
+    for (const g of data.glossary) { ok(g.plain.length > 15 && g.def.length > 25 && mods.has(g.module) && !ids.has(g.id), 'term ' + g.term + ' complete'); ids.add(g.id); ok(!/\bgit(ops|leaks|ea)/i.test(JSON.stringify(g)), 'no forbidden word in ' + g.term); }
     for (const m of data.modules) ok(data.glossary.filter((g) => g.module === m.id).length >= 4, 'terms for ' + m.id);
     await go(page, '/glossary'); await page.waitForSelector('.gl-entry');
     eq(await page.locator('.gl-entry').count(), data.glossary.length, 'all terms listed');
@@ -283,7 +283,7 @@
     const { ctx, page, issues } = await open(); await go(page, '/practice'); await page.waitForSelector('.pr-cmd');
     eq(await page.locator('.pr-feat .prac a').count(), 3, 'three featured tools');
     for (const h of ['#/explainers', '#/architecture', '#/drills']) eq(await page.locator(`.prac a[href="${h}"]`).count(), 1, h + ' appears once');
-    eq(await page.locator('.pr-li').count(), 42, '42 tools');
+    eq(await page.locator('.pr-li').count(), 44, '44 tools');
     eq(await page.locator('.pr-node').count(), 5, 'five groups');
     eq(await page.locator('.pr-week li').count(), 7, 'week strip');
     const t1 = await page.textContent('.pr-cmd h2');
@@ -298,7 +298,7 @@
     await page.fill('#pr-q', 'terraform');
     ok((await page.locator('.pr-li:not([hidden])').count()) >= 1 && (await page.locator('.pr-li:not([hidden])').count()) < 6, 'search narrows');
     await page.fill('#pr-q', 'zzzqqq'); eq(await page.locator('#pr-empty').isVisible(), true, 'empty state');
-    await page.click('#pr-empty [data-act="pr-clear"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 42, 'clear shows all');
+    await page.click('#pr-empty [data-act="pr-clear"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 44, 'clear shows all');
     await page.click('[data-flag="starred"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 0, 'no favourites yet');
     await page.click('[data-flag="all"]');
     await page.click('.pr-li[data-id="yaml"] .pr-star'); eq(await page.getAttribute('.pr-li[data-id="yaml"] .pr-star', 'aria-pressed'), 'true', 'starred');

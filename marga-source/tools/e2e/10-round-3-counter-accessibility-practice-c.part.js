@@ -337,7 +337,7 @@
     const links = await page.locator('#topnav > a').allInnerTexts();
     eq(links.join('|'), 'Skills|Skill trees|Practice|Real Linux labs|Progress|Interview questions|About', 'nav order');
     await nav(page, '/practice');
-    eq(await page.locator('.prac li').count(), 42, 'hub cards');
+    eq(await page.locator('.prac li').count(), 44, 'hub cards');
     for (const href of ['#/drills', '#/interview/mock', '#/flashcards', '#/cases', '#/architecture', '#/calculators', '#/review', '#/terminal-labs']) ok(await page.locator(`.prac a[href="${href}"]`).count() === 1, 'hub links to ' + href);
     await nav(page, '/module/kubernetes');
     ok(await page.locator('a[href="#/drills/kubernetes"]').count() === 1 && await page.locator('a[href="#/cases/kubernetes"]').count() === 1, 'module page links to practice');
