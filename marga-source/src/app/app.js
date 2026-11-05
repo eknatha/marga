@@ -81,7 +81,7 @@ function meAv(me, cls) {
 function meHello() { var h = new Date().getHours(); return h < 12 ? 'Good morning' : (h < 17 ? 'Good afternoon' : 'Good evening'); }
 function meGreet() {
   var me = meGet();
-  if (!me.n) return '<p class="greet greet-ask"><button class="linkish" type="button" data-act="me">Add a callsign</button> <span>to continue. It stays on this device.</span></p>';
+  if (!me.n) return '<p class="greet greet-ask"><button class="linkish" type="button" data-act="me">Choose a callsign</button> <span>It stays on this device.</span></p>';
   return '<p class="greet">' + meAv(me, 'sm') + '<span>' + meHello() + ',</span> <b translate="no">' + e(me.n) + '</b>. <button class="linkish" type="button" data-act="me">Change callsign</button></p>';
 }
 function meBtn() {
@@ -110,13 +110,16 @@ function meDialog(opener, gate) {
   function colorBtns() {
     return ME_COLORS.map(function (c, i) { return '<button type="button" role="radio" class="me-pick me-sw' + (draft.c === i ? ' on' : '') + '" data-me-c="' + i + '" aria-checked="' + (draft.c === i) + '" aria-label="' + ME_COLOR_NAMES[i] + '"><span style="background:' + c + '"></span></button>'; }).join('');
   }
+  function prevHtml() {
+    return meAv({ n: draft.n || 'A', c: draft.c, a: draft.a }, 'lg') + (draft.n ? '<span class="me-prev-n" translate="no">' + e(draft.n) + '</span>' : '<span class="me-prev-n">Your callsign</span>');
+  }
   function paint() {
     $('#me-ga', wrap).innerHTML = glyphBtns(); $('#me-gc', wrap).innerHTML = colorBtns();
-    $('#me-prev', wrap).innerHTML = meAv({ n: draft.n || 'A', c: draft.c, a: draft.a }, 'lg') + '<span class="me-prev-n" translate="no">' + e(draft.n || 'Your callsign') + '</span>';
+    $('#me-prev', wrap).innerHTML = prevHtml();
   }
   wrap.innerHTML = '<div class="me-back"' + (gate ? '' : ' data-me-close="1"') + '></div><div class="me-card" role="dialog" aria-modal="true" aria-labelledby="me-h" aria-describedby="me-d">' +
     '<h2 id="me-h">' + (gate ? 'Choose your callsign' : 'Change callsign') + '</h2>' +
-    '<p class="small" id="me-d">' + (gate ? 'Your crew name on MARGA. It is used for greetings and your progress page. ' : 'Change your name or avatar. ') + 'No account and no sign-in.</p>' +
+    '<p class="small" id="me-d">' + (gate ? 'Your crew name on MARGA. It is used for greetings and your progress page. No account and no sign-in.' : 'Change your name or avatar. No account and no sign-in.') + '</p>' +
     '<p class="me-priv small">' + e(ME_PRIVACY) + '</p>' +
     '<div class="me-prev" id="me-prev"></div>' +
     '<label class="me-f" for="me-name">Callsign<span class="me-in"><input id="me-name" type="text" maxlength="24" autocomplete="off" spellcheck="false" value="' + e(me.n) + '" placeholder="For example, Ravi" aria-describedby="me-err"><button class="btn btn-quiet" type="button" data-me="suggest">Suggest one</button></span></label>' +
@@ -139,7 +142,7 @@ function meDialog(opener, gate) {
     else if (!ev.shiftKey && document.activeElement === f[f.length - 1]) { ev.preventDefault(); f[0].focus(); }
   }
   document.addEventListener('keydown', onKey, true);
-  inp.addEventListener('input', function () { $('#me-err', wrap).textContent = ''; draft.n = meClean(inp.value); $('#me-prev', wrap).innerHTML = meAv({ n: draft.n || 'A', c: draft.c, a: draft.a }, 'lg') + '<span class="me-prev-n" translate="no">' + e(draft.n || 'Your callsign') + '</span>'; });
+  inp.addEventListener('input', function () { $('#me-err', wrap).textContent = ''; draft.n = meClean(inp.value); $('#me-prev', wrap).innerHTML = prevHtml(); });
   wrap.addEventListener('click', function (ev) {
     var t = ev.target;
     if (t.closest('[data-me-close]')) { close(); return; }

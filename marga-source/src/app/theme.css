@@ -147,10 +147,10 @@ h1, h2, h3, h4 { letter-spacing: -.022em; }
   --serif: "Source Serif 4", "Noto Sans Telugu", "Noto Sans Devanagari", "Noto Sans Tamil", "Noto Sans Kannada", "Noto Sans Malayalam", "Noto Sans Bengali", "Iowan Old Style", Georgia, serif;
 }
 /* tight letter-spacing and short line-height break Indic conjuncts and vowel signs */
-html[data-lang="te"] *, html[data-lang="hi"] *, html[data-lang="ta"] *, html[data-lang="kn"] *, html[data-lang="ml"] *, html[data-lang="bn"] * { letter-spacing: 0 !important; }
-html[data-lang="te"] h1, html[data-lang="te"] h2, html[data-lang="te"] h3, html[data-lang="te"] h4, html[data-lang="hi"] h1, html[data-lang="hi"] h2, html[data-lang="hi"] h3, html[data-lang="hi"] h4, html[data-lang="ta"] h1, html[data-lang="ta"] h2, html[data-lang="ta"] h3, html[data-lang="ta"] h4, html[data-lang="kn"] h1, html[data-lang="kn"] h2, html[data-lang="kn"] h3, html[data-lang="kn"] h4, html[data-lang="ml"] h1, html[data-lang="ml"] h2, html[data-lang="ml"] h3, html[data-lang="ml"] h4, html[data-lang="bn"] h1, html[data-lang="bn"] h2, html[data-lang="bn"] h3, html[data-lang="bn"] h4 { line-height: 1.4; }
-html[data-lang="te"] body, html[data-lang="hi"] body, html[data-lang="ta"] body, html[data-lang="kn"] body, html[data-lang="ml"] body, html[data-lang="bn"] body { line-height: 1.7; }
-html[data-lang="te"] .btn, html[data-lang="hi"] .btn, html[data-lang="ta"] .btn, html[data-lang="kn"] .btn, html[data-lang="ml"] .btn, html[data-lang="bn"] .btn { line-height: 1.5; }
+html[data-lang="te"] *, html[data-lang="hi"] *, html[data-lang="mr"] *, html[data-lang="ta"] *, html[data-lang="kn"] *, html[data-lang="ml"] *, html[data-lang="bn"] * { letter-spacing: 0 !important; }
+html[data-lang="te"] h1, html[data-lang="te"] h2, html[data-lang="te"] h3, html[data-lang="te"] h4, html[data-lang="hi"] h1, html[data-lang="mr"] h1, html[data-lang="hi"] h2, html[data-lang="mr"] h2, html[data-lang="hi"] h3, html[data-lang="mr"] h3, html[data-lang="hi"] h4, html[data-lang="mr"] h4, html[data-lang="ta"] h1, html[data-lang="ta"] h2, html[data-lang="ta"] h3, html[data-lang="ta"] h4, html[data-lang="kn"] h1, html[data-lang="kn"] h2, html[data-lang="kn"] h3, html[data-lang="kn"] h4, html[data-lang="ml"] h1, html[data-lang="ml"] h2, html[data-lang="ml"] h3, html[data-lang="ml"] h4, html[data-lang="bn"] h1, html[data-lang="bn"] h2, html[data-lang="bn"] h3, html[data-lang="bn"] h4 { line-height: 1.4; }
+html[data-lang="te"] body, html[data-lang="hi"] body, html[data-lang="mr"] body, html[data-lang="ta"] body, html[data-lang="kn"] body, html[data-lang="ml"] body, html[data-lang="bn"] body { line-height: 1.7; }
+html[data-lang="te"] .btn, html[data-lang="hi"] .btn, html[data-lang="mr"] .btn, html[data-lang="ta"] .btn, html[data-lang="kn"] .btn, html[data-lang="ml"] .btn, html[data-lang="bn"] .btn { line-height: 1.5; }
 .lang-pick { display: inline-flex; align-items: center; }
 .lang-pick select { min-height: 44px; padding: 0 28px 0 12px; border-radius: var(--r-ctl); border: 2px solid var(--line-strong); background: var(--surface); color: var(--ink); font: 600 .95rem var(--sans); cursor: pointer; }
 .lang-pick select:hover { border-color: var(--ink); }
@@ -164,7 +164,7 @@ html.nav-fold .topnav a { padding: 12px 10px; font-size: 1rem; }
 /* the brand word in another script belongs to those languages only; English shows the plain wordmark */
 html:not([data-lang]) .hero-mark, html[data-lang="en"] .hero-mark, html[data-lang="es"] .hero-mark, html[data-lang="de"] .hero-mark, html[data-lang="fr"] .hero-mark, html[data-lang="pt"] .hero-mark { display: none; }
 /* long Indic words in the home headline must fit their column */
-html[data-lang="te"] .hero2 h1, html[data-lang="hi"] .hero2 h1, html[data-lang="ta"] .hero2 h1, html[data-lang="kn"] .hero2 h1, html[data-lang="ml"] .hero2 h1, html[data-lang="bn"] .hero2 h1 { font-size: clamp(1.7rem, 3.2vw, 2.4rem); overflow-wrap: anywhere; hyphens: auto; }
+html[data-lang="te"] .hero2 h1, html[data-lang="hi"] .hero2 h1, html[data-lang="mr"] .hero2 h1, html[data-lang="ta"] .hero2 h1, html[data-lang="kn"] .hero2 h1, html[data-lang="ml"] .hero2 h1, html[data-lang="bn"] .hero2 h1 { font-size: clamp(1.7rem, 3.2vw, 2.4rem); overflow-wrap: anywhere; hyphens: auto; }
 /* role tabs wrap instead of running off the page */
 .tabs { flex-wrap: wrap; max-width: 100%; }
 .tab { white-space: normal; text-align: left; }

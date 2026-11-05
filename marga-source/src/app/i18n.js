@@ -5,8 +5,8 @@
 (function () {
   'use strict';
   var KEY = 'ea.lang';
-  var LANGS = [['en', 'English'], ['te', 'తెలుగు'], ['hi', 'हिन्दी'], ['ta', 'தமிழ்'], ['kn', 'ಕನ್ನಡ'], ['ml', 'മലയാളം'], ['bn', 'বাংলা'], ['es', 'Español'], ['de', 'Deutsch'], ['fr', 'Français'], ['pt', 'Português']];
-  var MARK = { te: '\u0C2E\u0C3E\u0C30\u0C4D\u0C17', hi: '\u092E\u093E\u0930\u094D\u0917', ta: '\u0BAE\u0BBE\u0BB0\u0BCD\u0B95\u0BCD\u0B95\u0BAE\u0BCD', kn: '\u0CAE\u0CBE\u0CB0\u0CCD\u0C97', ml: '\u0D2E\u0D3E\u0D7C\u0D17\u0D02', bn: '\u09AE\u09BE\u09B0\u09CD\u0997' };
+  var LANGS = [['en', 'English'], ['te', 'తెలుగు'], ['hi', 'हिन्दी'], ['ta', 'தமிழ்'], ['kn', 'ಕನ್ನಡ'], ['ml', 'മലയാളം'], ['bn', 'বাংলা'], ['es', 'Español'], ['de', 'Deutsch'], ['fr', 'Français'], ['pt', 'Português'], ['mr', 'मराठी']];
+  var MARK = { te: '\u0C2E\u0C3E\u0C30\u0C4D\u0C17', hi: '\u092E\u093E\u0930\u094D\u0917', mr: '\u092E\u093E\u0930\u094D\u0917', ta: '\u0BAE\u0BBE\u0BB0\u0BCD\u0B95\u0BCD\u0B95\u0BAE\u0BCD', kn: '\u0CAE\u0CBE\u0CB0\u0CCD\u0C97', ml: '\u0D2E\u0D3E\u0D7C\u0D17\u0D02', bn: '\u09AE\u09BE\u09B0\u09CD\u0997' };
   var SKIP = 'pre, code, kbd, .tb, .prose, .tl-term, .tl-termwrap, .vm-term, .vmx-term, .xterm, script, style, textarea, svg text, [data-no-i18n], [translate="no"], .hero-mark';
   var ATTRS = ['placeholder', 'aria-label', 'title', 'alt'];
   var cur = 'en', data = null, busy = false, queue = [], pending = false, obs = null;
@@ -146,7 +146,8 @@
     sel.addEventListener('change', function () { set(sel.value); });
     wrap.appendChild(lab); wrap.appendChild(sel);
     tools.insertBefore(wrap, tools.firstChild);
-    if (cur !== 'en') run([lab]);
+    /* queue it: a synchronous run() here would drop the pending records of a header re-render (callsign save, progress reset) and leave the page in English */
+    if (cur !== 'en') schedule([lab]);
   }
 
   /* fold the top menu into the Menu button when it would not fit (long labels, a language picker, a narrow window) */
