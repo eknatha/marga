@@ -1430,5 +1430,173 @@
  "service-mesh/observing-and-troubleshooting-the-mesh": {
   "s": "The helper beside each service writes down every call it sees, so you can tell which hop failed and why.",
   "i": "Use proxy-status to check config sync, analyze to check configuration, and response flags in proxy logs to place the failure. Follow a fixed method before changing anything."
+ },
+ "linux/troubleshooting-playbook-method-and-first-five-minutes": {
+  "s": "A doctor asks questions and takes vital signs before prescribing anything. Troubleshooting a server works the same way: look first, then act.",
+  "i": "I ask what changed and who is affected, then apply the USE method to CPU, memory, disk and network, checking dmesg, vmstat, iostat and ss before I change one thing at a time."
+ },
+ "linux/troubleshooting-playbook-high-load-and-cpu-saturation": {
+  "s": "Load average is like the queue at a bank: it counts people waiting and people being served, not just how busy the tellers are.",
+  "i": "I compare load with the core count, split CPU time into user, system, iowait and steal, find the busy thread with top -H or pidstat, and only then decide to fix, limit or scale."
+ },
+ "linux/troubleshooting-playbook-memory-pressure-swap-and-the-oom-killer": {
+  "s": "Linux uses spare memory as a desk for papers it might need again. A full desk is normal; a desk with no room to work is the problem.",
+  "i": "I read the available figure, not free, check vmstat for swap in and out, and look in dmesg or the journal for OOM kills. For containers I compare the working set with the cgroup limit."
+ },
+ "linux/troubleshooting-playbook-disk-full-inodes-and-io-stalls": {
+  "s": "A disk can be full of space or full of name tags. Many tiny files can use up all the labels even when the shelves still have room.",
+  "i": "I check df for space and df -i for inodes, use du with -x to find big directories, look for deleted-but-open files with lsof +L1, and read iostat await and queue size for slow disks."
+ },
+ "linux/troubleshooting-playbook-network-drops-and-slow-connections": {
+  "s": "When a parcel is late, you check each stage: the van, the sorting depot, the street address. Check a network path layer by layer in the same way.",
+  "i": "I check interface errors with ip -s link and ethtool, retransmits with nstat and ss -ti, path MTU with a do-not-fragment ping, and time DNS, connect and TLS separately with curl."
+ },
+ "linux/troubleshooting-playbook-boot-failures-and-services-that-wont-start": {
+  "s": "A reboot is a stress test of every promise you made to the system. Things you forgot about show up when the power comes back.",
+  "i": "I read systemctl status and the full journalctl for the boot, use systemd-analyze blame and critical-chain for slow starts, and fix fstab with UUIDs and nofail when a mount drops the system into emergency mode."
+ },
+ "python/sre-automation-aws-with-boto3-safely": {
+  "s": "A script that can delete cloud resources is like a power tool: safe habits matter more than speed. Read the label, test on scrap, then cut.",
+  "i": "I use named profiles or assumed roles, set the region explicitly, paginate every list call, select by tags, default to a dry run with an explicit apply flag, and print the caller identity first."
+ },
+ "python/sre-automation-kubernetes-client-scripts-and-reports": {
+  "s": "kubectl is for people reading a screen. The Python client is for programs that need facts in a form they can count and compare.",
+  "i": "I load the in-cluster or kubeconfig credentials, list pods with paging, read container statuses and resource settings as objects, and use a read-only service account that handles 403, 404 and 429 errors."
+ },
+ "python/sre-automation-retries-backoff-timeouts-and-idempotency": {
+  "s": "If you knock and nobody answers, you wait a bit longer each time, not hammer the door. Machines should behave the same way, with a limit.",
+  "i": "I set connect and read timeouts on every call, retry only transient errors with exponential backoff and jitter, honor Retry-After, cap attempts and time, and make writes idempotent with keys or existence checks."
+ },
+ "python/sre-automation-parsing-logs-and-building-incident-timelines": {
+  "s": "A detective lines up witness statements by time. A timeline script does the same with logs from many systems.",
+  "i": "I parse lines defensively, count the ones that fail, group messages by replacing ids with placeholders, stream large files, convert every timestamp to UTC and merge sources into one sorted list."
+ },
+ "python/sre-automation-chatops-alert-handlers-and-webhooks": {
+  "s": "A chat bot with a button that restarts servers is useful and dangerous, like giving a stranger a key. Check who they are and what they may open.",
+  "i": "I verify webhook signatures with an HMAC and constant-time comparison, deduplicate by fingerprint, post structured messages with links, and allow only approved actions with approvals and an audit line."
+ },
+ "python/sre-automation-safe-bulk-operations-and-audit-trails": {
+  "s": "Painting one room is a chore. Painting every room in a hotel needs a plan, a test patch and a way to stop when the colour is wrong.",
+  "i": "I separate the plan from the apply, review the list, start with a canary, work in batches with a health check and rate limits, keep a kill switch, store state to resume and write an audit log."
+ },
+ "networking/dns-tls-pki-dns-records-resolution-and-caching": {
+  "s": "DNS is a phone book that everyone photocopies. The original is correct, but old copies stay in drawers until they expire.",
+  "i": "I explain stub, recursive and authoritative servers, the main record types, why a CNAME cannot sit at the apex, how TTL and negative caching work, and I query the authoritative server with dig when I suspect stale answers."
+ },
+ "networking/dns-tls-pki-debugging-dns-failures": {
+  "s": "When a letter does not arrive, you check whether the address exists, whether the post office is open and whether your own mailbox is the problem.",
+  "i": "I read the dig status (NOERROR, NXDOMAIN, SERVFAIL, timeout), test the host's own resolver path with getent, then a public resolver, then the authoritative server, and I check search domains and ndots in containers."
+ },
+ "networking/dns-tls-pki-tls-handshake-and-certificate-chains": {
+  "s": "A certificate chain is a chain of introductions: someone you trust vouches for someone who vouches for the server you want to talk to.",
+  "i": "I describe the TLS 1.3 handshake and SNI, explain leaf, intermediate and root certificates, check names against the SAN list and use openssl s_client with -servername to show the chain, dates and verify result."
+ },
+ "networking/dns-tls-pki-certificate-lifecycle-and-automation": {
+  "s": "A passport expires so that a lost one stops working. Certificates expire for the same reason, and need renewing before a trip, not at the airport.",
+  "i": "I generate a key and CSR, prove control with ACME HTTP-01 or DNS-01, automate renewal with a client, reload the service after renewal, and alert on probe_ssl_earliest_cert_expiry before the dates matter."
+ },
+ "networking/dns-tls-pki-mtls-and-internal-certificate-authorities": {
+  "s": "mTLS is a door where both sides show ID. The guard checks you and you check the guard, so neither side has to take the other's word.",
+  "i": "I use an offline root with online intermediates, short-lived workload certificates, cert-manager to issue and renew them, a SPIFFE-style identity in the SAN, and trust bundles that overlap during a CA rotation."
+ },
+ "networking/dns-tls-pki-outage-prevention-checklist": {
+  "s": "Most house fires start with something small and ignored. Most DNS and certificate outages do too: an expiry date nobody wrote down.",
+  "i": "I keep a generated inventory of domains, zones and certificates, alert on certificate, CA and domain expiry, change DNS through code with review and a rollback, test targets with curl --resolve and use two DNS providers for critical names."
+ },
+ "cloud/finops-reading-a-cloud-bill-and-tagging": {
+  "s": "A cloud bill is a till receipt with thousands of lines. Tags are the labels that tell you which team's shopping each line belongs to.",
+  "i": "I group cost by service, account, region and tag, look at daily trends to date a jump, enforce a small set of mandatory tags, and track unit cost such as cost per order, not only the total."
+ },
+ "cloud/finops-rightsizing-and-removing-waste": {
+  "s": "Paying for an idle server is like heating an empty house. First find which rooms nobody uses, then turn the heat down.",
+  "i": "I rightsize from high-percentile utilization over a representative period, find unattached volumes, old snapshots and idle load balancers, schedule non-production environments off hours and delete with a grace period and owner check."
+ },
+ "cloud/finops-commitments-savings-plans-and-spot": {
+  "s": "Buying a monthly train pass is cheaper than single tickets only if you ride every day. Commit to the trips you always make.",
+  "i": "I commit to the always-on baseline in steps, track coverage and utilization, stagger expiry dates, run fault-tolerant work on spot with interruption handling and keep stateful systems on stable capacity."
+ },
+ "cloud/finops-kubernetes-cost-allocation-and-requests": {
+  "s": "On a shared bus you pay for the seats you reserved, not the seats you sat in. Pods reserve CPU and memory the same way.",
+  "i": "I compare requests with real usage, set requests from a long window with headroom, use VPA recommendations and HPA, apply quotas per namespace and allocate node cost to teams by labels with idle cost shown separately."
+ },
+ "cloud/finops-data-transfer-storage-and-hidden-costs": {
+  "s": "The price tag on the shelf is not the whole cost: delivery, packaging and storage add up. In the cloud the delivery is data transfer.",
+  "i": "I look at egress, cross-zone and cross-region traffic, NAT gateway processing, storage class and lifecycle rules, and observability ingest and cardinality, and I use private endpoints and caches to cut the biggest flows."
+ },
+ "cloud/finops-budgets-anomalies-and-a-cost-practice": {
+  "s": "A smoke alarm beats checking the kitchen every hour. Budgets and anomaly alerts watch the bill for you and tell the right person.",
+  "i": "I set actual and forecast budget alerts, add anomaly detection routed to owning teams, run a weekly and monthly review with owned actions, and put a cost section and an estimate into design reviews and pull requests."
+ },
+ "storage/backup-and-dr-strategy-3-2-1-and-retention": {
+  "s": "A spare key kept in the same drawer as the first key is not a spare. Backups must live somewhere a single accident cannot reach.",
+  "i": "I start from RPO and RTO, apply 3-2-1 with an immutable or offline copy, choose full, incremental and snapshot methods, set retention, encrypt, and back up configuration and keys as well as data."
+ },
+ "storage/backup-and-dr-database-backups-and-point-in-time-recovery": {
+  "s": "A base backup is a photo of the library; the archived log is the diary of every book moved since. Together you can rebuild any day.",
+  "i": "I take physical base backups with continuous WAL archiving using pgBackRest or Barman, use pg_dump for portable exports, restore to a new server to a chosen time, and alert on archive failures and backup age."
+ },
+ "storage/backup-and-dr-kubernetes-etcd-and-volume-snapshots": {
+  "s": "Rebuilding a cluster is like rebuilding a house from blueprints: the plans are in version control, and only the furniture, your data, needs a backup.",
+  "i": "I keep manifests and infrastructure code in version control, snapshot etcd on a schedule and copy it off the node encrypted, use CSI volume snapshots with a hook for consistency, and back up databases with their own tools."
+ },
+ "storage/backup-and-dr-testing-restores-and-verifying-backups": {
+  "s": "A fire extinguisher nobody has tested is just a red decoration. A backup nobody has restored is the same.",
+  "i": "I verify at three levels: the job succeeded, the data passes integrity checks, and a scheduled automated restore into a clean environment passes application-level checks. I track restore time against RTO."
+ },
+ "storage/backup-and-dr-disaster-recovery-patterns-and-failover": {
+  "s": "A spare tyre, a second car, or two cars always on the road: DR patterns trade money for how quickly you can keep going.",
+  "i": "I compare backup and restore, pilot light, warm standby and active-active against RTO and RPO, plan data replication and consistency, design traffic failover, define who decides, and rehearse failover and failback."
+ },
+ "storage/backup-and-dr-ransomware-immutable-backups-and-runbooks": {
+  "s": "Keep one copy of your valuables in a safe that even you cannot open before the timer ends. That is what immutable backups do.",
+  "i": "I use object lock or offline copies, a separate account with a write-only path, versioning and long retention, alerts on deletes, and a runbook that starts with containment and restores in dependency order."
+ },
+ "virtualization/virtualization-ops-capacity-overcommit-and-noisy-neighbours": {
+  "s": "A hotel sells more rooms than it has guests who actually show up. It works until everyone arrives at once, which is contention.",
+  "i": "I use modest overcommit ratios, higher for CPU and low for memory, watch steal, ballooning, swap and I/O wait, use NUMA-aware placement for demanding guests and separate pools and limits to contain noisy neighbours."
+ },
+ "virtualization/virtualization-ops-libvirt-and-kvm-day-two-operations": {
+  "s": "Running a host is like running an airport: the planes land all day, and maintenance has to happen without stopping the flights.",
+  "i": "I manage guests with virsh and the domain XML, use --live and --config correctly, take short-lived quiesced snapshots, patch hosts by live migrating guests away and keep host configuration identical by code."
+ },
+ "virtualization/virtualization-ops-guest-performance-troubleshooting": {
+  "s": "To find why a car is slow, you check the engine and the road. For a VM, look inside the guest and at the host at the same time.",
+  "i": "I define the symptom, check USE signals in the guest, compare with host-side counters from virsh domstats, iostat and virt-top, look at storage and network paths, and verify virtio drivers and guest agents."
+ },
+ "openstack/openstack-ops-no-valid-host-and-scheduling-failures": {
+  "s": "No valid host is like a restaurant saying it has no table. It could be full, closed, or have no table for your party size.",
+  "i": "I read the instance fault and request ID, query Placement with allocation candidate list, check compute services and aggregates, and search the scheduler log for the filter that rejected hosts, including cell discovery for new nodes."
+ },
+ "openstack/openstack-ops-neutron-and-ceph-troubleshooting": {
+  "s": "Networking and storage are the roads and the warehouse of a cloud. When either jams, every service feels it.",
+  "i": "For Neutron I check agents, port binding and security groups, then trace the data path with ovs, namespaces and tcpdump at each hop and compare MTUs. For Ceph I read ceph -s, health detail, OSD tree, df and perf."
+ },
+ "openstack/openstack-ops-maintenance-evacuation-and-a-day-two-runbook": {
+  "s": "Maintenance on a busy cloud is like changing a tyre while the car keeps rolling slowly: you need a plan, helpers and a safe order.",
+  "i": "I disable the compute service, check capacity, live migrate guests in batches, patch and verify, and re-enable. For a dead host I confirm it is fenced before evacuating, and I run pre-checks and a canary test around every change."
+ },
+ "sre/senior-skills-writing-design-docs-and-rfcs": {
+  "s": "A design document is a map you draw before the journey, so others can say there is a cliff on that route.",
+  "i": "I write short documents with context, goals, non-goals, a proposal, real alternatives, risks and rollout, send them early to named reviewers with a deadline, and record the decision with its status and date."
+ },
+ "sre/senior-skills-estimating-and-planning-work": {
+  "s": "An estimate is a weather forecast, not a promise: it says what is likely and how sure you are, and it changes as the clouds move.",
+  "i": "I give ranges with assumptions and risks, do a short spike to reduce uncertainty, slice work into testable pieces, tackle the riskiest part first, define done as running in production and keep slack in the plan."
+ },
+ "sre/senior-skills-running-incident-and-postmortem-meetings": {
+  "s": "A good incident call is like a good orchestra rehearsal: one conductor, clear parts and nobody playing over the others.",
+  "i": "I name an incident commander, scribe and comms lead, set update cadence, favor mitigation over root cause, label hypotheses and then run a blameless review with a timeline and a few owned, dated actions."
+ },
+ "sre/senior-skills-mentoring-and-growing-engineers": {
+  "s": "A good mentor teaches someone to fish and then lets them cast the line, even when the mentor could catch the fish faster.",
+  "i": "I agree on goals and rhythm, ask what they tried and expect, pair with them driving, delegate stretch tasks with context and checkpoints, and give specific feedback using situation, behavior, impact and next step."
+ },
+ "sre/senior-skills-influencing-and-stakeholder-management": {
+  "s": "You cannot order people you do not manage, so you earn agreement by showing them what they gain and what worries them.",
+  "i": "I map stakeholders and their concerns, talk to them before meetings, build a case with data, options and a clear decision request, start with a pilot, decline with alternatives and share bad news early with a plan."
+ },
+ "sre/senior-skills-interviewing-and-hiring-as-the-interviewer": {
+  "s": "A good interview is a fair measuring tape applied the same way to everyone, not a mood ring that reflects the interviewer.",
+  "i": "I define competencies and a scorecard first, ask realistic scenario questions with follow-ups, take notes, submit independent scores before the debrief, watch for bias and keep the candidate experience respectful."
  }
 }
