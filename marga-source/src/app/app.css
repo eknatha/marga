@@ -2021,7 +2021,7 @@ body.embed #main{padding-top:.5rem}
 .me-av.lg { width: 56px; height: 56px; font-size: 1.5rem; }
 .me-btn { display: inline-flex; align-items: center; gap: 8px; padding: 4px 8px; min-height: 40px; }
 .me-btn .me-name { max-width: 9ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
-@media (max-width: 1100px) { .me-btn .me-name { display: none; } }
+@media (max-width: 1400px) { .me-btn .me-name { display: none; } .topbar-in .me-btn { min-width: 0; padding: 3px 4px; } }
 .greet { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin: 0 0 10px; color: var(--text); font-weight: 500; }
 .greet b { font-weight: 700; overflow-wrap: anywhere; }
 .greet-ask { color: var(--muted); font-weight: 400; }
@@ -2043,3 +2043,12 @@ body.embed #main{padding-top:.5rem}
 .me-sw span { display: block; width: 28px; height: 28px; border-radius: 50%; }
 .me-act { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 @media (max-width: 560px) { .topbar-in .me-btn { min-width: 40px; padding: 4px 6px; } }
+
+/* Round 41: required callsign gate */
+.me-in { display: flex; gap: 8px; align-items: stretch; }
+.me-in input { flex: 1; min-width: 0; }
+.me-in .btn { white-space: nowrap; }
+.me-priv { margin: 0 0 4px; padding: 8px 10px; border-left: 3px solid var(--line-strong); background: var(--surface-2, transparent); }
+.me-err { color: var(--fail); min-height: 1.2em; margin: -6px 0 10px; font-weight: 600; }
+.me-err:empty { min-height: 0; margin: 0; }
+@media (max-width: 420px) { .me-in { flex-direction: column; } }

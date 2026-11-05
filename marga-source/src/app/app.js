@@ -46,7 +46,7 @@ function load() {
 var S = load();
 function save() { memStore = S; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (x) { /* ignore */ } if (typeof refreshTree === 'function') refreshTree(); }
 
-/* ---------- callsign and avatar (device only, optional) ---------- */
+/* ---------- callsign and avatar (device only, required on first visit) ---------- */
 var ME_KEY = 'ea.me';
 var ME_COLORS = ['#0b5cad', '#1a7f4b', '#6f2dbd', '#b42318', '#a15c00', '#0e7490', '#be185d', '#475569'];
 var ME_COLOR_NAMES = ['Blue', 'Green', 'Purple', 'Red', 'Amber', 'Teal', 'Pink', 'Slate'];
@@ -81,16 +81,24 @@ function meAv(me, cls) {
 function meHello() { var h = new Date().getHours(); return h < 12 ? 'Good morning' : (h < 17 ? 'Good afternoon' : 'Good evening'); }
 function meGreet() {
   var me = meGet();
-  if (!me.n) return '<p class="greet greet-ask"><button class="linkish" type="button" data-act="me">Add a callsign</button> <span>to personalise this page. Optional, and it stays on this device.</span></p>';
-  return '<p class="greet">' + meAv(me, 'sm') + '<span>' + meHello() + ',</span> <b translate="no">' + e(me.n) + '</b>. <button class="linkish" type="button" data-act="me">Rename</button></p>';
+  if (!me.n) return '<p class="greet greet-ask"><button class="linkish" type="button" data-act="me">Add a callsign</button> <span>to continue. It stays on this device.</span></p>';
+  return '<p class="greet">' + meAv(me, 'sm') + '<span>' + meHello() + ',</span> <b translate="no">' + e(me.n) + '</b>. <button class="linkish" type="button" data-act="me">Change callsign</button></p>';
 }
 function meBtn() {
   var me = meGet();
-  return '<button class="btn btn-quiet me-btn' + (me.n ? ' has' : '') + '" type="button" data-act="me" aria-haspopup="dialog" aria-label="' + (me.n ? 'Your callsign is ' + e(me.n) + '. Change it' : 'Add a callsign') + '">' + meAv(me, 'sm') + (me.n ? '<span class="me-name" translate="no">' + e(me.n) + '</span>' : '') + '</button>';
+  return '<button class="btn btn-quiet me-btn' + (me.n ? ' has' : '') + '" type="button" data-act="me" aria-haspopup="dialog" aria-label="' + (me.n ? 'Your callsign is ' + e(me.n) + '. Change callsign' : 'Choose a callsign') + '">' + meAv(me, 'sm') + (me.n ? '<span class="me-name" translate="no">' + e(me.n) + '</span>' : '') + '</button>';
 }
-function meDialog(opener) {
+var ME_ADJ = ['quiet', 'swift', 'steady', 'bright', 'calm', 'bold', 'keen', 'rapid', 'lucid', 'nimble', 'sturdy', 'clever', 'silent', 'sharp', 'brave', 'cosmic'];
+var ME_NOUN = ['kernel', 'pod', 'node', 'daemon', 'cluster', 'packet', 'shell', 'proxy', 'socket', 'container', 'pipeline', 'beacon', 'cursor', 'tunnel', 'vector', 'compiler'];
+function mePick(a) { return a[Math.floor(Math.random() * a.length)]; }
+function meSuggest() { return mePick(ME_ADJ) + '-' + mePick(ME_NOUN) + '-' + (2 + Math.floor(Math.random() * 98)); }
+var ME_PRIVACY = 'Privacy Assured: Feel free to use your name or a preferred alias. This identity token remains local to your active session and is never stored on external databases.';
+
+function meDialog(opener, gate) {
   if ($('#me-dlg')) return;
   var me = meGet(), draft = { n: me.n, c: me.c, a: me.a };
+  gate = !!gate && !me.n;
+  if (gate) { draft.c = Math.floor(Math.random() * ME_COLORS.length); draft.a = mePick(['i'].concat(Object.keys(ME_GLYPHS))); }
   var wrap = document.createElement('div'); wrap.id = 'me-dlg'; wrap.className = 'me-dlg';
   function glyphBtns() {
     var list = [['i', 'Initial']].concat(Object.keys(ME_GLYPHS).map(function (k) { return [k, ME_GLYPHS[k][0]]; }));
@@ -106,20 +114,23 @@ function meDialog(opener) {
     $('#me-ga', wrap).innerHTML = glyphBtns(); $('#me-gc', wrap).innerHTML = colorBtns();
     $('#me-prev', wrap).innerHTML = meAv({ n: draft.n || 'A', c: draft.c, a: draft.a }, 'lg') + '<span class="me-prev-n" translate="no">' + e(draft.n || 'Your callsign') + '</span>';
   }
-  wrap.innerHTML = '<div class="me-back" data-me-close="1"></div><div class="me-card" role="dialog" aria-modal="true" aria-labelledby="me-h">' +
-    '<h2 id="me-h">' + (me.n ? 'Rename or change your avatar' : 'Choose a callsign') + '</h2>' +
-    '<p class="small">A name for greetings and your progress page. It is saved only on this device. No account, nothing is sent anywhere.</p>' +
+  wrap.innerHTML = '<div class="me-back"' + (gate ? '' : ' data-me-close="1"') + '></div><div class="me-card" role="dialog" aria-modal="true" aria-labelledby="me-h" aria-describedby="me-d">' +
+    '<h2 id="me-h">' + (gate ? 'Choose your callsign' : 'Change callsign') + '</h2>' +
+    '<p class="small" id="me-d">' + (gate ? 'Your crew name on MARGA. It is used for greetings and your progress page. ' : 'Change your name or avatar. ') + 'No account and no sign-in.</p>' +
+    '<p class="me-priv small">' + e(ME_PRIVACY) + '</p>' +
     '<div class="me-prev" id="me-prev"></div>' +
-    '<label class="me-f" for="me-name">Callsign<input id="me-name" type="text" maxlength="24" autocomplete="off" spellcheck="false" value="' + e(me.n) + '" placeholder="For example, Ravi"></label>' +
+    '<label class="me-f" for="me-name">Callsign<span class="me-in"><input id="me-name" type="text" maxlength="24" autocomplete="off" spellcheck="false" value="' + e(me.n) + '" placeholder="For example, Ravi" aria-describedby="me-err"><button class="btn btn-quiet" type="button" data-me="suggest">Suggest one</button></span></label>' +
+    '<p class="me-err small" id="me-err" role="alert"></p>' +
     '<div class="me-grp" role="radiogroup" aria-label="Avatar"><span class="me-gl">Avatar</span><div id="me-ga" class="me-row"></div></div>' +
     '<div class="me-grp" role="radiogroup" aria-label="Colour"><span class="me-gl">Colour</span><div id="me-gc" class="me-row"></div></div>' +
-    '<div class="me-act"><button class="btn btn-primary" type="button" data-me="save">Save</button><button class="btn btn-quiet" type="button" data-me-close="1">Cancel</button>' +
-    (me.n ? '<button class="btn btn-quiet danger" type="button" data-me="remove">Remove callsign</button>' : '') + '</div></div>';
+    '<div class="me-act"><button class="btn btn-primary" type="button" data-me="save">' + (gate ? 'Start learning' : 'Save') + '</button>' +
+    (gate ? '' : '<button class="btn btn-quiet" type="button" data-me-close="1">Cancel</button>') + '</div></div>';
   document.body.appendChild(wrap); paint();
-  var inp = $('#me-name', wrap), card = $('.me-card', wrap);
-  function close(back) { wrap.remove(); document.removeEventListener('keydown', onKey, true); if (back !== false && opener && opener.isConnected) opener.focus(); }
+  var inp = $('#me-name', wrap), card = $('.me-card', wrap), inerted = [];
+  if (gate) { Array.prototype.forEach.call(document.body.children, function (n) { if (n !== wrap && !n.inert && n.tagName !== 'SCRIPT') { n.inert = true; inerted.push(n); } }); }
+  function close(back) { inerted.forEach(function (n) { n.inert = false; }); wrap.remove(); document.removeEventListener('keydown', onKey, true); if (back !== false && opener && opener.isConnected) opener.focus(); }
   function onKey(ev) {
-    if (ev.key === 'Escape') { ev.stopPropagation(); close(); return; }
+    if (ev.key === 'Escape') { ev.stopPropagation(); if (!gate) close(); return; }
     if (ev.key === 'Enter' && ev.target === inp) { ev.preventDefault(); $('[data-me=save]', wrap).click(); return; }
     if (ev.key !== 'Tab') return;
     var f = $$('button, input', card).filter(function (x) { return !x.disabled && x.offsetParent !== null; });
@@ -128,7 +139,7 @@ function meDialog(opener) {
     else if (!ev.shiftKey && document.activeElement === f[f.length - 1]) { ev.preventDefault(); f[0].focus(); }
   }
   document.addEventListener('keydown', onKey, true);
-  inp.addEventListener('input', function () { draft.n = meClean(inp.value); $('#me-prev', wrap).innerHTML = meAv({ n: draft.n || 'A', c: draft.c, a: draft.a }, 'lg') + '<span class="me-prev-n" translate="no">' + e(draft.n || 'Your callsign') + '</span>'; });
+  inp.addEventListener('input', function () { $('#me-err', wrap).textContent = ''; draft.n = meClean(inp.value); $('#me-prev', wrap).innerHTML = meAv({ n: draft.n || 'A', c: draft.c, a: draft.a }, 'lg') + '<span class="me-prev-n" translate="no">' + e(draft.n || 'Your callsign') + '</span>'; });
   wrap.addEventListener('click', function (ev) {
     var t = ev.target;
     if (t.closest('[data-me-close]')) { close(); return; }
@@ -136,13 +147,14 @@ function meDialog(opener) {
     if (pa) { draft.a = pa.getAttribute('data-me-a'); paint(); var n1 = $('[data-me-a="' + draft.a + '"]', wrap); if (n1) n1.focus(); return; }
     if (pc) { draft.c = parseInt(pc.getAttribute('data-me-c'), 10); paint(); var n2 = $('[data-me-c="' + draft.c + '"]', wrap); if (n2) n2.focus(); return; }
     var b = t.closest('[data-me]'); if (!b) return;
-    if (b.getAttribute('data-me') === 'save') {
+    var errEl = $('#me-err', wrap);
+    if (b.getAttribute('data-me') === 'suggest') {
+      inp.value = meSuggest(); draft.n = meClean(inp.value); errEl.textContent = ''; paint(); inp.focus();
+    } else if (b.getAttribute('data-me') === 'save') {
       draft.n = meClean(inp.value);
-      if (!draft.n) { toast('Type a callsign first, or choose Cancel.'); inp.focus(); return; }
-      meSet(draft); close(false); renderChrome(); setNav(view.nav); route(); toast('Callsign saved: ' + draft.n + '.');
-    } else if (b.getAttribute('data-me') === 'remove') {
-      if (b.getAttribute('data-armed')) { meSet({ n: '', c: 0, a: 'i' }); close(false); renderChrome(); setNav(view.nav); route(); toast('Callsign removed.'); }
-      else { b.setAttribute('data-armed', '1'); b.textContent = 'Select again to remove'; setTimeout(function () { if (b.isConnected) { b.removeAttribute('data-armed'); b.textContent = 'Remove callsign'; } }, 5000); }
+      if (Array.from(draft.n).length < 2) { errEl.textContent = 'Enter a callsign of 2 to 24 characters, or choose Suggest one.'; inp.focus(); return; }
+      meSet(draft); close(false); renderChrome(); setNav(view.nav); route(); toast((gate ? 'Welcome, ' : 'Callsign changed to ') + draft.n + '.');
+      if (opener === null && gate) { var mh = $('#main'); if (mh) mh.focus && mh.focus(); }
     }
   });
   inp.focus(); inp.select();
@@ -1186,7 +1198,7 @@ function progressView() {
     (st.cur && !st.today ? '<p class="small">Do one lesson check or review a card today to keep your streak.</p>' : '') +
     '<h2 class="sub-h">Activity, last 12 weeks</h2><div class="heat" aria-hidden="true">' + cells + '</div>' +
     '<h2 class="sub-h">Completion by stage</h2><ul class="modbars">' + mods + '</ul>' +
-    '<h2 class="sub-h">Your callsign</h2><div class="actions"><button class="btn btn-quiet" type="button" data-act="me">' + (meGet().n ? 'Rename or change avatar' : 'Add a callsign') + '</button></div><p class="small">Saved only on this device. Resetting progress keeps your callsign; remove it from the same dialog.</p>' +
+    '<h2 class="sub-h">Your callsign</h2><div class="actions"><button class="btn btn-quiet" type="button" data-act="me">' + 'Change callsign</button></div><p class="small">Saved only on this device. Resetting progress keeps your callsign.</p>' +
     '<h2 class="sub-h">Your data</h2><div class="actions"><button class="btn btn-quiet" type="button" data-act="export">Export progress</button>' +
     '<label class="btn btn-quiet file">Import progress<input type="file" accept="application/json" id="import-file"></label>' +
     '<button class="btn btn-quiet danger" type="button" data-act="reset" id="reset-btn">Reset all progress</button></div></div>';
@@ -1531,6 +1543,7 @@ if (typeof window.MargaCloudCompare === "function") window.MargaCloudCompare(api
 renderChrome();
 route();
 visitors();
+if (!meGet().n) meDialog(null, true);
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
   var hadSW = !!navigator.serviceWorker.controller, reloaded = false;
   navigator.serviceWorker.addEventListener('controllerchange', function () { if (hadSW && !reloaded) { reloaded = true; location.reload(); } });
