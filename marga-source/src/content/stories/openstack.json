@@ -18,5 +18,17 @@
  "operating-openstack-logs-upgrades-and-troubleshooting": {
   "r": "A volume stuck in detaching blocked a migration because its compute node was down. Operators checked that the guest was not running elsewhere, restored the node and retried the detach, instead of just resetting the state.",
   "x": "Operations is evidence first: request ids, service and agent liveness, queue depth, Galera quorum. Treat state resets as database edits, upgrade release by release with tested restores, and plan capacity for N+1 per flavor class."
+ },
+ "openstack-ops-no-valid-host-and-scheduling-failures": {
+  "r": "A project could not create servers of a new flavor while the dashboard showed 40 percent free capacity. The flavor needed dedicated cores and huge pages, and only two full hosts offered them. More hosts joined that aggregate and the dashboard gained per-class views.",
+  "x": "Show capacity per flavor class and aggregate, not only in total. Special flavors with pinned CPUs or huge pages need their own host pools and their own capacity view."
+ },
+ "openstack-ops-neutron-and-ceph-troubleshooting": {
+  "r": "Many instances froze and Cinder timed out one afternoon. Several OSDs on one host had reached the full ratio, so Ceph blocked writes. Operators freed space, rebalanced, added disks and set alerts at 70 and 80 percent.",
+  "x": "Check the storage cluster before restarting instances that freeze on I/O. Act on nearfull warnings at 70 to 80 percent, and remember that overlay tunnels reduce MTU."
+ },
+ "openstack-ops-maintenance-evacuation-and-a-day-two-runbook": {
+  "r": "A compute host lost its network but kept running, and an operator evacuated its instances because the service showed down. Several databases ended up writing to the same volumes from two hosts. The runbook now requires powering off through the out-of-band controller first.",
+  "x": "Fence before you evacuate or you risk two copies of one instance writing to the same volume. Prefer boot from volume for important workloads and keep a short, tested runbook."
  }
 }

@@ -18,5 +18,17 @@
  "live-migration-ha-and-troubleshooting": {
   "r": "Draining one host for patching failed to migrate a guest because the target was almost out of memory, and HA then restarted two guests on it, exhausting memory. The team capped host memory use at 80 percent and drained one host at a time.",
   "x": "Design clusters for the failure case: N+1 capacity counted in memory, a common CPU model, reliable fencing and quorum. Check the six basics (virtualization, memory, storage, disk files, network, steal) before blaming a guest."
+ },
+ "virtualization-ops-capacity-overcommit-and-noisy-neighbours": {
+  "r": "Every Monday at 09:00 unrelated servers on one host slowed for twenty minutes. A weekly batch guest with 16 vCPUs took the cores on a 40-core host. Moving it to a dedicated pool with CPU shares ended the stalls.",
+  "x": "Judge by measured contention, not by the ratio. Keep N+1 headroom to evacuate the largest host and move guests early when pressure trends upward."
+ },
+ "virtualization-ops-libvirt-and-kvm-day-two-operations": {
+  "r": "A database guest got slower every week and finally froze when its datastore filled. Each change had left another snapshot, and the chain was nine layers deep. Merging the chain and limiting snapshots to 72 hours with an owner fixed the pattern.",
+  "x": "Snapshots are not backups and long chains hurt. Live migration depends on compatible CPUs, storage and bandwidth, so keep a pool of similar hosts and check capacity before every drain."
+ },
+ "virtualization-ops-guest-performance-troubleshooting": {
+  "r": "File transfers between two guests on the same host reached only a fraction of the network speed. The guest used the emulated e1000 card with a single queue. Switching to virtio with multiqueue raised throughput several times and ended the drops.",
+  "x": "Many guests slowing together point below them. One slow guest points to its own configuration, and emulated devices are a common silent cause of poor throughput."
  }
 }

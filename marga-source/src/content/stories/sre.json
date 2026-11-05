@@ -1,15 +1,78 @@
 {
-"slos-and-error-budgets": {"r": "A team chased 100 percent availability and shipped almost nothing. After agreeing on a 99.9 percent target, the leftover error budget gave them room to release often, and the budget told them when to slow down.", "x": "SLOs are a negotiation between reliability and speed. Pick indicators users feel, set targets from data, define consequences when the budget is gone and review them as the product changes."},
-"incident-response": {"r": "During an outage five people investigated the same graph and nobody updated customers. Naming one incident commander, one communicator and one person for each task made the next incident calmer and shorter.", "x": "Roles beat heroics. Mitigate first, diagnose second, communicate on a schedule, and keep a timeline as you go. Practise before the real thing, and make it safe to escalate early."},
-"postmortems-and-toil": {"r": "After an outage, the review ended with 'be more careful', which fixed nothing. A blameless review found that the deploy tool allowed a dangerous change without a check, and adding that check prevented the whole class of error.", "x": "Look for conditions, not culprits. Track action items to completion, share lessons widely and measure toil so you can decide what to automate first."},
-"reliability-patterns": {"r": "A slow dependency caused requests to pile up and then took the whole service down as threads ran out. Timeouts, a circuit breaker and load shedding kept the service alive and degraded gracefully.", "x": "Patterns can backfire: retries multiply load, caches hide problems and breakers need tuning. Test failure paths with real load, and always define what degraded service looks like."},
-"on-call": {"r": "A small team burned out from nightly pages. Reducing noisy alerts, sharing the rotation more widely and paying attention to handoffs made on-call sustainable again.", "x": "On-call is a system with humans in it. Measure pages per shift and time to acknowledge, protect rest, give people authority to act and fix recurring causes rather than relying on endurance."},
-"capacity-planning": {"r": "A product launch doubled traffic and the database ran out of connections. A load test beforehand would have shown the limit, and headroom planned from the test would have prevented the outage.", "x": "Capacity planning combines forecasts, tests and headroom. Find the bottleneck, test beyond expected peaks, plan for the loss of a zone and revisit numbers after every big change."},
-"chaos-engineering-and-game-days": {"r": "A game day turned off one replica in staging and revealed the clients did not retry. Finding that in practice, not during a real failure, led to a quick fix.", "x": "Run experiments with a hypothesis, a small blast radius and a stop condition. Start in lower environments, involve the owners and turn every surprise into a fix or a test."},
-"change-management-and-releases": {"r": "A large release every quarter caused a long outage nobody could diagnose. Shipping small changes daily with automatic rollback made failures small and easy to trace.", "x": "Most incidents follow a change. Make changes small, observable and reversible, use progressive delivery, and keep a change log that on-call can search during an incident."},
-"production-readiness-reviews": {"r": "A new service launched without alerts or a rollback plan and failed on day two. A readiness review that asked about monitoring, capacity, dependencies and runbooks would have surfaced the gaps.", "x": "A review should help, not block. Use a short checklist, tie it to real risks, allow documented exceptions and revisit it after incidents so it keeps learning."},
-"incident-communication-and-stakeholders": {"r": "Customers wrote angry messages because the status page said 'investigating' for two hours. Regular updates with what is known, what is being done and when the next update comes reduced complaints even though the fix took the same time.", "x": "Communication is part of the fix. Be honest, specific and regular, separate the technical channel from the stakeholder channel and prepare templates beforehand."},
-"dependencies-and-third-party-risk": {"r": "A payment provider had an outage, and the checkout page failed completely. Showing a clear message and queuing orders for later kept some revenue and trust during the incident.", "x": "Your SLO cannot beat your dependencies unless you add redundancy or degrade gracefully. Map dependencies, measure them yourself and agree on what you do when each fails."},
-"disaster-recovery-exercises": {"r": "A recovery drill found the restore took nine hours against a four-hour goal because one script depended on a laptop. Fixing that before a real disaster was the entire value of the exercise.", "x": "Treat RTO and RPO as testable numbers. Rehearse the whole path including access, people and communication, and make exercises safe to fail."},
-"debugging-under-pressure": {"r": "Under pressure, an engineer changed three things at once and could not tell which fixed the problem. Writing down a hypothesis, changing one thing and checking the result gave a clear answer the next time.", "x": "Slow is smooth and smooth is fast. Stabilise first, keep a log, state hypotheses aloud, change one thing at a time and ask for a second pair of eyes when stuck."}
+ "slos-and-error-budgets": {
+  "r": "A team chased 100 percent availability and shipped almost nothing. After agreeing on a 99.9 percent target, the leftover error budget gave them room to release often, and the budget told them when to slow down.",
+  "x": "SLOs are a negotiation between reliability and speed. Pick indicators users feel, set targets from data, define consequences when the budget is gone and review them as the product changes."
+ },
+ "incident-response": {
+  "r": "During an outage five people investigated the same graph and nobody updated customers. Naming one incident commander, one communicator and one person for each task made the next incident calmer and shorter.",
+  "x": "Roles beat heroics. Mitigate first, diagnose second, communicate on a schedule, and keep a timeline as you go. Practise before the real thing, and make it safe to escalate early."
+ },
+ "postmortems-and-toil": {
+  "r": "After an outage, the review ended with 'be more careful', which fixed nothing. A blameless review found that the deploy tool allowed a dangerous change without a check, and adding that check prevented the whole class of error.",
+  "x": "Look for conditions, not culprits. Track action items to completion, share lessons widely and measure toil so you can decide what to automate first."
+ },
+ "reliability-patterns": {
+  "r": "A slow dependency caused requests to pile up and then took the whole service down as threads ran out. Timeouts, a circuit breaker and load shedding kept the service alive and degraded gracefully.",
+  "x": "Patterns can backfire: retries multiply load, caches hide problems and breakers need tuning. Test failure paths with real load, and always define what degraded service looks like."
+ },
+ "on-call": {
+  "r": "A small team burned out from nightly pages. Reducing noisy alerts, sharing the rotation more widely and paying attention to handoffs made on-call sustainable again.",
+  "x": "On-call is a system with humans in it. Measure pages per shift and time to acknowledge, protect rest, give people authority to act and fix recurring causes rather than relying on endurance."
+ },
+ "capacity-planning": {
+  "r": "A product launch doubled traffic and the database ran out of connections. A load test beforehand would have shown the limit, and headroom planned from the test would have prevented the outage.",
+  "x": "Capacity planning combines forecasts, tests and headroom. Find the bottleneck, test beyond expected peaks, plan for the loss of a zone and revisit numbers after every big change."
+ },
+ "chaos-engineering-and-game-days": {
+  "r": "A game day turned off one replica in staging and revealed the clients did not retry. Finding that in practice, not during a real failure, led to a quick fix.",
+  "x": "Run experiments with a hypothesis, a small blast radius and a stop condition. Start in lower environments, involve the owners and turn every surprise into a fix or a test."
+ },
+ "change-management-and-releases": {
+  "r": "A large release every quarter caused a long outage nobody could diagnose. Shipping small changes daily with automatic rollback made failures small and easy to trace.",
+  "x": "Most incidents follow a change. Make changes small, observable and reversible, use progressive delivery, and keep a change log that on-call can search during an incident."
+ },
+ "production-readiness-reviews": {
+  "r": "A new service launched without alerts or a rollback plan and failed on day two. A readiness review that asked about monitoring, capacity, dependencies and runbooks would have surfaced the gaps.",
+  "x": "A review should help, not block. Use a short checklist, tie it to real risks, allow documented exceptions and revisit it after incidents so it keeps learning."
+ },
+ "incident-communication-and-stakeholders": {
+  "r": "Customers wrote angry messages because the status page said 'investigating' for two hours. Regular updates with what is known, what is being done and when the next update comes reduced complaints even though the fix took the same time.",
+  "x": "Communication is part of the fix. Be honest, specific and regular, separate the technical channel from the stakeholder channel and prepare templates beforehand."
+ },
+ "dependencies-and-third-party-risk": {
+  "r": "A payment provider had an outage, and the checkout page failed completely. Showing a clear message and queuing orders for later kept some revenue and trust during the incident.",
+  "x": "Your SLO cannot beat your dependencies unless you add redundancy or degrade gracefully. Map dependencies, measure them yourself and agree on what you do when each fails."
+ },
+ "disaster-recovery-exercises": {
+  "r": "A recovery drill found the restore took nine hours against a four-hour goal because one script depended on a laptop. Fixing that before a real disaster was the entire value of the exercise.",
+  "x": "Treat RTO and RPO as testable numbers. Rehearse the whole path including access, people and communication, and make exercises safe to fail."
+ },
+ "debugging-under-pressure": {
+  "r": "Under pressure, an engineer changed three things at once and could not tell which fixed the problem. Writing down a hypothesis, changing one thing and checking the result gave a clear answer the next time.",
+  "x": "Slow is smooth and smooth is fast. Stabilise first, keep a log, state hypotheses aloud, change one thing at a time and ask for a second pair of eyes when stuck."
+ },
+ "senior-skills-writing-design-docs-and-rfcs": {
+  "r": "A 30-page design for a deployment system was approved with two comments, and a month after launch the on-call team refused to run it because there was no easy rollback. A five-page rewrite with named reviewers found three real issues before code shipped.",
+  "x": "The document is for thinking and for shared decisions. Present options fairly, say what would change your mind, and keep a durable record so later teams know why a choice was made."
+ },
+ "senior-skills-estimating-and-planning-work": {
+  "r": "An engineer estimated three weeks to move a service and it took four months. The estimate assumed 20 simple jobs, but there were 214 and nearly half read variables from the old platform. The next project started with a two-day inventory and landed within 15 percent.",
+  "x": "Surface trade-offs rather than only saying no: scope, date, phases or help. Tell people early when an assumption breaks, and learn from the gap between estimates and actuals."
+ },
+ "senior-skills-running-incident-and-postmortem-meetings": {
+  "r": "A ninety-minute outage turned out to have a fix, a rollback, that was suggested at minute twenty and lost in the chatter. With no commander, several people chased the same idea. A commander role and a try-the-rollback-first rule cut the next one to twelve minutes.",
+  "x": "Facilitation decides how fast the group finds the cause and how much it learns. Keep the tone calm, hand off the commander role when people tire and track actions to completion."
+ },
+ "senior-skills-mentoring-and-growing-engineers": {
+  "r": "A senior engineer fixed every problem a new teammate brought, and a year later the teammate still could not handle an on-call shift. A plan of shadowing, leading with backup and then going solo turned them into a calm incident responder in three months.",
+  "x": "Your impact includes how much stronger others become. Resist rescuing, share credit, explain the reasons in reviews, and measure success by what they can do without you."
+ },
+ "senior-skills-influencing-and-stakeholder-management": {
+  "r": "A platform team emailed a mandatory CI template and six months later only three of forty teams used it. After interviews they supported custom steps, offered migration help and showed builds 40 percent faster in a pilot. Thirty teams moved within a quarter.",
+  "x": "Influence rests on trust and clarity. Understand the interest behind a demand, keep promises small and visible, and escalate only after direct conversation and with the other party informed."
+ },
+ "senior-skills-interviewing-and-hiring-as-the-interviewer": {
+  "r": "One candidate impressed an interviewer with trivia, and the debrief nearly missed five written concerns about collaboration from other rounds. The hiring manager asked the panel to weigh the notes against the criteria, and independent scoring became mandatory.",
+  "x": "Hiring is high leverage and bias is subtle. Weigh evidence against the criteria, include collaboration as a competency, and review later whether your scores predict performance."
+ }
 }

@@ -4685,6 +4685,594 @@
     "Google SRE book: Monitoring",
     "https://sre.google/sre-book/monitoring-distributed-systems/"
    ]
+  ],
+  "linux/troubleshooting-playbook-method-and-first-five-minutes": [
+   [
+    "Brendan Gregg: The USE Method for Linux",
+    "https://www.brendangregg.com/USEmethod/use-linux.html"
+   ],
+   [
+    "Brendan Gregg: Linux performance",
+    "https://www.brendangregg.com/linuxperf.html"
+   ],
+   [
+    "Linux man-pages: proc(5)",
+    "https://man7.org/linux/man-pages/man5/proc.5.html"
+   ]
+  ],
+  "linux/troubleshooting-playbook-high-load-and-cpu-saturation": [
+   [
+    "Brendan Gregg: Linux load averages",
+    "https://www.brendangregg.com/blog/2017-08-08/linux-load-averages.html"
+   ],
+   [
+    "Linux kernel: Pressure Stall Information",
+    "https://docs.kernel.org/accounting/psi.html"
+   ],
+   [
+    "Linux man-pages: top(1)",
+    "https://man7.org/linux/man-pages/man1/top.1.html"
+   ]
+  ],
+  "linux/troubleshooting-playbook-memory-pressure-swap-and-the-oom-killer": [
+   [
+    "Linux kernel: memory management concepts",
+    "https://docs.kernel.org/admin-guide/mm/concepts.html"
+   ],
+   [
+    "Linux kernel: control group v2",
+    "https://docs.kernel.org/admin-guide/cgroup-v2.html"
+   ],
+   [
+    "Linux man-pages: proc_meminfo(5)",
+    "https://man7.org/linux/man-pages/man5/proc_meminfo.5.html"
+   ]
+  ],
+  "linux/troubleshooting-playbook-disk-full-inodes-and-io-stalls": [
+   [
+    "Linux kernel: I/O statistics fields",
+    "https://docs.kernel.org/admin-guide/iostats.html"
+   ],
+   [
+    "GNU coreutils: df invocation",
+    "https://www.gnu.org/software/coreutils/manual/html_node/df-invocation.html"
+   ],
+   [
+    "Linux man-pages: ionice(1)",
+    "https://man7.org/linux/man-pages/man1/ionice.1.html"
+   ]
+  ],
+  "linux/troubleshooting-playbook-network-drops-and-slow-connections": [
+   [
+    "Linux man-pages: ss(8)",
+    "https://man7.org/linux/man-pages/man8/ss.8.html"
+   ],
+   [
+    "Linux kernel: IP sysctl",
+    "https://docs.kernel.org/networking/ip-sysctl.html"
+   ],
+   [
+    "tcpdump manual",
+    "https://www.tcpdump.org/manpages/tcpdump.1.html"
+   ]
+  ],
+  "linux/troubleshooting-playbook-boot-failures-and-services-that-wont-start": [
+   [
+    "systemd: systemctl",
+    "https://www.freedesktop.org/software/systemd/man/latest/systemctl.html"
+   ],
+   [
+    "systemd: journalctl",
+    "https://www.freedesktop.org/software/systemd/man/latest/journalctl.html"
+   ],
+   [
+    "systemd: systemd-analyze",
+    "https://www.freedesktop.org/software/systemd/man/latest/systemd-analyze.html"
+   ]
+  ],
+  "python/sre-automation-aws-with-boto3-safely": [
+   [
+    "Boto3: paginators",
+    "https://boto3.amazonaws.com/v1/documentation/api/latest/guide/paginators.html"
+   ],
+   [
+    "Boto3: credentials",
+    "https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html"
+   ],
+   [
+    "AWS IAM best practices",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+   ]
+  ],
+  "python/sre-automation-kubernetes-client-scripts-and-reports": [
+   [
+    "Kubernetes client libraries",
+    "https://kubernetes.io/docs/reference/using-api/client-libraries/"
+   ],
+   [
+    "Kubernetes API concepts",
+    "https://kubernetes.io/docs/reference/using-api/api-concepts/"
+   ],
+   [
+    "Kubernetes RBAC",
+    "https://kubernetes.io/docs/reference/access-authn-authz/rbac/"
+   ]
+  ],
+  "python/sre-automation-retries-backoff-timeouts-and-idempotency": [
+   [
+    "AWS Builders' Library: timeouts, retries and backoff with jitter",
+    "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/"
+   ],
+   [
+    "Requests: timeouts",
+    "https://requests.readthedocs.io/en/latest/user/advanced/#timeouts"
+   ],
+   [
+    "Google SRE book: handling overload",
+    "https://sre.google/sre-book/handling-overload/"
+   ]
+  ],
+  "python/sre-automation-parsing-logs-and-building-incident-timelines": [
+   [
+    "Python re module",
+    "https://docs.python.org/3/library/re.html"
+   ],
+   [
+    "Python collections module",
+    "https://docs.python.org/3/library/collections.html"
+   ],
+   [
+    "Python datetime module",
+    "https://docs.python.org/3/library/datetime.html"
+   ]
+  ],
+  "python/sre-automation-chatops-alert-handlers-and-webhooks": [
+   [
+    "Python hmac module",
+    "https://docs.python.org/3/library/hmac.html"
+   ],
+   [
+    "Python http.server module",
+    "https://docs.python.org/3/library/http.server.html"
+   ],
+   [
+    "OWASP Top Ten",
+    "https://owasp.org/www-project-top-ten/"
+   ]
+  ],
+  "python/sre-automation-safe-bulk-operations-and-audit-trails": [
+   [
+    "Python concurrent.futures",
+    "https://docs.python.org/3/library/concurrent.futures.html"
+   ],
+   [
+    "Google SRE workbook: canarying releases",
+    "https://sre.google/workbook/canarying-releases/"
+   ],
+   [
+    "Google SRE book: automation at Google",
+    "https://sre.google/sre-book/automation-at-google/"
+   ]
+  ],
+  "networking/dns-tls-pki-dns-records-resolution-and-caching": [
+   [
+    "RFC 1034: Domain names, concepts and facilities",
+    "https://www.rfc-editor.org/rfc/rfc1034"
+   ],
+   [
+    "RFC 1035: Domain names, implementation and specification",
+    "https://www.rfc-editor.org/rfc/rfc1035"
+   ],
+   [
+    "RFC 2308: Negative caching of DNS queries",
+    "https://www.rfc-editor.org/rfc/rfc2308"
+   ]
+  ],
+  "networking/dns-tls-pki-debugging-dns-failures": [
+   [
+    "RFC 8499: DNS terminology",
+    "https://www.rfc-editor.org/rfc/rfc8499"
+   ],
+   [
+    "Kubernetes: DNS for services and pods",
+    "https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/"
+   ],
+   [
+    "Cloudflare: what is DNS",
+    "https://www.cloudflare.com/learning/dns/what-is-dns/"
+   ]
+  ],
+  "networking/dns-tls-pki-tls-handshake-and-certificate-chains": [
+   [
+    "RFC 8446: TLS 1.3",
+    "https://www.rfc-editor.org/rfc/rfc8446"
+   ],
+   [
+    "RFC 6125: Service identity in TLS",
+    "https://www.rfc-editor.org/rfc/rfc6125"
+   ],
+   [
+    "OpenSSL: s_client",
+    "https://docs.openssl.org/master/man1/openssl-s_client/"
+   ]
+  ],
+  "networking/dns-tls-pki-certificate-lifecycle-and-automation": [
+   [
+    "RFC 8555: ACME",
+    "https://www.rfc-editor.org/rfc/rfc8555"
+   ],
+   [
+    "Let's Encrypt documentation",
+    "https://letsencrypt.org/docs/"
+   ],
+   [
+    "NIST SP 800-57: key management",
+    "https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final"
+   ]
+  ],
+  "networking/dns-tls-pki-mtls-and-internal-certificate-authorities": [
+   [
+    "RFC 5280: X.509 certificate profile",
+    "https://www.rfc-editor.org/rfc/rfc5280"
+   ],
+   [
+    "Istio: security concepts",
+    "https://istio.io/latest/docs/concepts/security/"
+   ],
+   [
+    "Kubernetes: managing TLS in a cluster",
+    "https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/"
+   ]
+  ],
+  "networking/dns-tls-pki-outage-prevention-checklist": [
+   [
+    "Amazon Route 53: DNS failover",
+    "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-failover.html"
+   ],
+   [
+    "Prometheus exporters and integrations",
+    "https://prometheus.io/docs/instrumenting/exporters/"
+   ],
+   [
+    "NIST SP 800-81: secure DNS deployment guide",
+    "https://csrc.nist.gov/pubs/sp/800/81/2/final"
+   ]
+  ],
+  "cloud/finops-reading-a-cloud-bill-and-tagging": [
+   [
+    "AWS Cost Explorer",
+    "https://docs.aws.amazon.com/cost-management/latest/userguide/ce-what-is.html"
+   ],
+   [
+    "AWS tagging best practices",
+    "https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html"
+   ],
+   [
+    "Microsoft Cost Management and Billing",
+    "https://learn.microsoft.com/en-us/azure/cost-management-billing/"
+   ]
+  ],
+  "cloud/finops-rightsizing-and-removing-waste": [
+   [
+    "AWS Compute Optimizer",
+    "https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html"
+   ],
+   [
+    "AWS Well-Architected: cost optimization pillar",
+    "https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html"
+   ],
+   [
+    "Google Cloud billing documentation",
+    "https://cloud.google.com/billing/docs"
+   ]
+  ],
+  "cloud/finops-commitments-savings-plans-and-spot": [
+   [
+    "AWS Savings Plans",
+    "https://docs.aws.amazon.com/savingsplans/latest/userguide/what-is-savings-plans.html"
+   ],
+   [
+    "Azure reservations",
+    "https://learn.microsoft.com/en-us/azure/cost-management-billing/reservations/save-compute-costs-reservations"
+   ],
+   [
+    "Google Cloud committed use discounts",
+    "https://cloud.google.com/docs/cuds"
+   ]
+  ],
+  "cloud/finops-kubernetes-cost-allocation-and-requests": [
+   [
+    "Kubernetes: resource management for containers",
+    "https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/"
+   ],
+   [
+    "Kubernetes: resource quotas",
+    "https://kubernetes.io/docs/concepts/policy/resource-quotas/"
+   ],
+   [
+    "Karpenter documentation",
+    "https://karpenter.sh/docs/"
+   ]
+  ],
+  "cloud/finops-data-transfer-storage-and-hidden-costs": [
+   [
+    "AWS: data transfer costs for common architectures",
+    "https://aws.amazon.com/blogs/architecture/overview-of-data-transfer-costs-for-common-architectures/"
+   ],
+   [
+    "Amazon S3 lifecycle management",
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html"
+   ],
+   [
+    "Google Cloud billing documentation",
+    "https://cloud.google.com/billing/docs"
+   ]
+  ],
+  "cloud/finops-budgets-anomalies-and-a-cost-practice": [
+   [
+    "AWS Budgets",
+    "https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html"
+   ],
+   [
+    "AWS Cost Anomaly Detection",
+    "https://docs.aws.amazon.com/cost-management/latest/userguide/manage-ad.html"
+   ],
+   [
+    "AWS Well-Architected: cost optimization pillar",
+    "https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html"
+   ]
+  ],
+  "storage/backup-and-dr-strategy-3-2-1-and-retention": [
+   [
+    "NIST SP 800-34: contingency planning guide",
+    "https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final"
+   ],
+   [
+    "restic documentation",
+    "https://restic.readthedocs.io/en/stable/"
+   ],
+   [
+    "Google SRE book: data integrity",
+    "https://sre.google/sre-book/data-integrity/"
+   ]
+  ],
+  "storage/backup-and-dr-database-backups-and-point-in-time-recovery": [
+   [
+    "PostgreSQL: continuous archiving and PITR",
+    "https://www.postgresql.org/docs/current/continuous-archiving.html"
+   ],
+   [
+    "pgBackRest user guide",
+    "https://pgbackrest.org/user-guide.html"
+   ],
+   [
+    "PostgreSQL: pg_dump",
+    "https://www.postgresql.org/docs/current/app-pgdump.html"
+   ]
+  ],
+  "storage/backup-and-dr-kubernetes-etcd-and-volume-snapshots": [
+   [
+    "Kubernetes: operating etcd clusters",
+    "https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/"
+   ],
+   [
+    "Kubernetes: volume snapshots",
+    "https://kubernetes.io/docs/concepts/storage/volume-snapshots/"
+   ],
+   [
+    "etcd: disaster recovery",
+    "https://etcd.io/docs/latest/op-guide/recovery/"
+   ]
+  ],
+  "storage/backup-and-dr-testing-restores-and-verifying-backups": [
+   [
+    "restic documentation",
+    "https://restic.readthedocs.io/en/stable/"
+   ],
+   [
+    "pgBackRest command reference",
+    "https://pgbackrest.org/command.html"
+   ],
+   [
+    "Google SRE book: data integrity",
+    "https://sre.google/sre-book/data-integrity/"
+   ]
+  ],
+  "storage/backup-and-dr-disaster-recovery-patterns-and-failover": [
+   [
+    "AWS: disaster recovery options in the cloud",
+    "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html"
+   ],
+   [
+    "Azure Well-Architected: disaster recovery",
+    "https://learn.microsoft.com/en-us/azure/well-architected/reliability/disaster-recovery"
+   ],
+   [
+    "NIST SP 800-34: contingency planning guide",
+    "https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final"
+   ]
+  ],
+  "storage/backup-and-dr-ransomware-immutable-backups-and-runbooks": [
+   [
+    "Amazon S3 Object Lock",
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html"
+   ],
+   [
+    "CISA: stop ransomware",
+    "https://www.cisa.gov/stopransomware"
+   ],
+   [
+    "NIST SP 1800-25: identifying and protecting assets against ransomware",
+    "https://csrc.nist.gov/pubs/sp/1800/25/final"
+   ]
+  ],
+  "virtualization/virtualization-ops-capacity-overcommit-and-noisy-neighbours": [
+   [
+    "libvirt documentation",
+    "https://libvirt.org/docs.html"
+   ],
+   [
+    "Linux kernel: Pressure Stall Information",
+    "https://docs.kernel.org/accounting/psi.html"
+   ],
+   [
+    "KVM documentation",
+    "https://www.linux-kvm.org/page/Documents"
+   ]
+  ],
+  "virtualization/virtualization-ops-libvirt-and-kvm-day-two-operations": [
+   [
+    "virsh command reference",
+    "https://libvirt.org/manpages/virsh.html"
+   ],
+   [
+    "libvirt: migration",
+    "https://libvirt.org/migration.html"
+   ],
+   [
+    "QEMU documentation",
+    "https://www.qemu.org/docs/master/"
+   ]
+  ],
+  "virtualization/virtualization-ops-guest-performance-troubleshooting": [
+   [
+    "libvirt: domain XML format",
+    "https://libvirt.org/formatdomain.html"
+   ],
+   [
+    "KVM: Virtio",
+    "https://www.linux-kvm.org/page/Virtio"
+   ],
+   [
+    "Brendan Gregg: The USE Method for Linux",
+    "https://www.brendangregg.com/USEmethod/use-linux.html"
+   ]
+  ],
+  "openstack/openstack-ops-no-valid-host-and-scheduling-failures": [
+   [
+    "Nova: scheduling",
+    "https://docs.openstack.org/nova/latest/admin/scheduling.html"
+   ],
+   [
+    "Placement documentation",
+    "https://docs.openstack.org/placement/latest/"
+   ],
+   [
+    "Nova administration guide",
+    "https://docs.openstack.org/nova/latest/admin/index.html"
+   ]
+  ],
+  "openstack/openstack-ops-neutron-and-ceph-troubleshooting": [
+   [
+    "Neutron administration guide",
+    "https://docs.openstack.org/neutron/latest/admin/index.html"
+   ],
+   [
+    "Ceph: health checks",
+    "https://docs.ceph.com/en/latest/rados/operations/health-checks/"
+   ],
+   [
+    "Ceph: troubleshooting OSDs",
+    "https://docs.ceph.com/en/latest/rados/troubleshooting/troubleshooting-osd/"
+   ]
+  ],
+  "openstack/openstack-ops-maintenance-evacuation-and-a-day-two-runbook": [
+   [
+    "Nova: evacuate",
+    "https://docs.openstack.org/nova/latest/admin/evacuate.html"
+   ],
+   [
+    "Nova: live migration usage",
+    "https://docs.openstack.org/nova/latest/admin/live-migration-usage.html"
+   ],
+   [
+    "OpenStack operations guide",
+    "https://docs.openstack.org/operations-guide/"
+   ]
+  ],
+  "sre/senior-skills-writing-design-docs-and-rfcs": [
+   [
+    "Martin Fowler: architecture decision record",
+    "https://martinfowler.com/bliki/ArchitectureDecisionRecord.html"
+   ],
+   [
+    "Atlassian team playbook",
+    "https://www.atlassian.com/team-playbook"
+   ],
+   [
+    "Martin Fowler: scaling the practice of architecture, conversationally",
+    "https://martinfowler.com/articles/scaling-architecture-conversationally.html"
+   ]
+  ],
+  "sre/senior-skills-estimating-and-planning-work": [
+   [
+    "Atlassian: agile estimation",
+    "https://www.atlassian.com/agile/project-management/estimation"
+   ],
+   [
+    "Google SRE book: embracing risk",
+    "https://sre.google/sre-book/embracing-risk/"
+   ],
+   [
+    "DORA research",
+    "https://dora.dev/"
+   ]
+  ],
+  "sre/senior-skills-running-incident-and-postmortem-meetings": [
+   [
+    "Google SRE book: managing incidents",
+    "https://sre.google/sre-book/managing-incidents/"
+   ],
+   [
+    "Google SRE book: postmortem culture",
+    "https://sre.google/sre-book/postmortem-culture/"
+   ],
+   [
+    "PagerDuty incident response guide",
+    "https://response.pagerduty.com/"
+   ]
+  ],
+  "sre/senior-skills-mentoring-and-growing-engineers": [
+   [
+    "Google SRE workbook: team lifecycles",
+    "https://sre.google/workbook/team-lifecycles/"
+   ],
+   [
+    "Google SRE book: accelerating SREs to on-call",
+    "https://sre.google/sre-book/accelerating-sre-on-call/"
+   ],
+   [
+    "PagerDuty incident response training",
+    "https://response.pagerduty.com/training/"
+   ]
+  ],
+  "sre/senior-skills-influencing-and-stakeholder-management": [
+   [
+    "Google SRE book: communication and collaboration",
+    "https://sre.google/sre-book/communication-and-collaboration/"
+   ],
+   [
+    "Google SRE workbook: organizational change management",
+    "https://sre.google/workbook/organizational-change/"
+   ],
+   [
+    "Atlassian team playbook",
+    "https://www.atlassian.com/team-playbook"
+   ]
+  ],
+  "sre/senior-skills-interviewing-and-hiring-as-the-interviewer": [
+   [
+    "Google SRE workbook: team lifecycles",
+    "https://sre.google/workbook/team-lifecycles/"
+   ],
+   [
+    "Google SRE book: accelerating SREs to on-call",
+    "https://sre.google/sre-book/accelerating-sre-on-call/"
+   ],
+   [
+    "Atlassian team playbook",
+    "https://www.atlassian.com/team-playbook"
+   ]
   ]
  },
  "sheets": {

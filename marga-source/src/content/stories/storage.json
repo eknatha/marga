@@ -18,5 +18,29 @@
  "performance-backups-and-troubleshooting": {
   "r": "A disk alert fired at 100 percent but du found only 3.4 GB. A rotated log file had been deleted while the Java process kept writing, and it held 44 GB. Restarting the service freed the space and rotation was fixed with copytruncate.",
   "x": "Work in order: device, mount, space and inodes, then latency. Reconcile df and du, find deleted-but-open files, size backups by RPO and RTO, keep an immutable copy off-site, and schedule restore drills."
+ },
+ "backup-and-dr-strategy-3-2-1-and-retention": {
+  "r": "After an administrator's credentials were stolen, the attacker deleted a production database and its backups, which lived in the same account. Recovery used a six-week-old export from a partner. Backups moved to a separate account with object lock.",
+  "x": "Replication is not backup, because deletions replicate too. Separate the credentials that can delete production from those that can delete backups, and test restores regularly."
+ },
+ "backup-and-dr-database-backups-and-point-in-time-recovery": {
+  "r": "During a recovery drill the newest archived WAL segment was nine weeks old. A rotated credential had broken archive_command, and nobody had alerts. After fixing it the team added alerts on archive failure and a quarterly restore drill.",
+  "x": "Point-in-time recovery turns hours of loss into seconds, but only if archiving works. Monitor pg_stat_archiver and practice recovery to a timestamp before you need it."
+ },
+ "backup-and-dr-kubernetes-etcd-and-volume-snapshots": {
+  "r": "A team restored a volume snapshot of a database after a failed upgrade. The snapshot was taken during writes, so recovery replayed a long log and some recent transactions were lost. Native database backups with log archiving became the main path.",
+  "x": "Know what each backup can restore. A storage snapshot is crash-consistent, not application-consistent, and a snapshot in the same storage is not a disaster recovery copy."
+ },
+ "backup-and-dr-testing-restores-and-verifying-backups": {
+  "r": "When a file server failed, the team found nightly backups had been empty for nine months after a path change, while the log said completed successfully. A size baseline check, weekly restore test and a last-tested-restore dashboard now cover every system.",
+  "x": "Job success proves little. Run restore tests with row counts and latest timestamps, measure how long they take, and treat a failed or missing backup as an incident."
+ },
+ "backup-and-dr-disaster-recovery-patterns-and-failover": {
+  "r": "When a region failed, the standby started but ran out of capacity within minutes: it had four nodes against thirty-six, and a launch quota nobody had raised. The service was degraded for ninety minutes. Quotas and load tests of the DR site followed.",
+  "x": "Data is the hard part. Check capacity and quotas at the DR site, keep it in step with production through code, and agree the failover decision rule in advance to avoid split-brain."
+ },
+ "backup-and-dr-ransomware-immutable-backups-and-runbooks": {
+  "r": "After a ransomware attack a company restored its servers within a day, and they were encrypted again two hours later. The attacker's service account and a scheduled task were still in place. The new runbook contains and rotates first, then restores.",
+  "x": "Assume an administrator account can be compromised. Restoring into an environment that is still compromised wastes the backup, so rebuild identity, rotate credentials and restore from a clean point."
  }
 }
