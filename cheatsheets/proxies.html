@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>"Reverse proxies and load balancers" cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content=""nginx and HAProxy basics, the status codes you will see, timeouts, health checks and a debugging order for 502 and 504."">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/proxies.html">
+<meta property="og:title" content=""Reverse proxies and load balancers" cheat sheet">
+<meta property="og:description" content=""nginx and HAProxy basics, the status codes you will see, timeouts, health checks and a debugging order for 502 and 504."">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/proxies.html">
+<meta name="theme-color" content="#0B2B2E">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=07e57493">
+<script src="../assets/a11y.js?v=07e57493"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>"Reverse proxies and load balancers" cheat sheet</h1>
+    <p class="lede">"nginx and HAProxy basics, the status codes you will see, timeouts, health checks and a debugging order for 502 and 504."</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button><label class="print-style no-print"><span>Print style</span><select id="print-style" aria-label="Print and Save as PDF style"><option value="light">Light</option><option value="dark">Dark</option><option value="large">Large type</option></select></label></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="test-and-reload-safely">Test and reload safely</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="nginx -t                       # syntax and file check, never reload without it
+nginx -T | less                # print the full effective configuration
+nginx -s reload                # graceful reload, old workers finish their requests
+tail -f /var/log/nginx/error.log" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">nginx -t                       <span class="hljs-comment"># syntax and file check, never reload without it</span>
+nginx -T | less                <span class="hljs-comment"># print the full effective configuration</span>
+nginx -s reload                <span class="hljs-comment"># graceful reload, old workers finish their requests</span>
+<span class="hljs-built_in">tail</span> -f /var/log/nginx/error.log</code></pre></div>
+<h2 id="a-minimal-reverse-proxy">A minimal reverse proxy</h2>
+<div class="code" data-lang="nginx"><button class="copy" type="button" data-copy="upstream app {
+    server 10.0.2.14:8080 max_fails=3 fail_timeout=10s;
+    server 10.0.2.15:8080;
+    keepalive 32;
+}
+server {
+    listen 443 ssl;
+    server_name shop.example.com;
+    location / {
+        proxy_pass http://app;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 3s;
+        proxy_read_timeout 30s;
+    }
+}" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs"><span class="hljs-section">upstream</span> app {
+    <span class="hljs-attribute">server</span> <span class="hljs-number">10.0.2.14:8080</span> max_fails=<span class="hljs-number">3</span> fail_timeout=<span class="hljs-number">10s</span>;
+    <span class="hljs-attribute">server</span> <span class="hljs-number">10.0.2.15:8080</span>;
+    <span class="hljs-attribute">keepalive</span> <span class="hljs-number">32</span>;
+}
+<span class="hljs-section">server</span> {
+    <span class="hljs-attribute">listen</span> <span class="hljs-number">443</span> ssl;
+    <span class="hljs-attribute">server_name</span> shop.example.com;
+    <span class="hljs-section">location</span> / {
+        <span class="hljs-attribute">proxy_pass</span> http://app;
+        <span class="hljs-attribute">proxy_set_header</span> Host <span class="hljs-variable">$host</span>;
+        <span class="hljs-attribute">proxy_set_header</span> X-Forwarded-For <span class="hljs-variable">$remote_addr</span>;
+        <span class="hljs-attribute">proxy_set_header</span> X-Forwarded-Proto <span class="hljs-variable">$scheme</span>;
+        <span class="hljs-attribute">proxy_connect_timeout</span> <span class="hljs-number">3s</span>;
+        <span class="hljs-attribute">proxy_read_timeout</span> <span class="hljs-number">30s</span>;
+    }
+}</code></pre></div>
+<h2 id="status-codes-from-the-proxy">Status codes from the proxy</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
+<th>Code</th>
+<th>Meaning</th>
+<th>First check</th>
+</tr>
+</thead><tbody><tr>
+<td>502</td>
+<td>No valid answer from the upstream</td>
+<td>Error log: connection refused or reset</td>
+</tr>
+<tr>
+<td>503</td>
+<td>No healthy upstream or limit reached</td>
+<td>Health checks, connection limits</td>
+</tr>
+<tr>
+<td>504</td>
+<td>Upstream too slow</td>
+<td>Backend latency, database, timeouts</td>
+</tr>
+<tr>
+<td>429</td>
+<td>Rate limit applied</td>
+<td>Limit settings and client behaviour</td>
+</tr>
+</tbody></table></div>
+<h2 id="look-from-outside-and-inside">Look from outside and inside</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="curl -sI https://shop.example.com | head -5
+curl -s -o /dev/null -w '%{http_code} %{time_connect} %{time_starttransfer}\n' https://shop.example.com/
+ss -ltnp | grep -E ':80|:443|:8080'
+openssl s_client -connect shop.example.com:443 -servername shop.example.com &lt;/dev/null | openssl x509 -noout -dates" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">curl -sI https://shop.example.com | <span class="hljs-built_in">head</span> -5
+curl -s -o /dev/null -w <span class="hljs-string">&#x27;%{http_code} %{time_connect} %{time_starttransfer}\n&#x27;</span> https://shop.example.com/
+ss -ltnp | grep -E <span class="hljs-string">&#x27;:80|:443|:8080&#x27;</span>
+openssl s_client -connect shop.example.com:443 -servername shop.example.com &lt;/dev/null | openssl x509 -noout -dates</code></pre></div>
+<h2 id="haproxy-essentials">HAProxy essentials</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="haproxy -c -f /etc/haproxy/haproxy.cfg     # validate configuration
+echo &quot;show stat&quot; | socat stdio /run/haproxy/admin.sock | cut -d, -f1,2,18" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">haproxy -c -f /etc/haproxy/haproxy.cfg     <span class="hljs-comment"># validate configuration</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;show stat&quot;</span> | socat stdio /run/haproxy/admin.sock | <span class="hljs-built_in">cut</span> -d, -f1,2,18</code></pre></div>
+<h2 id="debugging-order">Debugging order</h2>
+<ol>
+<li>Read the error log line and note the upstream address and error text.</li>
+<li>Connect to the backend from the proxy host with curl.</li>
+<li>Check backend health, CPU, database and connection pools.</li>
+<li>Review the last change: deploy, configuration, certificate.</li>
+<li>Turn off risky retries, add limits, fix the slow dependency, then tune timeouts.</li>
+</ol>
+<h2 id="safe-changes">Safe changes</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="nginx -t &amp;&amp; nginx -s reload" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">nginx -t &amp;&amp; nginx -s reload</code></pre></div>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="curl -sv -H 'Host: app.example.com' http://127.0.0.1/ -o /dev/null" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">curl -sv -H <span class="hljs-string">&#x27;Host: app.example.com&#x27;</span> http://127.0.0.1/ -o /dev/null</code></pre></div>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="curl -sI https://app.example.com | grep -i 'strict-transport\|server'" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">curl -sI https://app.example.com | grep -i <span class="hljs-string">&#x27;strict-transport\|server&#x27;</span></code></pre></div>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="haproxy -c -f /etc/haproxy/haproxy.cfg" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">haproxy -c -f /etc/haproxy/haproxy.cfg</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Always run <code>nginx -t</code> before a reload. A bad config makes the reload fail, and a restart instead of a reload drops live connections.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>A trailing slash in <code>proxy_pass</code> changes the path sent to the backend. Test one URL by hand after every change.</p>
+</aside>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p>Never cache responses that carry cookies or <code>Authorization</code> headers without a key that separates users. One user can see another user&#39;s page.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Retrying non-idempotent requests (POST) on a timeout can charge or create twice. Limit <code>proxy_next_upstream</code> to safe methods.</p>
+</aside>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://nginx.org/en/docs/" target="_blank" rel="noopener">NGINX documentation</a><span class="host">nginx.org</span></li><li><a href="https://docs.haproxy.org/" target="_blank" rel="noopener">HAProxy documentation</a><span class="host">docs.haproxy.org</span></li><li><a href="https://www.envoyproxy.io/docs/envoy/latest/" target="_blank" rel="noopener">Envoy documentation</a><span class="host">www.envoyproxy.io</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="../#/interview">Interview questions</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=07e57493"></script>
+<script src="../assets/counter.js?v=07e57493"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+(function(){var ps=document.getElementById('print-style');if(!ps)return;ps.value=document.documentElement.getAttribute('data-a-print')||'light';ps.addEventListener('change',function(){if(window.MargaA11y){MargaA11y.set('print',ps.value);}else{document.documentElement.setAttribute('data-a-print',ps.value);}});})();
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

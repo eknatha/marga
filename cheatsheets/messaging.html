@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>"Messaging and streaming" cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content=""RabbitMQ and Kafka commands for queues, topics, consumer groups and lag, with the delivery rules to remember."">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/messaging.html">
+<meta property="og:title" content=""Messaging and streaming" cheat sheet">
+<meta property="og:description" content=""RabbitMQ and Kafka commands for queues, topics, consumer groups and lag, with the delivery rules to remember."">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/messaging.html">
+<meta name="theme-color" content="#0B2B2E">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=07e57493">
+<script src="../assets/a11y.js?v=07e57493"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>"Messaging and streaming" cheat sheet</h1>
+    <p class="lede">"RabbitMQ and Kafka commands for queues, topics, consumer groups and lag, with the delivery rules to remember."</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button><label class="print-style no-print"><span>Print style</span><select id="print-style" aria-label="Print and Save as PDF style"><option value="light">Light</option><option value="dark">Dark</option><option value="large">Large type</option></select></label></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="delivery-rules">Delivery rules</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
+<th>Term</th>
+<th>Rule to remember</th>
+</tr>
+</thead><tbody><tr>
+<td>At-least-once</td>
+<td>Duplicates are possible, so handlers must be idempotent</td>
+</tr>
+<tr>
+<td>Ordering</td>
+<td>Guaranteed only within one queue or partition</td>
+</tr>
+<tr>
+<td>Acknowledge</td>
+<td>After the work is saved, not before</td>
+</tr>
+<tr>
+<td>Dead letters</td>
+<td>Every queue needs a failed-message path and an alert on it</td>
+</tr>
+</tbody></table></div>
+<h2 id="rabbitmq">RabbitMQ</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="rabbitmqctl list_queues name messages_ready messages_unacknowledged consumers
+rabbitmqctl list_bindings
+rabbitmqctl list_connections name state
+rabbitmqadmin declare queue name=billing durable=true
+rabbitmqadmin publish exchange=events routing_key=order.paid.eu payload='{&quot;id&quot;:4411}'" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">rabbitmqctl list_queues name messages_ready messages_unacknowledged consumers
+rabbitmqctl list_bindings
+rabbitmqctl list_connections name state
+rabbitmqadmin <span class="hljs-built_in">declare</span> queue name=billing durable=<span class="hljs-literal">true</span>
+rabbitmqadmin publish exchange=events routing_key=order.paid.eu payload=<span class="hljs-string">&#x27;{&quot;id&quot;:4411}&#x27;</span></code></pre></div>
+<h2 id="kafka-topics">Kafka topics</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kafka-topics.sh --bootstrap-server b1:9092 --list
+kafka-topics.sh --bootstrap-server b1:9092 --describe --topic orders
+kafka-topics.sh --bootstrap-server b1:9092 --describe --under-replicated-partitions
+kafka-configs.sh --bootstrap-server b1:9092 --entity-type topics --entity-name orders --describe" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kafka-topics.sh --bootstrap-server b1:9092 --list
+kafka-topics.sh --bootstrap-server b1:9092 --describe --topic orders
+kafka-topics.sh --bootstrap-server b1:9092 --describe --under-replicated-partitions
+kafka-configs.sh --bootstrap-server b1:9092 --entity-type topics --entity-name orders --describe</code></pre></div>
+<h2 id="kafka-consumers-and-lag">Kafka consumers and lag</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kafka-consumer-groups.sh --bootstrap-server b1:9092 --list
+kafka-consumer-groups.sh --bootstrap-server b1:9092 --describe --group invoicer
+kafka-console-consumer.sh --bootstrap-server b1:9092 --topic orders --from-beginning --max-messages 5" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kafka-consumer-groups.sh --bootstrap-server b1:9092 --list
+kafka-consumer-groups.sh --bootstrap-server b1:9092 --describe --group invoicer
+kafka-console-consumer.sh --bootstrap-server b1:9092 --topic orders --from-beginning --max-messages 5</code></pre></div>
+<h2 id="producer-and-consumer-settings-that-matter">Producer and consumer settings that matter</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
+<th>Setting</th>
+<th>Safe starting value</th>
+</tr>
+</thead><tbody><tr>
+<td>acks</td>
+<td>all</td>
+</tr>
+<tr>
+<td>enable.idempotence</td>
+<td>true</td>
+</tr>
+<tr>
+<td>min.insync.replicas</td>
+<td>2 with replication factor 3</td>
+</tr>
+<tr>
+<td>enable.auto.commit</td>
+<td>false</td>
+</tr>
+<tr>
+<td>max.poll.interval.ms</td>
+<td>longer than your slowest batch</td>
+</tr>
+</tbody></table></div>
+<h2 id="debugging-order">Debugging order</h2>
+<ol>
+<li>Are consumers running and connected?</li>
+<li>Is lag on one partition or all of them?</li>
+<li>Is a dependency slow, or is a message failing in a loop?</li>
+<li>Is the broker healthy: disk, under-replicated partitions, controller?</li>
+<li>Trace one message id from producer to database.</li>
+</ol>
+<h2 id="daily-checks">Daily checks</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kafka-consumer-groups.sh --bootstrap-server $B --describe --group orders" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kafka-consumer-groups.sh --bootstrap-server <span class="hljs-variable">$B</span> --describe --group orders</code></pre></div>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kafka-topics.sh --bootstrap-server $B --describe --topic orders" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kafka-topics.sh --bootstrap-server <span class="hljs-variable">$B</span> --describe --topic orders</code></pre></div>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="rabbitmqctl list_queues name messages consumers" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">rabbitmqctl list_queues name messages consumers</code></pre></div>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="kafka-console-consumer.sh --bootstrap-server $B --topic orders --from-beginning --max-messages 5" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">kafka-console-consumer.sh --bootstrap-server <span class="hljs-variable">$B</span> --topic orders --from-beginning --max-messages 5</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Resetting consumer group offsets skips or replays messages. Stop the group first and use <code>--dry-run</code> before <code>--execute</code>.</p>
+</aside>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p>Deleting a topic or purging a queue cannot be undone. Check the name twice and confirm the environment.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Auto-acknowledge loses messages when a consumer crashes mid-work. Acknowledge after the work is stored.</p>
+</aside>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Lowering retention deletes old data on the next cleanup. Check what slow consumers still need first.</p>
+</aside>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://kafka.apache.org/documentation/" target="_blank" rel="noopener">Apache Kafka documentation</a><span class="host">kafka.apache.org</span></li><li><a href="https://www.rabbitmq.com/docs" target="_blank" rel="noopener">RabbitMQ documentation</a><span class="host">www.rabbitmq.com</span></li><li><a href="https://cloud.google.com/pubsub/docs/overview" target="_blank" rel="noopener">Google Cloud Pub/Sub</a><span class="host">cloud.google.com</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="../#/interview">Interview questions</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=07e57493"></script>
+<script src="../assets/counter.js?v=07e57493"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+(function(){var ps=document.getElementById('print-style');if(!ps)return;ps.value=document.documentElement.getAttribute('data-a-print')||'light';ps.addEventListener('change',function(){if(window.MargaA11y){MargaA11y.set('print',ps.value);}else{document.documentElement.setAttribute('data-a-print',ps.value);}});})();
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>

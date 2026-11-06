@@ -13,8 +13,8 @@
 <script>
 (function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<link rel="stylesheet" href="../assets/app.css?v=05ae47a4">
-<script src="../assets/a11y.js?v=05ae47a4"></script>
+<link rel="stylesheet" href="../assets/app.css?v=07e57493">
+<script src="../assets/a11y.js?v=07e57493"></script>
 </head>
 <body class="standalone">
 <header class="topbar"><div class="wrap topbar-in">
@@ -34,11 +34,13 @@
 <li><a href="azure.html"><strong>"Azure"</strong><span>"Identity, networking, compute, storage, cost and diagnostics commands for Azure."</span></a></li>
 <li><a href="baremetal.html"><strong>"Bare metal and datacenter"</strong><span>"Remote management, provisioning, disks and RAID, bonding and the first checks on a sick server."</span></a></li>
 <li><a href="bash.html"><strong>"Bash scripting"</strong><span>"Safe script headers, variables, conditionals, loops, functions and text-processing one-liners."</span></a></li>
+<li><a href="cfn-bicep.html"><strong>"CloudFormation and Bicep"</strong><span>"Commands to validate, preview, deploy and debug CloudFormation stacks and Bicep deployments, and the checks to run first."</span></a></li>
 <li><a href="cicd.html"><strong>"CI/CD"</strong><span>"Pipeline stages, a Jenkinsfile skeleton, deployment strategies, and declarative delivery commands."</span></a></li>
 <li><a href="claude-skills.html"><strong>"Claude Skills"</strong><span>"Skill folder layout, SKILL.md header, descriptions that trigger, structure, scripts, tests and a security review checklist."</span></a></li>
 <li><a href="cloud-iam.html"><strong>"Cloud security and IAM"</strong><span>"Policies, roles, scopes, keys, private access, audit logs and an incident checklist for AWS and Azure."</span></a></li>
 <li><a href="databases.html"><strong>"Databases (PostgreSQL)"</strong><span>"SQL basics, operator queries, indexes and plans, locks, backups, replication, pooling and safe migrations."</span></a></li>
 <li><a href="docker.html"><strong>"Docker and Compose"</strong><span>"Run, build, inspect, clean up and harden containers, plus everyday Compose commands."</span></a></li>
+<li><a href="gcp.html"><strong>"Google Cloud"</strong><span>"gcloud commands for projects, networks, compute, storage, Cloud Run, GKE and logs, plus a debugging order for permission errors."</span></a></li>
 <li><a href="git.html"><strong>"Git"</strong><span>"Everyday commands for commits, branches, remotes, undoing mistakes, tags and recovery."</span></a></li>
 <li><a href="go.html"><strong>"Go"</strong><span>"Toolchain commands, types, errors, interfaces, goroutines, context, HTTP, testing and build flags for services and CLIs."</span></a></li>
 <li><a href="gpu-serving.html"><strong>"GPU, AI infrastructure and LLM serving"</strong><span>"Memory sums, nvidia-smi, vLLM flags, Kubernetes GPU scheduling and the metrics that explain slow or failing inference."</span></a></li>
@@ -49,11 +51,13 @@
 <li><a href="linux.html"><strong>"Linux"</strong><span>"Files, permissions, processes, disks, logs and performance commands you reach for daily."</span></a></li>
 <li><a href="llm.html"><strong>"LLM fundamentals"</strong><span>"Tokens, context limits, API calls, sampling, cost, caching, evaluation and a debugging checklist for LLM features."</span></a></li>
 <li><a href="mcp.html"><strong>"Tool use and MCP"</strong><span>"Tool definitions, the tool-use loop, MCP messages, a Python server, transports, approvals and injection defences."</span></a></li>
+<li><a href="messaging.html"><strong>"Messaging and streaming"</strong><span>"RabbitMQ and Kafka commands for queues, topics, consumer groups and lag, with the delivery rules to remember."</span></a></li>
 <li><a href="mlops.html"><strong>"MLOps"</strong><span>"Checks, records and release steps that keep machine learning models reliable in production."</span></a></li>
 <li><a href="networking.html"><strong>"Networking"</strong><span>"Addressing, DNS, HTTP and TLS checks, and the order to troubleshoot connectivity."</span></a></li>
 <li><a href="openstack.html"><strong>"OpenStack and private cloud"</strong><span>"The openstack client commands and checks for identity, compute, networking, volumes and troubleshooting a private cloud."</span></a></li>
 <li><a href="prometheus.html"><strong>"Prometheus and observability"</strong><span>"Metric types, PromQL patterns, scrape and alert configuration, and the RED, USE and golden-signal checklists."</span></a></li>
 <li><a href="prompting.html"><strong>"Prompting and structured output"</strong><span>"Prompt structure, examples, reasoning patterns, system prompts, JSON schemas, validation, retries and versioning."</span></a></li>
+<li><a href="proxies.html"><strong>"Reverse proxies and load balancers"</strong><span>"nginx and HAProxy basics, the status codes you will see, timeouts, health checks and a debugging order for 502 and 504."</span></a></li>
 <li><a href="python.html"><strong>"Python"</strong><span>"Environments, core syntax, files, subprocess, HTTP, JSON, cloud SDK, testing and packaging snippets for automation."</span></a></li>
 <li><a href="security.html"><strong>"DevSecOps and security"</strong><span>"Scanning, secrets, signing, container and cluster hardening, cloud identity checks and incident first steps."</span></a></li>
 <li><a href="service-mesh.html"><strong>"Service mesh and Kubernetes networking"</strong><span>"Check Services and endpoints, DNS, network policy, sidecars, sync and the response flags in proxy logs."</span></a></li>
@@ -67,7 +71,7 @@
   </ul>
 </main>
 <footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="../#/interview">Interview questions</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
-<script src="../assets/counter.js?v=05ae47a4"></script>
+<script src="../assets/counter.js?v=07e57493"></script>
 <script>if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit('/cheatsheets/',document.title);}</script>
 </body>
 </html>
