@@ -5273,6 +5273,1068 @@
     "Atlassian team playbook",
     "https://www.atlassian.com/team-playbook"
    ]
+  ],
+  "cicd/how-ci-platforms-differ": [
+   [
+    "GitHub Actions documentation",
+    "https://docs.github.com/en/actions"
+   ],
+   [
+    "GitLab CI/CD documentation",
+    "https://docs.gitlab.com/ee/ci/"
+   ],
+   [
+    "Tekton documentation",
+    "https://tekton.dev/docs/"
+   ]
+  ],
+  "cicd/actions-workflows-jobs-and-steps": [
+   [
+    "Workflow syntax for GitHub Actions",
+    "https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions"
+   ],
+   [
+    "Understanding GitHub Actions",
+    "https://docs.github.com/en/actions/about-github-actions/understanding-github-actions"
+   ]
+  ],
+  "cicd/actions-triggers-matrices-and-caching": [
+   [
+    "Events that trigger workflows",
+    "https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows"
+   ],
+   [
+    "Dependency caching",
+    "https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/caching-dependencies-to-speed-up-workflows"
+   ]
+  ],
+  "cicd/actions-reusable-workflows-and-composite-actions": [
+   [
+    "Reusing workflows",
+    "https://docs.github.com/en/actions/sharing-automations/reusing-workflows"
+   ],
+   [
+    "Creating a composite action",
+    "https://docs.github.com/en/actions/sharing-automations/creating-actions/creating-a-composite-action"
+   ]
+  ],
+  "cicd/actions-secrets-oidc-and-hardening": [
+   [
+    "Security hardening for GitHub Actions",
+    "https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions"
+   ],
+   [
+    "OpenID Connect in cloud providers",
+    "https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect"
+   ]
+  ],
+  "cicd/actions-runners-environments-and-deployments": [
+   [
+    "About runners",
+    "https://docs.github.com/en/actions/concepts/runners"
+   ],
+   [
+    "Managing environments for deployment",
+    "https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-deployments/managing-environments-for-deployment"
+   ]
+  ],
+  "cicd/gitlab-ci-pipelines-stages-and-jobs": [
+   [
+    "GitLab CI/CD documentation",
+    "https://docs.gitlab.com/ee/ci/"
+   ],
+   [
+    "CI/CD YAML syntax reference",
+    "https://docs.gitlab.com/ee/ci/yaml/"
+   ]
+  ],
+  "cicd/gitlab-ci-rules-artifacts-and-caches": [
+   [
+    "Rules reference",
+    "https://docs.gitlab.com/ee/ci/yaml/#rules"
+   ],
+   [
+    "Caching in GitLab CI/CD",
+    "https://docs.gitlab.com/ee/ci/caching/"
+   ]
+  ],
+  "cicd/gitlab-ci-includes-templates-and-dynamic-pipelines": [
+   [
+    "Use CI/CD configuration from other files",
+    "https://docs.gitlab.com/ee/ci/yaml/includes.html"
+   ],
+   [
+    "Downstream pipelines",
+    "https://docs.gitlab.com/ee/ci/pipelines/downstream_pipelines.html"
+   ]
+  ],
+  "cicd/gitlab-runners-environments-and-security": [
+   [
+    "GitLab Runner",
+    "https://docs.gitlab.com/runner/"
+   ],
+   [
+    "Environments",
+    "https://docs.gitlab.com/ee/ci/environments/"
+   ]
+  ],
+  "cicd/tekton-tasks-pipelines-and-workspaces": [
+   [
+    "Tekton Pipelines",
+    "https://tekton.dev/docs/pipelines/"
+   ],
+   [
+    "Tasks and Pipelines",
+    "https://tekton.dev/docs/pipelines/tasks/"
+   ]
+  ],
+  "cicd/tekton-triggers-chains-and-production-use": [
+   [
+    "Tekton Triggers",
+    "https://tekton.dev/docs/triggers/"
+   ],
+   [
+    "Tekton Chains",
+    "https://tekton.dev/docs/chains/"
+   ]
+  ],
+  "cicd/choosing-and-migrating-between-ci-platforms": [
+   [
+    "GitHub Actions documentation",
+    "https://docs.github.com/en/actions"
+   ],
+   [
+    "Tekton documentation",
+    "https://tekton.dev/docs/"
+   ],
+   [
+    "GitLab CI/CD documentation",
+    "https://docs.gitlab.com/ee/ci/"
+   ]
+  ],
+  "baremetal/bmc-ipmi-and-redfish-automation": [
+   [
+    "DMTF Redfish standard",
+    "https://www.dmtf.org/standards/redfish"
+   ],
+   [
+    "Redfish API specification",
+    "https://redfish.dmtf.org/"
+   ]
+  ],
+  "baremetal/cloud-init-and-first-boot-configuration": [
+   [
+    "cloud-init documentation",
+    "https://cloudinit.readthedocs.io/en/latest/"
+   ],
+   [
+    "Ubuntu server provisioning",
+    "https://ubuntu.com/server/docs"
+   ]
+  ],
+  "baremetal/firmware-and-bios-management-at-scale": [
+   [
+    "DMTF Redfish standard",
+    "https://www.dmtf.org/standards/redfish"
+   ],
+   [
+    "Open Compute Project",
+    "https://www.opencomputeproject.org/"
+   ]
+  ],
+  "baremetal/maas-and-ironic-bare-metal-provisioning": [
+   [
+    "MAAS documentation",
+    "https://maas.io/docs"
+   ],
+   [
+    "OpenStack Ironic documentation",
+    "https://docs.openstack.org/ironic/latest/"
+   ]
+  ],
+  "baremetal/hardware-failure-diagnosis-and-rma": [
+   [
+    "smartmontools",
+    "https://www.smartmontools.org/"
+   ],
+   [
+    "Linux kernel documentation",
+    "https://docs.kernel.org/"
+   ]
+  ],
+  "baremetal/power-cooling-and-rack-capacity": [
+   [
+    "Open Compute Project",
+    "https://www.opencomputeproject.org/"
+   ],
+   [
+    "Supermicro resources",
+    "https://www.supermicro.com/"
+   ]
+  ],
+  "baremetal/uefi-bootloaders-and-secure-boot": [
+   [
+    "UEFI specifications",
+    "https://wiki.ubuntu.com/UEFI"
+   ],
+   [
+    "Ubuntu Secure Boot",
+    "https://wiki.ubuntu.com/UEFI/SecureBoot"
+   ]
+  ],
+  "sql-ops/pg-stat-statements-and-query-tuning": [
+   [
+    "PostgreSQL pg_stat_statements",
+    "https://www.postgresql.org/docs/current/pgstatstatements.html"
+   ],
+   [
+    "PostgreSQL using EXPLAIN",
+    "https://www.postgresql.org/docs/current/using-explain.html"
+   ]
+  ],
+  "sql-ops/partitioning-and-data-retention": [
+   [
+    "PostgreSQL table partitioning",
+    "https://www.postgresql.org/docs/current/ddl-partitioning.html"
+   ],
+   [
+    "PostgreSQL routine vacuuming",
+    "https://www.postgresql.org/docs/current/routine-vacuuming.html"
+   ]
+  ],
+  "sql-ops/sql-backup-and-point-in-time-recovery-operations": [
+   [
+    "PostgreSQL continuous archiving and PITR",
+    "https://www.postgresql.org/docs/current/continuous-archiving.html"
+   ],
+   [
+    "pgBackRest user guide",
+    "https://pgbackrest.org/user-guide.html"
+   ]
+  ],
+  "sql-ops/online-schema-changes-without-downtime": [
+   [
+    "PostgreSQL ALTER TABLE",
+    "https://www.postgresql.org/docs/current/sql-altertable.html"
+   ],
+   [
+    "PostgreSQL explicit locking",
+    "https://www.postgresql.org/docs/current/explicit-locking.html"
+   ]
+  ],
+  "sql-ops/replicas-failover-and-switchover-operations": [
+   [
+    "PostgreSQL high availability and replication",
+    "https://www.postgresql.org/docs/current/high-availability.html"
+   ],
+   [
+    "PostgreSQL warm standby and streaming replication",
+    "https://www.postgresql.org/docs/current/warm-standby.html"
+   ]
+  ],
+  "sql-ops/autovacuum-bloat-and-maintenance-windows": [
+   [
+    "PostgreSQL routine vacuuming",
+    "https://www.postgresql.org/docs/current/routine-vacuuming.html"
+   ],
+   [
+    "PostgreSQL autovacuum configuration",
+    "https://www.postgresql.org/docs/current/runtime-config-autovacuum.html"
+   ]
+  ],
+  "sql-ops/database-incident-runbook": [
+   [
+    "PostgreSQL monitoring statistics",
+    "https://www.postgresql.org/docs/current/monitoring-stats.html"
+   ],
+   [
+    "PostgreSQL pg_locks view",
+    "https://www.postgresql.org/docs/current/view-pg-locks.html"
+   ]
+  ],
+  "service-mesh/sidecar-and-ambient-mesh-data-planes": [
+   [
+    "Istio documentation",
+    "https://istio.io/latest/docs/"
+   ],
+   [
+    "Linkerd documentation",
+    "https://linkerd.io/2/overview/"
+   ]
+  ],
+  "service-mesh/ingress-gateways-and-the-gateway-api": [
+   [
+    "Kubernetes Gateway API",
+    "https://gateway-api.sigs.k8s.io/"
+   ],
+   [
+    "Istio ingress gateways",
+    "https://istio.io/latest/docs/tasks/traffic-management/ingress/"
+   ]
+  ],
+  "service-mesh/traffic-shifting-retries-and-timeouts": [
+   [
+    "Istio traffic management",
+    "https://istio.io/latest/docs/concepts/traffic-management/"
+   ],
+   [
+    "Envoy circuit breaking",
+    "https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/circuit_breaking"
+   ]
+  ],
+  "service-mesh/mesh-authorization-and-zero-trust-policy": [
+   [
+    "Istio security",
+    "https://istio.io/latest/docs/concepts/security/"
+   ],
+   [
+    "Linkerd authorization policy",
+    "https://linkerd.io/2/features/server-policy/"
+   ]
+  ],
+  "service-mesh/multi-cluster-mesh-and-failover": [
+   [
+    "Istio multicluster",
+    "https://istio.io/latest/docs/setup/install/multicluster/"
+   ],
+   [
+    "Linkerd multicluster",
+    "https://linkerd.io/2/features/multicluster/"
+   ]
+  ],
+  "service-mesh/mesh-performance-cost-and-resource-tuning": [
+   [
+    "Istio performance and scalability",
+    "https://istio.io/latest/docs/ops/deployment/performance-and-scalability/"
+   ],
+   [
+    "Envoy documentation",
+    "https://www.envoyproxy.io/docs/envoy/latest/"
+   ]
+  ],
+  "service-mesh/operating-and-upgrading-a-service-mesh": [
+   [
+    "Istio upgrade guide",
+    "https://istio.io/latest/docs/setup/upgrade/"
+   ],
+   [
+    "Linkerd upgrade guide",
+    "https://linkerd.io/2/tasks/upgrade/"
+   ]
+  ],
+  "gpu-serving/quantization-and-model-sizing": [
+   [
+    "NVIDIA developer documentation",
+    "https://docs.nvidia.com/"
+   ],
+   [
+    "Hugging Face quantization guide",
+    "https://huggingface.co/docs/transformers/main/en/quantization/overview"
+   ],
+   [
+    "vLLM quantization",
+    "https://docs.vllm.ai/en/latest/features/quantization/index.html"
+   ]
+  ],
+  "gpu-serving/batching-kv-cache-and-throughput": [
+   [
+    "vLLM documentation",
+    "https://docs.vllm.ai/en/latest/"
+   ],
+   [
+    "NVIDIA Triton Inference Server",
+    "https://docs.nvidia.com/deeplearning/triton-inference-server/"
+   ]
+  ],
+  "gpu-serving/multi-gpu-tensor-and-pipeline-parallelism": [
+   [
+    "vLLM parallelism and scaling",
+    "https://docs.vllm.ai/en/latest/serving/distributed_serving.html"
+   ],
+   [
+    "NVIDIA developer documentation",
+    "https://docs.nvidia.com/"
+   ]
+  ],
+  "gpu-serving/autoscaling-llm-inference": [
+   [
+    "KEDA documentation",
+    "https://keda.sh/docs/"
+   ],
+   [
+    "Kubernetes horizontal pod autoscaling",
+    "https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/"
+   ]
+  ],
+  "gpu-serving/model-loading-caching-and-cold-starts": [
+   [
+    "Hugging Face safetensors",
+    "https://huggingface.co/docs/safetensors/index"
+   ],
+   [
+    "Kubernetes probes",
+    "https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/"
+   ]
+  ],
+  "gpu-serving/gpu-sharing-mig-and-time-slicing": [
+   [
+    "NVIDIA MIG user guide",
+    "https://docs.nvidia.com/datacenter/tesla/mig-user-guide/"
+   ],
+   [
+    "NVIDIA GPU Operator",
+    "https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/index.html"
+   ]
+  ],
+  "gpu-serving/gpu-failures-xid-errors-and-recovery": [
+   [
+    "NVIDIA Xid errors",
+    "https://docs.nvidia.com/deploy/xid-errors/index.html"
+   ],
+   [
+    "NVIDIA DCGM",
+    "https://docs.nvidia.com/datacenter/dcgm/latest/index.html"
+   ]
+  ],
+  "aiops/telemetry-quality-for-aiops": [
+   [
+    "OpenTelemetry semantic conventions",
+    "https://opentelemetry.io/docs/specs/semconv/"
+   ],
+   [
+    "Prometheus naming practices",
+    "https://prometheus.io/docs/practices/naming/"
+   ]
+  ],
+  "aiops/forecasting-capacity-and-saturation": [
+   [
+    "Prometheus predict_linear",
+    "https://prometheus.io/docs/prometheus/latest/querying/functions/#predict_linear"
+   ],
+   [
+    "Google SRE book: capacity planning",
+    "https://sre.google/sre-book/software-engineering-in-sre/"
+   ]
+  ],
+  "aiops/llm-assistants-for-incident-response": [
+   [
+    "Anthropic documentation",
+    "https://docs.anthropic.com/"
+   ],
+   [
+    "Google SRE workbook: incident response",
+    "https://sre.google/workbook/incident-response/"
+   ]
+  ],
+  "aiops/measuring-aiops-value-and-avoiding-hype": [
+   [
+    "Google SRE book: monitoring distributed systems",
+    "https://sre.google/sre-book/monitoring-distributed-systems/"
+   ],
+   [
+    "Atlassian incident management",
+    "https://www.atlassian.com/incident-management"
+   ]
+  ],
+  "aiops/runbook-automation-and-guardrails": [
+   [
+    "Google SRE book: automation",
+    "https://sre.google/sre-book/automation-at-google/"
+   ],
+   [
+    "Ansible documentation",
+    "https://docs.ansible.com/"
+   ]
+  ],
+  "argocd/argocd-sso-rbac-and-audit": [
+   [
+    "Argo CD user management",
+    "https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/"
+   ],
+   [
+    "Argo CD RBAC",
+    "https://argo-cd.readthedocs.io/en/stable/operator-manual/rbac/"
+   ]
+  ],
+  "argocd/argocd-notifications-and-image-updates": [
+   [
+    "Argo CD notifications",
+    "https://argo-cd.readthedocs.io/en/stable/operator-manual/notifications/"
+   ],
+   [
+    "Argo CD documentation",
+    "https://argo-cd.readthedocs.io/en/stable/"
+   ]
+  ],
+  "argocd/progressive-delivery-with-argo-rollouts": [
+   [
+    "Argo Rollouts documentation",
+    "https://argo-rollouts.readthedocs.io/en/stable/"
+   ],
+   [
+    "Argo CD documentation",
+    "https://argo-cd.readthedocs.io/en/stable/"
+   ]
+  ],
+  "argocd/argocd-disaster-recovery-and-upgrades": [
+   [
+    "Argo CD disaster recovery",
+    "https://argo-cd.readthedocs.io/en/stable/operator-manual/disaster_recovery/"
+   ],
+   [
+    "Argo CD upgrading",
+    "https://argo-cd.readthedocs.io/en/stable/operator-manual/upgrading/overview/"
+   ]
+  ],
+  "claude-skills/skills-for-runbooks-and-operations": [
+   [
+    "Anthropic Agent Skills overview",
+    "https://docs.anthropic.com/en/docs/agents-and-tools/agent-skills/overview"
+   ],
+   [
+    "Claude documentation",
+    "https://docs.claude.com/"
+   ]
+  ],
+  "claude-skills/skills-with-references-templates-and-assets": [
+   [
+    "Anthropic Agent Skills overview",
+    "https://docs.anthropic.com/en/docs/agents-and-tools/agent-skills/overview"
+   ],
+   [
+    "Claude documentation",
+    "https://docs.claude.com/"
+   ]
+  ],
+  "claude-skills/organizing-skills-for-a-team": [
+   [
+    "Anthropic Agent Skills overview",
+    "https://docs.anthropic.com/en/docs/agents-and-tools/agent-skills/overview"
+   ],
+   [
+    "Claude documentation",
+    "https://docs.claude.com/"
+   ]
+  ],
+  "claude-skills/evaluating-and-regression-testing-skills": [
+   [
+    "Anthropic Agent Skills overview",
+    "https://docs.anthropic.com/en/docs/agents-and-tools/agent-skills/overview"
+   ],
+   [
+    "Anthropic: define success and build evaluations",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests"
+   ]
+  ],
+  "cloud-iam/gcp-iam-and-service-accounts": [
+   [
+    "Google Cloud IAM overview",
+    "https://cloud.google.com/iam/docs/overview"
+   ],
+   [
+    "Service account best practices",
+    "https://cloud.google.com/iam/docs/best-practices-service-accounts"
+   ]
+  ],
+  "cloud-iam/workload-identity-federation-and-oidc-trust": [
+   [
+    "AWS IAM roles for OIDC identity providers",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html"
+   ],
+   [
+    "Google workload identity federation",
+    "https://cloud.google.com/iam/docs/workload-identity-federation"
+   ]
+  ],
+  "cloud-iam/permission-boundaries-scps-and-guardrails": [
+   [
+    "AWS Organizations service control policies",
+    "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html"
+   ],
+   [
+    "AWS IAM permissions boundaries",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html"
+   ]
+  ],
+  "cloud-iam/iam-policy-analysis-and-unused-access": [
+   [
+    "AWS IAM Access Analyzer",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html"
+   ],
+   [
+    "Google Cloud policy analyzer",
+    "https://cloud.google.com/policy-intelligence/docs/policy-analyzer-overview"
+   ]
+  ],
+  "helm/testing-and-linting-helm-charts": [
+   [
+    "Helm chart tests",
+    "https://helm.sh/docs/topics/chart_tests/"
+   ],
+   [
+    "Helm chart best practices",
+    "https://helm.sh/docs/chart_best_practices/"
+   ]
+  ],
+  "helm/library-charts-and-chart-reuse": [
+   [
+    "Helm library charts",
+    "https://helm.sh/docs/topics/library_charts/"
+   ],
+   [
+    "Helm chart best practices",
+    "https://helm.sh/docs/chart_best_practices/"
+   ]
+  ],
+  "helm/publishing-and-signing-helm-charts": [
+   [
+    "Helm registries",
+    "https://helm.sh/docs/topics/registries/"
+   ],
+   [
+    "Helm provenance",
+    "https://helm.sh/docs/topics/provenance/"
+   ]
+  ],
+  "helm/helm-security-and-supply-chain": [
+   [
+    "Helm chart best practices",
+    "https://helm.sh/docs/chart_best_practices/"
+   ],
+   [
+    "Kubernetes Pod Security Standards",
+    "https://kubernetes.io/docs/concepts/security/pod-security-standards/"
+   ]
+  ],
+  "k8s-ops/control-plane-monitoring-and-slos": [
+   [
+    "Kubernetes metrics reference",
+    "https://kubernetes.io/docs/reference/instrumentation/metrics/"
+   ],
+   [
+    "etcd metrics",
+    "https://etcd.io/docs/latest/metrics/"
+   ]
+  ],
+  "k8s-ops/persistent-storage-and-csi-operations": [
+   [
+    "Kubernetes persistent volumes",
+    "https://kubernetes.io/docs/concepts/storage/persistent-volumes/"
+   ],
+   [
+    "Kubernetes volume snapshots",
+    "https://kubernetes.io/docs/concepts/storage/volume-snapshots/"
+   ]
+  ],
+  "k8s-ops/multi-tenancy-namespaces-and-fair-sharing": [
+   [
+    "Kubernetes multi-tenancy",
+    "https://kubernetes.io/docs/concepts/security/multi-tenancy/"
+   ],
+   [
+    "Kubernetes resource quotas",
+    "https://kubernetes.io/docs/concepts/policy/resource-quotas/"
+   ]
+  ],
+  "k8s-ops/cluster-disaster-recovery-runbook": [
+   [
+    "Kubernetes: operating etcd clusters",
+    "https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/"
+   ],
+   [
+    "Kubernetes administration",
+    "https://kubernetes.io/docs/tasks/administer-cluster/"
+   ]
+  ],
+  "llm/embeddings-and-vector-search": [
+   [
+    "Anthropic embeddings guide",
+    "https://docs.anthropic.com/en/docs/build-with-claude/embeddings"
+   ],
+   [
+    "Hugging Face sentence embeddings",
+    "https://huggingface.co/docs/transformers/index"
+   ]
+  ],
+  "llm/retrieval-augmented-generation": [
+   [
+    "Anthropic: retrieval and contextual embeddings",
+    "https://docs.anthropic.com/en/docs/build-with-claude/embeddings"
+   ],
+   [
+    "Anthropic prompt engineering overview",
+    "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview"
+   ]
+  ],
+  "llm/fine-tuning-versus-prompting-versus-rag": [
+   [
+    "Anthropic prompt engineering overview",
+    "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview"
+   ],
+   [
+    "Anthropic: define success criteria",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/define-success"
+   ]
+  ],
+  "llm/llm-safety-privacy-and-data-handling": [
+   [
+    "OWASP Top 10 for LLM applications",
+    "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+   ],
+   [
+    "NIST AI risk management framework",
+    "https://www.nist.gov/itl/ai-risk-management-framework"
+   ]
+  ],
+  "mcp/designing-good-tools-for-agents": [
+   [
+    "Model Context Protocol tools",
+    "https://modelcontextprotocol.io/docs/concepts/tools"
+   ],
+   [
+    "Anthropic: tool use with Claude",
+    "https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview"
+   ]
+  ],
+  "mcp/testing-and-debugging-mcp-servers-with-the-inspector": [
+   [
+    "Model Context Protocol documentation",
+    "https://modelcontextprotocol.io/"
+   ],
+   [
+    "MCP Inspector",
+    "https://modelcontextprotocol.io/docs/tools/inspector"
+   ]
+  ],
+  "mcp/deploying-and-scaling-mcp-servers": [
+   [
+    "Model Context Protocol transports",
+    "https://modelcontextprotocol.io/docs/concepts/transports"
+   ],
+   [
+    "MCP authorization",
+    "https://modelcontextprotocol.io/specification/2025-06-18/basic/authorization"
+   ]
+  ],
+  "mcp/composing-multiple-mcp-servers": [
+   [
+    "Model Context Protocol architecture",
+    "https://modelcontextprotocol.io/docs/concepts/architecture"
+   ],
+   [
+    "Anthropic: tool use with Claude",
+    "https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview"
+   ]
+  ],
+  "mlops/feature-stores-and-data-versioning": [
+   [
+    "MLflow documentation",
+    "https://mlflow.org/docs/latest/index.html"
+   ],
+   [
+    "Kubeflow documentation",
+    "https://www.kubeflow.org/docs/"
+   ]
+  ],
+  "mlops/model-evaluation-ab-tests-and-shadow-deployments": [
+   [
+    "MLflow documentation",
+    "https://mlflow.org/docs/latest/index.html"
+   ],
+   [
+    "Evidently AI documentation",
+    "https://docs.evidentlyai.com/"
+   ]
+  ],
+  "mlops/ml-pipelines-and-workflow-orchestration": [
+   [
+    "Kubeflow Pipelines",
+    "https://www.kubeflow.org/docs/components/pipelines/"
+   ],
+   [
+    "Apache Airflow documentation",
+    "https://airflow.apache.org/docs/"
+   ]
+  ],
+  "mlops/llmops-prompts-evals-and-versioning": [
+   [
+    "Anthropic: develop test cases",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests"
+   ],
+   [
+    "MLflow documentation",
+    "https://mlflow.org/docs/latest/index.html"
+   ]
+  ],
+  "openstack/cinder-glance-and-storage-services": [
+   [
+    "OpenStack Cinder documentation",
+    "https://docs.openstack.org/cinder/latest/"
+   ],
+   [
+    "OpenStack Glance documentation",
+    "https://docs.openstack.org/glance/latest/"
+   ]
+  ],
+  "openstack/horizon-heat-and-openstack-automation": [
+   [
+    "OpenStack Heat documentation",
+    "https://docs.openstack.org/heat/latest/"
+   ],
+   [
+    "OpenStack SDK documentation",
+    "https://docs.openstack.org/openstacksdk/latest/"
+   ]
+  ],
+  "openstack/deploying-openstack-with-kolla-ansible": [
+   [
+    "Kolla-Ansible documentation",
+    "https://docs.openstack.org/kolla-ansible/latest/"
+   ],
+   [
+    "OpenStack installation guides",
+    "https://docs.openstack.org/install-guide/"
+   ]
+  ],
+  "openstack/openstack-monitoring-and-capacity-planning": [
+   [
+    "OpenStack monitoring",
+    "https://docs.openstack.org/operations-guide/ops-monitoring.html"
+   ],
+   [
+    "Prometheus documentation",
+    "https://prometheus.io/docs/introduction/overview/"
+   ]
+  ],
+  "prompting/prompting-for-code-and-infrastructure": [
+   [
+    "Anthropic prompt engineering overview",
+    "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview"
+   ],
+   [
+    "Terraform documentation",
+    "https://developer.hashicorp.com/terraform/docs"
+   ]
+  ],
+  "prompting/prompt-injection-and-defensive-prompting": [
+   [
+    "OWASP Top 10 for LLM applications",
+    "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+   ],
+   [
+    "Anthropic: mitigate jailbreaks and prompt injections",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks"
+   ]
+  ],
+  "prompting/agents-and-multi-step-workflows": [
+   [
+    "Anthropic: building effective agents",
+    "https://www.anthropic.com/research/building-effective-agents"
+   ],
+   [
+    "Anthropic: tool use with Claude",
+    "https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview"
+   ]
+  ],
+  "prompting/evaluating-prompts-with-datasets": [
+   [
+    "Anthropic: develop test cases",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests"
+   ],
+   [
+    "Anthropic: define success criteria",
+    "https://docs.anthropic.com/en/docs/test-and-evaluate/define-success"
+   ]
+  ],
+  "virtualization/vm-backup-replication-and-recovery": [
+   [
+    "libvirt documentation",
+    "https://libvirt.org/docs.html"
+   ],
+   [
+    "Proxmox documentation",
+    "https://pve.proxmox.com/pve-docs/"
+   ]
+  ],
+  "virtualization/vm-templates-cloud-init-and-image-pipelines": [
+   [
+    "HashiCorp Packer documentation",
+    "https://developer.hashicorp.com/packer/docs"
+   ],
+   [
+    "cloud-init documentation",
+    "https://cloudinit.readthedocs.io/en/latest/"
+   ]
+  ],
+  "virtualization/gpu-passthrough-and-device-assignment": [
+   [
+    "libvirt PCI passthrough",
+    "https://libvirt.org/formatdomain.html#pci-devices"
+   ],
+   [
+    "Linux VFIO documentation",
+    "https://docs.kernel.org/driver-api/vfio.html"
+   ]
+  ],
+  "virtualization/hypervisor-security-and-isolation": [
+   [
+    "libvirt security",
+    "https://libvirt.org/securityprocess.html"
+   ],
+   [
+    "QEMU security",
+    "https://www.qemu.org/docs/master/system/security.html"
+   ]
+  ],
+  "ansible/ansible-performance-and-execution-strategies": [
+   [
+    "Ansible playbook strategies",
+    "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_strategies.html"
+   ],
+   [
+    "Ansible configuration settings",
+    "https://docs.ansible.com/ansible/latest/reference_appendices/config.html"
+   ]
+  ],
+  "ansible/writing-custom-ansible-modules-and-filters": [
+   [
+    "Developing Ansible modules",
+    "https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html"
+   ],
+   [
+    "Ansible plugins",
+    "https://docs.ansible.com/ansible/latest/plugins/plugins.html"
+   ]
+  ],
+  "git/git-internals-objects-refs-and-the-index": [
+   [
+    "Pro Git: Git internals",
+    "https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain"
+   ],
+   [
+    "Git documentation",
+    "https://git-scm.com/docs"
+   ]
+  ],
+  "git/release-and-hotfix-workflows-with-git": [
+   [
+    "Pro Git: branching workflows",
+    "https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows"
+   ],
+   [
+    "Semantic Versioning",
+    "https://semver.org/"
+   ]
+  ],
+  "go/configuration-logging-and-metrics-in-go-services": [
+   [
+    "Go slog package",
+    "https://pkg.go.dev/log/slog"
+   ],
+   [
+    "Prometheus client for Go",
+    "https://prometheus.io/docs/guides/go-application/"
+   ]
+  ],
+  "go/writing-kubernetes-clients-and-controllers-in-go": [
+   [
+    "Kubernetes client-go",
+    "https://github.com/kubernetes/client-go"
+   ],
+   [
+    "Kubernetes controllers",
+    "https://kubernetes.io/docs/concepts/architecture/controller/"
+   ]
+  ],
+  "bash/log-analysis-one-liners-and-pipelines": [
+   [
+    "GNU awk manual",
+    "https://www.gnu.org/software/gawk/manual/gawk.html"
+   ],
+   [
+    "jq manual",
+    "https://jqlang.github.io/jq/manual/"
+   ]
+  ],
+  "databases/database-observability-and-capacity-planning": [
+   [
+    "PostgreSQL monitoring statistics",
+    "https://www.postgresql.org/docs/current/monitoring-stats.html"
+   ],
+   [
+    "Prometheus documentation",
+    "https://prometheus.io/docs/introduction/overview/"
+   ]
+  ],
+  "storage/storage-benchmarking-with-fio": [
+   [
+    "fio documentation",
+    "https://fio.readthedocs.io/en/latest/"
+   ],
+   [
+    "Linux block layer documentation",
+    "https://docs.kernel.org/block/index.html"
+   ]
+  ],
+  "security/web-and-api-attacks-for-operators": [
+   [
+    "OWASP Top 10",
+    "https://owasp.org/www-project-top-ten/"
+   ],
+   [
+    "OWASP API Security Top 10",
+    "https://owasp.org/API-Security/"
+   ]
+  ],
+  "security/sast-dast-and-dependency-scanning-gates": [
+   [
+    "OWASP DevSecOps guideline",
+    "https://owasp.org/www-project-devsecops-guideline/"
+   ],
+   [
+    "NIST Secure Software Development Framework",
+    "https://csrc.nist.gov/projects/ssdf"
+   ]
+  ],
+  "security/cloud-posture-and-misconfiguration-management": [
+   [
+    "CIS Benchmarks",
+    "https://www.cisecurity.org/cis-benchmarks"
+   ],
+   [
+    "AWS Security Hub documentation",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html"
+   ]
+  ],
+  "security/security-champions-and-secure-code-review": [
+   [
+    "OWASP Security Champions guide",
+    "https://owasp.org/www-project-security-culture/"
+   ],
+   [
+    "OWASP Code Review Guide",
+    "https://owasp.org/www-project-code-review-guide/"
+   ]
+  ],
+  "security/incident-forensics-and-evidence-handling": [
+   [
+    "NIST incident response guide SP 800-61",
+    "https://csrc.nist.gov/pubs/sp/800/61/r2/final"
+   ],
+   [
+    "CISA incident response resources",
+    "https://www.cisa.gov/topics/cybersecurity-best-practices"
+   ]
+  ],
+  "security/audit-readiness-and-continuous-compliance-evidence": [
+   [
+    "NIST Cybersecurity Framework",
+    "https://www.nist.gov/cyberframework"
+   ],
+   [
+    "CIS Critical Security Controls",
+    "https://www.cisecurity.org/controls"
+   ]
   ]
  },
  "sheets": {
