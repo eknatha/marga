@@ -1,0 +1,697 @@
+[
+ {
+  "id": "x-msg-models",
+  "module": "messaging",
+  "lesson": "messaging/queues-logs-and-pub-sub-choosing-a-model",
+  "title": "One event, three messaging models",
+  "summary": "A queue, a topic and a log treat the same message differently.",
+  "actors": [
+   "Producer",
+   "Queue",
+   "Topic",
+   "Log"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Send to a queue",
+    "n": "The producer sends a job to the queue and one worker will take it."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Message removed",
+    "n": "Once the worker acknowledges, the queue deletes the message for good."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Publish to a topic",
+    "n": "The same producer publishes an event and every subscriber receives its own copy."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Append to a log",
+    "n": "The event is appended to the log with an offset and stays for the retention period."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Late reader replays",
+    "n": "A new consumer starts at an older offset and reads history that the queue no longer holds."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Same event, many readers",
+    "n": "Billing and search each keep their own offset in the log and read at their own speed."
+   }
+  ]
+ },
+ {
+  "id": "x-msg-delivery",
+  "module": "messaging",
+  "lesson": "messaging/delivery-guarantees-ordering-and-idempotency",
+  "title": "A duplicate delivery made harmless",
+  "summary": "The consumer checks a message id before applying the effect.",
+  "actors": [
+   "Broker",
+   "Consumer",
+   "Database",
+   "Producer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Deliver message 7f3a",
+    "n": "The broker delivers a message with a stable id to the consumer."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Record id and apply",
+    "n": "In one transaction the consumer inserts the id and updates the data."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Acknowledge lost",
+    "n": "The acknowledgement is lost on the network, so the broker thinks the work failed."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Redeliver 7f3a",
+    "n": "The broker delivers the same message again after the timeout."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Id already present",
+    "n": "The insert finds the id already recorded, so no row is inserted."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Skip and acknowledge",
+    "n": "The consumer skips the effect, acknowledges, and the customer is charged only once."
+   }
+  ]
+ },
+ {
+  "id": "x-msg-rabbit",
+  "module": "messaging",
+  "lesson": "messaging/rabbitmq-exchanges-queues-and-routing",
+  "title": "A message routed by a topic exchange",
+  "summary": "The exchange copies the message into every queue whose binding matches.",
+  "actors": [
+   "Producer",
+   "Exchange",
+   "Billing queue",
+   "Search queue"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Publish with a key",
+    "n": "The producer publishes to the events exchange with routing key order.paid.eu."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Match bindings",
+    "n": "The topic exchange compares the key with each binding pattern."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Copy to billing",
+    "n": "The billing binding order.paid.# matches, so a copy enters the billing queue."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Copy to search",
+    "n": "The search binding order.# also matches, so it receives a copy too."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "No match elsewhere",
+    "n": "A queue bound to refund.# does not match and gets nothing."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Consumer reads",
+    "n": "The billing consumer takes the message and acknowledges it when done."
+   }
+  ]
+ },
+ {
+  "id": "x-msg-rabbitdlx",
+  "module": "messaging",
+  "lesson": "messaging/rabbitmq-acknowledgements-prefetch-and-dead-letters",
+  "title": "Retry then park a failing message",
+  "summary": "A delayed retry queue limits attempts and a parked queue holds the rest.",
+  "actors": [
+   "Main queue",
+   "Consumer",
+   "Retry queue",
+   "Parked queue"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Deliver with prefetch",
+    "n": "The queue hands the consumer up to its prefetch limit of messages."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Processing fails",
+    "n": "The consumer cannot process one message because the payload is malformed."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Reject without requeue",
+    "n": "The consumer rejects it and the broker dead-letters it into the retry queue."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Wait for TTL",
+    "n": "The retry queue holds it for 30 seconds before it expires."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Return to main",
+    "n": "On expiry the message is dead-lettered back to the main queue for another attempt."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "After N attempts",
+    "n": "Once the attempt header reaches the limit the message goes to the parked queue for a human."
+   }
+  ]
+ },
+ {
+  "id": "x-msg-kpart",
+  "module": "messaging",
+  "lesson": "messaging/kafka-topics-partitions-and-brokers",
+  "title": "A keyed record reaches its partition",
+  "summary": "The same key always lands in the same partition so order is kept.",
+  "actors": [
+   "Producer",
+   "Partitioner",
+   "Broker 1",
+   "Broker 2"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Send record with key",
+    "n": "The producer sends an order event with the key order-4411."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Hash the key",
+    "n": "The partitioner hashes the key and takes it modulo the partition count."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Leader for partition 2",
+    "n": "Partition 2 is led by broker 1, so the record is sent there."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Replicate",
+    "n": "The followers on broker 2 fetch the record and copy it to their logs."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Acknowledge",
+    "n": "With acks=all the leader answers after enough replicas have the record."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Later record, same key",
+    "n": "The next event for order-4411 hashes to the same partition and keeps its order."
+   }
+  ]
+ },
+ {
+  "id": "x-msg-group",
+  "module": "messaging",
+  "lesson": "messaging/kafka-producers-consumers-and-consumer-groups",
+  "title": "A consumer group rebalance",
+  "summary": "Partitions move when a member joins, and consumption pauses briefly.",
+  "actors": [
+   "Consumer 1",
+   "Coordinator",
+   "Consumer 2",
+   "Topic"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Reading all six",
+    "n": "Consumer 1 is alone in the group and reads all six partitions of the topic."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "New member joins",
+    "n": "Consumer 2 starts and sends a join request to the group coordinator."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Rebalance begins",
+    "n": "The coordinator tells members to stop and rejoin, so reading pauses."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Assign partitions",
+    "n": "The coordinator assigns three partitions to each consumer."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Assignment sent",
+    "n": "Consumer 2 receives partitions 3 to 5 and Consumer 1 keeps 0 to 2."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Resume from commit",
+    "n": "Each consumer resumes from the last committed offset of its partitions."
+   }
+  ]
+ },
+ {
+  "id": "x-msg-isr",
+  "module": "messaging",
+  "lesson": "messaging/kafka-replication-isr-and-durability",
+  "title": "Leader failure with a healthy ISR",
+  "summary": "A caught-up follower becomes leader, so no acknowledged record is lost.",
+  "actors": [
+   "Producer",
+   "Leader",
+   "Follower",
+   "Controller"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Write with acks=all",
+    "n": "The producer writes a record and waits for in-sync replicas to confirm."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Follower copies",
+    "n": "The follower fetches the record and stays in the in-sync set."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Acknowledged",
+    "n": "The record is acknowledged only after min.insync.replicas have it."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Leader crashes",
+    "n": "The leader broker stops, and the partition has no leader for a moment."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Elect from ISR",
+    "n": "The controller promotes the follower, which already has every acknowledged record."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Writes continue",
+    "n": "The producer finds the new leader and carries on without data loss."
+   }
+  ]
+ },
+ {
+  "id": "x-msg-compact",
+  "module": "messaging",
+  "lesson": "messaging/kafka-retention-compaction-and-storage",
+  "title": "Log compaction keeps the latest value",
+  "summary": "Older records for a key are removed in the background.",
+  "actors": [
+   "Producer",
+   "Log",
+   "Cleaner",
+   "Consumer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Write updates",
+    "n": "The producer appends user-1 = A, user-2 = B, then user-1 = C to a compacted topic."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Cleaner scans",
+    "n": "A background cleaner reads closed segments and finds duplicate keys."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Drop old values",
+    "n": "It removes user-1 = A because a newer value exists."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Tombstone",
+    "n": "The producer writes user-2 with a null value to delete that key."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Remove after delay",
+    "n": "After the delete retention time the cleaner removes the key itself."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Read a snapshot",
+    "n": "A new consumer reading from the start sees only the latest value per key."
+   }
+  ]
+ },
+ {
+  "id": "x-msg-lag",
+  "module": "messaging",
+  "lesson": "messaging/kafka-lag-rebalances-and-capacity-in-operation",
+  "title": "Spotting and fixing consumer lag",
+  "summary": "Lag is read per partition, then traced to a cause.",
+  "actors": [
+   "Monitor",
+   "Consumer",
+   "Broker",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Read the lag",
+    "n": "Monitoring shows partition 1 is 18 minutes behind while the others are current."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Check the consumer",
+    "n": "The operator finds the consumer for partition 1 alive but stuck on one slow call."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Check the broker",
+    "n": "Broker metrics look normal, with no under-replicated partitions."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Slow dependency",
+    "n": "The consumer waits for a downstream API that has become slow."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Fix the dependency",
+    "n": "The operator adds a timeout and a retry limit, then restarts the consumer."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Lag falls",
+    "n": "The consumer catches up and lag in minutes returns to near zero."
+   }
+  ]
+ },
+ {
+  "id": "x-msg-cloud",
+  "module": "messaging",
+  "lesson": "messaging/managed-messaging-on-cloud-sqs-sns-pub-sub-and-event-hubs",
+  "title": "Fan-out with a topic and queues",
+  "summary": "One publish reaches several queues, each with its own dead-letter queue.",
+  "actors": [
+   "Publisher",
+   "Topic",
+   "Billing queue",
+   "Dead-letter queue"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Publish once",
+    "n": "The service publishes the order event to the topic."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Copy to billing",
+    "n": "The topic delivers a copy to the billing queue."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Visibility window",
+    "n": "A worker receives the message and it is hidden from others for the visibility timeout."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Too many failures",
+    "n": "After the maximum receive count the message moves to the dead-letter queue."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Alert fires",
+    "n": "An alarm on the dead-letter queue depth notifies the team."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Redrive after a fix",
+    "n": "After the bug is fixed the team redrives the parked messages back to the billing queue."
+   }
+  ]
+ },
+ {
+  "id": "x-msg-schema",
+  "module": "messaging",
+  "lesson": "messaging/schemas-contracts-and-evolving-messages",
+  "title": "A schema change checked in CI",
+  "summary": "The registry refuses a change that would break existing readers.",
+  "actors": [
+   "Developer",
+   "CI",
+   "Registry",
+   "Consumers"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Open a pull request",
+    "n": "The developer changes a field name in the schema file."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Ask the registry",
+    "n": "CI sends the new schema to the registry's compatibility check."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Reject",
+    "n": "The registry reports that renaming the field breaks backward compatibility."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Build fails",
+    "n": "The pull request cannot merge, and the message says which rule failed."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Add instead",
+    "n": "The developer adds the new field with a default and keeps the old one."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Accept",
+    "n": "The registry accepts the change as compatible."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Safe rollout",
+    "n": "Consumers keep reading old and new records while the old field is retired later."
+   }
+  ]
+ },
+ {
+  "id": "x-msg-failsilent",
+  "module": "messaging",
+  "lesson": "messaging/debugging-messaging-incidents",
+  "title": "Failure and recovery: messages dropped by an exchange",
+  "summary": "A routing key typo loses messages without any error.",
+  "actors": [
+   "Producer",
+   "Exchange",
+   "Consumer",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Publish with new key",
+    "n": "The producer starts publishing with the key order.payed.eu after a code change."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "No binding matches",
+    "n": "The topic exchange finds no queue bound to that key."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Message dropped",
+    "n": "With no alternate exchange the message is silently discarded."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Consumer idle",
+    "n": "The consumer sees nothing wrong and simply receives fewer messages."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Trace one order",
+    "n": "The operator follows one order id and finds it published but never delivered."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Read broker counters",
+    "n": "The exchange shows a rising unroutable count that matches the missing orders."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Fix the key",
+    "n": "The producer is corrected and an alternate exchange is added to catch unroutable messages."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Replay missed orders",
+    "n": "The missed orders are republished from the outbox, and an alert is set on the dropped count."
+   }
+  ],
+  "kind": "failure"
+ },
+ {
+  "id": "x-msg-failfull",
+  "module": "messaging",
+  "lesson": "messaging/kafka-retention-compaction-and-storage",
+  "title": "Failure and recovery: Kafka disk fills up",
+  "summary": "A traffic spike outruns retention and brokers stop accepting writes.",
+  "actors": [
+   "Producer",
+   "Broker",
+   "Operator",
+   "Consumer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Traffic doubles",
+    "n": "A bug in a producer sends twice the normal volume of records."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Disk grows fast",
+    "n": "The topic keeps data for seven days, so disk use climbs far faster than planned."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Disk reaches 100 percent",
+    "n": "The log directory fills and the broker marks it failed and stops."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Writes fail",
+    "n": "Producers receive errors because partitions have no available leader."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Free space",
+    "n": "The operator lowers retention on the noisy topic so old segments are deleted."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Stop the cause",
+    "n": "The buggy producer is rolled back and a quota is added for it."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Broker restarts",
+    "n": "With space available the broker starts, replicas catch up and partitions come back."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Consumers resume",
+    "n": "Consumers continue from their committed offsets with no gaps in the data."
+   }
+  ],
+  "kind": "failure"
+ }
+]

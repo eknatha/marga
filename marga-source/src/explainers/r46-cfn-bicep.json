@@ -1,0 +1,691 @@
+[
+ {
+  "id": "x-cf-native",
+  "module": "cfn-bicep",
+  "lesson": "cfn-bicep/native-iac-cloudformation-bicep-or-terraform",
+  "title": "Where state lives in each tool",
+  "summary": "The cloud keeps state for native tools, while you keep it for Terraform.",
+  "actors": [
+   "Engineer",
+   "CloudFormation",
+   "Terraform",
+   "Cloud"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Submit a template",
+    "n": "The engineer sends a template and CloudFormation records it as a stack."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Create resources",
+    "n": "The service creates the resources and tracks them itself, so no state file is needed."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Run terraform apply",
+    "n": "With Terraform the engineer plans and applies from their own machine or pipeline."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Write state",
+    "n": "Terraform writes what it created to a state file in a backend that the team must protect."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Create resources",
+    "n": "Terraform calls the same cloud APIs to build the resources."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "State is lost",
+    "n": "If the state file is corrupted, Terraform no longer knows what it owns until it is repaired."
+   }
+  ]
+ },
+ {
+  "id": "x-cf-template",
+  "module": "cfn-bicep",
+  "lesson": "cfn-bicep/cloudformation-templates-parameters-and-resources",
+  "title": "Deploying a CloudFormation stack",
+  "summary": "Validation, deploy and events show the path from file to resources.",
+  "actors": [
+   "Engineer",
+   "CLI",
+   "CloudFormation",
+   "Resources"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Validate",
+    "n": "The engineer runs validate-template to catch syntax errors early."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Deploy",
+    "n": "The deploy command uploads the template with parameter values."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Create the stack",
+    "n": "CloudFormation reads the template and builds a plan of resources and dependencies."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Create in order",
+    "n": "It creates resources in dependency order, such as the role before the function."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Stream events",
+    "n": "Each resource status is reported as an event the CLI prints."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Stack complete",
+    "n": "The stack reaches CREATE_COMPLETE and outputs become available."
+   }
+  ]
+ },
+ {
+  "id": "x-cf-func",
+  "module": "cfn-bicep",
+  "lesson": "cfn-bicep/intrinsic-functions-conditions-and-mappings",
+  "title": "Resolving a template at deploy time",
+  "summary": "Parameters, mappings and conditions turn one template into an environment.",
+  "actors": [
+   "Parameters",
+   "Mappings",
+   "Conditions",
+   "Resources"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Env is prod",
+    "n": "The deployer passes Env=prod as a parameter."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Lookup size",
+    "n": "FindInMap uses Env to read the instance type m5.large from the mapping."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Evaluate IsProd",
+    "n": "The condition IsProd becomes true because Env equals prod."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Create the alarm",
+    "n": "The alarm resource guarded by IsProd is created."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Apply the size",
+    "n": "The server resource receives the looked-up instance type."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Dev differs",
+    "n": "With Env=dev the alarm is skipped and a smaller instance is used from the same file."
+   }
+  ]
+ },
+ {
+  "id": "x-cf-change",
+  "module": "cfn-bicep",
+  "lesson": "cfn-bicep/stacks-change-sets-and-safe-updates",
+  "title": "Reading a change set before updating",
+  "summary": "The preview shows replacement before data is lost.",
+  "actors": [
+   "Engineer",
+   "Change set",
+   "Reviewer",
+   "Stack"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Create change set",
+    "n": "The engineer proposes the new template without applying it."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Compute the diff",
+    "n": "CloudFormation compares the new template to the running stack."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Show the changes",
+    "n": "The change set lists Modify Database with Replacement True."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Stop and think",
+    "n": "The reviewer sees that replacement would delete the database and asks for a snapshot policy."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Adjust and recreate",
+    "n": "The engineer adds UpdateReplacePolicy Snapshot and creates a new change set."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Approve",
+    "n": "The reviewer approves, the change set is executed and the stack updates safely."
+   }
+  ]
+ },
+ {
+  "id": "x-cf-nested",
+  "module": "cfn-bicep",
+  "lesson": "cfn-bicep/nested-stacks-stacksets-and-reusable-modules",
+  "title": "A StackSet rollout",
+  "summary": "One template reaches many accounts with a stop on failure.",
+  "actors": [
+   "Admin",
+   "StackSet",
+   "Account A",
+   "Account B"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Create the StackSet",
+    "n": "The admin defines a baseline role template and the target accounts."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Deploy to account A",
+    "n": "The first batch deploys the stack to account A."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Deploy to account B",
+    "n": "Account B receives the stack in the same batch within the concurrency limit."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "One failure",
+    "n": "Account B reports a failure because a role name already exists."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Failure tolerance",
+    "n": "The tolerance of one failure is reached, so the rollout stops before reaching more accounts."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fix and resume",
+    "n": "The admin fixes the conflict and resumes the operation."
+   }
+  ]
+ },
+ {
+  "id": "x-cf-drift",
+  "module": "cfn-bicep",
+  "lesson": "cfn-bicep/drift-rollbacks-and-resource-protection",
+  "title": "Drift detection finds a manual change",
+  "summary": "A console edit is found and reconciled through code.",
+  "actors": [
+   "Engineer",
+   "Cloud console",
+   "CloudFormation",
+   "Resource"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Quick fix by hand",
+    "n": "An engineer opens a security group port in the console during an incident."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Resource changes",
+    "n": "The real security group now differs from the template."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Detect drift",
+    "n": "A scheduled drift detection compares actual properties with the template."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Report MODIFIED",
+    "n": "The report shows the expected and actual values for the changed rule."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Decide",
+    "n": "The team decides the rule is not needed and re-applies the stack."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Back in sync",
+    "n": "The resource matches the template again and the manual change is gone."
+   }
+  ]
+ },
+ {
+  "id": "x-cf-bicep",
+  "module": "cfn-bicep",
+  "lesson": "cfn-bicep/bicep-syntax-resources-and-parameters",
+  "title": "From Bicep file to Azure resources",
+  "summary": "The compiler checks the file and Resource Manager creates resources.",
+  "actors": [
+   "Engineer",
+   "Bicep compiler",
+   "Resource Manager",
+   "Resource group"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Write main.bicep",
+    "n": "The engineer writes parameters, a storage account resource and an output."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Compile",
+    "n": "The Bicep compiler checks types and produces an ARM template."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Submit deployment",
+    "n": "The ARM template and parameters are sent to Azure Resource Manager."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Order the work",
+    "n": "Resource Manager reads references and decides which resources come first."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Create resources",
+    "n": "The storage account is created inside the resource group."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Return outputs",
+    "n": "The blob endpoint is returned as a deployment output."
+   }
+  ]
+ },
+ {
+  "id": "x-cf-module",
+  "module": "cfn-bicep",
+  "lesson": "cfn-bicep/bicep-modules-loops-and-conditions",
+  "title": "A module with a loop",
+  "summary": "One module creates a subnet for each name in a list.",
+  "actors": [
+   "Main file",
+   "Module",
+   "Loop",
+   "vnet"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Call the module",
+    "n": "main.bicep passes the vnet name and a list of subnet names."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Create the vnet",
+    "n": "The module declares the virtual network first."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Loop over names",
+    "n": "A for expression creates one subnet resource for each name."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Subnets attach",
+    "n": "Each subnet is created as a child of the vnet with its own address range."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Return outputs",
+    "n": "The module returns the vnet id for other modules to use."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Add a name later",
+    "n": "Adding one more name to the list creates one more subnet and leaves the others untouched."
+   }
+  ]
+ },
+ {
+  "id": "x-cf-whatif",
+  "module": "cfn-bicep",
+  "lesson": "cfn-bicep/bicep-deployments-what-if-and-scopes",
+  "title": "What-if prevents a surprise delete",
+  "summary": "The preview exposes a delete that complete mode would perform.",
+  "actors": [
+   "Pipeline",
+   "What-if",
+   "Reviewer",
+   "Azure"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Run what-if",
+    "n": "The pipeline runs what-if for the pull request before any deployment."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Compare with Azure",
+    "n": "The preview compares the template with the current resource group contents."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Show results",
+    "n": "It lists a Create, a Modify and a Delete for a virtual machine."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Spot the delete",
+    "n": "The reviewer notices the template was run in complete mode with a partial file."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Change the mode",
+    "n": "The pipeline is switched to incremental mode and the template is completed."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Deploy safely",
+    "n": "The deployment now adds and updates resources without deleting the VM."
+   }
+  ]
+ },
+ {
+  "id": "x-cf-oidc",
+  "module": "cfn-bicep",
+  "lesson": "cfn-bicep/deployment-stacks-and-delivery-pipelines",
+  "title": "A pipeline using a federated identity",
+  "summary": "No secret is stored because a short-lived token is exchanged.",
+  "actors": [
+   "Pipeline",
+   "CI provider",
+   "Cloud identity",
+   "Cloud"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Job starts",
+    "n": "The pipeline job starts and requests an OIDC token from the CI provider."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Token issued",
+    "n": "The token states the repository, branch and environment of the job."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Present the token",
+    "n": "The pipeline presents it to the cloud identity service."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Check the trust rule",
+    "n": "The cloud checks that the token matches the rule allowing only the main branch to deploy."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Short-lived credentials",
+    "n": "The cloud returns credentials that expire in about an hour."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Deploy",
+    "n": "The pipeline deploys with these credentials, and nothing secret was ever stored."
+   }
+  ]
+ },
+ {
+  "id": "x-cf-lint",
+  "module": "cfn-bicep",
+  "lesson": "cfn-bicep/testing-linting-and-policy-checks-for-templates",
+  "title": "Checks before a template merges",
+  "summary": "Lint, policy and preview run in a fixed order.",
+  "actors": [
+   "Developer",
+   "Linter",
+   "Policy engine",
+   "CI"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Open a pull request",
+    "n": "The developer pushes a template change and CI starts."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Lint",
+    "n": "cfn-lint checks the syntax and property names and reports no errors."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Policy check",
+    "n": "cfn-guard evaluates the rule that security groups must not allow SSH from anywhere."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Rule fails",
+    "n": "The check reports the offending rule and its location."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Merge blocked",
+    "n": "The pull request cannot merge until the source range is narrowed."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Fix and push",
+    "n": "The developer fixes the rule, all checks pass and the preview is attached for review."
+   }
+  ]
+ },
+ {
+  "id": "x-cf-failevents",
+  "module": "cfn-bicep",
+  "lesson": "cfn-bicep/debugging-failed-deployments-and-moving-to-terraform",
+  "title": "Failure and recovery: a stack create fails",
+  "summary": "The first failed event holds the real reason.",
+  "actors": [
+   "Engineer",
+   "CloudFormation",
+   "Resource",
+   "CloudTrail"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Deploy",
+    "n": "The engineer deploys a stack and sees a vague message that creation failed."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Resource creation fails",
+    "n": "One bucket is rejected because its name is already used in another account."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Rollback starts",
+    "n": "CloudFormation cancels the remaining resources and begins to roll back."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Read the events",
+    "n": "The engineer lists stack events and looks at the earliest failure, not the last."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Find the reason",
+    "n": "The event says the bucket name already exists, which explains all the later cancellations."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Delete the failed stack",
+    "n": "A stack stuck in ROLLBACK_COMPLETE cannot be updated, so it is deleted."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Redeploy",
+    "n": "The template now lets CloudFormation generate the name and the deploy is repeated."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Check who changed what",
+    "n": "CloudTrail confirms the pipeline role made the calls, with no permission problems."
+   }
+  ],
+  "kind": "failure"
+ },
+ {
+  "id": "x-cf-faildrift",
+  "module": "cfn-bicep",
+  "lesson": "cfn-bicep/drift-rollbacks-and-resource-protection",
+  "title": "Failure and recovery: replacement deletes a database",
+  "summary": "A small change replaced a database and the team recovers from a snapshot.",
+  "actors": [
+   "Engineer",
+   "Stack",
+   "Database",
+   "Backup"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Update the stack",
+    "n": "The engineer changes a database property and runs the update directly."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Replacement",
+    "n": "The property requires replacement, so a new empty database is created."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Old one deleted",
+    "n": "The old database is deleted when the update completes."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Orders missing",
+    "n": "The application starts and reports that all tables are empty."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Find the backup",
+    "n": "The engineer finds the last automated snapshot from earlier that day."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Restore",
+    "n": "A new database is restored from the snapshot and the application is pointed at it."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Add protection",
+    "n": "UpdateReplacePolicy Snapshot, DeletionPolicy and a change set review step are added."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Safe next time",
+    "n": "Future replacements keep a snapshot and are reviewed before they run."
+   }
+  ],
+  "kind": "failure"
+ }
+]

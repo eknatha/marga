@@ -1,0 +1,739 @@
+[
+ {
+  "id": "x-px-what",
+  "module": "proxies",
+  "lesson": "proxies/what-a-reverse-proxy-does",
+  "title": "How a reverse proxy handles a request",
+  "summary": "One public entry point hides many private servers.",
+  "actors": [
+   "Browser",
+   "Reverse proxy",
+   "App server",
+   "Cache"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request arrives",
+    "n": "The browser connects to the one public address, which belongs to the proxy rather than to any app server."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Check the rules",
+    "n": "The proxy matches the host name and path against its configuration to pick a backend."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Look in the cache",
+    "n": "For a cacheable page the proxy first asks its cache, which may answer without bothering the app."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Forward the request",
+    "n": "On a miss the proxy opens or reuses a connection to the app and adds headers such as X-Forwarded-For."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "App answers",
+    "n": "The app server builds the response and sends it back to the proxy only, never to the browser directly."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Store a copy",
+    "n": "If the response is cacheable the proxy saves it so the next visitor is served faster."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Reply to the browser",
+    "n": "The proxy returns the response, and the browser never learns which server did the work."
+   }
+  ]
+ },
+ {
+  "id": "x-px-nginx",
+  "module": "proxies",
+  "lesson": "proxies/nginx-configuration-servers-and-locations",
+  "title": "How nginx picks a server and a location",
+  "summary": "Two matching steps decide which block handles a request.",
+  "actors": [
+   "Client",
+   "nginx",
+   "Server block",
+   "Location block"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request with Host header",
+    "n": "The client sends a request whose Host header names the site it wants."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Match the server",
+    "n": "nginx compares the listening port and the Host header with each server block and selects the best match."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Default server",
+    "n": "If nothing matches, the first or the default_server block answers, which is why unknown hosts reach a surprising site."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Match the location",
+    "n": "Inside the server, nginx tests exact locations, then the longest prefix, then regular expressions."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Apply directives",
+    "n": "The chosen location sets root, proxy_pass or return rules, and only that block applies."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Send the response",
+    "n": "The result goes back to the client, and the access log records which location handled it."
+   }
+  ]
+ },
+ {
+  "id": "x-px-headers",
+  "module": "proxies",
+  "lesson": "proxies/proxying-to-upstreams-headers-and-buffers",
+  "title": "What a proxy adds on the way to the app",
+  "summary": "Headers carry the client identity that a proxy would otherwise hide.",
+  "actors": [
+   "Client",
+   "Proxy",
+   "App",
+   "Log"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Client connects",
+    "n": "The client address 203.0.113.9 reaches the proxy, which is now the only peer the app can see."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Add forwarding headers",
+    "n": "The proxy sets X-Forwarded-For, X-Forwarded-Proto and Host so the app can know the original request."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Forward with buffering",
+    "n": "The proxy buffers the response from the app so a slow client does not keep the app busy."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "App logs the address",
+    "n": "Without trusting the headers the app would log the proxy address for every user."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Response returns",
+    "n": "The app finishes quickly and is free for the next request while the proxy handles the slow client."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Slow client reads",
+    "n": "The proxy feeds the buffered response at the client's own speed."
+   }
+  ]
+ },
+ {
+  "id": "x-px-tls",
+  "module": "proxies",
+  "lesson": "proxies/tls-termination-http2-and-certificates",
+  "title": "TLS termination at the proxy",
+  "summary": "The proxy ends encryption and talks plainly or re-encrypts to the app.",
+  "actors": [
+   "Browser",
+   "Proxy",
+   "Certificate store",
+   "App"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "ClientHello",
+    "n": "The browser starts TLS and names the site it wants using the SNI extension."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Find the certificate",
+    "n": "The proxy picks the certificate that matches the name from its store."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Certificate returned",
+    "n": "The matching certificate and chain are loaded for the handshake."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Handshake completes",
+    "n": "Keys are agreed, HTTP/2 is negotiated and the browser sees a valid padlock."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Encrypted request",
+    "n": "The request travels encrypted to the proxy, which decrypts it."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Forward to the app",
+    "n": "The proxy forwards over a private network, optionally encrypting again for stricter environments."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "App response",
+    "n": "The app answers and the proxy encrypts the reply for the browser."
+   }
+  ]
+ },
+ {
+  "id": "x-px-lb",
+  "module": "proxies",
+  "lesson": "proxies/load-balancing-algorithms-and-health-checks",
+  "title": "Round robin with a health check",
+  "summary": "The balancer stops sending traffic to a server that fails its check.",
+  "actors": [
+   "Client",
+   "Balancer",
+   "Server A",
+   "Server B"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request 1",
+    "n": "The client request reaches the balancer, which picks the next server in rotation."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Sent to A",
+    "n": "Server A is healthy so it receives the first request and answers it."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request 2",
+    "n": "The next request arrives and the rotation moves on."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Sent to B",
+    "n": "Server B takes the second request in the same way."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Health probe fails",
+    "n": "The balancer's periodic probe to B gets no answer for several tries in a row."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Mark B down",
+    "n": "After the failure threshold B is removed from rotation without any human action."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request 3",
+    "n": "A new request arrives while B is down."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Only A is used",
+    "n": "All traffic now goes to A until B passes its probes again."
+   }
+  ]
+ },
+ {
+  "id": "x-px-timeouts",
+  "module": "proxies",
+  "lesson": "proxies/timeouts-retries-keepalive-and-limits",
+  "title": "Timeout chain and a retry",
+  "summary": "Every hop has its own timer and the shortest one wins.",
+  "actors": [
+   "Client",
+   "Proxy",
+   "App",
+   "Database"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Client waits",
+    "n": "The client allows 60 seconds, the proxy read timeout is 30 seconds and the app has no limit of its own."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Forward request",
+    "n": "The proxy passes the request and starts its 30 second timer."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Slow query",
+    "n": "The app calls the database and the query runs longer than expected."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Proxy times out",
+    "n": "After 30 seconds the proxy gives up and prepares a 504 Gateway Timeout response."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Client sees 504",
+    "n": "The client receives an error while the app is still waiting for the database."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Wasted work",
+    "n": "The app keeps working on a request nobody is waiting for, using a database connection."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Unsafe retry",
+    "n": "If the proxy retried a non-idempotent request, the same order could be created twice."
+   }
+  ]
+ },
+ {
+  "id": "x-px-cache",
+  "module": "proxies",
+  "lesson": "proxies/caching-compression-and-static-files",
+  "title": "Proxy cache hit and miss",
+  "summary": "The first request fills the cache and later ones are served from it.",
+  "actors": [
+   "Client",
+   "Proxy",
+   "Cache",
+   "App"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "First request",
+    "n": "A client asks for a product page that the proxy has not seen before."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Cache lookup",
+    "n": "The proxy builds a cache key from the URL and looks it up."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Miss",
+    "n": "Nothing is stored for that key so the proxy must go to the app."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Fetch from app",
+    "n": "The app renders the page and returns it with Cache-Control headers."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Store the response",
+    "n": "The proxy writes the page to the cache with a lifetime taken from the headers."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Second request",
+    "n": "Another client asks for the same page a moment later."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Hit",
+    "n": "The cache returns the stored copy and the app is not touched."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Fast reply",
+    "n": "The client receives the page in milliseconds with an X-Cache: HIT header."
+   }
+  ]
+ },
+ {
+  "id": "x-px-rate",
+  "module": "proxies",
+  "lesson": "proxies/rate-limiting-and-protecting-backends",
+  "title": "A leaky bucket rate limit",
+  "summary": "Requests above the rate are queued or rejected before they reach the app.",
+  "actors": [
+   "Client",
+   "Limiter",
+   "Proxy",
+   "App"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Burst arrives",
+    "n": "A client sends 30 requests in one second against a limit of 10 per second."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Count per key",
+    "n": "The limiter counts requests for this client address in its shared memory zone."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Allowed requests pass",
+    "n": "The first requests within the rate and burst allowance continue to the proxy."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "App serves them",
+    "n": "The app handles the allowed requests at a pace it can sustain."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Excess rejected",
+    "n": "Requests above the burst receive 429 Too Many Requests with a Retry-After header."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Client backs off",
+    "n": "A well-behaved client waits and retries later, so load smooths out."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Normal rate resumes",
+    "n": "When the client slows down the bucket drains and requests flow again."
+   }
+  ]
+ },
+ {
+  "id": "x-px-haproxy",
+  "module": "proxies",
+  "lesson": "proxies/haproxy-frontends-backends-and-acls",
+  "title": "HAProxy frontend to backend",
+  "summary": "An ACL decides which backend serves a request.",
+  "actors": [
+   "Client",
+   "Frontend",
+   "ACL",
+   "Backend"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Connection accepted",
+    "n": "The frontend listens on port 443 and accepts the connection."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Evaluate ACLs",
+    "n": "Rules test the request path, host name and headers, for example path_beg /api."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Rule matches",
+    "n": "The first matching use_backend rule selects the api backend."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Choose a server",
+    "n": "The backend balances across its servers with the configured algorithm and health checks."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Server answers",
+    "n": "The chosen server returns the response to HAProxy."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Return to client",
+    "n": "HAProxy sends the response back and records the timings in its log."
+   }
+  ]
+ },
+ {
+  "id": "x-px-envoy",
+  "module": "proxies",
+  "lesson": "proxies/envoy-traefik-and-dynamic-proxies",
+  "title": "A dynamic proxy learns a new route",
+  "summary": "New services appear without a restart or manual config edit.",
+  "actors": [
+   "Orchestrator",
+   "Control plane",
+   "Proxy",
+   "Service"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "New service starts",
+    "n": "The orchestrator starts a new instance and registers it with discovery."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Build config",
+    "n": "The control plane updates its model of routes and endpoints."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Push update",
+    "n": "The new routes and endpoints are streamed to the proxy with no restart."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Apply atomically",
+    "n": "The proxy swaps in the new configuration and keeps existing connections alive."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Traffic arrives",
+    "n": "Requests now match the new route and reach the new instance."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Health reported",
+    "n": "Health checks tell the proxy to remove the instance if it later fails."
+   }
+  ]
+ },
+ {
+  "id": "x-px-reload",
+  "module": "proxies",
+  "lesson": "proxies/zero-downtime-reloads-and-blue-green-at-the-proxy",
+  "title": "A graceful reload",
+  "summary": "New workers take new connections while old workers finish theirs.",
+  "actors": [
+   "Operator",
+   "Master",
+   "Old workers",
+   "New workers"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Edit and test",
+    "n": "The operator edits the config and runs a syntax test, which must pass before anything else."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Send reload",
+    "n": "The operator sends a reload signal to the master process."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Start new workers",
+    "n": "The master reads the new configuration and starts new workers with it."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Tell old workers to drain",
+    "n": "Old workers stop accepting new connections but keep serving existing ones."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Take new traffic",
+    "n": "New connections go to the new workers using the new rules."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Finish and exit",
+    "n": "Old workers close once their last request is done, so no user sees an error."
+   }
+  ]
+ },
+ {
+  "id": "x-px-fail502",
+  "module": "proxies",
+  "lesson": "proxies/debugging-502-504-and-proxy-problems",
+  "title": "Failure and recovery: 502 Bad Gateway after a deploy",
+  "summary": "A restarted app is unreachable until it listens again.",
+  "actors": [
+   "Client",
+   "Proxy",
+   "App",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request arrives",
+    "n": "A user requests a page just after the app container restarts."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Connect to upstream",
+    "n": "The proxy tries to connect to the app on its port."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Connection refused",
+    "n": "The app process is not listening yet so the connection is refused."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "502 Bad Gateway",
+    "n": "The proxy returns 502 and logs connect() failed (111: Connection refused) while connecting to upstream."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Read the error log",
+    "n": "The operator reads the proxy error log and sees the exact upstream address and error."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Check the app",
+    "n": "The operator finds the app is crash-looping because of a missing environment variable."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Fix and restart",
+    "n": "After restoring the variable the app listens again and passes its health check."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Traffic recovers",
+    "n": "The proxy connects, requests succeed and the 502 count returns to zero."
+   }
+  ],
+  "kind": "failure"
+ },
+ {
+  "id": "x-px-fail504",
+  "module": "proxies",
+  "lesson": "proxies/debugging-502-504-and-proxy-problems",
+  "title": "Failure and recovery: 504 from a slow backend",
+  "summary": "A slow dependency makes the proxy time out and retry.",
+  "actors": [
+   "Client",
+   "Proxy",
+   "App",
+   "Database"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Traffic rises",
+    "n": "Requests increase during a sale and every one needs a slow database query."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Forward requests",
+    "n": "The proxy forwards them and the app accepts more than the database can serve."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Database saturates",
+    "n": "Queries queue up in the database and each response takes longer than 30 seconds."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "504 Gateway Timeout",
+    "n": "The proxy timeout is reached and clients receive 504 errors."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Retries add load",
+    "n": "Automatic retries send the same slow requests again, making the overload worse."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Operator limits load",
+    "n": "The team turns off retries, adds a rate limit and raises the database capacity."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Queue drains",
+    "n": "With less load the queries finish in a few seconds and latency falls."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Clients succeed",
+    "n": "Responses arrive inside the timeout and the error rate returns to normal."
+   }
+  ],
+  "kind": "failure"
+ }
+]
