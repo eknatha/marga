@@ -308,5 +308,42 @@
     "requires": [
       "kubernetes"
     ]
+  },
+  {
+    "id": "proxies",
+    "title": "Reverse proxies and load balancers",
+    "summary": "Run nginx, HAProxy and Envoy in front of services: routing, TLS, load balancing, timeouts, caching, rate limits and debugging 502 and 504 errors.",
+    "level": "Intermediate",
+    "requires": [
+      "networking"
+    ]
+  },
+  {
+    "id": "messaging",
+    "title": "Messaging and streaming",
+    "summary": "Choose and operate queues and logs: RabbitMQ and Kafka, delivery guarantees, consumer groups, lag, retention, schemas and managed cloud services.",
+    "level": "Intermediate",
+    "requires": [
+      "linux",
+      "networking"
+    ]
+  },
+  {
+    "id": "cfn-bicep",
+    "title": "CloudFormation and Bicep",
+    "summary": "Write and operate cloud-native infrastructure as code: AWS CloudFormation and Azure Bicep, change previews, stacks, modules, testing and debugging failed deployments.",
+    "level": "Intermediate",
+    "requires": [
+      "cloud"
+    ]
+  },
+  {
+    "id": "gcp",
+    "title": "Google Cloud",
+    "summary": "Learn the Google Cloud model: projects, VPC, Compute Engine, Cloud Storage, GKE, Cloud Run, data and messaging services, operations and cost, with the gcloud CLI.",
+    "level": "Intermediate",
+    "requires": [
+      "cloud"
+    ]
   }
 ]
