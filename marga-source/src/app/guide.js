@@ -6,23 +6,23 @@ window.MargaGuide = function (A) {
 var D = A.D, view = A.view, $ = A.$, e = A.e, plural = A.plural;
 
 var GOALS = {
-  sre: { title: 'Become an SRE in 100 days', short: 'Site reliability engineer', path: 'sre', plans: ['sre-30', 'sre-100'],
+  sre: { title: 'Become an SRE in 100 days', short: 'Site reliability engineer', path: 'sre', plans: ['sre-30', 'sre-60', 'sre-100'],
     why: 'You want to keep systems up: service levels, incidents, on-call and capacity. This goal follows the Site Reliability Engineer path and adds the 100-day challenge, with a review day every week.',
     first: ['Read the SRE path outline and pick your plan.', 'Fix your first Real Linux lab: a full disk.', 'Try a diagnose-only lab: name the cause before you touch anything.', 'Read one real outage in the case studies.', 'Answer five SRE interview questions out loud.'],
     labs: [['#/linux?level=Beginner&topic=fix', 'Real Linux labs, beginner'], ['#/linux?level=All&topic=diagnose', 'Diagnose-only labs'], ['#/terminal-labs/linux', 'Terminal labs: Linux']] },
-  linux: { title: 'Learn Linux from zero', short: 'Linux and the shell', path: 'devops', plans: ['linux-bash-30', 'devops-100'],
+  linux: { title: 'Learn Linux from zero', short: 'Linux and the shell', path: 'devops', plans: ['linux-bash-30', 'devops-60', 'devops-100'],
     why: 'You want to be comfortable at a command line before anything else. Start with files, users and permissions, processes and disks, then fix broken machines.',
     first: ['Open the first Linux lesson: files and navigation.', 'Pass its quiz to unlock the next lesson.', 'Open the Linux cheat sheet and keep it beside you.', 'Solve a beginner Real Linux lab.', 'Take the 30-day Linux and shell plan.'],
     labs: [['#/linux?level=Beginner&topic=fix', 'Real Linux labs, beginner'], ['#/terminal-labs/linux', 'Terminal labs: Linux'], ['#/terminal-labs/bash', 'Terminal labs: Shell']] },
-  kubernetes: { title: 'Pass the Kubernetes exam (CKA)', short: 'Kubernetes operator', path: 'devops', plans: ['kubernetes-30', 'devops-100'],
+  kubernetes: { title: 'Pass the Kubernetes exam (CKA)', short: 'Kubernetes operator', path: 'devops', plans: ['kubernetes-30', 'devops-60', 'devops-100'],
     why: 'You want to run and fix clusters. The Kubernetes stage covers workloads, networking, storage and troubleshooting, with break-and-fix labs in a simulated cluster.',
     first: ['Open the Kubernetes stage and read the first lesson.', 'Run a Kubernetes terminal lab: a pod that will not start.', 'Use the Kubernetes cheat sheet for the kubectl commands.', 'Follow the 30-day Kubernetes plan.', 'Practise interview questions on Kubernetes.'],
     labs: [['#/terminal-labs/kubernetes', 'Terminal labs: Kubernetes'], ['#/terminal-labs/docker', 'Terminal labs: Docker'], ['#/interview', 'Interview questions']], module: 'kubernetes' },
-  devops: { title: 'Get a DevOps job', short: 'DevOps engineer', path: 'devops', plans: ['linux-bash-30', 'devops-100'],
+  devops: { title: 'Get a DevOps job', short: 'DevOps engineer', path: 'devops', plans: ['linux-bash-30', 'devops-60', 'devops-100'],
     why: 'You want the full set of skills a DevOps role asks for: Linux, Git, containers, pipelines, Kubernetes, Terraform and monitoring, plus interview practice.',
     first: ['Follow the DevOps path from the top.', 'Solve a Real Linux lab and a Docker terminal lab.', 'Build a capstone project and put it on your portfolio.', 'Answer interview questions by topic.', 'Run the 100-day DevOps challenge.'],
     labs: [['#/linux?level=Beginner&topic=fix', 'Real Linux labs, beginner'], ['#/terminal-labs/docker', 'Terminal labs: Docker'], ['#/interview', 'Interview questions']] },
-  cloud: { title: 'Learn AWS and Azure', short: 'Cloud engineer', path: 'cloud', plans: ['cloud-iac-30', 'devops-100'],
+  cloud: { title: 'Learn AWS and Azure', short: 'Cloud engineer', path: 'cloud', plans: ['cloud-iac-30', 'devops-60', 'devops-100'],
     why: 'You want to work with cloud accounts: identity, networks, storage, cost and security. The cloud labs use an imitation aws and az command line, so you need no account and risk no bill.',
     first: ['Read cloud fundamentals and identity and access.', 'Fix your first cloud lab: an upload refused by the wrong profile.', 'Close a public bucket and open a firewall rule the safe way.', 'Follow the 30-day cloud and infrastructure plan.', 'Read the AWS and Azure cheat sheets.'],
     labs: [['#/terminal-labs/cloud', 'Cloud labs: AWS and Azure, simulated'], ['#/linux?level=All&topic=tls', 'TLS labs'], ['#/cheatsheets', 'Cheat sheets']] }

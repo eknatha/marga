@@ -157,7 +157,7 @@ function mountPlayer(id, scenes) {
   }
   function speak(s) {
     if (!(voice && synth)) return 0;
-    try { if (window.MargaVoice && MargaVoice.stop) MargaVoice.stop(); synth.cancel(); var u = new SpeechSynthesisUtterance(s.sayText); u.rate = Math.min(1.6, speed); u.lang = document.documentElement.lang || 'en'; synth.speak(u); } catch (x) { return 0; }
+    try { if (window.MargaVoice && MargaVoice.stop) MargaVoice.stop(); synth.cancel(); var u = new SpeechSynthesisUtterance(s.sayText); u.rate = Math.min(1.6, speed); var gl = (document.documentElement.lang || 'en').split('-')[0]; var gv = window.MargaVoice && MargaVoice.voiceFor ? MargaVoice.voiceFor('en') : null; if (gv) { u.voice = gv; u.lang = gv.lang; } else u.lang = 'en'; synth.speak(u); } catch (x) { return 0; }
     return 1;
   }
   function dwell(s) { return s.secs * 1000; }
