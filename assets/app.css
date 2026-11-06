@@ -2075,6 +2075,32 @@ body.embed #main{padding-top:.5rem}
 .me-err:empty { min-height: 0; margin: 0; }
 @media (max-width: 420px) { .me-in { flex-direction: column; } }
 
+/* placement diagnostic and project tracks */
+.pd-goals { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin: 12px 0 16px; }
+.pd-goal { text-align: left; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 14px 16px; cursor: pointer; color: var(--ink); font: inherit; display: grid; gap: 4px; }
+.pd-goal:hover, .pd-goal:focus-visible { border-color: var(--accent, currentColor); }
+.pd-goal span { font-size: .9rem; color: var(--muted, inherit); }
+.pd-saved { border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; }
+.pd-res .pd-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; }
+.pd-res .pd-row > a.small { grid-column: 1 / -1; }
+.pd-bar { display: block; height: 6px; border-radius: 3px; background: var(--line); margin-top: 6px; max-width: 260px; overflow: hidden; }
+.pd-bar i { display: block; height: 100%; background: var(--accent, currentColor); }
+.trk-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+.trk-stage { border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; margin: 14px 0; background: var(--surface); }
+.trk-stage h3 { margin: 0 0 6px; font-size: 1.1rem; }
+.trk-stage ul { margin: 6px 0 10px; padding-left: 1.2em; }
+.trk-chk { list-style: none; padding-left: 0 !important; }
+.trk-chk li { margin: 6px 0; }
+.trk-chk label { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
+.trk-chk input { margin-top: .3em; }
+.trk-chk .done { text-decoration: line-through; opacity: .7; }
+.trk-break { border: 1px dashed var(--line); border-radius: 10px; padding: 8px 14px; margin: 10px 0; }
+.trk-break summary { cursor: pointer; font-weight: 700; }
+.rung { font-weight: 700; }
+.bs-tiers { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.chipbtn { font: inherit; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+.chipbtn[aria-pressed="true"] { border-color: var(--accent, currentColor); font-weight: 700; }
+
 /* ===== Round 35 theme layer: the merged design =====
    Loaded after app.css. Tokens first, then components.
    Teal and marigold in light, midnight and gold in dark.

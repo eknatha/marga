@@ -62,6 +62,9 @@ function prTools() {
   add('labs', 'widgets', '#/widgets', 'Interactive widgets', 'Small simulations for the concepts in each skill. Change a setting and watch the system respond.', (window.MARGA_WIDGET_COUNT || (D.widgets || []).length) + ' widgets', '5 min', 'starter', 'Every skill', null);
   add('labs', 'subnet', '#/subnet', 'Subnet and CIDR playground', 'Inspect networks, split them and plan VLSM for a VPC.', 'Runs in your browser', '10 min', 'starter', 'Networking, Cloud', null);
   add('scenarios', 'games', '#/games', 'Incident games', 'Be on call for an outage. Choose, then see where it leads.', (F.gameCount ? F.gameCount() : '12 games'), '10 min', 'mid', 'Every skill', null);
+  add('study', 'broken-servers', '#/broken-servers', 'Broken servers', 'Every fix-it lab in one list: Easy, Medium and Hard, each with a Check my work button.', 'All fix-it labs', '15 minutes', 'beginner', 'Troubleshooting', null);
+  add('scenarios', 'tracks', '#/tracks', 'Project tracks', 'Four end-to-end builds, from a commit to a running, secured system.', (A.tracksCount ? A.tracksCount() : '4 tracks'), '24 hours', 'advanced', 'Every path', null);
+  add('study', 'placement', '#/placement', 'Placement diagnostic', 'Three questions per skill. Get a level for each skill, a plan and a track.', '10 minutes', '10 minutes', 'beginner', 'Every path', null);
   add('scenarios', 'capstones', '#/capstones', 'Capstone projects', 'Guided builds for each path, with a self-check.', (F.capCount ? F.capCount() : '16 projects'), '2 hours', 'advanced', 'Every path', null);
   add('scenarios', 'calculators', '#/calculators', 'Trade-off calculators', 'Error budgets, redundancy, cost, recovery time and capacity.', '7 calculators', '10 min', 'mid', 'SRE, Cloud', null);
   add('scenarios', 'mix', '#/mix', 'Mixed practice', 'Twelve questions and drills from different stages, shuffled.', 'Uses lessons you passed', '12 min', 'mid', 'Passed lessons', null);

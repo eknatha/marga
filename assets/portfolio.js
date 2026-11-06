@@ -11,7 +11,7 @@ function capDone(c) { var b = bagOf('cap')[c.id] || {}, i; for (i = 0; i < c.ste
 
 function gather() {
   var skills = A.MODS.map(function (m) { var done = m.lessons.filter(A.isDone).length; return { id: m.id, title: m.title, done: done, total: m.lessons.length, full: done === m.lessons.length && done > 0 }; });
-  var caps = (D.capstones || []).filter(capDone);
+  var caps = (D.capstones || []).filter(capDone).concat(A.tracksFinished ? A.tracksFinished().map(function (t) { return { id: '', title: t.title, summary: t.summary, trk: t.id }; }) : []);
   var gm = bagOf('gm'), games = (D.games || []).filter(function (g) { return gm[g.id] && gm[g.id].best === 'win'; });
   var plans = window.MargaPlanInfo && MargaPlanInfo.all ? MargaPlanInfo.all() : [];
   var badges = (A.state().bd && A.state().bd.earned) ? Object.keys(A.state().bd.earned).length : 0;
@@ -46,7 +46,7 @@ function view_() {
       var pct = s.total ? Math.round(s.done / s.total * 100) : 0;
       return '<li><span class="pf-sn">' + e(s.title) + '</span><span class="pf-bar" aria-hidden="true"><i style="width:' + pct + '%"></i></span><span class="pf-sv">' + s.done + ' of ' + s.total + (s.full ? ', complete' : '') + '</span></li>';
     }).join('') + '</ul>' +
-    '<h2 class="sub-h">Capstone projects</h2>' + (g.caps.length ? '<ul class="pf-list">' + g.caps.map(function (c) { return '<li><a href="#/capstone/' + e(c.id) + '"><strong>' + e(c.title) + '</strong></a><span>' + e(c.summary) + '</span></li>'; }).join('') + '</ul>' : '<p class="small">No capstones finished yet. <a href="#/capstones">See the projects</a>.</p>') +
+    '<h2 class="sub-h">Capstone projects</h2>' + (g.caps.length ? '<ul class="pf-list">' + g.caps.map(function (c) { return '<li><a href="' + (c.trk ? '#/track/' + e(c.trk) : '#/capstone/' + e(c.id)) + '"><strong>' + e(c.title) + '</strong></a><span>' + e(c.summary) + '</span></li>'; }).join('') + '</ul>' : '<p class="small">No capstones finished yet. <a href="#/capstones">See the projects</a>.</p>') +
     '<h2 class="sub-h">Incident games won</h2>' + (g.games.length ? '<ul class="pf-list">' + g.games.map(function (x) { return '<li><a href="#/game/' + e(x.id) + '"><strong>' + e(x.title) + '</strong></a><span>' + e(A.MOD[x.module] ? A.MOD[x.module].title : '') + ' | ' + e(x.level) + '</span></li>'; }).join('') + '</ul>' : '<p class="small">No games won yet. <a href="#/games">Play an incident</a>.</p>') +
     '<h2 class="sub-h">Learning plans</h2>' + (g.plans.some(function (p) { return p.s.done > 0; }) ? '<ul class="pf-list">' + g.plans.filter(function (p) { return p.s.done > 0; }).map(function (p) { return '<li><a href="#/plan/' + e(p.plan.id) + '"><strong>' + e(p.plan.title) + '</strong></a><span>' + p.s.done + ' of ' + p.s.total + ' days done</span></li>'; }).join('') + '</ul>' : '<p class="small">No plan days done yet. <a href="#/plans">Pick a plan</a>.</p>') +
     '<p class="small pf-note">This is a record of practice you did in this browser. It is not a certificate and nobody has verified it. Export your progress from the footer to keep it safe.</p>' +

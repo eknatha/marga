@@ -242,7 +242,7 @@ function labView(id) {
     function saymsg(t) { var m = $('#vm-savemsg'); if (m) m.textContent = t; }
     function showHints() {
       var n = Math.min(bag().h[x.id] || 0, x.hints.length), box = $('#vm-hints'); if (!box) return;
-      box.innerHTML = n ? '<h2 class="sub-h">Hints</h2><ol>' + x.hints.slice(0, n).map(function (h) { return '<li>' + e(h) + '</li>'; }).join('') + '</ol>' : '';
+      box.innerHTML = n ? '<h2 class="sub-h">Hints</h2><ol>' + x.hints.slice(0, n).map(function (h, hi) { var N = x.hints.length; return '<li><span class="rung">' + (N < 2 || hi === 0 ? 'Nudge' : hi >= N - 1 ? 'Nearly the answer' : 'Pointer') + '.</span> ' + e(h) + '</li>'; }).join('') + '</ol>' : '';
       var hb = $('#vm-hint'); if (hb) { hb.textContent = n >= x.hints.length ? 'No more hints' : 'Show a hint (' + n + ' of ' + x.hints.length + ' shown)'; hb.disabled = n >= x.hints.length; }
     }
     if (!sb) showHints();
