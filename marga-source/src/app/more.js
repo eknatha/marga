@@ -258,58 +258,6 @@ function todayStrip() {
 }
 A.todayStrip = todayStrip;
 
-/* ---------------------------------------------------------------- placement check */
-var PL = null;
-function plBuild() {
-  var p = A.PATH[S().path] || A.LIVE[0], mods = p.modules.slice(0, 5), qs = [];
-  mods.forEach(function (mid) {
-    var l = A.LES[MOD[mid].lessons[0]];
-    A.shuffle(l.quiz).slice(0, 2).forEach(function (q) { qs.push({ q: q, mod: mid }); });
-  });
-  return { p: p, mods: mods, qs: qs, pos: 0, right: {} };
-}
-function placementView() {
-  view.title = 'Placement check | MARGA by EknathaLabs'; view.nav = 'paths';
-  PL = plBuild();
-  view.html = head('Placement check', 'Ten questions, two from the start of each of the first five stages of your path. It suggests where to begin. It is a guide, not a certificate, and it does not unlock anything.') +
-    '<div class="wrap narrow"><p class="small">Path: <strong>' + e(PL.p.title) + '</strong>. You can change the path on the <a href="#/">home page</a>.</p><div id="pl" class="check"></div></div>';
-  view.after = plAsk;
-}
-A.addRoute(/^\/placement$/, placementView);
-function plAsk() {
-  var root = $('#pl'); if (!root || !PL) return;
-  if (PL.pos >= PL.qs.length) return plDone(root);
-  var it = PL.qs[PL.pos], q = it.q, opts = A.shuffle(q.options.map(function (o, oi) { return { o: o, oi: oi }; }));
-  root.innerHTML = '<div class="qprog" aria-hidden="true"><i style="width:' + (PL.pos / PL.qs.length * 100) + '%"></i></div><p class="qcount">Question ' + (PL.pos + 1) + ' of ' + PL.qs.length + '</p>' +
-    '<h2 class="qtext">' + e(q.q) + '</h2><div class="opts" role="group" aria-label="Answer choices">' + opts.map(function (x, k) {
-      return '<button type="button" class="opt" data-oi="' + x.oi + '"><span class="key">' + String.fromCharCode(65 + k) + '</span><span>' + e(x.o) + '</span></button>'; }).join('') + '</div><div class="feedback" id="pl-fb" aria-live="polite"></div>';
-  $$('.opt', root).forEach(function (b) {
-    b.addEventListener('click', function () {
-      var ok = Number(b.getAttribute('data-oi')) === q.answer;
-      if (ok) PL.right[it.mod] = (PL.right[it.mod] || 0) + 1;
-      $$('.opt', root).forEach(function (x) { x.disabled = true; if (Number(x.getAttribute('data-oi')) === q.answer) x.classList.add('right'); });
-      if (!ok) b.classList.add('wrong');
-      var last = PL.pos === PL.qs.length - 1;
-      $('#pl-fb', root).innerHTML = '<p class="' + (ok ? 'ok' : 'bad') + '"><strong>' + (ok ? 'Correct.' : 'Not quite.') + '</strong> ' + e(q.why) + '</p><button class="btn btn-primary" type="button" id="pl-next">' + (last ? 'See result' : 'Next question') + '</button>';
-      var nb = $('#pl-next', root); nb.focus();
-      nb.addEventListener('click', function () { PL.pos++; plAsk(); });
-    });
-  });
-}
-function plDone(root) {
-  var total = 0, start = -1;
-  PL.mods.forEach(function (mid, i) { var r = PL.right[mid] || 0; total += r; if (start < 0 && r < 2) start = i; });
-  var rec = start < 0 ? null : MOD[PL.mods[start]];
-  var msg = rec
-    ? 'Suggested starting point: <strong>' + e(rec.title) + '</strong> (stage ' + (start + 1) + ' of ' + PL.p.modules.length + '). ' + (start === 0 ? 'Begin at the first stage.' : 'The earlier stages looked solid. You can still skim them from the stage pages.')
-    : 'You answered every question correctly. Start with <strong>' + e(MOD[PL.p.modules[Math.min(5, PL.p.modules.length - 1)]].title) + '</strong>, or revisit anything from the earlier stages.';
-  root.innerHTML = '<div class="result ' + (rec ? 'fail' : 'pass') + '"><h2>' + total + ' of ' + PL.qs.length + ' correct</h2><p>' + msg + '</p>' +
-    '<p class="small">Stages open when the stages they depend on are passed, so you still pass each lesson check in order. This result is not saved.</p>' +
-    '<ul class="pl-res">' + PL.mods.map(function (mid) { return '<li><a href="#/module/' + e(mid) + '">' + e(modTitle(mid)) + '</a><span>' + (PL.right[mid] || 0) + ' of 2</span></li>'; }).join('') + '</ul>' +
-    '<div class="actions">' + (rec ? '<a class="btn btn-primary" href="#/module/' + e(rec.id) + '">Open ' + e(rec.title) + '</a>' : '<a class="btn btn-primary" href="#/path/' + e(PL.p.id) + '">Open the path</a>') + '<button class="btn btn-quiet" type="button" id="pl-again">Take it again</button></div></div>';
-  $('#pl-again', root).addEventListener('click', function () { PL = plBuild(); plAsk(); });
-}
-
 /* ---------------------------------------------------------------- subnet and CIDR playground */
 var NET = window.MargaNet;
 function kvRows(rows) { return '<dl class="calc-out">' + rows.map(function (r) { return '<div class="calc-row"><dt>' + e(r[0]) + '</dt><dd>' + e(r[1]) + '</dd></div>'; }).join('') + '</dl>'; }

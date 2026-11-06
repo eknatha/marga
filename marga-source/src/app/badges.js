@@ -6,9 +6,13 @@
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 var CAUTION1 = 'Self-reported completion record from MARGA by EknathaLabs. Not a certification, degree or qualification.';
 var CAUTION2 = 'The verification code only checks that the name, badge and date match each other. It does not confirm identity.';
-var HUES = { baremetal: 18, 'service-mesh': 175, 'system-design': 48, 'cloud-iam': 200, 'k8s-ops': 250, argocd: 28, llm: 262, prompting: 292, 'claude-skills': 20, mcp: 168, mlops: 142, aiops: 330, ai: 262, linux: 28, git: 12, go: 190, helm: 222, bash: 150, python: 52, networking: 195, docker: 212, cicd: 120, kubernetes: 235, terraform: 268, ansible: 352, cloud: 176, databases: 305, observability: 18, sre: 78, security: 332, devops: 215, devsecops: 332, virtualization: 160, storage: 38, 'sql-ops': 290, 'gpu-serving': 120, openstack: 8 };
+var HUES = { proxies: 100, messaging: 320, 'cfn-bicep': 255, gcp: 225, baremetal: 18, 'service-mesh': 175, 'system-design': 48, 'cloud-iam': 200, 'k8s-ops': 250, argocd: 28, llm: 262, prompting: 292, 'claude-skills': 20, mcp: 168, mlops: 142, aiops: 330, ai: 262, linux: 28, git: 12, go: 190, helm: 222, bash: 150, python: 52, networking: 195, docker: 212, cicd: 120, kubernetes: 235, terraform: 268, ansible: 352, cloud: 176, databases: 305, observability: 18, sre: 78, security: 332, devops: 215, devsecops: 332, virtualization: 160, storage: 38, 'sql-ops': 290, 'gpu-serving': 120, openstack: 8 };
 /* Each symbol is drawn on a 24 by 24 grid so the shape, not only the colour, tells badges apart. */
 var SYM = {
+  proxies: '<rect x="9" y="4" width="6" height="16" rx="1"/><path d="M3 8h6M3 16h6M15 8h6M15 16h6"/>',
+  messaging: '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 8l9 6 9-6"/>',
+  'cfn-bicep': '<path d="M8 4c-2 0-3 1-3 3v2c0 1-1 2-2 3 1 1 2 2 2 3v2c0 2 1 3 3 3"/><path d="M12 8h7M12 12h5M12 16h7"/>',
+  gcp: '<path d="M12 3l7.5 4.3v8.4L12 20l-7.5-4.3V7.3z"/><circle cx="12" cy="12" r="3"/>',
   virtualization: '<rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 10h4v4h-4z"/>',
   storage: '<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>',
   'sql-ops': '<ellipse cx="10" cy="6" rx="6" ry="2.5"/><path d="M4 6v8c0 1.4 2.7 2.5 6 2.5M16 6v4"/><circle cx="17" cy="16" r="3"/><path d="M19.2 18.2L22 21"/>',

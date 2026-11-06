@@ -148,6 +148,16 @@ function why(cmd, output, code, ctx) {
   if (/Is a directory/.test(o)) out.push('That path is a folder, and the command wanted a file. Use ls to look inside it, or -r for commands that can recurse.');
   if (/Not a directory/.test(o)) out.push('Part of the path is a file, not a folder. Check each segment with ls -ld.');
   if (/(aws|az)/.test(w) && /An error occurred|ERROR:/.test(o)) { out = out.concat(cloud(w, cmd, o).slice(0, 2)); }
+  if (/Address already in use|bind\(\) to .* failed|EADDRINUSE/i.test(o)) out.push('Another program already listens on that port. Find it with: ss -ltnp | grep PORT. Stop that program or give this one a different port.');
+  if (/Connection refused|ECONNREFUSED/i.test(o)) out.push('The machine answered but nothing listens on that port. Check the service is running (systemctl status NAME) and listening on the address you used (ss -ltn). A firewall would usually time out instead.');
+  if (/Name or service not known|Could not resolve host|NXDOMAIN|Temporary failure in name resolution/i.test(o)) out.push('The name did not resolve. Check the spelling, then test DNS alone: dig NAME or getent hosts NAME. If the IP address works but the name does not, the problem is DNS, not the service.');
+  if (/No space left on device/i.test(o)) out.push('The disk or its inodes are full. Check df -h and df -i, then find the large folder with du -sh /var/* | sort -h.');
+  if (/Read-only file system/i.test(o)) out.push('The filesystem is mounted read-only, often after disk errors or on purpose. Check mount | grep PATH before you try to remount it.');
+  if (/Too many open files/i.test(o)) out.push('The process hit its open-file limit. Check ulimit -n and the service LimitNOFILE value, and look for a leak with lsof -p PID | wc -l.');
+  if (/\[emerg\]|\[error\].*(nginx|upstream)|nginx: configuration file .* test failed/i.test(o)) out.push('nginx rejected its configuration. The message names the file and the line. Fix that line, run nginx -t until it says the test is successful, then reload.');
+  if (/\b502\b|Bad Gateway/i.test(o)) out.push('502 means the proxy reached no healthy upstream or got a bad reply from it. Check the upstream is up and on the port the proxy uses, then the proxy error log.');
+  if (/\b504\b|Gateway Time-?out|upstream timed out/i.test(o)) out.push('504 means the upstream was too slow. Compare the proxy timeout with the real response time and look at what the upstream is waiting for.');
+  if (/Operation not permitted/i.test(o)) out.push('The kernel refused the action even though the file exists: often a missing capability, an immutable flag (lsattr) or a security profile. Check who you are with id and the flags with lsattr.');
   if (!out.length) {
     var line = o.split('\n').filter(function (l) { return /error|fail|denied|cannot|invalid|unable|refused/i.test(l); })[0];
     out.push(line ? 'The first line that looks like the problem: "' + line.trim().slice(0, 140) + '". Fix that one first, then run the command again.' : 'Nothing in the output names a clear cause. Run echo $? to see the exit status, then try the command with --help, or break it into smaller steps.');
