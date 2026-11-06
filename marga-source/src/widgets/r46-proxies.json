@@ -1,0 +1,668 @@
+[
+ {
+  "id": "proxy-connection-pool",
+  "module": "proxies",
+  "lesson": "proxies/proxying-to-upstreams-headers-and-buffers",
+  "title": "Proxy connections to the backend",
+  "summary": "Little's law shows how many backend connections a proxy needs for a given request rate and latency, and when it queues.",
+  "inputs": [
+   {
+    "id": "rps",
+    "label": "Requests per second",
+    "min": 10,
+    "max": 5000,
+    "value": 400,
+    "step": 10
+   },
+   {
+    "id": "lat",
+    "label": "Backend latency",
+    "min": 5,
+    "max": 2000,
+    "value": 120,
+    "step": 5,
+    "unit": "ms"
+   },
+   {
+    "id": "servers",
+    "label": "Backend servers",
+    "min": 1,
+    "max": 20,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "per",
+    "label": "Connections each server accepts",
+    "min": 10,
+    "max": 500,
+    "value": 64,
+    "step": 2
+   }
+  ],
+  "vars": [
+   [
+    "need",
+    "rps * lat / 1000"
+   ],
+   [
+    "cap",
+    "servers * per"
+   ],
+   [
+    "over",
+    "need > cap"
+   ],
+   [
+    "use",
+    "need / max(1, cap)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Clients",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(rps) + ' req/s'"
+   },
+   {
+    "id": "p",
+    "label": "Proxy",
+    "x": 1,
+    "y": 0,
+    "state": "over ? 2 : (use>0.8 ? 1 : 0)",
+    "sub": "round(need) + ' connections needed'"
+   },
+   {
+    "id": "b",
+    "label": "Backends",
+    "x": 2,
+    "y": 0,
+    "state": "over ? 2 : (use>0.8 ? 1 : 0)",
+    "sub": "round(cap) + ' connections available'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "p",
+    "flow": "min(1, rps/5000 + 0.1)",
+    "bad": "false"
+   },
+   {
+    "from": "p",
+    "to": "b",
+    "flow": "min(1, use)",
+    "bad": "over"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Connections needed",
+    "expr": "need",
+    "dp": 0
+   },
+   {
+    "label": "Connections available",
+    "expr": "cap",
+    "dp": 0
+   },
+   {
+    "label": "Utilisation percent",
+    "expr": "use * 100",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "over",
+    "tone": "bad",
+    "text": "Demand is higher than the backends accept, so requests wait in a queue and then time out as 502 or 504 errors. Add servers, raise limits or cut latency."
+   },
+   {
+    "when": "use > 0.8",
+    "tone": "warn",
+    "text": "Above 80 percent a small burst or a slow query tips the pool over."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "There is room to absorb bursts."
+   }
+  ],
+  "tries": [
+   "Raise latency to 1500 ms.",
+   "Add servers until utilisation falls.",
+   "Double the request rate."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Slow queries make the pool run out.",
+    "tone": "bad",
+    "values": {
+     "rps": 2000,
+     "lat": 900,
+     "servers": 3,
+     "per": 64
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Capacity covers demand with room to spare.",
+    "tone": "good",
+    "values": {
+     "rps": 400,
+     "lat": 100,
+     "servers": 4,
+     "per": 100
+    }
+   }
+  ]
+ },
+ {
+  "id": "proxy-timeout-retry",
+  "module": "proxies",
+  "lesson": "proxies/timeouts-retries-keepalive-and-limits",
+  "title": "Timeouts and retries under a slow backend",
+  "summary": "A proxy timeout shorter than the backend latency causes errors, and retries then multiply the load on a struggling backend.",
+  "inputs": [
+   {
+    "id": "p95",
+    "label": "Backend p95 latency",
+    "min": 0.1,
+    "max": 60,
+    "value": 2,
+    "step": 0.1,
+    "unit": "s"
+   },
+   {
+    "id": "to",
+    "label": "Proxy read timeout",
+    "min": 1,
+    "max": 120,
+    "value": 30,
+    "step": 1,
+    "unit": "s"
+   },
+   {
+    "id": "rps",
+    "label": "Requests per second",
+    "min": 10,
+    "max": 2000,
+    "value": 200,
+    "step": 10
+   },
+   {
+    "id": "retries",
+    "label": "Retries per failed request",
+    "min": 0,
+    "max": 5,
+    "value": 1,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "fail",
+    "p95 > to ? 1 : 0"
+   ],
+   [
+    "load",
+    "rps * (1 + fail * retries)"
+   ],
+   [
+    "mult",
+    "load / rps"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Clients",
+    "x": 0,
+    "y": 0,
+    "state": "fail ? 2 : 0",
+    "sub": "round(rps) + ' req/s'"
+   },
+   {
+    "id": "p",
+    "label": "Proxy",
+    "x": 1,
+    "y": 0,
+    "state": "fail ? 2 : 0",
+    "sub": "'timeout ' + to + ' s'"
+   },
+   {
+    "id": "b",
+    "label": "Backend",
+    "x": 2,
+    "y": 0,
+    "state": "mult>1.5 ? 2 : (p95>to*0.7 ? 1 : 0)",
+    "sub": "round(load) + ' req/s received'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "p",
+    "flow": "0.5",
+    "bad": "fail"
+   },
+   {
+    "from": "p",
+    "to": "b",
+    "flow": "min(1, load/(rps*6))",
+    "bad": "mult>1.5"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Load on the backend",
+    "expr": "load",
+    "dp": 0
+   },
+   {
+    "label": "Load multiplier",
+    "expr": "mult",
+    "dp": 1
+   },
+   {
+    "label": "Slowest allowed",
+    "expr": "to",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "fail && retries >= 2",
+    "tone": "bad",
+    "text": "Requests time out and are retried, so the backend receives several times its normal load while already slow. Retries here make the outage worse."
+   },
+   {
+    "when": "fail",
+    "tone": "warn",
+    "text": "The timeout is shorter than the backend latency, so users see 504 errors. Fix the slowness or raise the timeout with care."
+   },
+   {
+    "when": "p95 > to * 0.7",
+    "tone": "warn",
+    "text": "The timeout is close to the latency, so natural variation will cause errors."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The timeout leaves a safe margin over the backend latency."
+   }
+  ],
+  "tries": [
+   "Set the timeout to 1 s with p95 at 5 s.",
+   "Set retries to 5.",
+   "Raise the timeout above the p95."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A slow backend plus retries multiplies load.",
+    "tone": "bad",
+    "values": {
+     "p95": 20,
+     "to": 10,
+     "rps": 800,
+     "retries": 3
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A timeout with margin and a single retry.",
+    "tone": "good",
+    "values": {
+     "p95": 2,
+     "to": 30,
+     "rps": 200,
+     "retries": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "proxy-rate-limit",
+  "module": "proxies",
+  "lesson": "proxies/rate-limiting-and-protecting-backends",
+  "title": "Rate limit with a burst allowance",
+  "summary": "A limit of requests per second plus a burst decides how many requests pass and how many receive 429.",
+  "inputs": [
+   {
+    "id": "rate",
+    "label": "Allowed rate",
+    "min": 1,
+    "max": 500,
+    "value": 20,
+    "step": 1,
+    "unit": "req/s"
+   },
+   {
+    "id": "burst",
+    "label": "Burst allowance",
+    "min": 0,
+    "max": 500,
+    "value": 40,
+    "step": 5
+   },
+   {
+    "id": "offer",
+    "label": "Client sends",
+    "min": 1,
+    "max": 2000,
+    "value": 100,
+    "step": 5,
+    "unit": "req/s"
+   },
+   {
+    "id": "secs",
+    "label": "Burst lasts",
+    "min": 1,
+    "max": 60,
+    "value": 5,
+    "step": 1,
+    "unit": "s"
+   }
+  ],
+  "vars": [
+   [
+    "allowed",
+    "min(offer * secs, rate * secs + burst)"
+   ],
+   [
+    "sent",
+    "offer * secs"
+   ],
+   [
+    "rej",
+    "max(0, sent - allowed)"
+   ],
+   [
+    "pct",
+    "rej / max(1, sent)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Client",
+    "x": 0,
+    "y": 0,
+    "state": "pct>0.5 ? 2 : (pct>0 ? 1 : 0)",
+    "sub": "round(sent) + ' requests'"
+   },
+   {
+    "id": "l",
+    "label": "Limiter",
+    "x": 1,
+    "y": 0,
+    "state": "pct>0 ? 1 : 0",
+    "sub": "round(allowed) + ' pass'"
+   },
+   {
+    "id": "b",
+    "label": "Backend",
+    "x": 2,
+    "y": 0,
+    "state": "0",
+    "sub": "round(allowed/secs) + ' req/s'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "l",
+    "flow": "min(1, offer/500 + 0.1)",
+    "bad": "pct>0.5"
+   },
+   {
+    "from": "l",
+    "to": "b",
+    "flow": "min(1, allowed/max(1,sent))",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Requests passed",
+    "expr": "allowed",
+    "dp": 0
+   },
+   {
+    "label": "Rejected with 429",
+    "expr": "rej",
+    "dp": 0
+   },
+   {
+    "label": "Share rejected percent",
+    "expr": "pct * 100",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "pct > 0.5",
+    "tone": "bad",
+    "text": "More than half the requests are rejected. A real user would see errors, so check whether the limit is too tight or the client is misbehaving."
+   },
+   {
+    "when": "pct > 0",
+    "tone": "warn",
+    "text": "Some requests are rejected with 429. That is the limit working, as long as clients back off."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "All requests pass; the limit protects without hurting."
+   }
+  ],
+  "tries": [
+   "Send 500 req/s for 30 s.",
+   "Raise burst to 500.",
+   "Lower the rate to 1."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A flood is mostly rejected.",
+    "tone": "bad",
+    "values": {
+     "rate": 10,
+     "burst": 10,
+     "offer": 400,
+     "secs": 20
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Normal traffic passes, bursts are absorbed.",
+    "tone": "good",
+    "values": {
+     "rate": 50,
+     "burst": 200,
+     "offer": 40,
+     "secs": 5
+    }
+   }
+  ]
+ },
+ {
+  "id": "proxy-cache-hit",
+  "module": "proxies",
+  "lesson": "proxies/caching-compression-and-static-files",
+  "title": "Cache hit ratio and origin load",
+  "summary": "The share of requests served from the proxy cache decides how much traffic still reaches the origin.",
+  "inputs": [
+   {
+    "id": "rps",
+    "label": "Requests per second",
+    "min": 50,
+    "max": 10000,
+    "value": 2000,
+    "step": 50
+   },
+   {
+    "id": "hit",
+    "label": "Cache hit ratio",
+    "min": 0,
+    "max": 99,
+    "value": 80,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "cap",
+    "label": "Origin capacity",
+    "min": 50,
+    "max": 5000,
+    "value": 500,
+    "step": 10,
+    "unit": "req/s"
+   },
+   {
+    "id": "lat",
+    "label": "Latency from origin",
+    "min": 10,
+    "max": 2000,
+    "value": 200,
+    "step": 10,
+    "unit": "ms"
+   }
+  ],
+  "vars": [
+   [
+    "origin",
+    "rps * (1 - hit/100)"
+   ],
+   [
+    "over",
+    "origin > cap"
+   ],
+   [
+    "use",
+    "origin / max(1, cap)"
+   ],
+   [
+    "avg",
+    "(hit/100) * 5 + (1 - hit/100) * lat"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Clients",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(rps) + ' req/s'"
+   },
+   {
+    "id": "p",
+    "label": "Proxy cache",
+    "x": 1,
+    "y": 0,
+    "state": "hit<30 ? 1 : 0",
+    "sub": "round(hit) + ' percent hits'"
+   },
+   {
+    "id": "o",
+    "label": "Origin",
+    "x": 2,
+    "y": 0,
+    "state": "over ? 2 : (use>0.8 ? 1 : 0)",
+    "sub": "round(origin) + ' req/s'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "p",
+    "flow": "min(1, rps/10000 + 0.2)",
+    "bad": "false"
+   },
+   {
+    "from": "p",
+    "to": "o",
+    "flow": "min(1, use)",
+    "bad": "over"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Origin requests per second",
+    "expr": "origin",
+    "dp": 0
+   },
+   {
+    "label": "Average latency ms",
+    "expr": "avg",
+    "dp": 0
+   },
+   {
+    "label": "Origin utilisation percent",
+    "expr": "use * 100",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "over",
+    "tone": "bad",
+    "text": "The origin receives more than it can serve. Raise the hit ratio with longer lifetimes, caching more paths, or add origin capacity."
+   },
+   {
+    "when": "use > 0.8",
+    "tone": "warn",
+    "text": "The origin runs close to its limit; a cache flush would overload it."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The cache absorbs most traffic and the origin stays comfortable."
+   }
+  ],
+  "tries": [
+   "Drop the hit ratio to 20 percent.",
+   "Raise rps to 10000.",
+   "Raise the hit ratio to 95 percent."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A cold cache sends everything to the origin.",
+    "tone": "bad",
+    "values": {
+     "rps": 5000,
+     "hit": 10,
+     "cap": 500,
+     "lat": 400
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A warm cache protects the origin.",
+    "tone": "good",
+    "values": {
+     "rps": 2000,
+     "hit": 95,
+     "cap": 500,
+     "lat": 200
+    }
+   }
+  ]
+ }
+]

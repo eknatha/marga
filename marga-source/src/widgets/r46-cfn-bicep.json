@@ -1,0 +1,665 @@
+[
+ {
+  "id": "cfn-update-risk",
+  "module": "cfn-bicep",
+  "lesson": "cfn-bicep/stacks-change-sets-and-safe-updates",
+  "title": "Stack update risk",
+  "summary": "Replacement of stateful resources without a snapshot policy is the riskiest kind of update.",
+  "inputs": [
+   {
+    "id": "mod",
+    "label": "Resources modified",
+    "min": 0,
+    "max": 50,
+    "value": 5,
+    "step": 1
+   },
+   {
+    "id": "rep",
+    "label": "Resources replaced",
+    "min": 0,
+    "max": 20,
+    "value": 1,
+    "step": 1
+   },
+   {
+    "id": "state",
+    "label": "Stateful resources among the replaced",
+    "min": 0,
+    "max": 10,
+    "value": 1,
+    "step": 1
+   },
+   {
+    "id": "snap",
+    "label": "Snapshot or retain policy set",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "cs",
+    "label": "Change set reviewed",
+    "type": "toggle",
+    "value": true
+   }
+  ],
+  "vars": [
+   [
+    "lossy",
+    "state > 0 && !snap"
+   ],
+   [
+    "score",
+    "mod + rep * 5 + state * 20 + (cs ? 0 : 30)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "e",
+    "label": "Template change",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "mod + ' modified'"
+   },
+   {
+    "id": "c",
+    "label": "Change set",
+    "x": 1,
+    "y": 0,
+    "state": "cs ? 0 : 1",
+    "sub": "cs ? 'reviewed' : 'not reviewed'"
+   },
+   {
+    "id": "s",
+    "label": "Stack update",
+    "x": 2,
+    "y": 0,
+    "state": "lossy ? 2 : (rep>0 ? 1 : 0)",
+    "sub": "rep + ' replaced'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "e",
+    "to": "c",
+    "flow": "0.6",
+    "bad": "false"
+   },
+   {
+    "from": "c",
+    "to": "s",
+    "flow": "min(1, score/100)",
+    "bad": "lossy"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Risk score",
+    "expr": "score",
+    "dp": 0
+   },
+   {
+    "label": "Replacements",
+    "expr": "rep",
+    "dp": 0
+   },
+   {
+    "label": "Data at risk",
+    "expr": "lossy ? 1 : 0",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "lossy",
+    "tone": "bad",
+    "text": "A stateful resource would be replaced with no snapshot or retain policy, so its data would be lost. Stop and add DeletionPolicy and UpdateReplacePolicy first."
+   },
+   {
+    "when": "rep > 0 && !cs",
+    "tone": "warn",
+    "text": "Replacements without a reviewed change set are a blind gamble."
+   },
+   {
+    "when": "rep > 0",
+    "tone": "warn",
+    "text": "Replacements are planned and protected; still run a smoke test afterwards."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Only in-place changes with review."
+   }
+  ],
+  "tries": [
+   "Replace 3 stateful resources with no policy.",
+   "Turn the snapshot policy on.",
+   "Skip the change set review."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A database is replaced with no snapshot.",
+    "tone": "bad",
+    "values": {
+     "mod": 5,
+     "rep": 2,
+     "state": 1,
+     "snap": false,
+     "cs": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Reviewed change with a snapshot policy.",
+    "tone": "good",
+    "values": {
+     "mod": 5,
+     "rep": 2,
+     "state": 1,
+     "snap": true,
+     "cs": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "stackset-blast-radius",
+  "module": "cfn-bicep",
+  "lesson": "cfn-bicep/nested-stacks-stacksets-and-reusable-modules",
+  "title": "StackSet rollout blast radius",
+  "summary": "Failure tolerance and concurrency decide how many accounts a bad template touches before the rollout stops.",
+  "inputs": [
+   {
+    "id": "acc",
+    "label": "Target accounts",
+    "min": 5,
+    "max": 500,
+    "value": 140,
+    "step": 5
+   },
+   {
+    "id": "conc",
+    "label": "Accounts at a time",
+    "min": 1,
+    "max": 100,
+    "value": 10,
+    "step": 1
+   },
+   {
+    "id": "tol",
+    "label": "Failures tolerated",
+    "min": 0,
+    "max": 50,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "bad",
+    "label": "Share of accounts that fail",
+    "min": 0,
+    "max": 100,
+    "value": 20,
+    "step": 1,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "batch",
+    "conc"
+   ],
+   [
+    "hit",
+    "min(acc, tol + conc)"
+   ],
+   [
+    "stopped",
+    "bad > 0 && hit < acc"
+   ],
+   [
+    "touch",
+    "bad == 0 ? acc : hit"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "t",
+    "label": "Template",
+    "x": 0,
+    "y": 0,
+    "state": "bad>0 ? 1 : 0",
+    "sub": "bad + ' percent fail'"
+   },
+   {
+    "id": "r",
+    "label": "Rollout",
+    "x": 1,
+    "y": 0,
+    "state": "stopped ? 1 : (bad>30 ? 2 : 0)",
+    "sub": "tol + ' failures tolerated'"
+   },
+   {
+    "id": "a",
+    "label": "Accounts touched",
+    "x": 2,
+    "y": 0,
+    "state": "touch>acc*0.5 && bad>0 ? 2 : 0",
+    "sub": "round(touch) + ' of ' + acc"
+   }
+  ],
+  "edges": [
+   {
+    "from": "t",
+    "to": "r",
+    "flow": "0.6",
+    "bad": "bad>30"
+   },
+   {
+    "from": "r",
+    "to": "a",
+    "flow": "touch/max(1,acc)",
+    "bad": "touch>acc*0.5 && bad>0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Accounts touched",
+    "expr": "touch",
+    "dp": 0
+   },
+   {
+    "label": "Accounts left untouched",
+    "expr": "acc - touch",
+    "dp": 0
+   },
+   {
+    "label": "Stops early",
+    "expr": "stopped ? 1 : 0",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "bad > 0 && touch > acc * 0.5",
+    "tone": "bad",
+    "text": "A bad template reaches more than half the accounts before the rollout stops. Lower the tolerance and the concurrency."
+   },
+   {
+    "when": "stopped",
+    "tone": "warn",
+    "text": "The rollout stops early, which limits damage, but some accounts are already affected."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "A clean rollout or a very small blast radius."
+   }
+  ],
+  "tries": [
+   "Set tolerance to 50.",
+   "Set tolerance to 0 and concurrency to 1.",
+   "Set 100 accounts at a time."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A generous tolerance lets a bad change spread.",
+    "tone": "bad",
+    "values": {
+     "acc": 140,
+     "conc": 70,
+     "tol": 50,
+     "bad": 40
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A tight tolerance stops after a few accounts.",
+    "tone": "good",
+    "values": {
+     "acc": 140,
+     "conc": 5,
+     "tol": 1,
+     "bad": 40
+    }
+   }
+  ]
+ },
+ {
+  "id": "drift-exposure",
+  "module": "cfn-bicep",
+  "lesson": "cfn-bicep/drift-rollbacks-and-resource-protection",
+  "title": "Drift exposure time",
+  "summary": "How often drift detection runs decides how long a manual change stays unnoticed.",
+  "inputs": [
+   {
+    "id": "changes",
+    "label": "Manual changes per month",
+    "min": 0,
+    "max": 100,
+    "value": 8,
+    "step": 1
+   },
+   {
+    "id": "interval",
+    "label": "Days between drift checks",
+    "min": 1,
+    "max": 90,
+    "value": 30,
+    "step": 1
+   },
+   {
+    "id": "risky",
+    "label": "Share that are risky",
+    "min": 0,
+    "max": 100,
+    "value": 25,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "guard",
+    "label": "Share blocked by IAM and policy",
+    "min": 0,
+    "max": 100,
+    "value": 40,
+    "step": 1,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "made",
+    "changes * (1 - guard/100)"
+   ],
+   [
+    "avg",
+    "interval / 2"
+   ],
+   [
+    "riskyN",
+    "made * risky/100"
+   ],
+   [
+    "exp",
+    "riskyN * avg"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "m",
+    "label": "Manual changes",
+    "x": 0,
+    "y": 0,
+    "state": "made>10 ? 2 : (made>3 ? 1 : 0)",
+    "sub": "round(made) + ' get through'"
+   },
+   {
+    "id": "d",
+    "label": "Drift check",
+    "x": 1,
+    "y": 0,
+    "state": "interval>30 ? 1 : 0",
+    "sub": "'every ' + interval + ' days'"
+   },
+   {
+    "id": "x",
+    "label": "Exposure",
+    "x": 2,
+    "y": 0,
+    "state": "exp>100 ? 2 : (exp>20 ? 1 : 0)",
+    "sub": "round(exp) + ' risky change-days'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "m",
+    "to": "d",
+    "flow": "min(1, made/20 + 0.1)",
+    "bad": "false"
+   },
+   {
+    "from": "d",
+    "to": "x",
+    "flow": "min(1, exp/200)",
+    "bad": "exp>100"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Changes that get through",
+    "expr": "made",
+    "dp": 1
+   },
+   {
+    "label": "Average days unnoticed",
+    "expr": "avg",
+    "dp": 1
+   },
+   {
+    "label": "Risky exposure in change-days",
+    "expr": "exp",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "exp > 100",
+    "tone": "bad",
+    "text": "Risky manual changes sit unnoticed for weeks. Check drift more often and block console writes with IAM."
+   },
+   {
+    "when": "exp > 20",
+    "tone": "warn",
+    "text": "Exposure is noticeable; shorten the interval or cut console access."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Drift is rare and found quickly."
+   }
+  ],
+  "tries": [
+   "Set checks to every 90 days.",
+   "Block 90 percent of changes.",
+   "Check every day."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Rare checks and open console access.",
+    "tone": "bad",
+    "values": {
+     "changes": 60,
+     "interval": 90,
+     "risky": 40,
+     "guard": 0
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Daily checks and strict IAM.",
+    "tone": "good",
+    "values": {
+     "changes": 8,
+     "interval": 1,
+     "risky": 25,
+     "guard": 80
+    }
+   }
+  ]
+ },
+ {
+  "id": "cfn-template-size",
+  "module": "cfn-bicep",
+  "lesson": "cfn-bicep/nested-stacks-stacksets-and-reusable-modules",
+  "title": "Template size and nesting",
+  "summary": "A single CloudFormation stack is limited to 500 resources; nesting and layering keep each stack manageable.",
+  "inputs": [
+   {
+    "id": "res",
+    "label": "Total resources",
+    "min": 10,
+    "max": 3000,
+    "value": 420,
+    "step": 10
+   },
+   {
+    "id": "stacks",
+    "label": "Stacks it is split across",
+    "min": 1,
+    "max": 30,
+    "value": 1,
+    "step": 1
+   },
+   {
+    "id": "lim",
+    "label": "Stack resource limit",
+    "min": 100,
+    "max": 1000,
+    "value": 500,
+    "step": 50
+   },
+   {
+    "id": "deploy",
+    "label": "Minutes to update one stack of 100 resources",
+    "min": 1,
+    "max": 30,
+    "value": 6,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "per",
+    "res / stacks"
+   ],
+   [
+    "over",
+    "per > lim"
+   ],
+   [
+    "mins",
+    "per / 100 * deploy"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "t",
+    "label": "Resources",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(res) + ' total'"
+   },
+   {
+    "id": "s",
+    "label": "Stacks",
+    "x": 1,
+    "y": 0,
+    "state": "over ? 2 : (per>lim*0.8 ? 1 : 0)",
+    "sub": "round(per) + ' each'"
+   },
+   {
+    "id": "u",
+    "label": "Update time",
+    "x": 2,
+    "y": 0,
+    "state": "mins>30 ? 1 : 0",
+    "sub": "round(mins) + ' minutes'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "t",
+    "to": "s",
+    "flow": "min(1, res/3000 + 0.1)",
+    "bad": "over"
+   },
+   {
+    "from": "s",
+    "to": "u",
+    "flow": "min(1, mins/60)",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Resources per stack",
+    "expr": "per",
+    "dp": 0
+   },
+   {
+    "label": "Limit",
+    "expr": "lim",
+    "dp": 0
+   },
+   {
+    "label": "Minutes for one update",
+    "expr": "mins",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "over",
+    "tone": "bad",
+    "text": "A stack cannot hold this many resources. Split it into layers or nested stacks."
+   },
+   {
+    "when": "per > lim * 0.8",
+    "tone": "warn",
+    "text": "Close to the limit; the next feature may not fit."
+   },
+   {
+    "when": "mins > 30",
+    "tone": "warn",
+    "text": "Updates take long; split by rate of change."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Each stack is a comfortable size."
+   }
+  ],
+  "tries": [
+   "Put 3000 resources in one stack.",
+   "Split into 10 stacks.",
+   "Raise the deploy time."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "One stack is over the limit.",
+    "tone": "bad",
+    "values": {
+     "res": 800,
+     "stacks": 1,
+     "lim": 500,
+     "deploy": 6
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Layered stacks of sensible size.",
+    "tone": "good",
+    "values": {
+     "res": 800,
+     "stacks": 8,
+     "lim": 500,
+     "deploy": 6
+    }
+   }
+  ]
+ }
+]

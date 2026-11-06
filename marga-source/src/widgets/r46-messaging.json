@@ -1,0 +1,674 @@
+[
+ {
+  "id": "queue-backlog",
+  "module": "messaging",
+  "lesson": "messaging/debugging-messaging-incidents",
+  "title": "Backlog growth and drain time",
+  "summary": "Compare producer rate with total consumer rate to see whether a queue grows, and how long it takes to drain.",
+  "inputs": [
+   {
+    "id": "prod",
+    "label": "Messages arriving",
+    "min": 10,
+    "max": 5000,
+    "value": 800,
+    "step": 10,
+    "unit": "per s"
+   },
+   {
+    "id": "cons",
+    "label": "Consumers",
+    "min": 1,
+    "max": 60,
+    "value": 6,
+    "step": 1
+   },
+   {
+    "id": "rate",
+    "label": "Each consumer handles",
+    "min": 1,
+    "max": 500,
+    "value": 100,
+    "step": 1,
+    "unit": "per s"
+   },
+   {
+    "id": "back",
+    "label": "Backlog now",
+    "min": 0,
+    "max": 1000000,
+    "value": 20000,
+    "step": 1000
+   }
+  ],
+  "vars": [
+   [
+    "cap",
+    "cons * rate"
+   ],
+   [
+    "net",
+    "prod - cap"
+   ],
+   [
+    "growing",
+    "net > 0"
+   ],
+   [
+    "drain",
+    "net < 0 ? back / max(0.001, -net) : 0"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "p",
+    "label": "Producers",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(prod) + ' per s'"
+   },
+   {
+    "id": "q",
+    "label": "Queue",
+    "x": 1,
+    "y": 0,
+    "state": "growing ? 2 : (back>50000 ? 1 : 0)",
+    "sub": "round(back) + ' waiting'"
+   },
+   {
+    "id": "c",
+    "label": "Consumers",
+    "x": 2,
+    "y": 0,
+    "state": "growing ? 2 : 0",
+    "sub": "round(cap) + ' per s total'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "p",
+    "to": "q",
+    "flow": "min(1, prod/5000 + 0.1)",
+    "bad": "growing"
+   },
+   {
+    "from": "q",
+    "to": "c",
+    "flow": "min(1, cap/5000 + 0.1)",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Total consumer rate",
+    "expr": "cap",
+    "dp": 0
+   },
+   {
+    "label": "Net growth per second",
+    "expr": "net",
+    "dp": 0
+   },
+   {
+    "label": "Seconds to drain",
+    "expr": "drain",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "growing",
+    "tone": "bad",
+    "text": "Messages arrive faster than they are handled, so the backlog grows without limit. Add consumers, speed up the work, or slow the producer."
+   },
+   {
+    "when": "back > 50000",
+    "tone": "warn",
+    "text": "The rate is fine now but a large backlog still takes a long time to clear."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Consumers keep up and the queue stays short."
+   }
+  ],
+  "tries": [
+   "Cut consumers to 2.",
+   "Raise arrivals to 5000.",
+   "Add consumers until the drain time is short."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Consumers fall behind the producers.",
+    "tone": "bad",
+    "values": {
+     "prod": 2000,
+     "cons": 4,
+     "rate": 100,
+     "back": 100000
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Consumers outpace arrivals and clear the backlog.",
+    "tone": "good",
+    "values": {
+     "prod": 500,
+     "cons": 12,
+     "rate": 100,
+     "back": 20000
+    }
+   }
+  ]
+ },
+ {
+  "id": "kafka-parallelism",
+  "module": "messaging",
+  "lesson": "messaging/kafka-topics-partitions-and-brokers",
+  "title": "Partitions and consumer parallelism",
+  "summary": "Consumers beyond the partition count sit idle, so partitions set the ceiling on parallel reading.",
+  "inputs": [
+   {
+    "id": "parts",
+    "label": "Partitions",
+    "min": 1,
+    "max": 64,
+    "value": 6,
+    "step": 1
+   },
+   {
+    "id": "cons",
+    "label": "Consumers in the group",
+    "min": 1,
+    "max": 64,
+    "value": 6,
+    "step": 1
+   },
+   {
+    "id": "per",
+    "label": "Each consumer handles",
+    "min": 1,
+    "max": 200,
+    "value": 50,
+    "step": 1,
+    "unit": "MB/s"
+   },
+   {
+    "id": "target",
+    "label": "Data arriving",
+    "min": 1,
+    "max": 1000,
+    "value": 150,
+    "step": 5,
+    "unit": "MB/s"
+   }
+  ],
+  "vars": [
+   [
+    "active",
+    "min(parts, cons)"
+   ],
+   [
+    "idle",
+    "max(0, cons - parts)"
+   ],
+   [
+    "cap",
+    "active * per"
+   ],
+   [
+    "short",
+    "cap < target"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "t",
+    "label": "Topic",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "parts + ' partitions'"
+   },
+   {
+    "id": "g",
+    "label": "Consumer group",
+    "x": 1,
+    "y": 0,
+    "state": "idle>0 ? 1 : 0",
+    "sub": "active + ' active, ' + idle + ' idle'"
+   },
+   {
+    "id": "o",
+    "label": "Throughput",
+    "x": 2,
+    "y": 0,
+    "state": "short ? 2 : 0",
+    "sub": "round(cap) + ' MB/s'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "t",
+    "to": "g",
+    "flow": "min(1, parts/64 + 0.1)",
+    "bad": "false"
+   },
+   {
+    "from": "g",
+    "to": "o",
+    "flow": "min(1, cap/max(1,target))",
+    "bad": "short"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Active consumers",
+    "expr": "active",
+    "dp": 0
+   },
+   {
+    "label": "Idle consumers",
+    "expr": "idle",
+    "dp": 0
+   },
+   {
+    "label": "Group throughput MB per second",
+    "expr": "cap",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "short",
+    "tone": "bad",
+    "text": "The group cannot keep up with the data arriving. If consumers exceed partitions, adding more does nothing; add partitions with a plan for keys, or speed each consumer."
+   },
+   {
+    "when": "idle > 0",
+    "tone": "warn",
+    "text": "Some consumers have no partition and are wasted."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Parallelism matches the load."
+   }
+  ],
+  "tries": [
+   "Set 40 consumers on 6 partitions.",
+   "Add partitions to 24.",
+   "Lower the per-consumer rate to 10."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Extra consumers do nothing past the partition count.",
+    "tone": "bad",
+    "values": {
+     "parts": 3,
+     "cons": 20,
+     "per": 20,
+     "target": 200
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Partitions and consumers match the load.",
+    "tone": "good",
+    "values": {
+     "parts": 12,
+     "cons": 12,
+     "per": 20,
+     "target": 200
+    }
+   }
+  ]
+ },
+ {
+  "id": "kafka-durability",
+  "module": "messaging",
+  "lesson": "messaging/kafka-replication-isr-and-durability",
+  "title": "Brokers lost and write safety",
+  "summary": "Replication factor, min in-sync replicas and acks decide whether writes keep working or data is at risk when brokers fail.",
+  "inputs": [
+   {
+    "id": "rf",
+    "label": "Replication factor",
+    "min": 1,
+    "max": 5,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "min",
+    "label": "min.insync.replicas",
+    "min": 1,
+    "max": 5,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "down",
+    "label": "Replicas currently down",
+    "min": 0,
+    "max": 4,
+    "value": 1,
+    "step": 1
+   },
+   {
+    "id": "all",
+    "label": "Producers use acks=all",
+    "type": "toggle",
+    "value": true
+   }
+  ],
+  "vars": [
+   [
+    "alive",
+    "max(0, rf - down)"
+   ],
+   [
+    "blocked",
+    "all && alive < min"
+   ],
+   [
+    "risk",
+    "!all || (alive < 2)"
+   ],
+   [
+    "lost",
+    "alive < 1"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "p",
+    "label": "Producer",
+    "x": 0,
+    "y": 0,
+    "state": "blocked ? 2 : 0",
+    "sub": "all ? 'acks=all' : 'acks=1'"
+   },
+   {
+    "id": "l",
+    "label": "Replicas",
+    "x": 1,
+    "y": 0,
+    "state": "lost ? 2 : (alive<2 ? 1 : 0)",
+    "sub": "alive + ' of ' + rf + ' alive'"
+   },
+   {
+    "id": "d",
+    "label": "Data safety",
+    "x": 2,
+    "y": 0,
+    "state": "lost ? 2 : (risk ? 1 : 0)",
+    "sub": "risk ? 'one copy or weak acks' : 'protected'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "p",
+    "to": "l",
+    "flow": "0.6",
+    "bad": "blocked"
+   },
+   {
+    "from": "l",
+    "to": "d",
+    "flow": "alive/max(1,rf)",
+    "bad": "risk"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Replicas alive",
+    "expr": "alive",
+    "dp": 0
+   },
+   {
+    "label": "Min needed for writes",
+    "expr": "min",
+    "dp": 0
+   },
+   {
+    "label": "Writes accepted",
+    "expr": "blocked ? 0 : 1",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "lost",
+    "tone": "bad",
+    "text": "No replica is alive, so the partition is offline and data may be lost for good."
+   },
+   {
+    "when": "blocked",
+    "tone": "warn",
+    "text": "Writes are refused because fewer replicas are in sync than required. This protects data but stops producers."
+   },
+   {
+    "when": "risk",
+    "tone": "warn",
+    "text": "Writes continue, but with weak acks or a single copy a further failure loses acknowledged data."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Enough replicas are alive and the producer waits for them."
+   }
+  ],
+  "tries": [
+   "Turn acks=all off.",
+   "Set min to 3 with one replica down.",
+   "Take 3 replicas down at replication factor 3."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Replicas are gone and writes stop or risk loss.",
+    "tone": "bad",
+    "values": {
+     "rf": 3,
+     "min": 2,
+     "down": 2,
+     "all": true
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Healthy replicas and safe acknowledgements.",
+    "tone": "good",
+    "values": {
+     "rf": 3,
+     "min": 2,
+     "down": 0,
+     "all": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "kafka-disk-plan",
+  "module": "messaging",
+  "lesson": "messaging/kafka-retention-compaction-and-storage",
+  "title": "Kafka disk planning",
+  "summary": "Write rate, retention and replication give the disk each broker needs, with headroom for surprises.",
+  "inputs": [
+   {
+    "id": "mb",
+    "label": "Write rate",
+    "min": 1,
+    "max": 500,
+    "value": 20,
+    "step": 1,
+    "unit": "MB/s"
+   },
+   {
+    "id": "days",
+    "label": "Retention",
+    "min": 1,
+    "max": 30,
+    "value": 7,
+    "step": 1,
+    "unit": "days"
+   },
+   {
+    "id": "rf",
+    "label": "Replication factor",
+    "min": 1,
+    "max": 5,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "brokers",
+    "label": "Brokers",
+    "min": 3,
+    "max": 30,
+    "value": 6,
+    "step": 1
+   },
+   {
+    "id": "disk",
+    "label": "Disk per broker",
+    "min": 1,
+    "max": 32,
+    "value": 8,
+    "step": 1,
+    "unit": "TB"
+   }
+  ],
+  "vars": [
+   [
+    "tb",
+    "mb * 86400 * days * rf / 1000000"
+   ],
+   [
+    "per",
+    "tb / brokers"
+   ],
+   [
+    "use",
+    "per / disk"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "w",
+    "label": "Producers",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "mb + ' MB/s'"
+   },
+   {
+    "id": "b",
+    "label": "Brokers",
+    "x": 1,
+    "y": 0,
+    "state": "use>0.9 ? 2 : (use>0.7 ? 1 : 0)",
+    "sub": "round(per*10)/10 + ' TB each'"
+   },
+   {
+    "id": "d",
+    "label": "Disks",
+    "x": 2,
+    "y": 0,
+    "state": "use>0.9 ? 2 : (use>0.7 ? 1 : 0)",
+    "sub": "round(use*100) + ' percent full'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "w",
+    "to": "b",
+    "flow": "min(1, mb/500 + 0.1)",
+    "bad": "use>0.9"
+   },
+   {
+    "from": "b",
+    "to": "d",
+    "flow": "min(1, use)",
+    "bad": "use>0.9"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Total data stored TB",
+    "expr": "tb",
+    "dp": 1
+   },
+   {
+    "label": "Disk needed per broker TB",
+    "expr": "per",
+    "dp": 1
+   },
+   {
+    "label": "Disk used percent",
+    "expr": "use * 100",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "use > 0.9",
+    "tone": "bad",
+    "text": "The disks will fill, and a full Kafka log directory takes brokers offline. Shorten retention, add brokers or disks, or reduce the write rate."
+   },
+   {
+    "when": "use > 0.7",
+    "tone": "warn",
+    "text": "Above about 70 percent there is no room for a traffic spike or a long outage."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Disk headroom is healthy."
+   }
+  ],
+  "tries": [
+   "Raise retention to 30 days.",
+   "Double the write rate.",
+   "Add brokers until usage is below 60 percent."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Retention and traffic outgrow the disks.",
+    "tone": "bad",
+    "values": {
+     "mb": 100,
+     "days": 14,
+     "rf": 3,
+     "brokers": 6,
+     "disk": 8
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Plenty of headroom.",
+    "tone": "good",
+    "values": {
+     "mb": 20,
+     "days": 7,
+     "rf": 3,
+     "brokers": 9,
+     "disk": 8
+    }
+   }
+  ]
+ }
+]
