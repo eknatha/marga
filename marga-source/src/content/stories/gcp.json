@@ -1,0 +1,50 @@
+{
+ "google-cloud-organization-projects-and-billing": {
+  "r": "A team put dev, test and production in one project. A cleanup script meant for dev deleted production disks. Separate projects with separate permissions would have limited the damage.",
+  "x": "Use one project per environment and application, grouped in folders, because the project is the main boundary for permissions, quotas and billing."
+ },
+ "gcloud-cli-configurations-and-automation": {
+  "r": "An engineer ran a delete command while the CLI pointed at production, because the active project had been switched earlier and forgotten. A named configuration and a prompt showing the project would have prevented it.",
+  "x": "Always pass --project explicitly in scripts and show the active project in your shell prompt, so a command can never silently run against the wrong place."
+ },
+ "vpc-networks-subnets-and-firewall-rules": {
+  "r": "A team used the default network, which allows SSH and RDP from anywhere. Moving to a custom VPC with rules for named tags closed those ports and still left everything working.",
+  "x": "Delete the default network, use custom subnets and write firewall rules by service account or tag, with IAP for administrator access instead of open SSH."
+ },
+ "compute-engine-images-and-managed-instance-groups": {
+  "r": "A single VM held a company's web service, and when its zone had a problem the service went down for hours. A regional managed instance group would have replaced it in another zone automatically.",
+  "x": "Treat VMs as disposable: build an image or template once, run them in a regional managed group and let the group heal, scale and update them."
+ },
+ "cloud-storage-and-persistent-disks": {
+  "r": "A public bucket exposed customer exports for weeks because someone granted allUsers read access to share a file. Public access prevention and signed URLs would have blocked it.",
+  "x": "Keep buckets private with uniform access and public access prevention, share files with signed URLs, and use lifecycle rules so old data moves to cheaper classes automatically."
+ },
+ "gke-autopilot-and-standard-clusters": {
+  "r": "A team on Standard left a large node pool running all weekend at low use. Autopilot's per-pod billing would have charged only for the requests of the pods actually running.",
+  "x": "Start with Autopilot unless you need privileged workloads or custom node settings, and always use Workload Identity rather than node-wide service account keys."
+ },
+ "cloud-run-and-cloud-functions": {
+  "r": "A service that took 20 seconds to start suffered from cold starts after each quiet period. Setting minimum instances to one removed the delay for a small monthly cost.",
+  "x": "Keep containers small and fast to start, set concurrency and max instances deliberately, and use minimum instances only where cold-start delay hurts users."
+ },
+ "cloud-sql-spanner-bigquery-and-firestore": {
+  "r": "An analyst ran a query without a partition filter on a multi-terabyte table. BigQuery scanned the whole table and the single query cost hundreds of dollars.",
+  "x": "Match the database to the access pattern, protect every one with backups and private access, and in BigQuery partition tables and preview the bytes scanned before running."
+ },
+ "pub-sub-eventarc-and-cloud-tasks": {
+  "r": "A subscriber took longer than the acknowledgement deadline, so Pub/Sub kept redelivering the same messages. Extending the deadline and making the handler idempotent stopped the duplicates.",
+  "x": "Set the acknowledgement deadline longer than the handler takes, attach a dead-letter topic and make every handler safe to run twice."
+ },
+ "observability-with-cloud-logging-monitoring-and-slos": {
+  "r": "A service alerted on CPU above 80 percent and paged people at night for harmless spikes, while a real slowdown with normal CPU raised no alert. A latency SLO alert would have caught the slowdown.",
+  "x": "Alert on what users feel (errors and latency against an objective), keep cause-level metrics on dashboards, and route logs you must keep to cheap storage."
+ },
+ "terraform-on-google-cloud": {
+  "r": "A team stored a service account key in the pipeline to run Terraform. When the repository was exposed the key gave attackers full control of the project. Workload Identity Federation would have left nothing to steal.",
+  "x": "Run Terraform with impersonation or Workload Identity Federation, store state in a versioned, locked bucket and never commit keys."
+ },
+ "security-cost-and-debugging-on-google-cloud": {
+  "r": "A developer received PERMISSION_DENIED and was granted Owner to make it go away. Policy Troubleshooter would have shown one missing role on one bucket.",
+  "x": "When access fails, find the exact missing permission with Policy Troubleshooter and grant the smallest role at the lowest level; never grant Owner to silence an error."
+ }
+}

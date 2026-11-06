@@ -1,0 +1,50 @@
+{
+ "queues-logs-and-pub-sub-choosing-a-model": {
+  "r": "A team used a queue to feed three downstream systems and had to copy each message by hand to three queues. When one system needed to reprocess last week's data, the messages were gone. A log would have served all three and allowed replay.",
+  "x": "Pick the model from the questions you will ask later: who reads each message, in what order, for how long, and can it be replayed after a bug fix."
+ },
+ "delivery-guarantees-ordering-and-idempotency": {
+  "r": "A payment consumer crashed after charging a card but before acknowledging. The broker redelivered the message and the customer was charged twice. An idempotency key would have made the second attempt a no-op.",
+  "x": "Assume every message can arrive twice and out of order, and make the handler safe for both. Design for redelivery before the first duplicate shows up in production."
+ },
+ "rabbitmq-exchanges-queues-and-routing": {
+  "r": "A developer published straight to a queue name and later needed a second system to receive the same events. Because there was no exchange in the design, every producer had to be changed.",
+  "x": "Publish to exchanges and bind queues to them, so adding a consumer later is a configuration change rather than a code change in every producer."
+ },
+ "rabbitmq-acknowledgements-prefetch-and-dead-letters": {
+  "r": "A poison message crashed its consumer every time. With requeue on, the same message returned instantly and the consumer restarted in a loop that blocked the whole queue.",
+  "x": "Give every failing message a limited number of attempts and a place to wait for a human, so one bad message cannot stop all the good ones."
+ },
+ "kafka-topics-partitions-and-brokers": {
+  "r": "A team created a topic with three partitions for a service that later needed twenty consumers. Only three could ever work in parallel, and changing the key mapping for an existing topic reordered data.",
+  "x": "Choose partition count and key for the load you expect in a year, because changing them later changes ordering and the cost of moving data."
+ },
+ "kafka-producers-consumers-and-consumer-groups": {
+  "r": "A consumer committed offsets before processing. When it crashed mid-batch, it restarted after the committed offset and the unprocessed records were never handled. No error appeared anywhere.",
+  "x": "Commit only after the work is safely done, and design the consumer so that reprocessing a record is harmless."
+ },
+ "kafka-replication-isr-and-durability": {
+  "r": "A cluster lost two brokers in one rack. Partitions with all replicas in that rack went offline, and the team had to choose between waiting and electing an out-of-sync replica, which would lose recent records.",
+  "x": "Spread replicas across failure domains and decide beforehand whether you prefer availability or data safety when too many replicas are gone."
+ },
+ "kafka-retention-compaction-and-storage": {
+  "r": "A disk filled up on a Sunday because a producer bug doubled traffic and the topic had size-based retention far above the free space. Brokers went read-only and producers errored.",
+  "x": "Size retention from the data rate you actually have, add headroom for a bug that doubles it, and alert on disk well before it is full."
+ },
+ "kafka-lag-rebalances-and-capacity-in-operation": {
+  "r": "A lag alert fired on a threshold of 10,000 records and nobody understood it. The consumer was healthy but a batch job had produced a burst. A rate-based lag alert that measured time behind would have said \"ten minutes late\", which people understand.",
+  "x": "Express lag as time, alert on a growing trend rather than a single number, and always check whether consumers are alive before touching topics."
+ },
+ "managed-messaging-on-cloud-sqs-sns-pub-sub-and-event-hubs": {
+  "r": "A team spent three engineers' time keeping a Kafka cluster healthy for a workload of a few hundred messages a second. Moving to a managed queue freed those engineers and cost less than their time.",
+  "x": "Run your own broker only when you need what a managed service cannot give you, because every broker you operate is a service you must page for."
+ },
+ "schemas-contracts-and-evolving-messages": {
+  "r": "A producer renamed a field from amount to total. Every consumer that read amount got nulls, and a report showed zero revenue for a day. A compatibility check in the build would have rejected the change.",
+  "x": "Treat message formats as public APIs with versioning rules, and let a tool refuse incompatible changes before they ship."
+ },
+ "debugging-messaging-incidents": {
+  "r": "Orders were missing from a report. After days of searching, the team added a message id to each log line and followed one order. It had been dropped by an exchange with no matching binding, a problem a single traced id revealed in minutes.",
+  "x": "Put a stable message id in every log line and metric so you can follow one message through every hop instead of guessing."
+ }
+}

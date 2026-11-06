@@ -110,5 +110,33 @@
  "troubleshooting-playbook-boot-failures-and-services-that-wont-start": {
   "r": "After a routine patch a server never came back on the network. A data disk removed weeks earlier left a stale line in fstab, so boot stopped in emergency mode before SSH started. A UUID entry with nofail and a pre-reboot check ended that class of failure.",
   "x": "Validate before you reboot: findmnt --verify, systemd-analyze verify, and config tests for services. Keep out-of-band access ready and keep an older kernel entry as a rollback."
+ },
+ "debugging-with-strace-system-calls": {
+  "r": "A service printed only \"failed to start\". strace showed it opening /etc/app/config.yml, getting ENOENT, and trying a second path that also failed. The file was in a different directory than the unit file assumed.",
+  "x": "When logs are silent, ask the kernel what the program asked for. The failing call names the file, port or permission."
+ },
+ "seeing-the-network-with-ss-and-tcpdump": {
+  "r": "A client said the database was down. ss on the server showed it listening, and tcpdump showed SYN packets arriving with no reply, which pointed at a host firewall rule rather than the database.",
+  "x": "Prove each hop: is it listening, does the packet arrive, does a reply leave. Check the facts first, change one thing at a time, and write down what you learned."
+ },
+ "open-files-and-proc-with-lsof": {
+  "r": "A disk was 100 percent full but du found only half of it. A deleted log file was still open by a running process, holding gigabytes until the process restarted.",
+  "x": "If df and du disagree, look for deleted files that are still open. Check the facts first, change one thing at a time, and write down what you learned."
+ },
+ "finding-cpu-memory-and-io-hogs": {
+  "r": "A server was slow and everyone blamed the CPU. vmstat showed 60 percent I/O wait and iostat showed the disk at 100 percent busy: a backup job was reading the same disk as the database.",
+  "x": "Name the resource first, then the process. A CPU graph alone can mislead. Check the facts first, change one thing at a time, and write down what you learned."
+ },
+ "kernel-messages-journal-and-core-dumps": {
+  "r": "A service vanished every few days with no error in its own log. dmesg showed the kernel out-of-memory killer ending it each time, which the application could not log because it was killed instantly.",
+  "x": "A process cannot log its own sudden death. The kernel and the journal can. Check the facts first, change one thing at a time, and write down what you learned."
+ },
+ "ebpf-and-bpftrace-live-questions": {
+  "r": "A team could not tell which process was reading a huge number of small files. One bpftrace line counting openat calls by process name named it within a minute, with no restart and no code change.",
+  "x": "Reach for strace when you know the process; reach for eBPF when you do not know what you are looking for."
+ },
+ "debugging-a-slow-or-hung-server-a-method": {
+  "r": "A team tried five fixes in one hour on a slow server: restarts, more memory, a bigger instance. None helped. When they finally measured each resource, a single stuck NFS mount was the cause.",
+  "x": "Guessing feels fast and is slow. A fixed order of checks is slower for the first minute and faster for the next hour."
  }
 }

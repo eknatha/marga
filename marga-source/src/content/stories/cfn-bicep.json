@@ -1,0 +1,50 @@
+{
+ "native-iac-cloudformation-bicep-or-terraform": {
+  "r": "A team using Terraform for AWS lost a day when a state file was corrupted. Colleagues on a CloudFormation team had no state file to lose because AWS held the state for them.",
+  "x": "Choose the native tool when you live on one cloud and want the provider to hold state and support new services on day one; choose Terraform when you span clouds or providers."
+ },
+ "cloudformation-templates-parameters-and-resources": {
+  "r": "A template hard-coded an S3 bucket name. The second environment failed to deploy because bucket names are global, and the team had to rewrite the template.",
+  "x": "Let CloudFormation generate names and pass differences as parameters, so the same template deploys to every environment."
+ },
+ "intrinsic-functions-conditions-and-mappings": {
+  "r": "A template baked in an AMI id for one region and failed everywhere else. Replacing it with an SSM parameter type made it work in every region and always pick the current image.",
+  "x": "Compute values with functions and look up environment differences in mappings and conditions, rather than copying a template per environment."
+ },
+ "stacks-change-sets-and-safe-updates": {
+  "r": "A property change on a database looked small, but it forced replacement, and the database was deleted and recreated empty. A change set would have shown Replacement: True.",
+  "x": "Never update a production stack without reading its change set; the word Replacement is the one to look for."
+ },
+ "nested-stacks-stacksets-and-reusable-modules": {
+  "r": "A security team needed the same guardrail role in 140 accounts. A StackSet pushed it in an afternoon, where scripts had taken weeks and left accounts out of date.",
+  "x": "Use nested stacks to organise one application and StackSets to repeat a baseline across accounts, and avoid tight export coupling between stacks that change at different speeds."
+ },
+ "drift-rollbacks-and-resource-protection": {
+  "r": "An engineer opened a security group in the console to debug, and forgot. Months later a drift report found the rule open to the world, though the template still said closed.",
+  "x": "Run drift detection on a schedule and fix differences by changing the template, not the resource, so the code stays the truth."
+ },
+ "bicep-syntax-resources-and-parameters": {
+  "r": "A team wrote 300 lines of ARM JSON for a storage account and a plan. The same thing in Bicep was 30 lines and could be reviewed in a pull request without squinting.",
+  "x": "Prefer Bicep to hand-written ARM JSON: it compiles to the same thing but is readable, typed and easier to review."
+ },
+ "bicep-modules-loops-and-conditions": {
+  "r": "A team copied the same virtual network block into six files. A module with a loop replaced them, and a subnet change then took one edit instead of six.",
+  "x": "Put each repeated pattern in a module with clear parameters and outputs, and use loops for repeats, so a change is made once."
+ },
+ "bicep-deployments-what-if-and-scopes": {
+  "r": "Someone ran a complete-mode deployment with a partial template and Azure deleted every resource in the group that was not in the file. What-if would have listed them as deletes first.",
+  "x": "Run what-if on every deployment and keep to incremental mode unless you really mean to delete everything not in the file."
+ },
+ "deployment-stacks-and-delivery-pipelines": {
+  "r": "A pipeline stored a long-lived cloud key in its settings and the key leaked in a log. Replacing it with a federated identity removed the secret from the pipeline entirely.",
+  "x": "Deploy from a pipeline using short-lived federated identities and the narrowest role that can do the job, and never keep cloud keys in pipeline settings."
+ },
+ "testing-linting-and-policy-checks-for-templates": {
+  "r": "A linter found an S3 bucket without encryption and a security group open to the world in a pull request. Both were fixed in minutes instead of being found in an audit months later.",
+  "x": "Run checks on every pull request in this order: syntax, lint, policy, preview, then a short-lived test deployment for what the tools cannot prove."
+ },
+ "debugging-failed-deployments-and-moving-to-terraform": {
+  "r": "A deployment failed with a generic message. The real cause was a missing permission on the pipeline role, visible in one line of the deployment operations that nobody had opened.",
+  "x": "Read the first failed event or operation, not the last, because later failures are usually a consequence of the first."
+ }
+}

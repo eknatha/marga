@@ -98,5 +98,33 @@
  "choosing-and-migrating-between-ci-platforms": {
   "r": "A team announced a migration in January and finished in October because every pipeline had hidden dependencies. A pilot-first plan with a shared scripts layer made later moves routine.",
   "x": "A platform migration is a product launch for your developers. Measure lead time and failure rate before and after, and communicate dates and support early."
+ },
+ "jenkins-architecture-controllers-agents-and-jobs": {
+  "r": "A team ran every build on the controller itself. One heavy test run used all its memory, the web page stopped answering and nobody could start or stop any build until the host was restarted.",
+  "x": "Keep the controller small and boring: no builds on it, a backed-up home directory, and agents that can be thrown away and recreated."
+ },
+ "jenkins-declarative-pipelines-and-the-jenkinsfile": {
+  "r": "A team clicked a build together in the web interface. When the controller was rebuilt the job was gone, and nobody remembered the exact settings. A Jenkinsfile in the repository would have survived.",
+  "x": "Put the pipeline in version control beside the code, keep it short and let scripts do the work. Check the facts first, change one thing at a time, and write down what you learned."
+ },
+ "jenkins-build-agents-with-docker-and-kubernetes": {
+  "r": "A team had four long-lived agents. A build that worked on one failed on another because an older Java was installed. They moved to container agents and the differences disappeared.",
+  "x": "Treat build agents as cattle: defined by an image, created on demand, destroyed after use. Check the facts first, change one thing at a time, and write down what you learned."
+ },
+ "jenkins-shared-libraries-and-reusable-pipelines": {
+  "r": "Fifty repositories each had a copy of the same deploy stage. A change to the registry address meant fifty pull requests, and three were forgotten. A library step would have needed one.",
+  "x": "Share behaviour, not secrets. Version the library like any dependency. Check the facts first, change one thing at a time, and write down what you learned."
+ },
+ "jenkins-credentials-security-and-hardening": {
+  "r": "A job echoed an environment variable while debugging. The value was masked, but a base64 copy of it was not, and it ended up in a build log many people could read.",
+  "x": "Assume build logs and job configuration are public inside the company, and never let them hold a raw secret."
+ },
+ "jenkins-plugins-upgrades-and-operating-at-scale": {
+  "r": "A team upgraded fifteen plugins on a Friday afternoon. One was incompatible, the controller would not start, and the only fix was a restore from a backup nobody had tested.",
+  "x": "Anything you cannot rebuild from code and a backup is a liability. Test the upgrade and the restore before you need them."
+ },
+ "jenkins-debugging-and-migrating-to-another-platform": {
+  "r": "A team announced a big-bang move off Jenkins. Two months later half the jobs were still on the old server, because nobody knew which jobs still mattered.",
+  "x": "Count what exists, move the useful pipelines first, and delete what nobody uses. Check the facts first, change one thing at a time, and write down what you learned."
  }
 }

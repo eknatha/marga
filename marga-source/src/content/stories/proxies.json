@@ -1,0 +1,50 @@
+{
+ "what-a-reverse-proxy-does": {
+  "r": "A company exposed three apps on three public ports and three certificates. A single reverse proxy gave them one address, one certificate and one place to add logging and limits.",
+  "x": "Put one well-run front door in front of many services, and keep the apps behind it private. Check the facts first, change one thing at a time, and write down what you learned."
+ },
+ "nginx-configuration-servers-and-locations": {
+  "r": "An engineer added a regex location for images and suddenly the API stopped working. A regex location beat the prefix location for /api/, and the request went to the wrong place.",
+  "x": "Know the match order and always test the config before reload. Check the facts first, change one thing at a time, and write down what you learned."
+ },
+ "proxying-to-upstreams-headers-and-buffers": {
+  "r": "A login page worked on the intranet but redirected users to http://localhost:3000 behind the proxy. The application built redirect URLs from the Host header it received, and the proxy had not passed the original host.",
+  "x": "The proxy must tell the app what the user saw, and only the proxy should be allowed to say it. Check the facts first, change one thing at a time, and write down what you learned."
+ },
+ "tls-termination-http2-and-certificates": {
+  "r": "A certificate expired at 03:00 on a Sunday because the renewal job had failed silently for two months. Browsers showed a full-page warning and traffic fell to zero.",
+  "x": "Automate renewal and alert well before expiry; a certificate that depends on a person is an outage waiting."
+ },
+ "load-balancing-algorithms-and-health-checks": {
+  "r": "One of four backends hung but still accepted connections. Round robin kept sending it a quarter of the requests, and one in four users saw timeouts for an hour.",
+  "x": "A load balancer is only as good as its health check. Check what users need, not just that the port is open."
+ },
+ "timeouts-retries-keepalive-and-limits": {
+  "r": "A report endpoint took 70 seconds. The proxy read timeout was 60, so users got a 504 even though the app finished correctly and spent the effort. Raising one timeout fixed it, but the real fix was an asynchronous job.",
+  "x": "Timeouts should shrink as you go up the stack: callers wait longer than the services they call. Check the facts first, change one thing at a time, and write down what you learned."
+ },
+ "caching-compression-and-static-files": {
+  "r": "A page showing the logged-in user's name was cached by the proxy. For ten minutes everyone saw the first user's name. The cache key had ignored the cookie.",
+  "x": "Cache what is the same for everyone, and be explicit about what is not. Check the facts first, change one thing at a time, and write down what you learned."
+ },
+ "rate-limiting-and-protecting-backends": {
+  "r": "A mobile app bug retried failed requests in a tight loop. Without limits it sent 5,000 requests a second from a few thousand devices and took down the API. A per-client limit would have contained it.",
+  "x": "Limit by who is calling, not just by total volume, and fail with a clear 429. Check the facts first, change one thing at a time, and write down what you learned."
+ },
+ "haproxy-frontends-backends-and-acls": {
+  "r": "A team needed to route and rate-limit at wire speed with live state to inspect. HAProxy's stats page and runtime socket let them drain a server and see queue depth without a restart.",
+  "x": "HAProxy shines when you need to see and change live traffic state safely. Check the facts first, change one thing at a time, and write down what you learned."
+ },
+ "envoy-traefik-and-dynamic-proxies": {
+  "r": "A team with hundreds of containers that came and went could not reload nginx fast enough. Traefik watched the container engine and updated routes automatically.",
+  "x": "In a dynamic environment, let the platform tell the proxy what exists instead of editing files. Check the facts first, change one thing at a time, and write down what you learned."
+ },
+ "zero-downtime-reloads-and-blue-green-at-the-proxy": {
+  "r": "A config change was applied with a restart in business hours. Every open connection dropped, and a thousand uploads failed. A reload, or a canary, would have kept them.",
+  "x": "Never restart a proxy to change config; reload it, and send traffic gradually to new versions. Check the facts first, change one thing at a time, and write down what you learned."
+ },
+ "debugging-502-504-and-proxy-problems": {
+  "r": "After a backend IP changed, nginx kept sending to the old address for hours because it had resolved the name only at startup. Every request returned 502 until someone reloaded.",
+  "x": "Read the proxy's own log first. It usually says which side failed and why. Check the facts first, change one thing at a time, and write down what you learned."
+ }
+}
