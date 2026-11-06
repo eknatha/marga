@@ -1903,6 +1903,22 @@
   "service-mesh": {
    "title": "Maillage de services et réseau Kubernetes",
    "summary": "Comprenez le réseau des pods, le CNI et les politiques réseau, puis exploitez un maillage de services avec mTLS, routage du trafic et dépannage."
+  },
+  "proxies": {
+   "title": "Proxys inverses et répartiteurs de charge",
+   "summary": "Exécutez nginx, HAProxy et Envoy devant vos services : routage, TLS, répartition de charge, délais, cache, limites de débit et débogage des erreurs 502 et 504."
+  },
+  "messaging": {
+   "title": "Messagerie et streaming",
+   "summary": "Choisissez et exploitez files et journaux : RabbitMQ et Kafka, garanties de livraison, groupes de consommateurs, retard, rétention, schémas et services cloud gérés."
+  },
+  "cfn-bicep": {
+   "title": "CloudFormation et Bicep",
+   "summary": "Écrivez et exploitez l'infrastructure as code native du cloud : AWS CloudFormation et Azure Bicep, aperçus des changements, stacks, modules, tests et débogage des déploiements échoués."
+  },
+  "gcp": {
+   "title": "Google Cloud",
+   "summary": "Apprenez le modèle Google Cloud : projets, VPC, Compute Engine, Cloud Storage, GKE, Cloud Run, services de données et de messagerie, exploitation et coûts, avec la CLI gcloud."
   }
  },
  "paths": {
@@ -2436,6 +2452,68 @@
   "security/cloud-posture-and-misconfiguration-management": "Repérez en continu buckets publics, ports ouverts et chiffrement manquant avec des outils de posture et la politique comme code, et corrigez la dérive à la source.",
   "security/security-champions-and-secure-code-review": "Diffusez la sécurité dans les équipes avec des champions, des listes pratiques de revue de code, la modélisation des menaces et des boucles de retour appréciées des développeurs.",
   "security/incident-forensics-and-evidence-handling": "Préservez les preuves volatiles, collectez logs et images disque en sécurité, tenez la chaîne de custody et construisez une chronologie pendant un incident de sécurité.",
-  "security/audit-readiness-and-continuous-compliance-evidence": "Préparez-vous aux audits SOC 2 ou ISO 27001 en automatisant les preuves, en reliant les contrôles à des vérifications techniques et en tenant un registre vivant."
+  "security/audit-readiness-and-continuous-compliance-evidence": "Préparez-vous aux audits SOC 2 ou ISO 27001 en automatisant les preuves, en reliant les contrôles à des vérifications techniques et en tenant un registre vivant.",
+  "cicd/jenkins-architecture-controllers-agents-and-jobs": "Comprenez comment le contrôleur Jenkins répartit le travail sur les agents, ce que sont un job et un build, et où Jenkins garde son état.",
+  "cicd/jenkins-declarative-pipelines-and-the-jenkinsfile": "Écrivez un Jenkinsfile déclaratif avec stages, steps, environnement, conditions et actions post, et lisez une exécution en échec.",
+  "cicd/jenkins-build-agents-with-docker-and-kubernetes": "Exécutez les builds sur des agents jetables : nœuds statiques, agents Docker et plugin Kubernetes avec modèles de pod.",
+  "cicd/jenkins-shared-libraries-and-reusable-pipelines": "Partagez le code des pipelines entre de nombreux dépôts avec des bibliothèques partagées, variables globales et versions.",
+  "cicd/jenkins-credentials-security-and-hardening": "Stockez les secrets en sécurité, limitez les droits, gardez le code des builds loin du contrôleur et durcissez un serveur Jenkins.",
+  "cicd/jenkins-plugins-upgrades-and-operating-at-scale": "Gérez plugins et mises à jour en sécurité, configurez Jenkins en code et passez à l'échelle avec agents, sauvegardes et supervision.",
+  "cicd/jenkins-debugging-and-migrating-to-another-platform": "Déboguez les builds bloqués, lents et instables, puis planifiez une migration progressive vers Actions ou GitLab CI si vous le décidez.",
+  "linux/debugging-with-strace-system-calls": "Utilisez strace pour voir quels fichiers, sockets et appels système emploie un programme bloqué ou en échec, et trouvez la vraie cause.",
+  "linux/seeing-the-network-with-ss-and-tcpdump": "Listez les sockets avec ss et capturez les paquets avec tcpdump pour prouver si le trafic part, arrive et reçoit une réponse.",
+  "linux/open-files-and-proc-with-lsof": "Utilisez lsof et /proc pour trouver quel processus retient un fichier, un port ou un fichier supprimé, et repérer les fuites de descripteurs.",
+  "linux/finding-cpu-memory-and-io-hogs": "Utilisez top, vmstat, iostat et pidstat pour distinguer les problèmes de CPU, mémoire et disque et trouver le processus responsable.",
+  "linux/kernel-messages-journal-and-core-dumps": "Lisez dmesg et journalctl pour les événements noyau et services, trouvez les arrêts par manque de mémoire et récupérez un core dump.",
+  "linux/ebpf-and-bpftrace-live-questions": "Comprenez eBPF et utilisez des lignes bpftrace et des outils prêts à l'emploi pour répondre en direct sur fichiers, processus et latence.",
+  "linux/debugging-a-slow-or-hung-server-a-method": "Combinez les outils précédents en une méthode reproductible : définir le symptôme, trouver la ressource saturée, le processus et confirmer la cause.",
+  "proxies/what-a-reverse-proxy-does": "Découvrez ce qui se trouve entre les utilisateurs et vos services, le rôle d'un reverse proxy et sa différence avec un proxy direct et un répartiteur de charge.",
+  "proxies/nginx-configuration-servers-and-locations": "Lisez et écrivez la configuration nginx : contextes, blocs server, règles de location, et comment tester et recharger en sécurité.",
+  "proxies/proxying-to-upstreams-headers-and-buffers": "Transmettez les requêtes aux backends avec proxy_pass, passez les bons en-têtes, comprenez la mise en tampon et gérez correctement les WebSockets.",
+  "proxies/tls-termination-http2-and-certificates": "Terminez TLS sur le proxy avec des protocoles solides, redirections, HSTS, agrafage OCSP et renouvellement automatique des certificats.",
+  "proxies/load-balancing-algorithms-and-health-checks": "Répartissez le trafic par round robin, moins de connexions et hachage, et retirez les backends en panne avec des contrôles passifs et actifs.",
+  "proxies/timeouts-retries-keepalive-and-limits": "Réglez les timeouts du proxy selon le comportement réel, ajustez keepalive et comprenez comment les retries et limites causent ou évitent les pannes.",
+  "proxies/caching-compression-and-static-files": "Servez efficacement les fichiers statiques, mettez en cache les réponses avec des clés et expirations correctes et compressez en sécurité au proxy.",
+  "proxies/rate-limiting-and-protecting-backends": "Limitez le débit des requêtes et connexions au proxy, renvoyez les bons codes et protégez les backends des pics et des abus.",
+  "proxies/haproxy-frontends-backends-and-acls": "Configurez HAProxy avec frontends, backends, routage par ACL, stick tables et contrôles de santé, et lisez ses statistiques.",
+  "proxies/envoy-traefik-and-dynamic-proxies": "Comparez les proxys qui se configurent via la découverte de services : Envoy, Traefik et le HTTPS automatique de Caddy.",
+  "proxies/zero-downtime-reloads-and-blue-green-at-the-proxy": "Changez la configuration du proxy et déplacez le trafic entre versions sans perdre de requêtes, avec rechargement doux, routage pondéré et drainage.",
+  "proxies/debugging-502-504-and-proxy-problems": "Diagnostiquez les erreurs du proxy dans un ordre fixe avec codes de statut, journaux d'erreurs, temps en amont et requêtes directes au backend.",
+  "messaging/queues-logs-and-pub-sub-choosing-a-model": "Comparez files de travail, sujets publication-abonnement et journaux en ajout seul, et choisissez le bon modèle de messagerie.",
+  "messaging/delivery-guarantees-ordering-and-idempotency": "Comprenez la livraison au plus une fois, au moins une fois et effectivement une fois, quand l'ordre tient et comment les consommateurs idempotents neutralisent les doublons.",
+  "messaging/rabbitmq-exchanges-queues-and-routing": "Comprenez le modèle de RabbitMQ avec producteurs, exchanges, bindings et files, et choisissez les exchanges direct, topic, fanout et headers.",
+  "messaging/rabbitmq-acknowledgements-prefetch-and-dead-letters": "Gérez les pannes dans RabbitMQ avec acquittements, prefetch, nouvelles tentatives, exchanges de lettres mortes et suivi de la profondeur des files.",
+  "messaging/kafka-topics-partitions-and-brokers": "Apprenez le modèle de Kafka : topics divisés en partitions, brokers, offsets et clés, et comment le partitionnement façonne ordre et échelle.",
+  "messaging/kafka-producers-consumers-and-consumer-groups": "Configurez les producteurs pour la durabilité et le débit, les consommateurs pour des commits d'offsets sûrs et comprenez le partage des partitions en groupe.",
+  "messaging/kafka-replication-isr-and-durability": "Comprenez l'élection du leader, les réplicas synchronisés, min.insync.replicas et les élections impures pour savoir ce que Kafka perd en cas de panne de brokers.",
+  "messaging/kafka-retention-compaction-and-storage": "Décidez combien de temps Kafka garde les données, quand compacter et comment segments, disques et stockage hiérarchisé influencent coût et reprise.",
+  "messaging/kafka-lag-rebalances-and-capacity-in-operation": "Surveillez le retard des consommateurs, les partitions sous-répliquées et la latence, dimensionnez un cluster et réagissez aux problèmes courants en production.",
+  "messaging/managed-messaging-on-cloud-sqs-sns-pub-sub-and-event-hubs": "Comparez SQS et SNS, Google Pub/Sub, Azure Service Bus et Event Hubs, et Kafka managé, et choisissez entre exploiter un broker ou le louer.",
+  "messaging/schemas-contracts-and-evolving-messages": "Définissez les formats de message avec Avro, Protobuf ou JSON Schema, utilisez un registre de schémas et changez les formats sans casser producteurs ni consommateurs.",
+  "messaging/debugging-messaging-incidents": "Suivez une liste fixe pour les arriérés, doublons, messages perdus, erreurs d'ordre et consommateurs bloqués dans files et journaux.",
+  "cfn-bicep/native-iac-cloudformation-bicep-or-terraform": "Comparez AWS CloudFormation et Azure Bicep à Terraform et décidez quand l'outil d'infrastructure en code du cloud est le meilleur choix.",
+  "cfn-bicep/cloudformation-templates-parameters-and-resources": "Écrivez un modèle CloudFormation avec paramètres, ressources, sorties et références, et déployez-le comme stack depuis la CLI.",
+  "cfn-bicep/intrinsic-functions-conditions-and-mappings": "Utilisez Ref, GetAtt, Sub, Join, Select, If, Conditions et Mappings pour qu'un modèle s'adapte à de nombreux environnements.",
+  "cfn-bicep/stacks-change-sets-and-safe-updates": "Prévisualisez les mises à jour avec les change sets, comprenez remplacement et modification sur place, et protégez les ressources critiques.",
+  "cfn-bicep/nested-stacks-stacksets-and-reusable-modules": "Découpez les gros modèles en stacks imbriquées, déployez un modèle sur de nombreux comptes et régions avec StackSets et partagez des modèles de conception en modules.",
+  "cfn-bicep/drift-rollbacks-and-resource-protection": "Détectez la dérive entre une stack et la réalité, importez des ressources existantes, gérez les rollbacks bloqués et protégez les données d'une suppression accidentelle.",
+  "cfn-bicep/bicep-syntax-resources-and-parameters": "Écrivez des fichiers Bicep avec paramètres, variables, ressources, sorties et décorateurs, et déployez-les dans un groupe de ressources.",
+  "cfn-bicep/bicep-modules-loops-and-conditions": "Découpez Bicep en modules, répétez des ressources avec des boucles for, activez-les par conditions et partagez les modules via un registre.",
+  "cfn-bicep/bicep-deployments-what-if-and-scopes": "Choisissez les portées de déploiement, prévisualisez avec what-if, comprenez les modes incrémental et complet et gardez l'historique maîtrisable.",
+  "cfn-bicep/deployment-stacks-and-delivery-pipelines": "Gérez le cycle de vie des ressources avec les deployment stacks Azure et lancez CloudFormation et Bicep depuis la CI avec des rôles à moindre privilège.",
+  "cfn-bicep/testing-linting-and-policy-checks-for-templates": "Repérez les erreurs de modèles avant le déploiement avec cfn-lint, cfn-guard, le linter Bicep, what-if, la politique en code et des environnements de test éphémères.",
+  "cfn-bicep/debugging-failed-deployments-and-moving-to-terraform": "Lisez les événements CloudFormation et les erreurs de déploiement Azure, corrigez les échecs courants et planifiez une migration sûre vers ou depuis Terraform.",
+  "gcp/google-cloud-organization-projects-and-billing": "Découvrez comment Google Cloud organise les ressources en organisation, dossiers et projets, et comment IAM, comptes de facturation et budgets s'y ajoutent.",
+  "gcp/gcloud-cli-configurations-and-automation": "Utilisez la CLI gcloud avec des configurations nommées, l'emprunt d'identité de compte de service, des formats de sortie et filtres, et écrivez des scripts sûrs.",
+  "gcp/vpc-networks-subnets-and-firewall-rules": "Concevez des réseaux VPC Google Cloud avec VPC globaux, sous-réseaux régionaux, règles de pare-feu, Cloud NAT et accès privé aux services Google.",
+  "gcp/compute-engine-images-and-managed-instance-groups": "Créez des VM Compute Engine, choisissez types de machine et images, et exécutez-les en groupes gérés avec autoscaling, contrôles de santé et mises à jour progressives.",
+  "gcp/cloud-storage-and-persistent-disks": "Utilisez des buckets Cloud Storage avec classes, règles de cycle de vie, versionnage et accès uniforme, et choisissez entre Persistent Disk, Hyperdisk et Filestore.",
+  "gcp/gke-autopilot-and-standard-clusters": "Comparez les modes GKE Autopilot et Standard, créez un cluster, utilisez Workload Identity, pools de nœuds et canaux de version, et évitez les pièges de coût et de mise à jour.",
+  "gcp/cloud-run-and-cloud-functions": "Déployez des conteneurs sur Cloud Run et du code événementiel dans des fonctions Cloud Run, avec mise à l'échelle à zéro, révisions, répartition du trafic, concurrence et secrets.",
+  "gcp/cloud-sql-spanner-bigquery-and-firestore": "Choisissez entre Cloud SQL, AlloyDB, Spanner, Firestore et BigQuery, et exploitez Cloud SQL en sécurité avec haute disponibilité, sauvegardes et connexions privées.",
+  "gcp/pub-sub-eventarc-and-cloud-tasks": "Utilisez les sujets et abonnements Pub/Sub, les déclencheurs Eventarc et les files Cloud Tasks pour relier des services Google Cloud en asynchrone et gérer les échecs.",
+  "gcp/observability-with-cloud-logging-monitoring-and-slos": "Utilisez Cloud Logging, Cloud Monitoring, Trace et Error Reporting pour trouver les problèmes, écrire des politiques d'alerte et définir des objectifs de niveau de service.",
+  "gcp/terraform-on-google-cloud": "Gérez Google Cloud avec Terraform : le fournisseur google, l'état distant dans Cloud Storage, les comptes de service pour les pipelines et les fabriques de projets.",
+  "gcp/security-cost-and-debugging-on-google-cloud": "Appliquez les contrôles de sécurité Google Cloud comme IAM, politiques d'organisation et VPC Service Controls, maîtrisez les coûts et déboguez les erreurs de permission et de quota."
  }
 }

@@ -1887,6 +1887,22 @@
   "service-mesh": {
    "title": "ಸೇವಾ ಜಾಲ ಮತ್ತು Kubernetes ನೆಟ್‌ವರ್ಕಿಂಗ್",
    "summary": "ಪಾಡ್ ನೆಟ್‌ವರ್ಕಿಂಗ್, CNI ಮತ್ತು ನೆಟ್‌ವರ್ಕ್ ನೀತಿಯನ್ನು ಅರ್ಥಮಾಡಿಕೊಂಡು, mTLS, ಟ್ರಾಫಿಕ್ ರೂಟಿಂಗ್ ಮತ್ತು ದೋಷನಿವಾರಣೆಯೊಂದಿಗೆ ಸೇವಾ ಜಾಲವನ್ನು ನಡೆಸಿ."
+  },
+  "proxies": {
+   "title": "ರಿವರ್ಸ್ ಪ್ರಾಕ್ಸಿ ಮತ್ತು ಲೋಡ್ ಬ್ಯಾಲೆನ್ಸರ್",
+   "summary": "ಸೇವೆಗಳ ಮುಂದೆ nginx, HAProxy ಮತ್ತು Envoy ಚಲಾಯಿಸಿ: ರೂಟಿಂಗ್, TLS, ಲೋಡ್ ಬ್ಯಾಲೆನ್ಸಿಂಗ್, ಟೈಮ್‌ಔಟ್, ಕ್ಯಾಶಿಂಗ್, ದರ ಮಿತಿ ಮತ್ತು 502, 504 ದೋಷಗಳ ಡೀಬಗ್."
+  },
+  "messaging": {
+   "title": "ಮೆಸೇಜಿಂಗ್ ಮತ್ತು ಸ್ಟ್ರೀಮಿಂಗ್",
+   "summary": "ಕ್ಯೂ ಮತ್ತು ಲಾಗ್ ಆಯ್ಕೆ ಮಾಡಿ ನಿರ್ವಹಿಸಿ: RabbitMQ ಮತ್ತು Kafka, ವಿತರಣಾ ಖಾತರಿ, ಕನ್ಸ್ಯೂಮರ್ ಗುಂಪು, ಲ್ಯಾಗ್, ಉಳಿಸುವಿಕೆ, ಸ್ಕೀಮಾ ಮತ್ತು ನಿರ್ವಹಿತ ಕ್ಲೌಡ್ ಸೇವೆಗಳು."
+  },
+  "cfn-bicep": {
+   "title": "CloudFormation ಮತ್ತು Bicep",
+   "summary": "ಕ್ಲೌಡ್ ಸ್ಥಳೀಯ ಇನ್ಫ್ರಾಸ್ಟ್ರಕ್ಚರ್ ಆಸ್ ಕೋಡ್ ಬರೆದು ನಿರ್ವಹಿಸಿ: AWS CloudFormation ಮತ್ತು Azure Bicep, ಬದಲಾವಣೆ ಪೂರ್ವವೀಕ್ಷಣೆ, ಸ್ಟ್ಯಾಕ್, ಮಾಡ್ಯೂಲ್, ಪರೀಕ್ಷೆ ಮತ್ತು ವಿಫಲ ನಿಯೋಜನೆಗಳ ಡೀಬಗ್."
+  },
+  "gcp": {
+   "title": "Google Cloud",
+   "summary": "Google Cloud ಮಾದರಿ ಕಲಿಯಿರಿ: ಪ್ರಾಜೆಕ್ಟ್, VPC, Compute Engine, Cloud Storage, GKE, Cloud Run, ಡೇಟಾ ಮತ್ತು ಮೆಸೇಜಿಂಗ್ ಸೇವೆಗಳು, ಕಾರ್ಯಾಚರಣೆ ಮತ್ತು ವೆಚ್ಚ, gcloud CLI ಜೊತೆ."
   }
  },
  "paths": {
@@ -2420,6 +2436,68 @@
   "security/cloud-posture-and-misconfiguration-management": "ಸ್ಥಿತಿ ಸಾಧನಗಳು ಮತ್ತು ನೀತಿ-ಕೋಡ್‌ನಿಂದ ಸಾರ್ವಜನಿಕ ಬಕೆಟ್‌ಗಳು, ತೆರೆದ ಪೋರ್ಟ್‌ಗಳು ಮತ್ತು ಕಾಣೆಯಾದ ಎನ್‌ಕ್ರಿಪ್ಶನ್ ಅನ್ನು ನಿರಂತರವಾಗಿ ಕಂಡುಹಿಡಿಯಿರಿ, ಜಾರುವಿಕೆಯನ್ನು ಮೂಲದಲ್ಲೇ ಸರಿಪಡಿಸಿ.",
   "security/security-champions-and-secure-code-review": "ಚಾಂಪಿಯನ್‌ಗಳು, ಪ್ರಾಯೋಗಿಕ ಕೋಡ್ ವಿಮರ್ಶೆ ಪರಿಶೀಲನಾಪಟ್ಟಿಗಳು, ಬೆದರಿಕೆ ಮಾದರಿ ಮತ್ತು ಡೆವಲಪರ್‌ಗಳು ಮೆಚ್ಚುವ ಪ್ರತಿಕ್ರಿಯೆ ಚಕ್ರಗಳಿಂದ ತಂಡಗಳಲ್ಲಿ ಭದ್ರತೆಯನ್ನು ಹರಡಿ.",
   "security/incident-forensics-and-evidence-handling": "ಅಸ್ಥಿರ ಸಾಕ್ಷ್ಯಗಳನ್ನು ಸಂರಕ್ಷಿಸಿ, ಲಾಗ್‌ಗಳು ಮತ್ತು ಡಿಸ್ಕ್ ಇಮೇಜ್‌ಗಳನ್ನು ಸುರಕ್ಷಿತವಾಗಿ ಸಂಗ್ರಹಿಸಿ, ಸಾಕ್ಷ್ಯ ಸರಪಳಿ ಇರಿಸಿ, ಭದ್ರತಾ ಘಟನೆಯಲ್ಲಿ ಕಾಲರೇಖೆ ನಿರ್ಮಿಸಿ.",
-  "security/audit-readiness-and-continuous-compliance-evidence": "ಸಾಕ್ಷ್ಯಗಳನ್ನು ಸ್ವಯಂಚಾಲಿತಗೊಳಿಸಿ, ನಿಯಂತ್ರಣಗಳನ್ನು ತಾಂತ್ರಿಕ ಪರಿಶೀಲನೆಗಳಿಗೆ ಹೊಂದಿಸಿ, ಜೀವಂತ ದಾಖಲೆ ಇರಿಸಿ SOC 2 ಅಥವಾ ISO 27001 ಲೆಕ್ಕಪರಿಶೋಧನೆಗೆ ಸಿದ್ಧರಾಗಿ."
+  "security/audit-readiness-and-continuous-compliance-evidence": "ಸಾಕ್ಷ್ಯಗಳನ್ನು ಸ್ವಯಂಚಾಲಿತಗೊಳಿಸಿ, ನಿಯಂತ್ರಣಗಳನ್ನು ತಾಂತ್ರಿಕ ಪರಿಶೀಲನೆಗಳಿಗೆ ಹೊಂದಿಸಿ, ಜೀವಂತ ದಾಖಲೆ ಇರಿಸಿ SOC 2 ಅಥವಾ ISO 27001 ಲೆಕ್ಕಪರಿಶೋಧನೆಗೆ ಸಿದ್ಧರಾಗಿ.",
+  "cicd/jenkins-architecture-controllers-agents-and-jobs": "Jenkins ನಿಯಂತ್ರಕವು ಏಜೆಂಟ್‌ಗಳಿಗೆ ಕೆಲಸವನ್ನು ಹೇಗೆ ಹಂಚುತ್ತದೆ, ಜಾಬ್ ಮತ್ತು ಬಿಲ್ಡ್ ಎಂದರೇನು, Jenkins ತನ್ನ ಸ್ಥಿತಿಯನ್ನು ಎಲ್ಲಿ ಇಡುತ್ತದೆ ಎಂಬುದನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ.",
+  "cicd/jenkins-declarative-pipelines-and-the-jenkinsfile": "ಹಂತಗಳು, ಸ್ಟೆಪ್‌ಗಳು, ಪರಿಸರ, ಷರತ್ತುಗಳು ಮತ್ತು ಪೋಸ್ಟ್ ಕ್ರಿಯೆಗಳೊಂದಿಗೆ ಡಿಕ್ಲರೇಟಿವ್ Jenkinsfile ಬರೆದು ವಿಫಲ ರನ್ ಓದಿ.",
+  "cicd/jenkins-build-agents-with-docker-and-kubernetes": "ತಾತ್ಕಾಲಿಕ ಏಜೆಂಟ್‌ಗಳಲ್ಲಿ ಬಿಲ್ಡ್‌ಗಳನ್ನು ಓಡಿಸಿ: ಸ್ಥಿರ ನೋಡ್‌ಗಳು, Docker ಏಜೆಂಟ್‌ಗಳು ಮತ್ತು ಪಾಡ್ ಟೆಂಪ್ಲೇಟ್‌ಗಳೊಂದಿಗೆ Kubernetes ಪ್ಲಗಿನ್.",
+  "cicd/jenkins-shared-libraries-and-reusable-pipelines": "ಹಂಚಿಕೆಯ ಲೈಬ್ರರಿಗಳು, ಜಾಗತಿಕ ಚರಗಳು ಮತ್ತು ಆವೃತ್ತಿ ಬಿಡುಗಡೆಗಳ ಮೂಲಕ ಹಲವು ರೆಪೊಸಿಟರಿಗಳಲ್ಲಿ ಪೈಪ್‌ಲೈನ್ ಕೋಡ್ ಹಂಚಿಕೊಳ್ಳಿ.",
+  "cicd/jenkins-credentials-security-and-hardening": "ರಹಸ್ಯಗಳನ್ನು ಸುರಕ್ಷಿತವಾಗಿಡಿ, ಅನುಮತಿಗಳನ್ನು ಮಿತಿಗೊಳಿಸಿ, ಬಿಲ್ಡ್ ಕೋಡ್ ಅನ್ನು ನಿಯಂತ್ರಕದಿಂದ ದೂರವಿಡಿ ಮತ್ತು Jenkins ಸರ್ವರ್ ಅನ್ನು ಬಲಪಡಿಸಿ.",
+  "cicd/jenkins-plugins-upgrades-and-operating-at-scale": "ಪ್ಲಗಿನ್‌ಗಳು ಮತ್ತು ಅಪ್‌ಗ್ರೇಡ್‌ಗಳನ್ನು ಸುರಕ್ಷಿತವಾಗಿ ನಿರ್ವಹಿಸಿ, Jenkins ಅನ್ನು ಕೋಡ್ ಆಗಿ ಹೊಂದಿಸಿ, ಏಜೆಂಟ್‌ಗಳು, ಬ್ಯಾಕಪ್‌ಗಳು, ಮೇಲ್ವಿಚಾರಣೆಯೊಂದಿಗೆ ವಿಸ್ತರಿಸಿ.",
+  "cicd/jenkins-debugging-and-migrating-to-another-platform": "ಸಿಲುಕಿದ, ನಿಧಾನ ಮತ್ತು ಅಸ್ಥಿರ ಬಿಲ್ಡ್‌ಗಳನ್ನು ಡೀಬಗ್ ಮಾಡಿ, ಬೇಕಿದ್ದರೆ Actions ಅಥವಾ GitLab CI ಗೆ ಹಂತ ಹಂತದ ವಲಸೆ ಯೋಜಿಸಿ.",
+  "linux/debugging-with-strace-system-calls": "strace ಬಳಸಿ ಸಿಲುಕಿದ ಅಥವಾ ವಿಫಲ ಪ್ರೋಗ್ರಾಂ ಯಾವ ಫೈಲ್‌ಗಳು, ಸಾಕೆಟ್‌ಗಳು, ಸಿಸ್ಟಮ್ ಕಾಲ್‌ಗಳನ್ನು ಬಳಸುತ್ತದೆ ಎಂದು ನೋಡಿ ನಿಜವಾದ ಕಾರಣ ಕಂಡುಹಿಡಿಯಿರಿ.",
+  "linux/seeing-the-network-with-ss-and-tcpdump": "ss ನಿಂದ ಸಾಕೆಟ್‌ಗಳನ್ನು ಪಟ್ಟಿ ಮಾಡಿ, tcpdump ನಿಂದ ಪ್ಯಾಕೆಟ್‌ಗಳನ್ನು ಹಿಡಿದು ಟ್ರಾಫಿಕ್ ಹೊರಹೋಗುತ್ತದೆಯೇ, ತಲುಪುತ್ತದೆಯೇ, ಉತ್ತರ ಸಿಗುತ್ತದೆಯೇ ಎಂದು ಸಾಬೀತುಪಡಿಸಿ.",
+  "linux/open-files-and-proc-with-lsof": "lsof ಮತ್ತು /proc ಬಳಸಿ ಫೈಲ್, ಪೋರ್ಟ್ ಅಥವಾ ಅಳಿಸಿದ ಫೈಲ್ ಅನ್ನು ಯಾವ ಪ್ರಕ್ರಿಯೆ ಹಿಡಿದಿದೆ ಎಂದು ಹುಡುಕಿ ಮತ್ತು ಡಿಸ್ಕ್ರಿಪ್ಟರ್ ಸೋರಿಕೆಗಳನ್ನು ಗುರುತಿಸಿ.",
+  "linux/finding-cpu-memory-and-io-hogs": "top, vmstat, iostat, pidstat ಬಳಸಿ CPU, ಮೆಮೊರಿ, ಡಿಸ್ಕ್ ಸಮಸ್ಯೆಗಳನ್ನು ಬೇರ್ಪಡಿಸಿ ಹೊಣೆಗಾರ ಪ್ರಕ್ರಿಯೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+  "linux/kernel-messages-journal-and-core-dumps": "ಕರ್ನಲ್ ಮತ್ತು ಸೇವಾ ಘಟನೆಗಳಿಗೆ dmesg, journalctl ಓದಿ, ಮೆಮೊರಿ ಖಾಲಿಯಾಗಿ ಕೊಲ್ಲಲ್ಪಟ್ಟವನ್ನು ಹುಡುಕಿ, ಕ್ರ್ಯಾಶ್ ನಂತರ ಕೋರ್ ಡಂಪ್ ಸಂಗ್ರಹಿಸಿ.",
+  "linux/ebpf-and-bpftrace-live-questions": "eBPF ಅರ್ಥಮಾಡಿಕೊಂಡು bpftrace ಒಂದು-ಸಾಲು ಆದೇಶಗಳು ಮತ್ತು ಸಿದ್ಧ ಸಾಧನಗಳಿಂದ ಫೈಲ್‌ಗಳು, ಪ್ರಕ್ರಿಯೆಗಳು, ವಿಳಂಬದ ಬಗ್ಗೆ ನೇರ ಪ್ರಶ್ನೆಗಳಿಗೆ ಉತ್ತರ ಪಡೆಯಿರಿ.",
+  "linux/debugging-a-slow-or-hung-server-a-method": "ಹಿಂದಿನ ಸಾಧನಗಳನ್ನು ಪುನರಾವರ್ತಿಸಬಹುದಾದ ವಿಧಾನವಾಗಿ ಸೇರಿಸಿ: ಲಕ್ಷಣ ವ್ಯಾಖ್ಯಾನಿಸಿ, ತುಂಬಿದ ಸಂಪನ್ಮೂಲ, ಪ್ರಕ್ರಿಯೆ ಕಂಡು ಕಾರಣ ದೃಢಪಡಿಸಿ.",
+  "proxies/what-a-reverse-proxy-does": "ಬಳಕೆದಾರರು ಮತ್ತು ಸೇವೆಗಳ ನಡುವೆ ಏನಿದೆ, ರಿವರ್ಸ್ ಪ್ರಾಕ್ಸಿ ಏನು ಮಾಡುತ್ತದೆ, ಫಾರ್ವರ್ಡ್ ಪ್ರಾಕ್ಸಿ ಮತ್ತು ಲೋಡ್ ಬ್ಯಾಲೆನ್ಸರ್‌ನಿಂದ ಹೇಗೆ ಭಿನ್ನ ಎಂದು ತಿಳಿಯಿರಿ.",
+  "proxies/nginx-configuration-servers-and-locations": "nginx ಸಂರಚನೆಯನ್ನು ಓದಿ ಬರೆಯಿರಿ: ಸಂದರ್ಭಗಳು, ಸರ್ವರ್ ಬ್ಲಾಕ್‌ಗಳು, ಲೊಕೇಶನ್ ನಿಯಮಗಳು, ಸುರಕ್ಷಿತ ಪರೀಕ್ಷೆ ಮತ್ತು ಮರುಲೋಡ್.",
+  "proxies/proxying-to-upstreams-headers-and-buffers": "proxy_pass ಮೂಲಕ ವಿನಂತಿಗಳನ್ನು ಬ್ಯಾಕೆಂಡ್‌ಗಳಿಗೆ ಕಳುಹಿಸಿ, ಸರಿಯಾದ ಹೆಡರ್‌ಗಳನ್ನು ನೀಡಿ, ಬಫರಿಂಗ್ ಅರ್ಥಮಾಡಿಕೊಂಡು WebSocket ಅನ್ನು ಸರಿಯಾಗಿ ಬೆಂಬಲಿಸಿ.",
+  "proxies/tls-termination-http2-and-certificates": "ಬಲವಾದ ಪ್ರೋಟೋಕಾಲ್‌ಗಳು, ಮರುನಿರ್ದೇಶನ, HSTS, OCSP ಸ್ಟೇಪ್ಲಿಂಗ್, ಸ್ವಯಂಚಾಲಿತ ಪ್ರಮಾಣಪತ್ರ ನವೀಕರಣದೊಂದಿಗೆ ಪ್ರಾಕ್ಸಿಯಲ್ಲಿ TLS ಮುಗಿಸಿ.",
+  "proxies/load-balancing-algorithms-and-health-checks": "ರೌಂಡ್ ರಾಬಿನ್, ಕಡಿಮೆ ಸಂಪರ್ಕಗಳು, ಹ್ಯಾಶಿಂಗ್‌ನಿಂದ ಟ್ರಾಫಿಕ್ ಹಂಚಿ, ನಿಷ್ಕ್ರಿಯ ಮತ್ತು ಸಕ್ರಿಯ ಆರೋಗ್ಯ ತಪಾಸಣೆಗಳಿಂದ ವಿಫಲ ಬ್ಯಾಕೆಂಡ್‌ಗಳನ್ನು ತೆಗೆಯಿರಿ.",
+  "proxies/timeouts-retries-keepalive-and-limits": "ನಿಜವಾದ ವರ್ತನೆಗೆ ಹೊಂದುವ ಪ್ರಾಕ್ಸಿ ಟೈಮ್‌ಔಟ್‌ಗಳನ್ನು ಹೊಂದಿಸಿ, keepalive ಟ್ಯೂನ್ ಮಾಡಿ, ಮರುಪ್ರಯತ್ನ ಮತ್ತು ಮಿತಿಗಳು ಸ್ಥಗಿತವನ್ನು ಹೇಗೆ ಉಂಟುಮಾಡುತ್ತವೆ ಅಥವಾ ತಡೆಯುತ್ತವೆ ಎಂದು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ.",
+  "proxies/caching-compression-and-static-files": "ಸ್ಥಿರ ಫೈಲ್‌ಗಳನ್ನು ಸಮರ್ಥವಾಗಿ ಒದಗಿಸಿ, ಸರಿಯಾದ ಕೀಲಿ ಮತ್ತು ಅವಧಿಯೊಂದಿಗೆ ಅಪ್‌ಸ್ಟ್ರೀಮ್ ಪ್ರತಿಕ್ರಿಯೆಗಳನ್ನು ಕ್ಯಾಶ್ ಮಾಡಿ, ಪ್ರಾಕ್ಸಿಯಲ್ಲಿ ಸುರಕ್ಷಿತವಾಗಿ ಸಂಕುಚಿಸಿ.",
+  "proxies/rate-limiting-and-protecting-backends": "ಪ್ರಾಕ್ಸಿಯಲ್ಲಿ ವಿನಂತಿ ಮತ್ತು ಸಂಪರ್ಕ ದರಗಳನ್ನು ಮಿತಿಗೊಳಿಸಿ, ಸರಿಯಾದ ಸ್ಥಿತಿ ಕೋಡ್‌ಗಳನ್ನು ಹಿಂತಿರುಗಿಸಿ, ಬ್ಯಾಕೆಂಡ್‌ಗಳನ್ನು ಹಠಾತ್ ಏರಿಕೆ ಮತ್ತು ದುರುಪಯೋಗದಿಂದ ಕಾಪಾಡಿ.",
+  "proxies/haproxy-frontends-backends-and-acls": "ಫ್ರಂಟೆಂಡ್‌ಗಳು, ಬ್ಯಾಕೆಂಡ್‌ಗಳು, ACL ರೂಟಿಂಗ್, ಸ್ಟಿಕ್ ಟೇಬಲ್‌ಗಳು, ಆರೋಗ್ಯ ತಪಾಸಣೆಗಳೊಂದಿಗೆ HAProxy ಹೊಂದಿಸಿ ಅದರ ಅಂಕಿಅಂಶ ಓದಿ.",
+  "proxies/envoy-traefik-and-dynamic-proxies": "ಸೇವಾ ಅನ್ವೇಷಣೆಯಿಂದ ತಾವೇ ಹೊಂದಿಸಿಕೊಳ್ಳುವ ಪ್ರಾಕ್ಸಿಗಳನ್ನು ಹೋಲಿಸಿ: Envoy, Traefik ಮತ್ತು Caddy ಸ್ವಯಂಚಾಲಿತ HTTPS.",
+  "proxies/zero-downtime-reloads-and-blue-green-at-the-proxy": "ವಿನಂತಿಗಳನ್ನು ಕಳೆದುಕೊಳ್ಳದೆ ಪ್ರಾಕ್ಸಿ ಸಂರಚನೆ ಬದಲಿಸಿ ಆವೃತ್ತಿಗಳ ನಡುವೆ ಟ್ರಾಫಿಕ್ ಸರಿಸಿ: ಸೌಮ್ಯ ಮರುಲೋಡ್, ತೂಕದ ರೂಟಿಂಗ್, ಡ್ರೇನ್.",
+  "proxies/debugging-502-504-and-proxy-problems": "ಸ್ಥಿತಿ ಕೋಡ್‌ಗಳು, ದೋಷ ಲಾಗ್‌ಗಳು, ಅಪ್‌ಸ್ಟ್ರೀಮ್ ಸಮಯ ಮತ್ತು ಬ್ಯಾಕೆಂಡ್‌ಗೆ ನೇರ ವಿನಂತಿಗಳೊಂದಿಗೆ ನಿಗದಿತ ಕ್ರಮದಲ್ಲಿ ಪ್ರಾಕ್ಸಿ ದೋಷಗಳನ್ನು ಪತ್ತೆಹಚ್ಚಿ.",
+  "messaging/queues-logs-and-pub-sub-choosing-a-model": "ಕೆಲಸದ ಸರತಿಗಳು, ಪ್ರಕಟಿಸು-ಚಂದಾದಾರರಾಗು ವಿಷಯಗಳು ಮತ್ತು ಸೇರಿಸುವ-ಮಾತ್ರ ಲಾಗ್‌ಗಳನ್ನು ಹೋಲಿಸಿ ಕೆಲಸಕ್ಕೆ ಸರಿಯಾದ ಸಂದೇಶ ಮಾದರಿ ಆರಿಸಿ.",
+  "messaging/delivery-guarantees-ordering-and-idempotency": "ಗರಿಷ್ಠ ಒಮ್ಮೆ, ಕನಿಷ್ಠ ಒಮ್ಮೆ, ಪರಿಣಾಮಕಾರಿಯಾಗಿ ಒಮ್ಮೆ ವಿತರಣೆ, ಕ್ರಮ ಯಾವಾಗ ಉಳಿಯುತ್ತದೆ, ಐಡೆಂಪೊಟೆಂಟ್ ಗ್ರಾಹಕರು ನಕಲುಗಳನ್ನು ಹೇಗೆ ನಿರುಪದ್ರವಗೊಳಿಸುತ್ತಾರೆ ಎಂದು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ.",
+  "messaging/rabbitmq-exchanges-queues-and-routing": "ನಿರ್ಮಾಪಕರು, ಎಕ್ಸ್‌ಚೇಂಜ್‌ಗಳು, ಬೈಂಡಿಂಗ್‌ಗಳು, ಸರತಿಗಳೊಂದಿಗೆ RabbitMQ ಮಾದರಿ ಅರ್ಥಮಾಡಿಕೊಂಡು direct, topic, fanout, headers ಎಕ್ಸ್‌ಚೇಂಜ್‌ಗಳನ್ನು ಆರಿಸಿ.",
+  "messaging/rabbitmq-acknowledgements-prefetch-and-dead-letters": "ಅಂಗೀಕಾರಗಳು, ಪ್ರೀಫೆಚ್, ಮರುಪ್ರಯತ್ನಗಳು, ಡೆಡ್-ಲೆಟರ್ ಎಕ್ಸ್‌ಚೇಂಜ್‌ಗಳು, ಸರತಿ ಆಳದ ಮೇಲ್ವಿಚಾರಣೆಯೊಂದಿಗೆ RabbitMQ ವೈಫಲ್ಯಗಳನ್ನು ನಿಭಾಯಿಸಿ.",
+  "messaging/kafka-topics-partitions-and-brokers": "ವಿಭಾಗಗಳಾಗಿ ವಿಂಗಡಿಸಿದ ವಿಷಯಗಳು, ಬ್ರೋಕರ್‌ಗಳು, ಆಫ್‌ಸೆಟ್‌ಗಳು, ಕೀಲಿಗಳೊಂದಿಗೆ Kafka ಮಾದರಿ ಕಲಿತು, ವಿಭಜನೆಯು ಕ್ರಮ ಮತ್ತು ಪ್ರಮಾಣವನ್ನು ಹೇಗೆ ರೂಪಿಸುತ್ತದೆ ಎಂದು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ.",
+  "messaging/kafka-producers-consumers-and-consumer-groups": "ಬಾಳಿಕೆ ಮತ್ತು ಥ್ರೂಪುಟ್‌ಗಾಗಿ ನಿರ್ಮಾಪಕರನ್ನು, ಸುರಕ್ಷಿತ ಆಫ್‌ಸೆಟ್ ಕಮಿಟ್‌ಗಳಿಗಾಗಿ ಗ್ರಾಹಕರನ್ನು ಹೊಂದಿಸಿ, ಗುಂಪುಗಳು ವಿಭಾಗಗಳನ್ನು ಹೇಗೆ ಹಂಚಿಕೊಳ್ಳುತ್ತವೆ ಎಂದು ತಿಳಿಯಿರಿ.",
+  "messaging/kafka-replication-isr-and-durability": "ನಾಯಕ ಆಯ್ಕೆ, ಸಿಂಕ್‌ನಲ್ಲಿರುವ ಪ್ರತಿಕೃತಿಗಳು, min.insync.replicas ಮತ್ತು ಅಶುದ್ಧ ಆಯ್ಕೆಗಳನ್ನು ಅರ್ಥಮಾಡಿಕೊಂಡು ಬ್ರೋಕರ್‌ಗಳು ವಿಫಲವಾದರೆ Kafka ಏನು ಕಳೆದುಕೊಳ್ಳುತ್ತದೆ ಎಂದು ಅಂದಾಜಿಸಿ.",
+  "messaging/kafka-retention-compaction-and-storage": "Kafka ಡೇಟಾವನ್ನು ಎಷ್ಟು ಕಾಲ ಇಡಬೇಕು, ಲಾಗ್ ಸಂಕುಚನ ಯಾವಾಗ ಬಳಸಬೇಕು, ಸೆಗ್ಮೆಂಟ್‌ಗಳು, ಡಿಸ್ಕ್‌ಗಳು, ಶ್ರೇಣೀಕೃತ ಸಂಗ್ರಹಣೆ ವೆಚ್ಚ ಮತ್ತು ಚೇತರಿಕೆಯನ್ನು ಹೇಗೆ ಪ್ರಭಾವಿಸುತ್ತವೆ ಎಂದು ನಿರ್ಧರಿಸಿ.",
+  "messaging/kafka-lag-rebalances-and-capacity-in-operation": "ಗ್ರಾಹಕ ವಿಳಂಬ, ಕಡಿಮೆ-ಪ್ರತಿಕೃತಿ ವಿಭಾಗಗಳು, ವಿನಂತಿ ವಿಳಂಬವನ್ನು ಮೇಲ್ವಿಚಾರಣೆ ಮಾಡಿ, ಕ್ಲಸ್ಟರ್ ಗಾತ್ರ ನಿರ್ಧರಿಸಿ, ಸಾಮಾನ್ಯ ಉತ್ಪಾದನಾ ಸಮಸ್ಯೆಗಳಿಗೆ ಪ್ರತಿಕ್ರಿಯಿಸಿ.",
+  "messaging/managed-messaging-on-cloud-sqs-sns-pub-sub-and-event-hubs": "SQS, SNS, Google Pub/Sub, Azure Service Bus, Event Hubs ಮತ್ತು ನಿರ್ವಹಿತ Kafka ಹೋಲಿಸಿ, ಬ್ರೋಕರ್ ಓಡಿಸುವುದೇ ಬಾಡಿಗೆಗೆ ಪಡೆಯುವುದೇ ಎಂದು ಆರಿಸಿ.",
+  "messaging/schemas-contracts-and-evolving-messages": "Avro, Protobuf ಅಥವಾ JSON Schema ಬಳಸಿ ಸಂದೇಶ ರೂಪಗಳನ್ನು ವ್ಯಾಖ್ಯಾನಿಸಿ, ಸ್ಕೀಮಾ ರಿಜಿಸ್ಟ್ರಿ ಬಳಸಿ, ನಿರ್ಮಾಪಕರು ಅಥವಾ ಗ್ರಾಹಕರನ್ನು ಮುರಿಯದೆ ರೂಪಗಳನ್ನು ಬದಲಿಸಿ.",
+  "messaging/debugging-messaging-incidents": "ಸರತಿಗಳು ಮತ್ತು ಲಾಗ್‌ಗಳಲ್ಲಿ ಬ್ಯಾಕ್‌ಲಾಗ್, ನಕಲುಗಳು, ಕಳೆದುಹೋದ ಸಂದೇಶಗಳು, ಕ್ರಮ ದೋಷಗಳು, ಸಿಲುಕಿದ ಗ್ರಾಹಕರಿಗೆ ನಿಗದಿತ ಪರಿಶೀಲನಾ ಪಟ್ಟಿ ಅನುಸರಿಸಿ.",
+  "cfn-bicep/native-iac-cloudformation-bicep-or-terraform": "AWS CloudFormation ಮತ್ತು Azure Bicep ಅನ್ನು Terraform ಜೊತೆ ಹೋಲಿಸಿ, ಕ್ಲೌಡ್‌ನ ಸ್ವಂತ ಮೂಲಸೌಕರ್ಯ-ಕೋಡ್ ಸಾಧನ ಯಾವಾಗ ಉತ್ತಮ ಎಂದು ನಿರ್ಧರಿಸಿ.",
+  "cfn-bicep/cloudformation-templates-parameters-and-resources": "ನಿಯತಾಂಕಗಳು, ಸಂಪನ್ಮೂಲಗಳು, ಔಟ್‌ಪುಟ್‌ಗಳು, ಉಲ್ಲೇಖಗಳೊಂದಿಗೆ CloudFormation ಟೆಂಪ್ಲೇಟ್ ಬರೆದು CLI ಮೂಲಕ ಸ್ಟ್ಯಾಕ್ ಆಗಿ ನಿಯೋಜಿಸಿ.",
+  "cfn-bicep/intrinsic-functions-conditions-and-mappings": "Ref, GetAtt, Sub, Join, Select, If, Conditions, Mappings ಬಳಸಿ ಒಂದು ಟೆಂಪ್ಲೇಟ್ ಹಲವು ಪರಿಸರಗಳಿಗೆ ಹೊಂದಿಕೊಳ್ಳುವಂತೆ ಮಾಡಿ.",
+  "cfn-bicep/stacks-change-sets-and-safe-updates": "ಬದಲಾವಣೆ ಸೆಟ್‌ಗಳಿಂದ ನವೀಕರಣಗಳನ್ನು ಮುಂಚಿತವಾಗಿ ನೋಡಿ, ಬದಲಿ ಮತ್ತು ಸ್ಥಳದಲ್ಲೇ ಬದಲಾವಣೆ ಅರ್ಥಮಾಡಿಕೊಂಡು ಪ್ರಮುಖ ಸಂಪನ್ಮೂಲಗಳನ್ನು ರಕ್ಷಿಸಿ.",
+  "cfn-bicep/nested-stacks-stacksets-and-reusable-modules": "ದೊಡ್ಡ ಟೆಂಪ್ಲೇಟ್‌ಗಳನ್ನು ಒಳಗೊಂಡ ಸ್ಟ್ಯಾಕ್‌ಗಳಾಗಿ ವಿಭಜಿಸಿ, StackSets ಮೂಲಕ ಒಂದನ್ನು ಹಲವು ಖಾತೆಗಳು ಮತ್ತು ಪ್ರದೇಶಗಳಿಗೆ ಹರಡಿ, ಮಾದರಿಗಳನ್ನು ಮಾಡ್ಯೂಲ್‌ಗಳಾಗಿ ಹಂಚಿಕೊಳ್ಳಿ.",
+  "cfn-bicep/drift-rollbacks-and-resource-protection": "ಸ್ಟ್ಯಾಕ್ ಮತ್ತು ವಾಸ್ತವದ ನಡುವಿನ ವ್ಯತ್ಯಾಸ ಪತ್ತೆಹಚ್ಚಿ, ಇರುವ ಸಂಪನ್ಮೂಲಗಳನ್ನು ಆಮದು ಮಾಡಿ, ಸಿಲುಕಿದ ರೋಲ್‌ಬ್ಯಾಕ್‌ಗಳನ್ನು ನಿಭಾಯಿಸಿ ಮತ್ತು ಡೇಟಾವನ್ನು ಆಕಸ್ಮಿಕ ಅಳಿಸುವಿಕೆಯಿಂದ ಕಾಪಾಡಿ.",
+  "cfn-bicep/bicep-syntax-resources-and-parameters": "ನಿಯತಾಂಕಗಳು, ಚರಗಳು, ಸಂಪನ್ಮೂಲಗಳು, ಔಟ್‌ಪುಟ್‌ಗಳು, ಅಲಂಕಾರಕಗಳೊಂದಿಗೆ Bicep ಫೈಲ್‌ಗಳನ್ನು ಬರೆದು ಸಂಪನ್ಮೂಲ ಗುಂಪಿಗೆ ನಿಯೋಜಿಸಿ.",
+  "cfn-bicep/bicep-modules-loops-and-conditions": "Bicep ಅನ್ನು ಮಾಡ್ಯೂಲ್‌ಗಳಾಗಿ ವಿಭಜಿಸಿ, for ಲೂಪ್‌ಗಳಿಂದ ಸಂಪನ್ಮೂಲಗಳನ್ನು ಪುನರಾವರ್ತಿಸಿ, ಷರತ್ತುಗಳಿಂದ ಆನ್ ಮಾಡಿ, ರಿಜಿಸ್ಟ್ರಿ ಮೂಲಕ ಮಾಡ್ಯೂಲ್‌ಗಳನ್ನು ಹಂಚಿಕೊಳ್ಳಿ.",
+  "cfn-bicep/bicep-deployments-what-if-and-scopes": "ನಿಯೋಜನೆ ವ್ಯಾಪ್ತಿಗಳನ್ನು ಆರಿಸಿ, what-if ಮೂಲಕ ಬದಲಾವಣೆಗಳನ್ನು ನೋಡಿ, ಹೆಚ್ಚುತ್ತಿರುವ ಮತ್ತು ಪೂರ್ಣ ಮೋಡ್‌ಗಳನ್ನು ಅರ್ಥಮಾಡಿಕೊಂಡು ಇತಿಹಾಸವನ್ನು ನಿರ್ವಹಿಸಬಹುದಾಗಿಡಿ.",
+  "cfn-bicep/deployment-stacks-and-delivery-pipelines": "Azure ನಿಯೋಜನೆ ಸ್ಟ್ಯಾಕ್‌ಗಳಿಂದ ಸಂಪನ್ಮೂಲ ಜೀವನಚಕ್ರ ನಿರ್ವಹಿಸಿ, ಕನಿಷ್ಠ ಸವಲತ್ತಿನ ಪಾತ್ರಗಳೊಂದಿಗೆ CI ಪೈಪ್‌ಲೈನ್‌ಗಳಿಂದ CloudFormation ಮತ್ತು Bicep ಓಡಿಸಿ.",
+  "cfn-bicep/testing-linting-and-policy-checks-for-templates": "cfn-lint, cfn-guard, Bicep ಲಿಂಟರ್, what-if, ನೀತಿ-ಕೋಡ್ ಮತ್ತು ತಾತ್ಕಾಲಿಕ ಪರೀಕ್ಷಾ ಪರಿಸರಗಳಿಂದ ನಿಯೋಜನೆಗೆ ಮುನ್ನ ಟೆಂಪ್ಲೇಟ್ ತಪ್ಪುಗಳನ್ನು ಹಿಡಿಯಿರಿ.",
+  "cfn-bicep/debugging-failed-deployments-and-moving-to-terraform": "CloudFormation ಘಟನೆಗಳು ಮತ್ತು Azure ನಿಯೋಜನೆ ದೋಷಗಳನ್ನು ಓದಿ, ಸಾಮಾನ್ಯ ವೈಫಲ್ಯಗಳನ್ನು ಸರಿಪಡಿಸಿ, Terraform ಗೆ ಅಥವಾ ಅದರಿಂದ ಸುರಕ್ಷಿತ ವಲಸೆ ಯೋಜಿಸಿ.",
+  "gcp/google-cloud-organization-projects-and-billing": "Google Cloud ಸಂಪನ್ಮೂಲಗಳನ್ನು ಸಂಸ್ಥೆ, ಫೋಲ್ಡರ್‌ಗಳು, ಯೋಜನೆಗಳಾಗಿ ಹೇಗೆ ಜೋಡಿಸುತ್ತದೆ, IAM, ಬಿಲ್ಲಿಂಗ್ ಖಾತೆಗಳು, ಬಜೆಟ್‌ಗಳು ಹೇಗೆ ಹೊಂದುತ್ತವೆ ಎಂದು ತಿಳಿಯಿರಿ.",
+  "gcp/gcloud-cli-configurations-and-automation": "ಹೆಸರಿಸಿದ ಸಂರಚನೆಗಳು, ಸೇವಾ ಖಾತೆ ಅನುಕರಣೆ, ಔಟ್‌ಪುಟ್ ರೂಪಗಳು, ಫಿಲ್ಟರ್‌ಗಳೊಂದಿಗೆ gcloud CLI ಬಳಸಿ ಸುರಕ್ಷಿತ ಸ್ಕ್ರಿಪ್ಟ್‌ಗಳನ್ನು ಬರೆಯಿರಿ.",
+  "gcp/vpc-networks-subnets-and-firewall-rules": "ಜಾಗತಿಕ VPCಗಳು, ಪ್ರಾದೇಶಿಕ ಉಪಜಾಲಗಳು, ಫೈರ್‌ವಾಲ್ ನಿಯಮಗಳು, Cloud NAT ಮತ್ತು Google ಸೇವೆಗಳಿಗೆ ಖಾಸಗಿ ಪ್ರವೇಶದೊಂದಿಗೆ Google Cloud VPC ಜಾಲಗಳನ್ನು ವಿನ್ಯಾಸಗೊಳಿಸಿ.",
+  "gcp/compute-engine-images-and-managed-instance-groups": "Compute Engine VMಗಳನ್ನು ರಚಿಸಿ, ಯಂತ್ರ ಪ್ರಕಾರಗಳು ಮತ್ತು ಚಿತ್ರಗಳನ್ನು ಆರಿಸಿ, ಸ್ವಯಂ ಮಾಪನ, ಆರೋಗ್ಯ ತಪಾಸಣೆ, ಹಂತ ಹಂತದ ನವೀಕರಣದೊಂದಿಗೆ ನಿರ್ವಹಿತ ಇನ್‌ಸ್ಟೆನ್ಸ್ ಗುಂಪುಗಳಲ್ಲಿ ಓಡಿಸಿ.",
+  "gcp/cloud-storage-and-persistent-disks": "ವರ್ಗಗಳು, ಜೀವನಚಕ್ರ ನಿಯಮಗಳು, ಆವೃತ್ತಿಕರಣ, ಏಕರೂಪ ಪ್ರವೇಶದೊಂದಿಗೆ Cloud Storage ಬಕೆಟ್‌ಗಳನ್ನು ಬಳಸಿ, Persistent Disk, Hyperdisk, Filestore ನಡುವೆ ಆರಿಸಿ.",
+  "gcp/gke-autopilot-and-standard-clusters": "GKE Autopilot ಮತ್ತು Standard ಮೋಡ್‌ಗಳನ್ನು ಹೋಲಿಸಿ, ಕ್ಲಸ್ಟರ್ ರಚಿಸಿ, Workload Identity, ನೋಡ್ ಪೂಲ್‌ಗಳು, ಬಿಡುಗಡೆ ಚಾನೆಲ್‌ಗಳನ್ನು ಬಳಸಿ ವೆಚ್ಚ ಮತ್ತು ಅಪ್‌ಗ್ರೇಡ್ ಬಲೆಗಳನ್ನು ತಪ್ಪಿಸಿ.",
+  "gcp/cloud-run-and-cloud-functions": "ಕಂಟೈನರ್‌ಗಳನ್ನು Cloud Run ಗೆ, ಘಟನೆ ಕೋಡ್ ಅನ್ನು Cloud Run ಕಾರ್ಯಗಳಿಗೆ ನಿಯೋಜಿಸಿ: ಶೂನ್ಯಕ್ಕೆ ಮಾಪನ, ಪರಿಷ್ಕರಣೆಗಳು, ಟ್ರಾಫಿಕ್ ವಿಭಜನೆ, ಸಮಕಾಲೀನತೆ, ರಹಸ್ಯಗಳು.",
+  "gcp/cloud-sql-spanner-bigquery-and-firestore": "Cloud SQL, AlloyDB, Spanner, Firestore, BigQuery ನಡುವೆ ಆರಿಸಿ, ಹೆಚ್ಚಿನ ಲಭ್ಯತೆ, ಬ್ಯಾಕಪ್‌ಗಳು, ಖಾಸಗಿ ಸಂಪರ್ಕಗಳೊಂದಿಗೆ Cloud SQL ಅನ್ನು ಸುರಕ್ಷಿತವಾಗಿ ಓಡಿಸಿ.",
+  "gcp/pub-sub-eventarc-and-cloud-tasks": "Pub/Sub ವಿಷಯಗಳು, ಚಂದಾದಾರಿಕೆಗಳು, Eventarc ಪ್ರಚೋದಕಗಳು, Cloud Tasks ಸರತಿಗಳಿಂದ Google Cloud ಸೇವೆಗಳನ್ನು ಅಸಮಕಾಲಿಕವಾಗಿ ಜೋಡಿಸಿ ವೈಫಲ್ಯಗಳನ್ನು ನಿಭಾಯಿಸಿ.",
+  "gcp/observability-with-cloud-logging-monitoring-and-slos": "ಸಮಸ್ಯೆಗಳನ್ನು ಹುಡುಕಲು, ಎಚ್ಚರಿಕೆ ನೀತಿಗಳನ್ನು ಬರೆಯಲು, ಸೇವಾ ಮಟ್ಟದ ಗುರಿಗಳನ್ನು ವ್ಯಾಖ್ಯಾನಿಸಲು Cloud Logging, Cloud Monitoring, Trace, Error Reporting ಬಳಸಿ.",
+  "gcp/terraform-on-google-cloud": "Terraform ಮೂಲಕ Google Cloud ನಿರ್ವಹಿಸಿ: google ಪೂರೈಕೆದಾರ, Cloud Storage ನಲ್ಲಿ ದೂರಸ್ಥ ಸ್ಥಿತಿ, ಪೈಪ್‌ಲೈನ್‌ಗಳಿಗೆ ಸೇವಾ ಖಾತೆಗಳು, ಯೋಜನೆ ಕಾರ್ಖಾನೆಗಳು.",
+  "gcp/security-cost-and-debugging-on-google-cloud": "IAM, ಸಂಸ್ಥೆ ನೀತಿ, VPC Service Controls ನಂತಹ Google Cloud ಭದ್ರತಾ ನಿಯಂತ್ರಣಗಳನ್ನು ಅನ್ವಯಿಸಿ, ವೆಚ್ಚ ನಿಯಂತ್ರಿಸಿ, ಅನುಮತಿ ಮತ್ತು ಕೋಟಾ ದೋಷಗಳನ್ನು ಡೀಬಗ್ ಮಾಡಿ."
  }
 }

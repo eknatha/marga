@@ -1887,6 +1887,22 @@
   "service-mesh": {
    "title": "सर्व्हिस मेश आणि Kubernetes नेटवर्किंग",
    "summary": "पॉड नेटवर्किंग, CNI आणि नेटवर्क पॉलिसी समजून घ्या, मग mTLS, ट्रॅफिक रूटिंग आणि समस्यानिवारणासह सर्व्हिस मेश चालवा."
+  },
+  "proxies": {
+   "title": "रिव्हर्स प्रॉक्सी आणि लोड बॅलन्सर",
+   "summary": "सेवांसमोर nginx, HAProxy आणि Envoy चालवा: राउटिंग, TLS, लोड बॅलन्सिंग, टाइमआउट, कॅशिंग, रेट मर्यादा आणि 502 व 504 त्रुटींचे डीबगिंग."
+  },
+  "messaging": {
+   "title": "मेसेजिंग आणि स्ट्रीमिंग",
+   "summary": "क्यू आणि लॉग निवडा व चालवा: RabbitMQ आणि Kafka, डिलिव्हरी हमी, कंझ्युमर गट, लॅग, रिटेन्शन, स्कीमा आणि व्यवस्थापित क्लाउड सेवा."
+  },
+  "cfn-bicep": {
+   "title": "CloudFormation आणि Bicep",
+   "summary": "क्लाउड-नेटिव्ह इन्फ्रास्ट्रक्चर-अ‍ॅज-कोड लिहा व चालवा: AWS CloudFormation आणि Azure Bicep, बदल पूर्वावलोकन, स्टॅक, मॉड्यूल, चाचणी आणि अयशस्वी डिप्लॉयमेंटचे डीबगिंग."
+  },
+  "gcp": {
+   "title": "Google Cloud",
+   "summary": "Google Cloud चे मॉडेल शिका: प्रकल्प, VPC, Compute Engine, Cloud Storage, GKE, Cloud Run, डेटा आणि मेसेजिंग सेवा, संचालन व खर्च, gcloud CLI सह."
   }
  },
  "paths": {
@@ -2420,6 +2436,68 @@
   "security/cloud-posture-and-misconfiguration-management": "पोश्चर साधने व पॉलिसी-अॅज-कोडने सार्वजनिक बकेट, उघडे पोर्ट व गायब एन्क्रिप्शन सतत शोधा आणि ड्रिफ्ट मुळातच दुरुस्त करा.",
   "security/security-champions-and-secure-code-review": "चॅम्पियन, व्यावहारिक कोड रिव्ह्यू चेकलिस्ट, थ्रेट मॉडेलिंग व डेव्हलपरना आवडणाऱ्या फीडबॅक लूपने संघांत सुरक्षा पसरवा.",
   "security/incident-forensics-and-evidence-handling": "अस्थिर पुरावे जतन करा, लॉग व डिस्क इमेज सुरक्षितपणे गोळा करा, चेन ऑफ कस्टडी राखा आणि सुरक्षा घटनेत टाइमलाइन बनवा.",
-  "security/audit-readiness-and-continuous-compliance-evidence": "पुरावे स्वयंचलित करून, नियंत्रणे तांत्रिक तपासण्यांशी जुळवून आणि जिवंत नोंद ठेवून SOC 2 किंवा ISO 27001 ऑडिटसाठी तयार व्हा."
+  "security/audit-readiness-and-continuous-compliance-evidence": "पुरावे स्वयंचलित करून, नियंत्रणे तांत्रिक तपासण्यांशी जुळवून आणि जिवंत नोंद ठेवून SOC 2 किंवा ISO 27001 ऑडिटसाठी तयार व्हा.",
+  "cicd/jenkins-architecture-controllers-agents-and-jobs": "Jenkins कंट्रोलर एजंट्सवर काम कसे वाटतो, जॉब आणि बिल्ड म्हणजे काय आणि Jenkins आपली स्थिती कुठे ठेवतो ते समजून घ्या.",
+  "cicd/jenkins-declarative-pipelines-and-the-jenkinsfile": "स्टेज, स्टेप, एनवायरनमेंट, अटी आणि पोस्ट कृतींसह डिक्लेरेटिव्ह Jenkinsfile लिहा आणि अयशस्वी रन वाचा.",
+  "cicd/jenkins-build-agents-with-docker-and-kubernetes": "तात्पुरत्या एजंट्सवर बिल्ड चालवा: स्थिर नोड, Docker एजंट आणि पॉड टेम्पलेटसह Kubernetes प्लगइन.",
+  "cicd/jenkins-shared-libraries-and-reusable-pipelines": "शेअर्ड लायब्ररी, ग्लोबल व्हेरिएबल आणि आवृत्ती रिलीजद्वारे अनेक रिपॉझिटरीमध्ये पाइपलाइन कोड शेअर करा.",
+  "cicd/jenkins-credentials-security-and-hardening": "गुपिते सुरक्षित ठेवा, परवानग्या मर्यादित करा, बिल्ड कोड कंट्रोलरपासून दूर ठेवा आणि Jenkins सर्व्हर मजबूत करा.",
+  "cicd/jenkins-plugins-upgrades-and-operating-at-scale": "प्लगइन आणि अपग्रेड सुरक्षितपणे हाताळा, Jenkins ला कोड म्हणून कॉन्फिगर करा आणि एजंट, बॅकअप व मॉनिटरिंगने विस्तार करा.",
+  "cicd/jenkins-debugging-and-migrating-to-another-platform": "अडकलेले, हळू आणि अस्थिर बिल्ड डीबग करा आणि हवे असल्यास Actions किंवा GitLab CI वर टप्प्याटप्प्याने स्थलांतर नियोजित करा.",
+  "linux/debugging-with-strace-system-calls": "strace वापरून अडकलेला किंवा अयशस्वी प्रोग्राम कोणत्या फाइल, सॉकेट आणि सिस्टम कॉल वापरतो ते पाहा आणि खरे कारण शोधा.",
+  "linux/seeing-the-network-with-ss-and-tcpdump": "ss ने सॉकेट सूचीबद्ध करा आणि tcpdump ने पॅकेट पकडून ट्रॅफिक बाहेर जातो, पोहोचतो आणि उत्तर मिळते का ते सिद्ध करा.",
+  "linux/open-files-and-proc-with-lsof": "lsof आणि /proc वापरून कोणती प्रक्रिया फाइल, पोर्ट किंवा हटवलेली फाइल धरून आहे ते शोधा आणि डिस्क्रिप्टर गळती ओळखा.",
+  "linux/finding-cpu-memory-and-io-hogs": "top, vmstat, iostat आणि pidstat ने CPU, मेमरी व डिस्कच्या समस्या वेगळ्या करा आणि जबाबदार प्रक्रिया शोधा.",
+  "linux/kernel-messages-journal-and-core-dumps": "कर्नल आणि सेवा घटनांसाठी dmesg व journalctl वाचा, मेमरी संपल्याने मारलेल्या प्रक्रिया शोधा आणि क्रॅशनंतर कोअर डंप गोळा करा.",
+  "linux/ebpf-and-bpftrace-live-questions": "eBPF समजून घ्या आणि bpftrace एक-ओळी कमांड व तयार साधनांनी फाइल, प्रक्रिया व लेटन्सीबद्दल थेट प्रश्नांची उत्तरे मिळवा.",
+  "linux/debugging-a-slow-or-hung-server-a-method": "आधीची साधने पुनरावृत्ती करण्यायोग्य पद्धतीत जोडा: लक्षण ठरवा, भरलेले संसाधन व प्रक्रिया शोधा आणि कारण निश्चित करा.",
+  "proxies/what-a-reverse-proxy-does": "वापरकर्ते आणि सेवांमध्ये काय असते, रिव्हर्स प्रॉक्सी काय करतो आणि तो फॉरवर्ड प्रॉक्सी व लोड बॅलन्सरपासून कसा वेगळा आहे ते शिका.",
+  "proxies/nginx-configuration-servers-and-locations": "nginx कॉन्फिगरेशन वाचा आणि लिहा: संदर्भ, सर्व्हर ब्लॉक, लोकेशन नियम आणि सुरक्षितपणे चाचणी व रीलोड.",
+  "proxies/proxying-to-upstreams-headers-and-buffers": "proxy_pass ने विनंत्या बॅकएंडकडे पाठवा, योग्य हेडर द्या, बफरिंग समजून घ्या आणि WebSocket नीट चालवा.",
+  "proxies/tls-termination-http2-and-certificates": "मजबूत प्रोटोकॉल, रीडायरेक्ट, HSTS, OCSP स्टेपलिंग आणि स्वयंचलित प्रमाणपत्र नूतनीकरणासह प्रॉक्सीवर TLS संपवा.",
+  "proxies/load-balancing-algorithms-and-health-checks": "राउंड रॉबिन, सर्वात कमी कनेक्शन आणि हॅशिंगने ट्रॅफिक वाटा आणि निष्क्रिय व सक्रिय हेल्थ चेकने अयशस्वी बॅकएंड काढा.",
+  "proxies/timeouts-retries-keepalive-and-limits": "प्रत्यक्ष वर्तनाशी जुळणारे प्रॉक्सी टाइमआउट ठरवा, keepalive ट्यून करा आणि रिट्राय व मर्यादा आउटेज कसे घडवतात किंवा टाळतात ते समजून घ्या.",
+  "proxies/caching-compression-and-static-files": "स्थिर फाइल कार्यक्षमतेने द्या, योग्य कळ आणि मुदतीसह अपस्ट्रीम प्रतिसाद कॅश करा आणि प्रॉक्सीवर सुरक्षितपणे कॉम्प्रेस करा.",
+  "proxies/rate-limiting-and-protecting-backends": "प्रॉक्सीवर विनंत्या व कनेक्शनचा दर मर्यादित करा, योग्य स्टेटस कोड द्या आणि बॅकएंडला उसळी व गैरवापरापासून वाचवा.",
+  "proxies/haproxy-frontends-backends-and-acls": "फ्रंटएंड, बॅकएंड, ACL राउटिंग, स्टिक टेबल आणि हेल्थ चेकसह HAProxy कॉन्फिगर करा आणि त्याची आकडेवारी वाचा.",
+  "proxies/envoy-traefik-and-dynamic-proxies": "सर्व्हिस डिस्कव्हरीवरून स्वतः कॉन्फिगर होणाऱ्या प्रॉक्सींची तुलना करा: Envoy, Traefik आणि Caddy चे स्वयंचलित HTTPS.",
+  "proxies/zero-downtime-reloads-and-blue-green-at-the-proxy": "विनंत्या न गमावता प्रॉक्सी कॉन्फिगरेशन बदला आणि आवृत्त्यांमध्ये ट्रॅफिक हलवा: सौम्य रीलोड, भारित राउटिंग आणि ड्रेन.",
+  "proxies/debugging-502-504-and-proxy-problems": "स्टेटस कोड, एरर लॉग, अपस्ट्रीम वेळ आणि बॅकएंडला थेट विनंत्यांनी ठरलेल्या क्रमाने प्रॉक्सी त्रुटी ओळखा.",
+  "messaging/queues-logs-and-pub-sub-choosing-a-model": "वर्क क्यू, पब्लिश-सबस्क्राइब टॉपिक आणि फक्त-जोडणारे लॉग यांची तुलना करा आणि कामासाठी योग्य मेसेजिंग मॉडेल निवडा.",
+  "messaging/delivery-guarantees-ordering-and-idempotency": "जास्तीत जास्त एकदा, किमान एकदा आणि प्रभावीपणे एकदा डिलिव्हरी, क्रम कधी टिकतो आणि आयडेम्पोटेंट कंझ्युमर डुप्लिकेट निरुपद्रवी कसे करतात ते समजून घ्या.",
+  "messaging/rabbitmq-exchanges-queues-and-routing": "प्रोड्युसर, एक्सचेंज, बाइंडिंग आणि क्यूसह RabbitMQ मॉडेल समजून घ्या आणि direct, topic, fanout व headers एक्सचेंज निवडा.",
+  "messaging/rabbitmq-acknowledgements-prefetch-and-dead-letters": "पोचपावती, प्रीफेच, रिट्राय, डेड-लेटर एक्सचेंज आणि क्यू खोलीच्या निरीक्षणाने RabbitMQ मधील अपयश हाताळा.",
+  "messaging/kafka-topics-partitions-and-brokers": "पार्टिशनमध्ये विभागलेले टॉपिक, ब्रोकर, ऑफसेट आणि कीसह Kafka मॉडेल शिका आणि पार्टिशनिंग क्रम व प्रमाण कसे ठरवते ते समजून घ्या.",
+  "messaging/kafka-producers-consumers-and-consumer-groups": "टिकाऊपणा आणि थ्रूपुटसाठी प्रोड्युसर, सुरक्षित ऑफसेट कमिटसाठी कंझ्युमर कॉन्फिगर करा आणि गट पार्टिशन कसे वाटतात ते समजून घ्या.",
+  "messaging/kafka-replication-isr-and-durability": "लीडर निवड, इन-सिंक रेप्लिका, min.insync.replicas आणि अशुद्ध निवडी समजून घ्या, ज्यामुळे ब्रोकर अयशस्वी झाल्यास Kafka काय गमावते याचा अंदाज येईल.",
+  "messaging/kafka-retention-compaction-and-storage": "Kafka डेटा किती काळ ठेवेल, लॉग कॉम्पॅक्शन कधी वापरावे आणि सेगमेंट, डिस्क व टियर्ड स्टोरेज खर्च व पुनर्प्राप्तीवर कसा परिणाम करतात ते ठरवा.",
+  "messaging/kafka-lag-rebalances-and-capacity-in-operation": "कंझ्युमर लॅग, अंडर-रेप्लिकेटेड पार्टिशन आणि रिक्वेस्ट लेटन्सीचे निरीक्षण करा, क्लस्टरचा आकार ठरवा आणि सामान्य उत्पादन समस्यांना प्रतिसाद द्या.",
+  "messaging/managed-messaging-on-cloud-sqs-sns-pub-sub-and-event-hubs": "SQS व SNS, Google Pub/Sub, Azure Service Bus व Event Hubs आणि व्यवस्थापित Kafka यांची तुलना करा आणि ब्रोकर चालवणे की भाड्याने घेणे ते निवडा.",
+  "messaging/schemas-contracts-and-evolving-messages": "Avro, Protobuf किंवा JSON Schema ने संदेश स्वरूप ठरवा, स्कीमा रजिस्ट्री वापरा आणि प्रोड्युसर किंवा कंझ्युमर न मोडता स्वरूप बदला.",
+  "messaging/debugging-messaging-incidents": "क्यू आणि लॉगमधील बॅकलॉग, डुप्लिकेट, हरवलेले संदेश, क्रमातील चुका आणि अडकलेल्या कंझ्युमरसाठी ठरलेली चेकलिस्ट पाळा.",
+  "cfn-bicep/native-iac-cloudformation-bicep-or-terraform": "AWS CloudFormation आणि Azure Bicep ची Terraform शी तुलना करा आणि क्लाउडचे स्वतःचे इन्फ्रास्ट्रक्चर-अ‍ॅज-कोड साधन कधी चांगले ते ठरवा.",
+  "cfn-bicep/cloudformation-templates-parameters-and-resources": "पॅरामीटर, रिसोर्स, आउटपुट आणि संदर्भांसह CloudFormation टेम्पलेट लिहा आणि CLI मधून स्टॅक म्हणून डिप्लॉय करा.",
+  "cfn-bicep/intrinsic-functions-conditions-and-mappings": "Ref, GetAtt, Sub, Join, Select, If, Conditions आणि Mappings ने एक टेम्पलेट अनेक एनवायरनमेंटला जुळवून घेईल असे करा.",
+  "cfn-bicep/stacks-change-sets-and-safe-updates": "चेंज सेटने अपडेटचे पूर्वावलोकन करा, बदली विरुद्ध जागेवरील बदल समजून घ्या आणि स्टॅक अपडेटमध्ये महत्त्वाची रिसोर्स सुरक्षित ठेवा.",
+  "cfn-bicep/nested-stacks-stacksets-and-reusable-modules": "मोठे टेम्पलेट नेस्टेड स्टॅकमध्ये विभागा, StackSets ने एक टेम्पलेट अनेक खाती व प्रदेशांत पसरवा आणि नमुने मॉड्यूल म्हणून शेअर करा.",
+  "cfn-bicep/drift-rollbacks-and-resource-protection": "स्टॅक आणि वास्तव यांच्यातील ड्रिफ्ट शोधा, अस्तित्वातील रिसोर्स इम्पोर्ट करा, अडकलेले रोलबॅक हाताळा आणि डेटा चुकून हटण्यापासून वाचवा.",
+  "cfn-bicep/bicep-syntax-resources-and-parameters": "पॅरामीटर, व्हेरिएबल, रिसोर्स, आउटपुट आणि डेकोरेटरसह Bicep फाइल लिहा आणि रिसोर्स ग्रुपमध्ये डिप्लॉय करा.",
+  "cfn-bicep/bicep-modules-loops-and-conditions": "Bicep ला मॉड्यूलमध्ये विभागा, for लूपने रिसोर्स पुन्हा करा, अटींनी चालू करा आणि रजिस्ट्रीद्वारे मॉड्यूल शेअर करा.",
+  "cfn-bicep/bicep-deployments-what-if-and-scopes": "डिप्लॉयमेंट स्कोप निवडा, what-if ने बदल पाहा, इन्क्रिमेंटल व कंप्लीट मोड समजून घ्या आणि इतिहास हाताळण्याजोगा ठेवा.",
+  "cfn-bicep/deployment-stacks-and-delivery-pipelines": "Azure डिप्लॉयमेंट स्टॅकने रिसोर्स जीवनचक्र सांभाळा आणि किमान अधिकार भूमिकांसह CI पाइपलाइनमधून CloudFormation व Bicep चालवा.",
+  "cfn-bicep/testing-linting-and-policy-checks-for-templates": "cfn-lint, cfn-guard, Bicep लिंटर, what-if, पॉलिसी-अ‍ॅज-कोड आणि तात्पुरत्या चाचणी वातावरणाने डिप्लॉयपूर्वी टेम्पलेटच्या चुका पकडा.",
+  "cfn-bicep/debugging-failed-deployments-and-moving-to-terraform": "CloudFormation इव्हेंट आणि Azure डिप्लॉयमेंट त्रुटी वाचा, सामान्य अपयश दुरुस्त करा आणि Terraform कडे किंवा तिथून सुरक्षित स्थलांतर नियोजित करा.",
+  "gcp/google-cloud-organization-projects-and-billing": "Google Cloud संसाधने संस्था, फोल्डर आणि प्रकल्पांमध्ये कशी मांडते आणि IAM, बिलिंग खाती व बजेट कसे जुळतात ते शिका.",
+  "gcp/gcloud-cli-configurations-and-automation": "नावाचे कॉन्फिगरेशन, सर्व्हिस अकाउंट इम्पर्सोनेशन, आउटपुट स्वरूप आणि फिल्टरसह gcloud CLI वापरा आणि सुरक्षित स्क्रिप्ट लिहा.",
+  "gcp/vpc-networks-subnets-and-firewall-rules": "जागतिक VPC, प्रादेशिक सबनेट, फायरवॉल नियम, Cloud NAT आणि Google सेवांना खाजगी प्रवेशासह Google Cloud VPC नेटवर्क डिझाइन करा.",
+  "gcp/compute-engine-images-and-managed-instance-groups": "Compute Engine VM तयार करा, मशीन प्रकार व इमेज निवडा आणि ऑटोस्केलिंग, हेल्थ चेक व रोलिंग अपडेटसह व्यवस्थापित इन्स्टन्स गटांमध्ये चालवा.",
+  "gcp/cloud-storage-and-persistent-disks": "क्लास, लाइफसायकल नियम, व्हर्जनिंग आणि एकसमान प्रवेशासह Cloud Storage बकेट वापरा आणि Persistent Disk, Hyperdisk व Filestore मधून निवडा.",
+  "gcp/gke-autopilot-and-standard-clusters": "GKE Autopilot आणि Standard मोडची तुलना करा, क्लस्टर तयार करा, Workload Identity, नोड पूल व रिलीज चॅनेल वापरा आणि खर्च व अपग्रेडचे सापळे टाळा.",
+  "gcp/cloud-run-and-cloud-functions": "कंटेनर Cloud Run वर आणि इव्हेंट कोड Cloud Run फंक्शनमध्ये डिप्लॉय करा: शून्यापर्यंत स्केलिंग, रिव्हिजन, ट्रॅफिक विभाजन, कॉन्करन्सी आणि गुपिते.",
+  "gcp/cloud-sql-spanner-bigquery-and-firestore": "Cloud SQL, AlloyDB, Spanner, Firestore आणि BigQuery मधून निवडा आणि उच्च उपलब्धता, बॅकअप व खाजगी कनेक्शनसह Cloud SQL सुरक्षितपणे चालवा.",
+  "gcp/pub-sub-eventarc-and-cloud-tasks": "Pub/Sub टॉपिक व सबस्क्रिप्शन, Eventarc ट्रिगर आणि Cloud Tasks क्यू वापरून Google Cloud सेवा असिंक्रोनस जोडा आणि अपयश हाताळा.",
+  "gcp/observability-with-cloud-logging-monitoring-and-slos": "समस्या शोधण्यासाठी, अलर्ट धोरणे लिहिण्यासाठी आणि सेवा पातळी उद्दिष्टे ठरवण्यासाठी Cloud Logging, Cloud Monitoring, Trace व Error Reporting वापरा.",
+  "gcp/terraform-on-google-cloud": "Terraform ने Google Cloud व्यवस्थापित करा: google प्रोव्हायडर, Cloud Storage मधील रिमोट स्टेट, पाइपलाइनसाठी सर्व्हिस अकाउंट आणि प्रकल्प कारखाने.",
+  "gcp/security-cost-and-debugging-on-google-cloud": "IAM, संस्था धोरण आणि VPC Service Controls सारखे Google Cloud सुरक्षा नियंत्रण लागू करा, खर्च नियंत्रित करा आणि परवानगी व कोटा त्रुटी डीबग करा."
  }
 }

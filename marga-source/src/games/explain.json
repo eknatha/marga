@@ -808,5 +808,29 @@
   "signs": "get endpoints shows <none> while Pods are Running and Ready.",
   "fix": "Match selector and labels, define them once in a template and test endpoints after deploy.",
   "example": "kubectl get pods --show-labels next to kubectl get svc shop -o yaml shows the selector and labels side by side."
+ },
+ "the-502s-after-the-midnight-deploy": {
+  "cause": "The new release crashed on startup because a required setting was missing, so nothing listened on the app port.",
+  "signs": "The proxy error log shows connect() failed with connection refused for every upstream, and the containers restart in a loop.",
+  "fix": "Roll back to the last good release, then add the missing setting and a readiness check before deploying again.",
+  "example": "kubectl rollout undo restores the previous image in under a minute and the 502 rate falls to zero."
+ },
+ "the-consumer-group-that-never-catches-up": {
+  "cause": "One consumer waited on a slow downstream call for every record, so its partition fell far behind.",
+  "signs": "Lag is high on one partition and low on the rest, and the consumer logs show long calls to one service.",
+  "fix": "Add a timeout with bounded retries and a dead-letter path, and alert on minutes of lag with a trend.",
+  "example": "A 2 second timeout with two retries replaces a 40 second wait, and lag drops from 18 minutes to under one."
+ },
+ "the-update-that-replaced-the-database": {
+  "cause": "A property change forced replacement of a stateful resource that had no snapshot policy and no change set review.",
+  "signs": "The database has a new physical id, the old instance is deleting and every table is empty.",
+  "fix": "Restore the latest snapshot, import it into the stack, and add retention policies and a reviewed change set to the pipeline.",
+  "example": "restore-db-instance-from-db-snapshot brings back last night's data and the pipeline now blocks Replacement True without approval."
+ },
+ "the-bucket-that-anyone-could-read": {
+  "cause": "A bucket was shared with allUsers for convenience and nothing prevented or detected the exposure.",
+  "signs": "Objects open without credentials and audit logs show reads from unknown external addresses.",
+  "fix": "Remove the public binding, enable public access prevention, review the logs and follow the incident process.",
+  "example": "The storage.publicAccessPrevention organization policy blocks allUsers bindings and a log alert fires on any attempt."
  }
 }

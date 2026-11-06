@@ -1547,3 +1547,143 @@ def: A kernel technology that runs verified programs at hooks in the networking 
 module: service-mesh
 plain: The part of a mesh that tells proxies what to do.
 def: The set of components, such as istiod in Istio, that turn mesh configuration into proxy settings, push them out and issue workload certificates.
+
+## Reverse proxy
+module: proxies
+plain: A server that stands in front of your apps and passes requests on.
+def: A server that accepts client requests and forwards them to backend servers, adding TLS, caching, load balancing and protection on the way.
+
+## Upstream
+module: proxies
+plain: The backend server the proxy talks to.
+def: In nginx and similar proxies, the group of backend servers that receive forwarded requests.
+
+## TLS termination
+module: proxies
+plain: The proxy handles the encryption so the app does not have to.
+def: Ending the encrypted connection at the proxy, which decrypts requests and passes them on, optionally re-encrypting to the backend.
+
+## Health check
+module: proxies
+plain: A regular test that shows whether a backend is working.
+def: A periodic probe the proxy or balancer sends to a backend, removing it from rotation after repeated failures.
+
+## 502 Bad Gateway
+module: proxies
+plain: The proxy could not get a valid answer from the backend.
+def: An HTTP status returned when the proxy cannot connect to the upstream or receives an invalid response, for example connection refused.
+
+## 504 Gateway Timeout
+module: proxies
+plain: The backend took too long to answer the proxy.
+def: An HTTP status returned when the upstream does not respond within the proxy timeout.
+
+## Rate limiting
+module: proxies
+plain: Capping how many requests a client can make.
+def: Rejecting or delaying requests above a set rate, usually with a 429 status, to protect backends from floods.
+
+## Message queue
+module: messaging
+plain: A line of jobs waiting for a worker.
+def: A buffer that delivers each message to one consumer and then removes it, used to spread work and absorb bursts.
+
+## Consumer group
+module: messaging
+plain: Several readers that share one topic between them.
+def: A set of Kafka consumers with the same group id that split the partitions of a topic so each partition is read by one member.
+
+## Offset
+module: messaging
+plain: Your place in a log.
+def: The position of a record within a Kafka partition, which a consumer commits to remember how far it has read.
+
+## Dead-letter queue
+module: messaging
+plain: A place for messages that keep failing.
+def: A queue or topic that receives messages that were rejected, expired or exceeded their retry limit, so humans can inspect them.
+
+## Idempotent consumer
+module: messaging
+plain: A reader that can safely see the same message twice.
+def: A consumer whose handling of a repeated message has the same effect as handling it once, often by checking a message id.
+
+## Partition
+module: messaging
+plain: One ordered slice of a Kafka topic.
+def: An append-only log that is the unit of ordering and parallelism in Kafka; order is guaranteed only within a partition.
+
+## Consumer lag
+module: messaging
+plain: How far behind the readers are.
+def: The number of records, or the time, between the newest record in a partition and the position the consumer has processed.
+
+## Stack
+module: cfn-bicep
+plain: A set of cloud resources managed as one unit.
+def: In CloudFormation, the running instance of a template, with its resources created, updated and deleted together.
+
+## Change set
+module: cfn-bicep
+plain: A preview of what an update will change.
+def: A list of the additions, modifications, removals and replacements a CloudFormation update would make, reviewed before it is executed.
+
+## Configuration drift
+module: cfn-bicep
+plain: When real resources no longer match the code.
+def: A difference between the template and the actual resource settings, usually caused by manual changes in the console.
+
+## Bicep
+module: cfn-bicep
+plain: A readable language for Azure infrastructure.
+def: A domain-specific language that compiles to ARM templates and describes Azure resources with less noise than JSON.
+
+## What-if
+module: cfn-bicep
+plain: A preview of an Azure deployment.
+def: An Azure Resource Manager operation that shows which resources a deployment would create, change or delete before it runs.
+
+## StackSet
+module: cfn-bicep
+plain: One template deployed to many accounts and regions.
+def: A CloudFormation feature that deploys and manages the same stack across several accounts and regions with controlled rollout.
+
+## Deployment stack
+module: cfn-bicep
+plain: An Azure object that remembers what a deployment created.
+def: An Azure resource that tracks the resources it manages so unmanaged ones can be detached or deleted and changes can be denied.
+
+## Google Cloud project
+module: gcp
+plain: The basic container for resources in Google Cloud.
+def: The unit that owns resources, enabled APIs, permissions and billing links; most environments get their own project.
+
+## Service account
+module: gcp
+plain: A login for a program rather than a person.
+def: A Google Cloud identity used by applications and machines to authenticate and call APIs with limited roles.
+
+## Cloud Run
+module: gcp
+plain: Run a container without managing servers.
+def: A managed platform that runs stateless containers, scales them from zero and bills for use.
+
+## GKE Autopilot
+module: gcp
+plain: Kubernetes where Google manages the nodes.
+def: A GKE mode in which Google provisions and manages nodes and bills for the resources pods request.
+
+## GKE Workload Identity
+module: gcp
+plain: Pods using Google permissions without key files.
+def: A feature that lets Kubernetes service accounts act as Google service accounts using short-lived tokens.
+
+## VPC Service Controls
+module: gcp
+plain: A fence around sensitive Google services.
+def: Perimeters that restrict API access to services such as BigQuery and Cloud Storage so data cannot be copied out of the boundary.
+
+## Organization policy
+module: gcp
+plain: A rule that applies across your whole Google Cloud tree.
+def: A constraint set at the organization, folder or project level that limits configurations, such as blocking public IPs or key creation.

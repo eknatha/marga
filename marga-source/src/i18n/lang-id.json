@@ -1887,6 +1887,22 @@
   "service-mesh": {
    "title": "Service mesh dan jaringan Kubernetes",
    "summary": "Pahami jaringan pod, CNI, dan network policy, lalu jalankan service mesh dengan mTLS, perutean lalu lintas, dan pemecahan masalah."
+  },
+  "proxies": {
+   "title": "Reverse proxy dan load balancer",
+   "summary": "Jalankan nginx, HAProxy, dan Envoy di depan layanan: routing, TLS, load balancing, timeout, caching, batas laju, dan debugging error 502 dan 504."
+  },
+  "messaging": {
+   "title": "Messaging dan streaming",
+   "summary": "Pilih dan kelola antrean dan log: RabbitMQ dan Kafka, jaminan pengiriman, consumer group, lag, retensi, skema, dan layanan cloud terkelola."
+  },
+  "cfn-bicep": {
+   "title": "CloudFormation dan Bicep",
+   "summary": "Tulis dan kelola infrastructure as code native cloud: AWS CloudFormation dan Azure Bicep, pratinjau perubahan, stack, modul, pengujian, dan debugging deployment yang gagal."
+  },
+  "gcp": {
+   "title": "Google Cloud",
+   "summary": "Pelajari model Google Cloud: project, VPC, Compute Engine, Cloud Storage, GKE, Cloud Run, layanan data dan messaging, operasi dan biaya, dengan CLI gcloud."
   }
  },
  "paths": {
@@ -2420,6 +2436,68 @@
   "security/cloud-posture-and-misconfiguration-management": "Temukan bucket publik, port terbuka, dan enkripsi yang hilang secara terus-menerus dengan alat posture dan policy as code, dan perbaiki drift di sumbernya.",
   "security/security-champions-and-secure-code-review": "Sebarkan keamanan ke seluruh tim dengan champion, checklist code review yang praktis, threat modeling, dan umpan balik yang dihargai pengembang.",
   "security/incident-forensics-and-evidence-handling": "Amankan bukti volatil, kumpulkan log dan image disk dengan aman, jaga chain of custody, dan susun linimasa saat insiden keamanan.",
-  "security/audit-readiness-and-continuous-compliance-evidence": "Bersiap untuk audit SOC 2 atau ISO 27001 dengan mengotomatiskan bukti, memetakan kontrol ke pemeriksaan teknis, dan menjaga catatan yang selalu mutakhir."
+  "security/audit-readiness-and-continuous-compliance-evidence": "Bersiap untuk audit SOC 2 atau ISO 27001 dengan mengotomatiskan bukti, memetakan kontrol ke pemeriksaan teknis, dan menjaga catatan yang selalu mutakhir.",
+  "cicd/jenkins-architecture-controllers-agents-and-jobs": "Pahami bagaimana controller Jenkins membagi kerja ke agent, apa itu job dan build, dan di mana Jenkins menyimpan statusnya.",
+  "cicd/jenkins-declarative-pipelines-and-the-jenkinsfile": "Tulis Jenkinsfile deklaratif dengan stage, step, environment, kondisi, dan aksi post, lalu baca proses yang gagal.",
+  "cicd/jenkins-build-agents-with-docker-and-kubernetes": "Jalankan build di agent sekali pakai: node statis, agent Docker, dan plugin Kubernetes dengan template pod.",
+  "cicd/jenkins-shared-libraries-and-reusable-pipelines": "Bagikan kode pipeline ke banyak repositori dengan shared library, variabel global, dan rilis berversi.",
+  "cicd/jenkins-credentials-security-and-hardening": "Simpan rahasia dengan aman, batasi hak akses, jauhkan kode build dari controller, dan perkuat server Jenkins.",
+  "cicd/jenkins-plugins-upgrades-and-operating-at-scale": "Kelola plugin dan upgrade dengan aman, konfigurasikan Jenkins sebagai kode, dan skalakan dengan agent, backup, dan pemantauan.",
+  "cicd/jenkins-debugging-and-migrating-to-another-platform": "Debug build yang macet, lambat, dan tidak stabil, lalu rencanakan migrasi bertahap ke Actions atau GitLab CI jika memilih pindah.",
+  "linux/debugging-with-strace-system-calls": "Gunakan strace untuk melihat file, socket, dan system call yang dipakai program yang macet atau gagal, lalu temukan penyebab sebenarnya.",
+  "linux/seeing-the-network-with-ss-and-tcpdump": "Daftar socket dengan ss dan tangkap paket dengan tcpdump untuk membuktikan apakah lalu lintas keluar, tiba, dan dijawab.",
+  "linux/open-files-and-proc-with-lsof": "Gunakan lsof dan /proc untuk menemukan proses yang menahan file, port, atau file terhapus, dan mendeteksi kebocoran descriptor.",
+  "linux/finding-cpu-memory-and-io-hogs": "Gunakan top, vmstat, iostat, dan pidstat untuk membedakan masalah CPU, memori, dan disk dan menemukan proses penyebabnya.",
+  "linux/kernel-messages-journal-and-core-dumps": "Baca dmesg dan journalctl untuk kejadian kernel dan layanan, temukan proses yang dimatikan karena kehabisan memori, dan ambil core dump setelah crash.",
+  "linux/ebpf-and-bpftrace-live-questions": "Pahami eBPF dan gunakan satu baris bpftrace serta alat siap pakai untuk menjawab pertanyaan langsung tentang file, proses, dan latensi.",
+  "linux/debugging-a-slow-or-hung-server-a-method": "Gabungkan alat-alat sebelumnya menjadi metode berulang: tentukan gejala, temukan sumber daya yang jenuh, proses, dan pastikan penyebabnya.",
+  "proxies/what-a-reverse-proxy-does": "Pelajari apa yang ada di antara pengguna dan layananmu, tugas reverse proxy, dan perbedaannya dengan forward proxy dan load balancer.",
+  "proxies/nginx-configuration-servers-and-locations": "Baca dan tulis konfigurasi nginx: konteks, blok server, aturan location, serta cara menguji dan memuat ulang dengan aman.",
+  "proxies/proxying-to-upstreams-headers-and-buffers": "Teruskan permintaan ke backend dengan proxy_pass, kirim header yang benar, pahami buffering, dan dukung WebSocket dengan benar.",
+  "proxies/tls-termination-http2-and-certificates": "Akhiri TLS di proxy dengan protokol yang kuat, pengalihan, HSTS, OCSP stapling, dan pembaruan sertifikat otomatis.",
+  "proxies/load-balancing-algorithms-and-health-checks": "Bagi lalu lintas dengan round robin, koneksi paling sedikit, dan hashing, lalu keluarkan backend yang gagal dengan health check pasif dan aktif.",
+  "proxies/timeouts-retries-keepalive-and-limits": "Atur timeout proxy sesuai perilaku nyata, setel keepalive, dan pahami bagaimana retry dan batas menyebabkan atau mencegah gangguan.",
+  "proxies/caching-compression-and-static-files": "Sajikan file statis secara efisien, cache respons upstream dengan kunci dan kedaluwarsa yang benar, dan kompres dengan aman di proxy.",
+  "proxies/rate-limiting-and-protecting-backends": "Batasi laju permintaan dan koneksi di proxy, kembalikan kode status yang benar, dan lindungi backend dari lonjakan dan penyalahgunaan.",
+  "proxies/haproxy-frontends-backends-and-acls": "Konfigurasikan HAProxy dengan frontend, backend, routing berbasis ACL, stick table, dan health check, lalu baca statistiknya.",
+  "proxies/envoy-traefik-and-dynamic-proxies": "Bandingkan proxy yang mengonfigurasi diri dari service discovery: Envoy, Traefik, dan HTTPS otomatis Caddy.",
+  "proxies/zero-downtime-reloads-and-blue-green-at-the-proxy": "Ubah konfigurasi proxy dan pindahkan lalu lintas antarversi tanpa kehilangan permintaan, dengan reload halus, routing berbobot, dan drain.",
+  "proxies/debugging-502-504-and-proxy-problems": "Diagnosis error proxy dalam urutan tetap dengan kode status, log error, waktu upstream, dan permintaan langsung ke backend.",
+  "messaging/queues-logs-and-pub-sub-choosing-a-model": "Bandingkan antrean kerja, topik publish-subscribe, dan log append-only, lalu pilih model pesan yang tepat.",
+  "messaging/delivery-guarantees-ordering-and-idempotency": "Pahami pengiriman paling banyak sekali, minimal sekali, dan efektif sekali, kapan urutan terjaga, dan bagaimana consumer idempoten membuat duplikat tidak berbahaya.",
+  "messaging/rabbitmq-exchanges-queues-and-routing": "Pahami model RabbitMQ dengan producer, exchange, binding, dan queue, lalu pilih exchange direct, topic, fanout, dan headers.",
+  "messaging/rabbitmq-acknowledgements-prefetch-and-dead-letters": "Tangani kegagalan di RabbitMQ dengan acknowledgement, prefetch, retry, dead-letter exchange, dan pemantauan kedalaman antrean.",
+  "messaging/kafka-topics-partitions-and-brokers": "Pelajari model Kafka dengan topic yang dibagi menjadi partisi, broker, offset, dan key, serta bagaimana partisi membentuk urutan dan skala.",
+  "messaging/kafka-producers-consumers-and-consumer-groups": "Konfigurasikan producer untuk ketahanan dan throughput, consumer untuk commit offset yang aman, dan pahami cara consumer group berbagi partisi.",
+  "messaging/kafka-replication-isr-and-durability": "Pahami pemilihan leader, in-sync replica, min.insync.replicas, dan unclean election untuk menalar apa yang hilang di Kafka saat broker gagal.",
+  "messaging/kafka-retention-compaction-and-storage": "Putuskan berapa lama Kafka menyimpan data, kapan memakai kompaksi log, dan bagaimana segmen, disk, dan tiered storage memengaruhi biaya dan pemulihan.",
+  "messaging/kafka-lag-rebalances-and-capacity-in-operation": "Pantau lag consumer, partisi under-replicated, dan latensi, tentukan ukuran cluster, dan tanggapi masalah produksi yang umum.",
+  "messaging/managed-messaging-on-cloud-sqs-sns-pub-sub-and-event-hubs": "Bandingkan SQS dan SNS, Google Pub/Sub, Azure Service Bus dan Event Hubs, serta Kafka terkelola, lalu pilih antara mengoperasikan broker atau menyewanya.",
+  "messaging/schemas-contracts-and-evolving-messages": "Tentukan format pesan dengan Avro, Protobuf, atau JSON Schema, gunakan schema registry, dan ubah format tanpa merusak producer atau consumer.",
+  "messaging/debugging-messaging-incidents": "Ikuti daftar periksa tetap untuk backlog, duplikat, pesan hilang, bug urutan, dan consumer macet di antrean dan log.",
+  "cfn-bicep/native-iac-cloudformation-bicep-or-terraform": "Bandingkan AWS CloudFormation dan Azure Bicep dengan Terraform, dan putuskan kapan alat infrastructure as code bawaan cloud lebih baik.",
+  "cfn-bicep/cloudformation-templates-parameters-and-resources": "Tulis template CloudFormation dengan parameter, resource, output, dan referensi, lalu deploy sebagai stack dari CLI.",
+  "cfn-bicep/intrinsic-functions-conditions-and-mappings": "Gunakan Ref, GetAtt, Sub, Join, Select, If, Conditions, dan Mappings agar satu template menyesuaikan diri dengan banyak lingkungan.",
+  "cfn-bicep/stacks-change-sets-and-safe-updates": "Pratinjau pembaruan dengan change set, pahami penggantian versus perubahan di tempat, dan lindungi resource penting saat memperbarui stack.",
+  "cfn-bicep/nested-stacks-stacksets-and-reusable-modules": "Pecah template besar menjadi nested stack, sebarkan satu template ke banyak akun dan region dengan StackSets, dan bagikan pola sebagai modul.",
+  "cfn-bicep/drift-rollbacks-and-resource-protection": "Deteksi drift antara stack dan kenyataan, impor resource yang ada, tangani rollback yang macet, dan lindungi data dari penghapusan tak sengaja.",
+  "cfn-bicep/bicep-syntax-resources-and-parameters": "Tulis file Bicep dengan parameter, variabel, resource, output, dan dekorator, lalu deploy ke resource group.",
+  "cfn-bicep/bicep-modules-loops-and-conditions": "Pecah Bicep menjadi modul, ulangi resource dengan loop for, aktifkan dengan kondisi, dan bagikan modul lewat registry.",
+  "cfn-bicep/bicep-deployments-what-if-and-scopes": "Pilih cakupan deployment, pratinjau perubahan dengan what-if, pahami mode incremental dan complete, dan jaga riwayat tetap terkelola.",
+  "cfn-bicep/deployment-stacks-and-delivery-pipelines": "Kelola siklus hidup resource dengan deployment stack Azure, dan jalankan CloudFormation dan Bicep dari pipeline CI dengan peran hak minimum.",
+  "cfn-bicep/testing-linting-and-policy-checks-for-templates": "Tangkap kesalahan template sebelum deployment dengan cfn-lint, cfn-guard, linter Bicep, what-if, policy as code, dan lingkungan uji sementara.",
+  "cfn-bicep/debugging-failed-deployments-and-moving-to-terraform": "Baca event CloudFormation dan error deployment Azure, perbaiki kegagalan umum, dan rencanakan migrasi aman ke atau dari Terraform.",
+  "gcp/google-cloud-organization-projects-and-billing": "Pelajari bagaimana Google Cloud mengatur resource menjadi organisasi, folder, dan proyek, serta bagaimana IAM, akun penagihan, dan anggaran melengkapinya.",
+  "gcp/gcloud-cli-configurations-and-automation": "Gunakan CLI gcloud dengan konfigurasi bernama, impersonasi service account, format keluaran, dan filter, serta tulis skrip yang aman.",
+  "gcp/vpc-networks-subnets-and-firewall-rules": "Rancang jaringan VPC Google Cloud dengan VPC global, subnet regional, aturan firewall, Cloud NAT, dan akses privat ke layanan Google.",
+  "gcp/compute-engine-images-and-managed-instance-groups": "Buat VM Compute Engine, pilih tipe mesin dan image, lalu jalankan dalam managed instance group dengan autoscaling, health check, dan rolling update.",
+  "gcp/cloud-storage-and-persistent-disks": "Gunakan bucket Cloud Storage dengan kelas, aturan lifecycle, versioning, dan akses seragam, dan pilih antara Persistent Disk, Hyperdisk, dan Filestore.",
+  "gcp/gke-autopilot-and-standard-clusters": "Bandingkan mode Autopilot dan Standard GKE, buat cluster, gunakan Workload Identity, node pool, dan release channel, dan hindari jebakan biaya dan upgrade.",
+  "gcp/cloud-run-and-cloud-functions": "Deploy kontainer ke Cloud Run dan kode event ke fungsi Cloud Run, dengan skala ke nol, revisi, pembagian traffic, konkurensi, dan secret.",
+  "gcp/cloud-sql-spanner-bigquery-and-firestore": "Pilih antara Cloud SQL, AlloyDB, Spanner, Firestore, dan BigQuery, dan jalankan Cloud SQL dengan aman dengan ketersediaan tinggi, backup, dan koneksi privat.",
+  "gcp/pub-sub-eventarc-and-cloud-tasks": "Gunakan topik dan langganan Pub/Sub, trigger Eventarc, dan antrean Cloud Tasks untuk menghubungkan layanan Google Cloud secara asinkron dan menangani kegagalan.",
+  "gcp/observability-with-cloud-logging-monitoring-and-slos": "Gunakan Cloud Logging, Cloud Monitoring, Trace, dan Error Reporting untuk menemukan masalah, menulis kebijakan peringatan, dan menetapkan service level objective.",
+  "gcp/terraform-on-google-cloud": "Kelola Google Cloud dengan Terraform: provider google, state jarak jauh di Cloud Storage, service account untuk pipeline, dan pabrik proyek.",
+  "gcp/security-cost-and-debugging-on-google-cloud": "Terapkan kontrol keamanan Google Cloud seperti IAM, kebijakan organisasi, dan VPC Service Controls, kendalikan biaya, dan debug error izin dan kuota."
  }
 }

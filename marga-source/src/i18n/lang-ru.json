@@ -1887,6 +1887,22 @@
   "service-mesh": {
    "title": "Сервисная сетка и сети Kubernetes",
    "summary": "Разберитесь в сети подов, CNI и сетевых политиках, затем запустите сервисную сетку с mTLS, маршрутизацией трафика и диагностикой."
+  },
+  "proxies": {
+   "title": "Обратные прокси и балансировщики нагрузки",
+   "summary": "Запускайте nginx, HAProxy и Envoy перед сервисами: маршрутизация, TLS, балансировка, таймауты, кеширование, лимиты запросов и отладка ошибок 502 и 504."
+  },
+  "messaging": {
+   "title": "Обмен сообщениями и потоковая передача",
+   "summary": "Выбирайте и эксплуатируйте очереди и журналы: RabbitMQ и Kafka, гарантии доставки, группы потребителей, лаг, хранение, схемы и управляемые облачные сервисы."
+  },
+  "cfn-bicep": {
+   "title": "CloudFormation и Bicep",
+   "summary": "Пишите и эксплуатируйте облачную инфраструктуру как код: AWS CloudFormation и Azure Bicep, предпросмотр изменений, стеки, модули, тестирование и отладка неудачных развертываний."
+  },
+  "gcp": {
+   "title": "Google Cloud",
+   "summary": "Изучите модель Google Cloud: проекты, VPC, Compute Engine, Cloud Storage, GKE, Cloud Run, сервисы данных и сообщений, эксплуатация и затраты, с CLI gcloud."
   }
  },
  "paths": {
@@ -2420,6 +2436,68 @@
   "security/cloud-posture-and-misconfiguration-management": "Непрерывно находите публичные бакеты, открытые порты и отсутствие шифрования с помощью инструментов контроля состояния и политик как кода и исправляйте дрейф в источнике.",
   "security/security-champions-and-secure-code-review": "Распространяйте безопасность по командам через чемпионов, практичные чек-листы код-ревью, моделирование угроз и обратную связь, которую ценят разработчики.",
   "security/incident-forensics-and-evidence-handling": "Сохраняйте изменчивые доказательства, безопасно собирайте логи и образы дисков, ведите цепочку хранения и стройте хронологию при инциденте безопасности.",
-  "security/audit-readiness-and-continuous-compliance-evidence": "Готовьтесь к аудитам SOC 2 или ISO 27001: автоматизируйте доказательства, сопоставляйте контроли с техническими проверками и ведите живой реестр."
+  "security/audit-readiness-and-continuous-compliance-evidence": "Готовьтесь к аудитам SOC 2 или ISO 27001: автоматизируйте доказательства, сопоставляйте контроли с техническими проверками и ведите живой реестр.",
+  "cicd/jenkins-architecture-controllers-agents-and-jobs": "Поймите, как контроллер Jenkins распределяет работу по агентам, что такое job и build и где Jenkins хранит своё состояние.",
+  "cicd/jenkins-declarative-pipelines-and-the-jenkinsfile": "Напишите декларативный Jenkinsfile со стадиями, шагами, окружением, условиями и post-действиями и разберите упавший запуск.",
+  "cicd/jenkins-build-agents-with-docker-and-kubernetes": "Запускайте сборки на одноразовых агентах: статические узлы, агенты Docker и плагин Kubernetes с шаблонами подов.",
+  "cicd/jenkins-shared-libraries-and-reusable-pipelines": "Делитесь кодом пайплайнов между репозиториями через общие библиотеки, глобальные переменные и версионные релизы.",
+  "cicd/jenkins-credentials-security-and-hardening": "Надёжно храните секреты, ограничивайте права, держите код сборок вдали от контроллера и укрепите сервер Jenkins.",
+  "cicd/jenkins-plugins-upgrades-and-operating-at-scale": "Безопасно управляйте плагинами и обновлениями, настраивайте Jenkins как код и масштабируйте агентами, резервными копиями и мониторингом.",
+  "cicd/jenkins-debugging-and-migrating-to-another-platform": "Отлаживайте зависшие, медленные и нестабильные сборки и спланируйте поэтапный переход на Actions или GitLab CI, если решите менять.",
+  "linux/debugging-with-strace-system-calls": "С помощью strace смотрите, какие файлы, сокеты и системные вызовы использует зависшая или падающая программа, и находите настоящую причину.",
+  "linux/seeing-the-network-with-ss-and-tcpdump": "Просматривайте сокеты через ss и перехватывайте пакеты tcpdump, чтобы доказать, уходит ли трафик, доходит ли и получает ли ответ.",
+  "linux/open-files-and-proc-with-lsof": "С помощью lsof и /proc находите процесс, удерживающий файл, порт или удалённый файл, и выявляйте утечки дескрипторов.",
+  "linux/finding-cpu-memory-and-io-hogs": "С помощью top, vmstat, iostat и pidstat различайте проблемы CPU, памяти и диска и находите виновный процесс.",
+  "linux/kernel-messages-journal-and-core-dumps": "Читайте dmesg и journalctl для событий ядра и служб, находите убийства из-за нехватки памяти и собирайте дамп после сбоя.",
+  "linux/ebpf-and-bpftrace-live-questions": "Поймите eBPF и используйте однострочники bpftrace и готовые инструменты для живых ответов о файлах, процессах и задержках.",
+  "linux/debugging-a-slow-or-hung-server-a-method": "Объедините прежние инструменты в повторяемый метод: определите симптом, найдите перегруженный ресурс, процесс и подтвердите причину.",
+  "proxies/what-a-reverse-proxy-does": "Узнайте, что стоит между пользователями и сервисами, что делает обратный прокси и чем он отличается от прямого прокси и балансировщика.",
+  "proxies/nginx-configuration-servers-and-locations": "Читайте и пишите конфигурацию nginx: контексты, блоки server, правила location, безопасная проверка и перезагрузка.",
+  "proxies/proxying-to-upstreams-headers-and-buffers": "Передавайте запросы бэкендам через proxy_pass, задавайте нужные заголовки, понимайте буферизацию и правильно поддерживайте WebSocket.",
+  "proxies/tls-termination-http2-and-certificates": "Завершайте TLS на прокси с надёжными протоколами, редиректами, HSTS, OCSP stapling и автоматическим продлением сертификатов.",
+  "proxies/load-balancing-algorithms-and-health-checks": "Распределяйте трафик по round robin, наименьшему числу соединений и хешу и исключайте упавшие бэкенды пассивными и активными проверками.",
+  "proxies/timeouts-retries-keepalive-and-limits": "Задавайте таймауты прокси по реальному поведению, настраивайте keepalive и понимайте, как повторы и лимиты вызывают или предотвращают сбои.",
+  "proxies/caching-compression-and-static-files": "Эффективно отдавайте статику, кэшируйте ответы с верными ключами и сроками и безопасно сжимайте на прокси.",
+  "proxies/rate-limiting-and-protecting-backends": "Ограничивайте частоту запросов и соединений на прокси, возвращайте верные коды и защищайте бэкенды от всплесков и злоупотреблений.",
+  "proxies/haproxy-frontends-backends-and-acls": "Настройте HAProxy с frontend, backend, маршрутизацией по ACL, stick-таблицами и проверками здоровья и читайте его статистику.",
+  "proxies/envoy-traefik-and-dynamic-proxies": "Сравните прокси, которые настраиваются сами через обнаружение сервисов: Envoy, Traefik и автоматический HTTPS Caddy.",
+  "proxies/zero-downtime-reloads-and-blue-green-at-the-proxy": "Меняйте конфигурацию прокси и переводите трафик между версиями без потери запросов: мягкая перезагрузка, взвешенная маршрутизация и слив.",
+  "proxies/debugging-502-504-and-proxy-problems": "Диагностируйте ошибки прокси в строгом порядке по кодам статуса, журналам ошибок, времени апстрима и прямым запросам к бэкенду.",
+  "messaging/queues-logs-and-pub-sub-choosing-a-model": "Сравните рабочие очереди, темы публикации-подписки и журналы только на добавление и выберите подходящую модель сообщений.",
+  "messaging/delivery-guarantees-ordering-and-idempotency": "Поймите доставку не более одного раза, не менее одного раза и фактически один раз, когда порядок сохраняется и как идемпотентные потребители обезвреживают дубликаты.",
+  "messaging/rabbitmq-exchanges-queues-and-routing": "Поймите модель RabbitMQ из продюсеров, обменников, привязок и очередей и выбирайте обменники direct, topic, fanout и headers.",
+  "messaging/rabbitmq-acknowledgements-prefetch-and-dead-letters": "Обрабатывайте сбои в RabbitMQ через подтверждения, prefetch, повторы, обменники недоставленных сообщений и контроль глубины очереди.",
+  "messaging/kafka-topics-partitions-and-brokers": "Изучите модель Kafka: топики из партиций, брокеры, смещения и ключи и то, как партиционирование задаёт порядок и масштаб.",
+  "messaging/kafka-producers-consumers-and-consumer-groups": "Настройте продюсеров для надёжности и пропускной способности, потребителей для безопасной фиксации смещений и поймите, как группы делят партиции.",
+  "messaging/kafka-replication-isr-and-durability": "Поймите выбор лидера, синхронные реплики, min.insync.replicas и нечистые выборы, чтобы оценить, что теряет Kafka при отказе брокеров.",
+  "messaging/kafka-retention-compaction-and-storage": "Решите, как долго Kafka хранит данные, когда применять компактацию и как сегменты, диски и многоуровневое хранение влияют на стоимость и восстановление.",
+  "messaging/kafka-lag-rebalances-and-capacity-in-operation": "Следите за отставанием потребителей, недореплицированными партициями и задержкой, оценивайте размер кластера и решайте типовые проблемы продакшена.",
+  "messaging/managed-messaging-on-cloud-sqs-sns-pub-sub-and-event-hubs": "Сравните SQS и SNS, Google Pub/Sub, Azure Service Bus и Event Hubs и управляемый Kafka и решите, держать брокер самим или арендовать.",
+  "messaging/schemas-contracts-and-evolving-messages": "Описывайте форматы сообщений в Avro, Protobuf или JSON Schema, используйте реестр схем и меняйте форматы, не ломая продюсеров и потребителей.",
+  "messaging/debugging-messaging-incidents": "Следуйте фиксированному списку проверок для накопления, дубликатов, потерянных сообщений, ошибок порядка и застрявших потребителей.",
+  "cfn-bicep/native-iac-cloudformation-bicep-or-terraform": "Сравните AWS CloudFormation и Azure Bicep с Terraform и решите, когда собственный инструмент инфраструктуры как кода облака лучше.",
+  "cfn-bicep/cloudformation-templates-parameters-and-resources": "Напишите шаблон CloudFormation с параметрами, ресурсами, выходами и ссылками и разверните его как стек из CLI.",
+  "cfn-bicep/intrinsic-functions-conditions-and-mappings": "Используйте Ref, GetAtt, Sub, Join, Select, If, Conditions и Mappings, чтобы один шаблон подстраивался под разные окружения.",
+  "cfn-bicep/stacks-change-sets-and-safe-updates": "Просматривайте обновления через наборы изменений, понимайте замену и изменение на месте и защищайте важные ресурсы при обновлении стека.",
+  "cfn-bicep/nested-stacks-stacksets-and-reusable-modules": "Делите большие шаблоны на вложенные стеки, раскатывайте один шаблон на много аккаунтов и регионов через StackSets и делитесь шаблонами как модулями.",
+  "cfn-bicep/drift-rollbacks-and-resource-protection": "Обнаруживайте дрейф между стеком и реальностью, импортируйте существующие ресурсы, справляйтесь с застрявшими откатами и защищайте данные от случайного удаления.",
+  "cfn-bicep/bicep-syntax-resources-and-parameters": "Пишите файлы Bicep с параметрами, переменными, ресурсами, выходами и декораторами и разворачивайте их в группу ресурсов.",
+  "cfn-bicep/bicep-modules-loops-and-conditions": "Делите Bicep на модули, повторяйте ресурсы циклами for, включайте их условиями и делитесь модулями через реестр.",
+  "cfn-bicep/bicep-deployments-what-if-and-scopes": "Выбирайте области развёртывания, просматривайте изменения через what-if, понимайте инкрементный и полный режимы и держите историю в порядке.",
+  "cfn-bicep/deployment-stacks-and-delivery-pipelines": "Управляйте жизненным циклом ресурсов с помощью стеков развёртывания Azure и запускайте CloudFormation и Bicep из CI с ролями минимальных прав.",
+  "cfn-bicep/testing-linting-and-policy-checks-for-templates": "Ловите ошибки шаблонов до развёртывания с cfn-lint, cfn-guard, линтером Bicep, what-if, политиками как кодом и временными тестовыми средами.",
+  "cfn-bicep/debugging-failed-deployments-and-moving-to-terraform": "Читайте события CloudFormation и ошибки развёртывания Azure, исправляйте частые сбои и планируйте безопасный переход на Terraform или с него.",
+  "gcp/google-cloud-organization-projects-and-billing": "Узнайте, как Google Cloud организует ресурсы в организацию, папки и проекты и как к ним добавляются IAM, платёжные аккаунты и бюджеты.",
+  "gcp/gcloud-cli-configurations-and-automation": "Используйте CLI gcloud с именованными конфигурациями, имперсонацией сервисных аккаунтов, форматами вывода и фильтрами и пишите безопасные скрипты.",
+  "gcp/vpc-networks-subnets-and-firewall-rules": "Проектируйте сети VPC Google Cloud: глобальные VPC, региональные подсети, правила брандмауэра, Cloud NAT и частный доступ к сервисам Google.",
+  "gcp/compute-engine-images-and-managed-instance-groups": "Создавайте ВМ Compute Engine, выбирайте типы машин и образы и запускайте их в управляемых группах с автомасштабированием, проверками здоровья и плавными обновлениями.",
+  "gcp/cloud-storage-and-persistent-disks": "Используйте бакеты Cloud Storage с классами, правилами жизненного цикла, версионированием и единым доступом и выбирайте между Persistent Disk, Hyperdisk и Filestore.",
+  "gcp/gke-autopilot-and-standard-clusters": "Сравните режимы GKE Autopilot и Standard, создайте кластер, используйте Workload Identity, пулы узлов и каналы релизов и избегайте ловушек стоимости и обновлений.",
+  "gcp/cloud-run-and-cloud-functions": "Разворачивайте контейнеры в Cloud Run и событийный код в функциях Cloud Run: масштабирование до нуля, ревизии, разделение трафика, параллелизм и секреты.",
+  "gcp/cloud-sql-spanner-bigquery-and-firestore": "Выбирайте между Cloud SQL, AlloyDB, Spanner, Firestore и BigQuery и безопасно эксплуатируйте Cloud SQL с высокой доступностью, резервными копиями и частными соединениями.",
+  "gcp/pub-sub-eventarc-and-cloud-tasks": "Используйте темы и подписки Pub/Sub, триггеры Eventarc и очереди Cloud Tasks для асинхронной связи сервисов Google Cloud и обработки сбоев.",
+  "gcp/observability-with-cloud-logging-monitoring-and-slos": "Используйте Cloud Logging, Cloud Monitoring, Trace и Error Reporting, чтобы находить проблемы, писать политики оповещений и задавать цели уровня сервиса.",
+  "gcp/terraform-on-google-cloud": "Управляйте Google Cloud через Terraform: провайдер google, удалённое состояние в Cloud Storage, сервисные аккаунты для пайплайнов и фабрики проектов.",
+  "gcp/security-cost-and-debugging-on-google-cloud": "Применяйте средства безопасности Google Cloud: IAM, политики организации и VPC Service Controls, контролируйте расходы и отлаживайте ошибки прав и квот."
  }
 }
