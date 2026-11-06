@@ -1,0 +1,1574 @@
+[
+ {
+  "id": "sre-60",
+  "title": "Become an SRE in 60 days",
+  "summary": "Sixty days from Linux and networking through containers, Kubernetes, telemetry, SLOs, incidents and on-call, with one lesson a day and a review day each week.",
+  "level": "Intermediate",
+  "who": "Engineers who run production systems, or want to, and can already work at a Linux shell.",
+  "needs": [
+   "linux"
+  ],
+  "outcomes": [
+   "Triage a sick Linux server and a failing network path with a fixed method.",
+   "Run workloads on Kubernetes and watch the control plane, nodes and telemetry.",
+   "Define SLOs and error budgets, run an incident and write a blameless post-mortem.",
+   "Plan capacity, change safely and keep an on-call rotation people can sustain."
+  ],
+  "days": [
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/processes-and-services"
+     },
+     {
+      "t": "widget",
+      "id": "oom-killer"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/logs-and-troubleshooting"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/performance-triage"
+     },
+     {
+      "t": "widget",
+      "id": "load-average"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/troubleshooting-playbook-method-and-first-five-minutes"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/troubleshooting-playbook-high-load-and-cpu-saturation"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/troubleshooting-playbook-memory-pressure-swap-and-the-oom-killer"
+     },
+     {
+      "t": "widget",
+      "id": "page-cache"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: Linux",
+    "items": [
+     {
+      "t": "drills",
+      "module": "linux"
+     },
+     {
+      "t": "cases",
+      "module": "linux"
+     },
+     {
+      "t": "link",
+      "href": "#/terminal-labs/linux",
+      "text": "Do a terminal lab",
+      "min": 20
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "networking/ip-addressing-and-subnets"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "networking/dns"
+     },
+     {
+      "t": "widget",
+      "id": "dns-ttl"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "networking/http-and-tls"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "networking/troubleshooting-toolkit"
+     },
+     {
+      "t": "widget",
+      "id": "tcp-handshake"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "networking/debugging-network-problems"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "bash/log-analysis-one-liners-and-pipelines"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: networking",
+    "items": [
+     {
+      "t": "drills",
+      "module": "networking"
+     },
+     {
+      "t": "cases",
+      "module": "networking"
+     },
+     {
+      "t": "link",
+      "href": "#/terminal-labs/networking",
+      "text": "Do a terminal lab",
+      "min": 20
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "docker/containers-and-images"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "docker/running-containers-in-production"
+     },
+     {
+      "t": "widget",
+      "id": "container-limits"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/architecture"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/pods-and-deployments"
+     },
+     {
+      "t": "widget",
+      "id": "rolling-update"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/resources-and-quotas"
+     },
+     {
+      "t": "widget",
+      "id": "requests-bin-packing"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/scheduling-and-troubleshooting"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/probes-metrics-and-logging"
+     },
+     {
+      "t": "widget",
+      "id": "liveness-cascade"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: Kubernetes",
+    "items": [
+     {
+      "t": "drills",
+      "module": "kubernetes"
+     },
+     {
+      "t": "cases",
+      "module": "kubernetes"
+     },
+     {
+      "t": "link",
+      "href": "#/terminal-labs/kubernetes",
+      "text": "Do a terminal lab",
+      "min": 20
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/debugging-kubernetes-workloads"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "k8s-ops/etcd-backup-and-restore"
+     },
+     {
+      "t": "widget",
+      "id": "etcd-quorum"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "k8s-ops/control-plane-monitoring-and-slos"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "k8s-ops/cluster-disaster-recovery-runbook"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/observability-fundamentals"
+     },
+     {
+      "t": "widget",
+      "id": "metric-cardinality"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: cluster operations",
+    "items": [
+     {
+      "t": "drills",
+      "module": "k8s-ops"
+     },
+     {
+      "t": "cases",
+      "module": "k8s-ops"
+     },
+     {
+      "t": "link",
+      "href": "#/games",
+      "text": "Play an incident game",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/metrics-and-prometheus"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/logs-and-traces"
+     },
+     {
+      "t": "widget",
+      "id": "trace-sampling"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/alerting-and-dashboards"
+     },
+     {
+      "t": "widget",
+      "id": "alert-window"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/red-use-and-golden-signals"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/telemetry-cost-and-cardinality"
+     },
+     {
+      "t": "widget",
+      "id": "log-volume"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/runbooks-and-dashboards-for-on-call"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: telemetry",
+    "items": [
+     {
+      "t": "drills",
+      "module": "observability"
+     },
+     {
+      "t": "cases",
+      "module": "observability"
+     },
+     {
+      "t": "link",
+      "href": "#/games",
+      "text": "Play an incident game",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/debugging-with-telemetry"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/slos-and-error-budgets"
+     },
+     {
+      "t": "widget",
+      "id": "error-budget"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/incident-response"
+     },
+     {
+      "t": "widget",
+      "id": "mttr-breakdown"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/postmortems-and-toil"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/reliability-patterns"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/on-call"
+     },
+     {
+      "t": "widget",
+      "id": "oncall-load"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: reliability",
+    "items": [
+     {
+      "t": "drills",
+      "module": "sre"
+     },
+     {
+      "t": "cases",
+      "module": "sre"
+     },
+     {
+      "t": "link",
+      "href": "#/games",
+      "text": "Play an incident game",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/capacity-planning"
+     },
+     {
+      "t": "widget",
+      "id": "capacity-runway"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/chaos-engineering-and-game-days"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/change-management-and-releases"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/production-readiness-reviews"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/incident-communication-and-stakeholders"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/dependencies-and-third-party-risk"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: pipelines",
+    "items": [
+     {
+      "t": "drills",
+      "module": "cicd"
+     },
+     {
+      "t": "cases",
+      "module": "cicd"
+     },
+     {
+      "t": "link",
+      "href": "#/games",
+      "text": "Play an incident game",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/disaster-recovery-exercises"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/debugging-under-pressure"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/failure-domains-cells-and-bulkheads"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/graceful-degradation-and-circuit-breakers"
+     },
+     {
+      "t": "widget",
+      "id": "retry-storm"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "system-design/rate-limiting-and-load-shedding"
+     },
+     {
+      "t": "widget",
+      "id": "token-bucket"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "terraform/iac-and-hcl-basics"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: system design",
+    "items": [
+     {
+      "t": "drills",
+      "module": "system-design"
+     },
+     {
+      "t": "cases",
+      "module": "system-design"
+     },
+     {
+      "t": "link",
+      "href": "#/games",
+      "text": "Play an incident game",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cicd/deployment-strategies"
+     },
+     {
+      "t": "widget",
+      "id": "canary-exposure"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cicd/environments-promotion-and-approvals"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "security/vulnerability-management-and-security-incidents"
+     }
+    ]
+   },
+   {
+    "title": "Final review: SRE",
+    "items": [
+     {
+      "t": "cases",
+      "module": "sre"
+     },
+     {
+      "t": "link",
+      "href": "#/capstones",
+      "text": "Pick a capstone project for your portfolio",
+      "min": 30
+     },
+     {
+      "t": "link",
+      "href": "#/games",
+      "text": "Play an incident game",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   }
+  ]
+ },
+ {
+  "id": "devops-60",
+  "title": "Become a DevOps engineer in 60 days",
+  "summary": "Sixty days from the Linux shell and Git to containers, pipelines, Kubernetes, Terraform, cloud basics and monitoring, with one lesson a day and a review day each week.",
+  "level": "Beginner",
+  "who": "Developers, admins and career changers who want the core DevOps toolchain in two months.",
+  "needs": [],
+  "outcomes": [
+   "Work confidently on Linux and automate tasks with safe shell scripts.",
+   "Use Git in a team and build container images and delivery pipelines.",
+   "Deploy and debug applications on Kubernetes and describe infrastructure as code.",
+   "Add monitoring, secrets handling and reliability habits to everything you ship."
+  ],
+  "days": [
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/filesystem-and-navigation"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/users-groups-permissions"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/processes-and-services"
+     },
+     {
+      "t": "widget",
+      "id": "oom-killer"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/package-management"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/ssh-and-remote-access"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "linux/logs-and-troubleshooting"
+     },
+     {
+      "t": "widget",
+      "id": "load-average"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: Linux",
+    "items": [
+     {
+      "t": "drills",
+      "module": "linux"
+     },
+     {
+      "t": "cases",
+      "module": "linux"
+     },
+     {
+      "t": "link",
+      "href": "#/terminal-labs/linux",
+      "text": "Do a terminal lab",
+      "min": 20
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "bash/script-basics"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "bash/control-flow-and-functions"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "bash/text-processing"
+     },
+     {
+      "t": "widget",
+      "id": "shell-exit-codes"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "bash/safe-automation"
+     },
+     {
+      "t": "widget",
+      "id": "atomic-write"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "git/first-repository-and-commits"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "git/staging-undoing-and-stashing"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: Git",
+    "items": [
+     {
+      "t": "drills",
+      "module": "git"
+     },
+     {
+      "t": "cases",
+      "module": "git"
+     },
+     {
+      "t": "link",
+      "href": "#/games",
+      "text": "Play an incident game",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "git/branches-and-merging"
+     },
+     {
+      "t": "widget",
+      "id": "git-rebase-merge"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "git/remotes-fetch-pull-and-push"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "git/team-workflows-pull-requests-and-reviews"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "networking/ip-addressing-and-subnets"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "networking/dns"
+     },
+     {
+      "t": "widget",
+      "id": "dns-ttl"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "networking/http-and-tls"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: networking",
+    "items": [
+     {
+      "t": "drills",
+      "module": "networking"
+     },
+     {
+      "t": "cases",
+      "module": "networking"
+     },
+     {
+      "t": "link",
+      "href": "#/terminal-labs/networking",
+      "text": "Do a terminal lab",
+      "min": 20
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "docker/containers-and-images"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "docker/writing-dockerfiles"
+     },
+     {
+      "t": "widget",
+      "id": "docker-layer-cache"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "docker/volumes-and-networking"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "docker/compose"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "docker/registries-and-supply-chain"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "docker/security-and-troubleshooting"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: containers",
+    "items": [
+     {
+      "t": "drills",
+      "module": "docker"
+     },
+     {
+      "t": "cases",
+      "module": "docker"
+     },
+     {
+      "t": "link",
+      "href": "#/terminal-labs/docker",
+      "text": "Do a terminal lab",
+      "min": 20
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cicd/pipeline-fundamentals"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cicd/building-a-pipeline"
+     },
+     {
+      "t": "widget",
+      "id": "pipeline-speed"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cicd/testing-and-quality-gates"
+     },
+     {
+      "t": "widget",
+      "id": "flaky-tests"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cicd/deployment-strategies"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cicd/actions-workflows-jobs-and-steps"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cicd/gitlab-ci-pipelines-stages-and-jobs"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: pipelines",
+    "items": [
+     {
+      "t": "drills",
+      "module": "cicd"
+     },
+     {
+      "t": "cases",
+      "module": "cicd"
+     },
+     {
+      "t": "link",
+      "href": "#/games",
+      "text": "Play an incident game",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/architecture"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/pods-and-deployments"
+     },
+     {
+      "t": "widget",
+      "id": "rolling-update"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/services-and-ingress"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/config-and-secrets"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/resources-and-quotas"
+     },
+     {
+      "t": "widget",
+      "id": "requests-bin-packing"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "kubernetes/probes-metrics-and-logging"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: Kubernetes",
+    "items": [
+     {
+      "t": "drills",
+      "module": "kubernetes"
+     },
+     {
+      "t": "cases",
+      "module": "kubernetes"
+     },
+     {
+      "t": "link",
+      "href": "#/terminal-labs/kubernetes",
+      "text": "Do a terminal lab",
+      "min": 20
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "terraform/iac-and-hcl-basics"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "terraform/providers-and-resources"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "terraform/variables-and-outputs"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "terraform/state"
+     },
+     {
+      "t": "widget",
+      "id": "tf-drift-window"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "terraform/modules"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud/cloud-fundamentals"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: infrastructure as code",
+    "items": [
+     {
+      "t": "drills",
+      "module": "terraform"
+     },
+     {
+      "t": "cases",
+      "module": "terraform"
+     },
+     {
+      "t": "link",
+      "href": "#/games",
+      "text": "Play an incident game",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "cloud/identity-and-access"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/observability-fundamentals"
+     },
+     {
+      "t": "widget",
+      "id": "metric-cardinality"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/metrics-and-prometheus"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "observability/alerting-and-dashboards"
+     },
+     {
+      "t": "widget",
+      "id": "alert-window"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "security/security-mindset-and-threat-modeling"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "security/secrets-management"
+     },
+     {
+      "t": "widget",
+      "id": "secret-rotation-effort"
+     }
+    ]
+   },
+   {
+    "title": "Practice and review: cloud",
+    "items": [
+     {
+      "t": "drills",
+      "module": "cloud"
+     },
+     {
+      "t": "cases",
+      "module": "cloud"
+     },
+     {
+      "t": "link",
+      "href": "#/terminal-labs/cloud",
+      "text": "Do a terminal lab",
+      "min": 20
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "argocd/pull-based-delivery-and-the-repository-as-source-of-truth"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/slos-and-error-budgets"
+     },
+     {
+      "t": "widget",
+      "id": "error-budget"
+     }
+    ]
+   },
+   {
+    "title": null,
+    "items": [
+     {
+      "t": "lesson",
+      "id": "sre/incident-response"
+     }
+    ]
+   },
+   {
+    "title": "Final review: DevOps",
+    "items": [
+     {
+      "t": "cases",
+      "module": "cicd"
+     },
+     {
+      "t": "link",
+      "href": "#/capstones",
+      "text": "Pick a capstone project for your portfolio",
+      "min": 30
+     },
+     {
+      "t": "link",
+      "href": "#/games",
+      "text": "Play an incident game",
+      "min": 15
+     },
+     {
+      "t": "link",
+      "href": "#/flashcards",
+      "text": "Review your flashcards",
+      "min": 10
+     }
+    ],
+    "practice": true
+   }
+  ]
+ }
+]
