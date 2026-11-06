@@ -1,0 +1,2425 @@
+{
+ "ui": [
+  [
+   "Skip to content",
+   "Lewati ke konten"
+  ],
+  [
+   "Free · No login · No ads · No cookies",
+   "Gratis · Tanpa login · Tanpa iklan · Tanpa cookie"
+  ],
+  [
+   "Visitor count unavailable",
+   "Jumlah pengunjung tidak tersedia"
+  ],
+  [
+   "Visitor count",
+   "Jumlah pengunjung"
+  ],
+  [
+   "Skills",
+   "Keahlian"
+  ],
+  [
+   "Skill trees",
+   "Pohon keahlian"
+  ],
+  [
+   "Practice",
+   "Latihan"
+  ],
+  [
+   "Real Linux labs",
+   "Lab Linux nyata"
+  ],
+  [
+   "Real Linux lab",
+   "Lab Linux nyata"
+  ],
+  [
+   "Progress",
+   "Kemajuan"
+  ],
+  [
+   "Your progress",
+   "Kemajuan Anda"
+  ],
+  [
+   "Interview questions",
+   "Pertanyaan wawancara"
+  ],
+  [
+   "About",
+   "Tentang"
+  ],
+  [
+   "Elsewhere",
+   "Lainnya"
+  ],
+  [
+   "Main",
+   "Utama"
+  ],
+  [
+   "Menu",
+   "Menu"
+  ],
+  [
+   "Search",
+   "Cari"
+  ],
+  [
+   "Search lessons and cheat sheets",
+   "Cari pelajaran dan lembar contekan"
+  ],
+  [
+   "Language",
+   "Bahasa"
+  ],
+  [
+   "Switch to dark theme",
+   "Ganti ke tema gelap"
+  ],
+  [
+   "Switch to light theme",
+   "Ganti ke tema terang"
+  ],
+  [
+   "Reading and accessibility",
+   "Membaca dan aksesibilitas"
+  ],
+  [
+   "Reading and accessibility options",
+   "Opsi membaca dan aksesibilitas"
+  ],
+  [
+   "Show the skills in each path",
+   "Tampilkan keahlian di setiap jalur"
+  ],
+  [
+   "Question bank, opens in a new tab",
+   "Bank soal, dibuka di tab baru"
+  ],
+  [
+   "Exam prep, opens in a new tab",
+   "Persiapan ujian, dibuka di tab baru"
+  ],
+  [
+   "InterviewHub (opens in a new tab)",
+   "InterviewHub (dibuka di tab baru)"
+  ],
+  [
+   "Certifications (opens in a new tab)",
+   "Sertifikasi (dibuka di tab baru)"
+  ],
+  [
+   "Certifications",
+   "Sertifikasi"
+  ],
+  [
+   "Case studies",
+   "Studi kasus"
+  ],
+  [
+   "Real outages explained",
+   "Gangguan nyata yang dijelaskan"
+  ],
+  [
+   "Terminal labs",
+   "Lab terminal"
+  ],
+  [
+   "Badges",
+   "Lencana"
+  ],
+  [
+   "Glossary",
+   "Glosarium"
+  ],
+  [
+   "Cheat sheets",
+   "Lembar contekan"
+  ],
+  [
+   "Printable cheat sheets",
+   "Lembar contekan yang bisa dicetak"
+  ],
+  [
+   "Printable, with watermark",
+   "Bisa dicetak, dengan tanda air"
+  ],
+  [
+   "Open content license",
+   "Lisensi konten terbuka"
+  ],
+  [
+   "Progress is saved in this browser only.",
+   "Kemajuan hanya disimpan di peramban ini."
+  ],
+  [
+   "MARGA by EknathaLabs",
+   "MARGA by EknathaLabs"
+  ],
+  [
+   "Close",
+   "Tutup"
+  ],
+  [
+   "Close details",
+   "Tutup detail"
+  ],
+  [
+   "Choices apply to every page and are saved in this browser only.",
+   "Pilihan berlaku untuk setiap halaman dan hanya disimpan di peramban ini."
+  ],
+  [
+   "Colour theme",
+   "Tema warna"
+  ],
+  [
+   "Match my device",
+   "Ikuti perangkat saya"
+  ],
+  [
+   "Light",
+   "Terang"
+  ],
+  [
+   "Dark",
+   "Gelap"
+  ],
+  [
+   "Reading mode",
+   "Mode membaca"
+  ],
+  [
+   "On: narrow column, larger text, no side panels",
+   "Aktif: kolom sempit, teks lebih besar, tanpa panel samping"
+  ],
+  [
+   "Text size",
+   "Ukuran teks"
+  ],
+  [
+   "Large",
+   "Besar"
+  ],
+  [
+   "Larger",
+   "Lebih besar"
+  ],
+  [
+   "Largest",
+   "Terbesar"
+  ],
+  [
+   "Standard",
+   "Standar"
+  ],
+  [
+   "Font",
+   "Font"
+  ],
+  [
+   "Line spacing",
+   "Jarak antarbaris"
+  ],
+  [
+   "Relaxed",
+   "Renggang"
+  ],
+  [
+   "Loose",
+   "Sangat renggang"
+  ],
+  [
+   "Letter and word spacing",
+   "Jarak huruf dan kata"
+  ],
+  [
+   "Wide",
+   "Lebar"
+  ],
+  [
+   "Contrast",
+   "Kontras"
+  ],
+  [
+   "High contrast",
+   "Kontras tinggi"
+  ],
+  [
+   "Motion",
+   "Gerakan"
+  ],
+  [
+   "Follow my device",
+   "Ikuti perangkat saya"
+  ],
+  [
+   "Reduce animations",
+   "Kurangi animasi"
+  ],
+  [
+   "Links",
+   "Tautan"
+  ],
+  [
+   "Always underlined",
+   "Selalu bergaris bawah"
+  ],
+  [
+   "Keyboard focus",
+   "Fokus keyboard"
+  ],
+  [
+   "Extra strong outline",
+   "Garis tepi ekstra tebal"
+  ],
+  [
+   "Print and Save as PDF style",
+   "Gaya cetak dan Simpan sebagai PDF"
+  ],
+  [
+   "Print style",
+   "Gaya cetak"
+  ],
+  [
+   "Light, saves ink",
+   "Terang, hemat tinta"
+  ],
+  [
+   "Light, large type",
+   "Terang, huruf besar"
+  ],
+  [
+   "Large type",
+   "Huruf besar"
+  ],
+  [
+   "Highlight the text being read aloud",
+   "Sorot teks yang sedang dibacakan"
+  ],
+  [
+   "On",
+   "Aktif"
+  ],
+  [
+   "Off",
+   "Nonaktif"
+  ],
+  [
+   "Reset to defaults",
+   "Kembalikan ke bawaan"
+  ],
+  [
+   "Spoken voice",
+   "Suara pembaca"
+  ],
+  [
+   "Print",
+   "Cetak"
+  ],
+  [
+   "Save as PDF",
+   "Simpan sebagai PDF"
+  ],
+  [
+   "Listen",
+   "Dengarkan"
+  ],
+  [
+   "Pause",
+   "Jeda"
+  ],
+  [
+   "Stop",
+   "Berhenti"
+  ],
+  [
+   "Voice",
+   "Suara"
+  ],
+  [
+   "Speed",
+   "Kecepatan"
+  ],
+  [
+   "No voices available",
+   "Tidak ada suara tersedia"
+  ],
+  [
+   "No voices found yet. If this stays empty, install a speech voice in your system settings.",
+   "Belum ada suara yang ditemukan. Jika tetap kosong, pasang suara ucapan di pengaturan sistem Anda."
+  ],
+  [
+   "Read aloud",
+   "Bacakan"
+  ],
+  [
+   "Copy commands",
+   "Salin perintah"
+  ],
+  [
+   "Tell a friend",
+   "Ceritakan ke teman"
+  ],
+  [
+   "Explain like I am new",
+   "Jelaskan seolah saya pemula"
+  ],
+  [
+   "Adds a plain-words note after each technical term. Hover or focus any dotted term for its meaning.",
+   "Menambahkan catatan dengan kata-kata sederhana setelah setiap istilah teknis. Arahkan kursor atau fokus ke istilah bertitik untuk melihat artinya."
+  ],
+  [
+   "In plain words:",
+   "Dengan kata sederhana:"
+  ],
+  [
+   "Learn to fix production before production breaks.",
+   "Belajar memperbaiki produksi sebelum produksi rusak."
+  ],
+  [
+   "Free. Offline. No sign-up.",
+   "Gratis. Offline. Tanpa daftar."
+  ],
+  [
+   "No payment, no ads.",
+   "Tanpa pembayaran, tanpa iklan."
+  ],
+  [
+   "Practical DevOps, cloud and SRE training from someone who runs production. Real incidents, real commands, no login, no ads.",
+   "Pelatihan DevOps, cloud, dan SRE yang praktis dari orang yang menjalankan produksi. Insiden nyata, perintah nyata, tanpa login, tanpa iklan."
+  ],
+  [
+   "Choose your role",
+   "Pilih peran Anda"
+  ],
+  [
+   "Find my path in 2 minutes",
+   "Temukan jalur saya dalam 2 menit"
+  ],
+  [
+   "No account needed. Start now. Progress stays in your browser on this device; export it to move it.",
+   "Tanpa akun. Mulai sekarang. Kemajuan tetap di peramban Anda di perangkat ini; ekspor untuk memindahkannya."
+  ],
+  [
+   "Open it once, turn off wifi, and keep learning. Lessons, labs and widgets run from your device.",
+   "Buka sekali, matikan wifi, dan terus belajar. Pelajaran, lab, dan widget berjalan dari perangkat Anda."
+  ],
+  [
+   "Ready to work offline",
+   "Siap bekerja offline"
+  ],
+  [
+   "Reload once to enable offline",
+   "Muat ulang sekali untuk mengaktifkan offline"
+  ],
+  [
+   "Checking offline support",
+   "Memeriksa dukungan offline"
+  ],
+  [
+   "Day streak",
+   "Hari beruntun"
+  ],
+  [
+   "Lessons passed",
+   "Pelajaran lulus"
+  ],
+  [
+   "Best streak",
+   "Rekor hari beruntun"
+  ],
+  [
+   "lessons with checks",
+   "pelajaran dengan pemeriksaan"
+  ],
+  [
+   "real incidents",
+   "insiden nyata"
+  ],
+  [
+   "troubleshooting drills",
+   "latihan pemecahan masalah"
+  ],
+  [
+   "interview answers",
+   "jawaban wawancara"
+  ],
+  [
+   "animated explainers",
+   "penjelasan beranimasi"
+  ],
+  [
+   "Pick a skill tree. Pass each check to unlock the next skill.",
+   "Pilih pohon keahlian. Lulus setiap pemeriksaan untuk membuka keahlian berikutnya."
+  ],
+  [
+   "Each role is a tree of skills. A skill unlocks when the skills that lead into it are mastered.",
+   "Setiap peran adalah pohon keahlian. Keahlian terbuka saat keahlian yang mengarah ke sana sudah dikuasai."
+  ],
+  [
+   "Role paths",
+   "Jalur peran"
+  ],
+  [
+   "Start from zero",
+   "Mulai dari nol"
+  ],
+  [
+   "Get a DevOps job",
+   "Dapatkan pekerjaan DevOps"
+  ],
+  [
+   "Prepare for an interview",
+   "Persiapan wawancara"
+  ],
+  [
+   "Fix production faster",
+   "Perbaiki produksi lebih cepat"
+  ],
+  [
+   "Ship code safely",
+   "Kirim kode dengan aman"
+  ],
+  [
+   "Automate the boring work",
+   "Otomatiskan pekerjaan membosankan"
+  ],
+  [
+   "Build with AI",
+   "Bangun dengan AI"
+  ],
+  [
+   "Build securely",
+   "Bangun dengan aman"
+  ],
+  [
+   "Learn by skill",
+   "Belajar per keahlian"
+  ],
+  [
+   "Build your own path",
+   "Buat jalur Anda sendiri"
+  ],
+  [
+   "Today",
+   "Hari ini"
+  ],
+  [
+   "Daily challenge",
+   "Tantangan harian"
+  ],
+  [
+   "Mixed practice",
+   "Latihan campuran"
+  ],
+  [
+   "Next up",
+   "Berikutnya"
+  ],
+  [
+   "In development",
+   "Dalam pengembangan"
+  ],
+  [
+   "Planned",
+   "Direncanakan"
+  ],
+  [
+   "Beginner",
+   "Pemula"
+  ],
+  [
+   "Intermediate",
+   "Menengah"
+  ],
+  [
+   "Advanced",
+   "Lanjutan"
+  ],
+  [
+   "Junior",
+   "Junior"
+  ],
+  [
+   "Mid-level",
+   "Madya"
+  ],
+  [
+   "Senior",
+   "Senior"
+  ],
+  [
+   "mid",
+   "madya"
+  ],
+  [
+   "senior",
+   "senior"
+  ],
+  [
+   "Goes with the lesson",
+   "Menyertai pelajaran"
+  ],
+  [
+   "Ready",
+   "Siap"
+  ],
+  [
+   "Locked",
+   "Terkunci"
+  ],
+  [
+   "Mastered",
+   "Dikuasai"
+  ],
+  [
+   "In progress",
+   "Sedang berjalan"
+  ],
+  [
+   "Passed",
+   "Lulus"
+  ],
+  [
+   "Not done",
+   "Belum selesai"
+  ],
+  [
+   "Not solved",
+   "Belum terpecahkan"
+  ],
+  [
+   "Not played",
+   "Belum dimainkan"
+  ],
+  [
+   "Open",
+   "Buka"
+  ],
+  [
+   "Test out",
+   "Uji langsung"
+  ],
+  [
+   "Need review",
+   "Perlu ditinjau"
+  ],
+  [
+   "I know this",
+   "Saya sudah tahu ini"
+  ],
+  [
+   "Show answer",
+   "Tampilkan jawaban"
+  ],
+  [
+   "Prerequisites open it",
+   "Prasyarat membukanya"
+  ],
+  [
+   "Start lab",
+   "Mulai lab"
+  ],
+  [
+   "(Terminal lab)",
+   "(Lab terminal)"
+  ],
+  [
+   "(Terminal lab),",
+   "(Lab terminal),"
+  ],
+  [
+   "(Real Linux lab)",
+   "(Lab Linux nyata)"
+  ],
+  [
+   "(Real Linux lab),",
+   "(Lab Linux nyata),"
+  ],
+  [
+   "Related practice:",
+   "Latihan terkait:"
+  ],
+  [
+   "Related stages:",
+   "Tahap terkait:"
+  ],
+  [
+   "Case file",
+   "Berkas kasus"
+  ],
+  [
+   "What happened",
+   "Apa yang terjadi"
+  ],
+  [
+   "Cause",
+   "Penyebab"
+  ],
+  [
+   "What changed",
+   "Apa yang berubah"
+  ],
+  [
+   "Lesson",
+   "Pelajaran"
+  ],
+  [
+   "Lessons",
+   "Pelajaran"
+  ],
+  [
+   "Original source:",
+   "Sumber asli:"
+  ],
+  [
+   "Open the full case file",
+   "Buka berkas kasus lengkap"
+  ],
+  [
+   "Mark as read",
+   "Tandai sudah dibaca"
+  ],
+  [
+   "Try it",
+   "Coba"
+  ],
+  [
+   "On this page",
+   "Di halaman ini"
+  ],
+  [
+   "Lesson check",
+   "Pemeriksaan pelajaran"
+  ],
+  [
+   "Flashcards",
+   "Kartu kilat"
+  ],
+  [
+   "Interactive",
+   "Interaktif"
+  ],
+  [
+   "Exercise",
+   "Latihan"
+  ],
+  [
+   "Study time",
+   "Waktu belajar"
+  ],
+  [
+   "Level",
+   "Tingkat"
+  ],
+  [
+   "Type",
+   "Jenis"
+  ],
+  [
+   "Stage",
+   "Tahap"
+  ],
+  [
+   "Paths",
+   "Jalur"
+  ],
+  [
+   "Breadcrumb",
+   "Remah roti"
+  ],
+  [
+   "Support level",
+   "Tingkat dukungan"
+  ],
+  [
+   "Show",
+   "Tampilkan"
+  ],
+  [
+   "All",
+   "Semua"
+  ],
+  [
+   "Clear filters",
+   "Hapus filter"
+  ],
+  [
+   "All skills",
+   "Semua keahlian"
+  ],
+  [
+   "All stages",
+   "Semua tahap"
+  ],
+  [
+   "Use",
+   "Gunakan"
+  ],
+  [
+   "and",
+   "dan"
+  ],
+  [
+   "or",
+   "atau"
+  ],
+  [
+   "Practises Every skill",
+   "Melatih setiap keahlian"
+  ],
+  [
+   "Practises Everyone",
+   "Melatih semua orang"
+  ],
+  [
+   "Runs in your browser",
+   "Berjalan di peramban Anda"
+  ],
+  [
+   "Diagnose only",
+   "Hanya diagnosis"
+  ],
+  [
+   "Several faults",
+   "Beberapa kerusakan"
+  ],
+  [
+   "Fix it",
+   "Perbaiki"
+  ],
+  [
+   "starter",
+   "pemula"
+  ],
+  [
+   "Newcomer",
+   "Pendatang baru"
+  ],
+  [
+   "Rank:",
+   "Peringkat:"
+  ],
+  [
+   "skill points",
+   "poin keahlian"
+  ],
+  [
+   "Unlocks",
+   "Membuka"
+  ],
+  [
+   "Skill details",
+   "Detail keahlian"
+  ],
+  [
+   "Key",
+   "Kunci"
+  ],
+  [
+   "Foundations",
+   "Dasar"
+  ],
+  [
+   "Core skills",
+   "Keahlian inti"
+  ],
+  [
+   "Platform skills",
+   "Keahlian platform"
+  ],
+  [
+   "Advanced skills",
+   "Keahlian lanjutan"
+  ],
+  [
+   "Mastery",
+   "Penguasaan"
+  ],
+  [
+   "Needs or unlocks the selected skill",
+   "Dibutuhkan atau membuka keahlian terpilih"
+  ],
+  [
+   "Select a skill to see what it needs and unlocks. Pass every lesson check in a skill to master it. Locked skills open when the skills that lead into them are mastered.",
+   "Pilih keahlian untuk melihat apa yang dibutuhkan dan dibukanya. Lulus setiap pemeriksaan pelajaran dalam satu keahlian untuk menguasainya. Keahlian terkunci terbuka saat keahlian yang mengarah ke sana dikuasai."
+  ],
+  [
+   "No prerequisites. A good place to start.",
+   "Tanpa prasyarat. Tempat yang bagus untuk memulai."
+  ],
+  [
+   "Skill route for DevOps Engineer",
+   "Rute keahlian untuk DevOps Engineer"
+  ],
+  [
+   "DevOps Engineer",
+   "DevOps Engineer"
+  ],
+  [
+   "Cloud Engineer",
+   "Cloud Engineer"
+  ],
+  [
+   "Site Reliability Engineer",
+   "Site Reliability Engineer"
+  ],
+  [
+   "DevSecOps Engineer",
+   "DevSecOps Engineer"
+  ],
+  [
+   "AI Engineer",
+   "AI Engineer"
+  ],
+  [
+   "MLOps and AIOps Engineer",
+   "MLOps and AIOps Engineer"
+  ],
+  [
+   "Platform Engineer",
+   "Platform Engineer"
+  ],
+  [
+   "Build internal developer platforms, golden paths and self-service infrastructure.",
+   "Bangun platform pengembang internal, jalur emas, dan infrastruktur swalayan."
+  ],
+  [
+   "Kubernetes Administrator (CKA and CKS)",
+   "Administrator Kubernetes (CKA dan CKS)"
+  ],
+  [
+   "A focused path for cluster administration and security certification practice.",
+   "Jalur terfokus untuk administrasi klaster dan latihan sertifikasi keamanan."
+  ],
+  [
+   "FinOps and cloud cost",
+   "FinOps dan biaya cloud"
+  ],
+  [
+   "Measure, allocate and reduce cloud spend without hurting reliability.",
+   "Ukur, alokasikan, dan kurangi biaya cloud tanpa merusak keandalan."
+  ],
+  [
+   "Data platform engineer",
+   "Data platform engineer"
+  ],
+  [
+   "Build pipelines, storage and governance for analytics and machine learning teams.",
+   "Bangun pipeline, penyimpanan, dan tata kelola untuk tim analitik dan machine learning."
+  ],
+  [
+   "Subnet and CIDR playground",
+   "Arena latihan subnet dan CIDR"
+  ],
+  [
+   "YAML playground",
+   "Arena latihan YAML"
+  ],
+  [
+   "Python playground",
+   "Arena latihan Python"
+  ],
+  [
+   "Go playground",
+   "Arena latihan Go"
+  ],
+  [
+   "SQL for SREs",
+   "SQL untuk SRE"
+  ],
+  [
+   "Skill-writing lab",
+   "Lab penulisan keahlian"
+  ],
+  [
+   "Animated explainers",
+   "Penjelasan beranimasi"
+  ],
+  [
+   "Multi-service incidents",
+   "Insiden multilayanan"
+  ],
+  [
+   "Real-world case studies",
+   "Studi kasus dunia nyata"
+  ],
+  [
+   "InterviewHub",
+   "InterviewHub"
+  ],
+  [
+   "Reference",
+   "Referensi"
+  ],
+  [
+   "Up next",
+   "Berikutnya"
+  ],
+  [
+   "Practice this stage:",
+   "Latih tahap ini:"
+  ],
+  [
+   "Watch and study:",
+   "Tonton dan pelajari:"
+  ],
+  [
+   "Cheat sheet:",
+   "Lembar contekan:"
+  ],
+  [
+   "Get the handbook (PDF or web page)",
+   "Dapatkan buku panduan (PDF atau halaman web)"
+  ],
+  [
+   "case studies",
+   "studi kasus"
+  ],
+  [
+   "flashcards",
+   "kartu kilat"
+  ],
+  [
+   "days",
+   "hari"
+  ],
+  [
+   "Prerequisites",
+   "Prasyarat"
+  ],
+  [
+   "What you will learn",
+   "Yang akan Anda pelajari"
+  ],
+  [
+   "Start here",
+   "Mulai di sini"
+  ],
+  [
+   "Continue",
+   "Lanjutkan"
+  ],
+  [
+   "Back",
+   "Kembali"
+  ],
+  [
+   "Next",
+   "Berikutnya"
+  ],
+  [
+   "Previous",
+   "Sebelumnya"
+  ],
+  [
+   "Submit",
+   "Kirim"
+  ],
+  [
+   "Check",
+   "Periksa"
+  ],
+  [
+   "Retry",
+   "Coba lagi"
+  ],
+  [
+   "Reset",
+   "Atur ulang"
+  ],
+  [
+   "Hint",
+   "Petunjuk"
+  ],
+  [
+   "Hints",
+   "Petunjuk"
+  ],
+  [
+   "Solution",
+   "Solusi"
+  ],
+  [
+   "Goals",
+   "Tujuan"
+  ],
+  [
+   "Copy",
+   "Salin"
+  ],
+  [
+   "Copied",
+   "Tersalin"
+  ],
+  [
+   "Download",
+   "Unduh"
+  ],
+  [
+   "Share",
+   "Bagikan"
+  ],
+  [
+   "Export progress",
+   "Ekspor kemajuan"
+  ],
+  [
+   "Import progress",
+   "Impor kemajuan"
+  ],
+  [
+   "Terminal lab",
+   "Lab terminal"
+  ],
+  [
+   "Real Linux",
+   "Linux nyata"
+  ],
+  [
+   "Incident game",
+   "Game insiden"
+  ],
+  [
+   "Explainer",
+   "Penjelasan"
+  ],
+  [
+   "Architecture",
+   "Arsitektur"
+  ],
+  [
+   "Try this lab",
+   "Coba lab ini"
+  ],
+  [
+   "Watch the guided version",
+   "Tonton versi berpandu"
+  ],
+  [
+   "In this lesson",
+   "Dalam pelajaran ini"
+  ],
+  [
+   "Quiz",
+   "Kuis"
+  ],
+  [
+   "Explain it to me like...",
+   "Jelaskan seperti saya..."
+  ],
+  [
+   "I am new to this",
+   "Saya baru di bidang ini"
+  ],
+  [
+   "A practitioner",
+   "Praktisi"
+  ],
+  [
+   "Senior view",
+   "Sudut pandang senior"
+  ],
+  [
+   "In an interview",
+   "Dalam wawancara"
+  ],
+  [
+   "Common mistakes",
+   "Kesalahan umum"
+  ],
+  [
+   "In the real world",
+   "Di dunia nyata"
+  ],
+  [
+   "Watch it",
+   "Tonton"
+  ],
+  [
+   "All widgets",
+   "Semua widget"
+  ],
+  [
+   "Key takeaways",
+   "Poin penting"
+  ],
+  [
+   "Start the check",
+   "Mulai pemeriksaan"
+  ],
+  [
+   "Question",
+   "Pertanyaan"
+  ],
+  [
+   "Select to show the answer",
+   "Pilih untuk menampilkan jawaban"
+  ],
+  [
+   "Again",
+   "Ulangi"
+  ],
+  [
+   "Got it",
+   "Mengerti"
+  ],
+  [
+   "Do it yourself",
+   "Lakukan sendiri"
+  ],
+  [
+   "Practise on a machine",
+   "Berlatih di mesin"
+  ],
+  [
+   "What to do next",
+   "Langkah berikutnya"
+  ],
+  [
+   "Take the lesson check",
+   "Ikuti pemeriksaan pelajaran"
+  ],
+  [
+   "Pass it to unlock the next lesson.",
+   "Lulus untuk membuka pelajaran berikutnya."
+  ],
+  [
+   "Troubleshooting drill",
+   "Latihan pemecahan masalah"
+  ],
+  [
+   "Animated explainer",
+   "Penjelasan beranimasi"
+  ],
+  [
+   "Post-mortem",
+   "Post-mortem"
+  ],
+  [
+   "Interview question",
+   "Pertanyaan wawancara"
+  ],
+  [
+   "Official documentation for this stage",
+   "Dokumentasi resmi untuk tahap ini"
+  ],
+  [
+   "Read the vendor and project documentation for the full, current detail.",
+   "Baca dokumentasi vendor dan proyek untuk detail lengkap dan terkini."
+  ],
+  [
+   "Pass every lesson check to earn the",
+   "Lulus setiap pemeriksaan pelajaran untuk mendapatkan"
+  ],
+  [
+   "stage badge",
+   "lencana tahap"
+  ],
+  [
+   "Make the calls during a realistic outage and see what each choice leads to.",
+   "Ambil keputusan saat pemadaman yang realistis dan lihat ke mana setiap pilihan membawa."
+  ],
+  [
+   "Reading list",
+   "Daftar bacaan"
+  ],
+  [
+   "See the reading lists for every stage",
+   "Lihat daftar bacaan untuk setiap tahap"
+  ],
+  [
+   "Where this skill fits",
+   "Posisi keahlian ini"
+  ],
+  [
+   "Test out of this skill",
+   "Uji langsung keahlian ini"
+  ],
+  [
+   "Open the labs for this stage",
+   "Buka lab untuk tahap ini"
+  ],
+  [
+   "Guide",
+   "Panduan"
+  ],
+  [
+   "Guides",
+   "Panduan"
+  ],
+  [
+   "Articles and talks",
+   "Artikel dan ceramah"
+  ],
+  [
+   "Saved in this browser. Export a backup if you switch devices.",
+   "Disimpan di peramban ini. Ekspor cadangan jika Anda berganti perangkat."
+  ],
+  [
+   "Share your progress",
+   "Bagikan kemajuan Anda"
+  ],
+  [
+   "Makes a picture on this device. Add a name if you like; it is not saved or sent anywhere.",
+   "Membuat gambar di perangkat ini. Tambahkan nama jika mau; nama tidak disimpan atau dikirim ke mana pun."
+  ],
+  [
+   "Name on the card (optional)",
+   "Nama di kartu (opsional)"
+  ],
+  [
+   "Look",
+   "Tampilan"
+  ],
+  [
+   "Shape",
+   "Bentuk"
+  ],
+  [
+   "Wide (for links and posts)",
+   "Lebar (untuk tautan dan unggahan)"
+  ],
+  [
+   "Square (for chat and feeds)",
+   "Persegi (untuk obrolan dan umpan)"
+  ],
+  [
+   "Download the card (PNG)",
+   "Unduh kartu (PNG)"
+  ],
+  [
+   "Open the learning dashboard",
+   "Buka dasbor belajar"
+  ],
+  [
+   "Current streak",
+   "Hari beruntun saat ini"
+  ],
+  [
+   "Active days",
+   "Hari aktif"
+  ],
+  [
+   "Activity, last 12 weeks",
+   "Aktivitas, 12 minggu terakhir"
+  ],
+  [
+   "Completion by stage",
+   "Penyelesaian per tahap"
+  ],
+  [
+   "Your data",
+   "Data Anda"
+  ],
+  [
+   "Reset all progress",
+   "Atur ulang semua kemajuan"
+  ],
+  [
+   "Role skill trees",
+   "Pohon keahlian peran"
+  ],
+  [
+   "See each role as a roadmap",
+   "Lihat setiap peran sebagai peta jalan"
+  ],
+  [
+   "All roles",
+   "Semua peran"
+  ],
+  [
+   "role paths",
+   "jalur peran"
+  ],
+  [
+   "build your own path",
+   "bangun jalur Anda sendiri"
+  ],
+  [
+   "Prefer a guided order for a job role? See the",
+   "Ingin urutan terpandu untuk peran pekerjaan? Lihat"
+  ],
+  [
+   "Select to see details",
+   "Pilih untuk melihat detail"
+  ],
+  [
+   "Choose your callsign",
+   "Pilih callsign Anda"
+  ],
+  [
+   "Change callsign",
+   "Ganti callsign"
+  ],
+  [
+   "Your crew name on MARGA. It is used for greetings and your progress page. No account and no sign-in.",
+   "Nama kru Anda di MARGA. Dipakai untuk sapaan dan halaman kemajuan Anda. Tanpa akun dan tanpa login."
+  ],
+  [
+   "Change your name or avatar. No account and no sign-in.",
+   "Ganti nama atau avatar Anda. Tanpa akun dan tanpa login."
+  ],
+  [
+   "Privacy Assured: Feel free to use your name or a preferred alias. This identity token remains local to your active session and is never stored on external databases.",
+   "Privasi Terjamin: Silakan gunakan nama Anda atau alias pilihan. Token identitas ini hanya tersimpan di sesi aktif Anda dan tidak pernah disimpan di basis data eksternal."
+  ],
+  [
+   "Callsign",
+   "Callsign"
+  ],
+  [
+   "Suggest one",
+   "Beri saran"
+  ],
+  [
+   "Start learning",
+   "Mulai belajar"
+  ],
+  [
+   "Save",
+   "Simpan"
+  ],
+  [
+   "Cancel",
+   "Batal"
+  ],
+  [
+   "Avatar",
+   "Avatar"
+  ],
+  [
+   "Colour",
+   "Warna"
+  ],
+  [
+   "Initial",
+   "Inisial"
+  ],
+  [
+   "Terminal",
+   "Terminal"
+  ],
+  [
+   "Bolt",
+   "Petir"
+  ],
+  [
+   "Shield",
+   "Perisai"
+  ],
+  [
+   "Cloud",
+   "Cloud"
+  ],
+  [
+   "Server",
+   "Server"
+  ],
+  [
+   "Branch",
+   "Cabang"
+  ],
+  [
+   "Cube",
+   "Kubus"
+  ],
+  [
+   "Blue",
+   "Biru"
+  ],
+  [
+   "Green",
+   "Hijau"
+  ],
+  [
+   "Purple",
+   "Ungu"
+  ],
+  [
+   "Red",
+   "Merah"
+  ],
+  [
+   "Amber",
+   "Kuning amber"
+  ],
+  [
+   "Teal",
+   "Teal"
+  ],
+  [
+   "Pink",
+   "Merah muda"
+  ],
+  [
+   "Slate",
+   "Abu-abu batu"
+  ],
+  [
+   "Enter a callsign of 2 to 24 characters, or choose Suggest one.",
+   "Masukkan callsign 2 sampai 24 karakter, atau pilih Beri saran."
+  ],
+  [
+   "For example, Ravi",
+   "Contoh: Ravi"
+  ],
+  [
+   "Your callsign",
+   "Callsign Anda"
+  ],
+  [
+   "Good morning,",
+   "Selamat pagi,"
+  ],
+  [
+   "Good afternoon,",
+   "Selamat siang,"
+  ],
+  [
+   "Good evening,",
+   "Selamat malam,"
+  ],
+  [
+   "Choose a callsign",
+   "Pilih callsign"
+  ],
+  [
+   "It stays on this device.",
+   "Tetap di perangkat ini."
+  ],
+  [
+   "Saved only on this device. Resetting progress keeps your callsign.",
+   "Hanya disimpan di perangkat ini. Mengatur ulang kemajuan tidak menghapus callsign Anda."
+  ],
+  [
+   "Progress reset. Your callsign is kept.",
+   "Kemajuan diatur ulang. Callsign Anda tetap ada."
+  ]
+ ],
+ "pats": [
+  [
+   "^(\\d+) lessons, (\\d+) stages$",
+   "$1 pelajaran, $2 tahap"
+  ],
+  [
+   "^About ([\\d.]+) h$",
+   "sekitar $1 jam"
+  ],
+  [
+   "^(\\d+) animated explainers$",
+   "$1 penjelasan beranimasi"
+  ],
+  [
+   "^(\\d+) interactive widgets$",
+   "$1 widget interaktif"
+  ],
+  [
+   "^(\\d+) architecture post-mortems$",
+   "$1 post-mortem arsitektur"
+  ],
+  [
+   "^(\\d+) failure and recovery stories$",
+   "$1 kisah kegagalan dan pemulihan"
+  ],
+  [
+   "^\\((\\d+) watched\\), including$",
+   "($1 ditonton), termasuk"
+  ],
+  [
+   "^(.+) · (.+) · about (\\d+) minutes$",
+   "$1 · $2 · sekitar $3 menit"
+  ],
+  [
+   "^(\\d+) min$",
+   "$1 menit"
+  ],
+  [
+   "^(\\d+) steps$",
+   "$1 langkah"
+  ],
+  [
+   "^(\\d+) questions$",
+   "$1 pertanyaan"
+  ],
+  [
+   "^(\\d+) lessons?$",
+   "$1 pelajaran"
+  ],
+  [
+   "^(\\d+) days$",
+   "$1 hari"
+  ],
+  [
+   "^(\\d+) min a day$",
+   "$1 menit sehari"
+  ],
+  [
+   "^([\\d.]+) h$",
+   "$1 jam"
+  ],
+  [
+   "^(\\d+) percent complete$",
+   "$1 persen selesai"
+  ],
+  [
+   "^(\\d+) of (\\d+) lessons passed$",
+   "$1 dari $2 pelajaran lulus"
+  ],
+  [
+   "^(\\d+) of (\\d+) lessons$",
+   "$1 dari $2 pelajaran"
+  ],
+  [
+   "^(\\d+) of (\\d+) watched$",
+   "$1 dari $2 ditonton"
+  ],
+  [
+   "^\\((\\d+) of (\\d+) done\\)$",
+   "($1 dari $2 selesai)"
+  ],
+  [
+   "^(\\d+) of (\\d+) solved$",
+   "$1 dari $2 terpecahkan"
+  ],
+  [
+   "^(\\d+) of (\\d+) skills mastered$",
+   "$1 dari $2 keahlian dikuasai"
+  ],
+  [
+   "^(\\d+) of (\\d+) lessons? passed$",
+   "$1 dari $2 pelajaran lulus"
+  ],
+  [
+   "^of (\\d+)$",
+   "dari $1"
+  ],
+  [
+   "^Level (\\d+) of (\\d+)$",
+   "Tingkat $1 dari $2"
+  ],
+  [
+   "^Level (\\d+)$",
+   "Tingkat $1"
+  ],
+  [
+   "^Question (\\d+) of (\\d+)$",
+   "Pertanyaan $1 dari $2"
+  ],
+  [
+   "^Current streak (\\d+) days?$",
+   "Hari beruntun saat ini $1 hari"
+  ],
+  [
+   "^Current streak (\\d+) days?, best (\\d+) days?$",
+   "Hari beruntun saat ini $1 hari, terbaik $2 hari"
+  ],
+  [
+   "^(\\d+) lessons?, about ([\\d.]+) h\\. No prerequisites\\. You can start here\\.$",
+   "$1 pelajaran, sekitar $2 jam. Tanpa prasyarat. Anda bisa mulai di sini."
+  ],
+  [
+   "^(\\d+) lessons?, about ([\\d.]+) h\\. Works best after$",
+   "$1 pelajaran, sekitar $2 jam. Paling baik setelah"
+  ],
+  [
+   "^(\\d+) lessons?, about ([\\d.]+) h$",
+   "$1 pelajaran, sekitar $2 jam"
+  ],
+  [
+   "^Used in (\\d+) paths?:$",
+   "Dipakai di $1 jalur:"
+  ],
+  [
+   "^Show all (\\d+) skills$",
+   "Tampilkan semua $1 keahlian"
+  ],
+  [
+   "^All (\\d+) lessons$",
+   "Semua $1 pelajaran"
+  ],
+  [
+   "^Version (.+)$",
+   "Versi $1"
+  ],
+  [
+   "^Start: (.+)$",
+   "Mulai: $1"
+  ],
+  [
+   "^Skill route for (.+)$",
+   "Rute keahlian untuk $1"
+  ],
+  [
+   "^(.+) skill tree$",
+   "Pohon keahlian $1"
+  ],
+  [
+   "^Open the (.+) page$",
+   "Buka halaman $1"
+  ],
+  [
+   "^Locked\\. Pass the check for \"(.+)\" first\\.$",
+   "Terkunci. Lulus dulu pemeriksaan untuk \"$1\"."
+  ],
+  [
+   "^real Linux in your browser, (.+)$",
+   "Linux nyata di peramban Anda, $1"
+  ],
+  [
+   "^(.+), locked$",
+   "$1, terkunci"
+  ],
+  [
+   "^(.+), ready$",
+   "$1, siap"
+  ],
+  [
+   "^(.+), Ready to unlock skills, (\\d+) of (\\d+) lessons passed\\.(.*)$",
+   "$1, Siap membuka keahlian, $2 dari $3 pelajaran lulus.$4"
+  ],
+  [
+   "^Needs (.+)$",
+   "Butuh $1"
+  ],
+  [
+   "^Select to see details$",
+   "Pilih untuk melihat detail"
+  ],
+  [
+   "^!(.+) and (.+)$",
+   "!$1 dan $2"
+  ],
+  [
+   "^Lesson (\\d+) of (\\d+)$",
+   "Pelajaran $1 dari $2"
+  ],
+  [
+   "^Lesson (\\d+): (.+), (Locked|Up next|Ready|Passed)$",
+   "Pelajaran $1: $2, $3"
+  ],
+  [
+   "^Part of your plan: (.+), day (\\d+) of (\\d+)$",
+   "Bagian dari rencana Anda: $1, hari $2 dari $3"
+  ],
+  [
+   "^Written from (\\d+) official references, listed at the end of the lesson\\. Check them for the current detail\\.$",
+   "Ditulis dari $1 referensi resmi, tercantum di akhir pelajaran. Periksa untuk detail terbaru."
+  ],
+  [
+   "^Used in (\\d+) role paths:$",
+   "Dipakai di $1 jalur peran:"
+  ],
+  [
+   "^(\\d+) questions\\. Answer (\\d+) correctly to pass and unlock the next lesson\\.$",
+   "$1 pertanyaan. Jawab $2 dengan benar untuk lulus dan membuka pelajaran berikutnya."
+  ],
+  [
+   "^Card (\\d+) of (\\d+)$",
+   "Kartu $1 dari $2"
+  ],
+  [
+   "^All (\\d+) real Linux labs for this lesson$",
+   "Semua $1 lab Linux nyata untuk pelajaran ini"
+  ],
+  [
+   "^(\\d+) break-and-fix labs for this stage, in a simulated terminal in your browser \\((\\d+) done\\)\\.$",
+   "$1 lab rusak-dan-perbaiki untuk tahap ini, di terminal simulasi di peramban Anda ($2 selesai)."
+  ],
+  [
+   "^simulated terminal, (\\d+) min$",
+   "terminal simulasi, $1 menit"
+  ],
+  [
+   "^(\\d+) skills, about ([\\d.]+) h of study\\.$",
+   "$1 keahlian, sekitar $2 jam belajar."
+  ],
+  [
+   "^Welcome, (.+)\\.$",
+   "Selamat datang, $1."
+  ],
+  [
+   "^Callsign changed to (.+)\\.$",
+   "Callsign diganti menjadi $1."
+  ],
+  [
+   "^Your callsign is (.+)\\. Change callsign$",
+   "Callsign Anda adalah $1. Ganti callsign"
+  ]
+ ],
+ "modules": {
+  "linux": {
+   "title": "Linux untuk engineer",
+   "summary": "Jelajahi, amankan, pasang paket, jadwalkan, dan atasi masalah server Linux sesuai tuntutan pekerjaan produksi."
+  },
+  "git": {
+   "title": "Git dan kontrol versi",
+   "summary": "Lacak perubahan dengan Git: commit, branch, merge, rebase, remote, pull request, tag, hook, repositori besar, dan pemulihan saat ada yang salah."
+  },
+  "bash": {
+   "title": "Scripting shell",
+   "summary": "Tulis skrip Bash yang gagal dengan jelas, berjalan aman, mengurai JSON dari API, dan menggantikan pekerjaan manual yang berulang."
+  },
+  "python": {
+   "title": "Python untuk otomasi",
+   "summary": "Tulis skrip Python yang menangani berkas, proses, API HTTP, dan SDK cloud, lengkap dengan pengujian dan alat baris perintah yang dikemas."
+  },
+  "networking": {
+   "title": "Dasar-dasar jaringan",
+   "summary": "Pahami alamat, DNS, HTTP, TLS, dan firewall cukup baik untuk men-debug kegagalan konektivitas apa pun."
+  },
+  "docker": {
+   "title": "Docker dan kontainer",
+   "summary": "Bangun image kecil yang aman, jalankan aplikasi multi-kontainer, dan pahami registry, runtime, serta standar OCI."
+  },
+  "cicd": {
+   "title": "CI/CD dan pengiriman",
+   "summary": "Rancang pipeline yang membangun, menguji, dan merilis dengan aman, amankan rantai pasokan, dan deploy dengan pengiriman rolling, canary, dan deklaratif."
+  },
+  "kubernetes": {
+   "title": "Kubernetes",
+   "summary": "Jalankan beban kerja di Kubernetes mulai dari arsitektur dan jaringan hingga Helm, autoscaling, operator, upgrade klaster, RBAC, pemecahan masalah, dan strategi ujian."
+  },
+  "terraform": {
+   "title": "Terraform dan infrastruktur sebagai kode",
+   "summary": "Deskripsikan infrastruktur sebagai kode, gunakan HCL tingkat lanjut, kelola state dan rahasia dengan aman, dan bangun stack AWS dan Azure yang nyata."
+  },
+  "cloud": {
+   "title": "Platform cloud: AWS dan Azure",
+   "summary": "Konsep inti berdampingan di AWS dan Azure: identitas, jaringan, DNS dan CDN, komputasi, serverless, Kubernetes terkelola, keamanan, pemantauan, dan biaya."
+  },
+  "observability": {
+   "title": "Observabilitas",
+   "summary": "Instrumentasi sistem dengan metrik, log, dan trace, kirim dengan OpenTelemetry, periksa dari luar, dan beri peringatan atas apa yang benar-benar dirasakan pengguna."
+  },
+  "sre": {
+   "title": "Site reliability engineering",
+   "summary": "Definisikan keandalan dengan SLO, tanggapi insiden, jalankan on-call, rencanakan kapasitas, latih kegagalan, dan kelola perubahan dengan aman."
+  },
+  "security": {
+   "title": "DevSecOps dan keamanan",
+   "summary": "Tanamkan keamanan dalam pengiriman: pemodelan ancaman, rahasia, pemeriksaan pipeline dan rantai pasokan, pengerasan kontainer dan Kubernetes, identitas cloud, dan respons insiden."
+  },
+  "ansible": {
+   "title": "Ansible dan manajemen konfigurasi",
+   "summary": "Deskripsikan server dalam inventori dan playbook, jaga konsistensi dengan role idempoten, lindungi rahasia dengan Vault, dan luncurkan perubahan dengan aman."
+  },
+  "databases": {
+   "title": "Database untuk operator",
+   "summary": "Jalankan database relasional dengan percaya diri: SQL, indeks dan rencana, transaksi, cadangan, replikasi, migrasi aman, cache, dan triase insiden."
+  },
+  "go": {
+   "title": "Go untuk DevOps engineer",
+   "summary": "Tulis layanan dan alat Go yang kecil, cepat, dan andal: tipe, error, antarmuka, goroutine, context, HTTP, pengujian, kontainer, dan debugging."
+  },
+  "helm": {
+   "title": "Helm untuk pemula",
+   "summary": "Kemas, konfigurasikan, upgrade, dan rollback aplikasi Kubernetes dengan Helm: chart, values, template, rilis, dependensi, dan debugging."
+  },
+  "cloud-iam": {
+   "title": "Keamanan cloud dan IAM",
+   "summary": "Kendalikan siapa dan apa yang boleh melakukan apa di cloud: identitas, role, dan kebijakan di AWS dan Azure, hak akses minimum, rahasia dan kunci, jaringan privat, log audit, dan debugging galat akses."
+  },
+  "k8s-ops": {
+   "title": "Administrasi dan operasi Kubernetes",
+   "summary": "Jalankan klaster, bukan hanya aplikasi: control plane dan etcd, cadangan, upgrade aman, RBAC, pemeliharaan node, kuota dan autoscaling, keamanan jaringan dan pod, serta debugging gangguan klaster."
+  },
+  "argocd": {
+   "title": "Continuous delivery dengan Argo CD",
+   "summary": "Kirim ke Kubernetes dengan membiarkan controller menarik kondisi yang diinginkan dari repositori: aplikasi, sinkronisasi dan drift, Helm dan Kustomize, lingkungan, hook, akses, dan debugging."
+  },
+  "llm": {
+   "title": "Dasar-dasar LLM",
+   "summary": "Pahami cara kerja large language model dalam praktik: token, jendela konteks, sampling, pelatihan, panggilan API, biaya, latensi, evaluasi, dan debugging."
+  },
+  "prompting": {
+   "title": "Prompting dan keluaran terstruktur",
+   "summary": "Tulis prompt yang andal, berikan contoh, minta penalaran langkah demi langkah, dapatkan JSON tervalidasi, serta versikan dan uji prompt Anda."
+  },
+  "claude-skills": {
+   "title": "Claude Skills",
+   "summary": "Kemas keahlian sebagai skill yang dimuat Claude sesuai kebutuhan: SKILL.md, deskripsi yang memicu, pengungkapan bertahap, skrip, pengujian, berbagi, dan keamanan."
+  },
+  "mcp": {
+   "title": "Penggunaan alat dan MCP",
+   "summary": "Biarkan model memanggil alat dengan aman: function calling, siklus penggunaan alat, Model Context Protocol, membangun server, izin, dan prompt injection."
+  },
+  "system-design": {
+   "title": "Desain sistem untuk platform dan SRE",
+   "summary": "Rancang sistem yang gagal kecil: estimasi, caching, antrean, konsistensi, kuorum, cell, shuffle sharding, load shedding, multi-region, keamanan perubahan, dan rancangan nyata yang ditinjau terhadap pemadaman sungguhan."
+  },
+  "mlops": {
+   "title": "MLOps: machine learning di produksi",
+   "summary": "Jalankan model seperti sistem produksi lainnya: pemeriksaan data, pelatihan yang dapat direproduksi, pipeline teruji, model registry, rilis aman, serving, dan pemantauan drift dengan siklus pelatihan ulang."
+  },
+  "aiops": {
+   "title": "AIOps: algoritma untuk operasi",
+   "summary": "Gunakan statistik dan machine learning untuk membantu menjalankan sistem: deteksi anomali, korelasi peringatan, pola log dan trace, petunjuk akar masalah, asisten insiden, dan remediasi otomatis yang aman."
+  },
+  "virtualization": {
+   "title": "Virtualisasi",
+   "summary": "Pahami hypervisor, overcommit CPU dan memori, disk virtual dan snapshot, jaringan virtual dan live migration, serta atasi masalah host KVM."
+  },
+  "storage": {
+   "title": "Penyimpanan dan sistem berkas",
+   "summary": "Pilih penyimpanan blok, berkas, atau objek, kelola ext4 dan XFS, LVM dan RAID, NFS, iSCSI, dan Ceph, serta diagnosis disk yang lambat atau penuh."
+  },
+  "sql-ops": {
+   "title": "Performa SQL dan operasi database",
+   "summary": "Baca rencana kueri, tambahkan indeks yang tepat, urai lock, tentukan ukuran connection pool, dan jalankan replikasi, vacuum, dan operasi hari kedua."
+  },
+  "gpu-serving": {
+   "title": "GPU, infrastruktur AI, dan serving LLM",
+   "summary": "Ketahui apa yang membatasi inferensi di GPU, jalankan vLLM, TGI, dan Triton, jadwalkan GPU di Kubernetes, serta kendalikan latensi dan biaya."
+  },
+  "openstack": {
+   "title": "OpenStack dan cloud privat",
+   "summary": "Jalankan cloud privat: Keystone, Nova, Neutron, Cinder, dan Glance, kuota, penjadwalan, jaringan, dan operasi hari kedua."
+  },
+  "baremetal": {
+   "title": "Bare metal dan pusat data",
+   "summary": "Pasang rak, provisioning, dan operasikan server fisik: BMC dan IPMI, provisioning PXE, disk dan RAID, jaringan leaf-spine, dan operasi armada."
+  },
+  "service-mesh": {
+   "title": "Service mesh dan jaringan Kubernetes",
+   "summary": "Pahami jaringan pod, CNI, dan network policy, lalu jalankan service mesh dengan mTLS, perutean lalu lintas, dan pemecahan masalah."
+  }
+ },
+ "paths": {
+  "devops": {
+   "summary": "Otomatiskan jalur dari kode ke produksi: Linux, Bash dan Python, jaringan, kontainer, pipeline, Kubernetes, infrastruktur sebagai kode, cloud, dan pemantauan.",
+   "audience": "Sysadmin, developer, dan engineer dukungan yang beralih ke peran DevOps."
+  },
+  "cloud": {
+   "summary": "Rancang dan jalankan infrastruktur cloud di AWS dan Azure dengan jaringan, identitas, Terraform, serverless, kontainer, dan pemantauan.",
+   "audience": "Engineer yang membangun dan mengoperasikan infrastruktur di akun cloud publik."
+  },
+  "sre": {
+   "summary": "Jaga layanan tetap andal: Linux, kontainer, dan cloud dulu, lalu observabilitas, SLO, on-call, respons insiden, kapasitas, dan chaos testing.",
+   "audience": "Engineer operasi dan platform yang bertanggung jawab atas uptime dan on-call."
+  },
+  "devsecops": {
+   "summary": "Amankan pengiriman dari kode ke cloud: kontrol pipeline dan rantai pasokan, kontainer dan klaster yang diperkeras, rahasia, identitas cloud, dan respons insiden keamanan.",
+   "audience": "Engineer DevOps, platform, dan keamanan yang bertanggung jawab atas keamanan hasil rilis."
+  },
+  "ai": {
+   "summary": "Bangun dengan large language model: cara kerjanya, prompting dan keluaran terstruktur, Claude Skills, dan penggunaan alat dengan Model Context Protocol, di atas Linux, Git, Python, dan jaringan.",
+   "audience": "Developer dan DevOps engineer yang ingin membangun, mengemas, dan mengoperasikan fitur AI dengan aman."
+  },
+  "mlops": {
+   "summary": "Jalankan machine learning dan operasi berbantuan algoritma di produksi: kontainer dan Kubernetes, pipeline, observabilitas, lalu MLOps dan AIOps.",
+   "audience": "DevOps dan SRE engineer yang mendukung tim data science, serta data engineer yang membutuhkan kebiasaan produksi."
+  }
+ },
+ "lessons": {
+  "linux/filesystem-and-navigation": "Pelajari di mana letak berbagai hal di server Linux, cara menemukannya dengan cepat, dan bagaimana symbolic link menyebabkan bug deployment yang nyata.",
+  "linux/users-groups-permissions": "Baca dan atur izin Linux dengan benar, dan debug galat \"permission denied\" yang sering menjebak deployment.",
+  "linux/processes-and-services": "Periksa dan kendalikan proses, kirim sinyal yang tepat, dan kelola layanan dengan unit systemd dan journalctl.",
+  "linux/disks-and-filesystems": "Ukur penggunaan disk dan inode, temukan apa yang menghabiskan ruang, dan diagnosis misteri \"disk penuh tapi tidak ada yang bisa dihapus\".",
+  "linux/lvm-and-raid": "Perbesar penyimpanan tanpa downtime dengan LVM, lindungi dari kegagalan disk dengan mdadm RAID, dan ketahui masalah apa yang diselesaikan masing-masing.",
+  "linux/package-management": "Pasang, perbarui, kunci versi, dan verifikasi perangkat lunak dengan apt dan dnf, pahami repositori dan tanda tangan, dan jaga server tetap ter-patch tanpa kejutan.",
+  "linux/ssh-and-remote-access": "Gunakan SSH berbasis kunci, konfigurasikan klien dan server dengan aman, buat tunnel lalu lintas, lompat melalui bastion host, dan transfer berkas dengan scp dan rsync.",
+  "linux/cron-and-timers": "Jalankan tugas terjadwal dengan cron dan timer systemd, hindari jebakan lingkungan klasik, dan buat pekerjaan terjadwal dapat diamati.",
+  "linux/logs-and-troubleshooting": "Baca journald dan log berkas, korelasikan peristiwa menurut waktu, dan gunakan log kernel untuk menjelaskan restart misterius.",
+  "linux/performance-triage": "Gunakan load average, vmstat, dan iostat untuk membedakan masalah CPU, memori, dan disk dalam waktu kurang dari lima menit.",
+  "linux/boot-and-kernel": "Ikuti urutan boot dari firmware hingga systemd, periksa dan setel kernel dengan sysctl dan modul, dan pulihkan server yang tidak mau boot.",
+  "linux/security-hardening": "Kurangi permukaan serangan server Linux dengan paket minimal, aturan firewall, hak akses minimum, SELinux atau AppArmor, audit, dan pemeriksaan rutin.",
+  "linux/namespaces-and-cgroups": "Pahami dua fitur kernel di balik setiap kontainer, namespace yang membatasi apa yang bisa dilihat proses dan cgroup yang membatasi apa yang bisa dipakainya, dan periksa dengan alat Linux biasa.",
+  "linux/working-efficiently-in-the-terminal": "Bekerja lebih cepat dan lebih sedikit salah dengan riwayat shell, pintasan keyboard, sesi tmux, pengaturan editor yang aman, alias, dan dotfile yang bisa dibawa antar mesin.",
+  "linux/time-ntp-and-timezones": "Jaga jam server tetap benar dengan NTP, pahami UTC versus waktu lokal, dan diagnosis kegagalan akibat clock drift.",
+  "linux/systemd-overrides-targets-and-dependencies": "Ubah layanan dengan aman menggunakan drop-in override, pahami urutan dan dependensi, dan gunakan target serta pengaturan sumber daya.",
+  "linux/kernel-modules-sysctl-and-boot-parameters": "Muat dan periksa modul kernel, setel kernel yang sedang berjalan dengan sysctl, atur parameter boot, dan baca ring buffer kernel.",
+  "linux/processes-memory-and-the-oom-killer": "Pahami memori virtual, page cache, dan swap, baca free dan /proc/meminfo dengan benar, dan selidiki pembunuhan proses karena kehabisan memori.",
+  "linux/system-calls-strace-and-perf": "Lihat bagaimana program berbicara dengan kernel lewat system call, lacak dengan strace, dan temukan titik panas dengan perf.",
+  "linux/filesystems-page-cache-and-io": "Ikuti proses baca dan tulis melalui VFS dan page cache, pahami writeback dan fsync, dan diagnosis disk lambat dengan iostat.",
+  "linux/networking-in-the-kernel-sockets-and-conntrack": "Pahami socket, antrean listen, status TCP, dan connection tracking, dan gunakan ss dan conntrack untuk menemukan masalah koneksi.",
+  "linux/debugging-a-sick-server": "Gunakan urutan pemeriksaan tetap (CPU, memori, disk, jaringan, log) untuk mencari tahu mengapa server lambat atau gagal, dan ketahui perintah mana yang menjawab pertanyaan apa.",
+  "git/first-repository-and-commits": "Pahami apa yang dicatat kontrol versi, buat commit pertama dengan pesan yang jelas, baca riwayat, dan jauhkan berkas hasil generate dengan .gitignore.",
+  "git/staging-undoing-and-stashing": "Pilih cara membatalkan yang tepat untuk situasinya: buang perubahan, batalkan staging, perbaiki commit terakhir, balikkan commit bersama, atau simpan pekerjaan dengan stash.",
+  "git/branches-and-merging": "Buat branch untuk setiap pekerjaan, gabungkan kembali dengan fast-forward atau merge commit, dan selesaikan konflik tanpa panik.",
+  "git/rebase-and-clean-history": "Gunakan rebase untuk menjaga riwayat tetap linear, rapikan commit Anda dengan rebase interaktif, dan ketahui aturan kapan tidak boleh rebase.",
+  "git/remotes-fetch-pull-and-push": "Bekerja dengan repositori bersama: clone, lihat perubahan dengan fetch, perbarui dengan pull, publikasikan dengan push, dan pahami mengapa push ditolak.",
+  "git/team-workflows-pull-requests-and-reviews": "Pilih strategi branching, jalankan pull request kecil yang ditinjau, dan lindungi main dengan pemeriksaan wajib.",
+  "git/tags-releases-and-versioning": "Tandai rilis dengan tag beranotasi, beri nomor dengan semantic versioning, dan tangani hotfix serta changelog.",
+  "git/hooks-signing-and-secrets-in-history": "Tangkap kesalahan dengan hook, buktikan siapa yang membuat commit dengan penandatanganan, dan tanggapi dengan benar saat rahasia ter-commit.",
+  "git/large-repositories-submodules-and-worktrees": "Jaga repositori besar tetap cepat dengan clone dangkal dan parsial, sparse checkout, dan LFS; ketahui kapan memakai submodule; bekerja di beberapa branch sekaligus dengan worktree.",
+  "git/debugging-git-problems": "Pulihkan commit yang hilang dengan reflog, temukan commit yang merusak sesuatu dengan bisect dan blame, dan pahami detached HEAD serta kondisi membingungkan lainnya.",
+  "bash/script-basics": "Tulis skrip Bash pertama Anda yang andal: shebang, variabel, quoting, argumen, kode keluar, dan substitusi perintah.",
+  "bash/control-flow-and-functions": "Gunakan kondisional, perulangan, pernyataan case, dan fungsi untuk mengubah perintah sekali pakai menjadi alat yang dapat dipakai ulang.",
+  "bash/text-processing": "Iris log dan keluaran perintah dengan pipe, grep, cut, sort, uniq, sed, dan awk untuk menjawab pertanyaan dalam satu baris.",
+  "bash/advanced-patterns": "Urai opsi dengan getopts, gunakan array dan array asosiatif dengan benar, tulis here-document, dan gabungkan perintah dengan process substitution.",
+  "bash/apis-and-json": "Panggil REST API dari shell dengan curl, olah JSON dengan jq, tangani galat dan paginasi, dan jauhkan rahasia dari riwayat perintah.",
+  "bash/safe-automation": "Buat skrip gagal dengan jelas lewat strict mode, bersihkan dengan trap, hindari eksekusi tumpang tindih, dan jadwalkan dengan cron atau timer systemd.",
+  "bash/arrays-and-parameter-expansion": "Gunakan array dan array asosiatif Bash untuk daftar dan pencarian, dan gunakan parameter expansion untuk memangkas, mengganti, dan memberi nilai bawaan tanpa memanggil program eksternal.",
+  "bash/building-and-testing-shell-tools": "Ubah skrip menjadi alat kecil dengan opsi, teks bantuan, kode keluar, dan pengujian memakai getopts, shellcheck, dan bats, lalu jalankan otomatis.",
+  "bash/temporary-files-and-atomic-writes": "Buat berkas sementara dengan aman, ganti berkas tanpa meninggalkan salinan setengah tertulis, dan cegah dua salinan skrip berjalan bersamaan.",
+  "bash/portable-scripts-and-shellcheck": "Tulis skrip yang berjalan di sistem berbeda, tangkap kesalahan dengan ShellCheck, dan jaga agar tetap mudah dibaca oleh orang berikutnya.",
+  "bash/debugging-shell-scripts": "Lacak skrip dengan set -x, tangkap kegagalan senyap dengan strict mode dan shellcheck, dan cari tahu mengapa skrip jalan di terminal tetapi gagal di bawah cron atau CI.",
+  "python/basics-and-environments": "Tulis Python yang mudah dibaca untuk otomasi, jaga paket tiap proyek terisolasi di virtual environment, dan jalankan skrip dengan cara yang sama di mana saja.",
+  "python/files-and-processes": "Baca dan tulis berkas dengan aman memakai pathlib, jalankan program lain dengan subprocess, tangani kegagalan secara eksplisit, dan catat apa yang terjadi.",
+  "python/http-apis-and-json": "Panggil REST API dengan requests, urai dan susun JSON, tangani timeout, percobaan ulang, dan paginasi, dan jauhkan token dari kode Anda.",
+  "python/cloud-sdks": "Otomatiskan AWS dengan boto3 dan Azure dengan SDK Python-nya, autentikasi tanpa kunci yang ditanam di kode, paginasi hasil, dan tulis skrip idempoten.",
+  "python/testing-and-packaging": "Bangun CLI sungguhan dengan argparse, uji dengan pytest termasuk mock, dan kemas agar rekan tim dapat memasangnya dengan satu perintah.",
+  "python/concurrency-for-operations": "Jalankan banyak panggilan jaringan atau perintah sekaligus dengan thread pool, asyncio, dan subprocess, dengan timeout, batas, dan penanganan galat yang menjaga skrip operasi tetap cepat dan aman.",
+  "python/writing-command-line-tools": "Bangun alat baris perintah yang jelas dan mudah diuji dengan argparse, keluaran terstruktur, logging, kode keluar, dan konfigurasi dari environment, siap dikemas dan dibagikan.",
+  "python/logging-for-scripts-and-services": "Ganti print dengan modul logging: level, format, handler, field terstruktur, dan log yang membantu saat insiden.",
+  "python/yaml-csv-and-config-files": "Baca dan tulis format data operasi dengan aman: YAML, CSV, dan INI, dengan validasi dan tanpa kejutan.",
+  "python/debugging-python": "Baca traceback dari bawah, gunakan logging dan debugger dengan baik, dan temukan skrip yang menggantung atau bocor memakai faulthandler dan py-spy.",
+  "networking/ip-addressing-and-subnets": "Baca notasi CIDR, bagi jaringan menjadi subnet, dan hindari kesalahan rentang yang tumpang tindih yang menghalangi peering cloud.",
+  "networking/dns": "Pahami bagaimana nama menjadi alamat, baca keluaran dig, dan rencanakan perubahan DNS agar pengguna tidak mengenai server lama.",
+  "networking/http-and-tls": "Baca permintaan HTTP dan kode status, ukur waktu tiap fase permintaan dengan curl, dan diagnosis kegagalan sertifikat.",
+  "networking/routing-and-nat": "Baca tabel routing, ikuti paket melintasi subnet, pahami default gateway, NAT sumber dan tujuan, dan debug rute asimetris atau yang hilang.",
+  "networking/troubleshooting-toolkit": "Debug \"layanan A tidak bisa menjangkau layanan B\" secara berurutan, dan pelajari mengapa \"connection refused\" dan \"timed out\" menunjuk ke penyebab berbeda.",
+  "networking/firewalls-and-load-balancing": "Tulis aturan firewall yang aman, pahami security group, dan diagnosis load balancer yang menandai server sehat sebagai mati.",
+  "networking/vpn-and-tunnels": "Hubungkan jaringan dengan aman memakai WireGuard dan IPsec, gunakan tunnel SSH dan TLS, dan pahami VPN site-to-site cloud, peering, dan private endpoint.",
+  "networking/ipv6-essentials": "Baca dan tulis alamat IPv6, pahami prefiks, SLAAC, neighbour discovery, dan operasi dual-stack, dan hindari kesalahan umum pada firewall, DNS, dan jaringan cloud.",
+  "networking/latency-mtu-and-network-performance": "Pisahkan latensi dari bandwidth, pahami perilaku TCP pada tautan lambat atau banyak kehilangan paket, temukan masalah MTU, dan ukur throughput dengan alat yang tepat.",
+  "networking/network-segmentation-and-security-groups": "Bagi jaringan menjadi zona, tulis aturan firewall dan security group yang hanya mengizinkan yang diperlukan, dan tinjau aturan tersebut.",
+  "networking/dhcp-arp-and-the-local-network": "Pahami bagaimana host mendapat alamat, menemukan tetangga di jaringannya sendiri, dan apa yang gagal ketika salah satu langkah itu rusak.",
+  "networking/debugging-network-problems": "Telusuri tumpukan dari tautan ke DNS, routing, port, dan TLS dengan ping, dig, curl, ss, dan traceroute, sehingga Anda bisa menyebut persis lapisan mana yang rusak.",
+  "docker/containers-and-images": "Pahami apa sebenarnya kontainer itu, bagaimana lapisan image bekerja, dan mengapa mengunci versi image mencegah \"di mesin saya jalan\".",
+  "docker/writing-dockerfiles": "Gunakan layer caching, build multi-tahap, dan pengguna non-root untuk membangun image yang cepat dibangun, kecil, dan lebih aman dijalankan.",
+  "docker/volumes-and-networking": "Simpan data melampaui umur kontainer dengan volume dan bind mount, dan hubungkan kontainer berdasarkan nama pada jaringan buatan pengguna.",
+  "docker/compose": "Deskripsikan aplikasi, database, jaringan, volume, dan rahasianya dalam satu berkas, dan buat layanan menunggu kesiapan yang sebenarnya.",
+  "docker/registries-and-supply-chain": "Push dan pull image dari registry, beri tag dan kunci dengan benar, pindai kerentanan, buat SBOM, dan tanda tangani image sebelum mencapai produksi.",
+  "docker/runtimes-oci-and-podman": "Pahami apa yang menjalankan kontainer di bawah Docker, bagaimana standar OCI membuat image portabel, dan bagaimana Podman dan containerd cocok, termasuk kontainer rootless.",
+  "docker/security-and-troubleshooting": "Perkeras kontainer dengan hak akses minimum, pindai image, dan gunakan kode keluar serta keluaran inspect untuk mengetahui mengapa kontainer mati.",
+  "docker/buildkit-caching-and-multi-arch": "Buat build image cepat dan berulang dengan urutan lapisan, cache mount BuildKit, rahasia yang tidak bocor ke lapisan, cache jarak jauh, dan image yang berjalan di amd64 maupun arm64.",
+  "docker/container-logging-and-resource-limits": "Catat log ke standard output, kendalikan pertumbuhan log, tambahkan health check yang bermakna, dan atur batas CPU, memori, dan proses yang melindungi host tanpa menyebabkan restart mendadak.",
+  "docker/slim-images-and-faster-builds": "Perkecil image kontainer dengan base image yang tepat, build multi-tahap, dan lapisan bersih, dan lihat apa isi sebuah image.",
+  "docker/running-containers-in-production": "Jalankan kontainer dengan pengaturan yang dibutuhkan produksi: pengguna non-root, sistem berkas hanya-baca, health check, batas, kebijakan restart, dan shutdown yang anggun.",
+  "docker/debugging-containers": "Baca kode keluar, log, dan peristiwa, periksa konfigurasi kontainer, dan masuk ke shell dalam image yang gagal atau minimal tanpa menebak-nebak.",
+  "kubernetes/architecture": "Pelajari komponen control plane dan node, siklus rekonsiliasi deklaratif, dan cara membaca status klaster dengan kubectl.",
+  "kubernetes/pods-and-deployments": "Tulis Deployment berbentuk produksi dengan resource request, health probe, dan rolling update yang aman, dan rollback saat gagal.",
+  "kubernetes/services-and-ingress": "Beri Pod yang berubah-ubah alamat stabil dengan Service, pahami DNS klaster, ekspos aplikasi dengan Ingress, dan batasi lalu lintas dengan NetworkPolicy.",
+  "kubernetes/config-and-secrets": "Pisahkan konfigurasi dari image dengan ConfigMap dan Secret, pilih antara variabel lingkungan dan berkas yang di-mount, dan tangani rahasia dengan jujur.",
+  "kubernetes/storage": "Simpan data secara persisten dengan PersistentVolumeClaim dan StorageClass, dan ketahui kapan StatefulSet adalah controller yang tepat.",
+  "kubernetes/jobs-cronjobs-daemonsets": "Pilih controller beban kerja yang tepat untuk pekerjaan batch, tugas terjadwal, dan agen per node, serta atur percobaan ulang, konkurensi, riwayat, dan pembersihan.",
+  "kubernetes/resources-and-quotas": "Tentukan ukuran Pod dengan request dan limit, pahami kelas QoS dan OOM kill, dan gunakan LimitRange dan ResourceQuota agar klaster bersama tetap adil.",
+  "kubernetes/autoscaling": "Skalakan Pod berdasarkan CPU, memori, dan metrik kustom dengan HPA, sesuaikan ukuran dengan VPA, skalakan hingga nol dengan autoscaling berbasis peristiwa, dan tambah node saat Pod tidak bisa dijadwalkan.",
+  "kubernetes/rbac-and-security": "Berikan akses hak minimum dengan Role dan ServiceAccount, uji dengan kubectl auth can-i, dan perkeras Pod dengan securityContext.",
+  "kubernetes/scheduling-and-troubleshooting": "Kendalikan di mana Pod berjalan dengan selector, taint, dan affinity, dan tangani kondisi gagal yang umum dengan urutan yang berulang.",
+  "kubernetes/helm-and-kustomize": "Kemas dan konfigurasikan aplikasi Kubernetes dengan chart dan values Helm, lapisi lingkungan dengan Kustomize, dan rilis, upgrade, serta rollback dengan aman.",
+  "kubernetes/crds-and-operators": "Perluas API Kubernetes dengan CustomResourceDefinition, pahami siklus rekonsiliasi controller, dan jalankan perangkat lunak produksi dengan operator.",
+  "kubernetes/cni-and-cluster-networking": "Pahami bagaimana Pod mendapat alamat IP dan saling menjangkau antar node, apa yang dilakukan plugin CNI, bagaimana kube-proxy mengimplementasikan Service, dan cara mengisolasi lalu lintas dengan NetworkPolicy.",
+  "kubernetes/cluster-install-upgrade-etcd": "Bootstrap klaster dengan kubeadm, upgrade satu versi minor setiap kali, cadangkan dan pulihkan etcd, dan kelola sertifikat serta pemeliharaan node.",
+  "kubernetes/cka-cks-exam-strategy": "Siapkan diri untuk sertifikasi Kubernetes praktik dengan pengaturan cepat, perintah imperatif, dan rencana waktu, dan lihat apa yang dicakup tiap ujian.",
+  "kubernetes/probes-metrics-and-logging": "Konfigurasikan probe liveness, readiness, dan startup dengan benar, kumpulkan metrik sumber daya dan aplikasi, dan kirim log agar klaster yang berjalan menjelaskan dirinya sendiri.",
+  "kubernetes/service-mesh-and-mtls": "Pahami apa yang ditambahkan service mesh ke klaster, bagaimana data plane sidecar dan tanpa sidecar bekerja, bagaimana mutual TLS dan kebijakan lalu lintas diterapkan, dan kapan mesh tidak sepadan dengan biayanya.",
+  "kubernetes/network-policies-in-practice": "Batasi pod mana yang boleh berbicara dengan pod mana, mulai dari tolak-semua secara default, dan uji aturannya.",
+  "kubernetes/statefulsets-and-running-databases": "Jalankan beban kerja yang membutuhkan nama stabil dan penyimpanan sendiri, dan putuskan dengan jujur kapan tidak menjalankan database di Kubernetes.",
+  "kubernetes/debugging-kubernetes-workloads": "Ikuti jalur tetap dari Pending ke CrashLoopBackOff, ImagePullBackOff, probe yang gagal, dan Service yang tidak terjangkau memakai describe, logs, events, exec, dan kontainer debug efemeral.",
+  "helm/what-helm-is-and-why-use-it": "Pahami chart, rilis, dan repositori, dan lihat bagaimana Helm mengubah tumpukan YAML Kubernetes menjadi satu paket yang bisa dipasang dan di-upgrade.",
+  "helm/installing-charts-and-values": "Temukan chart, baca nilai defaultnya, timpa dengan aman memakai berkas dan --set, dan pratinjau apa yang akan dipasang.",
+  "helm/anatomy-of-a-chart": "Buat chart dengan helm create, pahami tiap berkas, dan ketahui apa yang dipertahankan dan apa yang dihapus.",
+  "helm/templates-and-the-go-template-language": "Tulis template dengan values, kondisional, perulangan, helper, dan fungsi umum, dan hindari jebakan indentasi dan quoting.",
+  "helm/upgrade-rollback-and-release-history": "Upgrade rilis dengan aman memakai wait dan atomic, baca riwayat, rollback ke revisi yang diketahui baik, dan uninstall dengan bersih.",
+  "helm/values-per-environment-and-secrets": "Atur berkas values untuk dev, staging, dan produksi, validasi, dan tangani rahasia tanpa meng-commit-nya ke kontrol versi.",
+  "helm/dependencies-subcharts-and-registries": "Susun chart dari dependensi, kemas dan publikasikan chart ke registry OCI, dan beri versi dengan benar.",
+  "helm/debugging-helm-releases": "Diagnosis instalasi dan upgrade yang gagal: galat render, rilis macet, masalah hook, dan drift, dan verifikasi rilis dengan helm test.",
+  "k8s-ops/the-control-plane-in-depth": "Ketahui apa yang dilakukan setiap komponen control plane, bagaimana permintaan mengalir melaluinya, dan kegagalan mana yang paling penting.",
+  "k8s-ops/etcd-backup-and-restore": "Ambil snapshot terverifikasi dari status klaster, pulihkan, dan ketahui batas apa yang dilindungi cadangan.",
+  "k8s-ops/upgrading-clusters-safely": "Rencanakan dan jalankan upgrade versi Kubernetes: urutan komponen, version skew, deprekasi API, node, dan opsi rollback.",
+  "k8s-ops/rbac-and-service-accounts": "Berikan orang dan beban kerja hanya akses API Kubernetes yang mereka butuhkan, dan audit siapa yang dapat melakukan apa.",
+  "k8s-ops/nodes-draining-taints-and-capacity": "Rawat node tanpa downtime, kendalikan penempatan dengan taint dan affinity, dan rencanakan kapasitas.",
+  "k8s-ops/resource-quotas-limits-and-autoscaling": "Bagi klaster secara adil dengan request, limit, kuota, dan LimitRange, dan skalakan pod dan node secara otomatis.",
+  "k8s-ops/network-policies-and-pod-security": "Batasi lalu lintas antar pod dengan network policy dan batasi apa yang boleh dilakukan kontainer dengan Pod Security Standards.",
+  "k8s-ops/debugging-cluster-and-node-problems": "Temukan penyebab node NotReady, pod Pending, eviction, dan server API yang lambat memakai daftar periksa berurutan.",
+  "virtualization/what-virtualization-is-and-hypervisor-types": "Pahami bagaimana satu server fisik menjalankan banyak mesin virtual, dan apa perbedaan KVM, VMware, Hyper-V, dan Proxmox.",
+  "virtualization/cpu-memory-and-overcommit": "Pelajari bagaimana vCPU dan memori dibagi antar guest, apa arti overcommit, dan cara mengenali host yang terlalu padat.",
+  "virtualization/virtual-disks-snapshots-and-templates": "Pelajari format image disk, thin provisioning, bagaimana rantai snapshot bertumbuh, dan bagaimana template dan clone menghemat waktu.",
+  "virtualization/virtual-networking-bridges-and-vlans": "Lihat bagaimana guest mendapat akses jaringan lewat bridge, NAT, dan VLAN, dan cara menemukan mengapa guest tidak punya konektivitas.",
+  "virtualization/live-migration-ha-and-troubleshooting": "Pahami bagaimana guest berpindah antar host tanpa berhenti, bagaimana HA memulai ulang mereka setelah kegagalan, dan cara mendiagnosis gangguan umum.",
+  "storage/block-file-and-object-storage": "Bedakan tiga jenis penyimpanan, dan pelajari angka yang penting: kapasitas, IOPS, throughput, dan latensi.",
+  "storage/filesystems-ext4-xfs-and-mounts": "Bandingkan ext4, XFS, dan lainnya, mount disk dengan aman, dan hindari kesalahan fstab yang menghentikan server dari boot.",
+  "storage/lvm-and-raid": "Perbesar volume secara online dengan LVM, pahami level RAID beserta trade-off-nya, dan tangani disk yang rusak dengan tenang.",
+  "storage/network-storage-nfs-iscsi-and-ceph": "Lihat bagaimana penyimpanan dibagikan lewat jaringan dengan NFS dan iSCSI, dan apa yang ditambahkan sistem terdistribusi seperti Ceph.",
+  "storage/performance-backups-and-troubleshooting": "Cari tahu mengapa disk lambat atau penuh, pahami df versus du, dan rancang cadangan yang benar-benar pernah Anda pulihkan.",
+  "service-mesh/kubernetes-networking-under-the-hood": "Ikuti paket dari satu pod ke pod lain: jaringan pod, CNI, Service, kube-proxy, CoreDNS, dan bagaimana Ingress dan Gateway API memasukkan lalu lintas.",
+  "service-mesh/cni-network-policy-and-ebpf": "Pilih CNI, pahami apa yang diizinkan dan ditolak NetworkPolicy, dan lihat di mana eBPF mengubah cara kerja jaringan Kubernetes.",
+  "service-mesh/what-a-service-mesh-is-and-how-it-works": "Pahami masalah yang diselesaikan mesh, model sidecar dan ambient, control plane dan data plane, dan kapan Anda tidak boleh memakainya.",
+  "service-mesh/mtls-and-traffic-management": "Aktifkan mutual TLS, arahkan lalu lintas berdasarkan bobot untuk canary, dan atur timeout, percobaan ulang, dan circuit breaking dengan VirtualService dan DestinationRule.",
+  "service-mesh/observing-and-troubleshooting-the-mesh": "Baca metrik dan trace mesh, periksa sinkronisasi konfigurasi dengan istioctl, dan terjemahkan galat 503 dan koneksi yang umum.",
+  "cicd/pipeline-fundamentals": "Pahami continuous integration, delivery, dan deployment, tahap-tahap pipeline yang sehat, dan prinsip yang menjaganya tetap cepat dan tepercaya.",
+  "cicd/building-a-pipeline": "Tulis Jenkinsfile deklaratif dengan tahap build, test, scan, dan deploy, tangani kredensial dengan aman, dan baca kegagalan.",
+  "cicd/testing-and-quality-gates": "Tentukan pengujian mana yang berjalan di mana dalam pipeline, jaga agar cepat dan andal, tangani pengujian flaky, dan ubah cakupan, linting, dan pemeriksaan keamanan menjadi gerbang yang ditegakkan.",
+  "cicd/deployment-strategies": "Bandingkan rilis rolling, blue-green, dan canary, gunakan feature flag untuk memisahkan deploy dari rilis, dan rencanakan rollback serta perubahan database.",
+  "cicd/versioning-and-artifacts": "Bangun sekali dan promosikan artefak yang sama melalui lingkungan, beri versi dengan SemVer, simpan artefak dan cache dengan benar, dan jaga changelog dan jalur rollback.",
+  "cicd/pipeline-security": "Lindungi rahasia, runner, dan dependensi di CI/CD, terapkan hak akses minimum pada kredensial deploy, pindai kode dan image, dan bertahan dari dependensi yang diracuni.",
+  "cicd/declarative-delivery-with-argo-cd": "Pindahkan deployment dari push ke pull, di mana controller di klaster terus-menerus menyamakan klaster dengan konfigurasi yang Anda simpan dan tinjau.",
+  "cicd/release-management-and-feature-flags": "Pisahkan deploy dari rilis dengan feature flag, rancang lingkungan dan persetujuan yang sesuai risiko Anda, dan kelola flag, versi, dan rollback tanpa kekacauan.",
+  "cicd/fast-pipelines-caching-parallelism-monorepos": "Pangkas waktu pipeline dengan menjalankan job independen secara paralel, men-cache dependensi dan keluaran build, menjalankan hanya yang berubah di monorepo, dan mengukur ke mana menit-menit itu pergi.",
+  "cicd/reusable-pipelines-and-templates": "Berhenti menyalin berkas pipeline antar repositori: bagikan langkah sebagai template, beri versi, dan jaga konsistensi tim tanpa menghambat mereka.",
+  "cicd/environments-promotion-and-approvals": "Pindahkan satu build melalui test, staging, dan produksi dengan pemeriksaan, persetujuan, dan catatan yang tepat untuk tiap langkah.",
+  "cicd/debugging-pipelines": "Reproduksi kegagalan pipeline secara lokal, bedakan kegagalan nyata dari yang flaky, temukan drift lingkungan, masalah cache dan rahasia, dan cegah satu run buruk memblokir tim.",
+  "terraform/iac-and-hcl-basics": "Pahami mengapa infrastruktur dideskripsikan dalam berkas, pelajari alur kerja Terraform, dan baca sintaks dasar HCL.",
+  "terraform/providers-and-resources": "Bangun infrastruktur nyata dengan dependensi, kueri sumber daya yang ada dengan data source, dan gunakan aturan lifecycle serta meta-argument dengan aman.",
+  "terraform/variables-and-outputs": "Buat konfigurasi dapat dipakai ulang dengan variabel bertipe, validasi, locals, dan output, dan jauhkan nilai sensitif dari berkas Anda.",
+  "terraform/expressions-and-dynamic-blocks": "Buat banyak sumber daya dari data dengan count dan for_each, ubah nilai dengan ekspresi for dan fungsi, dan hasilkan blok bersarang dengan dynamic.",
+  "terraform/state": "Pahami apa itu state Terraform, simpan secara jarak jauh dengan penguncian, dan gunakan perintah import dan state tanpa merusak apa pun.",
+  "terraform/modules": "Kemas infrastruktur yang dapat dipakai ulang sebagai modul dengan input dan output yang jelas, beri versi, dan tata lingkungan agar perubahan tetap terisolasi.",
+  "terraform/secrets-and-sensitive-data": "Jauhkan kata sandi dan kunci dari kode dan log, pahami bahwa state menyimpan rahasia, baca rahasia dari manajer saat runtime, dan amankan backend state.",
+  "terraform/aws-and-azure-end-to-end": "Bangun platform web kecil yang sama dengan Terraform di AWS dan di Azure, jaringan, komputasi, load balancer, dan database, dan bandingkan sumber daya yang setara.",
+  "terraform/workflows-and-drift": "Jalankan Terraform dengan aman di pipeline dengan plan yang ditinjau, deteksi dan atasi drift, dan tambahkan pemeriksaan otomatis sebelum apply.",
+  "terraform/testing-terraform": "Tangkap kesalahan lebih awal dengan format, validasi, linting, pemeriksaan kebijakan, assertion plan, dan deployment uji nyata memakai terraform test dan Terratest, dalam pipeline yang tetap terjangkau.",
+  "terraform/environments-and-team-workflows": "Pilih antara workspace dan direktori untuk lingkungan, pisahkan state untuk membatasi radius dampak, dan siapkan alur plan dan apply otomatis yang ditinjau untuk tim.",
+  "terraform/import-refactor-and-moved-blocks": "Bawa infrastruktur yang ada ke bawah Terraform, ubah nama dan susun ulang sumber daya tanpa menghancurkannya, dan gunakan plan untuk membuktikannya.",
+  "terraform/large-configurations-and-performance": "Pecah kode Terraform besar menjadi stack yang plan-nya cepat dan gagalnya kecil, dengan batas dan dependensi yang jelas di antaranya.",
+  "terraform/debugging-terraform": "Diagnosis plan dan apply yang gagal, state lock, drift, penggantian tak terduga, dan galat provider memakai TF_LOG, keluaran plan, perintah state, dan import.",
+  "cloud/cloud-fundamentals": "Pelajari kosakata bersama AWS dan Azure: region, availability zone, model tanggung jawab bersama, jenis layanan, dan cara mengatur akun.",
+  "cloud/identity-and-access": "Kendalikan siapa yang boleh melakukan apa di AWS dan Azure dengan role dan kebijakan, hindari kunci berumur panjang, dan debug galat akses ditolak secara sistematis.",
+  "cloud/virtual-networks": "Rancang VPC atau VNet dengan subnet publik dan privat, tabel rute, gateway, dan aturan keamanan, dan telusuri mengapa koneksi gagal.",
+  "cloud/compute-and-storage": "Pilih antara mesin virtual, kontainer, dan serverless, pahami penyimpanan objek, blok, dan berkas, dan lindungi data dengan versioning dan cadangan.",
+  "cloud/dns-and-cdn": "Host zona DNS dengan Route 53 dan Azure DNS, pilih kebijakan routing, pasang CDN di depan aplikasi, dan kelola sertifikat serta perilaku cache.",
+  "cloud/serverless": "Jalankan kode tanpa mengelola server, hubungkan fungsi ke antrean, penyimpanan, dan API, pahami cold start, konkurensi, dan batas, dan kendalikan biaya serta kegagalan.",
+  "cloud/kubernetes-on-cloud": "Buat dan operasikan Kubernetes terkelola di AWS dan Azure, hubungkan beban kerja ke identitas cloud, ekspos lewat load balancer, dan rencanakan upgrade serta node group.",
+  "cloud/monitoring-and-logging": "Kumpulkan metrik, log, dan jejak audit dengan CloudWatch, CloudTrail, Azure Monitor, dan Log Analytics, kueri, buat alarm, dan jaga retensi serta biaya tetap terkendali.",
+  "cloud/security-and-governance": "Atur akun dan langganan, tegakkan pagar pengaman dengan SCP dan Azure Policy, lindungi data dengan enkripsi dan manajemen kunci, dan deteksi kesalahan konfigurasi secara terus-menerus.",
+  "cloud/managed-services-and-cost": "Gunakan database terkelola, antrean, dan DNS dengan baik, rancang untuk kegagalan lintas zona, dan jaga pengeluaran tetap terlihat dan terkendali.",
+  "cloud/high-availability-and-disaster-recovery": "Rancang untuk kegagalan di tingkat instance, zona, dan region, pilih antara backup, pilot light, warm standby, dan active-active, dan buktikan target pemulihan dengan pengujian.",
+  "cloud/landing-zones-and-multi-account-strategy": "Atur akun atau langganan cloud ke dalam hierarki dengan pagar pengaman, logging terpusat, jaringan, dan identitas, agar tim bergerak cepat dalam batas yang aman.",
+  "cloud/object-storage-and-data-lifecycle": "Gunakan penyimpanan objek dengan baik: kelas, aturan lifecycle, versioning, kontrol akses, dan perlindungan dari penghapusan dan paparan.",
+  "cloud/hybrid-connectivity-and-peering": "Hubungkan jaringan cloud satu sama lain dan ke kantor atau pusat data dengan peering, VPN, tautan khusus, dan private endpoint, dan hindari bentrok alamat.",
+  "cloud/debugging-cloud-outages": "Telusuri kegagalan cloud lewat identitas, jalur jaringan, kuota, dan kesehatan layanan memakai log audit, simulasi kebijakan, dan flow log alih-alih menebak.",
+  "observability/observability-fundamentals": "Pelajari perbedaan antara pemantauan dan observabilitas, tiga sinyal yaitu metrik, log, dan trace, serta metode RED dan USE untuk memutuskan apa yang diukur.",
+  "observability/metrics-and-prometheus": "Pahami model data Prometheus, konfigurasi scrape, dan kueri PromQL yang akan Anda pakai sehari-hari, termasuk rate, agregasi, dan histogram.",
+  "observability/logs-and-traces": "Tulis log terstruktur yang dapat dikueri, ikuti permintaan lintas layanan dengan trace, dan jaga volume serta biaya telemetri tetap terkendali.",
+  "observability/log-pipelines": "Kumpulkan, urai, perkaya, dan simpan log dalam skala besar, pilih antara Loki dan Elasticsearch, kueri dengan LogQL, dan kendalikan volume, retensi, dan biaya.",
+  "observability/opentelemetry": "Keluarkan trace, metrik, dan log dengan standar netral vendor, tambahkan instrumentasi otomatis dan manual, alirkan data lewat Collector, dan jaga konteks lintas layanan.",
+  "observability/synthetic-and-blackbox-monitoring": "Ukur ketersediaan dari sisi pengguna dengan Prometheus blackbox exporter dan pemeriksaan sintetis, probe HTTP, TCP, DNS, dan sertifikat, dan beri peringatan atas apa yang benar-benar dialami pengguna.",
+  "observability/alerting-and-dashboards": "Beri peringatan pada gejala yang penting bagi pengguna, tulis aturan peringatan dengan routing Alertmanager, dan rancang dasbor yang menjawab pertanyaan dengan cepat.",
+  "observability/red-use-and-golden-signals": "Pilih sekumpulan kecil metrik yang tepat untuk setiap layanan dan sumber daya memakai metode RED, metode USE, dan empat sinyal emas, dan bangun dasbor yang menjawab pertanyaan dengan cepat.",
+  "observability/telemetry-cost-and-cardinality": "Jaga pemantauan tetap terjangkau dan cepat dengan mengendalikan kardinalitas metrik, volume log, sampling trace, dan retensi, serta melacak biaya observabilitas sebagai anggaran.",
+  "observability/structured-logging-and-log-design": "Tulis log yang mudah dicari: field terstruktur, nama konsisten, ID korelasi, level yang masuk akal, dan tanpa rahasia.",
+  "observability/runbooks-and-dashboards-for-on-call": "Rancang beberapa dasbor dan runbook yang benar-benar dibutuhkan engineer on-call, dan jaga agar tetap akurat.",
+  "observability/debugging-with-telemetry": "Gunakan metrik untuk menemukan bahwa ada yang salah, trace untuk menemukan di mana, dan log untuk menemukan mengapa, dan belajar men-debug pemantauan itu sendiri saat data hilang.",
+  "sre/slos-and-error-budgets": "Definisikan keandalan dalam angka yang dipedulikan pengguna, tetapkan target yang menyeimbangkan kecepatan dan stabilitas, dan gunakan error budget untuk keputusan rilis.",
+  "sre/incident-response": "Jalankan insiden dengan peran yang jelas, tingkat keparahan, dan komunikasi, mitigasi dulu baru diagnosis, dan serahterimakan dengan rapi.",
+  "sre/postmortems-and-toil": "Belajar dari insiden tanpa menyalahkan, tulis postmortem yang menghasilkan perbaikan nyata, dan kenali serta hilangkan toil.",
+  "sre/reliability-patterns": "Terapkan timeout, percobaan ulang dengan backoff, circuit breaker, load shedding, dan perencanaan kapasitas agar satu bagian yang gagal tidak menjatuhkan seluruh sistem.",
+  "sre/on-call": "Rancang jadwal on-call, eskalasi, dan serah terima, tulis peringatan dan runbook yang bisa ditindaklanjuti orang, ukur beban pager, dan jaga rotasi tetap berkelanjutan.",
+  "sre/capacity-planning": "Perkirakan permintaan, temukan batas layanan dengan uji beban, rencanakan ruang cadangan dan redundansi N+1, dan hubungkan kapasitas dengan biaya dan autoscaling.",
+  "sre/chaos-engineering-and-game-days": "Latih kegagalan dengan sengaja lewat eksperimen terkendali dan game day, uji cadangan dan failover, dan tetapkan target pemulihan yang benar-benar sudah Anda buktikan.",
+  "sre/change-management-and-releases": "Buat perubahan aman dan membosankan dengan batch kecil, feature flag, analisis canary, rollback otomatis, dan kebijakan rilis yang sadar error budget.",
+  "sre/production-readiness-reviews": "Periksa bahwa layanan siap untuk pengguna nyata sebelum peluncuran, mencakup kepemilikan, SLO, pemantauan, kapasitas, mode kegagalan, rollout, runbook, dan keamanan, dengan tinjauan ringan yang dihargai tim.",
+  "sre/incident-communication-and-stakeholders": "Berkomunikasi saat pemadaman dengan pembaruan status yang jelas, tingkat keparahan, struktur kanal internal, pesan ke pelanggan, dan serah terima yang tenang, agar pekerjaan teknis tidak terhambat kebingungan.",
+  "sre/dependencies-and-third-party-risk": "Pahami bagaimana keandalan Anda bergantung pada layanan lain, tetapkan target yang realistis, dan rencanakan kegagalan mereka.",
+  "sre/disaster-recovery-exercises": "Rencanakan, jalankan, dan belajar dari latihan pemulihan: RTO dan RPO, skenario, eksekusi yang aman, dan memperbaiki apa yang diungkap latihan.",
+  "sre/debugging-under-pressure": "Jalankan investigasi insiden dengan hipotesis, satu perubahan setiap kali, mitigasi sebelum akar masalah, peran yang jelas, dan catatan yang memudahkan tinjauan.",
+  "security/security-mindset-and-threat-modeling": "Pindahkan keamanan ke setiap tahap pengiriman, pelajari kosakata risiko, dan gunakan model ancaman sederhana untuk menemukan masalah sebelum penyerang.",
+  "security/secrets-management": "Jauhkan kata sandi, token, dan kunci dari kode dan log, terbitkan kredensial berumur pendek, rotasi sesuai jadwal, dan ketahui persis apa yang harus dilakukan saat ada yang bocor.",
+  "security/securing-the-pipeline": "Tambahkan pemindaian dependensi, kode, dan image ke CI, buat inventaris apa yang Anda rilis, tanda tangani artefak, dan lindungi pipeline itu sendiri sebagai target.",
+  "security/container-and-image-security": "Bangun image minimal, jalankan sebagai pengguna non-root dengan capability dilepas, pindai dan tanda tangani, dan gunakan kontrol runtime untuk membatasi apa yang bisa dilakukan kontainer yang diretas.",
+  "security/kubernetes-security": "Kendalikan siapa yang boleh melakukan apa dengan RBAC, batasi perilaku pod dengan standar dan kebijakan keamanan, isolasi lalu lintas dengan network policy, dan lindungi rahasia serta control plane.",
+  "security/cloud-security-and-iam": "Rancang identitas hak akses minimum, lindungi data dengan enkripsi dan jaringan privat, aktifkan audit logging, dan periksa Terraform serta akun cloud untuk kesalahan konfigurasi.",
+  "security/vulnerability-management-and-security-incidents": "Prioritaskan temuan berdasarkan risiko nyata, tambal dalam waktu yang disepakati, deteksi serangan dari log dan sinyal, dan jalankan insiden keamanan dengan peran dan bukti yang jelas.",
+  "security/identity-authentication-and-zero-trust": "Pahami cara kerja sign-in, token, dan autentikasi multi-faktor, terapkan OAuth dan OIDC dengan aman, autentikasi layanan dengan mutual TLS, dan rancang dengan zero trust alih-alih jaringan tepercaya.",
+  "security/application-security-for-devops": "Kenali kelemahan web dan API yang paling umum, pahami bagaimana validasi input, header, dan pembatasan laju menghentikannya, dan tinjau kode serta konfigurasi untuk pola berisiko.",
+  "security/policy-as-code-and-compliance": "Ubah aturan keamanan menjadi pemeriksaan yang berjalan otomatis, gunakan kebijakan admission dan pipeline untuk mencegah drift, dan kumpulkan bukti berkelanjutan untuk audit alih-alih tangkapan layar.",
+  "security/network-and-edge-security": "Segmentasikan jaringan, kendalikan lalu lintas keluar, lindungi tepi dengan TLS, WAF, dan pertahanan DDoS, dan amankan DNS serta sertifikat.",
+  "security/ransomware-resilience-and-recovery": "Pahami bagaimana serangan ransomware berlangsung, rancang cadangan imutabel dan terisolasi, latih pemulihan, dan kurangi radius dampak agar satu akun yang diretas tidak bisa mengenkripsi segalanya.",
+  "security/detection-and-security-logging": "Putuskan apa yang dicatat, pusatkan dan lindungi, tulis deteksi yang penting, kurangi positif palsu, dan gunakan kerangka seperti ATT&CK untuk menemukan celah cakupan.",
+  "security/encryption-and-key-management": "Gunakan enkripsi saat diam, dalam transit, dan saat digunakan dengan benar, kelola kunci dengan layanan manajemen kunci, rotasi dan pisahkan tugas, dan hindari kesalahan umum yang membuat enkripsi tak berguna.",
+  "security/supply-chain-sboms-and-provenance": "Ketahui apa yang ada di dalam perangkat lunak Anda, buktikan di mana ia dibangun, dan verifikasi tanda tangan sebelum apa pun berjalan di produksi.",
+  "security/cloud-incident-playbooks": "Siapkan playbook singkat untuk insiden cloud yang umum: kunci bocor, penyimpanan publik, dan beban kerja yang diretas.",
+  "security/debugging-and-investigating-security-issues": "Triase peringatan, amankan bukti, telusuri tindakan mencurigakan lewat log audit dan batasi dampaknya, dan debug kontrol keamanan yang memblokir pekerjaan yang sah.",
+  "ansible/ansible-basics-inventory-and-ad-hoc": "Pahami manajemen konfigurasi tanpa agen, deskripsikan server Anda dalam inventori, dan jalankan perintah sekali pakai serta modul di banyak host.",
+  "ansible/playbooks-tasks-and-idempotence": "Tulis playbook YAML dengan play dan task, jalankan dengan aman memakai mode check dan diff, dan pahami mengapa idempotensi penting.",
+  "ansible/variables-facts-and-templates": "Parameterkan playbook dengan variabel, pahami prioritas, gunakan fakta yang dikumpulkan, dan render berkas konfigurasi dengan template Jinja2.",
+  "ansible/handlers-conditionals-and-loops": "Kendalikan alur task dengan kondisi when, perulangan, handler yang aktif saat ada perubahan, penanganan galat block/rescue, dan tag.",
+  "ansible/roles-and-collections": "Atur otomasi ke dalam role dengan tata letak standar, pasang collection dan requirements bersama, dan jaga role tetap kecil dan dapat diuji.",
+  "ansible/vault-secrets-and-safe-practice": "Jauhkan kata sandi dan kunci dari teks biasa dengan Ansible Vault, sembunyikan rahasia dari log, batasi eskalasi hak akses, dan tinjau apa yang dapat dijangkau otomasi.",
+  "ansible/ansible-at-scale": "Luncurkan perubahan dengan aman memakai batch serial dan batas, uji role dengan linting dan Molecule, skalakan koneksi, dan bagi pekerjaan antara Terraform dan Ansible.",
+  "ansible/dynamic-inventory-for-cloud": "Biarkan Ansible menemukan host dari cloud berdasarkan tag alih-alih memelihara daftar tulisan tangan.",
+  "ansible/testing-and-linting-ansible": "Tangkap kesalahan sebelum produksi dengan ansible-lint, pemeriksaan sintaks, mode check, Molecule, dan uji idempotensi.",
+  "ansible/debugging-ansible-runs": "Cari tahu mengapa playbook gagal, host tidak terjangkau, variabel bernilai salah, atau eksekusi lambat, memakai verbosity, debug, mode langkah, dan log.",
+  "databases/relational-fundamentals-and-sql": "Pahami tabel, kunci, dan relasi, dan baca serta tulis SQL yang dipakai operator untuk memeriksa data, mengecek ukuran, dan menemukan masalah.",
+  "databases/indexes-and-query-plans": "Ketahui apa yang dilakukan dan berapa biaya sebuah indeks, baca keluaran EXPLAIN untuk menemukan sequential scan dan estimasi buruk, dan tambahkan indeks yang tepat dengan aman di sistem aktif.",
+  "databases/transactions-and-locking": "Pelajari ACID, level isolasi, bagaimana lock dan transaksi panjang menyebabkan tersendat, dan cara menemukan dan menyelesaikan blocking dan deadlock.",
+  "databases/backups-and-recovery": "Pilih antara cadangan logis dan fisik, gunakan arsip WAL untuk pemulihan point-in-time, tetapkan target RPO dan RTO, dan buktikan pemulihan berfungsi.",
+  "databases/replication-and-failover": "Pahami konfigurasi primary dan replica, replikasi sinkron dan asinkron, lag replikasi, failover dan split brain, serta penskalaan baca.",
+  "databases/performance-and-connection-pooling": "Temukan kueri lambat dengan statistik, pahami perilaku memori dan cache, tentukan ukuran koneksi dengan pooler, dan kenali masalah bloat dan vacuum.",
+  "databases/safe-schema-migrations": "Ubah skema aktif tanpa pemadaman memakai pola expand and contract, perubahan indeks dan kolom online, backfill berkelompok, dan alat migrasi.",
+  "databases/nosql-caches-and-choosing": "Bandingkan penyimpanan relasional, key-value, dokumen, wide-column, dan pencarian, pahami cache seperti Redis dan mode kegagalannya, dan pilih dengan mempertimbangkan trade-off.",
+  "databases/postgres-vacuum-bloat-and-maintenance": "Pahami mengapa Postgres butuh vacuum, cara mengenali bloat dan transaksi panjang, dan pemeliharaan mana yang menjaga database tetap sehat.",
+  "databases/schema-design-for-operations": "Pilih kunci, tipe, constraint, dan tata letak tabel yang menjaga database tetap cepat, aman diubah, dan mudah dioperasikan.",
+  "databases/debugging-database-problems": "Triase database yang lambat, terblokir, penuh, atau tidak terjangkau dengan urutan pemeriksaan tetap, dari koneksi dan lock hingga disk, replikasi, dan pemulihan.",
+  "go/why-go-and-your-first-program": "Lihat mengapa begitu banyak perangkat lunak infrastruktur ditulis dalam Go, siapkan modul, bangun satu binary statis, dan gunakan alat standar.",
+  "go/types-structs-slices-and-maps": "Gunakan tipe data inti: zero value, slice, map, dan struct dengan method, dan hindari kejutan umum pada slice dan map.",
+  "go/functions-errors-and-defer": "Tangani galat dengan cara Go: kembalikan, bungkus dengan konteks, periksa, dan gunakan defer untuk pembersihan.",
+  "go/interfaces-and-packages": "Gunakan antarmuka kecil untuk memisahkan kode dan membuatnya dapat diuji, dan atur proyek ke dalam paket dengan batas yang jelas.",
+  "go/goroutines-channels-and-sync": "Jalankan pekerjaan secara konkuren dengan goroutine, koordinasikan dengan channel dan WaitGroup, lindungi state bersama, dan temukan race lebih awal.",
+  "go/context-timeouts-and-cancellation": "Teruskan context lewat kode Anda agar pekerjaan bisa timeout, dibatalkan, dan berhenti dengan bersih saat proses diperintahkan mati.",
+  "go/http-services-and-json": "Bangun layanan HTTP kecil dengan handler, middleware, endpoint kesehatan, dan JSON, dan panggil layanan lain dengan aman.",
+  "go/testing-benchmarks-and-tooling": "Tulis pengujian berbasis tabel, ukur cakupan, benchmark jalur panas, dan gunakan pemeriksaan toolchain di CI.",
+  "go/building-containers-and-cli-tools": "Rilis program Go dengan baik: antarmuka baris perintah yang jelas, informasi versi, build multi-tahap, dan image kontainer kecil yang aman.",
+  "go/debugging-go-programs": "Baca stack trace Go, temukan kebocoran goroutine dan race, dan gunakan pprof untuk melihat ke mana waktu dan memori pergi.",
+  "cloud-iam/identities-principals-and-permissions": "Pelajari kosakata akses cloud: siapa yang meminta, apa yang boleh dilakukannya, pada sumber daya apa, dan bagaimana keputusan diambil.",
+  "cloud-iam/aws-iam-policies-roles-and-assume-role": "Baca dan tulis kebijakan AWS IAM, gunakan role alih-alih user untuk beban kerja, dan pahami bagaimana sesi dan batasan digabungkan.",
+  "cloud-iam/azure-entra-id-rbac-and-managed-identities": "Pahami bagaimana Azure memisahkan direktori dari izin sumber daya, tetapkan role pada cakupan yang tepat, dan gunakan managed identity.",
+  "cloud-iam/least-privilege-and-access-reviews": "Ciutkan izin hingga sesuai kebutuhan, dengan alat untuk menemukan akses yang tak terpakai, dan jaga tetap kecil dengan tinjauan berkala.",
+  "cloud-iam/secrets-and-encryption-with-kms-and-key-vaults": "Simpan rahasia di layanan terkelola, pahami kunci dan envelope encryption, dan rotasi kredensial tanpa pemadaman.",
+  "cloud-iam/network-boundaries-and-private-access": "Batasi paparan dengan jaringan privat, security group, private endpoint, dan default yang masuk akal untuk penyimpanan dan database.",
+  "cloud-iam/logging-detection-and-audit-trails": "Catat setiap tindakan control plane, lindungi log, dan buat peringatan untuk tindakan yang menandakan masalah.",
+  "cloud-iam/debugging-access-denied-and-cloud-security-incidents": "Cari tahu mengapa permintaan ditolak, perbaiki tanpa memberi izin berlebihan, dan tanggapi secara berurutan dugaan kebocoran kredensial.",
+  "argocd/pull-based-delivery-and-the-repository-as-source-of-truth": "Pahami mengapa banyak tim membiarkan controller di klaster menarik kondisi yang diinginkan dari repositori, alih-alih pipeline yang mendorong perubahan masuk.",
+  "argocd/installing-argo-cd-and-the-application-resource": "Pasang Argo CD di klaster, masuk, dan deskripsikan aplikasi dengan custom resource Application.",
+  "argocd/sync-health-and-drift": "Baca status sinkronisasi dan kesehatan, pilih sinkronisasi manual atau otomatis, dan pahami prune dan self-heal.",
+  "argocd/helm-and-kustomize-with-argo-cd": "Kirim chart Helm dan overlay Kustomize, atur values per lingkungan, dan pahami bahwa Argo CD merender, bukan memasang.",
+  "argocd/environments-app-of-apps-and-applicationsets": "Atur banyak aplikasi dan lingkungan dengan tata letak repositori, pola app-of-apps, dan ApplicationSet.",
+  "argocd/hooks-sync-waves-and-progressive-delivery": "Urutkan sumber daya dalam sinkronisasi, jalankan job sebelum dan sesudahnya, dan luncurkan bertahap dengan strategi canary dan blue-green.",
+  "argocd/access-projects-secrets-and-multi-cluster": "Batasi siapa yang boleh melakukan apa dengan project dan RBAC, jauhkan rahasia dari repositori, dan kirim ke lebih dari satu klaster.",
+  "argocd/debugging-argo-cd": "Cari tahu mengapa aplikasi tidak mau sinkron, tetap OutOfSync, atau menjadi Degraded, dan apa yang diperiksa secara berurutan.",
+  "llm/what-an-llm-is-and-how-it-predicts-tokens": "Lihat large language model sebagai prediktor token berikutnya, dan pahami artinya bagi apa yang dilakukannya dengan baik dan buruk.",
+  "llm/tokens-context-windows-and-limits": "Hitung token, pahami apa yang mengisi jendela konteks, dan rancang dengan memperhatikan batas input dan output.",
+  "llm/sampling-temperature-and-determinism": "Pahami bagaimana token berikutnya dipilih, apa yang diubah temperature dan top-p, dan cara mendapat perilaku yang dapat diulang dari sistem yang acak secara desain.",
+  "llm/training-fine-tuning-and-where-knowledge-comes-from": "Pelajari bagaimana model mendapat pengetahuannya, mengapa ada tanggal batas, dan cara praktis menyediakan fakta yang tidak dimilikinya.",
+  "llm/calling-an-llm-api": "Buat panggilan API pertama, pahami pesan dan peran, stream balasan, tangani galat dan batas laju, dan jaga kunci tetap aman.",
+  "llm/cost-latency-and-caching": "Perkirakan biaya sebuah fitur, pahami bagian-bagian latensi, dan kurangi keduanya dengan pilihan model, desain prompt, dan caching.",
+  "llm/choosing-and-evaluating-models": "Bangun set uji kecil dari tugas Anda sendiri, bandingkan model dan prompt dengannya, dan hindari hanya memercayai benchmark publik.",
+  "llm/debugging-llm-applications": "Selidiki jawaban buruk langkah demi langkah: tangkap input persis, pisahkan masalah retrieval, prompt, model, dan parsing, dan perbaiki dengan pengujian.",
+  "prompting/anatomy-of-a-good-prompt": "Tulis prompt dengan tugas, konteks, batasan, dan format keluaran yang jelas, dan belajar menghilangkan ambiguitas sebelum menyalahkan model.",
+  "prompting/examples-and-few-shot-prompting": "Tunjukkan kepada model apa yang Anda inginkan dengan beberapa contoh yang baik, pilih dengan cermat, dan hindari jebakan yang membuat keluaran menyalin contoh.",
+  "prompting/reasoning-and-step-by-step-prompts": "Ketahui kapan meminta model bernalar langkah demi langkah memperbaiki jawaban, apa bedanya extended thinking, dan cara mencegah penalaran bocor ke keluaran yang Anda urai.",
+  "prompting/system-prompts-roles-and-context-layout": "Atur prompt dengan system message, bagian bertag, dan dokumen panjang yang diletakkan di tempat model memanfaatkannya paling baik.",
+  "prompting/structured-output-json-and-schemas": "Dapatkan jawaban yang dapat dibaca mesin dari model memakai skema yang jelas, keluaran berbasis tool atau terkendala skema, dan parsing ketat.",
+  "prompting/validating-repairing-and-retrying-outputs": "Periksa keluaran model dengan kode, coba lagi dengan umpan balik, perbaiki yang aman diperbaiki, dan kirim sisanya ke manusia.",
+  "prompting/prompt-versioning-and-testing": "Simpan prompt sebagai berkas berversi, tinjau perubahan, jalankan terhadap set evaluasi di CI, dan luncurkan serta tarik kembali dengan aman.",
+  "prompting/debugging-bad-prompts": "Selidiki keluaran yang salah, tidak konsisten, atau tidak aman: sederhanakan, isolasi, bandingkan, dan perbaiki dengan bukti.",
+  "claude-skills/what-a-claude-skill-is": "Pahami skill sebagai folder berisi instruksi, skrip, dan sumber daya yang dimuat Claude saat tugas membutuhkannya, dan kapan skill adalah alat yang tepat.",
+  "claude-skills/anatomy-of-a-skill-folder": "Susun skill: header dan isi SKILL.md, berkas referensi, template, dan skrip, dengan aturan penamaan dan struktur yang bersih.",
+  "claude-skills/writing-descriptions-that-trigger": "Tulis satu field yang menentukan apakah skill akan pernah dipakai: katakan apa yang dilakukannya, kapan dipakai, dan kata-kata yang benar-benar digunakan orang.",
+  "claude-skills/progressive-disclosure-and-structure": "Muat hanya yang dibutuhkan di setiap tahap: metadata dulu, lalu SKILL.md, lalu berkas dan skrip yang ditautkan, agar konteks tetap kecil dan jawaban terfokus.",
+  "claude-skills/scripts-and-deterministic-steps": "Gunakan skrip bawaan untuk pekerjaan yang tepat, tulis agar Claude dapat menjalankan dan membaca keluarannya, dan jaga agar aman dijalankan.",
+  "claude-skills/testing-and-evaluating-a-skill": "Uji pemicu, kualitas keluaran, dan biaya dengan set tugas tetap, bandingkan dengan dan tanpa skill, dan simpan hasilnya dari waktu ke waktu.",
+  "claude-skills/sharing-versioning-and-skill-security": "Bagikan skill dengan tim, beri versi, dan tinjau seperti kode: skill dapat berisi instruksi dan skrip yang berjalan dengan akses nyata.",
+  "claude-skills/debugging-skills-that-do-not-trigger-or-misbehave": "Selidiki skill yang tidak pernah dimuat, dimuat pada waktu yang salah, atau dimuat tetapi diabaikan: periksa penemuan, deskripsi, struktur, konflik, dan keluaran.",
+  "mcp/why-tools-and-what-mcp-is": "Lihat mengapa model membutuhkan alat untuk bertindak dan mengambil fakta, dan bagaimana Model Context Protocol membakukan penyambungan alat dan data ke aplikasi AI.",
+  "mcp/function-calling-and-tool-schemas": "Deskripsikan alat kepada model dengan nama, deskripsi yang jelas, dan skema JSON, dan rancang alat yang digunakan model dengan benar.",
+  "mcp/the-tool-use-loop": "Implementasikan siklus permintaan, panggilan alat, hasil alat dengan benar, tangani galat dan panggilan paralel, dan beri batas pada loop.",
+  "mcp/mcp-architecture-hosts-clients-servers-transports": "Pahami siklus hidup koneksi, pesan JSON-RPC, transport stdio dan HTTP, dan kapabilitas yang ditawarkan kedua sisi.",
+  "mcp/building-an-mcp-server-in-python": "Bangun server kecil dengan Python SDK, ekspos alat dengan type hint dan docstring, uji dengan inspector, dan hubungkan ke host.",
+  "mcp/resources-prompts-and-other-primitives": "Ketahui kapan mengekspos data sebagai resource atau prompt yang dapat dipakai ulang alih-alih alat, dan bagaimana klien menggunakannya.",
+  "mcp/permissions-auth-and-prompt-injection-defence": "Batasi apa yang bisa dilakukan alat, autentikasi server jarak jauh dengan benar, minta persetujuan pada saat yang tepat, dan rancang untuk melawan prompt injection.",
+  "mcp/debugging-tool-use-and-mcp": "Selidiki kegagalan di setiap lapisan: server, koneksi, definisi alat, pilihan model, dan loop.",
+  "system-design/the-design-method-and-estimation": "Urutan yang bisa diulang untuk setiap pertanyaan desain: klarifikasi, estimasi, sketsa, selami, patahkan, lalu nyatakan trade-off.",
+  "system-design/caching-without-stampedes": "Di mana cache membantu, bagaimana invalidasi dan TTL salah, dan cara mencegah cache dingin menghancurkan database di belakangnya.",
+  "system-design/queues-retries-and-idempotency": "Pisahkan dengan antrean, coba ulang tanpa menyebabkan badai, dan buat operasi aman untuk diulang.",
+  "system-design/consistency-and-availability-in-practice": "Apa arti CAP dan PACELC untuk pilihan nyata, dan cara memilih level konsistensi per data.",
+  "system-design/quorum-leaders-and-split-brain": "Bagaimana sekelompok mesin bersepakat, mengapa bilangan ganjil penting, dan bagaimana fencing mencegah dua leader merusak data.",
+  "system-design/clocks-time-and-ordering": "Mengapa Anda tidak bisa memercayai jam dinding untuk mengurutkan peristiwa, dan apa yang dipakai sebagai gantinya.",
+  "system-design/partitioning-sharding-and-consistent-hashing": "Pecah data ke banyak node sebelum satu node kehabisan kapasitas, pilih partition key, dan hindari hot key serta pengacakan ulang yang menyakitkan.",
+  "system-design/storage-engines-and-replication-topologies": "Apa beda B-tree dan LSM tree, apa trade-off replikasi leader-follower, multi-leader, dan tanpa leader, dan bagaimana penyimpanan data gagal dari dalam.",
+  "system-design/backup-restore-and-object-storage-design": "Rancang cadangan yang benar-benar pernah Anda pulihkan, lindungi dari kegagalan yang menjatuhkan aslinya, dan gunakan penyimpanan objek untuk hal yang dikuasainya.",
+  "system-design/failure-domains-cells-and-bulkheads": "Bagi sistem agar satu kesalahan hanya dapat menjangkau bagian yang terbatas, memakai zona, cell, dan bulkhead.",
+  "system-design/blast-radius-and-shuffle-sharding": "Ukur seberapa jauh kesalahan bisa menjangkau, dan gunakan shuffle sharding agar satu klien atau permintaan buruk tidak dapat merugikan yang lain.",
+  "system-design/graceful-degradation-and-circuit-breakers": "Jaga inti tetap berfungsi saat dependensi lambat atau mati, dengan gagal cepat, melayani lebih sedikit, dan pulih dengan lembut.",
+  "system-design/rate-limiting-and-load-shedding": "Lindungi layanan dari kelebihan beban dengan batas di tepi, pembagian adil antar pemanggil, dan penyisihan yang menjaga pekerjaan berguna tetap mengalir.",
+  "system-design/multi-region-and-global-traffic": "Pilih antara active-passive dan active-active, tetapkan RTO dan RPO, dan arahkan lalu lintas dengan DNS dan anycast tanpa menciptakan titik tunggal baru.",
+  "system-design/config-and-control-plane-change-safety": "Perlakukan konfigurasi, data fitur, dan dorongan control plane sebagai deployment, dengan validasi, staging, dan jalan kembali.",
+  "system-design/hidden-dependencies-and-single-points": "Petakan apa yang sebenarnya dibutuhkan layanan Anda, termasuk alat yang dipakai untuk memperbaikinya, dan temukan titik tunggal sebelum pemadaman menemukannya.",
+  "system-design/observability-by-design": "Putuskan apa yang harus dikatakan sistem sebelum gagal: SLI dalam desain, sinyal emas, tracing, dan pemantauan yang bertahan saat pemadaman.",
+  "system-design/security-and-identity-by-design": "Rancang untuk hak akses minimum, kredensial berumur pendek, isolasi, dan rahasia yang dapat dipulihkan, memakai bagaimana pembobolan nyata terjadi.",
+  "system-design/capacity-planning-and-cost-trade-offs": "Rencanakan ruang cadangan dari pengukuran, perlakukan biaya sebagai masukan desain, dan ketahui penghematan mana yang diam-diam menghabiskan keandalan.",
+  "system-design/worked-design-global-api-at-four-nines": "Rancang API publik untuk ketersediaan 99,99 persen dari ujung ke ujung, memakai cell, region, rollout aman, dan degradasi, lalu tinjau terhadap pemadaman nyata.",
+  "system-design/worked-design-the-status-page-that-survives": "Rancang sistem kecil yang harus berfungsi saat semua yang lain mati, lalu belajar meninjau desain setelah pemadaman.",
+  "system-design/worked-design-a-url-shortener": "Desain klasik yang banyak dibaca, dari estimasi hingga pembuatan kunci, caching, tautan populer, penyalahgunaan, dan mode kegagalan.",
+  "system-design/worked-design-a-rate-limiter-service": "Rancang pembatas bersama untuk API gateway: algoritma, state, konsistensi, perilaku saat gagal, dan cara agar tidak menyebabkan pemadaman karenanya.",
+  "system-design/worked-design-a-notification-fan-out-system": "Kirim satu peristiwa ke jutaan perangkat, dengan strategi fan-out, antrean prioritas, batas penyedia, deduplikasi, dan kontrol percobaan ulang.",
+  "system-design/worked-design-a-metrics-and-log-pipeline": "Serap, simpan, dan kueri telemetri dalam skala besar tanpa membiarkan pipeline menjadi pemadaman, dengan kardinalitas, backpressure, dan retensi.",
+  "system-design/worked-design-a-multi-tenant-kubernetes-platform": "Bagikan klaster antar tim dengan aman: level isolasi, kuota, upgrade, jaringan, dan menjaga dependensi platform itu sendiri agar tidak menjadi pemadaman.",
+  "system-design/worked-design-an-authoritative-dns-service": "Rancang layanan nama yang menjadi tumpuan semua yang lain: anycast, keamanan data zona, ketahanan DDoS, dan disiplin untuk tidak mengubah segalanya sekaligus.",
+  "system-design/worked-design-a-chat-and-messaging-service": "Penelusuran desain obrolan: koneksi, jaminan pengiriman, pengurutan, presence, dan apa yang terjadi saat node atau region gagal.",
+  "system-design/worked-design-a-news-feed-and-timeline": "Rancang feed untuk produk sosial: fan-out saat menulis versus membaca, pemeringkatan, akun populer, dan kegagalan cache.",
+  "system-design/worked-design-video-upload-and-streaming": "Dari unggah hingga pemutaran: unggah bertahap, antrean transcoding, tingkatan penyimpanan, dan CDN, dengan mode kegagalan tiap tahap.",
+  "system-design/worked-design-a-distributed-key-value-store": "Partisi, replikasi, pembacaan dan penulisan kuorum, serta penanganan kegagalan, disatukan menjadi satu penyimpanan.",
+  "system-design/worked-design-a-payments-ledger": "Perpindahan uang yang benar: pencatatan double-entry, permintaan idempoten, transaksi, dan rekonsiliasi, dirancang untuk bertahan dari percobaan ulang dan kegagalan.",
+  "system-design/worked-design-search-autocomplete": "Sarankan pelengkapan dalam beberapa milidetik: indeks prefiks, pemeringkatan, kesegaran, dan cara menurunkan kualitas dengan anggun saat beban tinggi.",
+  "mlops/what-mlops-is-and-how-ml-systems-fail": "Model hanyalah sebagian kecil dari sistem machine learning. Pelajaran ini menunjukkan bagian-bagian di sekitarnya dan cara senyap mereka gagal di produksi.",
+  "mlops/data-and-feature-pipelines-for-ml": "Model hanya seandal data yang mengisinya. Pelajari validasi data, pemberian versi, dan menjaga fitur pelatihan dan serving tetap sama.",
+  "mlops/experiment-tracking-and-reproducibility": "Catat apa yang menghasilkan tiap model agar Anda dapat membandingkan eksekusi, mengulang hasil, dan menjelaskan keputusan nanti.",
+  "mlops/training-pipelines-and-testing-models-in-ci": "Ubah pelatihan menjadi pipeline otomatis dan teruji, dengan pemeriksaan data, kode, dan kualitas model sebelum apa pun dirilis.",
+  "mlops/model-registry-packaging-and-safe-releases": "Simpan model beserta riwayatnya, kemas untuk serving, dan rilis dengan shadow test, canary, dan rollback cepat.",
+  "mlops/serving-models-batch-online-and-streaming": "Pilih cara prediksi dihasilkan dan tentukan ukuran layanan untuk latensi, throughput, dan biaya.",
+  "mlops/monitoring-drift-and-retraining": "Deteksi saat data atau dunia berubah, ukur kualitas model ketika label datang terlambat, dan latih ulang dengan aman.",
+  "mlops/debugging-ml-systems-in-production": "Daftar periksa dari bawah ke atas untuk model yang salah, lambat, atau diam di produksi: data dulu, lalu fitur, lalu model, lalu serving.",
+  "aiops/what-aiops-is-and-is-not": "AIOps menerapkan statistik dan machine learning pada data operasi. Pelajari apa yang bisa dilakukannya, apa yang tidak, dan cara menilai sebuah alat dengan jujur.",
+  "aiops/anomaly-detection-on-metrics": "Pelajari baseline sederhana, musiman, dan ambang batas sebelum beralih ke model kompleks, dan cara menjaga alarm palsu tetap rendah.",
+  "aiops/alert-correlation-and-noise-reduction": "Kelompokkan peringatan terkait menjadi satu insiden, hapus duplikat, dan gunakan dependensi untuk menunjuk sumber badai.",
+  "aiops/logs-and-traces-finding-patterns-with-ml": "Kelompokkan baris log menjadi template, kenali pesan baru atau langka, dan kaitkan perubahan perilaku dengan deployment.",
+  "aiops/root-cause-hints-and-incident-assistants": "Peringkat penyebab yang mungkin dari perubahan dan dependensi, dan gunakan model bahasa untuk merangkum dengan aman sementara manusia tetap memegang kendali.",
+  "aiops/safe-automation-and-auto-remediation": "Otomatiskan perbaikan rutin dengan batas, persetujuan, dan rollback, agar otomasi mengurangi toil tanpa menjadi penyebab pemadaman berikutnya.",
+  "aiops/debugging-and-investigating-aiops-output": "Cara memeriksa jawaban asisten AI selama insiden: konfirmasi bukti, uji klaim terhadap data, dan biarkan manusia memegang kendali atas tindakan.",
+  "sql-ops/reading-explain-and-finding-slow-queries": "Temukan kueri yang paling mahal, baca rencana EXPLAIN, dan bedakan indeks yang hilang dari statistik yang basi.",
+  "sql-ops/indexes-that-help-and-indexes-that-hurt": "Rancang indeks komposit, parsial, dan covering, dan temukan yang tidak terpakai atau duplikat yang memperlambat penulisan.",
+  "sql-ops/locks-deadlocks-and-long-transactions": "Cari tahu apa yang memblokir apa, pahami sesi idle-in-transaction dan deadlock, dan atur timeout yang melindungi database.",
+  "sql-ops/connections-pooling-and-capacity": "Pahami mengapa terlalu banyak koneksi merugikan, bagaimana pooler seperti PgBouncer membantu, dan cara menentukan ukuran memori dan batas.",
+  "sql-ops/replication-lag-vacuum-and-day-two-operations": "Pantau replikasi, pahami autovacuum dan bloat, dan jalankan perubahan dan cadangan agar database tetap sehat.",
+  "gpu-serving/gpu-basics-memory-and-what-limits-inference": "Hitung berapa memori GPU yang dibutuhkan sebuah model, dan mengapa pembuatan teks lebih dibatasi oleh bandwidth memori daripada komputasi.",
+  "gpu-serving/serving-stacks-vllm-tgi-triton": "Bandingkan alat serving LLM utama, pahami continuous batching dan paged attention, dan baca flag yang penting.",
+  "gpu-serving/gpus-on-kubernetes": "Jadwalkan beban kerja GPU dengan device plugin, pahami mengapa GPU adalah unit utuh, dan baca pesan pod Pending.",
+  "gpu-serving/scaling-latency-and-cost": "Ukur apa yang dirasakan pengguna (TTFT dan kecepatan token), skalakan pada sinyal yang tepat, dan hitung biaya sebuah token.",
+  "gpu-serving/monitoring-and-debugging-gpu-workloads": "Baca nvidia-smi, gunakan metrik DCGM, dan diagnosis galat kehabisan memori, throttling, job multi-GPU yang menggantung, dan kartu yang rusak.",
+  "openstack/what-openstack-is-and-core-services": "Lihat bagaimana OpenStack membangun cloud privat dari layanan terpisah, dan bagaimana masing-masing padan dengan sesuatu yang Anda kenal dari AWS.",
+  "openstack/identity-projects-quotas-and-keystone": "Pahami user, project, role, dan token, bagaimana kuota membatasi project, dan cara membaca kegagalan autentikasi.",
+  "openstack/compute-flavors-images-and-scheduling": "Pahami bagaimana Nova memilih host untuk sebuah server, dan diagnosis server yang macet di ERROR dengan \"No valid host was found\".",
+  "openstack/neutron-networking-security-groups-and-floating-ips": "Ikuti paket dari server ke internet, dan perbaiki server yang tidak bisa dijangkau dengan SSH.",
+  "openstack/operating-openstack-logs-upgrades-and-troubleshooting": "Temukan log yang tepat dengan cepat, pulihkan server dan volume yang macet, dan rencanakan upgrade serta kapasitas untuk cloud privat.",
+  "baremetal/servers-racks-and-remote-management": "Pelajari apa isi server rak, bagaimana rak diberi daya dan didinginkan, dan cara mengelola mesin dari jauh lewat BMC-nya.",
+  "baremetal/provisioning-pxe-dhcp-and-images": "Ikuti server baru dari dinyalakan hingga sistem operasi berjalan dengan PXE, DHCP, TFTP, dan instalasi otomatis, dan pelajari mengapa tiap langkah bisa gagal.",
+  "baremetal/disks-raid-firmware-and-burn-in": "Pahami jenis drive, RAID perangkat lunak dan perangkat keras, kesehatan SMART, firmware, dan uji burn-in yang menangkap perangkat keras buruk sebelum menyimpan data.",
+  "baremetal/datacenter-networking-leaf-spine-and-bonding": "Lihat bagaimana rak terhubung dengan switch top-of-rack dalam fabric leaf-spine, dan bagaimana bonding, VLAN, dan jaringan manajemen terpisah menjaga server tetap terjangkau.",
+  "baremetal/operating-a-fleet-failures-lifecycle-and-capacity": "Diagnosis kegagalan perangkat keras yang umum, rencanakan masa pakai server dari rak hingga pensiun, dan jaga kapasitas serta suku cadang cadangan yang cukup.",
+  "linux/troubleshooting-playbook-method-and-first-five-minutes": "Triase server Linux yang lambat atau gagal secara berurutan: tanyakan apa yang berubah, periksa penggunaan, saturasi, dan galat tiap sumber daya, dan persempit penyebab sebelum menyentuh apa pun.",
+  "linux/troubleshooting-playbook-high-load-and-cpu-saturation": "Bedakan saturasi CPU dari I/O wait dan steal time, temukan proses atau thread yang sibuk, dan putuskan apakah akan memperbaiki, membatasi, atau menskalakan.",
+  "linux/troubleshooting-playbook-memory-pressure-swap-and-the-oom-killer": "Baca free, meminfo, dan log kernel dengan benar, kenali swap thrashing dan kebocoran, dan bedakan OOM kill tingkat host dari batas memori kontainer.",
+  "linux/troubleshooting-playbook-disk-full-inodes-and-io-stalls": "Temukan apa yang memenuhi sistem berkas, termasuk inode dan berkas yang dihapus tetapi masih terbuka, dan baca iostat untuk membedakan disk sibuk dari disk lambat.",
+  "linux/troubleshooting-playbook-network-drops-and-slow-connections": "Periksa jalur jaringan host Linux berlapis: galat antarmuka, MTU, retransmit, jeda DNS, dan connection tracking, lalu tangkap paket hanya saat Anda butuh bukti.",
+  "linux/troubleshooting-playbook-boot-failures-and-services-that-wont-start": "Diagnosis unit yang gagal dengan systemctl dan journalctl, temukan langkah boot yang lambat atau rusak, dan pulihkan dari mode darurat akibat mount dan kesalahan konfigurasi.",
+  "python/sre-automation-aws-with-boto3-safely": "Tulis skrip boto3 yang melakukan paginasi, memfilter menurut tag, bawaannya dry run, dan memakai role hak akses minimum, agar otomasi membantu dan tidak pernah mengejutkan.",
+  "python/sre-automation-kubernetes-client-scripts-and-reports": "Gunakan klien Python resmi untuk mendaftar beban kerja, menemukan pod tidak sehat dan limit yang hilang, dan membuat laporan tanpa membuat skrip dari keluaran kubectl.",
+  "python/sre-automation-retries-backoff-timeouts-and-idempotency": "Buat skrip bertahan dari jaringan dan API yang tidak stabil dengan timeout, exponential backoff dengan jitter, dan operasi idempoten, tanpa menyebabkan badai percobaan ulang.",
+  "python/sre-automation-parsing-logs-and-building-incident-timelines": "Urai log terstruktur dan biasa dengan Python, hitung dan kelompokkan galat, dan gabungkan peristiwa dari beberapa sumber menjadi satu linimasa terurut untuk tinjauan insiden.",
+  "python/sre-automation-chatops-alert-handlers-and-webhooks": "Bangun penerima webhook kecil yang memverifikasi tanda tangan, mendeduplikasi peringatan, dan memposting pesan berguna, dan jaga tindakan otomatis tetap aman dengan daftar izin dan persetujuan.",
+  "python/sre-automation-safe-bulk-operations-and-audit-trails": "Jalankan perubahan di banyak host atau sumber daya dengan rencana, batch, batas laju, tombol pemutus, state yang dapat dilanjutkan, dan jejak audit yang jelas.",
+  "networking/dns-tls-pki-dns-records-resolution-and-caching": "Pahami bagaimana nama menjadi alamat lewat server rekursif dan otoritatif, untuk apa tiap jenis record, dan bagaimana TTL dan cache menentukan seberapa cepat perubahan menyebar.",
+  "networking/dns-tls-pki-debugging-dns-failures": "Bedakan NXDOMAIN, SERVFAIL, dan timeout, uji setiap resolver di jalur, dan temukan masalah search-domain dan ndots Kubernetes yang melipatgandakan lookup.",
+  "networking/dns-tls-pki-tls-handshake-and-certificate-chains": "Ikuti koneksi TLS dari hello hingga data terenkripsi, baca rantai sertifikat dengan openssl, dan diagnosis galat ketidakcocokan nama, kedaluwarsa, dan rantai tidak lengkap.",
+  "networking/dns-tls-pki-certificate-lifecycle-and-automation": "Ikuti sertifikat dari kunci dan CSR hingga penerbitan, validasi, pembaruan, dan pencabutan, dan otomatiskan dengan ACME agar kedaluwarsa tak pernah bergantung pada orang yang ingat.",
+  "networking/dns-tls-pki-mtls-and-internal-certificate-authorities": "Gunakan mutual TLS untuk identitas layanan, jalankan CA internal dengan cara aman memakai cert-manager, dan distribusikan trust bundle dan rotasi tanpa pemadaman.",
+  "networking/dns-tls-pki-outage-prevention-checklist": "Cegah pemadaman DNS dan sertifikat yang umum dengan inventaris, peringatan kedaluwarsa dan perpanjangan domain, langkah perubahan yang aman, redundansi, dan rollback yang sudah dilatih.",
+  "cloud/finops-reading-a-cloud-bill-and-tagging": "Rincikan tagihan cloud menurut layanan, akun, dan tag, pahami bagaimana penggunaan menjadi biaya, dan atur tag dan akun agar setiap dolar punya pemilik.",
+  "cloud/finops-rightsizing-and-removing-waste": "Temukan sumber daya menganggur dan terlalu besar dengan data utilisasi, hentikan disk tak terpasang dan snapshot lama dengan aman, dan jadwalkan lingkungan non-produksi mati di luar jam kerja.",
+  "cloud/finops-commitments-savings-plans-and-spot": "Turunkan harga satuan beban kerja stabil dengan diskon reserved dan committed, jalankan pekerjaan tahan-gagal di kapasitas spot, dan hindari komitmen berlebihan.",
+  "cloud/finops-kubernetes-cost-allocation-and-requests": "Tunjukkan tim dan beban kerja mana yang menghabiskan berapa di klaster bersama, tetapkan request dan limit dari penggunaan nyata, dan gunakan autoscaling dan pilihan node untuk memangkas kapasitas menganggur.",
+  "cloud/finops-data-transfer-storage-and-hidden-costs": "Kenali biaya yang mengejutkan tim, seperti lalu lintas lintas zona dan egress, NAT gateway, ingest log, dan kelas penyimpanan, dan rancang untuk menguranginya.",
+  "cloud/finops-budgets-anomalies-and-a-cost-practice": "Tetapkan anggaran dan peringatan anomali, jalankan tinjauan biaya rutin bersama engineering dan keuangan, dan masukkan biaya ke dalam tinjauan desain dan pipeline agar penghematan bertahan.",
+  "storage/backup-and-dr-strategy-3-2-1-and-retention": "Rancang strategi cadangan dari target pemulihan, terapkan aturan 3-2-1, pilih metode penuh, inkremental, dan snapshot, dan tetapkan retensi yang sesuai kebutuhan bisnis.",
+  "storage/backup-and-dr-database-backups-and-point-in-time-recovery": "Ambil cadangan database yang konsisten, arsipkan write-ahead log untuk pemulihan point-in-time, dan latih memulihkan hingga tepat sebelum kesalahan.",
+  "storage/backup-and-dr-kubernetes-etcd-and-volume-snapshots": "Lindungi klaster Kubernetes dengan mencadangkan etcd, manifes deklaratif, dan persistent volume, dan ketahui apa yang bisa dan tidak bisa dipulihkan tiap cadangan.",
+  "storage/backup-and-dr-testing-restores-and-verifying-backups": "Buktikan cadangan berfungsi dengan uji pemulihan otomatis, pemeriksaan integritas, dan latihan berwaktu, dan lacak waktu pemulihan dan tingkat keberhasilan dari waktu ke waktu.",
+  "storage/backup-and-dr-disaster-recovery-patterns-and-failover": "Bandingkan desain backup and restore, pilot light, warm standby, dan active-active, dan rencanakan replikasi data, failover DNS, dan failback untuk tiap target pemulihan.",
+  "storage/backup-and-dr-ransomware-immutable-backups-and-runbooks": "Lindungi cadangan dari penghapusan dan enkripsi dengan imutabilitas, akun terpisah, dan kontrol akses, dan tulis runbook yang bisa diikuti orang di bawah tekanan.",
+  "virtualization/virtualization-ops-capacity-overcommit-and-noisy-neighbours": "Rencanakan kapasitas host dengan rasio overcommit yang wajar, kenali CPU steal, memory ballooning, dan perebutan I/O, dan tempatkan mesin virtual agar satu guest tidak mengambil jatah yang lain.",
+  "virtualization/virtualization-ops-libvirt-and-kvm-day-two-operations": "Jalankan host KVM dengan libvirt sehari-hari: periksa dan ubah guest, ambil snapshot dan cadangan dengan aman, tambal host dengan live migration, dan jaga konfigurasi tetap konsisten.",
+  "virtualization/virtualization-ops-guest-performance-troubleshooting": "Cari tahu apakah kelambatan berasal dari guest, host, penyimpanan, atau jaringan, memakai tampilan berpasangan dari dalam guest dan dari hypervisor.",
+  "openstack/openstack-ops-no-valid-host-and-scheduling-failures": "Telusuri build server yang gagal dari API melalui scheduler dan Placement, baca alasan sebenarnya di balik No valid host found, dan perbaiki ketidakcocokan kuota, kapasitas, dan aggregate.",
+  "openstack/openstack-ops-neutron-and-ceph-troubleshooting": "Telusuri jalur jaringan yang hilang melalui agen, bridge, dan namespace, dan baca kesehatan Ceph untuk memahami volume yang lambat atau macet dan placement group yang terdegradasi.",
+  "openstack/openstack-ops-maintenance-evacuation-and-a-day-two-runbook": "Keluarkan compute host dari layanan dengan aman memakai live migration dan evakuasi, tangani kegagalan host, dan simpan runbook dengan pemeriksaan untuk upgrade dan kapasitas.",
+  "sre/senior-skills-writing-design-docs-and-rfcs": "Tulis dokumen desain singkat yang menyatakan masalah, opsi, dan trade-off, dapatkan tinjauan yang berguna sejak dini, dan catat keputusan agar engineer masa depan tahu alasannya.",
+  "sre/senior-skills-estimating-and-planning-work": "Berikan estimasi jujur berupa rentang dengan asumsi, pecah pekerjaan menjadi irisan kecil, rencanakan operasi dan risiko, dan komunikasikan perubahan sejak dini.",
+  "sre/senior-skills-running-incident-and-postmortem-meetings": "Pimpin panggilan insiden langsung dengan peran dan pembaruan yang jelas, dan fasilitasi rapat post-mortem tanpa menyalahkan yang menghasilkan tindakan spesifik yang ada pemiliknya.",
+  "sre/senior-skills-mentoring-and-growing-engineers": "Bantu engineer berkembang lewat pertanyaan yang baik, delegasi yang disengaja, umpan balik berguna, dan tinjauan kode serta desain yang mendidik, tanpa mengerjakan pekerjaan mereka.",
+  "sre/senior-skills-influencing-and-stakeholder-management": "Selesaikan pekerjaan lintas tim dengan memahami apa yang dibutuhkan orang lain, membangun argumen dengan bukti, menegosiasikan trade-off, dan menjaga pemangku kepentingan tetap terinformasi tanpa kejutan.",
+  "sre/senior-skills-interviewing-and-hiring-as-the-interviewer": "Jalankan wawancara teknis yang adil dan terstruktur untuk peran platform dan SRE dengan kriteria jelas, pertanyaan bagus, penilaian terkalibrasi, dan pengalaman kandidat yang menghormati.",
+  "cicd/how-ci-platforms-differ": "Bandingkan model bersama semua sistem CI dan apa yang membedakan GitHub Actions, GitLab CI, dan Tekton dalam praktik.",
+  "cicd/actions-workflows-jobs-and-steps": "Tulis workflow GitHub Actions dengan job, langkah, output, dan token bawaan, lalu baca satu run untuk menemukan apa yang gagal.",
+  "cicd/actions-triggers-matrices-and-caching": "Pilih pemicu yang tepat, jalankan matriks build, batalkan run usang, dan cache dependensi agar Actions tetap cepat dan terprediksi.",
+  "cicd/actions-reusable-workflows-and-composite-actions": "Hilangkan salin-tempel antar repositori dengan reusable workflow, composite action, dan versioning yang masuk akal.",
+  "cicd/actions-secrets-oidc-and-hardening": "Lindungi secret di Actions, ganti kunci cloud berumur panjang dengan OIDC, pin action pihak ketiga, dan batasi apa yang boleh dilakukan pull request.",
+  "cicd/actions-runners-environments-and-deployments": "Pilih runner hosted atau self-hosted, lindungi deployment dengan environment dan persetujuan, dan jaga armada runner tetap aman dan skalabel.",
+  "cicd/gitlab-ci-pipelines-stages-and-jobs": "Tulis .gitlab-ci.yml dengan stage, job, variabel, dan image, lalu pahami bagaimana pipeline, job, dan runner saling terkait.",
+  "cicd/gitlab-ci-rules-artifacts-and-caches": "Kendalikan kapan job berjalan dengan rules, teruskan hasil build dengan artifacts, dan percepat pipeline dengan cache yang kuncinya benar.",
+  "cicd/gitlab-ci-includes-templates-and-dynamic-pipelines": "Bagikan konfigurasi pipeline dengan include dan extends, pecah pipeline besar menjadi parent dan child, dan hasilkan job secara dinamis.",
+  "cicd/gitlab-runners-environments-and-security": "Jalankan GitLab CI di runner bersama atau yang dikelola sendiri, pilih executor, lindungi variabel dan branch, dan gunakan environment serta persetujuan.",
+  "cicd/tekton-tasks-pipelines-and-workspaces": "Bangun Task dan Pipeline Tekton, teruskan data dengan params, results, dan workspaces, lalu jalankan dengan TaskRun dan PipelineRun.",
+  "cicd/tekton-triggers-chains-and-production-use": "Mulai Tekton dari event dengan Triggers, tanda tangani dan atestasi build dengan Chains, dan jalankan Tekton dengan aman memakai RBAC, kuota, dan pruning.",
+  "cicd/choosing-and-migrating-between-ci-platforms": "Bandingkan GitHub Actions, GitLab CI, dan Tekton dari sisi biaya, keamanan, skala, dan usaha, lalu rencanakan migrasi yang aman dari satu ke yang lain.",
+  "baremetal/bmc-ipmi-and-redfish-automation": "Kendalikan server secara out-of-band dengan BMC, gunakan IPMI dan Redfish dengan aman, dan otomatiskan tugas daya, boot, dan sensor dalam skala besar.",
+  "baremetal/cloud-init-and-first-boot-configuration": "Konfigurasikan mesin baru saat boot pertama dengan user data cloud-init, dan debug mengapa sebuah node menyala tanpa pengaturannya.",
+  "baremetal/firmware-and-bios-management-at-scale": "Jaga konsistensi firmware BIOS, BMC, NIC, dan disk di seluruh armada dengan baseline, rollout bertahap, dan pemeriksaan drift.",
+  "baremetal/maas-and-ironic-bare-metal-provisioning": "Lihat bagaimana MAAS dan OpenStack Ironic menemukan, mendaftarkan, mengomisioning, dan men-deploy server fisik lewat API seperti instance cloud.",
+  "baremetal/hardware-failure-diagnosis-and-rma": "Diagnosis kerusakan memori, disk, CPU, dan daya dari log dan sensor, lalu jalankan proses pengembalian RMA yang rapi dengan vendor.",
+  "baremetal/power-cooling-and-rack-capacity": "Rencanakan daya rak dalam watt dan ampere, pahami jalur daya redundan dan batas pendinginan, dan tempatkan server tanpa menjatuhkan breaker.",
+  "baremetal/uefi-bootloaders-and-secure-boot": "Ikuti jalur boot dari firmware ke kernel, kelola entri boot UEFI, dan pahami kunci Secure Boot serta bootloader bertanda tangan.",
+  "sql-ops/pg-stat-statements-and-query-tuning": "Urutkan query berdasarkan total waktu, jumlah panggilan, dan baris dengan pg_stat_statements, lalu tuning beberapa yang menyebabkan sebagian besar beban.",
+  "sql-ops/partitioning-and-data-retention": "Pecah tabel besar berdasarkan waktu atau kunci, hapus data lama dengan murah, dan rencanakan partisi agar pemeliharaan tetap cepat.",
+  "sql-ops/sql-backup-and-point-in-time-recovery-operations": "Jalankan base backup dan pengarsipan WAL, lakukan restore ke titik waktu tertentu, dan uji waktu restore terhadap target pemulihan Anda.",
+  "sql-ops/online-schema-changes-without-downtime": "Ubah tabel di database yang sibuk dengan aman memakai lock timeout, indeks concurrent, backfill bertahap, dan pola expand and contract.",
+  "sql-ops/replicas-failover-and-switchover-operations": "Jalankan replika streaming, bedakan switchover terencana dari failover darurat, hindari split brain, dan tangani lag replikasi.",
+  "sql-ops/autovacuum-bloat-and-maintenance-windows": "Jaga kesehatan tabel dengan menyetel autovacuum, mengukur bloat, menghindari wraparound ID transaksi, dan merencanakan pemeliharaan yang aman.",
+  "sql-ops/database-incident-runbook": "Tangani insiden database secara berurutan: konfirmasi dampak, periksa lock, koneksi, disk, dan replikasi, mitigasi dengan aman, dan catat kejadiannya.",
+  "service-mesh/sidecar-and-ambient-mesh-data-planes": "Bandingkan model proxy sidecar dengan model ambient tanpa sidecar dan biaya masing-masing dalam sumber daya, upgrade, dan isolasi.",
+  "service-mesh/ingress-gateways-and-the-gateway-api": "Bawa lalu lintas luar ke mesh dengan gateway, gunakan Kubernetes Gateway API, dan amankan sisi luar dengan TLS dan aturan routing.",
+  "service-mesh/traffic-shifting-retries-and-timeouts": "Geser lalu lintas bertahap antar versi, atur retry dan timeout yang aman, dan hindari badai retry di service mesh.",
+  "service-mesh/mesh-authorization-and-zero-trust-policy": "Gunakan identitas mTLS dan kebijakan otorisasi agar hanya panggilan yang dimaksud yang diizinkan, dengan tolak secara bawaan dan rollout aman.",
+  "service-mesh/multi-cluster-mesh-and-failover": "Hubungkan layanan antar cluster dengan kepercayaan bersama, discovery lintas cluster, dan failover sadar lokalitas, serta ketahui risikonya.",
+  "service-mesh/mesh-performance-cost-and-resource-tuning": "Ukur biaya latensi dan sumber daya mesh, batasi konfigurasi proxy, dan setel limit dan telemetri agar tetap terjangkau.",
+  "service-mesh/operating-and-upgrading-a-service-mesh": "Upgrade mesh dengan control plane canary, revision tag, dan restart proxy bertahap, serta ketahui cara rollback dan apa yang dipantau.",
+  "gpu-serving/quantization-and-model-sizing": "Perkirakan memori GPU untuk bobot dan cache, pahami format kuantisasi, dan pilih presisi yang sesuai kebutuhan kualitas dan biaya Anda.",
+  "gpu-serving/batching-kv-cache-and-throughput": "Pahami continuous batching, prefill dan decode, paging KV cache, dan pengaturan yang menukar latensi dengan throughput.",
+  "gpu-serving/multi-gpu-tensor-and-pipeline-parallelism": "Bagi model ke beberapa GPU dengan paralelisme tensor dan pipeline, pahami kebutuhan interkoneksi, dan putuskan kapan replika lebih baik.",
+  "gpu-serving/autoscaling-llm-inference": "Skalakan inferensi GPU berdasarkan kedalaman antrean dan latensi, bukan CPU, tangani startup lambat dengan kapasitas hangat, dan kendalikan biaya.",
+  "gpu-serving/model-loading-caching-and-cold-starts": "Muat file model besar dengan cepat memakai cache lokal dan penyimpanan cepat, gunakan safetensors dan volume bersama, dan rencanakan rollout sesuai waktu startup.",
+  "gpu-serving/gpu-sharing-mig-and-time-slicing": "Bagikan satu GPU ke beberapa beban kerja dengan partisi MIG, time-slicing, atau MPS dan pahami isolasi, kinerja, dan kecocokannya.",
+  "gpu-serving/gpu-failures-xid-errors-and-recovery": "Baca kode error GPU, bedakan kerusakan memori, termal, link, dan driver, lalu drain, reset, dan ganti GPU dengan aman.",
+  "aiops/telemetry-quality-for-aiops": "Perbaiki datanya sebelum modelnya: nama, label, timestamp, dan kelengkapan yang konsisten agar machine learning pada data operasional dapat bekerja.",
+  "aiops/forecasting-capacity-and-saturation": "Perkirakan pertumbuhan disk, memori, dan lalu lintas dengan model tren dan musiman sederhana dan beri peringatan sebelum kehabisan.",
+  "aiops/llm-assistants-for-incident-response": "Gunakan model bahasa untuk merangkum insiden, menyusun pembaruan, dan mencari runbook, dengan pagar pengaman untuk akurasi, privasi, dan persetujuan manusia.",
+  "aiops/measuring-aiops-value-and-avoiding-hype": "Tentukan apakah alat AIOps membantu dengan metrik sebelum dan sesudah seperti noise, waktu deteksi, dan waktu penyelesaian, dan jalankan pilot yang jujur.",
+  "aiops/runbook-automation-and-guardrails": "Ubah runbook menjadi otomasi aman dengan prasyarat, dry run, pembatasan laju, persetujuan, dan rollback, dan bangun kepercayaan selangkah demi selangkah.",
+  "argocd/argocd-sso-rbac-and-audit": "Hubungkan Argo CD ke identity provider Anda, tentukan peran dan izin proyek, dan simpan jejak audit siapa mengubah apa.",
+  "argocd/argocd-notifications-and-image-updates": "Kirim peringatan saat sync gagal atau aplikasi menurun dan otomatiskan pembaruan tag image dengan aman lewat Git, bukan dengan mengedit cluster.",
+  "argocd/progressive-delivery-with-argo-rollouts": "Rilis bertahap dengan strategi canary dan blue-green Argo Rollouts, analisis otomatis, dan pembatalan cepat saat metrik memburuk.",
+  "argocd/argocd-disaster-recovery-and-upgrades": "Backup dan bangun ulang Argo CD, pulih dari hilangnya cluster memakai Git, dan upgrade Argo CD dengan memperhatikan CRD dan perubahan yang merusak.",
+  "claude-skills/skills-for-runbooks-and-operations": "Ubah prosedur operasional menjadi skill yang memandu Claude melalui pemeriksaan dalam urutan aman, dengan skrip, titik berhenti, dan cakupan yang jelas.",
+  "claude-skills/skills-with-references-templates-and-assets": "Gunakan file pendukung dalam skill: dokumen referensi, templat, dan contoh, dan jaga file utama tetap kecil agar Claude hanya memuat yang dibutuhkan.",
+  "claude-skills/organizing-skills-for-a-team": "Bagikan skill di tim dengan penamaan, kepemilikan, review, versioning, dan katalog agar orang mudah menemukan dan memercayainya.",
+  "claude-skills/evaluating-and-regression-testing-skills": "Susun set uji kecil untuk skill, periksa pemicu dan kualitas output, bandingkan versi, dan tangkap regresi sebelum rilis.",
+  "cloud-iam/gcp-iam-and-service-accounts": "Pahami peran IAM Google Cloud, hierarki sumber daya, service account, dan cara menghindari kunci berumur panjang.",
+  "cloud-iam/workload-identity-federation-and-oidc-trust": "Biarkan sistem CI dan cluster memanggil cloud tanpa kunci tersimpan dengan memercayai token bertanda tangan dari identity provider, dan tulis kondisi kepercayaan yang ketat.",
+  "cloud-iam/permission-boundaries-scps-and-guardrails": "Tetapkan batas luar atas apa yang boleh dilakukan akun dan peran dengan SCP, permission boundary, dan kebijakan organisasi, dan pahami cara kombinasinya dengan izin yang diberikan.",
+  "cloud-iam/iam-policy-analysis-and-unused-access": "Temukan izin yang terlalu luas dan tidak terpakai dengan access analyzer, data terakhir dipakai, dan simulasi kebijakan, lalu hapus dengan aman.",
+  "helm/testing-and-linting-helm-charts": "Tangkap kesalahan chart sebelum rilis dengan helm lint, rendering template, validasi skema, unit test, dan tes di cluster nyata.",
+  "helm/library-charts-and-chart-reuse": "Hindari menyalin template antar chart dengan named template, library chart, dan umbrella chart, dan ketahui trade-off-nya.",
+  "helm/publishing-and-signing-helm-charts": "Publikasikan chart ke registri OCI, tanda tangani dan verifikasi, dan kendalikan siapa yang boleh merilis atau memakai chart.",
+  "helm/helm-security-and-supply-chain": "Tinjau chart pihak ketiga, pindai manifes hasil render, hindari hook dan nilai berisiko, dan terapkan kebijakan agar Helm tidak men-deploy beban kerja tidak aman.",
+  "k8s-ops/control-plane-monitoring-and-slos": "Pantau latensi dan error API server, kesehatan etcd, dan antrean controller, dan tetapkan tingkat layanan untuk cluster itu sendiri.",
+  "k8s-ops/persistent-storage-and-csi-operations": "Operasikan persistent volume dengan storage class dan driver CSI, tangani perluasan, snapshot, dan volume macet, dan jaga beban kerja stateful tetap aman.",
+  "k8s-ops/multi-tenancy-namespaces-and-fair-sharing": "Bagikan satu cluster antar tim dengan namespace, kuota, network policy, RBAC, dan aturan admission, dan ketahui kapan perlu cluster terpisah.",
+  "k8s-ops/cluster-disaster-recovery-runbook": "Rencanakan kehilangan cluster: apa yang di-backup, cara membangun ulang dari kode, dan memulihkan state, dengan tes dan target pemulihan yang jelas.",
+  "llm/embeddings-and-vector-search": "Ubah teks menjadi vektor, cari berdasarkan makna dengan kemiripan, dan pahami indeks, chunking, dan batas pencarian vektor.",
+  "llm/retrieval-augmented-generation": "Beri model pengetahuan segar dan privat dengan mengambil teks relevan dan memasukkannya ke prompt, lengkap dengan sitasi dan pemeriksaan terhadap jawaban karangan.",
+  "llm/fine-tuning-versus-prompting-versus-rag": "Putuskan apakah perlu mengubah prompt, menambah retrieval, atau fine-tuning model dengan melihat apa yang sebenarnya salah.",
+  "llm/llm-safety-privacy-and-data-handling": "Tangani data dengan aman di aplikasi model bahasa: samarkan data pribadi, kendalikan retensi, bertahan dari prompt injection, dan catat log secara bertanggung jawab.",
+  "mcp/designing-good-tools-for-agents": "Rancang nama, deskripsi, input, dan output tool agar model memilih dan memakainya dengan benar, dengan default aman dan error yang membantu.",
+  "mcp/testing-and-debugging-mcp-servers-with-the-inspector": "Uji server MCP dengan Inspector, unit test, dan sesi rekaman, dan temukan masalah protokol, skema, dan transport dengan cepat.",
+  "mcp/deploying-and-scaling-mcp-servers": "Jalankan server MCP jarak jauh lewat HTTP dengan autentikasi, container, health check, pembatasan laju, dan observabilitas.",
+  "mcp/composing-multiple-mcp-servers": "Hubungkan klien ke beberapa server MCP, hindari bentrok nama tool dan kelebihan beban, dan rancang sedikit server yang fokus.",
+  "mlops/feature-stores-and-data-versioning": "Jaga konsistensi fitur training dan serving dengan feature store, dan versikan dataset agar model apa pun bisa direproduksi.",
+  "mlops/model-evaluation-ab-tests-and-shadow-deployments": "Nilai model dengan metrik offline, slice, shadow traffic, dan eksperimen online terkontrol, dan putuskan kapan rilis atau rollback.",
+  "mlops/ml-pipelines-and-workflow-orchestration": "Jalankan training sebagai pipeline berulang dengan langkah, caching, retry, parameter, dan retraining terjadwal di orkestrator.",
+  "mlops/llmops-prompts-evals-and-versioning": "Jalankan aplikasi model bahasa seperti perangkat lunak: versikan prompt dan model, uji dengan set evaluasi, pantau biaya dan kualitas, dan rilis dengan hati-hati.",
+  "openstack/cinder-glance-and-storage-services": "Pahami volume blok dengan Cinder, image dengan Glance, dan keterhubungannya dengan Ceph, lalu atasi masalah volume dan image yang umum.",
+  "openstack/horizon-heat-and-openstack-automation": "Otomatiskan OpenStack dengan CLI, SDK, template Heat, dan Terraform, dan gunakan Horizon untuk hal yang memang unggul.",
+  "openstack/deploying-openstack-with-kolla-ansible": "Lihat bagaimana OpenStack berbasis container di-deploy dengan Kolla-Ansible, atur inventory dan globals, dan jalankan upgrade serta rekonfigurasi dengan aman.",
+  "openstack/openstack-monitoring-and-capacity-planning": "Pantau control plane dan kapasitas compute, beri peringatan pada kesehatan API dan antrean pesan, dan rencanakan kuota dan overcommit dengan data nyata.",
+  "prompting/prompting-for-code-and-infrastructure": "Tulis prompt yang menghasilkan skrip, konfigurasi, dan review yang benar: beri konteks, batasan, dan tes, minta perubahan kecil, dan verifikasi semuanya.",
+  "prompting/prompt-injection-and-defensive-prompting": "Kenali prompt injection di dokumen, halaman web, dan hasil tool, dan rancang aplikasi agar teks yang disusupkan tidak dapat menimbulkan kerugian.",
+  "prompting/agents-and-multi-step-workflows": "Pilih antara workflow tetap dan agen terbuka, rancang loop, tetapkan batas dan checkpoint, dan ketahui kapan rantai sederhana lebih baik.",
+  "prompting/evaluating-prompts-with-datasets": "Susun set uji berlabel yang kecil, tentukan kriteria lulus, bandingkan versi prompt, dan gunakan penilai otomatis dengan hati-hati.",
+  "virtualization/vm-backup-replication-and-recovery": "Backup mesin virtual dengan snapshot dan agen, replikasi ke situs lain, dan uji restore terhadap target pemulihan.",
+  "virtualization/vm-templates-cloud-init-and-image-pipelines": "Bangun image VM yang bersih dan ter-patch dalam pipeline, gunakan cloud-init untuk pengaturan per instance, dan hindari templat buatan tangan yang menyimpang.",
+  "virtualization/gpu-passthrough-and-device-assignment": "Beri VM akses langsung ke GPU atau kartu jaringan dengan VFIO dan IOMMU, dan pahami grup, keterbatasan, dan keamanan.",
+  "virtualization/hypervisor-security-and-isolation": "Perkuat hypervisor dan guest: patch dengan cepat, batasi akses manajemen, isolasi jaringan dan penyimpanan, dan rencanakan guest escape.",
+  "ansible/ansible-performance-and-execution-strategies": "Percepat run Ansible dengan forks, pipelining, fact caching, dan strategi yang lebih cerdas, dan kendalikan rollout dengan serial dan batas error.",
+  "ansible/writing-custom-ansible-modules-and-filters": "Perluas Ansible dengan modul Python kecil atau plugin filter, jaga idempotensinya, dukung mode check, dan ujilah.",
+  "git/git-internals-objects-refs-and-the-index": "Lihat ke dalam repositori untuk mengenali blob, tree, commit, ref, dan index, dan pahami mengapa perintah Git berperilaku seperti itu.",
+  "git/release-and-hotfix-workflows-with-git": "Buat rilis dari branch atau tag, kirim hotfix tanpa membawa pekerjaan yang belum selesai, dan jaga branch berumur panjang tetap sinkron dengan cherry-pick.",
+  "go/configuration-logging-and-metrics-in-go-services": "Baca konfigurasi dari flag dan environment, catat log dengan slog, dan ekspos metrik Prometheus agar layanan Go mudah dijalankan dan diamati.",
+  "go/writing-kubernetes-clients-and-controllers-in-go": "Gunakan client-go untuk mendaftar dan memantau resource, pahami informer dan work queue, dan tulis loop reconcile kecil yang aman.",
+  "bash/log-analysis-one-liners-and-pipelines": "Jawab pertanyaan operasional nyata dari file log dengan grep, awk, sort, uniq, dan jq, dan bangun pipeline kecil yang bisa dipakai ulang.",
+  "databases/database-observability-and-capacity-planning": "Pilih metrik database yang penting, bangun dashboard dan alert yang berguna, dan perkirakan penyimpanan, koneksi, dan I/O sebelum habis.",
+  "storage/storage-benchmarking-with-fio": "Ukur disk dan volume dengan fio memakai ukuran blok, kedalaman antrean, dan campuran baca-tulis yang realistis, dan baca persentil latensi dengan benar.",
+  "security/web-and-api-attacks-for-operators": "Kenali injeksi, broken access control, SSRF, dan penyalahgunaan API dari log, dan bertahan dengan penanganan input, pemeriksaan otorisasi, dan kontrol di edge.",
+  "security/sast-dast-and-dependency-scanning-gates": "Tambahkan analisis statis, pemindaian dependensi, dan pengujian dinamis ke pipeline, setel untuk mengurangi noise, dan putuskan apa yang harus memblokir rilis.",
+  "security/cloud-posture-and-misconfiguration-management": "Temukan bucket publik, port terbuka, dan enkripsi yang hilang secara terus-menerus dengan alat posture dan policy as code, dan perbaiki drift di sumbernya.",
+  "security/security-champions-and-secure-code-review": "Sebarkan keamanan ke seluruh tim dengan champion, checklist code review yang praktis, threat modeling, dan umpan balik yang dihargai pengembang.",
+  "security/incident-forensics-and-evidence-handling": "Amankan bukti volatil, kumpulkan log dan image disk dengan aman, jaga chain of custody, dan susun linimasa saat insiden keamanan.",
+  "security/audit-readiness-and-continuous-compliance-evidence": "Bersiap untuk audit SOC 2 atau ISO 27001 dengan mengotomatiskan bukti, memetakan kontrol ke pemeriksaan teknis, dan menjaga catatan yang selalu mutakhir."
+ }
+}

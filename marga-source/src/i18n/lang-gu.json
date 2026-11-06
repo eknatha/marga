@@ -1,0 +1,2425 @@
+{
+ "ui": [
+  [
+   "Skip to content",
+   "સામગ્રી પર જાઓ"
+  ],
+  [
+   "Free · No login · No ads · No cookies",
+   "મફત · લૉગિન નહીં · જાહેરાત નહીં · કૂકી નહીં"
+  ],
+  [
+   "Visitor count unavailable",
+   "મુલાકાતીઓની સંખ્યા ઉપલબ્ધ નથી"
+  ],
+  [
+   "Visitor count",
+   "મુલાકાતીઓની સંખ્યા"
+  ],
+  [
+   "Skills",
+   "કૌશલ્યો"
+  ],
+  [
+   "Skill trees",
+   "કૌશલ્ય વૃક્ષો"
+  ],
+  [
+   "Practice",
+   "અભ્યાસ"
+  ],
+  [
+   "Real Linux labs",
+   "વાસ્તવિક Linux લૅબ"
+  ],
+  [
+   "Real Linux lab",
+   "વાસ્તવિક Linux લૅબ"
+  ],
+  [
+   "Progress",
+   "પ્રગતિ"
+  ],
+  [
+   "Your progress",
+   "તમારી પ્રગતિ"
+  ],
+  [
+   "Interview questions",
+   "ઇન્ટરવ્યૂના પ્રશ્નો"
+  ],
+  [
+   "About",
+   "વિશે"
+  ],
+  [
+   "Elsewhere",
+   "અન્યત્ર"
+  ],
+  [
+   "Main",
+   "મુખ્ય"
+  ],
+  [
+   "Menu",
+   "મેનુ"
+  ],
+  [
+   "Search",
+   "શોધો"
+  ],
+  [
+   "Search lessons and cheat sheets",
+   "પાઠ અને ચીટ શીટ શોધો"
+  ],
+  [
+   "Language",
+   "ભાષા"
+  ],
+  [
+   "Switch to dark theme",
+   "ડાર્ક થીમ પર જાઓ"
+  ],
+  [
+   "Switch to light theme",
+   "લાઇટ થીમ પર જાઓ"
+  ],
+  [
+   "Reading and accessibility",
+   "વાંચન અને સુલભતા"
+  ],
+  [
+   "Reading and accessibility options",
+   "વાંચન અને સુલભતાના વિકલ્પો"
+  ],
+  [
+   "Show the skills in each path",
+   "દરેક માર્ગમાં કૌશલ્યો બતાવો"
+  ],
+  [
+   "Question bank, opens in a new tab",
+   "પ્રશ્ન ભંડોળ, નવા ટૅબમાં ખુલે છે"
+  ],
+  [
+   "Exam prep, opens in a new tab",
+   "પરીક્ષાની તૈયારી, નવા ટૅબમાં ખુલે છે"
+  ],
+  [
+   "InterviewHub (opens in a new tab)",
+   "InterviewHub (નવા ટૅબમાં ખુલે છે)"
+  ],
+  [
+   "Certifications (opens in a new tab)",
+   "પ્રમાણપત્રો (નવા ટૅબમાં ખુલે છે)"
+  ],
+  [
+   "Certifications",
+   "પ્રમાણપત્રો"
+  ],
+  [
+   "Case studies",
+   "કેસ સ્ટડી"
+  ],
+  [
+   "Real outages explained",
+   "વાસ્તવિક આઉટેજની સમજૂતી"
+  ],
+  [
+   "Terminal labs",
+   "ટર્મિનલ લૅબ"
+  ],
+  [
+   "Badges",
+   "બૅજ"
+  ],
+  [
+   "Glossary",
+   "શબ્દકોશ"
+  ],
+  [
+   "Cheat sheets",
+   "ચીટ શીટ"
+  ],
+  [
+   "Printable cheat sheets",
+   "છાપી શકાય તેવી ચીટ શીટ"
+  ],
+  [
+   "Printable, with watermark",
+   "છાપી શકાય તેવી, વૉટરમાર્ક સાથે"
+  ],
+  [
+   "Open content license",
+   "ખુલ્લું સામગ્રી લાઇસન્સ"
+  ],
+  [
+   "Progress is saved in this browser only.",
+   "પ્રગતિ ફક્ત આ બ્રાઉઝરમાં સાચવાય છે."
+  ],
+  [
+   "MARGA by EknathaLabs",
+   "EknathaLabs તરફથી MARGA"
+  ],
+  [
+   "Close",
+   "બંધ કરો"
+  ],
+  [
+   "Close details",
+   "વિગતો બંધ કરો"
+  ],
+  [
+   "Choices apply to every page and are saved in this browser only.",
+   "પસંદગીઓ દરેક પાના પર લાગુ પડે છે અને ફક્ત આ બ્રાઉઝરમાં સાચવાય છે."
+  ],
+  [
+   "Colour theme",
+   "રંગ થીમ"
+  ],
+  [
+   "Match my device",
+   "મારા ઉપકરણ મુજબ"
+  ],
+  [
+   "Light",
+   "લાઇટ"
+  ],
+  [
+   "Dark",
+   "ડાર્ક"
+  ],
+  [
+   "Reading mode",
+   "વાંચન મોડ"
+  ],
+  [
+   "On: narrow column, larger text, no side panels",
+   "ચાલુ: સાંકડી કૉલમ, મોટું લખાણ, બાજુની પૅનલ નહીં"
+  ],
+  [
+   "Text size",
+   "લખાણનું કદ"
+  ],
+  [
+   "Large",
+   "મોટું"
+  ],
+  [
+   "Larger",
+   "વધુ મોટું"
+  ],
+  [
+   "Largest",
+   "સૌથી મોટું"
+  ],
+  [
+   "Standard",
+   "માનક"
+  ],
+  [
+   "Font",
+   "ફૉન્ટ"
+  ],
+  [
+   "Line spacing",
+   "લીટીઓ વચ્ચેનું અંતર"
+  ],
+  [
+   "Relaxed",
+   "ઢીલું"
+  ],
+  [
+   "Loose",
+   "ખૂબ ઢીલું"
+  ],
+  [
+   "Letter and word spacing",
+   "અક્ષર અને શબ્દ વચ્ચેનું અંતર"
+  ],
+  [
+   "Wide",
+   "પહોળું"
+  ],
+  [
+   "Contrast",
+   "કૉન્ટ્રાસ્ટ"
+  ],
+  [
+   "High contrast",
+   "ઊંચો કૉન્ટ્રાસ્ટ"
+  ],
+  [
+   "Motion",
+   "ગતિ"
+  ],
+  [
+   "Follow my device",
+   "મારા ઉપકરણ મુજબ"
+  ],
+  [
+   "Reduce animations",
+   "ઍનિમેશન ઘટાડો"
+  ],
+  [
+   "Links",
+   "લિંક"
+  ],
+  [
+   "Always underlined",
+   "હંમેશાં રેખાંકિત"
+  ],
+  [
+   "Keyboard focus",
+   "કીબોર્ડ ફોકસ"
+  ],
+  [
+   "Extra strong outline",
+   "વધારાની મજબૂત રૂપરેખા"
+  ],
+  [
+   "Print and Save as PDF style",
+   "છાપકામ અને PDF તરીકે સાચવવાની શૈલી"
+  ],
+  [
+   "Print style",
+   "છાપકામ શૈલી"
+  ],
+  [
+   "Light, saves ink",
+   "હળવું, શાહી બચાવે છે"
+  ],
+  [
+   "Light, large type",
+   "હળવું, મોટા અક્ષરો"
+  ],
+  [
+   "Large type",
+   "મોટા અક્ષરો"
+  ],
+  [
+   "Highlight the text being read aloud",
+   "મોટેથી વંચાતું લખાણ હાઇલાઇટ કરો"
+  ],
+  [
+   "On",
+   "ચાલુ"
+  ],
+  [
+   "Off",
+   "બંધ"
+  ],
+  [
+   "Reset to defaults",
+   "ડિફૉલ્ટ પર પાછા લાવો"
+  ],
+  [
+   "Spoken voice",
+   "બોલતો અવાજ"
+  ],
+  [
+   "Print",
+   "છાપો"
+  ],
+  [
+   "Save as PDF",
+   "PDF તરીકે સાચવો"
+  ],
+  [
+   "Listen",
+   "સાંભળો"
+  ],
+  [
+   "Pause",
+   "થોભાવો"
+  ],
+  [
+   "Stop",
+   "અટકાવો"
+  ],
+  [
+   "Voice",
+   "અવાજ"
+  ],
+  [
+   "Speed",
+   "ઝડપ"
+  ],
+  [
+   "No voices available",
+   "કોઈ અવાજ ઉપલબ્ધ નથી"
+  ],
+  [
+   "No voices found yet. If this stays empty, install a speech voice in your system settings.",
+   "હજી કોઈ અવાજ મળ્યો નથી. જો આ ખાલી રહે, તો તમારા સિસ્ટમ સેટિંગમાં સ્પીચ અવાજ ઇન્સ્ટૉલ કરો."
+  ],
+  [
+   "Read aloud",
+   "મોટેથી વાંચો"
+  ],
+  [
+   "Copy commands",
+   "આદેશો કૉપિ કરો"
+  ],
+  [
+   "Tell a friend",
+   "મિત્રને કહો"
+  ],
+  [
+   "Explain like I am new",
+   "મને નવો સમજીને સમજાવો"
+  ],
+  [
+   "Adds a plain-words note after each technical term. Hover or focus any dotted term for its meaning.",
+   "દરેક તકનીકી શબ્દ પછી સરળ શબ્દોમાં નોંધ ઉમેરે છે. અર્થ માટે ટપકાંવાળા શબ્દ પર ફેરવો અથવા ફોકસ કરો."
+  ],
+  [
+   "In plain words:",
+   "સરળ શબ્દોમાં:"
+  ],
+  [
+   "Learn to fix production before production breaks.",
+   "પ્રોડક્શન બગડે તે પહેલાં તેને સુધારતા શીખો."
+  ],
+  [
+   "Free. Offline. No sign-up.",
+   "મફત. ઑફલાઇન. સાઇન-અપ નહીં."
+  ],
+  [
+   "No payment, no ads.",
+   "ચુકવણી નહીં, જાહેરાત નહીં."
+  ],
+  [
+   "Practical DevOps, cloud and SRE training from someone who runs production. Real incidents, real commands, no login, no ads.",
+   "પ્રોડક્શન ચલાવતી વ્યક્તિ પાસેથી વ્યવહારુ DevOps, ક્લાઉડ અને SRE તાલીમ. વાસ્તવિક ઘટનાઓ, વાસ્તવિક આદેશો, લૉગિન નહીં, જાહેરાત નહીં."
+  ],
+  [
+   "Choose your role",
+   "તમારી ભૂમિકા પસંદ કરો"
+  ],
+  [
+   "Find my path in 2 minutes",
+   "2 મિનિટમાં મારો માર્ગ શોધો"
+  ],
+  [
+   "No account needed. Start now. Progress stays in your browser on this device; export it to move it.",
+   "ખાતું જોઈતું નથી. હમણાં શરૂ કરો. પ્રગતિ આ ઉપકરણ પરના તમારા બ્રાઉઝરમાં રહે છે; ખસેડવા માટે તેને નિકાસ કરો."
+  ],
+  [
+   "Open it once, turn off wifi, and keep learning. Lessons, labs and widgets run from your device.",
+   "એકવાર ખોલો, વાઇફાઇ બંધ કરો અને શીખતા રહો. પાઠ, લૅબ અને વિજેટ તમારા ઉપકરણ પરથી ચાલે છે."
+  ],
+  [
+   "Ready to work offline",
+   "ઑફલાઇન કામ માટે તૈયાર"
+  ],
+  [
+   "Reload once to enable offline",
+   "ઑફલાઇન ચાલુ કરવા એકવાર રીલોડ કરો"
+  ],
+  [
+   "Checking offline support",
+   "ઑફલાઇન સપોર્ટ તપાસી રહ્યા છીએ"
+  ],
+  [
+   "Day streak",
+   "સળંગ દિવસો"
+  ],
+  [
+   "Lessons passed",
+   "પાસ થયેલા પાઠ"
+  ],
+  [
+   "Best streak",
+   "શ્રેષ્ઠ સળંગ દિવસો"
+  ],
+  [
+   "lessons with checks",
+   "ચકાસણી સાથેના પાઠ"
+  ],
+  [
+   "real incidents",
+   "વાસ્તવિક ઘટનાઓ"
+  ],
+  [
+   "troubleshooting drills",
+   "સમસ્યા નિવારણ અભ્યાસ"
+  ],
+  [
+   "interview answers",
+   "ઇન્ટરવ્યૂના જવાબો"
+  ],
+  [
+   "animated explainers",
+   "ઍનિમેટેડ સમજૂતીઓ"
+  ],
+  [
+   "Pick a skill tree. Pass each check to unlock the next skill.",
+   "એક કૌશલ્ય વૃક્ષ પસંદ કરો. આગળનું કૌશલ્ય ખોલવા દરેક ચકાસણી પાસ કરો."
+  ],
+  [
+   "Each role is a tree of skills. A skill unlocks when the skills that lead into it are mastered.",
+   "દરેક ભૂમિકા કૌશલ્યોનું વૃક્ષ છે. જે કૌશલ્યો ત્યાં લઈ જાય તે પાર પાડ્યા પછી કૌશલ્ય ખુલે છે."
+  ],
+  [
+   "Role paths",
+   "ભૂમિકા માર્ગો"
+  ],
+  [
+   "Start from zero",
+   "શૂન્યથી શરૂ કરો"
+  ],
+  [
+   "Get a DevOps job",
+   "DevOps નોકરી મેળવો"
+  ],
+  [
+   "Prepare for an interview",
+   "ઇન્ટરવ્યૂની તૈયારી કરો"
+  ],
+  [
+   "Fix production faster",
+   "પ્રોડક્શન ઝડપથી સુધારો"
+  ],
+  [
+   "Ship code safely",
+   "કોડ સુરક્ષિત રીતે મોકલો"
+  ],
+  [
+   "Automate the boring work",
+   "કંટાળાજનક કામ સ્વચાલિત કરો"
+  ],
+  [
+   "Build with AI",
+   "AI સાથે બનાવો"
+  ],
+  [
+   "Build securely",
+   "સુરક્ષિત રીતે બનાવો"
+  ],
+  [
+   "Learn by skill",
+   "કૌશલ્ય મુજબ શીખો"
+  ],
+  [
+   "Build your own path",
+   "તમારો પોતાનો માર્ગ બનાવો"
+  ],
+  [
+   "Today",
+   "આજે"
+  ],
+  [
+   "Daily challenge",
+   "દૈનિક પડકાર"
+  ],
+  [
+   "Mixed practice",
+   "મિશ્ર અભ્યાસ"
+  ],
+  [
+   "Next up",
+   "હવે પછી"
+  ],
+  [
+   "In development",
+   "વિકાસ હેઠળ"
+  ],
+  [
+   "Planned",
+   "આયોજિત"
+  ],
+  [
+   "Beginner",
+   "શરૂઆતી"
+  ],
+  [
+   "Intermediate",
+   "મધ્યમ"
+  ],
+  [
+   "Advanced",
+   "અદ્યતન"
+  ],
+  [
+   "Junior",
+   "જુનિયર"
+  ],
+  [
+   "Mid-level",
+   "મધ્યમ સ્તર"
+  ],
+  [
+   "Senior",
+   "સિનિયર"
+  ],
+  [
+   "mid",
+   "મધ્યમ"
+  ],
+  [
+   "senior",
+   "સિનિયર"
+  ],
+  [
+   "Goes with the lesson",
+   "પાઠ સાથે ચાલે છે"
+  ],
+  [
+   "Ready",
+   "તૈયાર"
+  ],
+  [
+   "Locked",
+   "લૉક"
+  ],
+  [
+   "Mastered",
+   "નિપુણ"
+  ],
+  [
+   "In progress",
+   "પ્રગતિમાં"
+  ],
+  [
+   "Passed",
+   "પાસ"
+  ],
+  [
+   "Not done",
+   "પૂર્ણ નથી"
+  ],
+  [
+   "Not solved",
+   "ઉકેલાયું નથી"
+  ],
+  [
+   "Not played",
+   "રમાયું નથી"
+  ],
+  [
+   "Open",
+   "ખોલો"
+  ],
+  [
+   "Test out",
+   "પરીક્ષા આપી પસાર થાઓ"
+  ],
+  [
+   "Need review",
+   "પુનરાવર્તન જોઈએ"
+  ],
+  [
+   "I know this",
+   "મને આ આવડે છે"
+  ],
+  [
+   "Show answer",
+   "જવાબ બતાવો"
+  ],
+  [
+   "Prerequisites open it",
+   "પૂર્વશરતો તેને ખોલે છે"
+  ],
+  [
+   "Start lab",
+   "લૅબ શરૂ કરો"
+  ],
+  [
+   "(Terminal lab)",
+   "(ટર્મિનલ લૅબ)"
+  ],
+  [
+   "(Terminal lab),",
+   "(ટર્મિનલ લૅબ),"
+  ],
+  [
+   "(Real Linux lab)",
+   "(વાસ્તવિક Linux લૅબ)"
+  ],
+  [
+   "(Real Linux lab),",
+   "(વાસ્તવિક Linux લૅબ),"
+  ],
+  [
+   "Related practice:",
+   "સંબંધિત અભ્યાસ:"
+  ],
+  [
+   "Related stages:",
+   "સંબંધિત તબક્કા:"
+  ],
+  [
+   "Case file",
+   "કેસ ફાઇલ"
+  ],
+  [
+   "What happened",
+   "શું બન્યું"
+  ],
+  [
+   "Cause",
+   "કારણ"
+  ],
+  [
+   "What changed",
+   "શું બદલાયું"
+  ],
+  [
+   "Lesson",
+   "પાઠ"
+  ],
+  [
+   "Lessons",
+   "પાઠ"
+  ],
+  [
+   "Original source:",
+   "મૂળ સ્ત્રોત:"
+  ],
+  [
+   "Open the full case file",
+   "સંપૂર્ણ કેસ ફાઇલ ખોલો"
+  ],
+  [
+   "Mark as read",
+   "વાંચેલું તરીકે ચિહ્નિત કરો"
+  ],
+  [
+   "Try it",
+   "અજમાવો"
+  ],
+  [
+   "On this page",
+   "આ પાના પર"
+  ],
+  [
+   "Lesson check",
+   "પાઠ ચકાસણી"
+  ],
+  [
+   "Flashcards",
+   "ફ્લૅશકાર્ડ"
+  ],
+  [
+   "Interactive",
+   "ઇન્ટરેક્ટિવ"
+  ],
+  [
+   "Exercise",
+   "અભ્યાસ"
+  ],
+  [
+   "Study time",
+   "અભ્યાસ સમય"
+  ],
+  [
+   "Level",
+   "સ્તર"
+  ],
+  [
+   "Type",
+   "પ્રકાર"
+  ],
+  [
+   "Stage",
+   "તબક્કો"
+  ],
+  [
+   "Paths",
+   "માર્ગો"
+  ],
+  [
+   "Breadcrumb",
+   "બ્રેડક્રમ્બ"
+  ],
+  [
+   "Support level",
+   "સપોર્ટ સ્તર"
+  ],
+  [
+   "Show",
+   "બતાવો"
+  ],
+  [
+   "All",
+   "બધા"
+  ],
+  [
+   "Clear filters",
+   "ફિલ્ટર સાફ કરો"
+  ],
+  [
+   "All skills",
+   "બધાં કૌશલ્યો"
+  ],
+  [
+   "All stages",
+   "બધા તબક્કા"
+  ],
+  [
+   "Use",
+   "વાપરો"
+  ],
+  [
+   "and",
+   "અને"
+  ],
+  [
+   "or",
+   "અથવા"
+  ],
+  [
+   "Practises Every skill",
+   "દરેક કૌશલ્યનો અભ્યાસ કરાવે છે"
+  ],
+  [
+   "Practises Everyone",
+   "દરેકનો અભ્યાસ કરાવે છે"
+  ],
+  [
+   "Runs in your browser",
+   "તમારા બ્રાઉઝરમાં ચાલે છે"
+  ],
+  [
+   "Diagnose only",
+   "ફક્ત નિદાન"
+  ],
+  [
+   "Several faults",
+   "ઘણી ખામીઓ"
+  ],
+  [
+   "Fix it",
+   "સુધારો"
+  ],
+  [
+   "starter",
+   "શરૂઆતી"
+  ],
+  [
+   "Newcomer",
+   "નવા આવનાર"
+  ],
+  [
+   "Rank:",
+   "રૅન્ક:"
+  ],
+  [
+   "skill points",
+   "કૌશલ્ય પોઇન્ટ"
+  ],
+  [
+   "Unlocks",
+   "ખોલે છે"
+  ],
+  [
+   "Skill details",
+   "કૌશલ્યની વિગતો"
+  ],
+  [
+   "Key",
+   "ચાવી"
+  ],
+  [
+   "Foundations",
+   "પાયો"
+  ],
+  [
+   "Core skills",
+   "મુખ્ય કૌશલ્યો"
+  ],
+  [
+   "Platform skills",
+   "પ્લૅટફૉર્મ કૌશલ્યો"
+  ],
+  [
+   "Advanced skills",
+   "અદ્યતન કૌશલ્યો"
+  ],
+  [
+   "Mastery",
+   "નિપુણતા"
+  ],
+  [
+   "Needs or unlocks the selected skill",
+   "પસંદ કરેલા કૌશલ્ય માટે જરૂરી અથવા તે ખોલે છે"
+  ],
+  [
+   "Select a skill to see what it needs and unlocks. Pass every lesson check in a skill to master it. Locked skills open when the skills that lead into them are mastered.",
+   "તે માટે શું જોઈએ અને તે શું ખોલે છે તે જોવા કૌશલ્ય પસંદ કરો. કૌશલ્યમાં નિપુણ થવા તેની દરેક પાઠ ચકાસણી પાસ કરો. લૉક કરેલાં કૌશલ્યો તેમાં લઈ જતાં કૌશલ્યોમાં નિપુણ થયા પછી ખુલે છે."
+  ],
+  [
+   "No prerequisites. A good place to start.",
+   "કોઈ પૂર્વશરત નથી. શરૂ કરવા માટે સારી જગ્યા."
+  ],
+  [
+   "Skill route for DevOps Engineer",
+   "DevOps Engineer માટે કૌશલ્ય માર્ગ"
+  ],
+  [
+   "DevOps Engineer",
+   "DevOps Engineer"
+  ],
+  [
+   "Cloud Engineer",
+   "Cloud Engineer"
+  ],
+  [
+   "Site Reliability Engineer",
+   "Site Reliability Engineer"
+  ],
+  [
+   "DevSecOps Engineer",
+   "DevSecOps Engineer"
+  ],
+  [
+   "AI Engineer",
+   "AI Engineer"
+  ],
+  [
+   "MLOps and AIOps Engineer",
+   "MLOps and AIOps Engineer"
+  ],
+  [
+   "Platform Engineer",
+   "Platform Engineer"
+  ],
+  [
+   "Build internal developer platforms, golden paths and self-service infrastructure.",
+   "આંતરિક ડેવલપર પ્લૅટફૉર્મ, ગોલ્ડન પાથ અને સ્વ-સેવા ઇન્ફ્રાસ્ટ્રક્ચર બનાવો."
+  ],
+  [
+   "Kubernetes Administrator (CKA and CKS)",
+   "Kubernetes ઍડમિનિસ્ટ્રેટર (CKA અને CKS)"
+  ],
+  [
+   "A focused path for cluster administration and security certification practice.",
+   "ક્લસ્ટર વહીવટ અને સુરક્ષા પ્રમાણપત્ર અભ્યાસ માટેનો કેન્દ્રિત માર્ગ."
+  ],
+  [
+   "FinOps and cloud cost",
+   "FinOps અને ક્લાઉડ ખર્ચ"
+  ],
+  [
+   "Measure, allocate and reduce cloud spend without hurting reliability.",
+   "વિશ્વસનીયતાને નુકસાન કર્યા વિના ક્લાઉડ ખર્ચ માપો, ફાળવો અને ઘટાડો."
+  ],
+  [
+   "Data platform engineer",
+   "ડેટા પ્લૅટફૉર્મ એન્જિનિયર"
+  ],
+  [
+   "Build pipelines, storage and governance for analytics and machine learning teams.",
+   "ઍનાલિટિક્સ અને મશીન લર્નિંગ ટીમો માટે પાઇપલાઇન, સ્ટોરેજ અને ગવર્નન્સ બનાવો."
+  ],
+  [
+   "Subnet and CIDR playground",
+   "સબનેટ અને CIDR પ્લેગ્રાઉન્ડ"
+  ],
+  [
+   "YAML playground",
+   "YAML પ્લેગ્રાઉન્ડ"
+  ],
+  [
+   "Python playground",
+   "Python પ્લેગ્રાઉન્ડ"
+  ],
+  [
+   "Go playground",
+   "Go પ્લેગ્રાઉન્ડ"
+  ],
+  [
+   "SQL for SREs",
+   "SRE માટે SQL"
+  ],
+  [
+   "Skill-writing lab",
+   "કૌશલ્ય-લેખન લૅબ"
+  ],
+  [
+   "Animated explainers",
+   "ઍનિમેટેડ સમજૂતીઓ"
+  ],
+  [
+   "Multi-service incidents",
+   "બહુ-સેવા ઘટનાઓ"
+  ],
+  [
+   "Real-world case studies",
+   "વાસ્તવિક જગતના કેસ સ્ટડી"
+  ],
+  [
+   "InterviewHub",
+   "InterviewHub"
+  ],
+  [
+   "Reference",
+   "સંદર્ભ"
+  ],
+  [
+   "Up next",
+   "હવે પછી"
+  ],
+  [
+   "Practice this stage:",
+   "આ તબક્કાનો અભ્યાસ કરો:"
+  ],
+  [
+   "Watch and study:",
+   "જુઓ અને શીખો:"
+  ],
+  [
+   "Cheat sheet:",
+   "ચીટ શીટ:"
+  ],
+  [
+   "Get the handbook (PDF or web page)",
+   "હૅન્ડબુક મેળવો (PDF અથવા વેબ પાનું)"
+  ],
+  [
+   "case studies",
+   "કેસ સ્ટડી"
+  ],
+  [
+   "flashcards",
+   "ફ્લૅશકાર્ડ"
+  ],
+  [
+   "days",
+   "દિવસો"
+  ],
+  [
+   "Prerequisites",
+   "પૂર્વશરતો"
+  ],
+  [
+   "What you will learn",
+   "તમે શું શીખશો"
+  ],
+  [
+   "Start here",
+   "અહીંથી શરૂ કરો"
+  ],
+  [
+   "Continue",
+   "ચાલુ રાખો"
+  ],
+  [
+   "Back",
+   "પાછા"
+  ],
+  [
+   "Next",
+   "આગળ"
+  ],
+  [
+   "Previous",
+   "પાછલું"
+  ],
+  [
+   "Submit",
+   "મોકલો"
+  ],
+  [
+   "Check",
+   "ચકાસો"
+  ],
+  [
+   "Retry",
+   "ફરી પ્રયાસ કરો"
+  ],
+  [
+   "Reset",
+   "રીસેટ"
+  ],
+  [
+   "Hint",
+   "સંકેત"
+  ],
+  [
+   "Hints",
+   "સંકેતો"
+  ],
+  [
+   "Solution",
+   "ઉકેલ"
+  ],
+  [
+   "Goals",
+   "લક્ષ્યો"
+  ],
+  [
+   "Copy",
+   "કૉપિ"
+  ],
+  [
+   "Copied",
+   "કૉપિ થયું"
+  ],
+  [
+   "Download",
+   "ડાઉનલોડ"
+  ],
+  [
+   "Share",
+   "શેર કરો"
+  ],
+  [
+   "Export progress",
+   "પ્રગતિ નિકાસ કરો"
+  ],
+  [
+   "Import progress",
+   "પ્રગતિ આયાત કરો"
+  ],
+  [
+   "Terminal lab",
+   "ટર્મિનલ લૅબ"
+  ],
+  [
+   "Real Linux",
+   "વાસ્તવિક Linux"
+  ],
+  [
+   "Incident game",
+   "ઘટના રમત"
+  ],
+  [
+   "Explainer",
+   "સમજૂતી"
+  ],
+  [
+   "Architecture",
+   "આર્કિટેક્ચર"
+  ],
+  [
+   "Try this lab",
+   "આ લૅબ અજમાવો"
+  ],
+  [
+   "Watch the guided version",
+   "માર્ગદર્શિત આવૃત્તિ જુઓ"
+  ],
+  [
+   "In this lesson",
+   "આ પાઠમાં"
+  ],
+  [
+   "Quiz",
+   "ક્વિઝ"
+  ],
+  [
+   "Explain it to me like...",
+   "મને આ રીતે સમજાવો..."
+  ],
+  [
+   "I am new to this",
+   "હું આમાં નવો છું"
+  ],
+  [
+   "A practitioner",
+   "અનુભવી વ્યક્તિ"
+  ],
+  [
+   "Senior view",
+   "સિનિયર દૃષ્ટિકોણ"
+  ],
+  [
+   "In an interview",
+   "ઇન્ટરવ્યૂમાં"
+  ],
+  [
+   "Common mistakes",
+   "સામાન્ય ભૂલો"
+  ],
+  [
+   "In the real world",
+   "વાસ્તવિક જગતમાં"
+  ],
+  [
+   "Watch it",
+   "જુઓ"
+  ],
+  [
+   "All widgets",
+   "બધા વિજેટ"
+  ],
+  [
+   "Key takeaways",
+   "મુખ્ય મુદ્દા"
+  ],
+  [
+   "Start the check",
+   "ચકાસણી શરૂ કરો"
+  ],
+  [
+   "Question",
+   "પ્રશ્ન"
+  ],
+  [
+   "Select to show the answer",
+   "જવાબ બતાવવા પસંદ કરો"
+  ],
+  [
+   "Again",
+   "ફરી"
+  ],
+  [
+   "Got it",
+   "સમજાયું"
+  ],
+  [
+   "Do it yourself",
+   "જાતે કરો"
+  ],
+  [
+   "Practise on a machine",
+   "મશીન પર અભ્યાસ કરો"
+  ],
+  [
+   "What to do next",
+   "આગળ શું કરવું"
+  ],
+  [
+   "Take the lesson check",
+   "પાઠ ચકાસણી લો"
+  ],
+  [
+   "Pass it to unlock the next lesson.",
+   "આગલો પાઠ ખોલવા તે પાસ કરો."
+  ],
+  [
+   "Troubleshooting drill",
+   "સમસ્યા નિવારણ અભ્યાસ"
+  ],
+  [
+   "Animated explainer",
+   "ઍનિમેટેડ સમજૂતી"
+  ],
+  [
+   "Post-mortem",
+   "પોસ્ટ-મૉર્ટમ"
+  ],
+  [
+   "Interview question",
+   "ઇન્ટરવ્યૂનો પ્રશ્ન"
+  ],
+  [
+   "Official documentation for this stage",
+   "આ તબક્કા માટે સત્તાવાર દસ્તાવેજીકરણ"
+  ],
+  [
+   "Read the vendor and project documentation for the full, current detail.",
+   "સંપૂર્ણ અને તાજી વિગતો માટે વેન્ડર અને પ્રોજેક્ટના દસ્તાવેજો વાંચો."
+  ],
+  [
+   "Pass every lesson check to earn the",
+   "મેળવવા માટે દરેક પાઠ ચકાસણી પાસ કરો"
+  ],
+  [
+   "stage badge",
+   "તબક્કા બૅજ"
+  ],
+  [
+   "Make the calls during a realistic outage and see what each choice leads to.",
+   "વાસ્તવિક આઉટેજ દરમિયાન નિર્ણયો લો અને જુઓ દરેક પસંદગી ક્યાં લઈ જાય છે."
+  ],
+  [
+   "Reading list",
+   "વાંચન યાદી"
+  ],
+  [
+   "See the reading lists for every stage",
+   "દરેક તબક્કાની વાંચન યાદી જુઓ"
+  ],
+  [
+   "Where this skill fits",
+   "આ કૌશલ્ય ક્યાં બંધ બેસે છે"
+  ],
+  [
+   "Test out of this skill",
+   "આ કૌશલ્યની પરીક્ષા આપો"
+  ],
+  [
+   "Open the labs for this stage",
+   "આ તબક્કા માટેની લૅબ ખોલો"
+  ],
+  [
+   "Guide",
+   "માર્ગદર્શિકા"
+  ],
+  [
+   "Guides",
+   "માર્ગદર્શિકાઓ"
+  ],
+  [
+   "Articles and talks",
+   "લેખો અને વક્તવ્યો"
+  ],
+  [
+   "Saved in this browser. Export a backup if you switch devices.",
+   "આ બ્રાઉઝરમાં સાચવ્યું. ઉપકરણ બદલો તો બૅકઅપ નિકાસ કરો."
+  ],
+  [
+   "Share your progress",
+   "તમારી પ્રગતિ શેર કરો"
+  ],
+  [
+   "Makes a picture on this device. Add a name if you like; it is not saved or sent anywhere.",
+   "આ ઉપકરણ પર ચિત્ર બનાવે છે. ઇચ્છો તો નામ ઉમેરો; તે ક્યાંય સાચવાતું કે મોકલાતું નથી."
+  ],
+  [
+   "Name on the card (optional)",
+   "કાર્ડ પરનું નામ (વૈકલ્પિક)"
+  ],
+  [
+   "Look",
+   "દેખાવ"
+  ],
+  [
+   "Shape",
+   "આકાર"
+  ],
+  [
+   "Wide (for links and posts)",
+   "પહોળું (લિંક અને પોસ્ટ માટે)"
+  ],
+  [
+   "Square (for chat and feeds)",
+   "ચોરસ (ચૅટ અને ફીડ માટે)"
+  ],
+  [
+   "Download the card (PNG)",
+   "કાર્ડ ડાઉનલોડ કરો (PNG)"
+  ],
+  [
+   "Open the learning dashboard",
+   "શીખવાનું ડૅશબોર્ડ ખોલો"
+  ],
+  [
+   "Current streak",
+   "વર્તમાન સળંગ દિવસો"
+  ],
+  [
+   "Active days",
+   "સક્રિય દિવસો"
+  ],
+  [
+   "Activity, last 12 weeks",
+   "પ્રવૃત્તિ, છેલ્લા 12 અઠવાડિયા"
+  ],
+  [
+   "Completion by stage",
+   "તબક્કા મુજબ પૂર્ણતા"
+  ],
+  [
+   "Your data",
+   "તમારો ડેટા"
+  ],
+  [
+   "Reset all progress",
+   "બધી પ્રગતિ રીસેટ કરો"
+  ],
+  [
+   "Role skill trees",
+   "ભૂમિકા કૌશલ્ય વૃક્ષો"
+  ],
+  [
+   "See each role as a roadmap",
+   "દરેક ભૂમિકાને રોડમૅપ તરીકે જુઓ"
+  ],
+  [
+   "All roles",
+   "બધી ભૂમિકાઓ"
+  ],
+  [
+   "role paths",
+   "ભૂમિકા માર્ગો"
+  ],
+  [
+   "build your own path",
+   "તમારો પોતાનો માર્ગ બનાવો"
+  ],
+  [
+   "Prefer a guided order for a job role? See the",
+   "નોકરીની ભૂમિકા માટે માર્ગદર્શિત ક્રમ જોઈએ? જુઓ"
+  ],
+  [
+   "Select to see details",
+   "વિગતો જોવા પસંદ કરો"
+  ],
+  [
+   "Choose your callsign",
+   "તમારો કૉલસાઇન પસંદ કરો"
+  ],
+  [
+   "Change callsign",
+   "કૉલસાઇન બદલો"
+  ],
+  [
+   "Your crew name on MARGA. It is used for greetings and your progress page. No account and no sign-in.",
+   "MARGA પર તમારું ક્રૂ નામ. તે શુભેચ્છાઓ અને તમારા પ્રગતિ પાના માટે વપરાય છે. ખાતું નહીં અને સાઇન-ઇન નહીં."
+  ],
+  [
+   "Change your name or avatar. No account and no sign-in.",
+   "તમારું નામ અથવા અવતાર બદલો. ખાતું નહીં અને સાઇન-ઇન નહીં."
+  ],
+  [
+   "Privacy Assured: Feel free to use your name or a preferred alias. This identity token remains local to your active session and is never stored on external databases.",
+   "ગોપનીયતાની ખાતરી: તમારું નામ અથવા મનપસંદ ઉપનામ વાપરવા નિઃસંકોચ રહો. આ ઓળખ ટોકન તમારા સક્રિય સત્રમાં જ રહે છે અને બાહ્ય ડેટાબેઝમાં ક્યારેય સંગ્રહાતું નથી."
+  ],
+  [
+   "Callsign",
+   "કૉલસાઇન"
+  ],
+  [
+   "Suggest one",
+   "સૂચવો"
+  ],
+  [
+   "Start learning",
+   "શીખવાનું શરૂ કરો"
+  ],
+  [
+   "Save",
+   "સાચવો"
+  ],
+  [
+   "Cancel",
+   "રદ કરો"
+  ],
+  [
+   "Avatar",
+   "અવતાર"
+  ],
+  [
+   "Colour",
+   "રંગ"
+  ],
+  [
+   "Initial",
+   "આદ્યાક્ષર"
+  ],
+  [
+   "Terminal",
+   "ટર્મિનલ"
+  ],
+  [
+   "Bolt",
+   "વીજળી"
+  ],
+  [
+   "Shield",
+   "કવચ"
+  ],
+  [
+   "Cloud",
+   "ક્લાઉડ"
+  ],
+  [
+   "Server",
+   "સર્વર"
+  ],
+  [
+   "Branch",
+   "શાખા"
+  ],
+  [
+   "Cube",
+   "ઘન"
+  ],
+  [
+   "Blue",
+   "વાદળી"
+  ],
+  [
+   "Green",
+   "લીલો"
+  ],
+  [
+   "Purple",
+   "જાંબલી"
+  ],
+  [
+   "Red",
+   "લાલ"
+  ],
+  [
+   "Amber",
+   "એમ્બર"
+  ],
+  [
+   "Teal",
+   "ટીલ"
+  ],
+  [
+   "Pink",
+   "ગુલાબી"
+  ],
+  [
+   "Slate",
+   "સ્લેટ"
+  ],
+  [
+   "Enter a callsign of 2 to 24 characters, or choose Suggest one.",
+   "2 થી 24 અક્ષરોનો કૉલસાઇન દાખલ કરો, અથવા સૂચવો પસંદ કરો."
+  ],
+  [
+   "For example, Ravi",
+   "ઉદાહરણ તરીકે, Ravi"
+  ],
+  [
+   "Your callsign",
+   "તમારો કૉલસાઇન"
+  ],
+  [
+   "Good morning,",
+   "શુભ સવાર,"
+  ],
+  [
+   "Good afternoon,",
+   "શુભ બપોર,"
+  ],
+  [
+   "Good evening,",
+   "શુભ સાંજ,"
+  ],
+  [
+   "Choose a callsign",
+   "કૉલસાઇન પસંદ કરો"
+  ],
+  [
+   "It stays on this device.",
+   "તે આ ઉપકરણ પર જ રહે છે."
+  ],
+  [
+   "Saved only on this device. Resetting progress keeps your callsign.",
+   "ફક્ત આ ઉપકરણ પર સાચવ્યું. પ્રગતિ રીસેટ કરવાથી તમારો કૉલસાઇન રહે છે."
+  ],
+  [
+   "Progress reset. Your callsign is kept.",
+   "પ્રગતિ રીસેટ થઈ. તમારો કૉલસાઇન જળવાયો છે."
+  ]
+ ],
+ "pats": [
+  [
+   "^(\\d+) lessons, (\\d+) stages$",
+   "$1 પાઠ, $2 તબક્કા"
+  ],
+  [
+   "^About ([\\d.]+) h$",
+   "લગભગ $1 કલાક"
+  ],
+  [
+   "^(\\d+) animated explainers$",
+   "$1 ઍનિમેટેડ સમજૂતીઓ"
+  ],
+  [
+   "^(\\d+) interactive widgets$",
+   "$1 ઇન્ટરેક્ટિવ વિજેટ"
+  ],
+  [
+   "^(\\d+) architecture post-mortems$",
+   "$1 આર્કિટેક્ચર પોસ્ટ-મૉર્ટમ"
+  ],
+  [
+   "^(\\d+) failure and recovery stories$",
+   "$1 નિષ્ફળતા અને પુનઃપ્રાપ્તિની કથાઓ"
+  ],
+  [
+   "^\\((\\d+) watched\\), including$",
+   "($1 જોયા), જેમાં સામેલ છે"
+  ],
+  [
+   "^(.+) · (.+) · about (\\d+) minutes$",
+   "$1 · $2 · લગભગ $3 મિનિટ"
+  ],
+  [
+   "^(\\d+) min$",
+   "$1 મિનિટ"
+  ],
+  [
+   "^(\\d+) steps$",
+   "$1 પગલાં"
+  ],
+  [
+   "^(\\d+) questions$",
+   "$1 પ્રશ્નો"
+  ],
+  [
+   "^(\\d+) lessons?$",
+   "$1 પાઠ"
+  ],
+  [
+   "^(\\d+) days$",
+   "$1 દિવસ"
+  ],
+  [
+   "^(\\d+) min a day$",
+   "દિવસના $1 મિનિટ"
+  ],
+  [
+   "^([\\d.]+) h$",
+   "$1 કલાક"
+  ],
+  [
+   "^(\\d+) percent complete$",
+   "$1 ટકા પૂર્ણ"
+  ],
+  [
+   "^(\\d+) of (\\d+) lessons passed$",
+   "$2 પાઠમાંથી $1 પાસ"
+  ],
+  [
+   "^(\\d+) of (\\d+) lessons$",
+   "$2 પાઠમાંથી $1"
+  ],
+  [
+   "^(\\d+) of (\\d+) watched$",
+   "$2 માંથી $1 જોયા"
+  ],
+  [
+   "^\\((\\d+) of (\\d+) done\\)$",
+   "($2 માંથી $1 પૂર્ણ)"
+  ],
+  [
+   "^(\\d+) of (\\d+) solved$",
+   "$2 માંથી $1 ઉકેલ્યા"
+  ],
+  [
+   "^(\\d+) of (\\d+) skills mastered$",
+   "$2 કૌશલ્યોમાંથી $1 નિપુણ"
+  ],
+  [
+   "^(\\d+) of (\\d+) lessons? passed$",
+   "$2 પાઠમાંથી $1 પાસ"
+  ],
+  [
+   "^of (\\d+)$",
+   "$1 માંથી"
+  ],
+  [
+   "^Level (\\d+) of (\\d+)$",
+   "સ્તર $1 / $2"
+  ],
+  [
+   "^Level (\\d+)$",
+   "સ્તર $1"
+  ],
+  [
+   "^Question (\\d+) of (\\d+)$",
+   "પ્રશ્ન $1 / $2"
+  ],
+  [
+   "^Current streak (\\d+) days?$",
+   "વર્તમાન સળંગ $1 દિવસ"
+  ],
+  [
+   "^Current streak (\\d+) days?, best (\\d+) days?$",
+   "વર્તમાન સળંગ $1 દિવસ, શ્રેષ્ઠ $2 દિવસ"
+  ],
+  [
+   "^(\\d+) lessons?, about ([\\d.]+) h\\. No prerequisites\\. You can start here\\.$",
+   "$1 પાઠ, લગભગ $2 કલાક. કોઈ પૂર્વશરત નથી. તમે અહીંથી શરૂ કરી શકો છો."
+  ],
+  [
+   "^(\\d+) lessons?, about ([\\d.]+) h\\. Works best after$",
+   "$1 પાઠ, લગભગ $2 કલાક. આ પછી કરવાથી સૌથી સારું"
+  ],
+  [
+   "^(\\d+) lessons?, about ([\\d.]+) h$",
+   "$1 પાઠ, લગભગ $2 કલાક"
+  ],
+  [
+   "^Used in (\\d+) paths?:$",
+   "$1 માર્ગોમાં વપરાય છે:"
+  ],
+  [
+   "^Show all (\\d+) skills$",
+   "બધાં $1 કૌશલ્યો બતાવો"
+  ],
+  [
+   "^All (\\d+) lessons$",
+   "બધા $1 પાઠ"
+  ],
+  [
+   "^Version (.+)$",
+   "આવૃત્તિ $1"
+  ],
+  [
+   "^Start: (.+)$",
+   "શરૂ કરો: $1"
+  ],
+  [
+   "^Skill route for (.+)$",
+   "$1 માટે કૌશલ્ય માર્ગ"
+  ],
+  [
+   "^(.+) skill tree$",
+   "$1 કૌશલ્ય વૃક્ષ"
+  ],
+  [
+   "^Open the (.+) page$",
+   "$1 પાનું ખોલો"
+  ],
+  [
+   "^Locked\\. Pass the check for \"(.+)\" first\\.$",
+   "લૉક છે. પહેલાં \"$1\" ની ચકાસણી પાસ કરો."
+  ],
+  [
+   "^real Linux in your browser, (.+)$",
+   "તમારા બ્રાઉઝરમાં વાસ્તવિક Linux, $1"
+  ],
+  [
+   "^(.+), locked$",
+   "$1, લૉક"
+  ],
+  [
+   "^(.+), ready$",
+   "$1, તૈયાર"
+  ],
+  [
+   "^(.+), Ready to unlock skills, (\\d+) of (\\d+) lessons passed\\.(.*)$",
+   "$1, કૌશલ્યો ખોલવા તૈયાર, $3 પાઠમાંથી $2 પાસ.$4"
+  ],
+  [
+   "^Needs (.+)$",
+   "$1 જોઈએ"
+  ],
+  [
+   "^Select to see details$",
+   "વિગતો જોવા પસંદ કરો"
+  ],
+  [
+   "^!(.+) and (.+)$",
+   "!$1 અને $2"
+  ],
+  [
+   "^Lesson (\\d+) of (\\d+)$",
+   "$2 પાઠમાંથી પાઠ $1"
+  ],
+  [
+   "^Lesson (\\d+): (.+), (Locked|Up next|Ready|Passed)$",
+   "પાઠ $1: $2, $3"
+  ],
+  [
+   "^Part of your plan: (.+), day (\\d+) of (\\d+)$",
+   "તમારી યોજનાનો ભાગ: $1, $3 માંથી દિવસ $2"
+  ],
+  [
+   "^Written from (\\d+) official references, listed at the end of the lesson\\. Check them for the current detail\\.$",
+   "$1 સત્તાવાર સંદર્ભોમાંથી લખેલું, પાઠના અંતે યાદી આપેલી છે. તાજી વિગતો માટે તે તપાસો."
+  ],
+  [
+   "^Used in (\\d+) role paths:$",
+   "$1 ભૂમિકા માર્ગોમાં વપરાય છે:"
+  ],
+  [
+   "^(\\d+) questions\\. Answer (\\d+) correctly to pass and unlock the next lesson\\.$",
+   "$1 પ્રશ્નો. પાસ થઈ આગલો પાઠ ખોલવા $2 સાચા જવાબ આપો."
+  ],
+  [
+   "^Card (\\d+) of (\\d+)$",
+   "કાર્ડ $1 / $2"
+  ],
+  [
+   "^All (\\d+) real Linux labs for this lesson$",
+   "આ પાઠની બધી $1 વાસ્તવિક Linux લૅબ"
+  ],
+  [
+   "^(\\d+) break-and-fix labs for this stage, in a simulated terminal in your browser \\((\\d+) done\\)\\.$",
+   "આ તબક્કાની $1 બ્રેક-ઍન્ડ-ફિક્સ લૅબ, તમારા બ્રાઉઝરમાં સિમ્યુલેટેડ ટર્મિનલમાં ($2 પૂર્ણ)."
+  ],
+  [
+   "^simulated terminal, (\\d+) min$",
+   "સિમ્યુલેટેડ ટર્મિનલ, $1 મિનિટ"
+  ],
+  [
+   "^(\\d+) skills, about ([\\d.]+) h of study\\.$",
+   "$1 કૌશલ્યો, લગભગ $2 કલાકનો અભ્યાસ."
+  ],
+  [
+   "^Welcome, (.+)\\.$",
+   "સ્વાગત છે, $1."
+  ],
+  [
+   "^Callsign changed to (.+)\\.$",
+   "કૉલસાઇન બદલીને $1 કર્યો."
+  ],
+  [
+   "^Your callsign is (.+)\\. Change callsign$",
+   "તમારો કૉલસાઇન $1 છે. કૉલસાઇન બદલો"
+  ]
+ ],
+ "modules": {
+  "linux": {
+   "title": "એન્જિનિયરો માટે Linux",
+   "summary": "ઉત્પાદન કામની માંગ મુજબ Linux સર્વરમાં ફરતાં, તેને સુરક્ષિત કરતાં, પૅકેજ કરતાં, શેડ્યૂલ કરતાં અને તેની સમસ્યાઓ ઉકેલતાં શીખો."
+  },
+  "git": {
+   "title": "Git અને વર્ઝન નિયંત્રણ",
+   "summary": "Git સાથે ફેરફારો ટ્રૅક કરો: કમિટ, બ્રાન્ચ, મર્જ, રીબેઝ, રિમોટ, પુલ રિક્વેસ્ટ, ટૅગ, હૂક, મોટી રિપોઝિટરી અને કંઈ બગડે ત્યારે પુનઃપ્રાપ્તિ."
+  },
+  "bash": {
+   "title": "શેલ સ્ક્રિપ્ટિંગ",
+   "summary": "મોટેથી નિષ્ફળ થતી, સુરક્ષિત રીતે ચાલતી Bash સ્ક્રિપ્ટ લખો, API માંથી JSON પાર્સ કરો અને પુનરાવર્તિત હાથનું કામ બદલો."
+  },
+  "python": {
+   "title": "ઑટોમેશન માટે Python",
+   "summary": "ફાઇલ, પ્રક્રિયા, HTTP API અને ક્લાઉડ SDK સંભાળતી Python સ્ક્રિપ્ટ લખો, ટેસ્ટ અને પૅકેજ કરેલા કમાન્ડ-લાઇન ટૂલ સાથે."
+  },
+  "networking": {
+   "title": "નેટવર્કિંગની મૂળભૂત બાબતો",
+   "summary": "સરનામાં, DNS, HTTP, TLS અને ફાયરવૉલ એટલા સારા સમજો કે કોઈપણ કનેક્ટિવિટી નિષ્ફળતા ડિબગ કરી શકો."
+  },
+  "docker": {
+   "title": "Docker અને કન્ટેનર",
+   "summary": "નાની, સુરક્ષિત ઇમેજ બનાવો, બહુ-કન્ટેનર ઍપ્લિકેશન ચલાવો અને રજિસ્ટ્રી, રનટાઇમ અને OCI ધોરણ સમજો."
+  },
+  "cicd": {
+   "title": "CI/CD અને ડિલિવરી",
+   "summary": "સુરક્ષિત રીતે બિલ્ડ, ટેસ્ટ અને શિપ કરતી પાઇપલાઇન ડિઝાઇન કરો, સપ્લાય ચેઇન સુરક્ષિત કરો અને રોલિંગ, કૅનેરી અને ડિક્લેરેટિવ ડિલિવરીથી ડિપ્લૉય કરો."
+  },
+  "kubernetes": {
+   "title": "Kubernetes",
+   "summary": "આર્કિટેક્ચર અને નેટવર્કિંગથી લઈને Helm, ઑટોસ્કેલિંગ, ઑપરેટર, ક્લસ્ટર અપગ્રેડ, RBAC, સમસ્યા નિવારણ અને પરીક્ષા વ્યૂહરચના સુધી Kubernetes પર વર્કલોડ ચલાવો."
+  },
+  "terraform": {
+   "title": "Terraform અને કોડ તરીકે ઇન્ફ્રાસ્ટ્રક્ચર",
+   "summary": "ઇન્ફ્રાસ્ટ્રક્ચરને કોડ તરીકે વર્ણવો, અદ્યતન HCL વાપરો, સ્ટેટ અને ગુપ્ત માહિતી સુરક્ષિત રીતે સંભાળો અને વાસ્તવિક AWS અને Azure સ્ટૅક બનાવો."
+  },
+  "cloud": {
+   "title": "ક્લાઉડ પ્લૅટફૉર્મ: AWS અને Azure",
+   "summary": "AWS અને Azure પર સાથે સાથે મુખ્ય ખ્યાલો: ઓળખ, નેટવર્ક, DNS અને CDN, કમ્પ્યુટ, સર્વરલેસ, મૅનેજ્ડ Kubernetes, સુરક્ષા, મૉનિટરિંગ અને ખર્ચ."
+  },
+  "observability": {
+   "title": "ઑબ્ઝર્વેબિલિટી",
+   "summary": "મેટ્રિક્સ, લૉગ અને ટ્રેસથી સિસ્ટમ સજ્જ કરો, OpenTelemetry સાથે મોકલો, બહારથી તપાસો અને વપરાશકર્તાઓ ખરેખર જે અનુભવે તેના પર ચેતવણી આપો."
+  },
+  "sre": {
+   "title": "સાઇટ રિલાયબિલિટી એન્જિનિયરિંગ",
+   "summary": "SLO વડે વિશ્વસનીયતા નક્કી કરો, ઘટનાઓનો પ્રતિસાદ આપો, ઑન-કૉલ ચલાવો, ક્ષમતા આયોજન કરો, નિષ્ફળતાનો અભ્યાસ કરો અને ફેરફારો સુરક્ષિત રીતે સંભાળો."
+  },
+  "security": {
+   "title": "DevSecOps અને સુરક્ષા",
+   "summary": "ડિલિવરીમાં સુરક્ષા સામેલ કરો: ખતરા મૉડેલિંગ, ગુપ્ત માહિતી, પાઇપલાઇન અને સપ્લાય ચેઇન તપાસ, કન્ટેનર અને Kubernetes મજબૂતીકરણ, ક્લાઉડ ઓળખ અને ઘટના પ્રતિસાદ."
+  },
+  "ansible": {
+   "title": "Ansible અને કન્ફિગરેશન મૅનેજમેન્ટ",
+   "summary": "ઇન્વેન્ટરી અને પ્લેબુકમાં સર્વર વર્ણવો, આઇડેમ્પોટન્ટ રોલથી તેમને સુસંગત રાખો, Vault વડે ગુપ્ત માહિતી સુરક્ષિત કરો અને ફેરફારો સુરક્ષિત રીતે લાગુ કરો."
+  },
+  "databases": {
+   "title": "ઑપરેટરો માટે ડેટાબેઝ",
+   "summary": "રિલેશનલ ડેટાબેઝ આત્મવિશ્વાસથી ચલાવો: SQL, ઇન્ડેક્સ અને પ્લાન, ટ્રાન્ઝૅક્શન, બૅકઅપ, રેપ્લિકેશન, સુરક્ષિત માઇગ્રેશન, કૅશ અને ઘટનાનું ટ્રાયેજ."
+  },
+  "go": {
+   "title": "DevOps એન્જિનિયરો માટે Go",
+   "summary": "નાની, ઝડપી, વિશ્વસનીય Go સેવાઓ અને ટૂલ લખો: ટાઇપ, ભૂલો, ઇન્ટરફેસ, ગોરૂટીન, કૉન્ટેક્સ્ટ, HTTP, ટેસ્ટિંગ, કન્ટેનર અને ડિબગિંગ."
+  },
+  "helm": {
+   "title": "શરૂઆત કરનારાઓ માટે Helm",
+   "summary": "Helm વડે Kubernetes ઍપ્લિકેશન પૅકેજ, કન્ફિગર, અપગ્રેડ અને રોલબૅક કરો: ચાર્ટ, વૅલ્યુ, ટેમ્પ્લેટ, રિલીઝ, નિર્ભરતાઓ અને ડિબગિંગ."
+  },
+  "cloud-iam": {
+   "title": "ક્લાઉડ સુરક્ષા અને IAM",
+   "summary": "ક્લાઉડમાં કોણ અને શું શું કરી શકે તે નિયંત્રિત કરો: AWS અને Azure પર ઓળખ, ભૂમિકા અને નીતિઓ, ન્યૂનતમ વિશેષાધિકાર, ગુપ્ત માહિતી અને કી, ખાનગી નેટવર્કિંગ, ઑડિટ લૉગ અને ઍક્સેસ ભૂલોનું ડિબગિંગ."
+  },
+  "k8s-ops": {
+   "title": "Kubernetes વહીવટ અને સંચાલન",
+   "summary": "ફક્ત ઍપ નહીં, ક્લસ્ટર ચલાવો: કંટ્રોલ પ્લેન અને etcd, બૅકઅપ, સુરક્ષિત અપગ્રેડ, RBAC, નોડ જાળવણી, ક્વોટા અને ઑટોસ્કેલિંગ, નેટવર્ક અને પોડ સુરક્ષા અને ક્લસ્ટરની ખામીઓનું ડિબગિંગ."
+  },
+  "argocd": {
+   "title": "Argo CD સાથે સતત ડિલિવરી",
+   "summary": "કંટ્રોલર રિપોઝિટરીમાંથી ઇચ્છિત સ્થિતિ ખેંચે તે રીતે Kubernetes પર ડિલિવર કરો: ઍપ્લિકેશન, સિંક અને ડ્રિફ્ટ, Helm અને Kustomize, પર્યાવરણ, હૂક, ઍક્સેસ અને ડિબગિંગ."
+  },
+  "llm": {
+   "title": "LLM ના પાયા",
+   "summary": "મોટા ભાષા મૉડેલ વ્યવહારમાં કેવી રીતે કામ કરે છે તે સમજો: ટોકન, કૉન્ટેક્સ્ટ વિન્ડો, સૅમ્પલિંગ, તાલીમ, API કૉલ, ખર્ચ, લેટન્સી, મૂલ્યાંકન અને ડિબગિંગ."
+  },
+  "prompting": {
+   "title": "પ્રૉમ્પ્ટિંગ અને સંરચિત આઉટપુટ",
+   "summary": "વિશ્વસનીય પ્રૉમ્પ્ટ લખો, ઉદાહરણો આપો, પગલાં-દર-પગલાં તર્ક માગો, ચકાસાયેલ JSON મેળવો અને તમારા પ્રૉમ્પ્ટનું વર્ઝન અને ટેસ્ટ કરો."
+  },
+  "claude-skills": {
+   "title": "Claude Skills",
+   "summary": "કુશળતાને સ્કિલ તરીકે પૅકેજ કરો જે Claude જરૂર પડ્યે લોડ કરે: SKILL.md, ટ્રિગર થતાં વર્ણન, ક્રમિક પ્રકટીકરણ, સ્ક્રિપ્ટ, ટેસ્ટિંગ, શેરિંગ અને સુરક્ષા."
+  },
+  "mcp": {
+   "title": "ટૂલ ઉપયોગ અને MCP",
+   "summary": "મૉડેલને ટૂલ સુરક્ષિત રીતે કૉલ કરવા દો: ફંક્શન કૉલિંગ, ટૂલ-ઉપયોગ લૂપ, Model Context Protocol, સર્વર બનાવવું, પરવાનગીઓ અને પ્રૉમ્પ્ટ ઇન્જેક્શન."
+  },
+  "system-design": {
+   "title": "પ્લૅટફૉર્મ અને SRE માટે સિસ્ટમ ડિઝાઇન",
+   "summary": "નાની નિષ્ફળતા થાય તેવી સિસ્ટમ ડિઝાઇન કરો: અંદાજ, કૅશિંગ, કતાર, સુસંગતતા, કોરમ, સેલ, શફલ શાર્ડિંગ, લોડ શેડિંગ, મલ્ટી-રીજન, ફેરફારની સલામતી અને વાસ્તવિક આઉટેજ સામે તપાસેલી ઉદાહરણ ડિઝાઇન."
+  },
+  "mlops": {
+   "title": "MLOps: પ્રોડક્શનમાં મશીન લર્નિંગ",
+   "summary": "મૉડેલ બીજી કોઈ પ્રોડક્શન સિસ્ટમની જેમ ચલાવો: ડેટા તપાસ, પુનઃઉત્પાદન યોગ્ય તાલીમ, ટેસ્ટ કરેલી પાઇપલાઇન, મૉડેલ રજિસ્ટ્રી, સુરક્ષિત રિલીઝ, સર્વિંગ અને પુનઃતાલીમ લૂપ સાથે ડ્રિફ્ટનું મૉનિટરિંગ."
+  },
+  "aiops": {
+   "title": "AIOps: સંચાલન માટે અલ્ગોરિધમ",
+   "summary": "સિસ્ટમ ચલાવવામાં મદદ કરવા આંકડાશાસ્ત્ર અને મશીન લર્નિંગ વાપરો: વિસંગતિ શોધ, ચેતવણી સહસંબંધ, લૉગ અને ટ્રેસ પૅટર્ન, મૂળ કારણના સંકેતો, ઘટના સહાયક અને સુરક્ષિત ઑટો-રેમેડિયેશન."
+  },
+  "virtualization": {
+   "title": "વર્ચ્યુઅલાઇઝેશન",
+   "summary": "હાઇપરવાઇઝર, CPU અને મેમરી ઓવરકમિટ, વર્ચ્યુઅલ ડિસ્ક અને સ્નૅપશૉટ, વર્ચ્યુઅલ નેટવર્ક અને લાઇવ માઇગ્રેશન સમજો અને KVM હોસ્ટની સમસ્યાઓ ઉકેલો."
+  },
+  "storage": {
+   "title": "સ્ટોરેજ અને ફાઇલસિસ્ટમ",
+   "summary": "બ્લૉક, ફાઇલ કે ઑબ્જેક્ટ સ્ટોરેજ પસંદ કરો, ext4 અને XFS, LVM અને RAID, NFS, iSCSI અને Ceph સંભાળો અને ધીમી કે ભરાયેલી ડિસ્કનું નિદાન કરો."
+  },
+  "sql-ops": {
+   "title": "SQL પર્ફૉર્મન્સ અને ડેટાબેઝ સંચાલન",
+   "summary": "ક્વેરી પ્લાન વાંચો, યોગ્ય ઇન્ડેક્સ ઉમેરો, લૉક ઉકેલો, કનેક્શન પૂલનું કદ નક્કી કરો અને રેપ્લિકેશન, વેક્યુમ અને બીજા દિવસના સંચાલન ચલાવો."
+  },
+  "gpu-serving": {
+   "title": "GPU, AI ઇન્ફ્રાસ્ટ્રક્ચર અને LLM સર્વિંગ",
+   "summary": "GPU પર ઇન્ફરન્સને શું મર્યાદિત કરે છે તે જાણો, vLLM, TGI અને Triton ચલાવો, Kubernetes પર GPU શેડ્યૂલ કરો અને લેટન્સી તથા ખર્ચ નિયંત્રિત કરો."
+  },
+  "openstack": {
+   "title": "OpenStack અને ખાનગી ક્લાઉડ",
+   "summary": "ખાનગી ક્લાઉડ ચલાવો: Keystone, Nova, Neutron, Cinder અને Glance, ક્વોટા, શેડ્યૂલિંગ, નેટવર્કિંગ અને બીજા દિવસના સંચાલન."
+  },
+  "baremetal": {
+   "title": "બેર મેટલ અને ડેટાસેન્ટર",
+   "summary": "ભૌતિક સર્વર રૅક, પ્રોવિઝન અને સંચાલિત કરો: BMC અને IPMI, PXE પ્રોવિઝનિંગ, ડિસ્ક અને RAID, લીફ-સ્પાઇન નેટવર્કિંગ અને ફ્લીટ સંચાલન."
+  },
+  "service-mesh": {
+   "title": "સર્વિસ મેશ અને Kubernetes નેટવર્કિંગ",
+   "summary": "પોડ નેટવર્કિંગ, CNI અને નેટવર્ક પૉલિસી સમજો, પછી mTLS, ટ્રાફિક રૂટિંગ અને સમસ્યા નિવારણ સાથે સર્વિસ મેશ ચલાવો."
+  }
+ },
+ "paths": {
+  "devops": {
+   "summary": "કોડથી પ્રોડક્શન સુધીનો માર્ગ સ્વયંચાલિત કરો: Linux, Bash અને Python, નેટવર્કિંગ, કન્ટેનર, પાઇપલાઇન, Kubernetes, કોડ તરીકે ઇન્ફ્રાસ્ટ્રક્ચર, ક્લાઉડ અને મૉનિટરિંગ.",
+   "audience": "DevOps ભૂમિકાઓ તરફ વળતા સિસ-ઍડમિન, ડેવલપર અને સપોર્ટ એન્જિનિયર."
+  },
+  "cloud": {
+   "summary": "નેટવર્કિંગ, ઓળખ, Terraform, સર્વરલેસ, કન્ટેનર અને મૉનિટરિંગ સાથે AWS અને Azure પર ક્લાઉડ ઇન્ફ્રાસ્ટ્રક્ચર ડિઝાઇન કરો અને ચલાવો.",
+   "audience": "જાહેર ક્લાઉડ ખાતાઓમાં ઇન્ફ્રાસ્ટ્રક્ચર બનાવતા અને ચલાવતા એન્જિનિયર."
+  },
+  "sre": {
+   "summary": "સેવાઓ વિશ્વસનીય રાખો: પહેલાં Linux, કન્ટેનર અને ક્લાઉડ, પછી ઑબ્ઝર્વેબિલિટી, SLO, ઑન-કૉલ, ઘટના પ્રતિસાદ, ક્ષમતા અને કેઓસ ટેસ્ટિંગ.",
+   "audience": "અપટાઇમ અને ઑન-કૉલની જવાબદારી ધરાવતા સંચાલન અને પ્લૅટફૉર્મ એન્જિનિયર."
+  },
+  "devsecops": {
+   "summary": "કોડથી ક્લાઉડ સુધી ડિલિવરી સુરક્ષિત કરો: પાઇપલાઇન અને સપ્લાય ચેઇન નિયંત્રણો, મજબૂત કન્ટેનર અને ક્લસ્ટર, ગુપ્ત માહિતી, ક્લાઉડ ઓળખ અને સુરક્ષા ઘટના પ્રતિસાદ.",
+   "audience": "જે શિપ થાય તેની સલામતીની જવાબદારી ધરાવતા DevOps, પ્લૅટફૉર્મ અને સુરક્ષા એન્જિનિયર."
+  },
+  "ai": {
+   "summary": "મોટા ભાષા મૉડેલ સાથે બનાવો: તે કેવી રીતે કામ કરે છે, પ્રૉમ્પ્ટિંગ અને સંરચિત આઉટપુટ, Claude Skills અને Model Context Protocol સાથે ટૂલ ઉપયોગ, Linux, Git, Python અને નેટવર્કિંગ ઉપર.",
+   "audience": "AI સુવિધાઓ સુરક્ષિત રીતે બનાવવા, પૅકેજ કરવા અને ચલાવવા માગતા ડેવલપર અને DevOps એન્જિનિયર."
+  },
+  "mlops": {
+   "summary": "પ્રોડક્શનમાં મશીન લર્નિંગ અને અલ્ગોરિધમ-સહાયિત સંચાલન ચલાવો: કન્ટેનર અને Kubernetes, પાઇપલાઇન, ઑબ્ઝર્વેબિલિટી, પછી MLOps અને AIOps.",
+   "audience": "ડેટા સાયન્સ ટીમોને ટેકો આપતા DevOps અને SRE એન્જિનિયર, અને પ્રોડક્શનની ટેવો જોઈતા ડેટા એન્જિનિયર."
+  }
+ },
+ "lessons": {
+  "linux/filesystem-and-navigation": "Linux સર્વર પર વસ્તુઓ ક્યાં રહે છે, તેમને ઝડપથી કેવી રીતે શોધવી અને સિમ્બોલિક લિંક વાસ્તવિક ડિપ્લૉયમેન્ટ બગ કેવી રીતે સર્જે છે તે શીખો.",
+  "linux/users-groups-permissions": "Linux પરવાનગીઓ સાચી રીતે વાંચો અને સેટ કરો અને ડિપ્લૉયમેન્ટને અટકાવતી \"permission denied\" ભૂલો ડિબગ કરો.",
+  "linux/processes-and-services": "પ્રક્રિયાઓ તપાસો અને નિયંત્રિત કરો, સાચા સિગ્નલ મોકલો અને systemd યુનિટ અને journalctl વડે સેવાઓ સંભાળો.",
+  "linux/disks-and-filesystems": "ડિસ્ક અને inode વપરાશ માપો, જગ્યા શું ખાય છે તે શોધો અને \"ડિસ્ક ભરેલી પણ કાઢવા જેવું કંઈ નથી\" નું રહસ્ય ઉકેલો.",
+  "linux/lvm-and-raid": "LVM સાથે ડાઉનટાઇમ વિના સ્ટોરેજ વધારો, mdadm RAID વડે ડિસ્ક નિષ્ફળતાથી બચો અને દરેક કઈ સમસ્યા ઉકેલે છે તે જાણો.",
+  "linux/package-management": "apt અને dnf સાથે સૉફ્ટવેર ઇન્સ્ટૉલ, અપડેટ, પિન અને ચકાસો, રિપોઝિટરી અને સહી સમજો અને સર્વર આશ્ચર્ય વિના પૅચ કરેલા રાખો.",
+  "linux/ssh-and-remote-access": "કી-આધારિત SSH વાપરો, ક્લાયન્ટ અને સર્વર સુરક્ષિત રીતે કન્ફિગર કરો, ટ્રાફિક ટનલ કરો, બેસ્ચન હોસ્ટ મારફતે જાઓ અને scp અને rsync વડે ફાઇલ ટ્રાન્સફર કરો.",
+  "linux/cron-and-timers": "cron અને systemd ટાઇમર વડે કામ શેડ્યૂલ પર ચલાવો, જાણીતા પર્યાવરણ ફંદા ટાળો અને શેડ્યૂલ કરેલા કામને અવલોકનક્ષમ બનાવો.",
+  "linux/logs-and-troubleshooting": "journald અને ફાઇલ લૉગ વાંચો, સમય પ્રમાણે ઘટનાઓ જોડો અને રહસ્યમય રીસ્ટાર્ટ સમજાવવા કર્નલ લૉગ વાપરો.",
+  "linux/performance-triage": "પાંચ મિનિટથી ઓછા સમયમાં CPU, મેમરી અને ડિસ્કની સમસ્યાઓ અલગ પાડવા load average, vmstat અને iostat વાપરો.",
+  "linux/boot-and-kernel": "ફર્મવેરથી systemd સુધીનો બૂટ ક્રમ અનુસરો, sysctl અને મૉડ્યુલ સાથે કર્નલ તપાસો અને ટ્યૂન કરો અને બૂટ ન થતો સર્વર પુનઃપ્રાપ્ત કરો.",
+  "linux/security-hardening": "ઓછા પૅકેજ, ફાયરવૉલ નિયમો, ન્યૂનતમ વિશેષાધિકાર, SELinux અથવા AppArmor, ઑડિટિંગ અને નિયમિત તપાસ વડે Linux સર્વરની હુમલા સપાટી ઘટાડો.",
+  "linux/namespaces-and-cgroups": "દરેક કન્ટેનર પાછળની બે કર્નલ સુવિધાઓ સમજો: નેમસ્પેસ જે પ્રક્રિયા શું જોઈ શકે તે મર્યાદિત કરે છે અને cgroup જે તે શું વાપરી શકે તે મર્યાદિત કરે છે, અને સામાન્ય Linux ટૂલથી તેમને તપાસો.",
+  "linux/working-efficiently-in-the-terminal": "શેલ હિસ્ટ્રી, કીબોર્ડ શૉર્ટકટ, tmux સત્રો, સુરક્ષિત એડિટર સેટઅપ, ઍલિયાસ અને મશીનો વચ્ચે લઈ જઈ શકાય તેવી ડૉટફાઇલ સાથે ઝડપથી કામ કરો અને ઓછી ભૂલો કરો.",
+  "linux/time-ntp-and-timezones": "NTP વડે સર્વર ઘડિયાળ સાચી રાખો, UTC અને સ્થાનિક સમયનો તફાવત સમજો અને ઘડિયાળ ડ્રિફ્ટથી થતી નિષ્ફળતાઓનું નિદાન કરો.",
+  "linux/systemd-overrides-targets-and-dependencies": "ડ્રોપ-ઇન ઓવરરાઇડ વડે સેવા સુરક્ષિત રીતે બદલો, ક્રમ અને નિર્ભરતાઓ સમજો અને ટાર્ગેટ તથા રિસોર્સ સેટિંગ વાપરો.",
+  "linux/kernel-modules-sysctl-and-boot-parameters": "કર્નલ મૉડ્યુલ લોડ કરો અને તપાસો, sysctl વડે ચાલતા કર્નલને ટ્યૂન કરો, બૂટ પૅરામીટર સેટ કરો અને કર્નલ રિંગ બફર વાંચો.",
+  "linux/processes-memory-and-the-oom-killer": "વર્ચ્યુઅલ મેમરી, પેજ કૅશ અને સ્વૅપ સમજો, free અને /proc/meminfo સાચી રીતે વાંચો અને મેમરી ખૂટવાથી થયેલા કિલની તપાસ કરો.",
+  "linux/system-calls-strace-and-perf": "પ્રોગ્રામ સિસ્ટમ કૉલ દ્વારા કર્નલ સાથે કેવી રીતે વાત કરે છે તે જુઓ, strace સાથે તેમને ટ્રેસ કરો અને perf સાથે હૉટ સ્પૉટ શોધો.",
+  "linux/filesystems-page-cache-and-io": "VFS અને પેજ કૅશ મારફતે વાંચન અને લેખનને અનુસરો, રાઇટબૅક અને fsync સમજો અને iostat વડે ધીમી ડિસ્કનું નિદાન કરો.",
+  "linux/networking-in-the-kernel-sockets-and-conntrack": "સૉકેટ, લિસન ક્યૂ, TCP સ્થિતિઓ અને કનેક્શન ટ્રૅકિંગ સમજો અને કનેક્શન સમસ્યાઓ શોધવા ss અને conntrack વાપરો.",
+  "linux/debugging-a-sick-server": "સર્વર ધીમો કે નિષ્ફળ કેમ છે તે શોધવા તપાસનો નિશ્ચિત ક્રમ (CPU, મેમરી, ડિસ્ક, નેટવર્ક, લૉગ) વાપરો અને કયો આદેશ કયા પ્રશ્નનો જવાબ આપે તે જાણો.",
+  "git/first-repository-and-commits": "વર્ઝન નિયંત્રણ શું નોંધે છે તે સમજો, સ્પષ્ટ સંદેશ સાથે તમારા પહેલા કમિટ કરો, ઇતિહાસ વાંચો અને .gitignore વડે જનરેટ કરેલી ફાઇલો બહાર રાખો.",
+  "git/staging-undoing-and-stashing": "પરિસ્થિતિ મુજબ યોગ્ય અનડુ પસંદ કરો: ફેરફાર કાઢી નાખો, સ્ટેજિંગ પાછું ખેંચો, છેલ્લું કમિટ સુધારો, વહેંચાયેલું કમિટ ઉલટાવો અથવા stash વડે કામ બાજુ પર રાખો.",
+  "git/branches-and-merging": "દરેક કામ માટે બ્રાન્ચ બનાવો, ફાસ્ટ-ફૉરવર્ડ કે મર્જ કમિટ વડે પાછી ભેળવો અને ગભરાટ વિના કૉન્ફ્લિક્ટ ઉકેલો.",
+  "git/rebase-and-clean-history": "રેખીય ઇતિહાસ રાખવા rebase વાપરો, ઇન્ટરેક્ટિવ rebase વડે તમારા કમિટ ગોઠવો અને ક્યારે rebase ન કરવું તેનો નિયમ જાણો.",
+  "git/remotes-fetch-pull-and-push": "વહેંચાયેલી રિપોઝિટરી સાથે કામ કરો: ક્લોન કરો, fetch વડે ફેરફાર જુઓ, pull વડે અપડેટ કરો, push વડે પ્રકાશિત કરો અને push કેમ નકારાય છે તે સમજો.",
+  "git/team-workflows-pull-requests-and-reviews": "બ્રાન્ચિંગ વ્યૂહરચના પસંદ કરો, નાની સમીક્ષા થયેલી પુલ રિક્વેસ્ટ ચલાવો અને જરૂરી તપાસ સાથે main ને સુરક્ષિત કરો.",
+  "git/tags-releases-and-versioning": "ઍનોટેટેડ ટૅગ વડે રિલીઝ ચિહ્નિત કરો, સિમૅન્ટિક વર્ઝનિંગથી ક્રમાંક આપો અને હૉટફિક્સ તથા ચેન્જલૉગ સંભાળો.",
+  "git/hooks-signing-and-secrets-in-history": "હૂક વડે ભૂલો પકડો, સહી વડે કમિટ કોણે કર્યું તે સાબિત કરો અને ગુપ્ત માહિતી કમિટ થઈ જાય ત્યારે સાચો પ્રતિસાદ આપો.",
+  "git/large-repositories-submodules-and-worktrees": "છીછરા (shallow) અને આંશિક ક્લોન, સ્પાર્સ ચેકઆઉટ અને LFS વડે મોટી રિપોઝિટરી ઝડપી રાખો; સબમૉડ્યુલ ક્યારે વાપરવા તે જાણો; વર્કટ્રી વડે એકસાથે ઘણી બ્રાન્ચ પર કામ કરો.",
+  "git/debugging-git-problems": "reflog વડે ખોવાયેલા કમિટ પાછા મેળવો, bisect અને blame વડે કંઈક બગાડનાર કમિટ શોધો અને detached HEAD તથા બીજી ગૂંચવણભરી સ્થિતિઓ સમજો.",
+  "bash/script-basics": "તમારી પહેલી વિશ્વસનીય Bash સ્ક્રિપ્ટ લખો: શેબેંગ, ચલ, ક્વૉટિંગ, દલીલો, એક્ઝિટ કોડ અને કમાન્ડ સબ્સ્ટિટ્યુશન.",
+  "bash/control-flow-and-functions": "એકવારના આદેશોને ફરી વાપરી શકાય તેવા ટૂલમાં ફેરવવા શરતો, લૂપ, case વિધાન અને ફંક્શન વાપરો.",
+  "bash/text-processing": "પાઇપ, grep, cut, sort, uniq, sed અને awk વડે લૉગ અને આદેશ આઉટપુટને કાપીને એક જ લીટીમાં પ્રશ્નોના જવાબ મેળવો.",
+  "bash/advanced-patterns": "getopts વડે વિકલ્પો પાર્સ કરો, ઍરે અને ઍસોસિએટિવ ઍરે સાચી રીતે વાપરો, હિયર-ડૉક્યુમેન્ટ લખો અને પ્રોસેસ સબ્સ્ટિટ્યુશન સાથે આદેશો જોડો.",
+  "bash/apis-and-json": "curl વડે શેલમાંથી REST API કૉલ કરો, jq વડે JSON પ્રક્રિયા કરો, ભૂલો અને પેજિનેશન સંભાળો અને ગુપ્ત માહિતી કમાન્ડ હિસ્ટ્રીથી દૂર રાખો.",
+  "bash/safe-automation": "સ્ટ્રિક્ટ મોડ વડે સ્ક્રિપ્ટને મોટેથી નિષ્ફળ કરાવો, ટ્રૅપ વડે સફાઈ કરો, ઓવરલેપિંગ રન ટાળો અને cron અથવા systemd ટાઇમરથી શેડ્યૂલ કરો.",
+  "bash/arrays-and-parameter-expansion": "યાદીઓ અને લુકઅપ માટે Bash ઍરે અને ઍસોસિએટિવ ઍરે વાપરો અને બાહ્ય પ્રોગ્રામ બોલાવ્યા વિના કાપવા, બદલવા અને ડિફૉલ્ટ આપવા પૅરામીટર એક્સપાન્શન વાપરો.",
+  "bash/building-and-testing-shell-tools": "getopts, shellcheck અને bats વડે વિકલ્પો, મદદ લખાણ, એક્ઝિટ કોડ અને ટેસ્ટ સાથે સ્ક્રિપ્ટને નાના ટૂલમાં ફેરવો અને તેમને આપમેળે ચલાવો.",
+  "bash/temporary-files-and-atomic-writes": "અસ્થાયી ફાઇલો સુરક્ષિત રીતે બનાવો, અડધી લખાયેલી નકલ છોડ્યા વિના ફાઇલો બદલો અને સ્ક્રિપ્ટની બે નકલો એકસાથે ચાલતી અટકાવો.",
+  "bash/portable-scripts-and-shellcheck": "જુદી જુદી સિસ્ટમ પર ચાલતી સ્ક્રિપ્ટ લખો, ShellCheck વડે ભૂલો પકડો અને પછીની વ્યક્તિ માટે તેમને વાંચવા યોગ્ય રાખો.",
+  "bash/debugging-shell-scripts": "set -x સાથે સ્ક્રિપ્ટ ટ્રેસ કરો, સ્ટ્રિક્ટ મોડ અને shellcheck વડે શાંત નિષ્ફળતાઓ પકડો અને સ્ક્રિપ્ટ તમારા ટર્મિનલમાં ચાલે પણ cron કે CI માં કેમ નિષ્ફળ જાય તે શોધો.",
+  "python/basics-and-environments": "ઑટોમેશન માટે વાંચવા યોગ્ય Python લખો, દરેક પ્રોજેક્ટના પૅકેજ વર્ચ્યુઅલ એન્વાયર્નમેન્ટમાં અલગ રાખો અને સ્ક્રિપ્ટ બધે એક જ રીતે ચલાવો.",
+  "python/files-and-processes": "pathlib વડે ફાઇલો સુરક્ષિત રીતે વાંચો અને લખો, subprocess વડે બીજા પ્રોગ્રામ ચલાવો, નિષ્ફળતા સ્પષ્ટ રીતે સંભાળો અને શું બન્યું તે લૉગ કરો.",
+  "python/http-apis-and-json": "requests વડે REST API કૉલ કરો, JSON પાર્સ કરો અને બનાવો, ટાઇમઆઉટ, રીટ્રાય અને પેજિનેશન સંભાળો અને ટોકન કોડથી દૂર રાખો.",
+  "python/cloud-sdks": "boto3 વડે AWS અને તેના Python SDK વડે Azure ઑટોમેટ કરો, કોડમાં લખેલી કી વિના પ્રમાણિત થાઓ, પરિણામોનું પેજિનેશન કરો અને આઇડેમ્પોટન્ટ સ્ક્રિપ્ટ લખો.",
+  "python/testing-and-packaging": "argparse વડે વાસ્તવિક CLI બનાવો, mock સહિત pytest વડે તેનું પરીક્ષણ કરો અને તેને પૅકેજ કરો જેથી સાથીઓ એક આદેશથી ઇન્સ્ટૉલ કરી શકે.",
+  "python/concurrency-for-operations": "થ્રેડ પૂલ, asyncio અને subprocess વડે ઘણા નેટવર્ક કૉલ કે આદેશો એકસાથે ચલાવો, ટાઇમઆઉટ, મર્યાદા અને ભૂલ સંભાળ સાથે જે ઑપરેશન સ્ક્રિપ્ટને ઝડપી અને સુરક્ષિત રાખે.",
+  "python/writing-command-line-tools": "argparse, સંરચિત આઉટપુટ, લૉગિંગ, એક્ઝિટ કોડ અને પર્યાવરણમાંથી કન્ફિગરેશન સાથે સ્પષ્ટ, ચકાસી શકાય તેવું કમાન્ડ-લાઇન ટૂલ બનાવો, પૅકેજ કરી શેર કરવા તૈયાર.",
+  "python/logging-for-scripts-and-services": "print ની જગ્યાએ logging મૉડ્યુલ વાપરો: સ્તર, ફૉર્મેટ, હૅન્ડલર, સંરચિત ફીલ્ડ અને ઘટના દરમિયાન મદદ કરતા લૉગ.",
+  "python/yaml-csv-and-config-files": "સંચાલનના ડેટા ફૉર્મેટ સુરક્ષિત રીતે વાંચો અને લખો: YAML, CSV અને INI, ચકાસણી સાથે અને આશ્ચર્ય વિના.",
+  "python/debugging-python": "ટ્રેસબૅક નીચેથી વાંચો, લૉગિંગ અને ડિબગરનો સારો ઉપયોગ કરો અને faulthandler અને py-spy વડે અટકી જતી કે લીક થતી સ્ક્રિપ્ટ શોધો.",
+  "networking/ip-addressing-and-subnets": "CIDR સંકેતલિપી વાંચો, નેટવર્કને સબનેટમાં વહેંચો અને ક્લાઉડ પિયરિંગ અટકાવતી ઓવરલેપિંગ રેન્જની ભૂલ ટાળો.",
+  "networking/dns": "નામ સરનામાં કેવી રીતે બને છે તે સમજો, dig આઉટપુટ વાંચો અને DNS ફેરફારોનું આયોજન કરો જેથી વપરાશકર્તાઓ જૂના સર્વર પર ન પહોંચે.",
+  "networking/http-and-tls": "HTTP વિનંતીઓ અને સ્ટેટસ કોડ વાંચો, curl વડે વિનંતીના દરેક તબક્કાનો સમય માપો અને પ્રમાણપત્રની નિષ્ફળતાઓનું નિદાન કરો.",
+  "networking/routing-and-nat": "રૂટિંગ ટેબલ વાંચો, સબનેટ પાર પૅકેટને અનુસરો, ડિફૉલ્ટ ગેટવે, સ્રોત અને ગંતવ્ય NAT સમજો અને અસમપ્રમાણ કે ખૂટતા રૂટ ડિબગ કરો.",
+  "networking/troubleshooting-toolkit": "\"સેવા A, સેવા B સુધી પહોંચતી નથી\" ક્રમમાં ડિબગ કરો અને \"connection refused\" અને \"timed out\" જુદા કારણો તરફ કેમ ઇશારો કરે છે તે શીખો.",
+  "networking/firewalls-and-load-balancing": "સુરક્ષિત ફાયરવૉલ નિયમો લખો, સિક્યોરિટી ગ્રૂપ સમજો અને તંદુરસ્ત સર્વરને બંધ ગણતા લોડ બૅલેન્સરનું નિદાન કરો.",
+  "networking/vpn-and-tunnels": "WireGuard અને IPsec વડે નેટવર્કને સુરક્ષિત રીતે જોડો, SSH અને TLS ટનલ વાપરો અને ક્લાઉડ સાઇટ-ટુ-સાઇટ VPN, પિયરિંગ અને પ્રાઇવેટ એન્ડપૉઇન્ટ સમજો.",
+  "networking/ipv6-essentials": "IPv6 સરનામાં વાંચો અને લખો, પ્રીફિક્સ, SLAAC, નેબર ડિસ્કવરી અને ડ્યુઅલ-સ્ટૅક સંચાલન સમજો અને ફાયરવૉલ, DNS અને ક્લાઉડ નેટવર્કની સામાન્ય ભૂલો ટાળો.",
+  "networking/latency-mtu-and-network-performance": "લેટન્સી અને બૅન્ડવિડ્થ અલગ કરો, ધીમી કે પૅકેટ ગુમાવતી લિંક પર TCP વર્તન સમજો, MTU સમસ્યાઓ શોધો અને યોગ્ય ટૂલથી થ્રુપુટ માપો.",
+  "networking/network-segmentation-and-security-groups": "નેટવર્કને ઝોનમાં વહેંચો, ફક્ત જરૂરી હોય તે જ મંજૂરી આપતા ફાયરવૉલ અને સિક્યોરિટી ગ્રૂપ નિયમો લખો અને તેમની સમીક્ષા કરો.",
+  "networking/dhcp-arp-and-the-local-network": "હોસ્ટને સરનામું કેવી રીતે મળે છે, પોતાના નેટવર્ક પર પડોશીઓ કેવી રીતે શોધે છે અને બંનેમાંથી કોઈ પણ પગલું તૂટે ત્યારે શું નિષ્ફળ જાય છે તે સમજો.",
+  "networking/debugging-network-problems": "ping, dig, curl, ss અને traceroute સાથે લિંકથી DNS, રૂટિંગ, પોર્ટ અને TLS સુધી સ્ટૅકમાં ઉપર જાઓ, જેથી કયો સ્તર તૂટેલો છે તે બરાબર કહી શકો.",
+  "docker/containers-and-images": "કન્ટેનર ખરેખર શું છે, ઇમેજ સ્તરો કેવી રીતે કામ કરે છે અને ઇમેજ વર્ઝન પિન કરવાથી \"મારા મશીન પર ચાલે છે\" કેમ અટકે છે તે સમજો.",
+  "docker/writing-dockerfiles": "ઝડપથી બનતી, નાની અને ચલાવવામાં વધુ સુરક્ષિત ઇમેજ બનાવવા લેયર કૅશિંગ, મલ્ટી-સ્ટેજ બિલ્ડ અને નૉન-રૂટ વપરાશકર્તા વાપરો.",
+  "docker/volumes-and-networking": "વૉલ્યુમ અને બાઇન્ડ માઉન્ટ વડે કન્ટેનરના આયુષ્ય પછી પણ ડેટા રાખો અને વપરાશકર્તા-વ્યાખ્યાયિત નેટવર્ક પર કન્ટેનરને નામથી જોડો.",
+  "docker/compose": "ઍપ, તેનો ડેટાબેઝ, નેટવર્ક, વૉલ્યુમ અને ગુપ્ત માહિતી એક ફાઇલમાં વર્ણવો અને સેવાઓને વાસ્તવિક તૈયારી સુધી રાહ જોવડાવો.",
+  "docker/registries-and-supply-chain": "રજિસ્ટ્રીમાંથી ઇમેજ push અને pull કરો, સાચા ટૅગ અને પિન કરો, નબળાઈઓ સ્કૅન કરો, SBOM બનાવો અને પ્રોડક્શનમાં પહોંચતા પહેલાં ઇમેજ પર સહી કરો.",
+  "docker/runtimes-oci-and-podman": "Docker નીચે કન્ટેનર કોણ ચલાવે છે, OCI ધોરણો ઇમેજને પોર્ટેબલ કેવી રીતે બનાવે છે અને રૂટલેસ કન્ટેનર સહિત Podman અને containerd ક્યાં બંધ બેસે છે તે સમજો.",
+  "docker/security-and-troubleshooting": "ન્યૂનતમ વિશેષાધિકારથી કન્ટેનર મજબૂત કરો, ઇમેજ સ્કૅન કરો અને કન્ટેનર કેમ મરી ગયું તે જાણવા એક્ઝિટ કોડ અને inspect આઉટપુટ વાપરો.",
+  "docker/buildkit-caching-and-multi-arch": "લેયર ક્રમ, BuildKit કૅશ માઉન્ટ, લેયરમાં લીક ન થતી ગુપ્ત માહિતી, રિમોટ કૅશ અને amd64 તથા arm64 બંને પર ચાલતી ઇમેજ વડે ઇમેજ બિલ્ડ ઝડપી અને પુનરાવર્તનીય બનાવો.",
+  "docker/container-logging-and-resource-limits": "સ્ટૅન્ડર્ડ આઉટપુટ પર લૉગ કરો, લૉગ વૃદ્ધિ નિયંત્રિત કરો, અર્થપૂર્ણ હેલ્થ ચેક ઉમેરો અને અચાનક રીસ્ટાર્ટ કર્યા વિના હોસ્ટનું રક્ષણ કરતી CPU, મેમરી અને પ્રક્રિયા મર્યાદાઓ સેટ કરો.",
+  "docker/slim-images-and-faster-builds": "યોગ્ય બેઝ ઇમેજ, મલ્ટી-સ્ટેજ બિલ્ડ અને સ્વચ્છ લેયર વડે કન્ટેનર ઇમેજ નાની કરો અને ઇમેજની અંદર શું છે તે જુઓ.",
+  "docker/running-containers-in-production": "પ્રોડક્શનને જોઈતા સેટિંગ સાથે કન્ટેનર ચલાવો: નૉન-રૂટ વપરાશકર્તા, રીડ-ઓન્લી ફાઇલસિસ્ટમ, હેલ્થ ચેક, મર્યાદાઓ, રીસ્ટાર્ટ નીતિ અને સૌમ્ય શટડાઉન.",
+  "docker/debugging-containers": "એક્ઝિટ કોડ, લૉગ અને ઇવેન્ટ વાંચો, કન્ટેનરનું કન્ફિગ તપાસો અને અંદાજ લગાવ્યા વિના નિષ્ફળ કે ન્યૂનતમ ઇમેજની અંદર શેલ મેળવો.",
+  "kubernetes/architecture": "કંટ્રોલ પ્લેન અને નોડ ઘટકો, ડિક્લેરેટિવ રિકન્સાઇલ લૂપ અને kubectl વડે ક્લસ્ટર સ્થિતિ કેવી રીતે વાંચવી તે શીખો.",
+  "kubernetes/pods-and-deployments": "રિસોર્સ રિક્વેસ્ટ, હેલ્થ પ્રોબ અને સુરક્ષિત રોલિંગ અપડેટ સાથે પ્રોડક્શન-આકારનું Deployment લખો અને નિષ્ફળ જાય ત્યારે રોલબૅક કરો.",
+  "kubernetes/services-and-ingress": "બદલાતા Pod ને Service વડે સ્થિર સરનામું આપો, ક્લસ્ટર DNS સમજો, Ingress વડે ઍપ ખુલ્લી મૂકો અને NetworkPolicy વડે ટ્રાફિક મર્યાદિત કરો.",
+  "kubernetes/config-and-secrets": "ConfigMap અને Secret વડે કન્ફિગરેશનને ઇમેજથી અલગ કરો, પર્યાવરણ ચલ અને માઉન્ટ કરેલી ફાઇલો વચ્ચે પસંદગી કરો અને ગુપ્ત માહિતી પ્રામાણિકપણે સંભાળો.",
+  "kubernetes/storage": "PersistentVolumeClaim અને StorageClass વડે ડેટા ટકાવી રાખો અને StatefulSet ક્યારે યોગ્ય કંટ્રોલર છે તે જાણો.",
+  "kubernetes/jobs-cronjobs-daemonsets": "બૅચ કામ, શેડ્યૂલ કરેલા કાર્યો અને નોડ દીઠ એજન્ટ માટે યોગ્ય વર્કલોડ કંટ્રોલર પસંદ કરો અને રીટ્રાય, સહવર્તિતા, ઇતિહાસ અને સફાઈ કન્ફિગર કરો.",
+  "kubernetes/resources-and-quotas": "request અને limit વડે Pod નું કદ નક્કી કરો, QoS વર્ગો અને OOM કિલ સમજો અને વહેંચાયેલા ક્લસ્ટરને ન્યાયી રાખવા LimitRange અને ResourceQuota વાપરો.",
+  "kubernetes/autoscaling": "HPA વડે CPU, મેમરી અને કસ્ટમ મેટ્રિક્સ પર Pod સ્કેલ કરો, VPA વડે યોગ્ય કદ નક્કી કરો, ઇવેન્ટ-આધારિત ઑટોસ્કેલિંગ વડે શૂન્ય સુધી સ્કેલ કરો અને Pod શેડ્યૂલ ન થઈ શકે ત્યારે નોડ ઉમેરો.",
+  "kubernetes/rbac-and-security": "Role અને ServiceAccount વડે ન્યૂનતમ વિશેષાધિકાર ઍક્સેસ આપો, kubectl auth can-i વડે તેનું પરીક્ષણ કરો અને securityContext વડે Pod મજબૂત કરો.",
+  "kubernetes/scheduling-and-troubleshooting": "selector, taint અને affinity વડે Pod ક્યાં ચાલે તે નિયંત્રિત કરો અને સામાન્ય નિષ્ફળતા સ્થિતિઓને પુનરાવર્તનીય ક્રમમાં ઉકેલો.",
+  "kubernetes/helm-and-kustomize": "Helm ચાર્ટ અને વૅલ્યુ સાથે Kubernetes ઍપ્લિકેશન પૅકેજ અને કન્ફિગર કરો, Kustomize વડે પર્યાવરણ ઓવરલે કરો અને સુરક્ષિત રીતે રિલીઝ, અપગ્રેડ અને રોલબૅક કરો.",
+  "kubernetes/crds-and-operators": "CustomResourceDefinition વડે Kubernetes API વિસ્તારો, કંટ્રોલર રિકન્સાઇલ લૂપ સમજો અને ઑપરેટર સાથે પ્રોડક્શન સૉફ્ટવેર ચલાવો.",
+  "kubernetes/cni-and-cluster-networking": "Pod ને IP સરનામાં કેવી રીતે મળે છે અને નોડ પાર એકબીજા સુધી કેવી રીતે પહોંચે છે, CNI પ્લગઇન શું કરે છે, kube-proxy Service કેવી રીતે અમલમાં મૂકે છે અને NetworkPolicy વડે ટ્રાફિક કેવી રીતે અલગ કરવો તે સમજો.",
+  "kubernetes/cluster-install-upgrade-etcd": "kubeadm વડે ક્લસ્ટર બૂટસ્ટ્રેપ કરો, એક સમયે એક માઇનર વર્ઝન અપગ્રેડ કરો, etcd નું બૅકઅપ અને રીસ્ટોર કરો અને પ્રમાણપત્રો તથા નોડ જાળવણી સંભાળો.",
+  "kubernetes/cka-cks-exam-strategy": "સ્પીડ સેટઅપ, ઇમ્પરેટિવ આદેશો અને સમય યોજના સાથે હાથ વડે કરવાની Kubernetes પ્રમાણપત્ર પરીક્ષાઓ માટે તૈયારી કરો અને દરેક પરીક્ષા શું આવરે છે તે જુઓ.",
+  "kubernetes/probes-metrics-and-logging": "liveness, readiness અને startup પ્રોબ સાચી રીતે કન્ફિગર કરો, રિસોર્સ અને ઍપ્લિકેશન મેટ્રિક્સ એકત્ર કરો અને લૉગ મોકલો જેથી ચાલતું ક્લસ્ટર પોતાને સમજાવે.",
+  "kubernetes/service-mesh-and-mtls": "સર્વિસ મેશ ક્લસ્ટરમાં શું ઉમેરે છે, સાઇડકાર અને સાઇડકાર-રહિત ડેટા પ્લેન કેવી રીતે કામ કરે છે, મ્યુચ્યુઅલ TLS અને ટ્રાફિક નીતિઓ કેવી રીતે લાગુ થાય છે અને મેશ ક્યારે ખર્ચને લાયક નથી તે સમજો.",
+  "kubernetes/network-policies-in-practice": "ડિફૉલ્ટ ડિનાયથી શરૂ કરીને કયા પોડ કોની સાથે વાત કરી શકે તે મર્યાદિત કરો અને નિયમોનું પરીક્ષણ કરો.",
+  "kubernetes/statefulsets-and-running-databases": "સ્થિર નામ અને પોતાના સ્ટોરેજની જરૂર હોય તેવા વર્કલોડ ચલાવો અને Kubernetes પર ડેટાબેઝ ક્યારે ન ચલાવવો તે પ્રામાણિકપણે નક્કી કરો.",
+  "kubernetes/debugging-kubernetes-workloads": "describe, logs, events, exec અને ક્ષણિક ડિબગ કન્ટેનર વડે Pending થી CrashLoopBackOff, ImagePullBackOff, નિષ્ફળ પ્રોબ અને અપ્રાપ્ય Service સુધીના નિશ્ચિત માર્ગને અનુસરો.",
+  "helm/what-helm-is-and-why-use-it": "ચાર્ટ, રિલીઝ અને રિપોઝિટરી સમજો અને Helm Kubernetes YAML ના ઢગલાને એક ઇન્સ્ટૉલ અને અપગ્રેડ થઈ શકે તેવા પૅકેજમાં કેવી રીતે ફેરવે છે તે જુઓ.",
+  "helm/installing-charts-and-values": "ચાર્ટ શોધો, તેમની ડિફૉલ્ટ વૅલ્યુ વાંચો, ફાઇલો અને --set વડે સુરક્ષિત રીતે ઓવરરાઇડ કરો અને શું ઇન્સ્ટૉલ થશે તેનું પૂર્વાવલોકન કરો.",
+  "helm/anatomy-of-a-chart": "helm create વડે ચાર્ટ બનાવો, દરેક ફાઇલ સમજો અને શું રાખવું અને શું કાઢવું તે જાણો.",
+  "helm/templates-and-the-go-template-language": "વૅલ્યુ, શરતો, લૂપ, હેલ્પર અને સામાન્ય ફંક્શન સાથે ટેમ્પ્લેટ લખો અને ઇન્ડેન્ટેશન તથા ક્વૉટિંગના ફંદા ટાળો.",
+  "helm/upgrade-rollback-and-release-history": "wait અને atomic વડે રિલીઝ સુરક્ષિત રીતે અપગ્રેડ કરો, ઇતિહાસ વાંચો, જાણીતા સારા રિવિઝન પર રોલબૅક કરો અને સ્વચ્છ રીતે અનઇન્સ્ટૉલ કરો.",
+  "helm/values-per-environment-and-secrets": "dev, staging અને પ્રોડક્શન માટે વૅલ્યુ ફાઇલો ગોઠવો, ચકાસો અને ગુપ્ત માહિતીને વર્ઝન નિયંત્રણમાં કમિટ કર્યા વિના સંભાળો.",
+  "helm/dependencies-subcharts-and-registries": "નિર્ભરતાઓમાંથી ચાર્ટ બનાવો, ચાર્ટ પૅકેજ કરી OCI રજિસ્ટ્રીમાં પ્રકાશિત કરો અને તેમને સાચી રીતે વર્ઝન આપો.",
+  "helm/debugging-helm-releases": "નિષ્ફળ ઇન્સ્ટૉલ અને અપગ્રેડનું નિદાન કરો: રેન્ડર ભૂલો, અટકેલી રિલીઝ, હૂક સમસ્યાઓ અને ડ્રિફ્ટ, અને helm test વડે રિલીઝ ચકાસો.",
+  "k8s-ops/the-control-plane-in-depth": "કંટ્રોલ પ્લેનનો દરેક ઘટક શું કરે છે, વિનંતી તેમાંથી કેવી રીતે વહે છે અને કઈ નિષ્ફળતાઓ સૌથી મહત્ત્વની છે તે જાણો.",
+  "k8s-ops/etcd-backup-and-restore": "ક્લસ્ટર સ્થિતિનો ચકાસાયેલ સ્નૅપશૉટ લો, તેને રીસ્ટોર કરો અને બૅકઅપ શું રક્ષણ આપે છે તેની મર્યાદાઓ જાણો.",
+  "k8s-ops/upgrading-clusters-safely": "Kubernetes વર્ઝન અપગ્રેડની યોજના બનાવો અને ચલાવો: ઘટકોનો ક્રમ, વર્ઝન સ્ક્યુ, API ના નિવૃત્તિ, નોડ અને રોલબૅક વિકલ્પો.",
+  "k8s-ops/rbac-and-service-accounts": "લોકો અને વર્કલોડને ફક્ત જોઈતી Kubernetes API ઍક્સેસ આપો અને કોણ શું કરી શકે છે તેનું ઑડિટ કરો.",
+  "k8s-ops/nodes-draining-taints-and-capacity": "ડાઉનટાઇમ વિના નોડ જાળવો, taint અને affinity વડે સ્થાન નિયંત્રિત કરો અને ક્ષમતાનું આયોજન કરો.",
+  "k8s-ops/resource-quotas-limits-and-autoscaling": "request, limit, ક્વોટા અને LimitRange વડે ક્લસ્ટર ન્યાયી રીતે વહેંચો અને પોડ તથા નોડ આપમેળે સ્કેલ કરો.",
+  "k8s-ops/network-policies-and-pod-security": "નેટવર્ક પૉલિસી વડે પોડ-ટુ-પોડ ટ્રાફિક મર્યાદિત કરો અને Pod Security Standards વડે કન્ટેનર શું કરી શકે તે મર્યાદિત કરો.",
+  "k8s-ops/debugging-cluster-and-node-problems": "ક્રમબદ્ધ ચેકલિસ્ટ વડે NotReady નોડ, Pending પોડ, ઇવિક્શન અને ધીમા API સર્વરનું કારણ શોધો.",
+  "virtualization/what-virtualization-is-and-hypervisor-types": "એક ભૌતિક સર્વર ઘણાં વર્ચ્યુઅલ મશીન કેવી રીતે ચલાવે છે અને KVM, VMware, Hyper-V અને Proxmox કેવી રીતે જુદા છે તે સમજો.",
+  "virtualization/cpu-memory-and-overcommit": "ગેસ્ટ વચ્ચે vCPU અને મેમરી કેવી રીતે વહેંચાય છે, ઓવરકમિટ એટલે શું અને ભીડવાળો હોસ્ટ કેવી રીતે ઓળખવો તે શીખો.",
+  "virtualization/virtual-disks-snapshots-and-templates": "ડિસ્ક ઇમેજ ફૉર્મેટ, થિન પ્રોવિઝનિંગ, સ્નૅપશૉટ સાંકળો કેવી રીતે વધે છે અને ટેમ્પ્લેટ તથા ક્લોન સમય કેવી રીતે બચાવે છે તે શીખો.",
+  "virtualization/virtual-networking-bridges-and-vlans": "ગેસ્ટને બ્રિજ, NAT અને VLAN દ્વારા નેટવર્ક ઍક્સેસ કેવી રીતે મળે છે અને ગેસ્ટ પાસે કનેક્ટિવિટી કેમ નથી તે કેવી રીતે શોધવું તે જુઓ.",
+  "virtualization/live-migration-ha-and-troubleshooting": "ગેસ્ટ અટક્યા વિના હોસ્ટ વચ્ચે કેવી રીતે ખસે છે, નિષ્ફળતા પછી HA તેમને કેવી રીતે ફરી શરૂ કરે છે અને સામાન્ય ખામીઓનું નિદાન કેવી રીતે કરવું તે સમજો.",
+  "storage/block-file-and-object-storage": "સ્ટોરેજના ત્રણ પ્રકાર અલગ પાડો અને મહત્ત્વના આંકડા શીખો: ક્ષમતા, IOPS, થ્રુપુટ અને લેટન્સી.",
+  "storage/filesystems-ext4-xfs-and-mounts": "ext4, XFS અને અન્યની સરખામણી કરો, ડિસ્ક સુરક્ષિત રીતે માઉન્ટ કરો અને સર્વરને બૂટ થતા અટકાવતી fstab ભૂલો ટાળો.",
+  "storage/lvm-and-raid": "LVM વડે વૉલ્યુમ ઑનલાઇન વધારો, RAID સ્તરો અને તેમના સમાધાન સમજો અને નિષ્ફળ ડિસ્કને શાંતિથી સંભાળો.",
+  "storage/network-storage-nfs-iscsi-and-ceph": "NFS અને iSCSI વડે નેટવર્ક પર સ્ટોરેજ કેવી રીતે વહેંચાય છે અને Ceph જેવી વિતરિત સિસ્ટમ શું ઉમેરે છે તે જુઓ.",
+  "storage/performance-backups-and-troubleshooting": "ડિસ્ક ધીમી કે ભરેલી કેમ છે તે શોધો, df અને du નો તફાવત સમજો અને તમે ખરેખર રીસ્ટોર કરી હોય તેવા બૅકઅપ ડિઝાઇન કરો.",
+  "service-mesh/kubernetes-networking-under-the-hood": "એક પોડથી બીજા પોડ સુધી પૅકેટને અનુસરો: પોડ નેટવર્ક, CNI, Service, kube-proxy, CoreDNS અને Ingress તથા Gateway API ટ્રાફિક કેવી રીતે અંદર લાવે છે.",
+  "service-mesh/cni-network-policy-and-ebpf": "CNI પસંદ કરો, NetworkPolicy શું મંજૂર અને નકારે છે તે સમજો અને eBPF Kubernetes નેટવર્કિંગ ક્યાં બદલે છે તે જુઓ.",
+  "service-mesh/what-a-service-mesh-is-and-how-it-works": "મેશ કઈ સમસ્યા ઉકેલે છે, સાઇડકાર અને ઍમ્બિયન્ટ મૉડેલ, કંટ્રોલ પ્લેન અને ડેટા પ્લેન અને ક્યારે મેશ વાપરવું ન જોઈએ તે સમજો.",
+  "service-mesh/mtls-and-traffic-management": "મ્યુચ્યુઅલ TLS ચાલુ કરો, કૅનેરી માટે વજન મુજબ ટ્રાફિક રૂટ કરો અને VirtualService અને DestinationRule વડે ટાઇમઆઉટ, રીટ્રાય અને સર્કિટ બ્રેકિંગ સેટ કરો.",
+  "service-mesh/observing-and-troubleshooting-the-mesh": "મેશ મેટ્રિક્સ અને ટ્રેસ વાંચો, istioctl વડે કન્ફિગરેશન સિંક તપાસો અને સામાન્ય 503 તથા કનેક્શન ભૂલોનો અર્થ ઉકેલો.",
+  "cicd/pipeline-fundamentals": "સતત ઇન્ટિગ્રેશન, ડિલિવરી અને ડિપ્લૉયમેન્ટ, સ્વસ્થ પાઇપલાઇનના તબક્કા અને તેને ઝડપી અને ભરોસાપાત્ર રાખતા સિદ્ધાંતો સમજો.",
+  "cicd/building-a-pipeline": "બિલ્ડ, ટેસ્ટ, સ્કૅન અને ડિપ્લૉય તબક્કા સાથે ડિક્લેરેટિવ Jenkinsfile લખો, ક્રેડેન્શિયલ સુરક્ષિત રીતે સંભાળો અને નિષ્ફળતાઓ વાંચો.",
+  "cicd/testing-and-quality-gates": "પાઇપલાઇનમાં કયા ટેસ્ટ ક્યાં ચાલે તે નક્કી કરો, તેમને ઝડપી અને વિશ્વસનીય રાખો, અસ્થિર ટેસ્ટ સંભાળો અને કવરેજ, લિન્ટિંગ અને સુરક્ષા તપાસને લાગુ કરેલા ગેટમાં ફેરવો.",
+  "cicd/deployment-strategies": "રોલિંગ, બ્લૂ-ગ્રીન અને કૅનેરી રિલીઝની સરખામણી કરો, ડિપ્લૉયને રિલીઝથી અલગ કરવા ફીચર ફ્લૅગ વાપરો અને રોલબૅક તથા ડેટાબેઝ ફેરફારોનું આયોજન કરો.",
+  "cicd/versioning-and-artifacts": "એક વાર બનાવો અને એ જ આર્ટિફેક્ટને પર્યાવરણો મારફતે આગળ વધારો, SemVer વડે વર્ઝન આપો, આર્ટિફેક્ટ અને કૅશ યોગ્ય રીતે સંગ્રહો અને ચેન્જલૉગ તથા રોલબૅક માર્ગ રાખો.",
+  "cicd/pipeline-security": "CI/CD માં ગુપ્ત માહિતી, રનર અને નિર્ભરતાઓનું રક્ષણ કરો, ડિપ્લૉય ક્રેડેન્શિયલ પર ન્યૂનતમ વિશેષાધિકાર લાગુ કરો, કોડ અને ઇમેજ સ્કૅન કરો અને ઝેરી નિર્ભરતાઓ સામે બચાવ કરો.",
+  "cicd/declarative-delivery-with-argo-cd": "ડિપ્લૉયમેન્ટને પુશમાંથી પુલ તરફ લઈ જાઓ, જ્યાં ક્લસ્ટરમાંનો કંટ્રોલર તમે સંગ્રહેલી અને સમીક્ષા કરેલી ઇચ્છિત કન્ફિગરેશન સાથે ક્લસ્ટરને સતત મેળ ખાતું બનાવે છે.",
+  "cicd/release-management-and-feature-flags": "ફીચર ફ્લૅગ વડે ડિપ્લૉયિંગને રિલીઝિંગથી અલગ કરો, તમારા જોખમને અનુરૂપ પર્યાવરણ અને મંજૂરીઓ ડિઝાઇન કરો અને અરાજકતા વિના ફ્લૅગ, વર્ઝન અને રોલબૅક સંભાળો.",
+  "cicd/fast-pipelines-caching-parallelism-monorepos": "સ્વતંત્ર જૉબ સમાંતર ચલાવીને, નિર્ભરતાઓ અને બિલ્ડ આઉટપુટ કૅશ કરીને, મોનોરેપોમાં ફક્ત બદલાયેલું ચલાવીને અને મિનિટો ક્યાં જાય છે તે માપીને પાઇપલાઇનનો સમય ઘટાડો.",
+  "cicd/reusable-pipelines-and-templates": "રિપોઝિટરી વચ્ચે પાઇપલાઇન ફાઇલો નકલ કરવાનું બંધ કરો: પગલાંને ટેમ્પ્લેટ તરીકે વહેંચો, વર્ઝન આપો અને ટીમોને અટકાવ્યા વિના સુસંગત રાખો.",
+  "cicd/environments-promotion-and-approvals": "દરેક પગલા માટે યોગ્ય તપાસ, મંજૂરી અને નોંધ સાથે એક બિલ્ડને ટેસ્ટ, સ્ટેજિંગ અને પ્રોડક્શન સુધી લઈ જાઓ.",
+  "cicd/debugging-pipelines": "પાઇપલાઇન નિષ્ફળતાઓ સ્થાનિક રીતે ફરી ઉત્પન્ન કરો, વાસ્તવિક નિષ્ફળતાને અસ્થિર નિષ્ફળતાથી અલગ પાડો, પર્યાવરણ ડ્રિફ્ટ, કૅશ અને ગુપ્ત માહિતીની સમસ્યાઓ શોધો અને એક ખરાબ રન ટીમને અટકાવે તે બંધ કરો.",
+  "terraform/iac-and-hcl-basics": "ઇન્ફ્રાસ્ટ્રક્ચરને ફાઇલોમાં કેમ વર્ણવાય છે તે સમજો, Terraform વર્કફ્લો શીખો અને મૂળભૂત HCL સિન્ટેક્સ વાંચો.",
+  "terraform/providers-and-resources": "નિર્ભરતાઓ સાથે વાસ્તવિક ઇન્ફ્રાસ્ટ્રક્ચર બનાવો, ડેટા સોર્સ વડે હાલના સંસાધનો ક્વેરી કરો અને લાઇફસાઇકલ નિયમો તથા મેટા-આર્ગ્યુમેન્ટ સુરક્ષિત રીતે વાપરો.",
+  "terraform/variables-and-outputs": "ટાઇપ કરેલા ચલ, ચકાસણી, locals અને આઉટપુટ વડે કન્ફિગરેશનને પુનઃઉપયોગી બનાવો અને સંવેદનશીલ મૂલ્યો તમારી ફાઇલોથી દૂર રાખો.",
+  "terraform/expressions-and-dynamic-blocks": "count અને for_each વડે ડેટામાંથી ઘણાં સંસાધનો બનાવો, for અભિવ્યક્તિઓ અને ફંક્શન વડે મૂલ્યો રૂપાંતરિત કરો અને dynamic વડે નેસ્ટેડ બ્લૉક બનાવો.",
+  "terraform/state": "Terraform state શું છે તે સમજો, લૉકિંગ સાથે તેને દૂરસ્થ રીતે સંગ્રહો અને કંઈ બગાડ્યા વિના import અને state આદેશો વાપરો.",
+  "terraform/modules": "સ્પષ્ટ ઇનપુટ અને આઉટપુટ સાથે પુનઃઉપયોગી ઇન્ફ્રાસ્ટ્રક્ચરને મૉડ્યુલ તરીકે પૅકેજ કરો, વર્ઝન આપો અને ફેરફારો અલગ રહે તે રીતે પર્યાવરણ ગોઠવો.",
+  "terraform/secrets-and-sensitive-data": "પાસવર્ડ અને કી કોડ અને લૉગથી દૂર રાખો, સમજો કે state માં ગુપ્ત માહિતી હોય છે, રનટાઇમ પર મૅનેજરમાંથી ગુપ્ત માહિતી વાંચો અને state બૅકએન્ડ સુરક્ષિત કરો.",
+  "terraform/aws-and-azure-end-to-end": "AWS અને Azure પર Terraform વડે એ જ નાનું વેબ પ્લૅટફૉર્મ બનાવો: નેટવર્ક, કમ્પ્યુટ, લોડ બૅલેન્સર અને ડેટાબેઝ, અને સમકક્ષ સંસાધનોની સરખામણી કરો.",
+  "terraform/workflows-and-drift": "સમીક્ષા કરેલા પ્લાન સાથે પાઇપલાઇનમાં Terraform સુરક્ષિત રીતે ચલાવો, ડ્રિફ્ટ શોધો અને ઉકેલો અને apply પહેલાં સ્વચાલિત તપાસ ઉમેરો.",
+  "terraform/testing-terraform": "ફૉર્મેટિંગ, ચકાસણી, લિન્ટિંગ, નીતિ તપાસ, પ્લાન ઍસર્શન અને terraform test તથા Terratest વડે વાસ્તવિક ટેસ્ટ ડિપ્લૉયમેન્ટ દ્વારા ભૂલો વહેલી પકડો, એવી પાઇપલાઇનમાં જે પરવડે તેવી રહે.",
+  "terraform/environments-and-team-workflows": "પર્યાવરણ માટે વર્કસ્પેસ અને ડિરેક્ટરી વચ્ચે પસંદગી કરો, નુકસાનની ત્રિજ્યા મર્યાદિત કરવા state વિભાજિત કરો અને ટીમ માટે સમીક્ષા કરેલા, સ્વચાલિત plan અને apply પ્રવાહ ગોઠવો.",
+  "terraform/import-refactor-and-moved-blocks": "હાલના ઇન્ફ્રાસ્ટ્રક્ચરને Terraform હેઠળ લાવો, સંસાધનોનાં નામ બદલો અને તેમને નાશ કર્યા વિના પુનર્ગઠિત કરો અને તે સાબિત કરવા plan વાપરો.",
+  "terraform/large-configurations-and-performance": "મોટા Terraform કોડને એવા સ્ટૅકમાં વિભાજિત કરો જે ઝડપથી plan થાય અને નાનું નિષ્ફળ થાય, તેમની વચ્ચે સ્પષ્ટ સીમાઓ અને નિર્ભરતાઓ સાથે.",
+  "terraform/debugging-terraform": "TF_LOG, plan આઉટપુટ, state આદેશો અને import વડે નિષ્ફળ plan અને apply, state લૉક, ડ્રિફ્ટ, અણધાર્યા બદલાવ અને પ્રોવાઇડર ભૂલોનું નિદાન કરો.",
+  "cloud/cloud-fundamentals": "AWS અને Azure ની સહિયારી શબ્દાવલિ શીખો: રીજન, ઉપલબ્ધતા ઝોન, સહિયારી જવાબદારી મૉડેલ, સેવાના પ્રકારો અને ખાતાં કેવી રીતે ગોઠવવાં.",
+  "cloud/identity-and-access": "ભૂમિકા અને નીતિઓ વડે AWS અને Azure માં કોણ શું કરી શકે તે નિયંત્રિત કરો, લાંબા ગાળાની કી ટાળો અને access denied ભૂલો વ્યવસ્થિત રીતે ડિબગ કરો.",
+  "cloud/virtual-networks": "જાહેર અને ખાનગી સબનેટ, રૂટ ટેબલ, ગેટવે અને સુરક્ષા નિયમો સાથે VPC કે VNet ડિઝાઇન કરો અને કનેક્શન કેમ નિષ્ફળ જાય છે તે શોધો.",
+  "cloud/compute-and-storage": "વર્ચ્યુઅલ મશીન, કન્ટેનર અને સર્વરલેસ વચ્ચે પસંદગી કરો, ઑબ્જેક્ટ, બ્લૉક અને ફાઇલ સ્ટોરેજ સમજો અને વર્ઝનિંગ તથા બૅકઅપ વડે ડેટા સુરક્ષિત કરો.",
+  "cloud/dns-and-cdn": "Route 53 અને Azure DNS સાથે DNS ઝોન હોસ્ટ કરો, રૂટિંગ નીતિઓ પસંદ કરો, ઍપ્લિકેશનોની આગળ CDN મૂકો અને પ્રમાણપત્રો તથા કૅશ વર્તણૂક સંભાળો.",
+  "cloud/serverless": "સર્વર સંભાળ્યા વિના કોડ ચલાવો, ફંક્શનને કતાર, સ્ટોરેજ અને API સાથે જોડો, કોલ્ડ સ્ટાર્ટ, સહવર્તિતા અને મર્યાદાઓ સમજો અને ખર્ચ તથા નિષ્ફળતાઓ નિયંત્રિત કરો.",
+  "cloud/kubernetes-on-cloud": "AWS અને Azure પર મૅનેજ્ડ Kubernetes બનાવો અને ચલાવો, વર્કલોડને ક્લાઉડ ઓળખ સાથે જોડો, લોડ બૅલેન્સર દ્વારા ખુલ્લા મૂકો અને અપગ્રેડ તથા નોડ ગ્રૂપનું આયોજન કરો.",
+  "cloud/monitoring-and-logging": "CloudWatch, CloudTrail, Azure Monitor અને Log Analytics સાથે મેટ્રિક્સ, લૉગ અને ઑડિટ ટ્રેઇલ એકત્ર કરો, ક્વેરી કરો, અલાર્મ બનાવો અને રિટેન્શન તથા ખર્ચ કાબૂમાં રાખો.",
+  "cloud/security-and-governance": "ખાતાં અને સબ્સ્ક્રિપ્શન ગોઠવો, SCP અને Azure Policy વડે ગાર્ડરેલ લાગુ કરો, એન્ક્રિપ્શન અને કી મૅનેજમેન્ટ વડે ડેટા સુરક્ષિત કરો અને ખોટા કન્ફિગરેશનને સતત શોધો.",
+  "cloud/managed-services-and-cost": "મૅનેજ્ડ ડેટાબેઝ, કતાર અને DNS સારી રીતે વાપરો, ઝોન પાર નિષ્ફળતા માટે ડિઝાઇન કરો અને ખર્ચ દેખાતો અને કાબૂમાં રાખો.",
+  "cloud/high-availability-and-disaster-recovery": "ઇન્સ્ટન્સ, ઝોન અને રીજનના સ્તરે નિષ્ફળતા માટે ડિઝાઇન કરો, બૅકઅપ, પાઇલટ લાઇટ, વૉર્મ સ્ટૅન્ડબાય અને ઍક્ટિવ-ઍક્ટિવ વચ્ચે પસંદગી કરો અને ટેસ્ટ વડે પુનઃપ્રાપ્તિ લક્ષ્યો સાબિત કરો.",
+  "cloud/landing-zones-and-multi-account-strategy": "ક્લાઉડ ખાતાં કે સબ્સ્ક્રિપ્શનને ગાર્ડરેલ, કેન્દ્રિય લૉગિંગ, નેટવર્કિંગ અને ઓળખ સાથે વંશવેલામાં ગોઠવો, જેથી ટીમો સુરક્ષિત સીમાઓમાં ઝડપથી આગળ વધે.",
+  "cloud/object-storage-and-data-lifecycle": "ઑબ્જેક્ટ સ્ટોરેજ સારી રીતે વાપરો: વર્ગો, લાઇફસાઇકલ નિયમો, વર્ઝનિંગ, ઍક્સેસ નિયંત્રણ અને કાઢી નાખવા તથા ખુલ્લા પડવા સામે રક્ષણ.",
+  "cloud/hybrid-connectivity-and-peering": "પિયરિંગ, VPN, સમર્પિત લિંક અને પ્રાઇવેટ એન્ડપૉઇન્ટ વડે ક્લાઉડ નેટવર્કને એકબીજા સાથે અને ઑફિસ કે ડેટા સેન્ટર સાથે જોડો અને સરનામાંની અથડામણ ટાળો.",
+  "cloud/debugging-cloud-outages": "અંદાજ લગાવવાને બદલે ઑડિટ લૉગ, નીતિ સિમ્યુલેશન અને ફ્લો લૉગ વડે ઓળખ, નેટવર્ક માર્ગ, ક્વોટા અને સેવા સ્વાસ્થ્ય મારફતે ક્લાઉડ નિષ્ફળતાઓ ટ્રેસ કરો.",
+  "observability/observability-fundamentals": "મૉનિટરિંગ અને ઑબ્ઝર્વેબિલિટી વચ્ચેનો તફાવત, મેટ્રિક્સ, લૉગ અને ટ્રેસના ત્રણ સંકેતો અને શું માપવું તે નક્કી કરવા RED અને USE પદ્ધતિઓ શીખો.",
+  "observability/metrics-and-prometheus": "Prometheus ડેટા મૉડેલ, સ્ક્રેપ કન્ફિગરેશન અને રોજ વાપરશો તેવી PromQL ક્વેરી સમજો, જેમાં રેટ, એગ્રિગેશન અને હિસ્ટોગ્રામ સામેલ છે.",
+  "observability/logs-and-traces": "ક્વેરી કરી શકાય તેવા સંરચિત લૉગ લખો, ટ્રેસ વડે સેવાઓ પાર વિનંતીઓને અનુસરો અને ટેલિમેટ્રી જથ્થો અને ખર્ચ કાબૂમાં રાખો.",
+  "observability/log-pipelines": "મોટા પાયે લૉગ એકત્ર કરો, પાર્સ કરો, સમૃદ્ધ કરો અને સંગ્રહો, Loki અને Elasticsearch વચ્ચે પસંદગી કરો, LogQL સાથે ક્વેરી કરો અને જથ્થો, રિટેન્શન અને ખર્ચ નિયંત્રિત કરો.",
+  "observability/opentelemetry": "વેન્ડર-તટસ્થ ધોરણ સાથે ટ્રેસ, મેટ્રિક્સ અને લૉગ ઉત્સર્જિત કરો, સ્વચાલિત અને મૅન્યુઅલ ઇન્સ્ટ્રુમેન્ટેશન ઉમેરો, Collector દ્વારા ડેટા રૂટ કરો અને સેવાઓ પાર કૉન્ટેક્સ્ટ જાળવો.",
+  "observability/synthetic-and-blackbox-monitoring": "Prometheus blackbox exporter અને સિન્થેટિક તપાસ વડે વપરાશકર્તાની બાજુથી ઉપલબ્ધતા માપો, HTTP, TCP, DNS અને પ્રમાણપત્રો પ્રોબ કરો અને વપરાશકર્તાઓ ખરેખર જે અનુભવે તેના પર ચેતવણી આપો.",
+  "observability/alerting-and-dashboards": "વપરાશકર્તાઓ માટે મહત્ત્વના લક્ષણો પર ચેતવણી આપો, Alertmanager રૂટિંગ સાથે ચેતવણી નિયમો લખો અને પ્રશ્નોના ઝડપથી જવાબ આપતા ડૅશબોર્ડ ડિઝાઇન કરો.",
+  "observability/red-use-and-golden-signals": "RED પદ્ધતિ, USE પદ્ધતિ અને ચાર ગોલ્ડન સિગ્નલ વડે દરેક સેવા અને સંસાધન માટે મેટ્રિક્સનો યોગ્ય નાનો સમૂહ પસંદ કરો અને પ્રશ્નોના ઝડપથી જવાબ આપતા ડૅશબોર્ડ બનાવો.",
+  "observability/telemetry-cost-and-cardinality": "મેટ્રિક કાર્ડિનાલિટી, લૉગ જથ્થો, ટ્રેસ સૅમ્પલિંગ અને રિટેન્શન નિયંત્રિત કરીને અને ઑબ્ઝર્વેબિલિટીના ખર્ચને બજેટ તરીકે ટ્રૅક કરીને મૉનિટરિંગ પરવડે તેવું અને ઝડપી રાખો.",
+  "observability/structured-logging-and-log-design": "શોધવામાં સરળ લૉગ લખો: સંરચિત ફીલ્ડ, સુસંગત નામ, કોરિલેશન ID, સમજદાર સ્તર અને ગુપ્ત માહિતી વિના.",
+  "observability/runbooks-and-dashboards-for-on-call": "ઑન-કૉલ એન્જિનિયરને ખરેખર જોઈતા થોડા ડૅશબોર્ડ અને રનબુક ડિઝાઇન કરો અને તેમને સચોટ રાખો.",
+  "observability/debugging-with-telemetry": "કંઈક ખોટું છે તે શોધવા મેટ્રિક્સ, ક્યાં છે તે શોધવા ટ્રેસ અને કેમ છે તે શોધવા લૉગ વાપરો, અને ડેટા ખૂટે ત્યારે મૉનિટરિંગને જ ડિબગ કરતાં શીખો.",
+  "sre/slos-and-error-budgets": "વપરાશકર્તાઓને ગમતા આંકડામાં વિશ્વસનીયતા વ્યાખ્યાયિત કરો, ઝડપ અને સ્થિરતાનું સંતુલન રાખતા લક્ષ્યો નક્કી કરો અને રિલીઝ નિર્ણયો માટે એરર બજેટ વાપરો.",
+  "sre/incident-response": "સ્પષ્ટ ભૂમિકા, ગંભીરતા સ્તર અને સંચાર સાથે ઘટનાઓ ચલાવો, પહેલાં શમન અને પછી નિદાન કરો અને સ્વચ્છ રીતે હસ્તાંતર કરો.",
+  "sre/postmortems-and-toil": "દોષ વિના ઘટનાઓમાંથી શીખો, વાસ્તવિક સુધારા આપતા પોસ્ટમૉર્ટમ લખો અને ટોઇલ ઓળખીને દૂર કરો.",
+  "sre/reliability-patterns": "ટાઇમઆઉટ, બૅકઑફ સાથે રીટ્રાય, સર્કિટ બ્રેકર, લોડ શેડિંગ અને ક્ષમતા આયોજન લાગુ કરો જેથી એક નિષ્ફળ ભાગ આખી સિસ્ટમને ન પાડે.",
+  "sre/on-call": "ઑન-કૉલ શેડ્યૂલ, એસ્કેલેશન અને હૅન્ડઑફ ડિઝાઇન કરો, લોકો પગલાં લઈ શકે તેવી ચેતવણીઓ અને રનબુક લખો, પેજર ભાર માપો અને રોટેશન ટકાઉ રાખો.",
+  "sre/capacity-planning": "માંગનો અંદાજ કાઢો, લોડ ટેસ્ટ વડે સેવાની મર્યાદાઓ શોધો, હેડરૂમ અને N+1 રિડન્ડન્સીનું આયોજન કરો અને ક્ષમતાને ખર્ચ અને ઑટોસ્કેલિંગ સાથે જોડો.",
+  "sre/chaos-engineering-and-game-days": "નિયંત્રિત પ્રયોગો અને ગેમ ડે વડે જાણી જોઈને નિષ્ફળતાનો અભ્યાસ કરો, બૅકઅપ અને ફેલઓવરનું પરીક્ષણ કરો અને તમે ખરેખર સાબિત કરેલા પુનઃપ્રાપ્તિ લક્ષ્યો નક્કી કરો.",
+  "sre/change-management-and-releases": "નાના બૅચ, ફીચર ફ્લૅગ, કૅનેરી વિશ્લેષણ, સ્વચાલિત રોલબૅક અને એરર-બજેટ-જાગૃત રિલીઝ નીતિઓ વડે ફેરફારો સુરક્ષિત અને કંટાળાજનક બનાવો.",
+  "sre/production-readiness-reviews": "લૉન્ચ પહેલાં સેવા વાસ્તવિક વપરાશકર્તાઓ માટે તૈયાર છે કે નહીં તે તપાસો, જેમાં માલિકી, SLO, મૉનિટરિંગ, ક્ષમતા, નિષ્ફળતા પ્રકારો, રોલઆઉટ, રનબુક અને સુરક્ષા આવરી લેવાય છે, ટીમો જેને મૂલ્યવાન ગણે તેવી હળવી સમીક્ષા સાથે.",
+  "sre/incident-communication-and-stakeholders": "સ્પષ્ટ સ્ટેટસ અપડેટ, ગંભીરતા સ્તર, આંતરિક ચેનલ માળખું, ગ્રાહક સંદેશા અને શાંત હસ્તાંતર સાથે આઉટેજ દરમિયાન સંચાર કરો, જેથી ગૂંચવણથી તકનીકી કામ ધીમું ન પડે.",
+  "sre/dependencies-and-third-party-risk": "તમારી વિશ્વસનીયતા બીજી સેવાઓ પર કેવી રીતે આધાર રાખે છે તે સમજો, વાસ્તવિક લક્ષ્યો નક્કી કરો અને તેમની નિષ્ફળતાઓ માટે આયોજન કરો.",
+  "sre/disaster-recovery-exercises": "પુનઃપ્રાપ્તિ ડ્રિલનું આયોજન કરો, ચલાવો અને તેમાંથી શીખો: RTO અને RPO, પરિદૃશ્યો, સુરક્ષિત અમલ અને ડ્રિલ જે બતાવે તે સુધારવું.",
+  "sre/debugging-under-pressure": "પરિકલ્પનાઓ, એક સમયે એક ફેરફાર, મૂળ કારણ પહેલાં શમન, સ્પષ્ટ ભૂમિકાઓ અને સમીક્ષા સરળ બનાવતી નોંધો સાથે ઘટના તપાસ ચલાવો.",
+  "security/security-mindset-and-threat-modeling": "સુરક્ષાને ડિલિવરીના દરેક તબક્કામાં લઈ જાઓ, જોખમની શબ્દાવલિ શીખો અને હુમલાખોરો પહેલાં સમસ્યાઓ શોધવા સરળ ખતરા મૉડેલ વાપરો.",
+  "security/secrets-management": "પાસવર્ડ, ટોકન અને કી કોડ અને લૉગથી દૂર રાખો, ટૂંકા ગાળાના ક્રેડેન્શિયલ આપો, સમયપત્રક મુજબ બદલો અને એક લીક થાય ત્યારે બરાબર શું કરવું તે જાણો.",
+  "security/securing-the-pipeline": "CI માં નિર્ભરતા, કોડ અને ઇમેજ સ્કૅનિંગ ઉમેરો, તમે જે શિપ કરો છો તેની યાદી બનાવો, આર્ટિફેક્ટ પર સહી કરો અને પાઇપલાઇનને જ લક્ષ્ય તરીકે સુરક્ષિત કરો.",
+  "security/container-and-image-security": "ન્યૂનતમ ઇમેજ બનાવો, ક્ષમતાઓ ઘટાડીને નૉન-રૂટ વપરાશકર્તા તરીકે ચલાવો, સ્કૅન કરી સહી કરો અને ચેડાં થયેલું કન્ટેનર શું કરી શકે તે મર્યાદિત કરવા રનટાઇમ નિયંત્રણો વાપરો.",
+  "security/kubernetes-security": "RBAC વડે કોણ શું કરી શકે તે નિયંત્રિત કરો, સુરક્ષા ધોરણો અને નીતિઓ વડે પોડ વર્તન મર્યાદિત કરો, નેટવર્ક પૉલિસી વડે ટ્રાફિક અલગ કરો અને ગુપ્ત માહિતી તથા કંટ્રોલ પ્લેન સુરક્ષિત કરો.",
+  "security/cloud-security-and-iam": "ન્યૂનતમ વિશેષાધિકાર ઓળખ ડિઝાઇન કરો, એન્ક્રિપ્શન અને ખાનગી નેટવર્કિંગ વડે ડેટા સુરક્ષિત કરો, ઑડિટ લૉગિંગ ચાલુ કરો અને Terraform તથા ક્લાઉડ ખાતાંમાં ખોટા કન્ફિગરેશન તપાસો.",
+  "security/vulnerability-management-and-security-incidents": "વાસ્તવિક જોખમ મુજબ તારણોને પ્રાથમિકતા આપો, સંમત સમયમાં પૅચ કરો, લૉગ અને સંકેતોમાંથી હુમલા શોધો અને સ્પષ્ટ ભૂમિકાઓ તથા પુરાવા સાથે સુરક્ષા ઘટના ચલાવો.",
+  "security/identity-authentication-and-zero-trust": "સાઇન-ઇન, ટોકન અને મલ્ટી-ફૅક્ટર પ્રમાણીકરણ કેવી રીતે કામ કરે છે તે સમજો, OAuth અને OIDC સુરક્ષિત રીતે લાગુ કરો, મ્યુચ્યુઅલ TLS વડે સેવાઓને પ્રમાણિત કરો અને વિશ્વસનીય નેટવર્કને બદલે ઝીરો ટ્રસ્ટ સાથે ડિઝાઇન કરો.",
+  "security/application-security-for-devops": "સૌથી સામાન્ય વેબ અને API નબળાઈઓ ઓળખો, ઇનપુટ ચકાસણી, હેડર અને રેટ લિમિટ તેમને કેવી રીતે રોકે છે તે સમજો અને જોખમી પૅટર્ન માટે કોડ અને કન્ફિગરેશનની સમીક્ષા કરો.",
+  "security/policy-as-code-and-compliance": "સુરક્ષા નિયમોને આપમેળે ચાલતી તપાસમાં ફેરવો, ડ્રિફ્ટ અટકાવવા ઍડમિશન અને પાઇપલાઇન નીતિઓ વાપરો અને સ્ક્રીનશૉટને બદલે ઑડિટ માટે સતત પુરાવા એકત્ર કરો.",
+  "security/network-and-edge-security": "નેટવર્કનું વિભાજન કરો, આઉટબાઉન્ડ ટ્રાફિક નિયંત્રિત કરો, TLS, WAF અને DDoS સંરક્ષણ વડે ધારનું રક્ષણ કરો અને DNS તથા પ્રમાણપત્રો સુરક્ષિત કરો.",
+  "security/ransomware-resilience-and-recovery": "રેન્સમવેર હુમલા કેવી રીતે પ્રગટ થાય છે તે સમજો, અપરિવર્તનીય અને અલગ બૅકઅપ ડિઝાઇન કરો, પુનઃપ્રાપ્તિનો મહાવરો કરો અને નુકસાનની ત્રિજ્યા ઘટાડો જેથી એક ચેડાં થયેલું ખાતું બધું એન્ક્રિપ્ટ ન કરી શકે.",
+  "security/detection-and-security-logging": "શું લૉગ કરવું તે નક્કી કરો, તેને કેન્દ્રિત કરી સુરક્ષિત કરો, મહત્ત્વની ડિટેક્શન લખો, ખોટા પૉઝિટિવ ઘટાડો અને કવરેજ ગેપ શોધવા ATT&CK જેવા ફ્રેમવર્ક વાપરો.",
+  "security/encryption-and-key-management": "સંગ્રહિત, પરિવહન દરમિયાન અને ઉપયોગમાં એન્ક્રિપ્શન સાચી રીતે વાપરો, કી મૅનેજમેન્ટ સેવા વડે કી સંભાળો, બદલો અને ફરજો અલગ કરો અને એન્ક્રિપ્શનને નકામું બનાવતી સામાન્ય ભૂલો ટાળો.",
+  "security/supply-chain-sboms-and-provenance": "તમારા સૉફ્ટવેરની અંદર શું છે તે જાણો, તે ક્યાં બન્યું તે સાબિત કરો અને પ્રોડક્શનમાં કંઈ ચાલે તે પહેલાં સહીઓ ચકાસો.",
+  "security/cloud-incident-playbooks": "સામાન્ય ક્લાઉડ ઘટનાઓ માટે ટૂંકા પ્લેબુક તૈયાર કરો: લીક થયેલી કી, જાહેર સ્ટોરેજ અને ચેડાં થયેલા વર્કલોડ.",
+  "security/debugging-and-investigating-security-issues": "ચેતવણીનું ટ્રાયેજ કરો, પુરાવા સાચવો, ઑડિટ લૉગ દ્વારા શંકાસ્પદ ક્રિયા ટ્રેસ કરી તેને કાબૂમાં લો અને કાયદેસર કામ અટકાવતા સુરક્ષા નિયંત્રણો ડિબગ કરો.",
+  "ansible/ansible-basics-inventory-and-ad-hoc": "એજન્ટ-રહિત કન્ફિગરેશન મૅનેજમેન્ટ સમજો, તમારા સર્વર ઇન્વેન્ટરીમાં વર્ણવો અને ઘણા હોસ્ટ પર એકવારના આદેશો તથા મૉડ્યુલ ચલાવો.",
+  "ansible/playbooks-tasks-and-idempotence": "પ્લે અને ટાસ્ક સાથે YAML પ્લેબુક લખો, check અને diff મોડ સાથે તેમને સુરક્ષિત રીતે ચલાવો અને આઇડેમ્પોટન્સ કેમ મહત્ત્વની છે તે સમજો.",
+  "ansible/variables-facts-and-templates": "ચલ વડે પ્લેબુક પૅરામીટરાઇઝ કરો, અગ્રતા સમજો, એકત્ર કરેલા ફૅક્ટ વાપરો અને Jinja2 ટેમ્પ્લેટ સાથે કન્ફિગરેશન ફાઇલો રેન્ડર કરો.",
+  "ansible/handlers-conditionals-and-loops": "when શરતો, લૂપ, ફેરફારે ચાલતા હૅન્ડલર, block/rescue ભૂલ સંભાળ અને ટૅગ વડે ટાસ્ક પ્રવાહ નિયંત્રિત કરો.",
+  "ansible/roles-and-collections": "ઑટોમેશનને પ્રમાણભૂત લેઆઉટ સાથે રોલમાં ગોઠવો, વહેંચાયેલા કલેક્શન અને requirements ઇન્સ્ટૉલ કરો અને રોલ નાના અને ચકાસી શકાય તેવા રાખો.",
+  "ansible/vault-secrets-and-safe-practice": "Ansible Vault વડે પાસવર્ડ અને કીને સાદા લખાણથી દૂર રાખો, લૉગમાંથી ગુપ્ત માહિતી છુપાવો, વિશેષાધિકાર વધારો મર્યાદિત કરો અને ઑટોમેશન શું પહોંચી શકે છે તેની સમીક્ષા કરો.",
+  "ansible/ansible-at-scale": "સીરિયલ બૅચ અને મર્યાદાઓ સાથે ફેરફારો સુરક્ષિત રીતે અમલમાં મૂકો, લિન્ટિંગ અને Molecule સાથે રોલનું પરીક્ષણ કરો, કનેક્શન સ્કેલ કરો અને Terraform તથા Ansible વચ્ચે કામ વહેંચો.",
+  "ansible/dynamic-inventory-for-cloud": "હાથે લખેલી યાદી જાળવવાને બદલે Ansible ને ક્લાઉડમાંથી ટૅગ મુજબ હોસ્ટ શોધવા દો.",
+  "ansible/testing-and-linting-ansible": "ansible-lint, સિન્ટેક્સ તપાસ, check મોડ, Molecule અને આઇડેમ્પોટન્સ ટેસ્ટ વડે પ્રોડક્શન પહેલાં ભૂલો પકડો.",
+  "ansible/debugging-ansible-runs": "વર્બોસિટી, ડિબગ, સ્ટેપ મોડ અને લૉગ વડે પ્લેબુક કેમ નિષ્ફળ ગઈ, હોસ્ટ અપ્રાપ્ય છે, ચલની કિંમત ખોટી છે કે રન ધીમો છે તે શોધો.",
+  "databases/relational-fundamentals-and-sql": "ટેબલ, કી અને સંબંધો સમજો અને ઑપરેટરો ડેટા તપાસવા, કદ ચકાસવા અને તકલીફ શોધવા જે SQL વાપરે છે તે વાંચો અને લખો.",
+  "databases/indexes-and-query-plans": "ઇન્ડેક્સ શું કરે છે અને તેની કિંમત શું છે તે જાણો, સિક્વન્શિયલ સ્કૅન અને ખરાબ અંદાજ શોધવા EXPLAIN આઉટપુટ વાંચો અને લાઇવ સિસ્ટમ પર યોગ્ય ઇન્ડેક્સ સુરક્ષિત રીતે ઉમેરો.",
+  "databases/transactions-and-locking": "ACID, આઇસોલેશન સ્તરો, લૉક અને લાંબા ટ્રાન્ઝૅક્શન અટકાવ કેવી રીતે સર્જે છે અને બ્લૉકિંગ તથા ડેડલૉક કેવી રીતે શોધી ઉકેલવા તે શીખો.",
+  "databases/backups-and-recovery": "લૉજિકલ અને ભૌતિક બૅકઅપ વચ્ચે પસંદગી કરો, પૉઇન્ટ-ઇન-ટાઇમ પુનઃપ્રાપ્તિ માટે WAL આર્કાઇવિંગ વાપરો, RPO અને RTO લક્ષ્યો નક્કી કરો અને રીસ્ટોર કામ કરે છે તે સાબિત કરો.",
+  "databases/replication-and-failover": "પ્રાઇમરી અને રેપ્લિકા સેટઅપ, સિંક્રોનસ અને અસિંક્રોનસ રેપ્લિકેશન, રેપ્લિકેશન લેગ, ફેલઓવર અને સ્પ્લિટ બ્રેઇન તથા રીડ સ્કેલિંગ સમજો.",
+  "databases/performance-and-connection-pooling": "આંકડા વડે ધીમી ક્વેરી શોધો, મેમરી અને કૅશ વર્તણૂક સમજો, પૂલર વડે કનેક્શનનું કદ નક્કી કરો અને બ્લૉટ તથા વેક્યુમ સમસ્યાઓ ઓળખો.",
+  "databases/safe-schema-migrations": "એક્સપાન્ડ અને કૉન્ટ્રૅક્ટ પૅટર્ન, ઑનલાઇન ઇન્ડેક્સ અને કૉલમ ફેરફાર, બૅચ બૅકફિલ અને માઇગ્રેશન ટૂલિંગ વડે આઉટેજ વિના લાઇવ સ્કીમા બદલો.",
+  "databases/nosql-caches-and-choosing": "રિલેશનલ, કી-વૅલ્યુ, ડૉક્યુમેન્ટ, વાઇડ-કૉલમ અને સર્ચ સ્ટોરની સરખામણી કરો, Redis જેવી કૅશ અને તેમના નિષ્ફળતા પ્રકારો સમજો અને સમાધાનોને ધ્યાનમાં રાખી પસંદગી કરો.",
+  "databases/postgres-vacuum-bloat-and-maintenance": "Postgres ને વેક્યુમ કેમ જોઈએ, બ્લૉટ અને લાંબા ટ્રાન્ઝૅક્શન કેવી રીતે ઓળખવા અને કઈ જાળવણી ડેટાબેઝ તંદુરસ્ત રાખે છે તે સમજો.",
+  "databases/schema-design-for-operations": "ડેટાબેઝને ઝડપી, બદલવામાં સુરક્ષિત અને ચલાવવામાં સરળ રાખતી કી, ટાઇપ, કન્સ્ટ્રેઇન્ટ અને ટેબલ લેઆઉટ પસંદ કરો.",
+  "databases/debugging-database-problems": "કનેક્શન અને લૉકથી લઈને ડિસ્ક, રેપ્લિકેશન અને પુનઃપ્રાપ્તિ સુધીની તપાસના નિશ્ચિત ક્રમ સાથે ધીમા, અવરોધિત, ભરેલા કે અપ્રાપ્ય ડેટાબેઝનું ટ્રાયેજ કરો.",
+  "go/why-go-and-your-first-program": "આટલું બધું ઇન્ફ્રાસ્ટ્રક્ચર સૉફ્ટવેર Go માં કેમ લખાય છે તે જુઓ, મૉડ્યુલ સેટ કરો, એક સ્ટેટિક બાઇનરી બનાવો અને પ્રમાણભૂત ટૂલ વાપરો.",
+  "go/types-structs-slices-and-maps": "મુખ્ય ડેટા પ્રકારો વાપરો: ઝીરો વૅલ્યુ, સ્લાઇસ, મૅપ અને મેથડ સાથેના સ્ટ્રક્ટ, અને સ્લાઇસ તથા મૅપના સામાન્ય આશ્ચર્યો ટાળો.",
+  "go/functions-errors-and-defer": "Go રીતે ભૂલો સંભાળો: તેમને પરત કરો, કૉન્ટેક્સ્ટ સાથે વીંટો, તપાસો અને સફાઈ માટે defer વાપરો.",
+  "go/interfaces-and-packages": "કોડને અલગ કરવા અને ચકાસી શકાય તેવો બનાવવા નાના ઇન્ટરફેસ વાપરો અને પ્રોજેક્ટને સ્પષ્ટ સીમાઓ સાથે પૅકેજમાં ગોઠવો.",
+  "go/goroutines-channels-and-sync": "goroutine વડે કામ સહવર્તી ચલાવો, channel અને WaitGroup વડે સંકલન કરો, વહેંચાયેલી સ્થિતિનું રક્ષણ કરો અને રેસ વહેલી શોધો.",
+  "go/context-timeouts-and-cancellation": "તમારા કોડમાં context પસાર કરો જેથી કામ ટાઇમઆઉટ થઈ શકે, રદ થઈ શકે અને પ્રક્રિયાને બંધ કરવા કહેવાય ત્યારે સ્વચ્છ રીતે અટકી શકે.",
+  "go/http-services-and-json": "હૅન્ડલર, મિડલવેર, હેલ્થ એન્ડપૉઇન્ટ અને JSON સાથે નાની HTTP સેવા બનાવો અને બીજી સેવાઓને સુરક્ષિત રીતે કૉલ કરો.",
+  "go/testing-benchmarks-and-tooling": "ટેબલ-ડ્રિવન ટેસ્ટ લખો, કવરેજ માપો, હૉટ પાથ બેન્ચમાર્ક કરો અને CI માં ટૂલચેઇન તપાસ વાપરો.",
+  "go/building-containers-and-cli-tools": "Go પ્રોગ્રામ સારી રીતે શિપ કરો: સ્પષ્ટ કમાન્ડ-લાઇન ઇન્ટરફેસ, વર્ઝન માહિતી, મલ્ટી-સ્ટેજ બિલ્ડ અને નાની, સુરક્ષિત કન્ટેનર ઇમેજ.",
+  "go/debugging-go-programs": "Go સ્ટૅક ટ્રેસ વાંચો, goroutine લીક અને રેસ શોધો અને સમય તથા મેમરી ક્યાં જાય છે તે જોવા pprof વાપરો.",
+  "cloud-iam/identities-principals-and-permissions": "ક્લાઉડ ઍક્સેસની શબ્દાવલિ શીખો: કોણ માગે છે, તે શું કરી શકે, કયા સંસાધન પર અને નિર્ણય કેવી રીતે લેવાય છે.",
+  "cloud-iam/aws-iam-policies-roles-and-assume-role": "AWS IAM નીતિઓ વાંચો અને લખો, વર્કલોડ માટે વપરાશકર્તાને બદલે રોલ વાપરો અને સત્ર તથા સીમાઓ કેવી રીતે ભેગી થાય છે તે સમજો.",
+  "cloud-iam/azure-entra-id-rbac-and-managed-identities": "Azure ડિરેક્ટરીને સંસાધન પરવાનગીઓથી કેવી રીતે અલગ કરે છે તે સમજો, સાચા સ્કોપ પર રોલ સોંપો અને મૅનેજ્ડ આઇડેન્ટિટી વાપરો.",
+  "cloud-iam/least-privilege-and-access-reviews": "પરવાનગીઓ જરૂર પૂરતી ઘટાડો, ન વપરાયેલી ઍક્સેસ શોધવાના ટૂલ સાથે, અને નિયમિત સમીક્ષા દ્વારા તેને નાની રાખો.",
+  "cloud-iam/secrets-and-encryption-with-kms-and-key-vaults": "ગુપ્ત માહિતી મૅનેજ્ડ સેવામાં સંગ્રહો, કી અને એન્વેલપ એન્ક્રિપ્શન સમજો અને આઉટેજ વિના ક્રેડેન્શિયલ બદલો.",
+  "cloud-iam/network-boundaries-and-private-access": "ખાનગી નેટવર્ક, સિક્યોરિટી ગ્રૂપ, પ્રાઇવેટ એન્ડપૉઇન્ટ અને સ્ટોરેજ તથા ડેટાબેઝ માટે સમજદાર ડિફૉલ્ટ વડે ખુલ્લાપણું મર્યાદિત કરો.",
+  "cloud-iam/logging-detection-and-audit-trails": "દરેક કંટ્રોલ-પ્લેન ક્રિયા નોંધો, લૉગનું રક્ષણ કરો અને મુશ્કેલીનો સંકેત આપતી ક્રિયાઓ માટે ચેતવણીઓ બનાવો.",
+  "cloud-iam/debugging-access-denied-and-cloud-security-incidents": "વિનંતી કેમ નકારાઈ તે શોધો, વધુ પડતી પરવાનગી આપ્યા વિના તેને સુધારો અને શંકાસ્પદ ક્રેડેન્શિયલ લીક પર ક્રમમાં પ્રતિસાદ આપો.",
+  "argocd/pull-based-delivery-and-the-repository-as-source-of-truth": "પાઇપલાઇન ફેરફારો ધકેલે તેને બદલે ઘણી ટીમો ક્લસ્ટરમાંના કંટ્રોલરને રિપોઝિટરીમાંથી ઇચ્છિત સ્થિતિ ખેંચવા કેમ દે છે તે સમજો.",
+  "argocd/installing-argo-cd-and-the-application-resource": "ક્લસ્ટરમાં Argo CD ઇન્સ્ટૉલ કરો, સાઇન ઇન કરો અને Application કસ્ટમ રિસોર્સ વડે ઍપ્લિકેશન વર્ણવો.",
+  "argocd/sync-health-and-drift": "સિંક અને હેલ્થ સ્ટેટસ વાંચો, મૅન્યુઅલ કે સ્વચાલિત સિંક પસંદ કરો અને prune તથા self-heal સમજો.",
+  "argocd/helm-and-kustomize-with-argo-cd": "Helm ચાર્ટ અને Kustomize ઓવરલે ડિલિવર કરો, પર્યાવરણ દીઠ વૅલ્યુ સેટ કરો અને સમજો કે Argo CD રેન્ડર કરે છે, ઇન્સ્ટૉલ કરતું નથી.",
+  "argocd/environments-app-of-apps-and-applicationsets": "રિપોઝિટરી લેઆઉટ, app-of-apps પૅટર્ન અને ApplicationSet વડે ઘણી ઍપ્લિકેશન અને પર્યાવરણ ગોઠવો.",
+  "argocd/hooks-sync-waves-and-progressive-delivery": "સિંકમાં સંસાધનોનો ક્રમ ગોઠવો, તેની પહેલાં અને પછી જૉબ ચલાવો અને કૅનેરી તથા બ્લૂ-ગ્રીન વ્યૂહરચનાથી ધીમે ધીમે રોલઆઉટ કરો.",
+  "argocd/access-projects-secrets-and-multi-cluster": "પ્રોજેક્ટ અને RBAC વડે કોણ શું કરી શકે તે મર્યાદિત કરો, ગુપ્ત માહિતી રિપોઝિટરીથી દૂર રાખો અને એક કરતાં વધુ ક્લસ્ટર પર ડિલિવર કરો.",
+  "argocd/debugging-argo-cd": "ઍપ્લિકેશન કેમ સિંક નથી થતી, OutOfSync રહે છે કે Degraded બને છે અને ક્રમમાં શું તપાસવું તે શોધો.",
+  "llm/what-an-llm-is-and-how-it-predicts-tokens": "મોટા ભાષા મૉડેલને આગલા-ટોકનના અનુમાનક તરીકે જુઓ અને તે શું સારું અને ખરાબ કરે છે તેનો અર્થ સમજો.",
+  "llm/tokens-context-windows-and-limits": "ટોકન ગણો, કૉન્ટેક્સ્ટ વિન્ડો શું ભરે છે તે સમજો અને ઇનપુટ તથા આઉટપુટ મર્યાદાઓને ધ્યાનમાં રાખી ડિઝાઇન કરો.",
+  "llm/sampling-temperature-and-determinism": "આગલું ટોકન કેવી રીતે પસંદ થાય છે, temperature અને top-p શું બદલે છે અને ડિઝાઇનથી જ રેન્ડમ સિસ્ટમમાંથી પુનરાવર્તનીય વર્તન કેવી રીતે મેળવવું તે સમજો.",
+  "llm/training-fine-tuning-and-where-knowledge-comes-from": "મૉડેલને તેનું જ્ઞાન કેવી રીતે મળે છે, તેની કટઑફ તારીખ કેમ હોય છે અને તેની પાસે ન હોય તેવી હકીકતો પૂરી પાડવાના વ્યવહારુ રસ્તા શીખો.",
+  "llm/calling-an-llm-api": "પહેલો API કૉલ કરો, સંદેશ અને ભૂમિકાઓ સમજો, જવાબ સ્ટ્રીમ કરો, ભૂલો અને રેટ લિમિટ સંભાળો અને કી સુરક્ષિત રાખો.",
+  "llm/cost-latency-and-caching": "કોઈ સુવિધાનો ખર્ચ અંદાજો, લેટન્સીના ભાગો સમજો અને મૉડેલ પસંદગી, પ્રૉમ્પ્ટ ડિઝાઇન અને કૅશિંગ વડે બંને ઘટાડો.",
+  "llm/choosing-and-evaluating-models": "તમારા પોતાના કાર્યમાંથી નાનો ટેસ્ટ સેટ બનાવો, તેના વડે મૉડેલ અને પ્રૉમ્પ્ટની સરખામણી કરો અને ફક્ત જાહેર બેન્ચમાર્ક પર ભરોસો ન રાખો.",
+  "llm/debugging-llm-applications": "ખરાબ જવાબની પગલાં-દર-પગલાં તપાસ કરો: ચોક્કસ ઇનપુટ પકડો, રીટ્રીવલ, પ્રૉમ્પ્ટ, મૉડેલ અને પાર્સિંગ સમસ્યાઓ અલગ કરો અને ટેસ્ટ વડે સુધારો.",
+  "prompting/anatomy-of-a-good-prompt": "સ્પષ્ટ કાર્ય, સંદર્ભ, અવરોધો અને આઉટપુટ ફૉર્મેટ સાથે પ્રૉમ્પ્ટ લખો અને મૉડેલને દોષ આપતા પહેલાં અસ્પષ્ટતા દૂર કરતાં શીખો.",
+  "prompting/examples-and-few-shot-prompting": "થોડાં સારાં ઉદાહરણો વડે મૉડેલને બતાવો કે તમને શું જોઈએ છે, તેમને સારી રીતે પસંદ કરો અને આઉટપુટ ઉદાહરણોની નકલ કરે તેવા ફંદા ટાળો.",
+  "prompting/reasoning-and-step-by-step-prompts": "મૉડેલને પગલાંમાં તર્ક કરવા કહેવાથી જવાબ ક્યારે સુધરે છે, એક્સટેન્ડેડ થિંકિંગ કેવી રીતે જુદું છે અને તર્કને તમે પાર્સ કરતા આઉટપુટમાં લીક થતો કેવી રીતે રોકવો તે જાણો.",
+  "prompting/system-prompts-roles-and-context-layout": "સિસ્ટમ સંદેશ, ટૅગ કરેલા વિભાગો અને મૉડેલ જ્યાં સૌથી સારી રીતે વાપરે ત્યાં મૂકેલા લાંબા દસ્તાવેજો સાથે પ્રૉમ્પ્ટ ગોઠવો.",
+  "prompting/structured-output-json-and-schemas": "સ્પષ્ટ સ્કીમા, ટૂલ-આધારિત કે સ્કીમા-મર્યાદિત આઉટપુટ અને કડક પાર્સિંગ વડે મૉડેલ પાસેથી મશીન-વાંચી શકાય તેવા જવાબ મેળવો.",
+  "prompting/validating-repairing-and-retrying-outputs": "કોડ વડે મૉડેલ આઉટપુટ તપાસો, પ્રતિસાદ સાથે ફરી પ્રયાસ કરો, જે સુરક્ષિત રીતે સુધારી શકાય તે સુધારો અને બાકીનું માણસને મોકલો.",
+  "prompting/prompt-versioning-and-testing": "પ્રૉમ્પ્ટને વર્ઝન કરેલી ફાઇલ તરીકે સંગ્રહો, ફેરફારોની સમીક્ષા કરો, CI માં મૂલ્યાંકન સેટ સામે ચલાવો અને સુરક્ષિત રીતે રોલઆઉટ તથા રોલબૅક કરો.",
+  "prompting/debugging-bad-prompts": "ખોટા, અસંગત કે અસુરક્ષિત આઉટપુટની તપાસ કરો: સરળ કરો, અલગ કરો, સરખાવો અને પુરાવા સાથે સુધારો.",
+  "claude-skills/what-a-claude-skill-is": "સ્કિલને સૂચનાઓ, સ્ક્રિપ્ટ અને સંસાધનોના ફોલ્ડર તરીકે સમજો જે Claude કાર્યને જરૂર પડે ત્યારે લોડ કરે છે, અને સ્કિલ ક્યારે યોગ્ય ટૂલ છે.",
+  "claude-skills/anatomy-of-a-skill-folder": "સ્કિલ ગોઠવો: SKILL.md હેડર અને બૉડી, સંદર્ભ ફાઇલો, ટેમ્પ્લેટ અને સ્ક્રિપ્ટ, નામકરણ નિયમો અને સ્વચ્છ માળખા સાથે.",
+  "claude-skills/writing-descriptions-that-trigger": "સ્કિલ ક્યારેય વપરાશે કે નહીં તે નક્કી કરતું એક ફીલ્ડ લખો: તે શું કરે છે, ક્યારે વાપરવી અને લોકો ખરેખર જે શબ્દો વાપરે છે તે કહો.",
+  "claude-skills/progressive-disclosure-and-structure": "દરેક તબક્કે ફક્ત જરૂરી હોય તે જ લોડ કરો: પહેલાં મેટાડેટા, પછી SKILL.md, પછી લિંક કરેલી ફાઇલો અને સ્ક્રિપ્ટ, જેથી કૉન્ટેક્સ્ટ નાનો રહે અને જવાબ કેન્દ્રિત રહે.",
+  "claude-skills/scripts-and-deterministic-steps": "ચોક્કસ કામ માટે બંડલ કરેલી સ્ક્રિપ્ટ વાપરો, તેમને એવી લખો કે Claude તેમને ચલાવી અને તેમનું આઉટપુટ વાંચી શકે, અને તેમને ચલાવવા સુરક્ષિત રાખો.",
+  "claude-skills/testing-and-evaluating-a-skill": "ટ્રિગરિંગ, આઉટપુટ ગુણવત્તા અને ખર્ચનું નિશ્ચિત કાર્ય-સમૂહ સાથે પરીક્ષણ કરો, સ્કિલ સાથે અને વિના સરખામણી કરો અને પરિણામો સમય સાથે સાચવો.",
+  "claude-skills/sharing-versioning-and-skill-security": "સ્કિલને ટીમ સાથે શેર કરો, વર્ઝન આપો અને કોડની જેમ સમીક્ષા કરો: સ્કિલમાં સૂચનાઓ અને સ્ક્રિપ્ટ હોઈ શકે છે જે વાસ્તવિક ઍક્સેસ સાથે ચાલે છે.",
+  "claude-skills/debugging-skills-that-do-not-trigger-or-misbehave": "જે સ્કિલ ક્યારેય લોડ ન થાય, ખોટા સમયે લોડ થાય કે લોડ થઈને અવગણાય તેની તપાસ કરો: શોધ, વર્ણન, માળખું, ટકરાવ અને આઉટપુટ તપાસો.",
+  "mcp/why-tools-and-what-mcp-is": "મૉડેલને કાર્ય કરવા અને હકીકતો મેળવવા ટૂલ કેમ જોઈએ અને Model Context Protocol ટૂલ તથા ડેટાને AI ઍપ્લિકેશન સાથે જોડવાનું કેવી રીતે પ્રમાણિત કરે છે તે જુઓ.",
+  "mcp/function-calling-and-tool-schemas": "નામ, સ્પષ્ટ વર્ણન અને JSON સ્કીમા વડે મૉડેલને ટૂલ વર્ણવો અને મૉડેલ સાચી રીતે વાપરે તેવા ટૂલ ડિઝાઇન કરો.",
+  "mcp/the-tool-use-loop": "વિનંતી, ટૂલ કૉલ, ટૂલ પરિણામ ચક્ર સાચી રીતે અમલમાં મૂકો, ભૂલો અને સમાંતર કૉલ સંભાળો અને લૂપ પર મર્યાદાઓ મૂકો.",
+  "mcp/mcp-architecture-hosts-clients-servers-transports": "કનેક્શન લાઇફસાઇકલ, JSON-RPC સંદેશા, stdio અને HTTP ટ્રાન્સપોર્ટ અને દરેક બાજુ જે ક્ષમતાઓ આપે છે તે સમજો.",
+  "mcp/building-an-mcp-server-in-python": "Python SDK સાથે નાનું સર્વર બનાવો, ટાઇપ હિન્ટ અને ડૉકસ્ટ્રિંગ સાથે ટૂલ ખુલ્લા મૂકો, ઇન્સ્પેક્ટર વડે ટેસ્ટ કરો અને હોસ્ટ સાથે જોડો.",
+  "mcp/resources-prompts-and-other-primitives": "ટૂલને બદલે ડેટા સંસાધન કે પુનઃઉપયોગી પ્રૉમ્પ્ટ તરીકે ક્યારે ખુલ્લો મૂકવો અને ક્લાયન્ટ તેમને કેવી રીતે વાપરે છે તે જાણો.",
+  "mcp/permissions-auth-and-prompt-injection-defence": "ટૂલ શું કરી શકે તે મર્યાદિત કરો, રિમોટ સર્વરને યોગ્ય રીતે પ્રમાણિત કરો, યોગ્ય ક્ષણે મંજૂરી માગો અને પ્રૉમ્પ્ટ ઇન્જેક્શન સામે ડિઝાઇન કરો.",
+  "mcp/debugging-tool-use-and-mcp": "દરેક સ્તરે નિષ્ફળતાની તપાસ કરો: સર્વર, કનેક્શન, ટૂલ વ્યાખ્યાઓ, મૉડેલની પસંદગીઓ અને લૂપ.",
+  "system-design/the-design-method-and-estimation": "કોઈપણ ડિઝાઇન પ્રશ્ન માટે પુનરાવર્તનીય ક્રમ: સ્પષ્ટતા કરો, અંદાજ લગાવો, સ્કેચ કરો, ઊંડાણમાં જાઓ, તોડી જુઓ, પછી સમાધાનો જણાવો.",
+  "system-design/caching-without-stampedes": "કૅશ ક્યાં મદદ કરે છે, ઇનવૅલિડેશન અને TTL કેવી રીતે ખોટા પડે છે અને ઠંડી કૅશને તેની પાછળના ડેટાબેઝને કચડતી કેવી રીતે અટકાવવી.",
+  "system-design/queues-retries-and-idempotency": "કતારો વડે અલગ કરો, તોફાન સર્જ્યા વિના ફરી પ્રયાસ કરો અને કામગીરીને પુનરાવર્તન માટે સુરક્ષિત બનાવો.",
+  "system-design/consistency-and-availability-in-practice": "વાસ્તવિક પસંદગીઓ માટે CAP અને PACELC નો અર્થ શું છે અને દરેક ડેટા માટે સુસંગતતા સ્તર કેવી રીતે પસંદ કરવું.",
+  "system-design/quorum-leaders-and-split-brain": "મશીનોનાં જૂથ કેવી રીતે સંમત થાય છે, બેકી સંખ્યાઓ કેમ મહત્ત્વની છે અને ફેન્સિંગ બે લીડરને ડેટા બગાડતા કેવી રીતે અટકાવે છે.",
+  "system-design/clocks-time-and-ordering": "ઘટનાઓનો ક્રમ નક્કી કરવા દીવાલ ઘડિયાળો પર ભરોસો કેમ ન કરી શકાય અને તેના બદલે શું વાપરવું.",
+  "system-design/partitioning-sharding-and-consistent-hashing": "એક નોડની ક્ષમતા ખૂટે તે પહેલાં ડેટા નોડ વચ્ચે વહેંચો, પાર્ટિશન કી પસંદ કરો અને હૉટ કી તથા પીડાદાયક પુનઃવ્યવસ્થા ટાળો.",
+  "system-design/storage-engines-and-replication-topologies": "B-ટ્રી અને LSM ટ્રી કેવી રીતે જુદાં છે, લીડર-ફૉલોઅર, મલ્ટી-લીડર અને લીડર-રહિત રેપ્લિકેશન શું સમાધાન કરે છે અને ડેટા સ્ટોર અંદરથી કેવી રીતે નિષ્ફળ જાય છે.",
+  "system-design/backup-restore-and-object-storage-design": "તમે ખરેખર રીસ્ટોર કર્યા હોય તેવા બૅકઅપ ડિઝાઇન કરો, મૂળને પાડનાર નિષ્ફળતાથી તેમને બચાવો અને ઑબ્જેક્ટ સ્ટોરેજ જેમાં સારું છે તેના માટે વાપરો.",
+  "system-design/failure-domains-cells-and-bulkheads": "સિસ્ટમને એ રીતે વિભાજિત કરો કે એક ખામી તેના મર્યાદિત ભાગ સુધી જ પહોંચે, ઝોન, સેલ અને બલ્કહેડ વાપરીને.",
+  "system-design/blast-radius-and-shuffle-sharding": "ખામી કેટલે સુધી પહોંચી શકે તે માપો અને એક ખરાબ ક્લાયન્ટ કે વિનંતી બાકીનાને નુકસાન ન કરી શકે તે માટે શફલ શાર્ડિંગ વાપરો.",
+  "system-design/graceful-degradation-and-circuit-breakers": "નિર્ભરતા ધીમી કે બંધ હોય ત્યારે ઝડપથી નિષ્ફળ થઈને, ઓછું પૂરું પાડીને અને નરમાશથી પુનઃપ્રાપ્ત થઈને મુખ્ય કામ ચાલુ રાખો.",
+  "system-design/rate-limiting-and-load-shedding": "કિનારે મર્યાદાઓ, કૉલર વચ્ચે ન્યાયી વહેંચણી અને ઉપયોગી કામ વહેતું રાખતા શેડિંગ વડે સેવાને ઓવરલોડથી બચાવો.",
+  "system-design/multi-region-and-global-traffic": "ઍક્ટિવ-પૅસિવ અને ઍક્ટિવ-ઍક્ટિવ વચ્ચે પસંદગી કરો, RTO અને RPO નક્કી કરો અને નવા સિંગલ પૉઇન્ટ સર્જ્યા વિના DNS અને anycast વડે ટ્રાફિક દોરો.",
+  "system-design/config-and-control-plane-change-safety": "કન્ફિગરેશન, ફીચર ડેટા અને કંટ્રોલ-પ્લેન પુશને ચકાસણી, સ્ટેજિંગ અને પાછા ફરવાના રસ્તા સાથે ડિપ્લૉયમેન્ટ ગણો.",
+  "system-design/hidden-dependencies-and-single-points": "તમારી સેવાને ખરેખર શું જોઈએ તે નકશામાં ઉતારો, તેને સુધારવા વપરાતા ટૂલ સહિત, અને આઉટેજ શોધે તે પહેલાં સિંગલ પૉઇન્ટ શોધો.",
+  "system-design/observability-by-design": "નિષ્ફળ થતાં પહેલાં સિસ્ટમે તમને શું કહેવું જોઈએ તે નક્કી કરો: ડિઝાઇનમાં SLI, ગોલ્ડન સિગ્નલ, ટ્રેસિંગ અને આઉટેજમાં ટકી રહેતું મૉનિટરિંગ.",
+  "system-design/security-and-identity-by-design": "વાસ્તવિક ભંગ કેવી રીતે થયા તેનો ઉપયોગ કરીને ન્યૂનતમ વિશેષાધિકાર, ટૂંકા ગાળાના ક્રેડેન્શિયલ, આઇસોલેશન અને પુનઃપ્રાપ્ત કરી શકાય તેવી ગુપ્ત માહિતી માટે ડિઝાઇન કરો.",
+  "system-design/capacity-planning-and-cost-trade-offs": "માપણીઓમાંથી હેડરૂમનું આયોજન કરો, ખર્ચને ડિઝાઇન ઇનપુટ ગણો અને કઈ બચત શાંતિથી વિશ્વસનીયતા ખર્ચી નાખે છે તે જાણો.",
+  "system-design/worked-design-global-api-at-four-nines": "સેલ, રીજન, સુરક્ષિત રોલઆઉટ અને ડિગ્રેડેશન વાપરીને છેડે-છેડે 99.99 ટકા ઉપલબ્ધતા માટે જાહેર API ડિઝાઇન કરો, પછી વાસ્તવિક આઉટેજ સામે સમીક્ષા કરો.",
+  "system-design/worked-design-the-status-page-that-survives": "બાકી બધું બંધ હોય ત્યારે પણ ચાલવું જોઈએ તેવી નાની સિસ્ટમ ડિઝાઇન કરો, પછી આઉટેજ પછી ડિઝાઇનની સમીક્ષા કરતાં શીખો.",
+  "system-design/worked-design-a-url-shortener": "ઉત્તમ વાંચન-પ્રધાન ડિઝાઇન, અંદાજથી લઈને કી જનરેશન, કૅશિંગ, હૉટ લિંક, દુરુપયોગ અને નિષ્ફળતા પ્રકારો સુધી.",
+  "system-design/worked-design-a-rate-limiter-service": "API ગેટવે માટે વહેંચાયેલું લિમિટર ડિઝાઇન કરો: અલ્ગોરિધમ, સ્ટેટ, સુસંગતતા, નિષ્ફળતા વર્તણૂક અને તેના દ્વારા આઉટેજ કેવી રીતે ન સર્જવું.",
+  "system-design/worked-design-a-notification-fan-out-system": "ફેન-આઉટ વ્યૂહરચના, પ્રાથમિકતા કતાર, પ્રોવાઇડર મર્યાદાઓ, ડિડુપ્લિકેશન અને રીટ્રાય નિયંત્રણ સાથે લાખો ઉપકરણો સુધી એક ઇવેન્ટ પહોંચાડો.",
+  "system-design/worked-design-a-metrics-and-log-pipeline": "પાઇપલાઇનને જ આઉટેજ બનવા દીધા વિના, કાર્ડિનાલિટી, બૅકપ્રેશર અને રિટેન્શન સાથે મોટા પાયે ટેલિમેટ્રી ગ્રહણ કરો, સંગ્રહો અને ક્વેરી કરો.",
+  "system-design/worked-design-a-multi-tenant-kubernetes-platform": "ટીમો વચ્ચે ક્લસ્ટર સુરક્ષિત રીતે વહેંચો: આઇસોલેશન સ્તરો, ક્વોટા, અપગ્રેડ, નેટવર્કિંગ અને પ્લૅટફૉર્મની પોતાની નિર્ભરતાઓ આઉટેજ ન બને તેનું ધ્યાન રાખવું.",
+  "system-design/worked-design-an-authoritative-dns-service": "જેના પર બાકી બધું આધારિત છે તે નામ સેવા ડિઝાઇન કરો: anycast, ઝોન ડેટા સલામતી, DDoS સહનશક્તિ અને બધું એકસાથે ન બદલવાની શિસ્ત.",
+  "system-design/worked-design-a-chat-and-messaging-service": "ચૅટ ડિઝાઇનની સફર: કનેક્શન, ડિલિવરી ગૅરંટી, ક્રમ, હાજરી અને નોડ કે રીજન નિષ્ફળ જાય ત્યારે શું થાય છે.",
+  "system-design/worked-design-a-news-feed-and-timeline": "સોશિયલ પ્રોડક્ટ માટે ફીડ ડિઝાઇન કરો: લખતી વખતે વિરુદ્ધ વાંચતી વખતે ફેન-આઉટ, રેન્કિંગ, હૉટ ખાતાં અને કૅશ નિષ્ફળતાઓ.",
+  "system-design/worked-design-video-upload-and-streaming": "અપલોડથી પ્લેબૅક સુધી: ટુકડાઓમાં અપલોડ, ટ્રાન્સકોડિંગ કતાર, સ્ટોરેજ સ્તરો અને CDN, દરેક તબક્કાના નિષ્ફળતા પ્રકારો સાથે.",
+  "system-design/worked-design-a-distributed-key-value-store": "પાર્ટિશનિંગ, રેપ્લિકેશન, કોરમ વાંચન અને લેખન અને નિષ્ફળતા સંભાળ, એક સ્ટોરમાં ભેગાં કરેલાં.",
+  "system-design/worked-design-a-payments-ledger": "સાચું નાણાં સ્થળાંતર: ડબલ-એન્ટ્રી રેકોર્ડ, આઇડેમ્પોટન્ટ વિનંતીઓ, ટ્રાન્ઝૅક્શન અને સમાધાન, રીટ્રાય અને નિષ્ફળતાઓમાં ટકે તે રીતે ડિઝાઇન કરેલાં.",
+  "system-design/worked-design-search-autocomplete": "થોડા મિલિસેકન્ડમાં પૂર્ણતા સૂચવો: પ્રીફિક્સ ઇન્ડેક્સ, રેન્કિંગ, તાજગી અને લોડ હેઠળ સૌમ્ય રીતે ગુણવત્તા કેવી રીતે ઘટાડવી.",
+  "mlops/what-mlops-is-and-how-ml-systems-fail": "મશીન લર્નિંગ સિસ્ટમમાં મૉડેલ ફક્ત નાનો ભાગ છે. આ પાઠ તેની આસપાસના ભાગો અને પ્રોડક્શનમાં તેઓ કેવી રીતે શાંતિથી નિષ્ફળ જાય છે તે બતાવે છે.",
+  "mlops/data-and-feature-pipelines-for-ml": "મૉડેલ તેમને ખવડાવતા ડેટા જેટલા જ વિશ્વસનીય હોય છે. ડેટા ચકાસણી, વર્ઝનિંગ અને તાલીમ તથા સર્વિંગ ફીચર સમાન રાખવાનું શીખો.",
+  "mlops/experiment-tracking-and-reproducibility": "દરેક મૉડેલ શાથી બન્યું તે નોંધો જેથી રન સરખાવી શકો, પરિણામ પુનરાવર્તિત કરી શકો અને પછી નિર્ણય સમજાવી શકો.",
+  "mlops/training-pipelines-and-testing-models-in-ci": "તાલીમને સ્વચાલિત, ચકાસેલી પાઇપલાઇનમાં ફેરવો, કંઈ રિલીઝ થાય તે પહેલાં ડેટા, કોડ અને મૉડેલ ગુણવત્તાની તપાસ સાથે.",
+  "mlops/model-registry-packaging-and-safe-releases": "મૉડેલ તેમના ઇતિહાસ સાથે સંગ્રહો, સર્વિંગ માટે પૅકેજ કરો અને શૅડો ટેસ્ટ, કૅનેરી અને ઝડપી રોલબૅક સાથે રિલીઝ કરો.",
+  "mlops/serving-models-batch-online-and-streaming": "અનુમાનો કેવી રીતે બને તે પસંદ કરો અને લેટન્સી, થ્રુપુટ અને ખર્ચ માટે સેવાનું કદ નક્કી કરો.",
+  "mlops/monitoring-drift-and-retraining": "ડેટા કે દુનિયા ક્યારે બદલાઈ તે શોધો, લેબલ મોડા આવે ત્યારે મૉડેલ ગુણવત્તા માપો અને સુરક્ષિત રીતે ફરી તાલીમ આપો.",
+  "mlops/debugging-ml-systems-in-production": "પ્રોડક્શનમાં ખોટા, ધીમા કે મૂંગા મૉડેલ માટે નીચેથી ઉપરનું ચેકલિસ્ટ: પહેલાં ડેટા, પછી ફીચર, પછી મૉડેલ, પછી સર્વિંગ.",
+  "aiops/what-aiops-is-and-is-not": "AIOps સંચાલન ડેટા પર આંકડાશાસ્ત્ર અને મશીન લર્નિંગ લાગુ કરે છે. તે શું કરી શકે, શું નહીં અને ટૂલનું પ્રામાણિકપણે મૂલ્યાંકન કેવી રીતે કરવું તે શીખો.",
+  "aiops/anomaly-detection-on-metrics": "જટિલ મૉડેલ તરફ જતાં પહેલાં સરળ બેઝલાઇન, મોસમીપણું અને થ્રેશોલ્ડ શીખો અને ખોટા એલાર્મ ઓછા કેવી રીતે રાખવા.",
+  "aiops/alert-correlation-and-noise-reduction": "સંબંધિત ચેતવણીઓને એક ઘટનામાં જૂથબદ્ધ કરો, ડુપ્લિકેટ દૂર કરો અને તોફાનના સ્રોત તરફ ઇશારો કરવા નિર્ભરતાઓ વાપરો.",
+  "aiops/logs-and-traces-finding-patterns-with-ml": "લૉગ લીટીઓને ટેમ્પ્લેટમાં ક્લસ્ટર કરો, નવા કે દુર્લભ સંદેશા ઓળખો અને વર્તણૂક ફેરફારોને ડિપ્લૉયમેન્ટ સાથે જોડો.",
+  "aiops/root-cause-hints-and-incident-assistants": "ફેરફારો અને નિર્ભરતાઓ પરથી સંભવિત કારણોને ક્રમાંકિત કરો અને માણસ જવાબદાર રહે ત્યારે સુરક્ષિત રીતે સારાંશ કરવા ભાષા મૉડેલ વાપરો.",
+  "aiops/safe-automation-and-auto-remediation": "નિયમિત સુધારાઓને મર્યાદાઓ, મંજૂરીઓ અને રોલબૅક સાથે સ્વચાલિત કરો, જેથી ઑટોમેશન ટોઇલ ઘટાડે પણ આગલા આઉટેજનું કારણ ન બને.",
+  "aiops/debugging-and-investigating-aiops-output": "ઘટના દરમિયાન AI સહાયકના જવાબો કેવી રીતે તપાસવા: પુરાવા ખાતરી કરો, દાવાને ડેટા સામે ચકાસો અને પગલાંની જવાબદારી માણસ પાસે રાખો.",
+  "sql-ops/reading-explain-and-finding-slow-queries": "સૌથી મોંઘી ક્વેરી શોધો, EXPLAIN પ્લાન વાંચો અને ખૂટતા ઇન્ડેક્સને જૂના આંકડાથી અલગ પાડો.",
+  "sql-ops/indexes-that-help-and-indexes-that-hurt": "કમ્પોઝિટ, આંશિક અને કવરિંગ ઇન્ડેક્સ ડિઝાઇન કરો અને લેખનને ધીમું કરતા ન વપરાયેલા કે ડુપ્લિકેટ ઇન્ડેક્સ શોધો.",
+  "sql-ops/locks-deadlocks-and-long-transactions": "શું શાને અવરોધે છે તે શોધો, idle-in-transaction સત્રો અને ડેડલૉક સમજો અને ડેટાબેઝનું રક્ષણ કરતા ટાઇમઆઉટ સેટ કરો.",
+  "sql-ops/connections-pooling-and-capacity": "ઘણા કનેક્શન કેમ નુકસાન કરે છે, PgBouncer જેવું પૂલર કેવી રીતે મદદ કરે છે અને મેમરી તથા મર્યાદાઓનું કદ કેવી રીતે નક્કી કરવું તે સમજો.",
+  "sql-ops/replication-lag-vacuum-and-day-two-operations": "રેપ્લિકેશન મૉનિટર કરો, autovacuum અને બ્લૉટ સમજો અને ડેટાબેઝ તંદુરસ્ત રહે તે રીતે ફેરફારો અને બૅકઅપ ચલાવો.",
+  "gpu-serving/gpu-basics-memory-and-what-limits-inference": "મૉડેલને કેટલી GPU મેમરી જોઈએ અને લખાણ બનાવવું કમ્પ્યુટ કરતાં મેમરી બૅન્ડવિડ્થથી વધુ કેમ મર્યાદિત છે તે શોધો.",
+  "gpu-serving/serving-stacks-vllm-tgi-triton": "મુખ્ય LLM સર્વિંગ ટૂલની સરખામણી કરો, કન્ટિન્યુઅસ બૅચિંગ અને પેજ્ડ ઍટેન્શન સમજો અને મહત્ત્વના ફ્લૅગ વાંચો.",
+  "gpu-serving/gpus-on-kubernetes": "ડિવાઇસ પ્લગઇન સાથે GPU વર્કલોડ શેડ્યૂલ કરો, GPU આખા એકમો કેમ છે તે સમજો અને Pending-પોડ સંદેશા વાંચો.",
+  "gpu-serving/scaling-latency-and-cost": "વપરાશકર્તાઓ જે અનુભવે તે માપો (TTFT અને ટોકન ઝડપ), સાચા સિગ્નલ પર સ્કેલ કરો અને ટોકનનો ખર્ચ ગણો.",
+  "gpu-serving/monitoring-and-debugging-gpu-workloads": "nvidia-smi વાંચો, DCGM મેટ્રિક્સ વાપરો અને મેમરી ખૂટવાની ભૂલો, થ્રૉટલિંગ, અટકી ગયેલા મલ્ટી-GPU જૉબ અને નિષ્ફળ કાર્ડનું નિદાન કરો.",
+  "openstack/what-openstack-is-and-core-services": "OpenStack અલગ સેવાઓમાંથી ખાનગી ક્લાઉડ કેવી રીતે બનાવે છે અને દરેક AWS માંથી તમે જે જાણો છો તેની સાથે કેવી રીતે જોડાય છે તે જુઓ.",
+  "openstack/identity-projects-quotas-and-keystone": "વપરાશકર્તા, પ્રોજેક્ટ, ભૂમિકા અને ટોકન, ક્વોટા પ્રોજેક્ટને કેવી રીતે મર્યાદિત કરે છે અને પ્રમાણીકરણ નિષ્ફળતા કેવી રીતે વાંચવી તે સમજો.",
+  "openstack/compute-flavors-images-and-scheduling": "Nova સર્વર માટે હોસ્ટ કેવી રીતે પસંદ કરે છે તે સમજો અને \"No valid host was found\" સાથે ERROR માં અટકેલા સર્વરનું નિદાન કરો.",
+  "openstack/neutron-networking-security-groups-and-floating-ips": "સર્વરથી ઇન્ટરનેટ સુધી પૅકેટને અનુસરો અને SSH વડે ન પહોંચી શકાતો સર્વર સુધારો.",
+  "openstack/operating-openstack-logs-upgrades-and-troubleshooting": "સાચો લૉગ ઝડપથી શોધો, અટકેલા સર્વર અને વૉલ્યુમ પુનઃપ્રાપ્ત કરો અને ખાનગી ક્લાઉડ માટે અપગ્રેડ તથા ક્ષમતાનું આયોજન કરો.",
+  "baremetal/servers-racks-and-remote-management": "રૅક સર્વરની અંદર શું હોય છે, રૅકને પાવર અને ઠંડક કેવી રીતે મળે છે અને BMC દ્વારા દૂરથી મશીન કેવી રીતે સંભાળવું તે શીખો.",
+  "baremetal/provisioning-pxe-dhcp-and-images": "PXE, DHCP, TFTP અને સ્વચાલિત ઇન્સ્ટૉલ સાથે નવા સર્વરને પાવર-ઑનથી ચાલતા ઑપરેટિંગ સિસ્ટમ સુધી અનુસરો અને દરેક પગલું કેમ નિષ્ફળ થઈ શકે તે શીખો.",
+  "baremetal/disks-raid-firmware-and-burn-in": "ડ્રાઇવ પ્રકારો, સૉફ્ટવેર અને હાર્ડવેર RAID, SMART સ્વાસ્થ્ય, ફર્મવેર અને ડેટા વહન કરે તે પહેલાં ખરાબ હાર્ડવેર પકડતા બર્ન-ઇન ટેસ્ટ સમજો.",
+  "baremetal/datacenter-networking-leaf-spine-and-bonding": "લીફ-સ્પાઇન ફેબ્રિકમાં ટૉપ-ઑફ-રૅક સ્વિચ સાથે રૅક કેવી રીતે જોડાય છે અને બૉન્ડિંગ, VLAN અને અલગ મૅનેજમેન્ટ નેટવર્ક સર્વરને પહોંચવા યોગ્ય કેવી રીતે રાખે છે તે જુઓ.",
+  "baremetal/operating-a-fleet-failures-lifecycle-and-capacity": "સામાન્ય હાર્ડવેર નિષ્ફળતાઓનું નિદાન કરો, રૅકથી નિવૃત્તિ સુધી સર્વરના જીવનનું આયોજન કરો અને પૂરતી વધારાની ક્ષમતા અને પાર્ટ્સ રાખો.",
+  "linux/troubleshooting-playbook-method-and-first-five-minutes": "ધીમા કે નિષ્ફળ Linux સર્વરનું ક્રમમાં ટ્રાયેજ કરો: શું બદલાયું તે પૂછો, દરેક સંસાધનનો ઉપયોગ, સંતૃપ્તિ અને ભૂલો તપાસો અને કંઈ સ્પર્શતાં પહેલાં કારણ સંકુચિત કરો.",
+  "linux/troubleshooting-playbook-high-load-and-cpu-saturation": "CPU સંતૃપ્તિને I/O વેઇટ અને સ્ટીલ ટાઇમથી અલગ પાડો, વ્યસ્ત પ્રક્રિયા કે થ્રેડ શોધો અને સુધારવું, મર્યાદિત કરવું કે સ્કેલ કરવું તે નક્કી કરો.",
+  "linux/troubleshooting-playbook-memory-pressure-swap-and-the-oom-killer": "free, meminfo અને કર્નલ લૉગ સાચી રીતે વાંચો, સ્વૅપ થ્રેશિંગ અને લીક ઓળખો અને હોસ્ટ-સ્તરના OOM કિલને કન્ટેનર મેમરી મર્યાદાથી અલગ પાડો.",
+  "linux/troubleshooting-playbook-disk-full-inodes-and-io-stalls": "ફાઇલસિસ્ટમ શું ભરે છે તે શોધો, inode અને કાઢી નાખેલી પણ ખુલ્લી ફાઇલો સહિત, અને વ્યસ્ત ડિસ્કને ધીમી ડિસ્કથી અલગ પાડવા iostat વાંચો.",
+  "linux/troubleshooting-playbook-network-drops-and-slow-connections": "Linux હોસ્ટનો નેટવર્ક માર્ગ સ્તરોમાં તપાસો: ઇન્ટરફેસ ભૂલો, MTU, રીટ્રાન્સમિટ, DNS વિલંબ અને કનેક્શન ટ્રૅકિંગ, પછી પુરાવાની જરૂર હોય ત્યારે જ પૅકેટ કૅપ્ચર કરો.",
+  "linux/troubleshooting-playbook-boot-failures-and-services-that-wont-start": "systemctl અને journalctl વડે નિષ્ફળ યુનિટનું નિદાન કરો, ધીમા કે તૂટેલા બૂટ પગલાં શોધો અને માઉન્ટ તથા કન્ફિગરેશન ભૂલોથી થયેલા ઇમર્જન્સી મોડમાંથી પુનઃપ્રાપ્ત થાઓ.",
+  "python/sre-automation-aws-with-boto3-safely": "પેજિનેશન કરતી, ટૅગ દ્વારા ફિલ્ટર કરતી, ડિફૉલ્ટ રૂપે ડ્રાય રન કરતી અને ન્યૂનતમ વિશેષાધિકાર રોલ વાપરતી boto3 સ્ક્રિપ્ટ લખો, જેથી ઑટોમેશન મદદ કરે અને ક્યારેય આશ્ચર્ય ન આપે.",
+  "python/sre-automation-kubernetes-client-scripts-and-reports": "વર્કલોડ સૂચિબદ્ધ કરવા, બિનતંદુરસ્ત પોડ અને ખૂટતી મર્યાદાઓ શોધવા અને kubectl આઉટપુટની સ્ક્રિપ્ટ બનાવ્યા વિના રિપોર્ટ બનાવવા સત્તાવાર Python ક્લાયન્ટ વાપરો.",
+  "python/sre-automation-retries-backoff-timeouts-and-idempotency": "ટાઇમઆઉટ, જિટર સાથે એક્સપોનેન્શિયલ બૅકઑફ અને આઇડેમ્પોટન્ટ ઑપરેશન વડે સ્ક્રિપ્ટને અસ્થિર નેટવર્ક અને API માંથી ટકાવો, રીટ્રાય તોફાન સર્જ્યા વિના.",
+  "python/sre-automation-parsing-logs-and-building-incident-timelines": "Python સાથે સંરચિત અને સાદા લૉગ પાર્સ કરો, ભૂલો ગણો અને જૂથબદ્ધ કરો અને ઘટના સમીક્ષા માટે ઘણા સ્રોતોની ઘટનાઓને એક ક્રમબદ્ધ સમયરેખામાં ભેળવો.",
+  "python/sre-automation-chatops-alert-handlers-and-webhooks": "સહીઓ ચકાસતું, ચેતવણીઓ ડિડુપ્લિકેટ કરતું અને ઉપયોગી સંદેશા પોસ્ટ કરતું નાનું વેબહૂક રીસીવર બનાવો અને મંજૂર યાદી તથા મંજૂરીઓ વડે સ્વચાલિત ક્રિયાઓ સુરક્ષિત રાખો.",
+  "python/sre-automation-safe-bulk-operations-and-audit-trails": "યોજના, બૅચ, રેટ લિમિટ, કિલ સ્વિચ, ફરી શરૂ થઈ શકે તેવી સ્થિતિ અને સ્પષ્ટ ઑડિટ ટ્રેઇલ સાથે ઘણા હોસ્ટ કે સંસાધનો પર ફેરફારો ચલાવો.",
+  "networking/dns-tls-pki-dns-records-resolution-and-caching": "નામ રિકર્સિવ અને ઑથોરિટેટિવ સર્વર દ્વારા સરનામું કેવી રીતે બને છે, દરેક રેકોર્ડ પ્રકાર શેના માટે છે અને TTL તથા કૅશ ફેરફારો કેટલી ઝડપથી ફેલાય તે કેવી રીતે નક્કી કરે છે તે સમજો.",
+  "networking/dns-tls-pki-debugging-dns-failures": "NXDOMAIN, SERVFAIL અને ટાઇમઆઉટ અલગ પાડો, માર્ગમાંના દરેક રિઝોલ્વરનું પરીક્ષણ કરો અને લુકઅપ ગુણાકાર કરતી search-domain અને Kubernetes ndots સમસ્યાઓ શોધો.",
+  "networking/dns-tls-pki-tls-handshake-and-certificate-chains": "hello થી એન્ક્રિપ્ટેડ ડેટા સુધી TLS કનેક્શનને અનુસરો, openssl વડે પ્રમાણપત્ર શૃંખલા વાંચો અને નામ મેળ ન ખાવો, સમાપ્તિ અને અધૂરી શૃંખલાની ભૂલોનું નિદાન કરો.",
+  "networking/dns-tls-pki-certificate-lifecycle-and-automation": "કી અને CSR થી ઇશ્યુ, ચકાસણી, નવીનીકરણ અને રદ સુધી પ્રમાણપત્રને અનુસરો અને ACME વડે સ્વચાલિત કરો જેથી સમાપ્તિ ક્યારેય વ્યક્તિના યાદ રાખવા પર આધાર ન રાખે.",
+  "networking/dns-tls-pki-mtls-and-internal-certificate-authorities": "સેવા ઓળખ માટે મ્યુચ્યુઅલ TLS વાપરો, cert-manager સાથે આંતરિક CA સુરક્ષિત રીતે ચલાવો અને આઉટેજ વિના ટ્રસ્ટ બંડલ અને રોટેશન વિતરિત કરો.",
+  "networking/dns-tls-pki-outage-prevention-checklist": "ઇન્વેન્ટરી, સમાપ્તિ અને ડોમેન-નવીનીકરણ ચેતવણીઓ, સુરક્ષિત ફેરફાર પગલાં, રિડન્ડન્સી અને અભ્યાસ કરેલા રોલબૅક વડે સામાન્ય DNS અને પ્રમાણપત્ર આઉટેજ અટકાવો.",
+  "cloud/finops-reading-a-cloud-bill-and-tagging": "ક્લાઉડ બિલને સેવા, ખાતા અને ટૅગ મુજબ વિભાજિત કરો, ઉપયોગ ચાર્જમાં કેવી રીતે ફેરવાય છે તે સમજો અને ટૅગ તથા ખાતાં ગોઠવો જેથી દરેક ડૉલરનો માલિક હોય.",
+  "cloud/finops-rightsizing-and-removing-waste": "ઉપયોગિતા ડેટા વડે નિષ્ક્રિય અને મોટા કદના સંસાધનો શોધો, જોડાણ વગરની ડિસ્ક અને જૂના સ્નૅપશૉટ સુરક્ષિત રીતે નિવૃત્ત કરો અને બિન-પ્રોડક્શન પર્યાવરણોને કામના કલાકો બહાર બંધ રાખવાનું શેડ્યૂલ કરો.",
+  "cloud/finops-commitments-savings-plans-and-spot": "રિઝર્વ્ડ અને કમિટેડ ડિસ્કાઉન્ટ વડે સ્થિર વર્કલોડનો એકમ ભાવ ઘટાડો, સ્પોટ ક્ષમતા પર ભૂલ-સહનશીલ કામ ચલાવો અને વધુ પડતી પ્રતિબદ્ધતા ટાળો.",
+  "cloud/finops-kubernetes-cost-allocation-and-requests": "વહેંચાયેલા ક્લસ્ટરમાં કઈ ટીમ અને વર્કલોડનો કેટલો ખર્ચ છે તે બતાવો, વાસ્તવિક ઉપયોગથી request અને limit સેટ કરો અને નિષ્ક્રિય ક્ષમતા ઘટાડવા ઑટોસ્કેલિંગ અને નોડ પસંદગીઓ વાપરો.",
+  "cloud/finops-data-transfer-storage-and-hidden-costs": "ટીમોને ચોંકાવતા ખર્ચ ઓળખો, જેમ કે ક્રૉસ-ઝોન અને egress ટ્રાફિક, NAT ગેટવે, લૉગ ઇન્જેશન અને સ્ટોરેજ વર્ગો, અને તેમને ઘટાડવા ડિઝાઇન કરો.",
+  "cloud/finops-budgets-anomalies-and-a-cost-practice": "બજેટ અને વિસંગતિ ચેતવણીઓ સેટ કરો, એન્જિનિયરિંગ અને ફાઇનાન્સ સાથે નિયમિત ખર્ચ સમીક્ષા ચલાવો અને ખર્ચને ડિઝાઇન સમીક્ષા અને પાઇપલાઇનમાં સમાવો જેથી બચત ટકે.",
+  "storage/backup-and-dr-strategy-3-2-1-and-retention": "પુનઃપ્રાપ્તિ લક્ષ્યોમાંથી બૅકઅપ વ્યૂહરચના ડિઝાઇન કરો, 3-2-1 નિયમ લાગુ કરો, સંપૂર્ણ, ઇન્ક્રિમેન્ટલ અને સ્નૅપશૉટ પદ્ધતિઓ પસંદ કરો અને વ્યવસાયની જરૂરિયાતને અનુરૂપ રિટેન્શન સેટ કરો.",
+  "storage/backup-and-dr-database-backups-and-point-in-time-recovery": "સુસંગત ડેટાબેઝ બૅકઅપ લો, પૉઇન્ટ-ઇન-ટાઇમ પુનઃપ્રાપ્તિ માટે write-ahead log આર્કાઇવ કરો અને ભૂલની તરત પહેલાં સુધી રીસ્ટોર કરવાનો અભ્યાસ કરો.",
+  "storage/backup-and-dr-kubernetes-etcd-and-volume-snapshots": "etcd, ડિક્લેરેટિવ મેનિફેસ્ટ અને પર્સિસ્ટન્ટ વૉલ્યુમનું બૅકઅપ લઈને Kubernetes ક્લસ્ટર સુરક્ષિત કરો અને દરેક બૅકઅપ શું રીસ્ટોર કરી શકે અને શું નહીં તે જાણો.",
+  "storage/backup-and-dr-testing-restores-and-verifying-backups": "સ્વચાલિત રીસ્ટોર ટેસ્ટ, અખંડિતતા તપાસ અને સમયબદ્ધ ડ્રિલ વડે સાબિત કરો કે બૅકઅપ કામ કરે છે, અને સમય સાથે પુનઃપ્રાપ્તિ સમય અને સફળતા દર ટ્રૅક કરો.",
+  "storage/backup-and-dr-disaster-recovery-patterns-and-failover": "બૅકઅપ અને રીસ્ટોર, પાઇલટ લાઇટ, વૉર્મ સ્ટૅન્ડબાય અને ઍક્ટિવ-ઍક્ટિવ ડિઝાઇનની સરખામણી કરો અને દરેક પુનઃપ્રાપ્તિ લક્ષ્ય માટે ડેટા રેપ્લિકેશન, DNS ફેલઓવર અને ફેલબૅકનું આયોજન કરો.",
+  "storage/backup-and-dr-ransomware-immutable-backups-and-runbooks": "અપરિવર્તનીયતા, અલગ ખાતાં અને ઍક્સેસ નિયંત્રણ વડે બૅકઅપને કાઢી નાખવા અને એન્ક્રિપ્શન સામે બચાવો અને દબાણ હેઠળ લોકો અનુસરી શકે તેવી રનબુક લખો.",
+  "virtualization/virtualization-ops-capacity-overcommit-and-noisy-neighbours": "સમજદાર ઓવરકમિટ ગુણોત્તર સાથે હોસ્ટ ક્ષમતાનું આયોજન કરો, CPU સ્ટીલ, મેમરી બલૂનિંગ અને I/O સ્પર્ધા ઓળખો અને વર્ચ્યુઅલ મશીનો એવી રીતે મૂકો કે એક ગેસ્ટ બીજાને ભૂખે ન મારે.",
+  "virtualization/virtualization-ops-libvirt-and-kvm-day-two-operations": "libvirt સાથે KVM હોસ્ટ રોજિંદા ચલાવો: ગેસ્ટ તપાસો અને બદલો, સ્નૅપશૉટ અને બૅકઅપ સુરક્ષિત રીતે લો, લાઇવ માઇગ્રેશન સાથે હોસ્ટ પૅચ કરો અને કન્ફિગરેશન સુસંગત રાખો.",
+  "virtualization/virtualization-ops-guest-performance-troubleshooting": "ગેસ્ટની અંદરથી અને હાઇપરવાઇઝર પરથી જોડીમાં દૃશ્યો વાપરીને ધીમાપણું ગેસ્ટ, હોસ્ટ, સ્ટોરેજ કે નેટવર્કમાંથી આવે છે તે શોધો.",
+  "openstack/openstack-ops-no-valid-host-and-scheduling-failures": "નિષ્ફળ સર્વર બિલ્ડને API થી શેડ્યૂલર અને Placement મારફતે ટ્રેસ કરો, No valid host found નું વાસ્તવિક કારણ વાંચો અને ક્વોટા, ક્ષમતા અને એગ્રિગેટ મેળ ન ખાવા સુધારો.",
+  "openstack/openstack-ops-neutron-and-ceph-troubleshooting": "એજન્ટ, બ્રિજ અને નેમસ્પેસ મારફતે ખૂટતા નેટવર્ક માર્ગને ટ્રેસ કરો અને ધીમા કે અટકેલા વૉલ્યુમ અને ડિગ્રેડેડ પ્લેસમેન્ટ ગ્રૂપ સમજવા Ceph હેલ્થ વાંચો.",
+  "openstack/openstack-ops-maintenance-evacuation-and-a-day-two-runbook": "લાઇવ માઇગ્રેશન અને ઇવૅક્યુએશન વડે કમ્પ્યુટ હોસ્ટને સુરક્ષિત રીતે સેવામાંથી બહાર કાઢો, હોસ્ટ નિષ્ફળતાઓ સંભાળો અને અપગ્રેડ તથા ક્ષમતા માટે તપાસ સાથેની રનબુક રાખો.",
+  "sre/senior-skills-writing-design-docs-and-rfcs": "સમસ્યા, વિકલ્પો અને સમાધાનો જણાવતા ટૂંકા ડિઝાઇન દસ્તાવેજ લખો, વહેલી ઉપયોગી સમીક્ષા મેળવો અને નિર્ણયો નોંધો જેથી ભવિષ્યના એન્જિનિયર જાણે કે કેમ.",
+  "sre/senior-skills-estimating-and-planning-work": "ધારણાઓ સાથે શ્રેણી તરીકે પ્રામાણિક અંદાજ આપો, કામને નાના ટુકડામાં તોડો, સંચાલન અને જોખમનું આયોજન કરો અને ફેરફારો વહેલા જણાવો.",
+  "sre/senior-skills-running-incident-and-postmortem-meetings": "સ્પષ્ટ ભૂમિકા અને અપડેટ સાથે લાઇવ ઘટના કૉલનું નેતૃત્વ કરો અને માલિક સાથેની, ચોક્કસ ક્રિયાઓ આપતી દોષ-રહિત પોસ્ટ-મૉર્ટમ બેઠક ચલાવો.",
+  "sre/senior-skills-mentoring-and-growing-engineers": "સારા પ્રશ્નો, ઇરાદાપૂર્વકની સોંપણી, ઉપયોગી પ્રતિસાદ અને શીખવતી કોડ તથા ડિઝાઇન સમીક્ષા દ્વારા એન્જિનિયરોને તેમનું કામ કર્યા વિના વિકસવામાં મદદ કરો.",
+  "sre/senior-skills-influencing-and-stakeholder-management": "બીજાને શું જોઈએ તે સમજીને, પુરાવા સાથે દલીલ બાંધીને, સમાધાનો પર વાટાઘાટ કરીને અને હિતધારકોને આશ્ચર્ય વિના માહિતગાર રાખીને ટીમો વચ્ચેનું કામ પાર પાડો.",
+  "sre/senior-skills-interviewing-and-hiring-as-the-interviewer": "પ્લૅટફૉર્મ અને SRE ભૂમિકાઓ માટે સ્પષ્ટ માપદંડ, સારા પ્રશ્નો, માપાંકિત ગુણાંકન અને આદરપૂર્ણ ઉમેદવાર અનુભવ સાથે ન્યાયી, સંરચિત તકનીકી ઇન્ટરવ્યૂ ચલાવો.",
+  "cicd/how-ci-platforms-differ": "બધી CI સિસ્ટમના સામાન્ય મોડેલની સરખામણી કરો અને જુઓ કે GitHub Actions, GitLab CI અને Tekton વ્યવહારમાં કેવી રીતે અલગ છે.",
+  "cicd/actions-workflows-jobs-and-steps": "જોબ, સ્ટેપ, આઉટપુટ અને ડિફોલ્ટ ટોકન સાથે GitHub Actions વર્કફ્લો લખો અને રન વાંચીને શું નિષ્ફળ ગયું તે શોધો.",
+  "cicd/actions-triggers-matrices-and-caching": "યોગ્ય ટ્રિગર પસંદ કરો, બિલ્ડ મેટ્રિક્સ ચલાવો, જૂના રન રદ કરો અને ડિપેન્ડન્સી કેશ કરી Actions ઝડપી અને અનુમાનિત રાખો.",
+  "cicd/actions-reusable-workflows-and-composite-actions": "ફરી વાપરી શકાય તેવા વર્કફ્લો, કમ્પોઝિટ એક્શન અને યોગ્ય વર્ઝનિંગથી રિપોઝિટરી વચ્ચેની કૉપી-પેસ્ટ દૂર કરો.",
+  "cicd/actions-secrets-oidc-and-hardening": "Actions માં સિક્રેટ સુરક્ષિત રાખો, લાંબા ગાળાની ક્લાઉડ કીને બદલે OIDC વાપરો, થર્ડ-પાર્ટી એક્શન પિન કરો અને પુલ રિક્વેસ્ટની સત્તા મર્યાદિત કરો.",
+  "cicd/actions-runners-environments-and-deployments": "હોસ્ટેડ અથવા પોતાના રનર પસંદ કરો, એન્વાયર્નમેન્ટ અને મંજૂરીઓથી ડિપ્લોયમેન્ટ સુરક્ષિત કરો અને રનર ફ્લીટ સુરક્ષિત અને સ્કેલેબલ રાખો.",
+  "cicd/gitlab-ci-pipelines-stages-and-jobs": "સ્ટેજ, જોબ, વેરિયેબલ અને ઇમેજ સાથે .gitlab-ci.yml લખો અને સમજો કે પાઇપલાઇન, જોબ અને રનર કેવી રીતે જોડાય છે.",
+  "cicd/gitlab-ci-rules-artifacts-and-caches": "rules થી જોબ ક્યારે ચાલે તે નક્કી કરો, artifacts થી બિલ્ડ આઉટપુટ આગળ મોકલો અને સાચી કીવાળા કેશથી પાઇપલાઇન ઝડપી કરો.",
+  "cicd/gitlab-ci-includes-templates-and-dynamic-pipelines": "include અને extends થી પાઇપલાઇન કન્ફિગરેશન શેર કરો, મોટી પાઇપલાઇનને પેરેન્ટ અને ચાઇલ્ડમાં વહેંચો અને જોબ ડાયનેમિક બનાવો.",
+  "cicd/gitlab-runners-environments-and-security": "શેર્ડ અથવા પોતાના રનર પર GitLab CI ચલાવો, એક્ઝિક્યુટર પસંદ કરો, વેરિયેબલ અને બ્રાન્ચ સુરક્ષિત કરો અને એન્વાયર્નમેન્ટ અને મંજૂરીઓ વાપરો.",
+  "cicd/tekton-tasks-pipelines-and-workspaces": "Tekton ના Task અને Pipeline બનાવો, params, results અને workspaces થી ડેટા પસાર કરો અને TaskRun અને PipelineRun થી ચલાવો.",
+  "cicd/tekton-triggers-chains-and-production-use": "Triggers થી ઇવેન્ટ પરથી Tekton શરૂ કરો, Chains થી બિલ્ડ પર સહી અને પ્રમાણન કરો અને RBAC, ક્વોટા અને પ્રૂનિંગ સાથે Tekton સુરક્ષિત ચલાવો.",
+  "cicd/choosing-and-migrating-between-ci-platforms": "GitHub Actions, GitLab CI અને Tekton ની ખર્ચ, સુરક્ષા, સ્કેલ અને મહેનતમાં સરખામણી કરો અને એકમાંથી બીજામાં સુરક્ષિત સ્થળાંતરનું આયોજન કરો.",
+  "baremetal/bmc-ipmi-and-redfish-automation": "BMC થી સર્વર આઉટ-ઓફ-બેન્ડ નિયંત્રિત કરો, IPMI અને Redfish સુરક્ષિત રીતે વાપરો અને પાવર, બૂટ અને સેન્સરના કામ મોટા પાયે સ્વચાલિત કરો.",
+  "baremetal/cloud-init-and-first-boot-configuration": "cloud-init યુઝર ડેટાથી નવું મશીન પહેલા બૂટ પર કન્ફિગર કરો અને ડીબગ કરો કે નોડ પોતાના સેટિંગ વિના કેમ ઊભો થયો.",
+  "baremetal/firmware-and-bios-management-at-scale": "બેઝલાઇન, તબક્કાવાર રોલઆઉટ અને ડ્રિફ્ટ તપાસથી આખા ફ્લીટમાં BIOS, BMC, NIC અને ડિસ્ક ફર્મવેર એકસરખા રાખો.",
+  "baremetal/maas-and-ironic-bare-metal-provisioning": "જુઓ કે MAAS અને OpenStack Ironic ક્લાઉડ ઇન્સ્ટન્સની જેમ API દ્વારા ફિઝિકલ સર્વર કેવી રીતે શોધે, નોંધે, કમિશન કરે અને ડિપ્લોય કરે છે.",
+  "baremetal/hardware-failure-diagnosis-and-rma": "લોગ અને સેન્સર પરથી મેમરી, ડિસ્ક, CPU અને પાવરની ખામી ઓળખો અને વેન્ડર સાથે સ્વચ્છ RMA પ્રક્રિયા ચલાવો.",
+  "baremetal/power-cooling-and-rack-capacity": "રેકની વીજળી વોટ અને એમ્પિયરમાં આયોજિત કરો, રિડન્ડન્ટ ફીડ અને કૂલિંગ મર્યાદા સમજો અને બ્રેકર ટ્રિપ કર્યા વિના સર્વર મૂકો.",
+  "baremetal/uefi-bootloaders-and-secure-boot": "ફર્મવેરથી કર્નલ સુધીનો બૂટ માર્ગ અનુસરો, UEFI બૂટ એન્ટ્રી સંભાળો અને Secure Boot કી અને સહી કરેલા બૂટલોડર સમજો.",
+  "sql-ops/pg-stat-statements-and-query-tuning": "pg_stat_statements થી ક્વેરીને કુલ સમય, કોલ અને રો પ્રમાણે ગોઠવો અને મોટાભાગનો લોડ સર્જતી થોડી ટ્યૂન કરો.",
+  "sql-ops/partitioning-and-data-retention": "મોટા ટેબલ સમય અથવા કી પ્રમાણે વહેંચો, જૂનો ડેટા સસ્તામાં કાઢો અને જાળવણી ઝડપી રહે તેમ પાર્ટિશન આયોજિત કરો.",
+  "sql-ops/sql-backup-and-point-in-time-recovery-operations": "બેઝ બેકઅપ અને WAL આર્કાઇવિંગ ચલાવો, પોઇન્ટ-ઇન-ટાઇમ રિસ્ટોર કરો અને રિસ્ટોર સમય તમારા રિકવરી લક્ષ્યો સામે ચકાસો.",
+  "sql-ops/online-schema-changes-without-downtime": "લોક ટાઇમઆઉટ, કોન્કરન્ટ ઇન્ડેક્સ, બેચમાં બેકફિલ અને એક્સપાન્ડ-એન્ડ-કોન્ટ્રેક્ટ પદ્ધતિથી વ્યસ્ત ડેટાબેઝમાં ટેબલ સુરક્ષિત રીતે બદલો.",
+  "sql-ops/replicas-failover-and-switchover-operations": "સ્ટ્રીમિંગ રેપ્લિકા ચલાવો, આયોજિત સ્વિચઓવર અને કટોકટીના ફેલઓવર વચ્ચેનો ફરક સમજો, સ્પ્લિટ બ્રેઇન ટાળો અને રેપ્લિકેશન લેગ સંભાળો.",
+  "sql-ops/autovacuum-bloat-and-maintenance-windows": "autovacuum ટ્યૂન કરી, બ્લોટ માપી, ટ્રાન્ઝેક્શન ID રેપઅરાઉન્ડ ટાળી અને સુરક્ષિત જાળવણીનું આયોજન કરી ટેબલ તંદુરસ્ત રાખો.",
+  "sql-ops/database-incident-runbook": "ડેટાબેઝ ઘટના ક્રમશઃ સંભાળો: અસર ખાતરી કરો, લોક, કનેક્શન, ડિસ્ક અને રેપ્લિકેશન તપાસો, સુરક્ષિત રીતે ઘટાડો અને જે બન્યું તે નોંધો.",
+  "service-mesh/sidecar-and-ambient-mesh-data-planes": "સાઇડકાર પ્રોક્સી મોડેલની સાઇડકાર વગરના એમ્બિયન્ટ મોડેલ સાથે સરખામણી કરો અને દરેકનો સંસાધન, અપગ્રેડ અને આઇસોલેશનમાં ખર્ચ જુઓ.",
+  "service-mesh/ingress-gateways-and-the-gateway-api": "ગેટવેથી બહારનો ટ્રાફિક મેશમાં લાવો, Kubernetes Gateway API વાપરો અને TLS અને રૂટિંગ નિયમોથી કિનારો સુરક્ષિત કરો.",
+  "service-mesh/traffic-shifting-retries-and-timeouts": "વર્ઝન વચ્ચે ટ્રાફિક ધીમે ધીમે ખસેડો, સુરક્ષિત રીટ્રાય અને ટાઇમઆઉટ ગોઠવો અને સર્વિસ મેશમાં રીટ્રાય તોફાન ટાળો.",
+  "service-mesh/mesh-authorization-and-zero-trust-policy": "mTLS ઓળખ અને અધિકૃતતા નીતિઓથી ફક્ત ઇચ્છિત કોલ મંજૂર કરો, ડિફોલ્ટ રૂપે નકાર અને સુરક્ષિત રોલઆઉટ સાથે.",
+  "service-mesh/multi-cluster-mesh-and-failover": "સહિયારો વિશ્વાસ, ક્રોસ-ક્લસ્ટર ડિસ્કવરી અને સ્થાન-સભાન ફેલઓવરથી ક્લસ્ટર વચ્ચે સેવાઓ જોડો અને જોખમો જાણો.",
+  "service-mesh/mesh-performance-cost-and-resource-tuning": "મેશની લેટન્સી અને સંસાધન ખર્ચ માપો, પ્રોક્સી કન્ફિગરેશન મર્યાદિત કરો અને મર્યાદા અને ટેલિમેટ્રી ટ્યૂન કરી તેને પરવડે તેવું રાખો.",
+  "service-mesh/operating-and-upgrading-a-service-mesh": "કેનેરી કંટ્રોલ પ્લેન, રિવિઝન ટેગ અને તબક્કાવાર પ્રોક્સી રીસ્ટાર્ટથી મેશ અપગ્રેડ કરો અને રોલબેક તથા શું મોનિટર કરવું તે જાણો.",
+  "gpu-serving/quantization-and-model-sizing": "વેઇટ અને કેશ માટે GPU મેમરીનો અંદાજ કાઢો, ક્વૉન્ટાઇઝેશન ફોર્મેટ સમજો અને તમારી ગુણવત્તા અને ખર્ચને અનુરૂપ ચોકસાઈ પસંદ કરો.",
+  "gpu-serving/batching-kv-cache-and-throughput": "સતત બેચિંગ, પ્રીફિલ અને ડીકોડ, KV કેશ પેજિંગ અને લેટન્સી-થ્રૂપુટ વચ્ચે સંતુલન કરતા સેટિંગ સમજો.",
+  "gpu-serving/multi-gpu-tensor-and-pipeline-parallelism": "ટેન્સર અને પાઇપલાઇન પેરેલલિઝમથી મોડેલને GPU વચ્ચે વહેંચો, ઇન્ટરકનેક્ટની જરૂરિયાત સમજો અને રેપ્લિકા ક્યારે સારી તે નક્કી કરો.",
+  "gpu-serving/autoscaling-llm-inference": "CPU ને બદલે કતારની ઊંડાઈ અને લેટન્સી પર GPU ઇન્ફરન્સ સ્કેલ કરો, ધીમી શરૂઆત ગરમ ક્ષમતાથી સંભાળો અને ખર્ચ નિયંત્રિત કરો.",
+  "gpu-serving/model-loading-caching-and-cold-starts": "લોકલ કેશ અને ઝડપી સ્ટોરેજથી મોટી મોડેલ ફાઇલ ઝડપથી લોડ કરો, safetensors અને શેર્ડ વોલ્યુમ વાપરો અને સ્ટાર્ટઅપ સમય પ્રમાણે રોલઆઉટ આયોજિત કરો.",
+  "gpu-serving/gpu-sharing-mig-and-time-slicing": "MIG પાર્ટિશન, ટાઇમ-સ્લાઇસિંગ અથવા MPS થી એક GPU ઘણા વર્કલોડ વચ્ચે વહેંચો અને આઇસોલેશન, કામગીરી અને યોગ્યતા સમજો.",
+  "gpu-serving/gpu-failures-xid-errors-and-recovery": "GPU એરર કોડ વાંચો, મેમરી, થર્મલ, લિંક અને ડ્રાઇવરની ખામી અલગ પાડો અને GPU સુરક્ષિત રીતે ડ્રેન, રીસેટ અને બદલો.",
+  "aiops/telemetry-quality-for-aiops": "મોડેલ પહેલાં ડેટા સુધારો: સુસંગત નામ, લેબલ, ટાઇમસ્ટેમ્પ અને સંપૂર્ણતા, જેથી ઓપરેશનલ ડેટા પર મશીન લર્નિંગ કામ કરે.",
+  "aiops/forecasting-capacity-and-saturation": "સરળ ટ્રેન્ડ અને મોસમી મોડેલથી ડિસ્ક, મેમરી અને ટ્રાફિકના વધારાની આગાહી કરો અને ખૂટે તે પહેલાં ચેતવણી આપો.",
+  "aiops/llm-assistants-for-incident-response": "ઘટનાનો સારાંશ, અપડેટનો મુસદ્દો અને રનબુક શોધ માટે ભાષા મોડેલ વાપરો, ચોકસાઈ, ગોપનીયતા અને માનવ મંજૂરીના રક્ષણ સાથે.",
+  "aiops/measuring-aiops-value-and-avoiding-hype": "ઘોંઘાટ, શોધવાનો સમય અને ઉકેલ સમય જેવા પહેલાં-પછીના મેટ્રિકથી નક્કી કરો કે AIOps સાધન મદદ કરે છે કે નહીં અને પ્રામાણિક પાયલોટ ચલાવો.",
+  "aiops/runbook-automation-and-guardrails": "રનબુકને પૂર્વશરતો, ડ્રાય રન, દર મર્યાદા, મંજૂરી અને રોલબેક સાથે સુરક્ષિત ઓટોમેશનમાં ફેરવો અને વિશ્વાસ તબક્કાવાર વધારો.",
+  "argocd/argocd-sso-rbac-and-audit": "Argo CD ને તમારા આઇડેન્ટિટી પ્રોવાઇડર સાથે જોડો, ભૂમિકા અને પ્રોજેક્ટ પરવાનગી નક્કી કરો અને કોણે શું બદલ્યું તેનો ઓડિટ રેકોર્ડ રાખો.",
+  "argocd/argocd-notifications-and-image-updates": "સિંક નિષ્ફળ જાય અથવા એપ બગડે ત્યારે ચેતવણી મોકલો અને ક્લસ્ટર સંપાદિત કરવાને બદલે Git દ્વારા ઇમેજ ટેગ અપડેટ સુરક્ષિત રીતે સ્વચાલિત કરો.",
+  "argocd/progressive-delivery-with-argo-rollouts": "Argo Rollouts ની કેનેરી અને બ્લુ-ગ્રીન વ્યૂહરચના, સ્વચાલિત વિશ્લેષણ અને મેટ્રિક બગડે તો ઝડપી રદ સાથે ધીમે ધીમે રિલીઝ કરો.",
+  "argocd/argocd-disaster-recovery-and-upgrades": "Argo CD નું બેકઅપ લો અને ફરી બનાવો, Git વડે ગુમાવેલા ક્લસ્ટરમાંથી ઉભરો અને CRD અને બ્રેકિંગ ફેરફારોની કાળજી રાખી અપગ્રેડ કરો.",
+  "claude-skills/skills-for-runbooks-and-operations": "ઓપરેશનલ પ્રક્રિયાઓને એવી સ્કિલમાં ફેરવો જે Claude ને સુરક્ષિત ક્રમમાં તપાસમાંથી પસાર કરાવે, સ્ક્રિપ્ટ, અટકવાના બિંદુ અને સ્પષ્ટ વ્યાપ સાથે.",
+  "claude-skills/skills-with-references-templates-and-assets": "સ્કિલમાં સહાયક ફાઇલ વાપરો: સંદર્ભ દસ્તાવેજ, ટેમ્પલેટ અને ઉદાહરણ, અને મુખ્ય ફાઇલ નાની રાખો જેથી Claude ફક્ત જરૂરી લોડ કરે.",
+  "claude-skills/organizing-skills-for-a-team": "નામકરણ, માલિકી, સમીક્ષા, વર્ઝનિંગ અને કેટલોગથી ટીમમાં સ્કિલ શેર કરો જેથી લોકો તેને શોધે અને ભરોસો કરે.",
+  "claude-skills/evaluating-and-regression-testing-skills": "સ્કિલ માટે નાનો ટેસ્ટ સેટ બનાવો, ટ્રિગરિંગ અને આઉટપુટ ગુણવત્તા તપાસો, વર્ઝનની સરખામણી કરો અને રિલીઝ પહેલાં રિગ્રેશન પકડો.",
+  "cloud-iam/gcp-iam-and-service-accounts": "Google Cloud IAM ભૂમિકા, રિસોર્સ હાયરાર્કી, સર્વિસ એકાઉન્ટ અને લાંબા ગાળાની કી કેવી રીતે ટાળવી તે સમજો.",
+  "cloud-iam/workload-identity-federation-and-oidc-trust": "આઇડેન્ટિટી પ્રોવાઇડરના સહી કરેલા ટોકન પર ભરોસો કરી સંગ્રહિત કી વિના CI સિસ્ટમ અને ક્લસ્ટરને ક્લાઉડ કૉલ કરવા દો અને કડક વિશ્વાસ શરતો લખો.",
+  "cloud-iam/permission-boundaries-scps-and-guardrails": "SCP, પરમિશન બાઉન્ડ્રી અને સંસ્થા નીતિઓથી એકાઉન્ટ અને ભૂમિકા શું કરી શકે તેની બાહ્ય મર્યાદા મૂકો અને આપેલા અધિકારો સાથે તે કેવી રીતે ભળે છે તે સમજો.",
+  "cloud-iam/iam-policy-analysis-and-unused-access": "એક્સેસ એનાલાઇઝર, છેલ્લા ઉપયોગનો ડેટા અને નીતિ સિમ્યુલેશનથી અતિવ્યાપક અને ન વપરાયેલી પરવાનગી શોધી સુરક્ષિત રીતે કાઢો.",
+  "helm/testing-and-linting-helm-charts": "helm lint, ટેમ્પલેટ રેન્ડરિંગ, સ્કીમા ચકાસણી, યુનિટ ટેસ્ટ અને સાચા ક્લસ્ટર પરના ટેસ્ટથી રિલીઝ પહેલાં ચાર્ટની ભૂલો પકડો.",
+  "helm/library-charts-and-chart-reuse": "નામવાળા ટેમ્પલેટ, લાઇબ્રેરી ચાર્ટ અને અમ્બ્રેલા ચાર્ટથી ચાર્ટ વચ્ચે ટેમ્પલેટ કૉપી કરવાનું ટાળો અને સમાધાનો જાણો.",
+  "helm/publishing-and-signing-helm-charts": "ચાર્ટ OCI રજિસ્ટ્રીમાં પ્રકાશિત કરો, સહી અને ચકાસણી કરો અને ચાર્ટ કોણ રિલીઝ કે વાપરી શકે તે નિયંત્રિત કરો.",
+  "helm/helm-security-and-supply-chain": "થર્ડ-પાર્ટી ચાર્ટની સમીક્ષા કરો, રેન્ડર કરેલા મેનિફેસ્ટ સ્કેન કરો, જોખમી હૂક અને મૂલ્યો ટાળો અને Helm અસુરક્ષિત વર્કલોડ ડિપ્લોય ન કરે તે માટે નીતિ લાગુ કરો.",
+  "k8s-ops/control-plane-monitoring-and-slos": "API સર્વરની લેટન્સી અને ભૂલો, etcd નું આરોગ્ય અને કંટ્રોલર કતાર પર નજર રાખો અને ક્લસ્ટર માટે જ સેવા સ્તર નક્કી કરો.",
+  "k8s-ops/persistent-storage-and-csi-operations": "સ્ટોરેજ ક્લાસ અને CSI ડ્રાઇવરથી પર્સિસ્ટન્ટ વોલ્યુમ ચલાવો, વિસ્તરણ, સ્નેપશોટ અને અટકેલા વોલ્યુમ સંભાળો અને સ્ટેટફુલ વર્કલોડ સુરક્ષિત રાખો.",
+  "k8s-ops/multi-tenancy-namespaces-and-fair-sharing": "નેમસ્પેસ, ક્વોટા, નેટવર્ક પોલિસી, RBAC અને એડમિશન નિયમોથી ટીમો વચ્ચે ક્લસ્ટર શેર કરો અને અલગ ક્લસ્ટર ક્યારે જોઈએ તે જાણો.",
+  "k8s-ops/cluster-disaster-recovery-runbook": "ક્લસ્ટર ગુમાવવાનું આયોજન કરો: શું બેકઅપ લેવું, કોડમાંથી કેવી રીતે ફરી બનાવવું અને સ્ટેટ કેવી રીતે પાછું લાવવું, ટેસ્ટ અને સ્પષ્ટ રિકવરી લક્ષ્યો સાથે.",
+  "llm/embeddings-and-vector-search": "ટેક્સ્ટને વેક્ટરમાં ફેરવો, સમાનતાથી અર્થના આધારે શોધો અને ઇન્ડેક્સ, ચંકિંગ અને વેક્ટર સર્ચની મર્યાદા સમજો.",
+  "llm/retrieval-augmented-generation": "સંબંધિત ટેક્સ્ટ મેળવી પ્રોમ્પ્ટમાં મૂકી મોડેલને તાજું, ખાનગી જ્ઞાન આપો, ટાંકણ અને બનાવટી જવાબો સામે ચકાસણી સાથે.",
+  "llm/fine-tuning-versus-prompting-versus-rag": "ખરેખર શું ખોટું થઈ રહ્યું છે તે જોઈને નક્કી કરો કે પ્રોમ્પ્ટ બદલવો, રિટ્રીવલ ઉમેરવું કે મોડેલ ફાઇન-ટ્યૂન કરવું.",
+  "llm/llm-safety-privacy-and-data-handling": "ભાષા મોડેલ એપ્લિકેશનમાં ડેટા સુરક્ષિત રીતે સંભાળો: અંગત ડેટા છુપાવો, જાળવણી નિયંત્રિત કરો, પ્રોમ્પ્ટ ઇન્જેક્શનથી બચો અને જવાબદારીપૂર્વક લોગ કરો.",
+  "mcp/designing-good-tools-for-agents": "સાધનોના નામ, વર્ણન, ઇનપુટ અને આઉટપુટ એવા રચો કે મોડેલ તેને સાચા પસંદ કરી વાપરે, સુરક્ષિત ડિફોલ્ટ અને ઉપયોગી ભૂલો સાથે.",
+  "mcp/testing-and-debugging-mcp-servers-with-the-inspector": "Inspector, યુનિટ ટેસ્ટ અને રેકોર્ડ કરેલા સત્રોથી MCP સર્વર ચકાસો અને પ્રોટોકોલ, સ્કીમા અને ટ્રાન્સપોર્ટ સમસ્યાઓ ઝડપથી શોધો.",
+  "mcp/deploying-and-scaling-mcp-servers": "પ્રમાણીકરણ, કન્ટેનર, હેલ્થ ચેક, દર મર્યાદા અને ઓબ્ઝર્વેબિલિટી સાથે MCP સર્વર HTTP પર દૂરથી ચલાવો.",
+  "mcp/composing-multiple-mcp-servers": "એક ક્લાયન્ટને અનેક MCP સર્વર સાથે જોડો, સાધન નામની ટક્કર અને ઓવરલોડ ટાળો અને થોડા, કેન્દ્રિત સર્વર રચો.",
+  "mlops/feature-stores-and-data-versioning": "ફીચર સ્ટોરથી ટ્રેનિંગ અને સર્વિંગ ફીચર સુસંગત રાખો અને કોઈપણ મોડેલ ફરી બનાવી શકાય તે માટે ડેટાસેટને વર્ઝન આપો.",
+  "mlops/model-evaluation-ab-tests-and-shadow-deployments": "ઓફલાઇન મેટ્રિક, સ્લાઇસ, શેડો ટ્રાફિક અને નિયંત્રિત ઓનલાઇન પ્રયોગોથી મોડેલ મૂલવો અને ક્યારે શિપ કે રોલબેક કરવું તે નક્કી કરો.",
+  "mlops/ml-pipelines-and-workflow-orchestration": "ટ્રેનિંગને સ્ટેપ, કેશિંગ, રીટ્રાય, પેરામીટર અને ઓર્કેસ્ટ્રેટર પર નિર્ધારિત પુનઃપ્રશિક્ષણ સાથે પુનરાવર્તિત પાઇપલાઇન તરીકે ચલાવો.",
+  "mlops/llmops-prompts-evals-and-versioning": "ભાષા મોડેલ એપ્લિકેશનને સોફ્ટવેરની જેમ ચલાવો: પ્રોમ્પ્ટ અને મોડેલને વર્ઝન આપો, મૂલ્યાંકન સેટથી ચકાસો, ખર્ચ અને ગુણવત્તા મોનિટર કરો અને કાળજીપૂર્વક રિલીઝ કરો.",
+  "openstack/cinder-glance-and-storage-services": "Cinder થી બ્લોક વોલ્યુમ, Glance થી ઇમેજ અને તે Ceph સાથે કેવી રીતે જોડાય છે તે સમજો અને સામાન્ય વોલ્યુમ અને ઇમેજ સમસ્યાઓ ઠીક કરો.",
+  "openstack/horizon-heat-and-openstack-automation": "CLI, SDK, Heat ટેમ્પલેટ અને Terraform થી OpenStack સ્વચાલિત કરો અને Horizon જે સારું કરે છે તેના માટે જ વાપરો.",
+  "openstack/deploying-openstack-with-kolla-ansible": "જુઓ કે Kolla-Ansible થી કન્ટેનરાઇઝ્ડ OpenStack કેવી રીતે ડિપ્લોય થાય છે, ઇન્વેન્ટરી અને globals કન્ફિગર કરો અને અપગ્રેડ તથા પુનઃકન્ફિગરેશન સુરક્ષિત ચલાવો.",
+  "openstack/openstack-monitoring-and-capacity-planning": "કંટ્રોલ પ્લેન અને કમ્પ્યુટ ક્ષમતા મોનિટર કરો, API અને મેસેજ કતારના આરોગ્ય પર ચેતવણી આપો અને સાચા ડેટાથી ક્વોટા અને ઓવરકમિટ આયોજિત કરો.",
+  "prompting/prompting-for-code-and-infrastructure": "સાચી સ્ક્રિપ્ટ, કન્ફિગ અને સમીક્ષા આપતા પ્રોમ્પ્ટ લખો: સંદર્ભ, મર્યાદા અને ટેસ્ટ આપો, નાના ફેરફાર માગો અને બધું ચકાસો.",
+  "prompting/prompt-injection-and-defensive-prompting": "દસ્તાવેજ, વેબ પેજ અને સાધન પરિણામોમાં પ્રોમ્પ્ટ ઇન્જેક્શન ઓળખો અને ઘુસાડેલું લખાણ નુકસાન ન કરી શકે તેવી રીતે એપ્લિકેશન રચો.",
+  "prompting/agents-and-multi-step-workflows": "નિશ્ચિત વર્કફ્લો અને ખુલ્લા એજન્ટ વચ્ચે પસંદ કરો, લૂપ રચો, મર્યાદા અને ચેકપોઇન્ટ ગોઠવો અને સાદી સાંકળ ક્યારે સારી તે જાણો.",
+  "prompting/evaluating-prompts-with-datasets": "નાનો લેબલવાળો ટેસ્ટ સેટ બનાવો, પાસના માપદંડ નક્કી કરો, પ્રોમ્પ્ટ વર્ઝનની સરખામણી કરો અને સ્વચાલિત ગ્રેડર કાળજીપૂર્વક વાપરો.",
+  "virtualization/vm-backup-replication-and-recovery": "સ્નેપશોટ અને એજન્ટથી વર્ચ્યુઅલ મશીનનું બેકઅપ લો, બીજી સાઇટ પર પ્રતિકૃતિ કરો અને રિકવરી લક્ષ્યો સામે રિસ્ટોર ચકાસો.",
+  "virtualization/vm-templates-cloud-init-and-image-pipelines": "પાઇપલાઇનમાં સ્વચ્છ, પેચ કરેલી VM ઇમેજ બનાવો, પ્રતિ-ઇન્સ્ટન્સ સેટિંગ માટે cloud-init વાપરો અને હાથે બનાવેલા, ભટકતા ટેમ્પલેટ ટાળો.",
+  "virtualization/gpu-passthrough-and-device-assignment": "VFIO અને IOMMU થી VM ને GPU કે નેટવર્ક કાર્ડ સુધી સીધી પહોંચ આપો અને ગ્રુપ, મર્યાદા અને સુરક્ષા સમજો.",
+  "virtualization/hypervisor-security-and-isolation": "હાઇપરવાઇઝર અને ગેસ્ટને મજબૂત કરો: ઝડપથી પેચ કરો, મેનેજમેન્ટ પહોંચ મર્યાદિત કરો, નેટવર્ક અને સ્ટોરેજ અલગ રાખો અને ગેસ્ટ એસ્કેપનું આયોજન કરો.",
+  "ansible/ansible-performance-and-execution-strategies": "forks, પાઇપલાઇનિંગ, ફેક્ટ કેશિંગ અને હોશિયાર વ્યૂહરચનાથી Ansible રન ઝડપી કરો અને serial અને ભૂલ મર્યાદાથી રોલઆઉટ નિયંત્રિત કરો.",
+  "ansible/writing-custom-ansible-modules-and-filters": "નાના Python મોડ્યુલ અથવા ફિલ્ટર પ્લગઇનથી Ansible વિસ્તારો, ઇડેમ્પોટન્ટ રાખો, ચેક મોડ સમર્થિત કરો અને ચકાસો.",
+  "git/git-internals-objects-refs-and-the-index": "રિપોઝિટરીની અંદર ડોકિયું કરી blob, tree, commit, ref અને ઇન્ડેક્સ જુઓ અને સમજો કે Git કમાન્ડ એવું વર્તન કેમ કરે છે.",
+  "git/release-and-hotfix-workflows-with-git": "બ્રાન્ચ અથવા ટેગથી રિલીઝ કાપો, અધૂરું કામ મોકલ્યા વિના હોટફિક્સ શિપ કરો અને ચેરી-પિકથી લાંબા ગાળાની બ્રાન્ચ સિંકમાં રાખો.",
+  "go/configuration-logging-and-metrics-in-go-services": "ફ્લેગ અને એન્વાયર્નમેન્ટમાંથી કન્ફિગરેશન વાંચો, slog થી લોગ કરો અને Prometheus મેટ્રિક ખુલ્લા કરો જેથી Go સેવાઓ ચલાવવી અને જોવી સરળ બને.",
+  "go/writing-kubernetes-clients-and-controllers-in-go": "client-go થી રિસોર્સની યાદી કરો અને વૉચ કરો, ઇન્ફોર્મર અને વર્ક ક્યૂ સમજો અને નાનો, સુરક્ષિત રિકન્સાઇલ લૂપ લખો.",
+  "bash/log-analysis-one-liners-and-pipelines": "grep, awk, sort, uniq અને jq થી લોગ ફાઇલમાંથી સાચા ઓપરેશનલ પ્રશ્નોના જવાબ મેળવો અને નાની ફરી વાપરી શકાય તેવી પાઇપલાઇન બનાવો.",
+  "databases/database-observability-and-capacity-planning": "મહત્વના ડેટાબેઝ મેટ્રિક પસંદ કરો, ઉપયોગી ડેશબોર્ડ અને ચેતવણી બનાવો અને સ્ટોરેજ, કનેક્શન અને I/O ખૂટે તે પહેલાં આગાહી કરો.",
+  "storage/storage-benchmarking-with-fio": "વાસ્તવિક બ્લોક કદ, કતારની ઊંડાઈ અને રીડ-રાઇટ મિશ્રણ સાથે fio થી ડિસ્ક અને વોલ્યુમ માપો અને લેટન્સી પર્સેન્ટાઇલ સાચા વાંચો.",
+  "security/web-and-api-attacks-for-operators": "લોગ પરથી ઇન્જેક્શન, તૂટેલું એક્સેસ કંટ્રોલ, SSRF અને API દુરુપયોગ ઓળખો અને ઇનપુટ હેન્ડલિંગ, અધિકૃતતા તપાસ અને એજ નિયંત્રણોથી બચાવ કરો.",
+  "security/sast-dast-and-dependency-scanning-gates": "પાઇપલાઇનમાં સ્ટેટિક વિશ્લેષણ, ડિપેન્ડન્સી સ્કેનિંગ અને ડાયનેમિક ટેસ્ટિંગ ઉમેરો, ઘોંઘાટ ઘટાડવા ટ્યૂન કરો અને રિલીઝ શું અટકાવે તે નક્કી કરો.",
+  "security/cloud-posture-and-misconfiguration-management": "પોશ્ચર સાધનો અને પોલિસી-એઝ-કોડથી જાહેર બકેટ, ખુલ્લા પોર્ટ અને ગુમ એન્ક્રિપ્શન સતત શોધો અને ડ્રિફ્ટ મૂળમાં જ ઠીક કરો.",
+  "security/security-champions-and-secure-code-review": "ચેમ્પિયન, વ્યવહારુ કોડ રિવ્યૂ ચેકલિસ્ટ, થ્રેટ મોડેલિંગ અને ડેવલપરને ગમતા ફીડબેક લૂપથી ટીમોમાં સુરક્ષા ફેલાવો.",
+  "security/incident-forensics-and-evidence-handling": "અસ્થિર પુરાવા સાચવો, લોગ અને ડિસ્ક ઇમેજ સુરક્ષિત રીતે એકત્ર કરો, ચેઇન ઓફ કસ્ટડી જાળવો અને સુરક્ષા ઘટનામાં ટાઇમલાઇન બનાવો.",
+  "security/audit-readiness-and-continuous-compliance-evidence": "પુરાવા સ્વચાલિત કરી, નિયંત્રણોને તકનીકી તપાસ સાથે જોડી અને જીવંત રેકોર્ડ રાખી SOC 2 અથવા ISO 27001 ઓડિટ માટે તૈયાર થાઓ."
+ }
+}
