@@ -2018,5 +2018,253 @@
  "security/audit-readiness-and-continuous-compliance-evidence": {
   "s": "Audits ask you to prove that your controls work. If evidence is collected automatically all year, an audit is a review, not a scramble.",
   "i": "I map each control to a technical check and an owner, collect evidence automatically from systems such as access reviews, change records and scan results, keep an immutable log, track exceptions and run internal reviews before the external audit."
+ },
+ "cicd/jenkins-architecture-controllers-agents-and-jobs": {
+  "s": "Jenkins is a server that waits for a trigger, picks a worker machine called an agent, and runs the steps you defined. The controller is the brain; agents do the work.",
+  "i": "The controller holds configuration, the queue, build history and credentials, and schedules builds onto agents by label. Jobs define what to run; builds are individual runs. Everything lives in JENKINS_HOME, so backups and disk space matter."
+ },
+ "cicd/jenkins-declarative-pipelines-and-the-jenkinsfile": {
+  "s": "A Jenkinsfile is a text file in your repository that tells Jenkins what to build. It lists stages, and each stage lists steps.",
+  "i": "Declarative syntax gives a fixed structure: pipeline, agent, environment, stages, post. Use when conditions, parallel stages and options such as timeout and retry to control flow, and keep the real work in scripts."
+ },
+ "cicd/jenkins-build-agents-with-docker-and-kubernetes": {
+  "s": "Instead of keeping build machines forever, start a fresh container for each build and throw it away after.",
+  "i": "Static agents drift and accumulate state. Docker agents give a clean image per build, and the Kubernetes plugin starts an agent pod per build from a pod template, so capacity follows demand and tools are versioned in images."
+ },
+ "cicd/jenkins-shared-libraries-and-reusable-pipelines": {
+  "s": "A shared library is a repository of pipeline code that many projects can call, so you fix a mistake once instead of in fifty Jenkinsfiles.",
+  "i": "Libraries load from a Git repository by version, expose steps in a vars/ directory and helpers in src/. Pin versions, test with a sandbox job and keep each step small and documented."
+ },
+ "cicd/jenkins-credentials-security-and-hardening": {
+  "s": "Jenkins holds the keys to your servers, so lock it down: store secrets properly, give people only the access they need and update it often.",
+  "i": "Use the credentials store with scoped IDs and masking, role-based authorization, an SSO login, no builds on the controller, script approval for sandboxed code and prompt patching of the core and plugins."
+ },
+ "cicd/jenkins-plugins-upgrades-and-operating-at-scale": {
+  "s": "Jenkins grows by plugins and by agents. Keep both under control: pin versions, upgrade on a schedule and write down the setup as code.",
+  "i": "Describe the controller with Jenkins Configuration as Code, list plugins in a file, upgrade the LTS line in a test instance first, monitor queue time and executor use, and keep backups restorable."
+ },
+ "cicd/jenkins-debugging-and-migrating-to-another-platform": {
+  "s": "When a Jenkins build is stuck or slow, check the queue, then the agent, then the log. If you decide to move to another tool, move one pipeline at a time.",
+  "i": "Use the queue reason, node status, thread dump and replay to debug. For a migration, inventory jobs, move build logic into scripts, translate triggers and credentials, run both systems in parallel and retire old jobs on a schedule."
+ },
+ "linux/debugging-with-strace-system-calls": {
+  "s": "strace shows every request a program makes to the operating system. When a program fails with a vague message, the last failing request usually tells you why.",
+  "i": "strace -f -tt -e trace=... follows children and times calls. Look for ENOENT, EACCES and ECONNREFUSED, blocked calls such as futex or poll, and the file or address involved. Use -c for a summary and attach with -p. It slows the target, so use it briefly."
+ },
+ "linux/seeing-the-network-with-ss-and-tcpdump": {
+  "s": "ss shows which programs are listening and connected. tcpdump shows the actual packets on the wire. Together they tell you where a connection breaks.",
+  "i": "Use ss -ltnp for listeners and ss -tn state for connections, then tcpdump -ni IFACE with a host, port and flags filter. SYN with no SYN-ACK means blocked or dropped; RST means refused; retransmissions mean loss."
+ },
+ "linux/open-files-and-proc-with-lsof": {
+  "s": "Every open file and socket is a numbered handle. lsof lists them, and /proc shows them for any process, so you can find who is holding a disk, a port or a lock.",
+  "i": "lsof -p PID, lsof -i :PORT and lsof +L1 answer who has it open. /proc/PID/fd, limits, status and cmdline show handles, limits and memory. A growing fd count is a leak; a deleted file still open keeps disk space."
+ },
+ "linux/finding-cpu-memory-and-io-hogs": {
+  "s": "A slow server is short of CPU, memory or disk. A few commands show which one it is and which process is using it.",
+  "i": "Read load average against core count, then top for CPU and memory, vmstat for run queue, swap and I/O wait, iostat -x for disk utilisation and await, and pidstat for per-process numbers. High wa or swap in/out means the bottleneck is not the CPU."
+ },
+ "linux/kernel-messages-journal-and-core-dumps": {
+  "s": "When something crashes the evidence is in the kernel log, the journal and sometimes a core file. Learn where each one is and how to read it.",
+  "i": "dmesg -T shows kernel events such as OOM kills and disk errors. journalctl -u, -p, -b and --since filter the journal. coredumpctl lists crashes and opens them in gdb. Persisting the journal across reboots keeps the evidence of the last crash."
+ },
+ "linux/ebpf-and-bpftrace-live-questions": {
+  "s": "eBPF lets you run small, safe programs inside the Linux kernel to count and time events without changing the app. bpftrace turns a one-line question into such a program.",
+  "i": "eBPF programs attach to probes (tracepoints, kprobes, uprobes), are verified by the kernel before they run and report through maps. bpftrace gives a short language for them, and tools like execsnoop, opensnoop and biolatency are ready-made. Overhead is low but not zero."
+ },
+ "linux/debugging-a-slow-or-hung-server-a-method": {
+  "s": "Debugging a slow server is easier with a fixed order of questions. Ask what is slow, what is short, who is using it and what changed.",
+  "i": "Use a USE-style walk through CPU, memory, disk and network (utilisation, saturation, errors), narrow to a process, then to a call or a log line, form one hypothesis, change one thing and measure again. Write down what you saw so the next person starts ahead."
+ },
+ "proxies/what-a-reverse-proxy-does": {
+  "s": "A reverse proxy is a server that receives requests on behalf of your apps and passes them on. Users talk to the proxy, never to the app directly.",
+  "i": "A reverse proxy terminates connections, routes by host and path, adds headers, can end TLS, balance, cache and limit traffic, and hides the backends. A forward proxy serves clients going out; a load balancer is a proxy focused on spreading load."
+ },
+ "proxies/nginx-configuration-servers-and-locations": {
+  "s": "nginx reads a text file made of nested blocks. A server block matches a site, and location blocks match the path of a request.",
+  "i": "Directives live in contexts (main, events, http, server, location). server_name and listen choose the server; location uses exact, prefix, regex and ^~ matching with a fixed order. nginx -t checks syntax and nginx -s reload applies it without dropping connections."
+ },
+ "proxies/proxying-to-upstreams-headers-and-buffers": {
+  "s": "When nginx passes a request to an app it should also tell the app who the user is and which host was asked for. It must also handle long-lived connections like WebSockets.",
+  "i": "proxy_pass sends requests to an upstream; proxy_set_header passes Host, X-Forwarded-For and X-Forwarded-Proto; proxy_http_version 1.1 with Upgrade headers supports WebSockets; buffering helps normal responses but hurts streaming. A trailing slash in proxy_pass changes the path sent."
+ },
+ "proxies/tls-termination-http2-and-certificates": {
+  "s": "The proxy holds the certificate and does the encryption with users. Keep the settings modern and renew certificates automatically.",
+  "i": "Configure listen 443 ssl with http2, a full-chain certificate, TLS 1.2 and 1.3, session reuse, HSTS and a redirect from port 80. Automate renewal with ACME clients and watch expiry. Choose re-encryption to backends when the internal network is not trusted."
+ },
+ "proxies/load-balancing-algorithms-and-health-checks": {
+  "s": "A load balancer shares requests among several servers and stops sending to the ones that fail.",
+  "i": "Round robin, weighted, least connections and hash methods suit different loads; ip_hash or a hash on a key gives stickiness. Passive checks mark a server down after failures; active checks probe a health endpoint. Slow start and connection draining protect servers during changes."
+ },
+ "proxies/timeouts-retries-keepalive-and-limits": {
+  "s": "A proxy has several timers. If they are wrong, healthy requests are cut off or slow ones hold connections forever.",
+  "i": "connect, send and read timeouts apply to the backend leg; client timeouts to the user leg. keepalive reuses connections to the backend; worker_connections and file limits cap concurrency. Retries amplify load, so cap them and keep timeouts shorter than the caller above."
+ },
+ "proxies/caching-compression-and-static-files": {
+  "s": "A proxy can answer repeat requests from memory or disk so the backend does less work. Compression makes responses smaller.",
+  "i": "sendfile and open_file_cache speed static files; proxy_cache with a key, valid times, stale serving and locking protect backends; gzip or brotli compress text. Never cache personalised responses without varying the key, and purge or version assets deliberately."
+ },
+ "proxies/rate-limiting-and-protecting-backends": {
+  "s": "A rate limit says how many requests one client may make. It keeps one noisy client from slowing everyone.",
+  "i": "limit_req uses a leaky bucket with burst and nodelay; limit_conn caps concurrent connections; the key (address, token, API key) decides who is counted. Return 429 with Retry-After, whitelist health checks, and combine with timeouts and body limits. Behind a CDN, key on the real client address."
+ },
+ "proxies/haproxy-frontends-backends-and-acls": {
+  "s": "HAProxy is a fast load balancer. A frontend listens, a backend holds servers, and ACLs decide which backend gets a request.",
+  "i": "Sections global, defaults, frontend, backend; ACLs match host, path, headers or source; use_backend and default_backend route; check, inter, rise and fall control health; stick tables track clients; the runtime socket and stats page expose live state and allow drain without reload."
+ },
+ "proxies/envoy-traefik-and-dynamic-proxies": {
+  "s": "Some proxies change their routes without a reload when services come and go. Envoy, Traefik and Caddy all work this way, in different styles.",
+  "i": "Envoy uses listeners, routes, clusters and endpoints, updated over xDS; Traefik reads labels or Kubernetes resources through providers with entrypoints, routers and services; Caddy gives automatic HTTPS with a short Caddyfile. Choose by environment, observability needs and who writes configuration."
+ },
+ "proxies/zero-downtime-reloads-and-blue-green-at-the-proxy": {
+  "s": "A proxy can reload without cutting users off, and it can send a small share of traffic to a new version first. Both reduce the risk of a change.",
+  "i": "Graceful reload keeps old workers until requests finish. Blue-green switches an upstream atomically; canary uses weights or headers to send a small share first. Drain, readiness checks, and a tested rollback complete the routine."
+ },
+ "proxies/debugging-502-504-and-proxy-problems": {
+  "s": "When users see 502 or 504 the proxy is the messenger. Check the proxy log, then the backend, to see which side failed.",
+  "i": "502 means a bad or no response from the upstream; 503 means no available upstream or deliberate overload; 504 means timeout. Compare proxy timings with direct backend requests, read error.log for the reason, log $upstream_status and $upstream_response_time, and check DNS caching of upstream names."
+ },
+ "messaging/queues-logs-and-pub-sub-choosing-a-model": {
+  "s": "Systems send messages so that the sender does not have to wait for the receiver. A queue hands each message to one worker; a log keeps messages so many readers can replay them.",
+  "i": "A queue (RabbitMQ, SQS) delivers each message to one consumer and removes it. Pub/sub fans a message out to many subscribers. A log (Kafka) appends messages in order and keeps them for a time so consumers track their own position and can replay."
+ },
+ "messaging/delivery-guarantees-ordering-and-idempotency": {
+  "s": "Networks lose and repeat messages. Most systems choose to repeat rather than lose, so consumers must cope with the same message arriving twice.",
+  "i": "At-most-once may lose messages; at-least-once may duplicate; exactly-once end to end needs idempotent processing or transactions. Ordering usually holds only within one partition or queue. Use idempotency keys, deduplication tables and upserts, and order by a key."
+ },
+ "messaging/rabbitmq-exchanges-queues-and-routing": {
+  "s": "In RabbitMQ producers send to an exchange, not to a queue. The exchange looks at routing rules called bindings and places copies in the right queues.",
+  "i": "Exchange types direct, topic, fanout and headers route by routing key or headers to bound queues; durable queues and persistent messages survive restarts; vhosts separate environments; the management UI and rabbitmqctl show queues, consumers and message rates."
+ },
+ "messaging/rabbitmq-acknowledgements-prefetch-and-dead-letters": {
+  "s": "A consumer tells the broker when it has finished with a message. If it crashes first the message goes back to the queue. Messages that keep failing go to a dead-letter queue.",
+  "i": "Manual acks give at-least-once. Prefetch limits unacknowledged messages per consumer to spread load and bound memory. Reject with requeue false, or time-limit messages, to route to a dead-letter exchange; use delayed retry queues with TTL; monitor ready, unacked and consumer counts."
+ },
+ "messaging/kafka-topics-partitions-and-brokers": {
+  "s": "Kafka stores messages in topics. A topic is split into partitions, each an ordered log on disk. More partitions mean more parallel readers.",
+  "i": "Records are appended to a partition chosen by key or round robin; each has an offset. Brokers host partitions; replicas copy them; a controller coordinates (KRaft mode replaces ZooKeeper). Ordering holds per partition; partition count sets maximum consumer parallelism and is hard to reduce."
+ },
+ "messaging/kafka-producers-consumers-and-consumer-groups": {
+  "s": "Producers choose how sure they want to be that a record was saved. Consumers in a group split the partitions and commit their position as they go.",
+  "i": "Producer settings acks, retries, idempotence, batching and compression; consumers poll, process, then commit offsets; groups assign partitions via a coordinator and rebalance when members change; commit after processing for at-least-once; static membership and cooperative rebalancing reduce disruption."
+ },
+ "messaging/kafka-replication-isr-and-durability": {
+  "s": "Every partition has copies on other brokers. If the leader dies, a follower takes over. Settings decide how many copies must have a record before it counts as saved.",
+  "i": "Replication factor sets copies; ISR is the caught-up set; acks=all plus min.insync.replicas defines durability and availability; unclean leader election trades data for uptime; rack awareness spreads replicas; controlled shutdown moves leaders before a restart."
+ },
+ "messaging/kafka-retention-compaction-and-storage": {
+  "s": "Kafka deletes old data by age or size, or keeps only the latest record for each key. That choice decides how much disk you need and what consumers can replay.",
+  "i": "retention.ms and retention.bytes delete whole segments; cleanup.policy=compact keeps the latest value per key and uses tombstones to delete; segment size and index settings affect cleanup timing; disks need headroom, and tiered storage moves old segments to object storage."
+ },
+ "messaging/kafka-lag-rebalances-and-capacity-in-operation": {
+  "s": "Operating Kafka means watching how far consumers are behind, whether replicas are healthy and whether disks and networks have room.",
+  "i": "Track consumer lag and its trend, under-replicated and offline partitions, request latency, ISR shrink events, disk, network and controller state. Respond to lag by checking consumer health before adding partitions; plan capacity with headroom and rolling restarts."
+ },
+ "messaging/managed-messaging-on-cloud-sqs-sns-pub-sub-and-event-hubs": {
+  "s": "Cloud providers run queues and streams for you. You trade some control for much less operating work.",
+  "i": "SQS is a queue and SNS a topic; Pub/Sub combines topics and subscriptions; Service Bus offers queues and topics with sessions; Event Hubs and Kinesis are partitioned logs; MSK and Confluent run Kafka for you. Check limits, ordering, retention, cost per request and portability."
+ },
+ "messaging/schemas-contracts-and-evolving-messages": {
+  "s": "A message is a contract between teams. When the format changes, old readers and old data must still work, so change it in compatible steps.",
+  "i": "Schemas describe fields and types; Avro and Protobuf are compact and carry evolution rules; a schema registry stores versions and enforces compatibility modes (backward, forward, full). Add optional fields with defaults, never reuse or retype a field, and expand then contract for breaking changes."
+ },
+ "messaging/debugging-messaging-incidents": {
+  "s": "Messaging problems show up as a growing backlog, missing messages, duplicates or wrong order. Each has a short list of causes to check in order.",
+  "i": "For backlog: consumer alive, processing slow, producer burst, partition skew. For loss: acks, retention, routing, unclean elections. For duplicates: redelivery, retries, rebalances. For order: partitions, retries, multiple consumers. Trace one message by id from producer to consumer, and keep dead letters visible."
+ },
+ "cfn-bicep/native-iac-cloudformation-bicep-or-terraform": {
+  "s": "Each big cloud ships its own infrastructure-as-code language. They are tightly integrated with the platform and free to use, but only work on one cloud.",
+  "i": "CloudFormation uses YAML or JSON templates and stacks; Bicep compiles to ARM templates and deploys through Azure Resource Manager. Both keep state in the cloud service, support new features early and need no state file. Terraform works across clouds but needs state storage."
+ },
+ "cfn-bicep/cloudformation-templates-parameters-and-resources": {
+  "s": "A template lists resources with their properties. Parameters make it reusable, outputs hand values to other stacks, and the stack is the running copy.",
+  "i": "Sections Parameters, Resources, Outputs, Conditions, Mappings; resource Type and Properties; Ref and Fn::GetAtt; aws cloudformation deploy and validate-template; logical id versus physical name; avoid hard-coded names to allow replacement."
+ },
+ "cfn-bicep/intrinsic-functions-conditions-and-mappings": {
+  "s": "Intrinsic functions compute values at deployment time. Conditions switch resources on and off, and mappings are lookup tables.",
+  "i": "Fn::Ref, GetAtt, Sub, Join, Select, Split, ImportValue, If, Equals, FindInMap; Conditions create resources only when true; Mappings map region or environment to values; pseudo parameters like AWS::Region; SSM parameter types for latest AMIs."
+ },
+ "cfn-bicep/stacks-change-sets-and-safe-updates": {
+  "s": "Updating a stack can change a resource in place or replace it with a new one. A change set shows which before anything happens.",
+  "i": "Create a change set, read Action and Replacement, execute or delete it; update behaviours No interruption, Some interruption, Replacement; UpdateReplacePolicy and DeletionPolicy; stack policies and termination protection; rollback on failure."
+ },
+ "cfn-bicep/nested-stacks-stacksets-and-reusable-modules": {
+  "s": "Big templates become hard to change. Nested stacks split them, and StackSets deploy one template to many accounts and regions.",
+  "i": "Nested stacks use AWS::CloudFormation::Stack with TemplateURL; limits of 500 resources per stack; exports and ImportValue couple stacks; StackSets with service-managed permissions in Organizations; CloudFormation modules and registry; cross-stack references via SSM parameters."
+ },
+ "cfn-bicep/drift-rollbacks-and-resource-protection": {
+  "s": "People change resources in the console. Drift detection finds where reality no longer matches the template, and import brings unmanaged resources under control.",
+  "i": "detect-stack-drift and describe-stack-resource-drifts; import existing resources into a stack; DeletionPolicy Retain; ROLLBACK_COMPLETE needs deleting before retry; UPDATE_ROLLBACK_FAILED continue-update-rollback; stack policies, IAM guardrails and CloudTrail to find who changed what."
+ },
+ "cfn-bicep/bicep-syntax-resources-and-parameters": {
+  "s": "Bicep is a short, typed language for Azure. You declare resources and let Azure Resource Manager work out the order.",
+  "i": "Keywords param, var, resource, output, module; resource symbolic names and API versions; decorators @allowed, @secure, @minLength, @description; string interpolation; implicit dependencies by reference; az deployment group create; bicep build and decompile."
+ },
+ "cfn-bicep/bicep-modules-loops-and-conditions": {
+  "s": "Modules are Bicep files used like functions. Loops create many resources from a list, and conditions decide whether a resource exists.",
+  "i": "module keyword with params and outputs; for loops over arrays and objects; if conditions; existing keyword to reference resources; scopes per module; Azure Container Registry as a module registry; br: and br/public aliases."
+ },
+ "cfn-bicep/bicep-deployments-what-if-and-scopes": {
+  "s": "Azure deployments can target a resource group, subscription, management group or tenant. What-if previews the changes before you apply them.",
+  "i": "targetScope; az deployment group/sub/mg/tenant create; what-if shows create, modify, delete, no change; incremental mode adds and updates, complete mode deletes unlisted resources; deployment history limit of 800 and automatic deletion; locks and Azure Policy."
+ },
+ "cfn-bicep/deployment-stacks-and-delivery-pipelines": {
+  "s": "A deployment stack tracks the resources a deployment created and can remove them when they leave the template. Pipelines run both tools safely with limited roles.",
+  "i": "Azure deployment stacks with deny settings and action on unmanage; GitHub Actions and Azure DevOps using OIDC federated credentials instead of stored secrets; CloudFormation deploy role and service role; per-environment approvals; artifacts and versioned templates."
+ },
+ "cfn-bicep/testing-linting-and-policy-checks-for-templates": {
+  "s": "Templates can be tested without deploying them. Linters find mistakes, policy rules enforce standards and a test deployment proves the result works.",
+  "i": "cfn-lint, cfn-guard rules, taskcat; Bicep linter rules and bicep build; PSRule for Azure; Checkov and Trivy for security scanning; what-if and change sets in CI; deploy to a short-lived environment and run smoke tests; pre-commit hooks."
+ },
+ "cfn-bicep/debugging-failed-deployments-and-moving-to-terraform": {
+  "s": "Most failures are one of a few kinds: a name taken, a permission missing, a quota reached, a bad value or a dependency. The error text names which.",
+  "i": "describe-stack-events and the first CREATE_FAILED; az deployment group show with error details and operations list; AuthorizationFailed, QuotaExceeded, InvalidTemplate, ResourceNotFound; CloudTrail and Activity Log; migration with terraform import, aws cloudformation import or aztfexport."
+ },
+ "gcp/google-cloud-organization-projects-and-billing": {
+  "s": "Everything in Google Cloud lives in a project. Projects sit in folders under an organization, and permissions and policies flow down that tree.",
+  "i": "Resource hierarchy organization, folders, projects; project id, name and number; IAM roles inherited downward; billing accounts linked to projects; budgets and alerts; labels; service enablement per project; landing zone patterns."
+ },
+ "gcp/gcloud-cli-configurations-and-automation": {
+  "s": "The gcloud command line controls every Google Cloud service. Named configurations keep project and account settings separate.",
+  "i": "gcloud init, auth login, config configurations, set project; application default credentials; service account impersonation; --format json/value/table and --filter; gcloud components; scripts with --quiet and --project; Cloud Shell."
+ },
+ "gcp/vpc-networks-subnets-and-firewall-rules": {
+  "s": "A Google Cloud VPC is global, with regional subnets. Firewall rules are applied to instances by tags or service accounts and deny incoming traffic by default.",
+  "i": "Custom mode VPC, regional subnets with CIDR ranges, implied deny ingress and allow egress; firewall rules by priority, tag and service account; Cloud Router and Cloud NAT; Private Google Access; VPC peering and Shared VPC; IAP for SSH."
+ },
+ "gcp/compute-engine-images-and-managed-instance-groups": {
+  "s": "Compute Engine runs virtual machines. For anything that must stay up, run them in a managed instance group built from a template instead of single hand-made servers.",
+  "i": "Machine families general purpose, compute, memory, GPU; custom machine types; images and instance templates; managed instance groups with autohealing, autoscaling and rolling updates; regional groups across zones; Spot VMs; startup scripts and OS Login."
+ },
+ "gcp/cloud-storage-and-persistent-disks": {
+  "s": "Cloud Storage holds objects in buckets. Disks hold the data of a single VM. Choose the right place, then protect it with versioning and snapshots.",
+  "i": "Buckets by location type and storage class (Standard, Nearline, Coldline, Archive); uniform bucket-level access; lifecycle rules; object versioning and retention; signed URLs; Persistent Disk types, snapshots and schedules; Filestore for NFS."
+ },
+ "gcp/gke-autopilot-and-standard-clusters": {
+  "s": "Google Kubernetes Engine runs the Kubernetes control plane for you. In Autopilot Google also manages the nodes; in Standard you manage node pools.",
+  "i": "Autopilot bills per pod resource requests; Standard bills for nodes; regional clusters; release channels; node pools, autoscaling and Spot; Workload Identity Federation for GKE; private clusters; Gateway API and load balancing; Config Connector and fleets."
+ },
+ "gcp/cloud-run-and-cloud-functions": {
+  "s": "Cloud Run runs a container and scales it from zero to many with no servers to manage. Each deploy creates a revision you can roll back to.",
+  "i": "gcloud run deploy from image or source; revisions and traffic splitting; concurrency, min and max instances, CPU allocation; request timeout; Secret Manager; VPC connector or Direct VPC egress; authentication with IAM invoker; Cloud Run jobs; functions triggered by events."
+ },
+ "gcp/cloud-sql-spanner-bigquery-and-firestore": {
+  "s": "Google Cloud has a database for each shape of data. Cloud SQL is managed MySQL, PostgreSQL or SQL Server; BigQuery is for analytics; Spanner and Firestore scale across regions.",
+  "i": "Cloud SQL high availability, read replicas, backups and point-in-time recovery, private IP, Auth Proxy; AlloyDB for heavy PostgreSQL; Spanner for global relational; Firestore documents; Bigtable wide-column; BigQuery slots, partitions and cost per bytes scanned."
+ },
+ "gcp/pub-sub-eventarc-and-cloud-tasks": {
+  "s": "Pub/Sub carries messages from publishers to subscribers. Eventarc turns events from Google services into calls, and Cloud Tasks runs individual jobs with rate limits.",
+  "i": "Topics, push and pull subscriptions, acknowledgement deadlines, retry policy, dead-letter topics, ordering keys, message retention and seek; Eventarc triggers to Cloud Run; Cloud Tasks queues with rate and retry settings; Cloud Scheduler for cron."
+ },
+ "gcp/observability-with-cloud-logging-monitoring-and-slos": {
+  "s": "Google Cloud collects logs and metrics from most services automatically. You add alerts and objectives on top so people are told before users complain.",
+  "i": "Cloud Logging log router and sinks, log-based metrics, Logs Explorer queries; Cloud Monitoring metrics, dashboards, alerting policies and notification channels; uptime checks; Trace and Profiler; Error Reporting; SLO monitoring with error budgets and burn-rate alerts; managed Prometheus."
+ },
+ "gcp/terraform-on-google-cloud": {
+  "s": "Terraform has an official Google provider. Keep state in a Cloud Storage bucket with versioning, and let a pipeline use a service account through a short-lived identity.",
+  "i": "google and google-beta providers, backend gcs with locking, impersonation and Workload Identity Federation for CI, project factory modules, import blocks, Cloud Foundation Toolkit, Config Connector, Infrastructure Manager; plan reviews and drift."
+ },
+ "gcp/security-cost-and-debugging-on-google-cloud": {
+  "s": "Most Google Cloud incidents come from broad permissions, exposed data and surprise cost. A few controls and a debugging routine cover them.",
+  "i": "Least-privilege IAM with predefined roles, IAM Recommender, conditions; organization policies such as no service account keys and no public IPs; VPC Service Controls perimeters; Cloud Audit Logs; Security Command Center; budgets, committed use, rightsizing; debug with PERMISSION_DENIED, quota and API-not-enabled errors, Policy Troubleshooter."
  }
 }
