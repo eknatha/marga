@@ -1598,5 +1598,425 @@
  "sre/senior-skills-interviewing-and-hiring-as-the-interviewer": {
   "s": "A good interview is a fair measuring tape applied the same way to everyone, not a mood ring that reflects the interviewer.",
   "i": "I define competencies and a scorecard first, ask realistic scenario questions with follow-ups, take notes, submit independent scores before the debrief, watch for bias and keep the candidate experience respectful."
+ },
+ "cicd/how-ci-platforms-differ": {
+  "s": "Every CI system watches for a change, starts a job on a worker and reports pass or fail. The three platforms differ in where the config lives, who runs the workers and how much you can change.",
+  "i": "All three run pipelines of jobs on runners triggered by events. Actions and GitLab CI are hosted by the forge with YAML beside the code, while Tekton is Kubernetes-native and runs as cluster resources. I pick by where code lives, who runs workers and how much customization is needed."
+ },
+ "cicd/actions-workflows-jobs-and-steps": {
+  "s": "A workflow is a YAML file that says when to run and what jobs to do. Each job runs steps on a fresh machine, and you read the run log to see where it broke.",
+  "i": "Workflows live in .github/workflows, are triggered by events and contain jobs that run in parallel on separate runners unless they declare needs. Steps either run shell or call actions, and step and job outputs pass values on. I scope the GITHUB_TOKEN with permissions."
+ },
+ "cicd/actions-triggers-matrices-and-caching": {
+  "s": "Triggers decide when a workflow runs. Matrices run the same job for many versions, and caches reuse downloaded files so builds finish faster.",
+  "i": "I scope on with branch and path filters, use matrix with fail-fast and include or exclude, cancel superseded runs with concurrency and cache with a key built from lockfile hashes. I avoid pull_request_target unless I understand its trust model."
+ },
+ "cicd/actions-reusable-workflows-and-composite-actions": {
+  "s": "Instead of copying the same pipeline into every repository, you write it once and call it. Reusable workflows share whole jobs, and composite actions share a few steps.",
+  "i": "workflow_call workflows take inputs and secrets and are called with uses at job level, while composite actions bundle steps behind an action.yml. I pin callers to a tag or SHA, document inputs and keep secrets explicit."
+ },
+ "cicd/actions-secrets-oidc-and-hardening": {
+  "s": "Workflows run code with access to secrets, so they need guarding. You keep secrets out of logs, pin third-party actions and let the cloud trust the workflow without storing a password.",
+  "i": "I use environment secrets with required reviewers, replace stored cloud keys with OIDC federation and id-token write, pin actions to SHAs, restrict token permissions and treat pull request title and branch names as untrusted input to avoid script injection."
+ },
+ "cicd/actions-runners-environments-and-deployments": {
+  "s": "Runners are the machines that do the work and environments guard where you deploy. You pick hosted for ease or self-hosted for control, and add approvals before production.",
+  "i": "Hosted runners are ephemeral and managed, while self-hosted runners suit private networks and special hardware but need isolation and patching. Environments add reviewers, wait timers and scoped secrets, and concurrency keeps one deploy per environment. I prefer ephemeral autoscaled runners."
+ },
+ "cicd/gitlab-ci-pipelines-stages-and-jobs": {
+  "s": "GitLab CI reads one file in your repository. You list stages in order, define jobs inside them and a runner executes each job in a container.",
+  "i": "A pipeline is built from stages and jobs in .gitlab-ci.yml. Jobs in a stage run in parallel, stages run in order, and each job runs in the image I choose with script, before_script and after_script. Variables set at several levels, with the most specific winning."
+ },
+ "cicd/gitlab-ci-rules-artifacts-and-caches": {
+  "s": "Rules decide which jobs run for each change, artifacts carry results to later jobs and caches save downloads. Mixing up artifacts and caches is the usual mistake.",
+  "i": "I use rules with if, changes and exists instead of only and except, workflow rules to avoid duplicate pipelines, artifacts for results between jobs and caches keyed by lockfile for dependencies. Cache is best-effort, artifacts are guaranteed."
+ },
+ "cicd/gitlab-ci-includes-templates-and-dynamic-pipelines": {
+  "s": "Large pipelines get unwieldy. You split them into files with include, reuse blocks with extends and run child pipelines for each part of a monorepo.",
+  "i": "I use include for local, project, remote and template files, extends and hidden jobs for reuse, trigger for parent and child pipelines and dynamic child pipelines generated from an artifact. I pin included project files to a ref."
+ },
+ "cicd/gitlab-runners-environments-and-security": {
+  "s": "A GitLab runner is the program that picks up your jobs. You choose where it runs, protect secrets with protected variables and gate production with environments.",
+  "i": "Runners register to an instance, group or project and use executors such as docker or kubernetes. I tag runners, use protected and masked variables, protected branches for deploy jobs, environments with approvals and job tokens or OIDC instead of long-lived keys."
+ },
+ "cicd/tekton-tasks-pipelines-and-workspaces": {
+  "s": "Tekton turns CI into Kubernetes objects. A Task is a list of container steps, a Pipeline links tasks, and a run object starts them as pods.",
+  "i": "A Task has steps that run in one pod and share workspaces and results. A Pipeline orders tasks with runAfter and params, and TaskRun and PipelineRun instantiate them. Workspaces map to volumes, and results pass small values between tasks."
+ },
+ "cicd/tekton-triggers-chains-and-production-use": {
+  "s": "Tekton does not watch your repository by itself. Triggers turn webhooks into runs, Chains signs what you built and RBAC and quotas keep the cluster safe.",
+  "i": "Triggers use EventListener, TriggerBinding and TriggerTemplate to create runs from events. Chains signs TaskRun results and produces provenance. In production I use dedicated service accounts, namespaces, quotas, pinned and signed task bundles, pruning and metrics."
+ },
+ "cicd/choosing-and-migrating-between-ci-platforms": {
+  "s": "There is no best CI tool, only the best fit for your team. You compare cost, security, scale and effort, then move one pipeline at a time.",
+  "i": "I compare hosting model, runner control, ecosystem, policy and audit, cost at scale and team skills. For migration I inventory pipelines, extract logic into scripts, move a pilot, run both in parallel and compare results before cutting over."
+ },
+ "baremetal/bmc-ipmi-and-redfish-automation": {
+  "s": "Every server has a small second computer called the BMC that works even when the main system is off. You use it to power servers on and off, set boot order and read sensors from far away.",
+  "i": "The BMC provides out-of-band power, console and sensor access over IPMI or the newer Redfish REST API. I keep it on an isolated management network, change default credentials, disable unused protocols and script power, boot and inventory tasks."
+ },
+ "baremetal/cloud-init-and-first-boot-configuration": {
+  "s": "cloud-init runs once when a machine first starts and applies settings such as users, keys and packages. It is how one generic image becomes many different servers.",
+  "i": "cloud-init reads metadata and user data from a datasource, runs modules in stages and writes logs under /var/log. I keep images generic, put identity in user data, make config idempotent and debug with cloud-init status and the logs."
+ },
+ "baremetal/firmware-and-bios-management-at-scale": {
+  "s": "Servers carry firmware in many places: BIOS, BMC, network cards and disks. You keep them on known versions and settings so machines behave the same.",
+  "i": "I define a firmware and BIOS baseline per hardware model, read it through Redfish or vendor tools, roll updates in waves with canaries and rollback plans, and check drift regularly. Settings such as power profile and virtualization flags are part of the baseline."
+ },
+ "baremetal/maas-and-ironic-bare-metal-provisioning": {
+  "s": "Tools like MAAS and Ironic treat physical servers like cloud machines. They discover hardware, test it and install an operating system on request through an API.",
+  "i": "MAAS and Ironic enroll machines through the BMC, commission them to collect hardware facts, then deploy images using PXE or virtual media with power control. I use them to get a repeatable lifecycle, tags, pools and an API for automation."
+ },
+ "baremetal/hardware-failure-diagnosis-and-rma": {
+  "s": "Hardware fails slowly and strangely. You read logs and sensors to find the failing part, prove it to the vendor and replace it without losing data.",
+  "i": "I correlate the BMC system event log, kernel messages, SMART and ECC counters to isolate a part, drain the node, run vendor diagnostics, collect evidence for an RMA and verify after the swap. I track failure rates by model and batch."
+ },
+ "baremetal/power-cooling-and-rack-capacity": {
+  "s": "A rack has a power budget and a heat budget. You add up what servers really draw, keep two feeds balanced and leave room so one failure does not take everything down.",
+  "i": "I budget per-rack kilowatts using measured draw rather than nameplate, keep A and B feeds balanced so either can carry the load, watch inlet temperature and airflow, and track stranded capacity. I place hot equipment where cooling can support it."
+ },
+ "baremetal/uefi-bootloaders-and-secure-boot": {
+  "s": "Before Linux starts, firmware picks a boot entry and loads a bootloader. Secure Boot checks that each piece is signed, which protects against tampered boot code.",
+  "i": "UEFI reads boot entries from NVRAM and loads a bootloader from the EFI system partition, which loads the kernel and initramfs. Secure Boot verifies signatures against enrolled keys. I manage entries with efibootmgr and plan for key and shim updates."
+ },
+ "sql-ops/pg-stat-statements-and-query-tuning": {
+  "s": "A database is often slow because of a handful of queries. pg_stat_statements counts every query shape so you can tune the ones that cost the most in total.",
+  "i": "I enable pg_stat_statements, order by total_exec_time, mean time and calls, compare before and after with a reset, read plans for the top offenders and fix with indexes, rewrites or caching. Normalized queries hide values, so I log samples separately."
+ },
+ "sql-ops/partitioning-and-data-retention": {
+  "s": "Huge tables get slow to maintain. Partitioning splits one table into smaller pieces so you can drop old data instantly and keep indexes small.",
+  "i": "I use declarative range partitioning by time for logs and events, create partitions ahead of time, drop or detach old ones instead of deleting rows, keep the partition key in queries so the planner prunes, and automate creation with a scheduled job."
+ },
+ "sql-ops/sql-backup-and-point-in-time-recovery-operations": {
+  "s": "A backup you have not restored is only a hope. You combine a base backup with the write-ahead log so you can return to the minute before a mistake.",
+  "i": "I take regular base backups, archive WAL continuously, store both off the server with retention, restore to a new host to a chosen timestamp and measure RPO and RTO. I run restore tests on a schedule and alert when archiving falls behind."
+ },
+ "sql-ops/online-schema-changes-without-downtime": {
+  "s": "A simple ALTER TABLE can lock a busy table and stop an application. You make changes in small safe steps and set time limits so locks cannot pile up.",
+  "i": "I set lock_timeout, add columns without volatile defaults, build indexes concurrently, backfill in small batches, add constraints as NOT VALID then validate, and use expand and contract across releases. I test the migration on realistic data size first."
+ },
+ "sql-ops/replicas-failover-and-switchover-operations": {
+  "s": "A replica keeps a copy of the data. You switch over on purpose for maintenance and fail over in emergencies, and you must make sure only one server accepts writes.",
+  "i": "I use streaming replication, watch replay lag in bytes and seconds, use a manager such as Patroni with a consensus store for automatic failover, fence the old primary to avoid split brain, rebuild old primaries as replicas and route clients through a stable endpoint."
+ },
+ "sql-ops/autovacuum-bloat-and-maintenance-windows": {
+  "s": "PostgreSQL leaves old row versions behind until vacuum cleans them. If vacuum falls behind, tables swell and queries slow, so you watch it and tune it.",
+  "i": "I monitor dead tuples, last autovacuum time and table size trends, tune scale factors and cost limits per hot table, find long transactions and replication slots that block cleanup, watch transaction ID age and use pg_repack or VACUUM FULL only in planned windows."
+ },
+ "sql-ops/database-incident-runbook": {
+  "s": "When the database is struggling, follow a fixed order of checks. You confirm what users see, look for the usual causes and apply the smallest safe fix first.",
+  "i": "I triage with a runbook: confirm scope, check connections, long queries and locks, disk and I/O, replication and recent changes, mitigate with the least risky action such as killing a blocker, and capture evidence for the review. I avoid restarting as a first move."
+ },
+ "service-mesh/sidecar-and-ambient-mesh-data-planes": {
+  "s": "A mesh puts a proxy beside each app or on each node. Sidecars give strong per-pod control, while ambient mode shares proxies per node to save resources.",
+  "i": "Sidecar meshes inject an Envoy proxy into every pod, which costs memory and CPU and ties proxy upgrades to pod restarts. Ambient mode uses a per-node layer 4 proxy and optional layer 7 waypoint proxies. I choose by resource cost, feature needs and risk."
+ },
+ "service-mesh/ingress-gateways-and-the-gateway-api": {
+  "s": "A gateway is the front door of your cluster. It terminates TLS, routes requests to services and applies edge policy before traffic enters the mesh.",
+  "i": "The Kubernetes Gateway API separates infrastructure roles with GatewayClass, Gateway and HTTPRoute. I terminate TLS at the gateway, route by host and path, set timeouts and limits, and keep mesh-internal and edge policy distinct."
+ },
+ "service-mesh/traffic-shifting-retries-and-timeouts": {
+  "s": "A mesh can send 5 percent of traffic to a new version and retry failed calls. Used carelessly, retries multiply load and make outages worse.",
+  "i": "I use weighted routing for canaries, set per-try and overall timeouts, limit retries with budgets and idempotency, add circuit breaking and outlier detection, and watch error rate and latency per version while shifting weights."
+ },
+ "service-mesh/mesh-authorization-and-zero-trust-policy": {
+  "s": "With mTLS every workload has an identity. Authorization policies use those identities to say who may call what, and deny everything else.",
+  "i": "I enforce strict mTLS, write AuthorizationPolicy with ALLOW rules by service account, namespace, method and path, start with a default deny per namespace, test in dry-run or audit first and review denials in logs before enforcing widely."
+ },
+ "service-mesh/multi-cluster-mesh-and-failover": {
+  "s": "A multi-cluster mesh lets services in different clusters call each other and fail over between them. It needs shared trust and careful network design.",
+  "i": "Multi-cluster needs a shared root of trust, cross-cluster service discovery and reachable gateways or flat networking. I use locality-aware load balancing with failover, keep clusters independent enough to survive each other's failure, and test failover regularly."
+ },
+ "service-mesh/mesh-performance-cost-and-resource-tuning": {
+  "s": "A mesh adds work to every request. You measure the added latency and memory, trim what each proxy knows and tune telemetry so the cost stays reasonable.",
+  "i": "I benchmark with and without the mesh, check proxy CPU, memory and added p99 latency, limit each workload's configuration with scoped sidecar resources, reduce high-cardinality metrics, size control plane resources and set proxy requests and limits."
+ },
+ "service-mesh/operating-and-upgrading-a-service-mesh": {
+  "s": "A mesh is critical infrastructure, so upgrades need a plan. You run the new version beside the old, move workloads in stages and keep a way back.",
+  "i": "I use revision-based canary upgrades, move namespaces with revision labels, restart workloads in waves, watch error rates and config push health, keep proxy and control plane versions within the supported skew and rehearse rollback."
+ },
+ "gpu-serving/quantization-and-model-sizing": {
+  "s": "A model must fit in GPU memory before it can run. Quantization stores weights with fewer bits, so bigger models fit on smaller GPUs with a small loss in quality.",
+  "i": "Weight memory is parameters times bytes per parameter, plus KV cache and overhead. FP16 uses 2 bytes, INT8 uses 1 and 4-bit formats use about half a byte. I compare quality on my own evaluation set before choosing a format."
+ },
+ "gpu-serving/batching-kv-cache-and-throughput": {
+  "s": "A GPU is most efficient when it serves many requests at once. Continuous batching and a well-managed cache raise throughput without making every user wait.",
+  "i": "Prefill processes the prompt in parallel and decode generates tokens one by one. Continuous batching adds and removes requests every step, paged attention manages the KV cache without fragmentation, and limits such as max batch tokens and max sequences set the latency and throughput balance."
+ },
+ "gpu-serving/multi-gpu-tensor-and-pipeline-parallelism": {
+  "s": "When a model does not fit on one GPU, you split it across several. Fast links between GPUs matter a lot, so placement decides performance.",
+  "i": "Tensor parallelism splits each layer across GPUs and needs fast NVLink-class links. Pipeline parallelism assigns layers to stages and tolerates slower links. If a model fits one GPU, replicas usually give better throughput and simpler failure handling."
+ },
+ "gpu-serving/autoscaling-llm-inference": {
+  "s": "CPU use is a poor signal for GPU model servers. You scale on queue depth or latency, keep some capacity warm because model loading is slow and cap spending.",
+  "i": "I scale on waiting requests, concurrency per replica or time to first token with KEDA or the HPA using custom metrics, set minimum replicas for warm capacity, use scale-down stabilization and cluster autoscaling for nodes, and set a maximum for cost control."
+ },
+ "gpu-serving/model-loading-caching-and-cold-starts": {
+  "s": "Big model files take minutes to download and load. Caching them near the GPU and using fast formats makes restarts and scaling much quicker.",
+  "i": "I use safetensors, store weights on a fast shared or node-local volume, pre-pull container images, verify checksums, warm pools before routing traffic and use readiness probes that wait until the model is loaded and answers a test request."
+ },
+ "gpu-serving/gpu-sharing-mig-and-time-slicing": {
+  "s": "A whole GPU is too big for many small jobs. You can split it into isolated slices or let jobs take turns, each with different trade-offs.",
+  "i": "MIG creates hardware-isolated partitions with guaranteed memory and compute. Time-slicing shares a GPU by switching without memory isolation, and MPS lets processes run concurrently. I choose MIG for isolation and predictable latency, and time-slicing for light dev workloads."
+ },
+ "gpu-serving/gpu-failures-xid-errors-and-recovery": {
+  "s": "GPUs fail in specific ways and leave codes in the kernel log. You learn to read them, take the node out of service and decide between a reset and a replacement.",
+  "i": "I watch dmesg for Xid errors, use DCGM health checks and ECC counters, distinguish application faults from hardware faults, cordon and drain the node, try a reset when allowed and replace parts that repeat. I automate detection and node isolation."
+ },
+ "aiops/telemetry-quality-for-aiops": {
+  "s": "AIOps tools are only as good as the data they read. Clean names, labels and time are worth more than a fancier model.",
+  "i": "I standardize service names, labels and timestamps, fix clock skew, track missing data and cardinality, keep a service catalog as the join key between metrics, logs, traces and incidents, and measure data quality as a metric."
+ },
+ "aiops/forecasting-capacity-and-saturation": {
+  "s": "Instead of waiting for a disk to fill, you forecast when it will. Simple trend lines with weekly patterns catch most capacity problems early.",
+  "i": "I use linear and seasonal forecasts on saturation metrics, alert on predicted time to full rather than current percentage, account for known events, review forecast error and keep models simple and explainable."
+ },
+ "aiops/llm-assistants-for-incident-response": {
+  "s": "A language model can summarize logs, draft status updates and find runbook steps quickly. It can also invent things, so a human checks anything that matters.",
+  "i": "I use LLMs for summarization, timeline drafts, runbook retrieval and stakeholder updates, ground answers in retrieved evidence with citations, redact sensitive data, require human approval for any action and log prompts and outputs for review."
+ },
+ "aiops/measuring-aiops-value-and-avoiding-hype": {
+  "s": "Does the tool actually help? You measure noise, detection time and resolution time before and after, and compare against a simple baseline.",
+  "i": "I define success metrics up front, such as alert volume, precision, recall, MTTD and MTTR, run a pilot with a control group or shadow mode, compare against a simple rule baseline, count the human cost of maintaining the tool and decide with data."
+ },
+ "aiops/runbook-automation-and-guardrails": {
+  "s": "Automating a runbook saves time, but a script that acts on a wrong signal can make an outage worse. Guardrails keep automation safe.",
+  "i": "I automate in stages: documented steps, a script a human runs, a script that suggests, then auto-run for low-risk actions. Each automation checks preconditions, supports dry run, limits blast radius with rate limits and circuit breakers, logs actions and has a rollback."
+ },
+ "argocd/argocd-sso-rbac-and-audit": {
+  "s": "Argo CD can deploy to your clusters, so who may use it matters. You sign in with single sign-on, give roles the least they need and keep a record of actions.",
+  "i": "I configure OIDC SSO, disable the local admin after bootstrapping, map groups to roles in argocd-rbac-cm, scope roles with AppProjects, restrict repositories and destinations, and send audit events and logs to central monitoring."
+ },
+ "argocd/argocd-notifications-and-image-updates": {
+  "s": "You want to hear when a deployment breaks, and you want new image versions to flow in without hand edits. Both can be done through Argo CD add-ons.",
+  "i": "Argo CD Notifications sends messages on triggers such as sync failed or health degraded with templates and subscriptions. Image updating writes new tags to Git by policy, so deployments remain reviewable and reversible."
+ },
+ "argocd/progressive-delivery-with-argo-rollouts": {
+  "s": "A normal Deployment replaces pods all at once. Argo Rollouts shifts traffic in steps and checks metrics, so a bad release is stopped before it reaches everyone.",
+  "i": "A Rollout resource replaces a Deployment and defines canary steps with weights and pauses, or a blue-green switch. AnalysisTemplates query metrics such as error rate, and the rollout aborts and rolls back automatically on failure."
+ },
+ "argocd/argocd-disaster-recovery-and-upgrades": {
+  "s": "Argo CD itself must survive failures. Because Git holds the desired state, you can rebuild it quickly if you keep its own configuration and secrets safe.",
+  "i": "I keep Argo CD configuration in Git, back up secrets and the Application and AppProject objects with argocd admin export, rehearse rebuilding a cluster from a bootstrap application, upgrade one minor version at a time after reading release notes and test in a non-production instance first."
+ },
+ "claude-skills/skills-for-runbooks-and-operations": {
+  "s": "A skill can hold a team's runbook so Claude follows the same steps every time. You write the order of checks, the safe commands and the points where a human must decide.",
+  "i": "An operations skill states when it applies, lists ordered checks with exact commands, includes read-only scripts, marks stop points that need approval, and records what it found. I keep dangerous actions out of the skill or behind explicit confirmation."
+ },
+ "claude-skills/skills-with-references-templates-and-assets": {
+  "s": "A skill folder can hold more than one file. The main file stays short, and extra files hold details Claude reads only when needed.",
+  "i": "SKILL.md holds the core instructions and links to reference files, templates and examples that load on demand. I keep each reference focused, name files clearly, avoid deep nesting and put rarely used detail outside the main file to save context."
+ },
+ "claude-skills/organizing-skills-for-a-team": {
+  "s": "When many people write skills, you need rules. Clear names, owners and reviews keep skills useful and safe.",
+  "i": "I use consistent names and descriptions, give every skill an owner and a review cycle, keep skills in a repository with pull requests and tests, version changes, publish a catalog, and retire unused or risky skills."
+ },
+ "claude-skills/evaluating-and-regression-testing-skills": {
+  "s": "A skill is only as good as its results. You keep a set of test prompts with expected behavior and run them whenever the skill changes.",
+  "i": "I create positive and negative trigger tests, task tests with graded outputs, run them with and without the skill, check script behavior separately, record scores per version and require results not to regress before merging changes."
+ },
+ "cloud-iam/gcp-iam-and-service-accounts": {
+  "s": "In Google Cloud you grant roles to identities on a resource, and permissions flow down the hierarchy. Service accounts are identities for workloads and should not use downloaded keys.",
+  "i": "IAM binds principals to roles at organization, folder, project or resource level, with inheritance downward. I use predefined or custom roles, avoid basic roles, give workloads dedicated service accounts, use impersonation and workload identity instead of keys, and review with policy analysis."
+ },
+ "cloud-iam/workload-identity-federation-and-oidc-trust": {
+  "s": "Instead of storing a cloud key in your CI system, the cloud trusts a signed token that proves who the job is. Tokens are short-lived, and trust rules limit who may use them.",
+  "i": "Federation uses OIDC: a workload gets a signed token from its platform, the cloud validates it against the issuer, and exchanges it for temporary credentials if claims such as repository, branch or service account match. I pin subject and audience in the trust policy."
+ },
+ "cloud-iam/permission-boundaries-scps-and-guardrails": {
+  "s": "Policies grant access, but guardrails set the maximum. An organization can say that no account may ever disable logging, whatever a local admin writes.",
+  "i": "Service control policies limit what every identity in an account can do, permission boundaries cap what a role can be granted, and organization policies enforce settings. Effective permission is the intersection of grants and guardrails, and explicit deny wins."
+ },
+ "cloud-iam/iam-policy-analysis-and-unused-access": {
+  "s": "Over time roles collect permissions nobody uses. Tools show what was actually used and who can reach what, so you can trim access with evidence.",
+  "i": "I use access analyzers to find external and unused access, last-accessed data to shrink policies, policy simulators to test changes, generate least-privilege policies from logs and remove permissions in steps with monitoring for denials."
+ },
+ "helm/testing-and-linting-helm-charts": {
+  "s": "A chart is code, so it needs tests. You lint it, render it, validate the output and try it on a throwaway cluster before anyone depends on it.",
+  "i": "I run helm lint and helm template in CI, validate rendered manifests with a Kubernetes schema checker, add a values.schema.json, write unit tests for templates and run chart-testing install and upgrade tests on a temporary cluster."
+ },
+ "helm/library-charts-and-chart-reuse": {
+  "s": "Fifty services should not mean fifty copies of the same Deployment template. A library chart holds shared templates that each service chart reuses.",
+  "i": "A library chart has type library and provides named templates through include. Service charts depend on it and call its templates with their values. I version the library, keep its interface small and use umbrella charts only where services deploy together."
+ },
+ "helm/publishing-and-signing-helm-charts": {
+  "s": "Charts are software artifacts. You package them, push them to a registry and sign them so users can verify where a chart came from.",
+  "i": "I package charts with a version, push to an OCI registry, authenticate with short-lived tokens, sign with cosign or a provenance file and verify before install. Release from CI only and keep versions immutable."
+ },
+ "helm/helm-security-and-supply-chain": {
+  "s": "A chart can create any Kubernetes object, including risky ones. You review what you install, scan what it renders and enforce policy at admission.",
+  "i": "I pin chart and image versions, render and review third-party charts, scan manifests and images, avoid charts requesting privileged settings, limit who can install cluster-wide objects, keep secrets out of values files and enforce Pod Security and policy at admission."
+ },
+ "k8s-ops/control-plane-monitoring-and-slos": {
+  "s": "The cluster's brain needs monitoring like any service. You watch the API server, etcd and controllers and set targets for how well the platform should work.",
+  "i": "I scrape API server request latency and error rate, etcd commit and fsync latency and database size, scheduler and controller work queues and certificate expiry, alert on symptoms and define platform SLOs for API availability and scheduling latency."
+ },
+ "k8s-ops/persistent-storage-and-csi-operations": {
+  "s": "Stateful apps need volumes that survive pods. You choose storage classes, expand volumes, snapshot them and fix volumes that will not attach or detach.",
+  "i": "A StorageClass names a CSI provisioner and parameters. PVCs bind to PVs, volumes attach to nodes and mount into pods. I enable expansion, use snapshots and volume snapshot classes, set reclaim policy deliberately and debug attach and mount errors by reading events and CSI logs."
+ },
+ "k8s-ops/multi-tenancy-namespaces-and-fair-sharing": {
+  "s": "Many teams can share one cluster if each gets a fenced area with limits. Namespaces, quotas and policies make the fences.",
+  "i": "I give each team namespaces with resource quotas, limit ranges, RBAC, network policies and policy controls, use priority classes and fair-share scheduling, label everything for cost and ownership, and use separate clusters when isolation needs are strict."
+ },
+ "k8s-ops/cluster-disaster-recovery-runbook": {
+  "s": "If a cluster is lost, you should be able to rebuild it and restore the data. That takes a plan, backups and practice.",
+  "i": "I separate cluster rebuild, from infrastructure code and configuration in Git, from state recovery, with etcd and volume backups. I define RPO and RTO, back up secrets and certificates safely, rehearse a full rebuild and document the order of steps."
+ },
+ "llm/embeddings-and-vector-search": {
+  "s": "An embedding turns text into a list of numbers so that similar meanings sit close together. Search then finds the nearest vectors instead of matching exact words.",
+  "i": "Embedding models map text to dense vectors, and cosine similarity or dot product measures closeness. I chunk documents sensibly, store vectors with metadata in an index such as HNSW, combine vector and keyword search and evaluate retrieval with real queries."
+ },
+ "llm/retrieval-augmented-generation": {
+  "s": "A model does not know your documents. RAG searches them first and gives the best passages to the model, so answers come from your sources.",
+  "i": "RAG retrieves relevant chunks, builds a prompt with them and instructions to answer only from that context with citations, then returns the answer and sources. I evaluate retrieval and answer quality separately, handle no-result cases and enforce access controls at retrieval."
+ },
+ "llm/fine-tuning-versus-prompting-versus-rag": {
+  "s": "When a model gives bad results, you can change the prompt, add retrieved documents or train it further. Each fixes a different kind of problem.",
+  "i": "Prompting fixes instructions and format, RAG supplies missing or changing knowledge and fine-tuning changes consistent style, format or narrow skills. I start with prompts and evaluation, add RAG for knowledge, and fine-tune only when a measured gap remains."
+ },
+ "llm/llm-safety-privacy-and-data-handling": {
+  "s": "Prompts can contain private data and models can be tricked. You decide what leaves your systems, what is stored and how untrusted text is treated.",
+  "i": "I classify data before sending it, redact secrets and personal data, choose providers and retention settings by policy, treat retrieved and user text as untrusted to resist prompt injection, limit tool permissions and log with care so logs do not become a leak."
+ },
+ "mcp/designing-good-tools-for-agents": {
+  "s": "A model only knows what your tool descriptions tell it. Clear names, small inputs and useful error messages make the difference between a tool that works and one that confuses.",
+  "i": "I give tools specific names and descriptions of when to use them, keep inputs few and typed with enums, return concise structured results with identifiers, make errors actionable, separate read and write tools and add confirmation for destructive actions."
+ },
+ "mcp/testing-and-debugging-mcp-servers-with-the-inspector": {
+  "s": "Before connecting a server to a model, you test it directly. The MCP Inspector lets you call tools by hand and see the exact messages.",
+  "i": "I use the MCP Inspector to list and call tools, check schemas and outputs, write unit tests for tool functions and integration tests over stdio, log to stderr for stdio servers, validate inputs and compare behavior across clients."
+ },
+ "mcp/deploying-and-scaling-mcp-servers": {
+  "s": "Local servers run on a developer's machine. Shared servers run remotely over HTTP, so they need authentication, limits and monitoring like any service.",
+  "i": "Remote MCP servers use streamable HTTP, authenticate clients with OAuth or tokens, run in containers with health checks and resource limits, apply rate limits and timeouts, keep state out of process where possible and emit logs, metrics and traces per tool call."
+ },
+ "mcp/composing-multiple-mcp-servers": {
+  "s": "Real agents use tools from several servers at once. You keep each server focused, name tools clearly and limit how many tools the model must choose from.",
+  "i": "A client can connect to many servers, and their tools appear together. I keep servers small and focused, namespace tools, limit which tools each agent sees, watch the context cost of many tool descriptions and test combinations for conflicting names and overlapping purposes."
+ },
+ "mlops/feature-stores-and-data-versioning": {
+  "s": "A model fails quietly when training and serving compute features differently. A feature store defines each feature once, and dataset versions let you rebuild any model.",
+  "i": "A feature store provides one definition for offline training data and online serving, with point-in-time correct joins to avoid leakage. I version datasets and feature definitions, record lineage from raw data to model and monitor feature freshness."
+ },
+ "mlops/model-evaluation-ab-tests-and-shadow-deployments": {
+  "s": "A better score on a test set does not prove a better product. You check slices of data, run the new model in shadow and then test it with a small share of real users.",
+  "i": "I evaluate on held-out data with metrics tied to the goal, break results down by slice, run shadow deployments to compare outputs on live traffic without affecting users, then run A/B tests or canaries with guardrail metrics and a rollback plan."
+ },
+ "mlops/ml-pipelines-and-workflow-orchestration": {
+  "s": "Training should be a pipeline anyone can rerun, not a notebook only one person understands. An orchestrator runs the steps, retries failures and records every run.",
+  "i": "I split work into steps such as ingest, validate, train, evaluate and register, run them on an orchestrator like Airflow, Argo Workflows or Kubeflow Pipelines, cache unchanged steps, pass artifacts by reference, set retries and resource requests, and trigger by schedule or data change."
+ },
+ "mlops/llmops-prompts-evals-and-versioning": {
+  "s": "Prompts and model choices change behavior as much as code does. You version them, test them against examples and watch cost and quality in production.",
+  "i": "I store prompts in version control with variables and tests, pin model versions, run an evaluation suite on every change, release with canaries, track tokens, latency and cost per request, log traces and collect feedback to grow the test set."
+ },
+ "openstack/cinder-glance-and-storage-services": {
+  "s": "Cinder provides block volumes for instances, and Glance stores the images they boot from. Both usually sit on shared storage such as Ceph.",
+  "i": "Cinder creates and attaches volumes through backend drivers, supports snapshots and backups and enforces quotas. Glance stores images with properties. With Ceph, volumes and images are RBD objects, so boot from volume and copy-on-write clones are fast."
+ },
+ "openstack/horizon-heat-and-openstack-automation": {
+  "s": "Clicking in a dashboard does not scale. You automate with the CLI, SDKs and templates, so environments are repeatable.",
+  "i": "Horizon is the web dashboard, the openstack CLI and SDKs call the same APIs, Heat describes stacks in templates, and Terraform's OpenStack provider is an alternative. I keep infrastructure in code, use application credentials and clean up with stack deletion."
+ },
+ "openstack/deploying-openstack-with-kolla-ansible": {
+  "s": "Kolla-Ansible installs OpenStack services as containers on your hosts using Ansible. You describe the cluster in a few files and it does the rest.",
+  "i": "Kolla builds service containers and Kolla-Ansible deploys them from an inventory with globals.yml and passwords.yml. I use bootstrap, prechecks, deploy and post-deploy steps, override configuration per service, use rolling upgrades and keep configuration in version control."
+ },
+ "openstack/openstack-monitoring-and-capacity-planning": {
+  "s": "A cloud needs two views: is the control plane healthy and is there room for new workloads. You collect metrics for both and plan before you run out.",
+  "i": "I monitor API latency and errors per service, RabbitMQ queues, the database, Ceph health, nova-compute heartbeats and hypervisor usage, track overcommit and free capacity per flavor, forecast growth and set quotas that reflect real capacity."
+ },
+ "prompting/prompting-for-code-and-infrastructure": {
+  "s": "Models write useful scripts and configs when you give them the context, limits and a way to check the result. You still run tests and review before anything reaches production.",
+  "i": "I supply the environment, versions, constraints and expected behavior, ask for small diffs with explanations, request tests and edge cases, run linters and dry runs, and never apply generated infrastructure changes without a plan or review."
+ },
+ "prompting/prompt-injection-and-defensive-prompting": {
+  "s": "Text a model reads can contain instructions. If your application lets the model act, a hidden instruction in an email or web page may try to take control.",
+  "i": "Direct injection comes from the user, indirect injection hides in content the model reads. I separate instructions from data, minimize tool permissions, require approval for sensitive actions, validate outputs and tool arguments, restrict data flows and test with adversarial examples."
+ },
+ "prompting/agents-and-multi-step-workflows": {
+  "s": "A workflow follows steps you define. An agent decides its own steps in a loop. Agents are flexible, and workflows are predictable. Many tasks only need a workflow.",
+  "i": "I prefer fixed workflows such as chaining, routing and parallel steps when the path is known, and use an agent loop with tools when the path is not known. I set step and cost limits, checkpoints, logging, error handling and human approval for risky actions."
+ },
+ "prompting/evaluating-prompts-with-datasets": {
+  "s": "You cannot improve a prompt you cannot measure. A small set of real examples with expected answers tells you whether a change helped.",
+  "i": "I collect real inputs, label expected outputs or criteria, define exact and rubric checks, run each prompt version over the set, compare scores and cost, spot-check model graders against human labels and grow the set from production failures."
+ },
+ "virtualization/vm-backup-replication-and-recovery": {
+  "s": "A VM is a file plus configuration, so it can be copied. But a good backup must be consistent and restorable, and you only know that by testing it.",
+  "i": "I use application-consistent snapshots with guest agents, back up changed blocks, keep copies off the primary storage, replicate to a second site for fast failover, set retention by policy and test restores including network and boot checks."
+ },
+ "virtualization/vm-templates-cloud-init-and-image-pipelines": {
+  "s": "Hand-made templates drift and nobody knows what is in them. An image pipeline builds a fresh, tested image from code every time.",
+  "i": "I build images with Packer or similar from a base ISO or cloud image, apply configuration with Ansible, harden and scan the result, remove machine-specific data, test boot with cloud-init and publish versioned images. Instances get identity from cloud-init, not from the image."
+ },
+ "virtualization/gpu-passthrough-and-device-assignment": {
+  "s": "Passthrough hands a physical device, such as a GPU, directly to one VM. The VM gets near-native speed, but the host and other VMs lose access to it.",
+  "i": "PCI passthrough uses the IOMMU and the VFIO driver to assign a device to a guest. I enable IOMMU, check IOMMU groups, bind the device to vfio-pci, attach it to the VM and plan for no live migration and for host reset behavior."
+ },
+ "virtualization/hypervisor-security-and-isolation": {
+  "s": "A hypervisor holds many machines, so a mistake there reaches all of them. You keep it patched, limit who manages it and separate what guests can see.",
+  "i": "I minimize the hypervisor attack surface, patch quickly, restrict and log management access, isolate management, storage and guest networks, use sVirt or equivalent confinement, protect images and snapshots, apply CPU mitigations as advised and separate workloads by trust."
+ },
+ "ansible/ansible-performance-and-execution-strategies": {
+  "s": "Ansible gets slow on big fleets if you leave the defaults. A few settings make runs much faster and safer.",
+  "i": "I raise forks, enable SSH pipelining and ControlPersist, cache or disable fact gathering, use async for long tasks, choose strategies such as free, and roll out with serial batches, max_fail_percentage and run_once for single-host steps."
+ },
+ "ansible/writing-custom-ansible-modules-and-filters": {
+  "s": "When no module does what you need, you can write one in Python. It must report changes honestly and be safe to run again.",
+  "i": "A custom module reads arguments, checks the current state, changes only when needed, supports check mode and returns changed and facts as JSON. Filters transform data in templates. I test them with unit tests and use existing modules first."
+ },
+ "git/git-internals-objects-refs-and-the-index": {
+  "s": "Git stores snapshots as objects named by their hash. Branches are just small files pointing at commits, which is why they are cheap.",
+  "i": "Git has four object types: blob, tree, commit and tag, addressed by content hash. Refs such as branches and tags point to commits, HEAD points to a ref, and the index is the staging area for the next tree. I use plumbing commands to inspect and recover state."
+ },
+ "git/release-and-hotfix-workflows-with-git": {
+  "s": "Releases need a stable point in history and a way to fix bugs in it without taking everything new. Branches, tags and cherry-pick give you that.",
+  "i": "I tag releases with annotated, signed tags, create release branches when several versions need support, develop hotfixes from the release tag or branch, cherry-pick fixes to other branches with the -x flag and automate versioning and changelogs from commit messages."
+ },
+ "go/configuration-logging-and-metrics-in-go-services": {
+  "s": "A service needs settings from outside, logs people can search and metrics for dashboards. Go's standard library and one small client cover all three.",
+  "i": "I load configuration with flags and environment variables with validation and defaults, log structured JSON with log/slog and request IDs, expose a metrics endpoint with the Prometheus client, add health endpoints and keep secrets out of logs."
+ },
+ "go/writing-kubernetes-clients-and-controllers-in-go": {
+  "s": "Operators and controllers are Go programs that watch Kubernetes and make the world match a desired state. Informers and queues make that efficient and reliable.",
+  "i": "client-go talks to the API server. Informers cache objects and deliver events, work queues deduplicate and retry keys, and a reconcile function compares desired and actual state and acts idempotently. I use controller-runtime for real controllers and add leader election and metrics."
+ },
+ "bash/log-analysis-one-liners-and-pipelines": {
+  "s": "Most incidents start with a log file and a question. A few commands piped together can count errors, find slow requests and show who is calling most.",
+  "i": "I filter with grep or awk, extract fields with cut and awk, aggregate with sort and uniq -c, compute percentiles with sort and awk, parse JSON logs with jq, work in streaming fashion with tail -F and keep useful pipelines in a script."
+ },
+ "databases/database-observability-and-capacity-planning": {
+  "s": "Database problems build slowly and then hit suddenly. The right handful of metrics show trouble early and let you plan growth.",
+  "i": "I track the golden signals per database: latency, traffic, errors and saturation, plus connections, locks, replication lag, cache hit ratio, disk and WAL growth. I alert on symptoms and time to full, and forecast capacity from trends."
+ },
+ "storage/storage-benchmarking-with-fio": {
+  "s": "A single speed number does not describe storage. fio lets you test the access pattern your application actually uses and read the latency, not just the throughput.",
+  "i": "I use fio with direct I/O and job files that match the workload: block size, random or sequential, read-write mix, queue depth and number of jobs, then read IOPS, bandwidth and latency percentiles. I test on a scratch volume and compare with the provider's limits."
+ },
+ "security/web-and-api-attacks-for-operators": {
+  "s": "Most web attacks abuse a few ideas: trusting input, skipping an access check or letting the server make requests for the attacker. Operators see them first in logs.",
+  "i": "Injection, broken access control, SSRF, insecure deserialization and API abuse are common causes of breaches. I recognize patterns in logs, use parameterized queries, enforce authorization on the server, restrict outbound requests, apply rate limits and a web application firewall and test regularly."
+ },
+ "security/sast-dast-and-dependency-scanning-gates": {
+  "s": "Scanners find problems early, but too many findings train people to ignore them. You choose the right tools, tune them and block only on what matters.",
+  "i": "SAST analyzes source, SCA scans dependencies, DAST tests a running app, and secret and IaC scanners check other risks. I run fast scans on every pull request, deeper ones on a schedule, set severity thresholds, triage with owners and SLAs and track false positives."
+ },
+ "security/cloud-posture-and-misconfiguration-management": {
+  "s": "Most cloud breaches come from settings, not clever exploits. Posture management checks your accounts continuously for risky configuration and drift.",
+  "i": "I scan with a cloud security posture tool and IaC scanners, use benchmarks such as CIS, prioritize by exposure and data sensitivity, fix findings in the infrastructure code instead of by hand, add guardrails to prevent recurrence and track time to remediate."
+ },
+ "security/security-champions-and-secure-code-review": {
+  "s": "Security cannot be a gate at the end. Champions inside teams and short review checklists catch issues where they are cheapest to fix.",
+  "i": "I run a champions program with training, time and a direct line to the security team, use small checklists for review of authentication, authorization, input handling, secrets and logging, threat model new features briefly and track recurring issues to improve libraries and templates."
+ },
+ "security/incident-forensics-and-evidence-handling": {
+  "s": "In a breach, what you do first can destroy evidence. You preserve what matters, record each step and build a timeline before cleaning up.",
+  "i": "I contain without destroying evidence, capture volatile data first, snapshot disks and export cloud logs to protected storage, hash and document everything for chain of custody, build a timeline from multiple sources and involve legal and management early."
+ },
+ "security/audit-readiness-and-continuous-compliance-evidence": {
+  "s": "Audits ask you to prove that your controls work. If evidence is collected automatically all year, an audit is a review, not a scramble.",
+  "i": "I map each control to a technical check and an owner, collect evidence automatically from systems such as access reviews, change records and scan results, keep an immutable log, track exceptions and run internal reviews before the external audit."
  }
 }
