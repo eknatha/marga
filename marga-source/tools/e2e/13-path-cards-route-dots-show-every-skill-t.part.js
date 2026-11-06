@@ -247,20 +247,40 @@
     await ctx.close();
   });
 
-  await test('placement check: ten questions, a result, a suggested stage', async () => {
+  await test('placement diagnostic: pick a goal, three questions per skill, saved result, plan and track', async () => {
     const { ctx, page } = await open(); await go(page, '/');
-    await page.click('a[href="#/placement"]'); await page.waitForSelector('#pl .opt');
-    for (let i = 0; i < 10; i++) {
-      eq((await page.textContent('.qcount')).trim(), `Question ${i + 1} of 10`);
-      await page.locator('#pl .opt').first().click();
-      await page.click('#pl-next');
+    await page.click('a[href="#/placement"]'); await page.waitForSelector('.pd-goal');
+    eq(await page.locator('.pd-goal').count(), 4, 'four goals');
+    await page.locator('.pd-goal[data-goal="sre"]').click(); await page.waitForSelector('#pd .opt');
+    for (let i = 0; i < 18; i++) {
+      eq((await page.textContent('.qcount')).trim().split('.')[0], `Question ${i + 1} of 18`);
+      if (i === 0) await page.click('#pd-skip'); else await page.locator('#pd .opt').first().click();
+      await page.click('#pd-next');
     }
-    await page.waitForSelector('.pl-res');
-    eq(await page.locator('.pl-res li').count(), 5, 'five stage rows');
-    ok(/of 10 correct/.test(await page.textContent('#pl h2')), 'score shown');
-    ok(await page.locator('#pl .btn-primary').count() === 1, 'primary action');
-    const before = await progress(page); eq(Object.keys((before && before.lessons) || {}).length, 0, 'nothing unlocked');
-    await page.click('#pl-again'); await page.waitForSelector('#pl .opt');
+    await page.waitForSelector('.pd-res');
+    eq(await page.locator('.pd-row').count(), 6, 'six skill rows');
+    ok(/of 18 correct/.test(await page.textContent('#pd h2')), 'score shown');
+    ok(await page.locator('#pd a[href="#/plan/sre-60"]').count() === 1, 'plan link');
+    ok(await page.locator('#pd a[href="#/track/run-it-reliably"]').count() === 1, 'track link');
+    const sv = await progress(page);
+    ok(sv && sv.pd && sv.pd.goal === 'sre' && sv.pd.of === 18, 'result saved');
+    await page.reload(); await page.waitForSelector('#pd-show'); await page.click('#pd-show'); await page.waitForSelector('.pd-res');
+    await page.click('#pd-again'); await page.waitForSelector('.pd-goal');
+    await ctx.close();
+  });
+
+  await test('project tracks: four tracks, stages with ticks that save and count', async () => {
+    const { ctx, page } = await open(); await go(page, '/tracks');
+    eq(await page.locator('.plan-card').count(), 4, 'four tracks');
+    await page.locator('.plan-card h2 a').first().click(); await page.waitForSelector('.trk-stage');
+    eq(await page.locator('.trk-stage').count(), 6, 'six stages');
+    ok(await page.locator('.trk-stage a[href^="#/lesson/"]').count() >= 12, 'lesson links');
+    const first = page.locator('.trk-stage').first().locator('input[type=checkbox]').first();
+    await first.check();
+    ok(/^1 of \d+/.test(await page.locator('[data-trk-count="0"]').textContent()), 'stage count updates');
+    await page.reload(); await page.waitForSelector('.trk-stage');
+    ok(await page.locator('.trk-stage').first().locator('input[type=checkbox]').first().isChecked(), 'tick survives reload');
+    await go(page, '/track/nope'); ok(/not found/i.test(await page.textContent('#main h1')), 'unknown track');
     await ctx.close();
   });
 
@@ -283,7 +303,7 @@
     const { ctx, page, issues } = await open(); await go(page, '/practice'); await page.waitForSelector('.pr-cmd');
     eq(await page.locator('.pr-feat .prac a').count(), 3, 'three featured tools');
     for (const h of ['#/explainers', '#/architecture', '#/drills']) eq(await page.locator(`.prac a[href="${h}"]`).count(), 1, h + ' appears once');
-    eq(await page.locator('.pr-li').count(), 44, '44 tools');
+    eq(await page.locator('.pr-li').count(), 47, '47 tools');
     eq(await page.locator('.pr-node').count(), 5, 'five groups');
     eq(await page.locator('.pr-week li').count(), 7, 'week strip');
     const t1 = await page.textContent('.pr-cmd h2');
@@ -298,7 +318,7 @@
     await page.fill('#pr-q', 'terraform');
     ok((await page.locator('.pr-li:not([hidden])').count()) >= 1 && (await page.locator('.pr-li:not([hidden])').count()) < 6, 'search narrows');
     await page.fill('#pr-q', 'zzzqqq'); eq(await page.locator('#pr-empty').isVisible(), true, 'empty state');
-    await page.click('#pr-empty [data-act="pr-clear"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 44, 'clear shows all');
+    await page.click('#pr-empty [data-act="pr-clear"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 47, 'clear shows all');
     await page.click('[data-flag="starred"]'); eq(await page.locator('.pr-li:not([hidden])').count(), 0, 'no favourites yet');
     await page.click('[data-flag="all"]');
     await page.click('.pr-li[data-id="yaml"] .pr-star'); eq(await page.getAttribute('.pr-li[data-id="yaml"] .pr-star', 'aria-pressed'), 'true', 'starred');

@@ -1,5 +1,5 @@
 import json,sys,os,re
-N='/home/claude/new44'; I='src/i18n'
+N='/home/claude/new46'; I='src/i18n'
 keys=[l.split('|',1)[0] for l in open(N+'/en.txt',encoding='utf8').read().split('\n') if l.strip()]
 bad=0
 for code in 'te hi ta kn ml bn es de fr pt mr id gu ru'.split():

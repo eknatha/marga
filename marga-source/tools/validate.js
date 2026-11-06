@@ -385,10 +385,12 @@ function checkCode() {
     const payload = JSON.stringify(yamlJobs.map((b) => b.code));
     const py = `
 import sys, json, yaml
+class L(yaml.SafeLoader): pass
+L.add_multi_constructor('!', lambda l, suf, node: None)
 res = []
 for src in json.load(sys.stdin):
     try:
-        list(yaml.safe_load_all(src)); res.append(None)
+        list(yaml.load_all(src, Loader=L)); res.append(None)
     except Exception as e:
         res.append(str(e).split("\\n")[0])
 print(json.dumps(res))
@@ -503,7 +505,7 @@ function checkBudgets() {
 
 
 // ---------------------------------------------------------------- 8. references, interview, promise, voice, print
-const REF_HOSTS = /^https:\/\/([a-z0-9-]+\.)*(tigera\.io|smb\.com|nvmexpress\.org|ibm\.com|canonical\.com|maas\.io|ipxe\.org|syslinux\.org|tftp-hpa\.org|intel\.com|supermicro\.com|dell\.com|opencomputeproject\.org|gateway-api\.sigs\.k8s\.io|linkerd\.io|smartmontools\.org|dmtf\.org|kubernetes\.io|docker\.com|hashicorp\.com|terraform\.io|aws\.amazon\.com|microsoft\.com|azure\.com|prometheus\.io|sre\.google|python\.org|man7\.org|rfc-editor\.org|opentelemetry\.io|grafana\.com|helm\.sh|kernel\.org|gnu\.org|redhat\.com|ubuntu\.com|debian\.org|nginx\.org|openssh\.com|argoproj\.github\.io|cncf\.io|opencontainers\.org|github\.com|tekton\.dev|knative\.dev|cloud\.google\.com|cloudflare\.com|iptables\.org|netfilter\.org|systemd\.io|freedesktop\.org|kubectl\.docs\.kubernetes\.io|kustomize\.io|pypa\.io|pytest\.org|readthedocs\.io|postgresql\.org|jenkins\.io|semver\.org|owasp\.org|nist\.gov|slsa\.dev|sigstore\.dev|open-policy-agent\.org|aquasec\.com|trivy\.dev|podman\.io|buildah\.io|etcd\.io|cni\.dev|istio\.io|envoyproxy\.io|linuxfoundation\.org|cisecurity\.org|google\.com|w3\.org|ietf\.org|letsencrypt\.org|github\.io|gitlab\.com|hashicorp\.github\.io|opengroup\.org|jq\.dev|jqlang\.github\.io|curl\.se|openssl\.org|lvm2\.sourceware\.org|sourceware\.org|kernel\.dk|brendangregg\.com|netflix\.github\.io|principlesofchaos\.org|litmuschaos\.io|chaos-mesh\.org|pagerduty\.com|atlassian\.com|dora\.dev|12factor\.net|martinfowler\.com|apache\.org|elastic\.co|fluentbit\.io|fluentd\.org|vector\.dev|jaegertracing\.io|loki\.io|thanos\.io|victoriametrics\.com|containerd\.io|continuousdelivery\.com|keepachangelog\.com|fluxcd\.io|keda\.sh|karpenter\.sh|cilium\.io|openfeature\.dev|selinuxproject\.org|shellcheck\.net|everything\.curl\.dev|jqlang\.org|amazonaws\.com|mozilla\.org|tcpdump\.org|wireshark\.org|wireguard\.com|nftables\.org|cisa\.gov|oauth\.net|openpolicyagent\.org|kyverno\.io|mitre\.org|opengroup\.org|sigstore\.dev|ansible\.com|redis\.io|mysql\.com|mongodb\.com|pgbouncer\.org|pgbackrest\.org|use-the-index-luke\.com|git-scm\.com|go\.dev|golang\.org|conventionalcommits\.org|trunkbaseddevelopment\.com|anthropic\.com|claude\.com|modelcontextprotocol\.io|json-schema\.org|mlflow\.org|kubeflow\.org|evidentlyai\.com|libvirt\.org|qemu\.org|linux-kvm\.org|openvswitch\.org|ceph\.com|openstack\.org|proxmox\.com|nvidia\.com|huggingface\.co|vllm\.ai|xfs\.org)(\/|$)/;
+const REF_HOSTS = /^https:\/\/([a-z0-9-]+\.)*(tigera\.io|smb\.com|nvmexpress\.org|ibm\.com|canonical\.com|maas\.io|ipxe\.org|syslinux\.org|tftp-hpa\.org|intel\.com|supermicro\.com|dell\.com|opencomputeproject\.org|gateway-api\.sigs\.k8s\.io|linkerd\.io|smartmontools\.org|dmtf\.org|kubernetes\.io|docker\.com|hashicorp\.com|terraform\.io|aws\.amazon\.com|microsoft\.com|azure\.com|prometheus\.io|sre\.google|python\.org|man7\.org|rfc-editor\.org|opentelemetry\.io|grafana\.com|helm\.sh|kernel\.org|gnu\.org|redhat\.com|ubuntu\.com|debian\.org|nginx\.org|nginx\.com|protobuf\.dev|haproxy\.org|rabbitmq\.com|traefik\.io|caddyserver\.com|confluent\.io|opentofu\.org|openssh\.com|argoproj\.github\.io|cncf\.io|opencontainers\.org|github\.com|tekton\.dev|knative\.dev|cloud\.google\.com|cloudflare\.com|iptables\.org|netfilter\.org|systemd\.io|freedesktop\.org|kubectl\.docs\.kubernetes\.io|kustomize\.io|pypa\.io|pytest\.org|readthedocs\.io|postgresql\.org|jenkins\.io|semver\.org|owasp\.org|nist\.gov|slsa\.dev|sigstore\.dev|open-policy-agent\.org|aquasec\.com|trivy\.dev|podman\.io|buildah\.io|etcd\.io|cni\.dev|istio\.io|envoyproxy\.io|linuxfoundation\.org|cisecurity\.org|google\.com|w3\.org|ietf\.org|letsencrypt\.org|github\.io|gitlab\.com|hashicorp\.github\.io|opengroup\.org|jq\.dev|jqlang\.github\.io|curl\.se|openssl\.org|lvm2\.sourceware\.org|sourceware\.org|kernel\.dk|brendangregg\.com|netflix\.github\.io|principlesofchaos\.org|litmuschaos\.io|chaos-mesh\.org|pagerduty\.com|atlassian\.com|dora\.dev|12factor\.net|martinfowler\.com|apache\.org|elastic\.co|fluentbit\.io|fluentd\.org|vector\.dev|jaegertracing\.io|loki\.io|thanos\.io|victoriametrics\.com|containerd\.io|continuousdelivery\.com|keepachangelog\.com|fluxcd\.io|keda\.sh|karpenter\.sh|cilium\.io|openfeature\.dev|selinuxproject\.org|shellcheck\.net|everything\.curl\.dev|jqlang\.org|amazonaws\.com|mozilla\.org|tcpdump\.org|wireshark\.org|wireguard\.com|nftables\.org|cisa\.gov|oauth\.net|openpolicyagent\.org|kyverno\.io|mitre\.org|opengroup\.org|sigstore\.dev|ansible\.com|redis\.io|mysql\.com|mongodb\.com|pgbouncer\.org|pgbackrest\.org|use-the-index-luke\.com|git-scm\.com|go\.dev|golang\.org|conventionalcommits\.org|trunkbaseddevelopment\.com|anthropic\.com|claude\.com|modelcontextprotocol\.io|json-schema\.org|mlflow\.org|kubeflow\.org|evidentlyai\.com|libvirt\.org|qemu\.org|linux-kvm\.org|openvswitch\.org|ceph\.com|openstack\.org|proxmox\.com|nvidia\.com|huggingface\.co|vllm\.ai|xfs\.org)(\/|$)/;
 function checkExtras() {
   // official references on every lesson, module and sheet
   const checkRefs = (what, refs) => {
@@ -1078,6 +1080,40 @@ function checkWidgets() {
   if (!/assets\/widgets\.js/.test(html)) err('widgets', 'widgets.js is not loaded by the page');
 }
 
+function checkTracks() {
+  const dir = path.join(SRC, 'tracks');
+  if (!fs.existsSync(dir)) { err('tracks', 'src/tracks is missing'); return; }
+  const modIds = JSON.parse(read(path.join(SRC, 'content/modules.json'))).map((m) => m.id);
+  const lessonSet = new Set();
+  for (const m of modIds) { const d = path.join(SRC, 'content', m); if (fs.existsSync(d)) for (const f of fs.readdirSync(d).filter((x) => x.endsWith('.md'))) lessonSet.add(m + '/' + f.replace(/^\d+-/, '').replace(/\.md$/, '')); }
+  const bad = /\bgit(ops|leaks|ea)/i; const glyph = /[\u2190-\u21FF\u2600-\u27BF\u{1F300}-\u{1FAFF}]/u;
+  const ids = new Set(); let n = 0;
+  for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.json')).sort()) {
+    let list; try { list = JSON.parse(read(path.join(dir, f))); } catch (x) { err('tracks', f + ': bad JSON'); continue; }
+    for (const t of list) {
+      n++; const E = (m) => err('tracks', `${t.id || '?'}: ${m}`);
+      if (!/^[a-z0-9-]+$/.test(t.id || '')) E('bad id'); else if (ids.has(t.id)) E('duplicate id'); else ids.add(t.id);
+      for (const k of ['title', 'summary', 'level', 'who', 'needs', 'outcome']) if (!t[k] || typeof t[k] !== 'string') E('missing ' + k);
+      if (!(t.hours >= 10)) E('hours missing');
+      if (!Array.isArray(t.tools) || t.tools.length < 2) E('needs at least 2 tools');
+      if (!Array.isArray(t.stages) || t.stages.length < 5) { E('needs at least 5 stages'); continue; }
+      t.stages.forEach((s, i) => {
+        const S = (m) => E(`stage ${i + 1}: ${m}`);
+        for (const k of ['title', 'goal', 'keep']) if (!s[k] || typeof s[k] !== 'string') S('missing ' + k);
+        if (!Array.isArray(s.learn) || s.learn.length < 2) S('needs at least 2 lessons');
+        else for (const l of s.learn) if (!lessonSet.has(l)) S('unknown lesson ' + l);
+        if (!Array.isArray(s.build) || s.build.length < 3) S('needs at least 3 build steps');
+        if (!Array.isArray(s.check) || s.check.length < 3) S('needs at least 3 checks');
+        if (!s.breakit || !s.breakit.do || !s.breakit.see || !s.breakit.fix) S('needs a breakit step with do, see and fix');
+        const text = [t.title, t.summary, t.who, t.needs, t.outcome, s.title, s.goal, s.keep].concat(s.build || [], s.check || [], s.breakit ? [s.breakit.do, s.breakit.see, s.breakit.fix] : []).join(' ');
+        if (bad.test(text)) S('banned word'); if (glyph.test(text)) S('emoji or arrow glyph');
+      });
+    }
+  }
+  count('project tracks', n);
+  if (n < 4) err('tracks', 'expected at least 4 tracks');
+}
+
 function checkPlans() {
   const dir = path.join(SRC, 'plans');
   if (!fs.existsSync(dir)) return;
@@ -1085,7 +1121,7 @@ function checkPlans() {
   const order = {}; for (const m of modIds) { const d = path.join(SRC, 'content', m); order[m] = fs.existsSync(d) ? fs.readdirSync(d).filter((x) => x.endsWith('.md')).sort().map((f) => m + '/' + f.replace(/^\d+-/, '').replace(/\.md$/, '')) : []; }
   const lessonSet = new Set(Object.values(order).flat());
   const widgetIds = new Set(); const wdir = path.join(SRC, 'widgets'); if (fs.existsSync(wdir)) for (const f of fs.readdirSync(wdir).filter((x) => x.endsWith('.json'))) for (const w of JSON.parse(read(path.join(wdir, f)))) widgetIds.add(w.id);
-  const okHash = /^#\/(flashcards|games|calculators|placement|widgets(\?skill=[a-z0-9-]+)?|system-design-lab|design-interview|interview\/mock|terminal-labs(\/(linux|bash|networking|python|kubernetes|docker|cloud))?|linux|playground\/(go|hcl|python|sql|yaml)|capstones|today|daily|mix|weak)$/;
+  const okHash = /^#\/(flashcards|games|calculators|placement|tracks|broken-servers|track\/[a-z0-9-]+|widgets(\?skill=[a-z0-9-]+)?|system-design-lab|design-interview|interview\/mock|terminal-labs(\/(linux|bash|networking|python|kubernetes|docker|cloud))?|linux|playground\/(go|hcl|python|sql|yaml)|capstones|today|daily|mix|weak)$/;
   const bad = /\bgit(ops|leaks|ea)/i; const glyph = /[←-⇿☀-➿\u{1F300}-\u{1FAFF}]/u; const junk = /\bundefined\b|\bNaN\b|\[object Object\]|\bTODO\b|\bFIXME\b|lorem ipsum/;
   const ids = new Set(); let n = 0;
   for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.json')).sort()) {
@@ -1210,6 +1246,7 @@ const steps = [
   ['case files', checkCaseFiles],
   ['interactive widgets', checkWidgets], ['lesson stories and senior views', checkStories],
   ['learning plans', checkPlans],
+  ['project tracks', checkTracks],
   ['languages (Telugu, Hindi, Tamil, Kannada, Malayalam, Bengali, Spanish, German, French, Portuguese)', checkI18n]
 ];
 for (const [name, fn] of steps) {

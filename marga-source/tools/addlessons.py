@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate lessons from compact sources: python3 tools/addlessons.py <module> /home/claude/new44/<module>.txt"""
+"""Generate lessons from compact sources: python3 tools/addlessons.py <module> /home/claude/new46/<module>.txt"""
 import sys, os, re, json, glob
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 C = os.path.join(ROOT, 'src/content')
@@ -58,5 +58,5 @@ for i, k in enumerate(seq, 1):
 json.dump(refs, open(C + '/refs.json', 'w'), ensure_ascii=False, indent=1)
 json.dump(lev, open(C + '/levels.json', 'w'), ensure_ascii=False, indent=1)
 json.dump(st, open(sp, 'w'), ensure_ascii=False, indent=1)
-open('/home/claude/new44/en.txt', 'a', encoding='utf8').write('\n'.join(en) + '\n')
+open('/home/claude/new46/en.txt', 'a', encoding='utf8').write('\n'.join(en) + '\n')
 print(mod, 'added', len(en), 'total', nxt - 1)
