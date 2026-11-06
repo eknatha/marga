@@ -18,5 +18,33 @@
  "observing-and-troubleshooting-the-mesh": {
   "r": "Checkout failed even though every pod was Running, because 40 proxies were STALE after the control plane ran out of memory. istioctl proxy-status found the cause in seconds.",
   "x": "Check config sync first, read the flag, check endpoints and policies, and run more than one control plane replica."
+ },
+ "sidecar-and-ambient-mesh-data-planes": {
+  "r": "A cluster with thousands of small pods spent more memory on sidecars than on the applications. Moving to a shared per-node model cut overhead and made upgrades less disruptive.",
+  "x": "The data plane design sets your cost, blast radius and upgrade story. Pick it deliberately and measure the overhead before you commit a whole fleet."
+ },
+ "ingress-gateways-and-the-gateway-api": {
+  "r": "Two teams edited one shared ingress object and broke each other's routes. Splitting into a platform-owned Gateway and per-team routes let each team change only its own rules.",
+  "x": "The edge is where mistakes become public. Separate who owns the listener from who owns the routes, and review every change to exposed hosts and certificates."
+ },
+ "traffic-shifting-retries-and-timeouts": {
+  "r": "A slow dependency caused every caller to retry three times. Load tripled on the struggling service and a small slowdown became an outage. Retry budgets and shorter timeouts stopped the storm.",
+  "x": "Resilience features interact. Retries, timeouts and queues must be designed together from the user's deadline backwards."
+ },
+ "mesh-authorization-and-zero-trust-policy": {
+  "r": "A flat network let any pod call the payments service. After identities and allow rules, only checkout could reach it, and a compromised test pod could no longer reach payment data.",
+  "x": "Zero trust means every call is authenticated and authorized, not just encrypted. Policy must be small, reviewed and observable, or teams will disable it to get work done."
+ },
+ "multi-cluster-mesh-and-failover": {
+  "r": "A region failed and traffic moved to a second cluster that had no spare capacity. The failover worked as designed but overloaded the healthy side, so capacity planning became part of the design.",
+  "x": "Multi-cluster improves availability only if failure domains stay independent. Shared control planes, shared certificates and shared capacity can quietly make two clusters fail together."
+ },
+ "mesh-performance-cost-and-resource-tuning": {
+  "r": "The mesh worked in staging but proxies in a large cluster used gigabytes of memory because each knew about every service. Scoping configuration to the namespaces each workload used cut memory by 70 percent.",
+  "x": "Every feature has a per-request price. Collect only the telemetry you use, and make cost a visible metric of the platform."
+ },
+ "operating-and-upgrading-a-service-mesh": {
+  "r": "An in-place control plane upgrade left proxies on an old version that could not understand new configuration. Traffic failed for some services until the team rolled back and adopted revision-based upgrades.",
+  "x": "Treat the mesh like a database engine: version skew is a real risk. Upgrades must be reversible, staged and observed."
  }
 }

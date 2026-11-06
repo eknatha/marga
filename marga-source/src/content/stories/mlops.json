@@ -30,5 +30,21 @@
  "debugging-ml-systems-in-production": {
   "r": "Recommendations lost conversion for two days. Two retrains changed nothing. A pipeline had begun filling a column with nulls after an upstream change, and no data check existed to notice.",
   "x": "Debug ML bottom-up: what changed, data, features versus training, replay from logs, then the model and serving. One layer at a time, then add the check that would have caught it."
+ },
+ "feature-stores-and-data-versioning": {
+  "r": "A model scored well in testing and poorly in production because a feature was computed with different rounding online. Using one shared definition removed the mismatch.",
+  "x": "Training and serving skew is the most common silent ML bug. Make the data path the same for both, and make every dataset reproducible."
+ },
+ "model-evaluation-ab-tests-and-shadow-deployments": {
+  "r": "A new recommender had a higher offline score but lowered purchases for new users. Slice analysis and an A/B test showed the problem before a full launch.",
+  "x": "Offline metrics are a filter, and online results are the verdict. Define success and guardrails before the experiment so the decision is not argued afterwards."
+ },
+ "ml-pipelines-and-workflow-orchestration": {
+  "r": "A model could not be retrained after its author left because the notebook depended on local files. Rebuilding it as a pipeline made retraining a button press and exposed hidden steps.",
+  "x": "If you cannot rerun it, you cannot trust it. Pipelines turn ML work into repeatable, reviewable and schedulable software."
+ },
+ "llmops-prompts-evals-and-versioning": {
+  "r": "A silent change to a hosted model alias changed output formatting and broke a parser. Pinning the model version and running evaluations on upgrades turned that into a planned change.",
+  "x": "A language model application has three moving parts: code, prompts and a model. Version and test all three, because any one can break the product."
  }
 }

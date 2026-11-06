@@ -30,5 +30,21 @@
  "openstack-ops-maintenance-evacuation-and-a-day-two-runbook": {
   "r": "A compute host lost its network but kept running, and an operator evacuated its instances because the service showed down. Several databases ended up writing to the same volumes from two hosts. The runbook now requires powering off through the out-of-band controller first.",
   "x": "Fence before you evacuate or you risk two copies of one instance writing to the same volume. Prefer boot from volume for important workloads and keep a short, tested runbook."
+ },
+ "cinder-glance-and-storage-services": {
+  "r": "Instances took ten minutes to boot because images were copied from Glance to local disk each time. Using Ceph for both services made clones nearly instant.",
+  "x": "In OpenStack the storage layer decides boot speed, resilience and failure behavior. Understand the path from image to volume to instance before the first big deployment."
+ },
+ "horizon-heat-and-openstack-automation": {
+  "r": "A tester built a lab by hand and nobody could recreate it. After moving it into a Heat template, an identical environment took five minutes to build and tear down.",
+  "x": "Everything in OpenStack is an API call, so everything can be code. Prefer declarative templates for environments and reserve the dashboard for exploration."
+ },
+ "deploying-openstack-with-kolla-ansible": {
+  "r": "A manual installation drifted between three controllers and nobody knew why one behaved differently. A containerized, declarative deployment made all three identical and upgrades repeatable.",
+  "x": "A cloud platform needs the same repeatability as the apps on it. Declarative configuration, prechecks and staged upgrades turn a risky project into routine work."
+ },
+ "openstack-monitoring-and-capacity-planning": {
+  "r": "Users saw instances stuck in scheduling while the dashboard looked healthy. The message queue had grown huge, and an alert on queue depth would have shown the problem hours earlier.",
+  "x": "Monitor the cloud like a service with users. Control plane health protects operations, and capacity forecasts protect new launches."
  }
 }

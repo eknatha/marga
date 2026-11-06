@@ -18,5 +18,33 @@
  "replication-lag-vacuum-and-day-two-operations": {
   "r": "New orders were missing for several minutes on a lagging standby, then the primary ran out of disk. An unused replication slot held 412 GB of WAL after a reporting replica was switched off. Dropping the slot freed the disk.",
   "x": "Day-two work is monitoring and discipline: lag and slot alerts, per-table autovacuum tuning, backward-compatible migrations with lock timeouts, and scheduled restore tests against RPO and RTO."
+ },
+ "pg-stat-statements-and-query-tuning": {
+  "r": "A dashboard query ran 200 times a second and took only 4 ms, but it used more time than any slow report. Ranking by total time showed it, and one index cut database CPU in half.",
+  "x": "Tune by total cost, not by how scary a single query looks. The biggest win is often a cheap query called too often."
+ },
+ "partitioning-and-data-retention": {
+  "r": "A nightly delete of old events ran for hours, bloated the table and blocked vacuum. Switching to monthly partitions turned retention into a drop that finished in milliseconds.",
+  "x": "Retention is an operational feature. Design tables so old data can leave cheaply, and make sure queries and constraints respect the partition key."
+ },
+ "sql-backup-and-point-in-time-recovery-operations": {
+  "r": "A bad migration deleted a table at 14:03. Because WAL was archived, the team restored to 14:02 on a new server and exported the table, instead of losing a day of data.",
+  "x": "Backups are judged by restore time and data loss, not by job success. Practice the restore until it is boring, and write down the actual numbers."
+ },
+ "online-schema-changes-without-downtime": {
+  "r": "A migration added an index on a hot table without CONCURRENTLY. It waited for a lock, then blocked every write behind it for four minutes, which looked like a full outage.",
+  "x": "Migration safety is about lock queues, not only runtime. A fast statement that waits behind a long transaction can stall everything that arrives after it."
+ },
+ "replicas-failover-and-switchover-operations": {
+  "r": "After a network partition the old primary kept accepting writes while a new one was promoted. Two diverging copies of the data had to be reconciled by hand, which took days.",
+  "x": "Failover is a decision about data loss and uptime. Automate it only with fencing, quorum and tested procedures, and know what it costs in lost transactions."
+ },
+ "autovacuum-bloat-and-maintenance-windows": {
+  "r": "A table grew to ten times its useful size because a forgotten transaction held back cleanup for weeks. After ending it and tuning autovacuum, the table stabilized and queries recovered.",
+  "x": "Vacuum is continuous maintenance, not an emergency tool. Alert on its backlog and on anything that prevents it from removing old data."
+ },
+ "database-incident-runbook": {
+  "r": "Latency spiked every afternoon. The runbook found a report query holding locks and exhausting connections. Killing it and moving the report to a replica ended the incident, and the evidence made the postmortem simple.",
+  "x": "Calm, ordered checks beat clever guesses. A shared runbook lets any on-call engineer reach the same diagnosis quickly."
  }
 }

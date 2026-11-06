@@ -1,50 +1,102 @@
 {
-"pipeline-fundamentals": {
-"r": "A team deployed by hand every other week and each release was an event. After building a pipeline that ran tests and deployed on every merge, releases became small and boring, and rollbacks took minutes.",
-"x": "A pipeline encodes how you trust change. Keep it fast and deterministic, fail early, build once and promote, and measure lead time and change failure rate to learn whether it is helping."
-},
-"building-a-pipeline": {
-"r": "A pipeline passed on the build server but a secret printed in a log line exposed a token. Masking credentials and using short-lived deploy tokens stopped the leak from being useful.",
-"x": "Pipelines hold powerful credentials. Give each job the minimum access, pin tool versions, separate build from deploy permissions and review pipeline changes as carefully as production code."
-},
-"testing-and-quality-gates": {
-"r": "A flaky test failed one run in five, so engineers learned to re-run until green and ignored a real failure one day. Quarantining the flaky test and fixing it restored trust in red builds.",
-"x": "A gate is only useful if people believe it. Keep tests fast and reliable, track flaky ones as defects, and place checks where they give the cheapest early signal."
-},
-"deployment-strategies": {
-"r": "A new version with a performance bug was released to five percent of users first. Metrics showed latency rising, an automatic rollback ran, and only a handful of users noticed.",
-"x": "Choose a strategy by the cost of being wrong and your ability to detect it. Canary needs good metrics and automatic judgement; database changes need backward compatible steps so rollback is possible."
-},
-"versioning-and-artifacts": {
-"r": "A bug fix was rebuilt for production from source, and the new build contained a different dependency than the tested one. Promoting the same artifact through each environment removed that gap.",
-"x": "Build once, promote the same artifact and record exactly what is in it. Keep artifacts immutable and traceable to a commit, and plan retention so you can rebuild or roll back."
-},
-"pipeline-security": {
-"r": "A malicious package was pulled into a build through an unpinned dependency. Pinning versions with checksums and scanning in CI meant the next such attempt failed the build.",
-"x": "Assume the build environment is a target. Isolate runners, avoid long-lived secrets, verify what you import, sign what you produce, and limit who can change the pipeline definition."
-},
-"declarative-delivery-with-argo-cd": {
-"r": "Someone changed a setting directly in the cluster to fix an issue and forgot to record it. The pull-based controller noticed the drift, reported it and restored the declared state, which exposed the missing change in the repository.",
-"x": "Pull-based delivery makes the repository the source of truth and drift visible. Plan secrets, ordering and rollbacks, and be clear about who may still change the cluster directly."
-},
-"release-management-and-feature-flags": {
-"r": "A risky feature was merged behind a flag that was off. It was turned on for staff first, then one percent of users, then everyone, and switched off in seconds when an issue appeared.",
-"x": "Flags separate deploy from release, but they are also debt. Give each flag an owner and an expiry, test both states and watch for combinations that nobody has tried."
-},
-"fast-pipelines-caching-parallelism-monorepos": {
-"r": "A forty-minute pipeline made people batch changes together, which made failures harder to find. Caching, parallel jobs and running only affected tests brought it under ten minutes, and changes got smaller again.",
-"x": "Pipeline speed shapes behaviour. Measure where time goes, cache with care for correctness, and avoid optimisations that let stale results through."
-},
-"reusable-pipelines-and-templates": {
-"r": "Thirty repositories copied the same pipeline file, and a security fix had to be applied thirty times. A shared, versioned template let the fix ship once.",
-"x": "Shared pipelines centralise good practice and also centralise risk. Version them, test changes against sample projects, and let teams pin or opt in so one change cannot break everyone."
-},
-"debugging-pipelines": {
-"r": "A job passed locally and failed in CI. Comparing tool versions showed the CI runner used an older compiler, and a stale cache hid it on some runs. Pinning versions and clearing the cache made results consistent.",
-"x": "Reproduce the pipeline environment locally, separate flaky from deterministic failures and look for hidden state in caches, shared runners and environment variables. Fix classes of failure, not single runs."
-},
-"environments-promotion-and-approvals": {
-"r": "A release reached production without anyone checking the staging results because the approval step was just a button. Linking approval to evidence such as test results and a change record made it meaningful.",
-"x": "Approvals should add information, not delay. Automate what can be checked by a machine, keep human approval for real judgement, and keep an audit record that is easy to produce."
-}
+ "pipeline-fundamentals": {
+  "r": "A team deployed by hand every other week and each release was an event. After building a pipeline that ran tests and deployed on every merge, releases became small and boring, and rollbacks took minutes.",
+  "x": "A pipeline encodes how you trust change. Keep it fast and deterministic, fail early, build once and promote, and measure lead time and change failure rate to learn whether it is helping."
+ },
+ "building-a-pipeline": {
+  "r": "A pipeline passed on the build server but a secret printed in a log line exposed a token. Masking credentials and using short-lived deploy tokens stopped the leak from being useful.",
+  "x": "Pipelines hold powerful credentials. Give each job the minimum access, pin tool versions, separate build from deploy permissions and review pipeline changes as carefully as production code."
+ },
+ "testing-and-quality-gates": {
+  "r": "A flaky test failed one run in five, so engineers learned to re-run until green and ignored a real failure one day. Quarantining the flaky test and fixing it restored trust in red builds.",
+  "x": "A gate is only useful if people believe it. Keep tests fast and reliable, track flaky ones as defects, and place checks where they give the cheapest early signal."
+ },
+ "deployment-strategies": {
+  "r": "A new version with a performance bug was released to five percent of users first. Metrics showed latency rising, an automatic rollback ran, and only a handful of users noticed.",
+  "x": "Choose a strategy by the cost of being wrong and your ability to detect it. Canary needs good metrics and automatic judgement; database changes need backward compatible steps so rollback is possible."
+ },
+ "versioning-and-artifacts": {
+  "r": "A bug fix was rebuilt for production from source, and the new build contained a different dependency than the tested one. Promoting the same artifact through each environment removed that gap.",
+  "x": "Build once, promote the same artifact and record exactly what is in it. Keep artifacts immutable and traceable to a commit, and plan retention so you can rebuild or roll back."
+ },
+ "pipeline-security": {
+  "r": "A malicious package was pulled into a build through an unpinned dependency. Pinning versions with checksums and scanning in CI meant the next such attempt failed the build.",
+  "x": "Assume the build environment is a target. Isolate runners, avoid long-lived secrets, verify what you import, sign what you produce, and limit who can change the pipeline definition."
+ },
+ "declarative-delivery-with-argo-cd": {
+  "r": "Someone changed a setting directly in the cluster to fix an issue and forgot to record it. The pull-based controller noticed the drift, reported it and restored the declared state, which exposed the missing change in the repository.",
+  "x": "Pull-based delivery makes the repository the source of truth and drift visible. Plan secrets, ordering and rollbacks, and be clear about who may still change the cluster directly."
+ },
+ "release-management-and-feature-flags": {
+  "r": "A risky feature was merged behind a flag that was off. It was turned on for staff first, then one percent of users, then everyone, and switched off in seconds when an issue appeared.",
+  "x": "Flags separate deploy from release, but they are also debt. Give each flag an owner and an expiry, test both states and watch for combinations that nobody has tried."
+ },
+ "fast-pipelines-caching-parallelism-monorepos": {
+  "r": "A forty-minute pipeline made people batch changes together, which made failures harder to find. Caching, parallel jobs and running only affected tests brought it under ten minutes, and changes got smaller again.",
+  "x": "Pipeline speed shapes behaviour. Measure where time goes, cache with care for correctness, and avoid optimisations that let stale results through."
+ },
+ "reusable-pipelines-and-templates": {
+  "r": "Thirty repositories copied the same pipeline file, and a security fix had to be applied thirty times. A shared, versioned template let the fix ship once.",
+  "x": "Shared pipelines centralise good practice and also centralise risk. Version them, test changes against sample projects, and let teams pin or opt in so one change cannot break everyone."
+ },
+ "debugging-pipelines": {
+  "r": "A job passed locally and failed in CI. Comparing tool versions showed the CI runner used an older compiler, and a stale cache hid it on some runs. Pinning versions and clearing the cache made results consistent.",
+  "x": "Reproduce the pipeline environment locally, separate flaky from deterministic failures and look for hidden state in caches, shared runners and environment variables. Fix classes of failure, not single runs."
+ },
+ "environments-promotion-and-approvals": {
+  "r": "A release reached production without anyone checking the staging results because the approval step was just a button. Linking approval to evidence such as test results and a change record made it meaningful.",
+  "x": "Approvals should add information, not delay. Automate what can be checked by a machine, keep human approval for real judgement, and keep an audit record that is easy to produce."
+ },
+ "how-ci-platforms-differ": {
+  "r": "A team moved to a new CI product and found their old pipeline did not translate one to one. The ideas of trigger, job, artifact and secret mapped cleanly, but the caching and approval rules did not.",
+  "x": "Treat CI as infrastructure with owners, budgets and an upgrade path. Choose the platform that fits your code host and security model, and avoid building a second platform on top of it."
+ },
+ "actions-workflows-jobs-and-steps": {
+  "r": "A workflow ran fine on one branch and failed on another because a job assumed a file left by an earlier job. Each job starts on a clean machine, so the fix was an artifact between them.",
+  "x": "Workflows are code that runs with credentials. Review them like application code, pin third-party actions and set the narrowest token permissions at the top of every file."
+ },
+ "actions-triggers-matrices-and-caching": {
+  "r": "A busy repository burned its minutes because every push to every branch ran the full suite twice. Path filters, concurrency cancel and a dependency cache cut run time and bills.",
+  "x": "CI minutes are a budget and a signal. Fast, narrow pipelines get used, and slow noisy ones get ignored or bypassed."
+ },
+ "actions-reusable-workflows-and-composite-actions": {
+  "r": "Forty repositories each carried a slightly different deploy workflow. After one security change had to be made forty times, the team moved to a versioned reusable workflow and changed it once.",
+  "x": "Shared pipeline code is a platform product. Give it an owner, semantic versions, release notes and a deprecation path, or it becomes a quiet single point of failure."
+ },
+ "actions-secrets-oidc-and-hardening": {
+  "r": "A workflow interpolated a pull request title into a shell line. A crafted title ran commands and read a secret. Passing the value through an environment variable removed the injection.",
+  "x": "CI is a high-value target because it holds deploy rights. Short-lived federated credentials, pinned dependencies and least-privilege tokens shrink the damage of any single compromise."
+ },
+ "actions-runners-environments-and-deployments": {
+  "r": "A self-hosted runner kept files between jobs. A later job on the same machine picked up a leftover credential from an earlier run. Ephemeral runners that reset after each job closed the gap.",
+  "x": "A self-hosted runner is a server inside your network that runs strangers' code if you allow it. Treat the fleet like production: isolate it, rebuild it often and never attach it to public repositories."
+ },
+ "gitlab-ci-pipelines-stages-and-jobs": {
+  "r": "A job was slow because each stage waited for the whole previous stage. Adding needs let independent jobs start as soon as their inputs were ready. The pipeline now gives first feedback in minutes.",
+  "x": "A pipeline is a directed graph of work. Design it so quick feedback comes first, slow checks run in parallel and nothing waits for something it does not depend on."
+ },
+ "gitlab-ci-rules-artifacts-and-caches": {
+  "r": "Merge requests ran two identical pipelines, one for the branch and one for the merge request. A workflow rule removed the duplicate and halved runner use.",
+  "x": "Know which state you may rely on. Artifacts are part of the pipeline's contract, while caches are an optimization that may be missing at any time."
+ },
+ "gitlab-ci-includes-templates-and-dynamic-pipelines": {
+  "r": "A monorepo ran every test on every change. A parent pipeline that triggered child pipelines only for changed folders cut typical runs from 45 to 9 minutes.",
+  "x": "Shared pipeline config is an internal product. Version it, keep it small and make it easy to override, or teams will fork it and drift apart."
+ },
+ "gitlab-runners-environments-and-security": {
+  "r": "A merge request from a fork printed a production variable in its log. The variable was neither protected nor masked. Protecting it and restricting where it exists stopped the leak.",
+  "x": "Runner and secret scope are your trust boundaries. Decide which code may reach which credentials, and make the platform enforce it rather than relying on habit."
+ },
+ "tekton-tasks-pipelines-and-workspaces": {
+  "r": "A pipeline lost its source between tasks because each task ran in its own pod. Binding a shared workspace backed by a volume claim kept the code available to every task.",
+  "x": "Tekton gives you primitives, not a product. That flexibility is useful for platform teams and costly for a team that only wanted a build to run."
+ },
+ "tekton-triggers-chains-and-production-use": {
+  "r": "Thousands of finished runs filled the cluster's database and slowed the API. A pruning policy and resource quotas stopped the growth and kept builds predictable.",
+  "x": "A CI system in a cluster shares the cluster's fate. Isolate it by namespace, limit its service accounts and budget its resources, or a runaway build becomes an outage."
+ },
+ "choosing-and-migrating-between-ci-platforms": {
+  "r": "A team announced a migration in January and finished in October because every pipeline had hidden dependencies. A pilot-first plan with a shared scripts layer made later moves routine.",
+  "x": "A platform migration is a product launch for your developers. Measure lead time and failure rate before and after, and communicate dates and support early."
+ }
 }

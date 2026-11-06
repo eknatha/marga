@@ -42,5 +42,9 @@
  "backup-and-dr-ransomware-immutable-backups-and-runbooks": {
   "r": "After a ransomware attack a company restored its servers within a day, and they were encrypted again two hours later. The attacker's service account and a scheduled task were still in place. The new runbook contains and rotates first, then restores.",
   "x": "Assume an administrator account can be compromised. Restoring into an environment that is still compromised wastes the backup, so rebuild identity, rotate credentials and restore from a clean point."
+ },
+ "storage-benchmarking-with-fio": {
+  "r": "A volume looked fast in a sequential test but a database on it was slow. A random 4k test at realistic queue depth showed high latency, and the team changed the volume type.",
+  "x": "Benchmark the workload, not the hardware's brochure. The right test is short, repeatable and run where it cannot damage data."
  }
 }

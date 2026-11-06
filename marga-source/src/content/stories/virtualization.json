@@ -30,5 +30,21 @@
  "virtualization-ops-guest-performance-troubleshooting": {
   "r": "File transfers between two guests on the same host reached only a fraction of the network speed. The guest used the emulated e1000 card with a single queue. Switching to virtio with multiqueue raised throughput several times and ended the drops.",
   "x": "Many guests slowing together point below them. One slow guest points to its own configuration, and emulated devices are a common silent cause of poor throughput."
+ },
+ "vm-backup-replication-and-recovery": {
+  "r": "A hypervisor snapshot was kept as the only backup and grew until it filled the datastore. A scheduled backup to separate storage with tested restores replaced it.",
+  "x": "A snapshot is a short-lived rollback point, not a backup. Backups need separate storage, consistency and regular restore tests."
+ },
+ "vm-templates-cloud-init-and-image-pipelines": {
+  "r": "A golden template built two years earlier still contained an old SSH key and missing patches. Rebuilding it monthly in a pipeline kept images current and reviewable.",
+  "x": "Images are artifacts with a supply chain. Build them from code, scan and sign them, and retire old versions on a schedule."
+ },
+ "gpu-passthrough-and-device-assignment": {
+  "r": "A passthrough GPU froze the host on VM shutdown because it did not reset cleanly. Choosing a supported reset method and testing shutdown and restart cycles solved it.",
+  "x": "Passthrough trades flexibility for performance. Know that the device is dedicated, test reset and failure paths and weigh it against sharing options such as vGPU or MIG."
+ },
+ "hypervisor-security-and-isolation": {
+  "r": "The management interface of a hypervisor was reachable from the guest network. A compromised guest could probe it. Moving management to an isolated network behind a jump host removed the exposure.",
+  "x": "Virtualization isolation is strong but not absolute. Defense in depth means separating by trust level and keeping the control plane far from guests."
  }
 }

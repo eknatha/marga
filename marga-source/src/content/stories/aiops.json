@@ -26,5 +26,25 @@
  "debugging-and-investigating-aiops-output": {
   "r": "An assistant blamed a deploy for slow checkout. An engineer rolled back without checking, but a database lock was the cause. The rollback added ten minutes of disruption.",
   "x": "Check AIOps answers like any guess: ask for evidence, test against data and the timeline, keep a person on every action, and record the misses."
+ },
+ "telemetry-quality-for-aiops": {
+  "r": "An anomaly detector flagged hundreds of false alarms because the same service had five different names across tools. Normalizing names through a catalog cut noise sharply.",
+  "x": "Most AIOps failures are data failures. Invest in consistent telemetry and ownership metadata before buying intelligence."
+ },
+ "forecasting-capacity-and-saturation": {
+  "r": "A database disk was at 70 percent and looked fine, but growth meant it would fill in nine days. A predict_linear alert gave a week of notice and avoided a weekend outage.",
+  "x": "Prefer boring models you can explain. A line with seasonality, honest error bars and a human review beats an opaque forecast no one trusts."
+ },
+ "llm-assistants-for-incident-response": {
+  "r": "An assistant confidently suggested a command that did not exist during an outage. The team added retrieval from the real runbooks with citations, so every suggestion pointed to a source an engineer could check.",
+  "x": "Use models to reduce toil in reading and writing, not to decide. Keep accountability with the on-call engineer, and design so wrong answers are cheap to notice."
+ },
+ "measuring-aiops-value-and-avoiding-hype": {
+  "r": "A vendor claimed a 90 percent noise reduction. In shadow mode the tool also suppressed two real incidents. The team kept the useful clustering and rejected automatic suppression.",
+  "x": "A model that does not beat a simple rule is not worth its complexity. Count false negatives as heavily as false positives, because missed incidents cost more than noisy pages."
+ },
+ "runbook-automation-and-guardrails": {
+  "r": "An auto-restart script restarted a healthy service fleet because a metrics outage looked like failure. A precondition that checks several independent signals and a rate limit would have stopped it.",
+  "x": "Automation multiplies mistakes as well as work. Earn trust with a ladder from manual to automatic, and make every action visible, limited and reversible."
  }
 }

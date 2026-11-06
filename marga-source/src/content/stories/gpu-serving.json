@@ -18,5 +18,33 @@
  "monitoring-and-debugging-gpu-workloads": {
   "r": "A four-GPU training job showed full utilization for six hours without progress. One worker had been evicted and the others waited for it inside NCCL. A job timeout and alert on running workers now fail it fast.",
   "x": "Debug in order: visibility, memory and holders, thermals and clocks, XID and ECC in the kernel log, rank health and network, version compatibility. Alert on progress signals such as step rate, not only on utilization."
+ },
+ "quantization-and-model-sizing": {
+  "r": "A team tried to run a 70-billion-parameter model on one 80 GB GPU in half precision and ran out of memory. Quantizing to 4 bits fit it with room for the cache, and a quality check showed acceptable results.",
+  "x": "Sizing is arithmetic plus measurement. Do the memory math first, then test quality and throughput, because the cheapest format that meets your bar wins."
+ },
+ "batching-kv-cache-and-throughput": {
+  "r": "A service was fast for one user and slow for fifty. Enabling continuous batching and sizing the cache for real concurrency tripled requests per second at the same p95 latency.",
+  "x": "Throughput and latency pull against each other. Decide your service level first, then tune batch limits to the highest load that still meets it."
+ },
+ "multi-gpu-tensor-and-pipeline-parallelism": {
+  "r": "A team spread a model across GPUs on separate machines linked by ordinary networking, and throughput fell below a single GPU. Keeping tensor parallelism inside one node with fast links fixed it.",
+  "x": "Parallelism is a cost you pay only when memory forces you. Prefer the smallest split that fits, keep it inside a node and check the topology."
+ },
+ "autoscaling-llm-inference": {
+  "r": "Traffic doubled at 9 a.m. and users saw timeouts for ten minutes while new GPU nodes joined and loaded the model. Keeping a small warm pool and scaling on queue depth removed the gap.",
+  "x": "Slow startup makes scaling a forecasting problem. Pair reactive scaling with schedule-based or predictive warm capacity for known peaks."
+ },
+ "model-loading-caching-and-cold-starts": {
+  "r": "A rolling update restarted all replicas at once and each downloaded 140 GB from the internet. A local cache and a slower rollout kept capacity during the change.",
+  "x": "Start-up time is an availability issue. Anything that makes a replica slow to return should be treated like a dependency of the rollout."
+ },
+ "gpu-sharing-mig-and-time-slicing": {
+  "r": "Fifty small notebooks each held a full GPU and left most idle. MIG slices let seven jobs share each card with fixed memory, and the same hardware served more users.",
+  "x": "Utilization is a cost lever, but sharing without isolation moves risk onto neighbours. Match the sharing method to how much each workload can tolerate interference."
+ },
+ "gpu-failures-xid-errors-and-recovery": {
+  "r": "Training jobs failed with a mysterious error every few hours. DCGM showed uncorrectable ECC errors on one GPU. Draining that node and replacing the card ended the failures.",
+  "x": "At scale some GPU will always be failing. Detect fast, remove the node automatically and keep spare capacity so a failure is a ticket, not an incident."
  }
 }

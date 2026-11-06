@@ -18,5 +18,33 @@
  "operating-a-fleet-failures-lifecycle-and-capacity": {
   "r": "A firmware update pushed to 120 servers at once left 30 unreachable because older BMCs needed an intermediate version. A visit to the datacentre followed. Later updates went in waves of five.",
   "x": "Use the evidence the hardware already records, change one thing at a time, stage firmware updates, and keep spares and inventory accurate."
+ },
+ "bmc-ipmi-and-redfish-automation": {
+  "r": "A team found hundreds of servers still using the vendor default BMC password on a flat network. After moving BMCs to a locked management VLAN and rotating credentials from a vault, remote control stopped being an open door.",
+  "x": "The BMC is a privileged backdoor into hardware. Treat it as critical infrastructure: isolate it, patch its firmware, log every use and never expose it to the internet."
+ },
+ "cloud-init-and-first-boot-configuration": {
+  "r": "Servers from the same image came up with different hostnames and missing SSH keys because the datasource was not reachable during early boot. A network wait and a clear log check made first boot reliable.",
+  "x": "First boot is where fleet identity is born. Keep images identical, pass differences through data and verify that every node proves its configuration before it takes traffic."
+ },
+ "firmware-and-bios-management-at-scale": {
+  "r": "A subset of nodes ran slowly because a BIOS power setting had been reset to an energy-saving mode after a part swap. A baseline check found the drift and restored the correct profile.",
+  "x": "Firmware is software with outages attached. Version it, test it on real hardware and roll it out like a production release."
+ },
+ "maas-and-ironic-bare-metal-provisioning": {
+  "r": "Provisioning was a manual ticket queue that took days. After moving to an API-driven lifecycle, the same request produced a ready server in under an hour and left an audit trail.",
+  "x": "The goal is a self-service lifecycle with guardrails: enroll, test, allocate, deploy, release and wipe. Automate every step, and make cleaning and decommissioning as reliable as deployment."
+ },
+ "hardware-failure-diagnosis-and-rma": {
+  "r": "A node crashed every few days with no clear cause. Corrected memory error counts on one DIMM had been rising for weeks. Replacing that module ended the crashes, and a new alert now catches rising ECC counts early.",
+  "x": "Predicting failures beats reacting to them. Track error counters, build vendor-ready evidence and keep spares so a failed part is a routine task."
+ },
+ "power-cooling-and-rack-capacity": {
+  "r": "A rack lost half its servers when one feed failed, because both feeds were already near their limit and the surviving breaker tripped. Rebalancing and capping total draw at 80 percent of one feed fixed the design.",
+  "x": "Capacity is not only space. Power, cooling and failure domains decide how much you can safely install, and the cheapest time to learn that is before you rack the servers."
+ },
+ "uefi-bootloaders-and-secure-boot": {
+  "r": "After a firmware update a server booted into the wrong disk and then refused to start a kernel built in house. The boot entry order had reset and the kernel was unsigned, so both had to be fixed deliberately.",
+  "x": "Boot is the root of trust. Know exactly which keys and signed components you depend on, and test firmware and bootloader updates on a canary node first."
  }
 }

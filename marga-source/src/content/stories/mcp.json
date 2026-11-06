@@ -1,10 +1,50 @@
 {
-"why-tools-and-what-mcp-is": {"r": "A model could explain how to check a server but could not actually check it. Giving it a tool that returned real status let it answer with facts, not guesses.", "x": "Tools turn a model from a talker into an actor, which makes permissions and failure handling essential. A standard protocol reduces integration work but not the need for careful design."},
-"function-calling-and-tool-schemas": {"r": "A tool was called with the wrong arguments because its description was vague. Clear names, typed parameters and an example in the description cut the errors sharply.", "x": "A tool schema is an interface for a reader that guesses. Make names obvious, parameters strict, errors informative, and avoid tools that overlap or do too much."},
-"the-tool-use-loop": {"r": "An agent called a failing tool again and again until it burned through its budget. A limit on steps and a clear error message to the model ended the loop.", "x": "Bound the loop with step limits, timeouts and budgets. Handle tool errors as information, keep humans in the loop for risky actions and log every call."},
-"mcp-architecture-hosts-clients-servers-transports": {"r": "A team wired one tool into several assistants by hand. With a standard server, each assistant connected to the same tool without any new integration code.", "x": "Know the roles: host, client, server, and the transport used. Local and remote servers have different trust and security properties, and each connection extends your attack surface."},
-"building-an-mcp-server-in-python": {"r": "A small server exposed a read-only function for looking up service status. Because it was narrow and well described, the assistant used it correctly from the first day.", "x": "Start with a few focused tools, validate inputs, return structured results and handle failures clearly. Prefer read-only to start and add writes only with confirmation."},
-"resources-prompts-and-other-primitives": {"r": "A server exposed documents as tools and the assistant called them for every question. Exposing them as resources that the user or application selects reduced noise and cost.", "x": "Choose the primitive by who controls it: tools for model-controlled actions, resources for application-controlled context and prompts for user-chosen workflows."},
-"permissions-auth-and-prompt-injection-defence": {"r": "A web page read by an assistant contained hidden text telling it to send private data to an address. Limiting what tools could send, and requiring confirmation for sensitive actions, stopped the attack.", "x": "Assume content the model reads can be hostile. Apply least privilege, separate untrusted data from instructions, require approval for actions with side effects and never put secrets where a tool result can leak them."},
-"debugging-tool-use-and-mcp": {"r": "A tool seemed ignored by the assistant. Logging showed the server connected but its description was too vague for the model to choose it. Rewriting it fixed the behaviour.", "x": "Debug layer by layer: server, connection, schema, model choice and tool result. Capture full requests and responses, and test the server alone before blaming the model."}
+ "why-tools-and-what-mcp-is": {
+  "r": "A model could explain how to check a server but could not actually check it. Giving it a tool that returned real status let it answer with facts, not guesses.",
+  "x": "Tools turn a model from a talker into an actor, which makes permissions and failure handling essential. A standard protocol reduces integration work but not the need for careful design."
+ },
+ "function-calling-and-tool-schemas": {
+  "r": "A tool was called with the wrong arguments because its description was vague. Clear names, typed parameters and an example in the description cut the errors sharply.",
+  "x": "A tool schema is an interface for a reader that guesses. Make names obvious, parameters strict, errors informative, and avoid tools that overlap or do too much."
+ },
+ "the-tool-use-loop": {
+  "r": "An agent called a failing tool again and again until it burned through its budget. A limit on steps and a clear error message to the model ended the loop.",
+  "x": "Bound the loop with step limits, timeouts and budgets. Handle tool errors as information, keep humans in the loop for risky actions and log every call."
+ },
+ "mcp-architecture-hosts-clients-servers-transports": {
+  "r": "A team wired one tool into several assistants by hand. With a standard server, each assistant connected to the same tool without any new integration code.",
+  "x": "Know the roles: host, client, server, and the transport used. Local and remote servers have different trust and security properties, and each connection extends your attack surface."
+ },
+ "building-an-mcp-server-in-python": {
+  "r": "A small server exposed a read-only function for looking up service status. Because it was narrow and well described, the assistant used it correctly from the first day.",
+  "x": "Start with a few focused tools, validate inputs, return structured results and handle failures clearly. Prefer read-only to start and add writes only with confirmation."
+ },
+ "resources-prompts-and-other-primitives": {
+  "r": "A server exposed documents as tools and the assistant called them for every question. Exposing them as resources that the user or application selects reduced noise and cost.",
+  "x": "Choose the primitive by who controls it: tools for model-controlled actions, resources for application-controlled context and prompts for user-chosen workflows."
+ },
+ "permissions-auth-and-prompt-injection-defence": {
+  "r": "A web page read by an assistant contained hidden text telling it to send private data to an address. Limiting what tools could send, and requiring confirmation for sensitive actions, stopped the attack.",
+  "x": "Assume content the model reads can be hostile. Apply least privilege, separate untrusted data from instructions, require approval for actions with side effects and never put secrets where a tool result can leak them."
+ },
+ "debugging-tool-use-and-mcp": {
+  "r": "A tool seemed ignored by the assistant. Logging showed the server connected but its description was too vague for the model to choose it. Rewriting it fixed the behaviour.",
+  "x": "Debug layer by layer: server, connection, schema, model choice and tool result. Capture full requests and responses, and test the server alone before blaming the model."
+ },
+ "designing-good-tools-for-agents": {
+  "r": "An agent kept calling a vague tool called run with free-form text and broke things. Splitting it into small tools with typed inputs and clear descriptions stopped the mistakes.",
+  "x": "A tool interface is an API for a very literal user. Optimize for clarity, safe defaults and errors the model can act on."
+ },
+ "testing-and-debugging-mcp-servers-with-the-inspector": {
+  "r": "A server worked in the Inspector but not in a client because it printed debug text to standard output, corrupting the protocol stream. Moving logs to standard error fixed it.",
+  "x": "Test the server independently of the model. If a tool works by hand with the right schema, model problems become much easier to isolate."
+ },
+ "deploying-and-scaling-mcp-servers": {
+  "r": "A shared tool server had no limits, and one runaway agent called an expensive search thousands of times. Rate limits and per-tool timeouts kept the server available for everyone.",
+  "x": "An MCP server is an API used by non-deterministic clients. Plan for retries, loops and surges, and keep an audit trail of what each identity did."
+ },
+ "composing-multiple-mcp-servers": {
+  "r": "An agent with sixty tools from five servers often picked the wrong one. Trimming each agent to the tools it needed and renaming overlapping tools made selection reliable.",
+  "x": "More tools are not better. Every tool description costs context and adds a chance of a wrong choice, so give each agent a curated, non-overlapping toolbox."
+ }
 }
