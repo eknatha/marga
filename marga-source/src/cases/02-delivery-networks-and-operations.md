@@ -13,7 +13,7 @@ lesson: Your recovery path must not depend on the network you broke, and a safet
 company: Fastly
 year: 2021
 area: Deployment and release
-modules: cloud, networking, sre
+modules: cloud, networking, sre, proxies
 source: Fastly blog | https://www.fastly.com/blog/summary-of-june-8-outage
 what: In June 2021 a large part of Fastly's content delivery network returned errors for under an hour, and well-known sites such as news and retail sites went offline.
 cause: A software deployment weeks earlier contained a bug that was only triggered by a specific valid customer configuration. When a customer changed their settings, the bug caused errors across most of the network.
@@ -112,7 +112,7 @@ lesson: Know the hard limits of your file system and database, alert on them, an
 company: UniSuper
 year: 2024
 area: Database
-modules: cloud, terraform, sre, cloud-iam
+modules: cloud, terraform, sre, cloud-iam, cfn-bicep, gcp
 source: UniSuper and Google Cloud joint statement | https://www.unisuper.com.au/about-us/media-centre/2024/a-joint-statement-from-unisuper-and-google-cloud
 what: In May 2024 a pension fund lost its cloud environment for about two weeks after the provider deleted its private cloud subscription. Members could not access their accounts.
 cause: A one-off misconfiguration during provisioning caused the deletion. The deletion also removed backups held in the same region. The fund had backups with another provider, which allowed recovery.
@@ -145,7 +145,7 @@ lesson: Do not make your pipeline depend directly on a public service. Mirror wh
 company: Kubernetes community
 year: 2025
 area: Kubernetes
-modules: kubernetes, docker, cicd, helm
+modules: kubernetes, docker, cicd, helm, proxies
 source: Kubernetes blog | https://kubernetes.io/blog/2025/03/24/ingress-nginx-cve-2025-1974/
 what: In March 2025 a serious flaw was published in the ingress-nginx controller, a very widely used component in Kubernetes clusters. An attacker who could reach the admission controller might run code in it.
 cause: The admission controller built NGINX configuration from Ingress objects and could be tricked into including attacker-supplied settings. It also had wide access to Secrets in the cluster.

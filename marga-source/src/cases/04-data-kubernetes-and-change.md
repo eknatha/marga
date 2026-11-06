@@ -46,7 +46,7 @@ lesson: Autoscaling a core component can create the failure it is meant to preve
 company: Google Cloud
 year: 2019
 area: Cloud networking
-modules: cloud, networking, sre
+modules: cloud, networking, sre, gcp
 source: Google Cloud incident report | https://status.cloud.google.com/incident/cloud-networking/19009
 what: On 2 June 2019 network congestion caused packet loss and latency in six Google Cloud regions and affected services such as YouTube and G Suite for roughly four hours.
 cause: A bug in maintenance automation let a single maintenance event deschedule the network control plane jobs in several independent locations at once. After a few minutes without a control plane, routes between locations were withdrawn and capacity dropped sharply. The congestion also disrupted the internal tools that engineers needed to diagnose it.
@@ -178,7 +178,7 @@ lesson: Prefer small, reversible steps over a big cutover, test with real volume
 company: Honeycomb
 year: 2024
 area: Observability and storage
-modules: observability, linux, cloud, storage
+modules: observability, linux, cloud, storage, messaging
 source: Honeycomb engineering blog | https://www.honeycomb.io/blog/bitten-by-a-kafka-bug-postmortem
 what: In May 2024 engineers noticed that one Kafka broker read eight times more from disk than the other eight brokers and peaked above the rated limit of its device. There was no customer impact yet.
 cause: After an upgrade, tiered storage metadata files had grown to hundreds of megabytes because the cleanup of metadata for segments deleted long ago was not enabled. One partition kept records of about six million deleted segments. Diagnosis needed kernel tracing because normal metrics did not show which files were read.
@@ -189,7 +189,7 @@ lesson: Revisit old settings as scale grows, look at per-device I/O and not only
 company: DataTalks.Club
 year: 2026
 area: Infrastructure as code
-modules: terraform, cloud, sre
+modules: terraform, cloud, sre, cfn-bicep
 source: Author's incident write-up | https://alexeyondata.substack.com/p/how-i-dropped-our-production-database
 what: On 26 and 27 February 2026 a Terraform destroy removed the production network, database, cluster and load balancers of a course platform, together with its automated snapshots. The platform was down for about a day.
 cause: The state file was local to an old laptop, so Terraform planned to create everything again. An older state file that pointed at production was later restored and used, two projects shared one configuration, and an AI coding agent was allowed to run plan, apply and destroy without review.

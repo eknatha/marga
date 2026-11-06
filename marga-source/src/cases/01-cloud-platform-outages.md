@@ -13,7 +13,7 @@ lesson: Give destructive tools guard rails, practise full restarts of critical s
 company: Amazon Web Services
 year: 2020
 area: Cloud outage
-modules: cloud, linux, sre, system-design
+modules: cloud, linux, sre, system-design, messaging
 source: AWS post-event summary | https://aws.amazon.com/message/11201/
 what: A routine capacity addition to the front-end fleet of Kinesis in US-East-1 led to a long outage. Services built on Kinesis, such as CloudWatch and Cognito, were affected for many hours.
 cause: Every front-end server keeps a thread for each of the other servers. Adding servers pushed each machine past the operating system's thread limit, so servers could not build their view of the fleet.
@@ -57,7 +57,7 @@ lesson: Retries without backoff turn a short blip into a long outage. Watch how 
 company: Amazon Web Services
 year: 2012
 area: Human error
-modules: cloud, sre, system-design
+modules: cloud, sre, system-design, proxies
 source: AWS post-event summary | https://aws.amazon.com/message/680587/
 what: On Christmas Eve a maintenance process deleted state data for some production load balancers in US-East-1. Streaming services such as Netflix saw heavy errors for several hours.
 cause: A developer with access to production ran the process against live data by mistake. The deleted data was needed to route traffic, and recovering it from snapshots was slow.
@@ -90,7 +90,7 @@ lesson: Protect internal messages with checksums, and design gossip protocols so
 company: Google
 year: 2020
 area: Cloud outage
-modules: cloud, sre, system-design
+modules: cloud, sre, system-design, gcp
 source: Google Cloud incident report | https://status.cloud.google.com/incident/zall/20013
 what: For about 45 minutes in December 2020 users could not sign in to many Google services, including Gmail and YouTube, and services that depended on Google authentication also failed.
 cause: During a migration to a new quota system, the quota for the user ID service's storage was set to zero. The service could no longer write, so authentication failed.
@@ -101,7 +101,7 @@ lesson: Sudden, large reductions in a limit should be refused or reviewed. Treat
 company: Google
 year: 2025
 area: Deployment and release
-modules: cloud, sre, cicd, system-design
+modules: cloud, sre, cicd, system-design, gcp
 source: Google Cloud incident report | https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW
 what: In June 2025 a global outage of the Service Control component caused API requests to fail across many Google Cloud products and the services that depend on them.
 cause: A new feature added extra quota checks. A policy with blank fields was replicated worldwide and triggered a null pointer error in code that had no feature flag and had not been tested with such data. Restarting tasks then overloaded the backing database.
@@ -134,7 +134,7 @@ lesson: Roll network changes out in small batches and block commands that touch 
 company: Microsoft
 year: 2025
 area: Configuration change
-modules: cloud, networking, cicd, ansible
+modules: cloud, networking, cicd, ansible, cfn-bicep
 source: Azure post-incident review | https://azure.status.microsoft/en-us/status/history/
 what: In October 2025 Azure Front Door, Microsoft's global content delivery and routing service, had a major outage that affected Azure portal pages, websites and Microsoft services.
 cause: A configuration change was deployed that bypassed the usual safety checks because of a software defect. Invalid configuration spread to many edge locations.
@@ -156,7 +156,7 @@ lesson: Date arithmetic needs a real library and edge-case tests. Make failure h
 company: Cloudflare
 year: 2019
 area: Deployment and release
-modules: cloud, python, cicd, sre, go, argocd, system-design
+modules: cloud, python, cicd, sre, go, argocd, system-design, proxies
 source: Cloudflare blog | https://blog.cloudflare.com/details-of-the-cloudflare-outage-on-july-2-2019/
 what: In July 2019 Cloudflare's network returned errors for about half an hour. CPU use across its servers rose to the limit and web traffic stopped being served.
 cause: A new web application firewall rule contained a regular expression with catastrophic backtracking. It was deployed to every server at once, and there was no limit on the CPU time one rule could use.
