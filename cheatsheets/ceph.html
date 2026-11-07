@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>"Ceph" cheat sheet | MARGA by EknathaLabs</title>
+<meta name="description" content=""Daemons, status commands, pools, placement groups, cephadm, RBD, health warnings and a safe maintenance routine."">
+<link rel="canonical" href="https://marga.eknathalabs.com/cheatsheets/ceph.html">
+<meta property="og:title" content=""Ceph" cheat sheet">
+<meta property="og:description" content=""Daemons, status commands, pools, placement groups, cephadm, RBD, health warnings and a safe maintenance routine."">
+<meta property="og:url" content="https://marga.eknathalabs.com/cheatsheets/ceph.html">
+<meta name="theme-color" content="#0B2B2E">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v=2b01306b">
+<script src="../assets/a11y.js?v=2b01306b"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Cheat sheets"><a href="./">All cheat sheets</a><a href="../#/">Learning paths</a><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>"Ceph" cheat sheet</h1>
+    <p class="lede">"Daemons, status commands, pools, placement groups, cephadm, RBD, health warnings and a safe maintenance routine."</p>
+    <div class="actions"><button class="btn btn-quiet" type="button" data-print>Print</button><button class="btn btn-quiet" type="button" data-print data-pdf>Save as PDF</button><label class="print-style no-print"><span>Print style</span><select id="print-style" aria-label="Print and Save as PDF style"><option value="light">Light</option><option value="dark">Dark</option><option value="large">Large type</option></select></label></div>
+    <p id="pdf-hint" class="small" hidden>In the print dialog, choose "Save as PDF" as the destination.</p>
+    <div id="voice-slot"></div>
+  </header>
+  <article class="sheet"><h2 id="status">Status</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="ceph -s
+ceph health detail
+ceph osd tree
+ceph osd df tree
+ceph df
+ceph pg stat" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">ceph -s
+ceph health detail
+ceph osd tree
+ceph osd <span class="hljs-built_in">df</span> tree
+ceph <span class="hljs-built_in">df</span>
+ceph pg <span class="hljs-built_in">stat</span></code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Healthy placement groups are <code>active+clean</code>. <code>inactive</code> or <code>incomplete</code> means IO is blocked and is urgent.</p>
+</aside>
+<h2 id="daemons">Daemons</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
+<th>Daemon</th>
+<th>Job</th>
+</tr>
+</thead><tbody><tr>
+<td>MON</td>
+<td>Cluster map and quorum, run 3 or 5</td>
+</tr>
+<tr>
+<td>MGR</td>
+<td>Metrics, dashboard, modules</td>
+</tr>
+<tr>
+<td>OSD</td>
+<td>Stores data on one disk</td>
+</tr>
+<tr>
+<td>MDS</td>
+<td>CephFS metadata</td>
+</tr>
+<tr>
+<td>RGW</td>
+<td>S3 and Swift gateway</td>
+</tr>
+</tbody></table></div>
+<h2 id="pools">Pools</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="ceph osd pool create vms 128
+ceph osd pool set vms size 3
+ceph osd pool set vms min_size 2
+ceph osd pool application enable vms rbd
+ceph osd pool autoscale-status" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">ceph osd pool create vms 128
+ceph osd pool <span class="hljs-built_in">set</span> vms size 3
+ceph osd pool <span class="hljs-built_in">set</span> vms min_size 2
+ceph osd pool application <span class="hljs-built_in">enable</span> vms rbd
+ceph osd pool autoscale-status</code></pre></div>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p>Never set <code>min_size 1</code>. A pool can then accept writes that exist as a single copy.</p>
+</aside>
+<h2 id="cephadm">cephadm</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="cephadm bootstrap --mon-ip 10.0.0.11
+ceph orch host add ceph2 10.0.0.12
+ceph orch apply osd --all-available-devices
+ceph orch ps
+ceph orch upgrade start --ceph-version 18.2.4" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">cephadm bootstrap --mon-ip 10.0.0.11
+ceph orch host add ceph2 10.0.0.12
+ceph orch apply osd --all-available-devices
+ceph orch ps
+ceph orch upgrade start --ceph-version 18.2.4</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Zap a disk only after you confirm it is spare. <code>ceph orch device zap</code> destroys its data.</p>
+</aside>
+<h2 id="rbd">RBD</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="rbd create rbd/db1 --size 100G
+rbd du rbd/db1
+rbd snap create rbd/db1@before-upgrade
+rbd snap ls rbd/db1" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">rbd create rbd/db1 --size 100G
+rbd <span class="hljs-built_in">du</span> rbd/db1
+rbd snap create rbd/db1@before-upgrade
+rbd snap <span class="hljs-built_in">ls</span> rbd/db1</code></pre></div>
+<aside class="callout callout-warning"><div class="callout-title">Warning</div><p>Old snapshots keep growing. Delete them on a schedule and watch <code>rbd du</code>.</p>
+</aside>
+<h2 id="maintenance">Maintenance</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="ceph osd set noout
+ceph osd unset noout
+ceph pg repair 7.3" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">ceph osd <span class="hljs-built_in">set</span> noout
+ceph osd <span class="hljs-built_in">unset</span> noout
+ceph pg repair 7.3</code></pre></div>
+<aside class="callout callout-danger"><div class="callout-title">Danger</div><p>Reboot one host at a time and wait for HEALTH_OK. Several at once can drop PGs below min_size.</p>
+</aside>
+<h2 id="capacity-thresholds">Capacity thresholds</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr>
+<th>Level</th>
+<th>Meaning</th>
+</tr>
+</thead><tbody><tr>
+<td>85% nearfull</td>
+<td>Warning, act now</td>
+</tr>
+<tr>
+<td>90% backfillfull</td>
+<td>Backfill to that OSD stops</td>
+</tr>
+<tr>
+<td>95% full</td>
+<td>Writes are blocked</td>
+</tr>
+</tbody></table></div>
+<h2 id="quick-health-sweep">Quick health sweep</h2>
+<div class="code" data-lang="bash"><button class="copy" type="button" data-copy="ceph -s
+ceph health detail
+ceph osd tree
+ceph df
+ceph osd pool ls detail" aria-label="Copy code">Copy</button><pre tabindex="0"><code class="hljs">ceph -s
+ceph health detail
+ceph osd tree
+ceph <span class="hljs-built_in">df</span>
+ceph osd pool <span class="hljs-built_in">ls</span> detail</code></pre></div>
+</article>
+  <section class="refs" aria-labelledby="refs-h"><h2 id="refs-h">Official references</h2><p class="small">Read the vendor and project documentation for the full, current detail.</p><ul><li><a href="https://docs.ceph.com/en/latest/" target="_blank" rel="noopener">Ceph documentation</a><span class="host">docs.ceph.com</span></li><li><a href="https://docs.ceph.com/en/latest/architecture/" target="_blank" rel="noopener">Ceph architecture</a><span class="host">docs.ceph.com</span></li><li><a href="https://rook.io/docs/rook/latest-release/" target="_blank" rel="noopener">Rook documentation</a><span class="host">rook.io</span></li></ul></section>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="../#/interview">Interview questions</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/voice.js?v=2b01306b"></script>
+<script src="../assets/counter.js?v=2b01306b"></script>
+<script>
+if(window.MargaCounter&&'marga-eknathalabs'){MargaCounter.init('marga-eknathalabs','#visitors');MargaCounter.hit(location.pathname.replace(/^.*\/cheatsheets\//,'/cheatsheets/'),document.title);}
+document.querySelectorAll('[data-print]').forEach(function(b){b.addEventListener('click',function(){if(window.MargaVoice)MargaVoice.stop();if(b.hasAttribute('data-pdf')){var n=document.getElementById('pdf-hint');if(n)n.hidden=false;}window.print();});});
+(function(){var ps=document.getElementById('print-style');if(!ps)return;ps.value=document.documentElement.getAttribute('data-a-print')||'light';ps.addEventListener('change',function(){if(window.MargaA11y){MargaA11y.set('print',ps.value);}else{document.documentElement.setAttribute('data-a-print',ps.value);}});})();
+if(window.MargaVoice){MargaVoice.mount(document.getElementById('voice-slot'),function(){return document.querySelector('.sheet');},document.querySelector('h1').textContent);}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var t=b.getAttribute('data-copy')||'';var done=function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){});}else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done();}catch(x){}a.remove();}});
+</script>
+</body>
+</html>
