@@ -1687,3 +1687,123 @@ def: Perimeters that restrict API access to services such as BigQuery and Cloud 
 module: gcp
 plain: A rule that applies across your whole Google Cloud tree.
 def: A constraint set at the organization, folder or project level that limits configurations, such as blocking public IPs or key creation.
+
+## KubeVirt
+module: kubevirt
+plain: A project that runs virtual machines as Kubernetes workloads.
+def: An add-on that adds VirtualMachine resources to Kubernetes, running each VM in a pod with libvirt and QEMU.
+
+## VirtualMachineInstance
+module: kubevirt
+plain: One running copy of a KubeVirt VM.
+def: The running instance created from a VirtualMachine; it is deleted when the VM stops.
+
+## virt-launcher
+module: kubevirt
+plain: The pod that runs one VM.
+def: A per-VM pod that holds libvirt and QEMU and the VM's disks and network.
+
+## DataVolume
+module: kubevirt
+plain: A resource that creates and fills a disk for a VM.
+def: A CDI resource that creates a PVC and imports, clones or uploads an image into it.
+
+## KubeVirt live migration
+module: kubevirt
+plain: Moving a running VM to another node.
+def: Copying memory to a target node while the VM runs, then switching with a short pause.
+
+## Multus
+module: kubevirt
+plain: A way to give a pod extra network interfaces.
+def: A CNI plugin that attaches additional networks described by NetworkAttachmentDefinitions.
+
+## Instance type
+module: kubevirt
+plain: A named CPU and memory size for VMs.
+def: A reusable resource that sets CPU and memory so VMs share consistent sizes.
+
+## Masquerade binding
+module: kubevirt
+plain: A VM network mode that hides the guest behind the pod IP.
+def: A NAT based binding for the pod network that works with live migration.
+
+## Ceph
+module: ceph
+plain: A distributed storage system for block, file and object data.
+def: Open source software-defined storage built on RADOS that offers RBD, CephFS and RGW.
+
+## RADOS
+module: ceph
+plain: The object store at the base of Ceph.
+def: The reliable distributed object store that holds all Ceph data and runs on OSDs.
+
+## OSD
+module: ceph
+plain: The Ceph daemon that stores data on one disk.
+def: An object storage daemon that stores, replicates and recovers data for a device.
+
+## CRUSH
+module: ceph
+plain: The algorithm Ceph uses to place data.
+def: A calculation over the cluster map that picks OSDs for each placement group.
+
+## Placement group
+module: ceph
+plain: A bucket of objects that moves together.
+def: A grouping of objects within a pool that is mapped to a set of OSDs.
+
+## Erasure coding
+module: ceph
+plain: Space efficient data protection with parity chunks.
+def: Splitting data into k data chunks and m coding chunks so it survives m failures.
+
+## RBD
+module: ceph
+plain: Ceph block devices.
+def: Thin provisioned, striped block images used for VM disks and Kubernetes volumes.
+
+## CephFS
+module: ceph
+plain: A shared POSIX file system on Ceph.
+def: A file system whose metadata is served by MDS daemons and data stored in RADOS.
+
+## Vault
+module: vault
+plain: A system for managing secrets and encryption.
+def: HashiCorp software that stores secrets, creates dynamic ones, encrypts data and records access.
+
+## Secrets engine
+module: vault
+plain: A Vault plugin that stores or generates secrets.
+def: A mountable component such as KV, database, PKI or transit.
+
+## Vault seal
+module: vault
+plain: The state in which Vault cannot read its data.
+def: Vault starts sealed and needs the root key, rebuilt from key shares or unwrapped by a KMS.
+
+## Vault lease
+module: vault
+plain: A time limit on a secret or token.
+def: A handle that lets Vault renew or revoke a credential and remove it at expiry.
+
+## Dynamic secret
+module: vault
+plain: A credential created on demand.
+def: A short-lived credential generated per caller, for example a temporary database user.
+
+## Vault policy
+module: vault
+plain: Rules that say what a token can do.
+def: Path based capabilities such as read or list; anything not allowed is denied.
+
+## Transit engine
+module: vault
+plain: Encryption as a service.
+def: An engine that encrypts and decrypts data with keys that never leave Vault.
+
+## Token accessor
+module: vault
+plain: A safe reference to a token.
+def: An identifier that lets you look up or revoke a token without knowing its value.
