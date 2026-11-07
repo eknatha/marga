@@ -50,6 +50,21 @@ High-cardinality labels, such as user IDs or full paths, can explode metric seri
 
 Set requests and limits on proxies based on measurements, and size the control plane for the number of proxies and changes. Watch control plane push latency and rejected configuration, since slow pushes mean stale routing.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Mesh performance, cost and resource tuning fits together
+node: n1 | Measure | 0 | 0 | Run the same load test against a service with and without the mesh, and compare p50 and p99 latency, CPU and memory. | Never benchmarking with and without the mesh. | process
+node: n2 | Scope configuration | 1 | 1 | By default each proxy learns about every service in the mesh. | Leaving every proxy with global configuration. | process
+node: n3 | Telemetry | 2 | 0 | High-cardinality labels, such as user IDs or full paths, can explode metric series. | Keeping all metric labels. | process
+node: n4 | Sizing | 3 | 1 | Set requests and limits on proxies based on measurements, and size the control plane for the number of proxies and changes. | Proxy limits copied from examples. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Gigabytes of proxy memory
 
 > **Incident:** Each proxy held configuration for every service in a large cluster.

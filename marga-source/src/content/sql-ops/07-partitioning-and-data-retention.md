@@ -51,6 +51,19 @@ WHERE created_at >= '2026-11-01' AND created_at < '2026-11-08';
 
 If the plan shows only the relevant partitions, **pruning** works. Queries that omit the partition key scan all partitions. Keep the number of partitions reasonable, because thousands of tiny partitions slow planning.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Partitioning and data retention fits together
+node: n1 | Declarative partitioning | 0 | 0 | Range partitions by time suit logs and events. | Forgetting to create future partitions. | process
+node: n2 | Automate and retire | 1 | 1 | Create next month's partition before it is needed, with a scheduled job or an extension, and alert if it is missing, because inserts outside every range fail. | Deleting rows instead of dropping partitions. | process
+node: n3 | Pruning | 2 | 0 | If the plan shows only the relevant partitions, pruning works. | Queries that do not use the partition key. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: No partition for today
 
 > **Incident:** Inserts failed at midnight because the next partition did not exist.

@@ -67,6 +67,21 @@ It gives the container full control of the Docker daemon on the host, which is e
 
 > **Danger:** Never use `--privileged` or mount the Docker socket into an application container. Both give the container control of the host.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Container and image security fits together
+node: n1 | Start with less | 0 | 0 | Every package in an image is something to patch and something an attacker can use. | Adding a shell and debugging tools to the production image. | process
+node: n2 | Do not run as root | 1 | 1 | If the process runs as root inside the container and an escape bug exists, the attacker may be root on the host. | Running as root because it was the default. | process
+node: n3 | Runtime restrictions | 2 | 0 | . | Scanning only at build time and never again. | process
+node: n4 | Scanning and registry policy | 3 | 1 | Scan in the build and again in the registry, since new advisories appear daily. | Passing secrets with build arguments or ENV. | security
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the shell in the web container
 
 > **Incident:** A runtime alert reports an interactive shell started inside a production web container, followed by a download of an unknown binary.

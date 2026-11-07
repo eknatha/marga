@@ -52,6 +52,21 @@ The debug text went to standard output, which is reserved for protocol messages.
 > stdout is the protocol channel.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How MCP architecture: hosts, clients, servers and... fits together
+node: n1 | Lifecycle | 0 | 0 | The client opens a connection and sends initialize with the protocol version it supports and its capabilities. | Ignoring protocol version negotiation. | process
+node: n2 | Messages | 1 | 1 | All messages are JSON-RPC 2.0: requests have an id and a method, responses return result or error, notifications have no id. | Assuming every client supports every feature. | queue
+node: n3 | Transports | 2 | 0 | stdio: the host starts the server as a child process and exchanges messages over standard input and output. | Printing logs to standard output in stdio servers. | process
+node: n4 | Client-side features | 3 | 1 | Besides consuming tools, clients may offer features that servers can ask for: roots (which directories the server may work in), sampling (the server asks the host's... | Running a remote server without authentication. | client
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The connection that closed at once
 
 > **Incident:** A new server worked in the inspector but the host reported a parse error.

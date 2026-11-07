@@ -263,6 +263,35 @@
     ]
   },
   {
+    "id": "kubevirt",
+    "title": "KubeVirt: VMs on Kubernetes",
+    "summary": "Run virtual machines on Kubernetes: architecture, install, disks and CDI, storage and live migration, networking, performance, backup, operations and moving from VMware.",
+    "level": "Advanced",
+    "requires": [
+      "kubernetes",
+      "virtualization"
+    ]
+  },
+  {
+    "id": "ceph",
+    "title": "Ceph and software-defined storage",
+    "summary": "Understand and operate Ceph: RADOS, OSDs and monitors, CRUSH and placement groups, RBD, CephFS, RGW, Rook on Kubernetes, performance, failure recovery and capacity planning.",
+    "level": "Advanced",
+    "requires": [
+      "linux",
+      "storage"
+    ]
+  },
+  {
+    "id": "vault",
+    "title": "Vault and secrets management",
+    "summary": "Manage secrets with HashiCorp Vault: seal and unseal, auth methods, policies, KV, dynamic secrets, PKI, transit encryption, Kubernetes integration, high availability and incident response.",
+    "level": "Intermediate",
+    "requires": [
+      "security"
+    ]
+  },
+  {
     "id": "sql-ops",
     "title": "SQL performance and database operations",
     "summary": "Read query plans, add the right indexes, untangle locks, size connection pools and run replication, vacuum and day-two operations.",

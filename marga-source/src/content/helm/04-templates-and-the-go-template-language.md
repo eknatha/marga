@@ -94,6 +94,21 @@ The nindent number does not match the position of the key. Count the indentation
 > nindent must equal the destination column.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Templates: the Go template language in Helm fits together
+node: n1 | Values and objects | 0 | 0 | The top-level objects are .Values (your values), .Release (name, namespace, revision, whether it is an upgrade), .Chart (Chart.yaml fields), and .Capabilities (cluster... | Forgetting quote on strings that look like numbers. | process
+node: n2 | Conditions and loops | 1 | 1 | if renders a block only when the value is set (an empty string, zero, false or empty list count as false). | Rendering only with default values in tests. | process
+node: n3 | Helpers and toYaml | 2 | 0 | include renders a named template and returns a string that you can pipe, unlike template. | Wrong nindent values. | process
+node: n4 | Whitespace and failing early | 3 | 1 | A dash inside braces trims whitespace: {{- removes the space before, -}} after. | Use it so that conditionals do not leave blank lines or break indentation. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The empty ingress that blocked a rollout
 
 > **Incident:** A chart upgrade failed in staging only, with a message about an unknown field.

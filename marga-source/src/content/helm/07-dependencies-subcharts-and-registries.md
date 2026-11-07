@@ -70,6 +70,21 @@ A new install may silently get different defaults. Pin an exact version, commit 
 > Locks make builds repeatable.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Dependencies, subcharts and registries fits together
+node: n1 | Declare dependencies | 0 | 0 | Chart.lock records exact versions and digests, like a lockfile. | Not committing Chart.lock. | process
+node: n2 | Passing values | 1 | 1 | Values for a subchart go under its name. | Trusting subchart defaults for production. | process
+node: n3 | OCI registries | 2 | 0 | Helm can store charts in the same kind of registry as container images. | Depending on third-party repositories without a mirror. | process
+node: n4 | Versions and updates | 3 | 1 | Chart version is SemVer: raise MAJOR for breaking value changes, MINOR for new features, PATCH for fixes. | Floating dependency ranges. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The dependency that disappeared
 
 > **Incident:** A deployment pipeline failed on a Monday morning with a missing chart error.

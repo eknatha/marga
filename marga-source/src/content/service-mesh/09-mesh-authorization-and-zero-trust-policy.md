@@ -62,6 +62,19 @@ kubectl get authorizationpolicy -A
 kubectl logs -n payments deploy/payments -c istio-proxy | grep RBAC
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Mesh authorization and zero trust policy fits together
+node: n1 | Identity and mTLS | 0 | 0 | Each workload gets a certificate tied to its Kubernetes service account, for example spiffe://cluster.local/ns/shop/sa/checkout. | Switching to strict mTLS without finding non-mesh callers. | security
+node: n2 | Allow policies | 1 | 1 | Once any ALLOW policy applies to a workload, requests that match no rule are denied. | Allow rules with wildcards for everything. | security
+node: n3 | Rollout | 2 | 0 | Inventory real traffic from mesh metrics first. | Policies nobody owns or reviews. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Strict mode broke the batch job
 
 > **Incident:** Enabling strict mTLS stopped a job that sent plain traffic.

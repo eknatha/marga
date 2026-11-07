@@ -89,6 +89,21 @@ Users who already have that version will not get the change, or the push is reje
 > Every published change needs a new chart version.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Anatomy of a chart fits together
+node: n1 | Generate and look | 0 | 0 | The generated chart is a good starting point but includes things you may not need. | Leaving unused generated templates in the chart. | process
+node: n2 | Chart.yaml | 1 | 1 | version follows semantic versioning and must increase whenever the chart changes, because repositories and OCI registries treat versions as immutable. | Reusing the same chart version for changed content. | process
+node: n3 | values.yaml is the interface | 2 | 0 | The values file documents every setting a user may change, with safe defaults and comments. | Exposing every Kubernetes field as a value. | process
+node: n4 | Helpers, notes and linting | 3 | 1 | _helpers.tpl defines reusable snippets with define, such as the standard name and labels, used with include. | Skipping helm lint in CI. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Same version, different chart
 
 > **Incident:** Two clusters installed chart 1.2.0 a month apart and behaved differently.

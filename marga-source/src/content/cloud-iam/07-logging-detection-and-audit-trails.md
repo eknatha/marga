@@ -48,6 +48,21 @@ Treat it as an incident: identify the principal, restore logging, review recent 
 > Logging changes are high risk.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Logging, detection and audit trails fits together
+node: n1 | What to log | 0 | 0 | Management events (create, change, delete), data events for sensitive storage, sign-in logs from the identity provider, network flow logs, and application logs. | Logs in the same account anyone can edit. | observe
+node: n2 | Reading a record | 1 | 1 | An audit record names the principal, the action, the resource, the source address, the time and whether it succeeded. | No alert on logging changes. | process
+node: n3 | Protect the logs | 2 | 0 | Send logs to a separate account that few people can use. | Logging only in some regions. | observe
+node: n4 | Detect and respond | 3 | 1 | Start with a short list of alerts: use of the root account, a change to logging, new access keys for privileged users, a policy that grants administrator rights, a... | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Logging was off
 
 > **Incident:** During an investigation the team found a gap of nine days with no audit records.

@@ -36,6 +36,21 @@ Deactivate the key or revoke the session immediately, then review its activity a
 > Contain first.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Debugging access denied and cloud security... fits together
+node: n1 | Read the error | 0 | 0 | A good error names the principal, the action and the resource: "User arn:...:role/build is not authorized to perform s3:PutObject on arn:aws:s3:::reports-prod/x". | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n2 | Walk the chain | 1 | 1 | Check in order: is the right identity in use; does an identity policy allow the action on this resource; does a resource policy allow or deny it; does a boundary... | Fixing access errors with wildcards. | process
+node: n3 | Fix narrowly | 2 | 0 | Add the specific action and resource, not a wildcard. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Suspected credential leak | 3 | 1 | Act in this order: contain (deactivate the key or revoke the session, do not delete it yet); assess (audit logs for use of that credential, new users or keys, new... | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Crypto servers in six regions
 
 > **Incident:** A cloud bill spiked because someone launched large servers in regions the team never used.

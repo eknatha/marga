@@ -64,6 +64,21 @@ A related risk is **transaction ID wraparound**: transaction numbers are finite,
 - Replication is not a backup: a mistaken `DELETE` replicates to every standby in seconds.
 - Decide RPO and RTO, then restore to a scratch server regularly and run a query that checks the data.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Replication lag, vacuum and day-two operations fits together
+node: n1 | Replication and lag | 0 | 0 | A primary sends its write-ahead log (WAL) to standbys, which replay it. | Reading important data from a lagging standby. | process
+node: n2 | Vacuum and bloat | 1 | 1 | When a row is updated or deleted, the old version stays until vacuum removes it. | Leaving autovacuum defaults on very large tables. | process
+node: n3 | Safe schema changes | 2 | 0 | Add columns as nullable with no default or with a constant default (cheap on current versions), then backfill in batches. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Backups | 3 | 1 | Logical backups (pg_dump) are portable and slow to restore on big databases. | Believing a replica is a backup. | store
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The standby that was always behind
 
 > **Incident:** Customers saw their new orders missing for several minutes, and then the primary ran out of disk.

@@ -51,6 +51,21 @@ Deactivation stops use but keeps the key record and its audit trail for the inve
 > Containment should not destroy evidence.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Cloud security incident playbooks fits together
+node: n1 | Phases | 0 | 0 | Detect and triage: is it real, how large, what is affected? | Deleting evidence while containing. | process
+node: n2 | Playbook: leaked access key | 1 | 1 | Deactivate (do not delete yet) the key, so you keep the record. | No written playbook or owner. | security
+node: n3 | Playbook: exposed storage | 2 | 0 | Block public access at once, then work out the exposure. | Not knowing who may disable production access. | store
+node: n4 | Playbook: compromised workload | 3 | 1 | Isolate rather than delete: change the security group to deny all traffic except from the investigation host, or apply a deny-all network policy to the pod. | Habits that help: central immutable audit logs, short-lived credentials, tested break-glass access, and a practice incident each quarter. | edge
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Keys in a public repository
 
 > **Incident:** A developer pushed a script with a long-lived key to a public code-sharing site. Within 20 minutes the account had 40 new compute instances mining coins.

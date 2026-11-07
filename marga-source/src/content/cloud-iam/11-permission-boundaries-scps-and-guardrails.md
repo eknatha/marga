@@ -54,6 +54,19 @@ aws organizations list-policies --filter SERVICE_CONTROL_POLICY
 aws iam simulate-principal-policy --policy-source-arn "$ROLE_ARN" --action-names cloudtrail:StopLogging
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Permission boundaries, SCPs and guardrails fits together
+node: n1 | Three kinds of limit | 0 | 0 | Service control policy (SCP): applies to all principals in the accounts it is attached to and never grants access, only limits it. | Rolling out an SCP to all accounts at once. | process
+node: n2 | An example guardrail | 1 | 1 | . | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n3 | Test before enforcing | 2 | 0 | Apply to a test organizational unit first and check what would be blocked using access logs. | Many overlapping guardrails nobody understands. | observe
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The deny that blocked everything
 
 > **Incident:** A broad SCP denied actions that automation needed.

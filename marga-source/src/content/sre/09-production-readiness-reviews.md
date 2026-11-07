@@ -72,6 +72,21 @@ Q: A team says "we have monitoring". What question reveals whether it is useful?
 > Scenario questions test the whole chain from detection to action.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Production readiness reviews and launch checklists fits together
+node: n1 | When | 0 | 0 | Hold a review before a new service takes production traffic, before a big change in traffic or architecture, and when ownership moves between teams. | Treating the review as paperwork. | process
+node: n2 | Checklist by area | 1 | 1 | Ownership and support. | Reviewing too late to change anything. | observe
+node: n3 | Running the review | 2 | 0 | Make it a conversation of an hour or two with the team and one or two experienced reviewers from outside, using the checklist as prompts. | No owner for follow-up items. | process
+node: n4 | After launch | 3 | 1 | Readiness decays. Re-review yearly, after major incidents, and when the service changes a lot. | Never revisiting after launch. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the launch that nobody could roll back
 
 > **Incident:** A new recommendation service launches on a Friday and doubles page latency. The team cannot roll back because the database migration removed a column the old version needs.

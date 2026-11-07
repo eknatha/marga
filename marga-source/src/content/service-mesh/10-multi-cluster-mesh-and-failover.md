@@ -49,6 +49,21 @@ Prefer local endpoints for latency and cost, and fail over only when local ones 
 
 Give each cluster its own control plane if possible, and keep the system able to run if the link between them is cut. Plan spare capacity so one cluster can absorb the other's traffic, and run regular failover tests during working hours.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Multi-cluster mesh and failover fits together
+node: n1 | Trust | 0 | 0 | Workloads in both clusters must trust the same root certificate authority, usually with a separate intermediate per cluster. | Assuming failover works without testing it. | process
+node: n2 | Connectivity and discovery | 1 | 1 | There are two main shapes. In flat networking the pod networks are routable, so proxies connect directly. | Sizing each cluster only for its own traffic. | process
+node: n3 | Locality and failover | 2 | 0 | Prefer local endpoints for latency and cost, and fail over only when local ones are unhealthy. | Locality and failover Prefer local endpoints for latency and cost, and fail over only when local ones are unhealthy. | process
+node: n4 | Independence | 3 | 1 | Give each cluster its own control plane if possible, and keep the system able to run if the link between them is cut. | Cross-region traffic on every call. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Failover overloaded the survivor
 
 > **Incident:** Traffic moved to the second cluster and overloaded it.

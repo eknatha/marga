@@ -53,6 +53,21 @@ Two releases of the same chart, each with its own objects and history (if the na
 > A release is an installation, a chart is the package.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How What Helm is and why teams use it fits together
+node: n1 | The problem | 0 | 0 | Plain manifests have three weaknesses. They repeat themselves (the same label in ten places), they cannot easily vary by environment (replica count, image tag... | Editing live objects with kubectl and expecting Helm to know. | process
+node: n2 | Four words to know | 1 | 1 | A chart is a package: a folder (or a .tgz file) with templates and default values. | Installing charts from unknown sources without reading them. | process
+node: n3 | Install something | 2 | 0 | Use a made-up repository name; the commands are the same for any repository. | Copying manifests per environment. | process
+node: n4 | What Helm does not do | 3 | 1 | Helm does not make bad YAML good, does not manage secrets by itself, and does not watch the cluster afterwards: it applies changes when you run a command. | Using latest as a chart or image version. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Three copies of the same YAML
 
 > **Incident:** Staging and production drifted apart because each had its own set of copied manifests.

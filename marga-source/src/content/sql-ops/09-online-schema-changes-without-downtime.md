@@ -49,6 +49,21 @@ Adding a constraint as `NOT VALID` checks only new rows and needs a short lock. 
 
 Make changes compatible in steps: **expand** by adding the new column, deploy code that writes both, backfill, switch reads, then **contract** by removing the old column in a later release. Each step can be rolled back.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Online schema changes without downtime fits together
+node: n1 | Locks and timeouts | 0 | 0 | ALTER TABLE needs a strong lock briefly, but if a long transaction holds a conflicting lock it waits, and every later query waits behind it. | Changing hot tables without lock_timeout. | process
+node: n2 | Backfill in batches | 1 | 1 | One huge update holds locks, bloats the table and creates replication lag. | One giant backfill update. | process
+node: n3 | Constraints | 2 | 0 | Adding a constraint as NOT VALID checks only new rows and needs a short lock. | Adding constraints with full validation inline. | process
+node: n4 | Expand and contract | 3 | 1 | Make changes compatible in steps: expand by adding the new column, deploy code that writes both, backfill, switch reads, then contract by removing the old column in a... | Dropping a column in the same release as the code change. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The index that blocked all writes
 
 > **Incident:** A plain CREATE INDEX stalled writes on a hot table.

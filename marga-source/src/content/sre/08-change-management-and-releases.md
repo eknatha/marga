@@ -106,6 +106,25 @@ A freeze at peak business times (a sales event, month-end) is reasonable, but a 
 
 Review proportionate to risk. A copy change needs less ceremony than a database migration. Ask of every risky change: What is the blast radius? How will we know it is wrong? How do we undo it, and how long does that take? Record the answers in the change description.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Change management, release engineering and... fits together
+node: n1 | Small batches | 0 | 0 | A release of one change has one suspect when something breaks. | Large, infrequent releases bundling many changes. | process
+node: n2 | Feature flags | 1 | 1 | A feature flag separates deploying code from releasing a feature. | Feature flags with no owner or expiry. | process
+node: n3 | Canary and progressive delivery | 2 | 0 | A canary sends a small share of traffic to the new version and compares it with the stable version before continuing. | Canaries judged by gut feeling instead of metrics. | process
+node: n4 | Database and configuration changes | 3 | 1 | Schema changes are the hardest to roll back. | Configuration changes that bypass all release controls. | store
+node: n5 | Change policy and the error budget | 4 | 0 | Tie release behaviour to your reliability data. | Check the Common mistakes list below this diagram for what usually goes wrong here. | security
+node: n6 | Peer review and risk | 5 | 1 | Review proportionate to risk. A copy change needs less ceremony than a database migration. | Irreversible database migrations coupled to code deploys. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: the friday afternoon config change
 
 > **Incident:** At 16:40 on Friday an engineer edits a timeout value in a shared configuration service for "a quick fix". It applies to every service at once. Within minutes, requests to the payment provider time out across the platform, and nobody can immediately say what changed.

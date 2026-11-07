@@ -43,6 +43,21 @@ Tool descriptions consume context, and large toolboxes reduce accuracy. Give eac
 
 Write scenario tests where the agent must use two or three tools across servers, and check that it picks the right ones. Check permissions across servers too: a read-only identity on one server should not become write access through another. Review the combined list of tool names and descriptions for overlaps whenever a server is added.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Composing multiple MCP servers fits together
+node: n1 | Configuration | 0 | 0 | The client connects to each server, lists its tools and presents all of them to the model. | Several tools with the same purpose. | process
+node: n2 | Keep servers focused | 1 | 1 | Group tools by domain and by permission level. | No namespacing across servers. | process
+node: n3 | Limit the toolbox | 2 | 0 | Tool descriptions consume context, and large toolboxes reduce accuracy. | Exposing every tool to every agent. | process
+node: n4 | Test combinations | 3 | 1 | Write scenario tests where the agent must use two or three tools across servers, and check that it picks the right ones. | Not testing cross-server scenarios. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Sixty tools and the wrong choice
 
 > **Incident:** An agent picked the wrong search tool among many similar ones.

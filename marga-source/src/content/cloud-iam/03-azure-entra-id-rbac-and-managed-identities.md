@@ -40,6 +40,23 @@ Give the app a managed identity and assign it a narrow role on that key vault.
 > The platform supplies the token.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Azure: Entra ID, RBAC and managed identities fits together
+node: n1 | Directory and resources | 0 | 0 | Entra ID authenticates people and applications and issues tokens. | Confusing directory roles with resource roles. | process
+node: n2 | Scopes and inheritance | 1 | 1 | Scopes form a hierarchy: management group, subscription, resource group, resource. | Assigning roles at the subscription level by default. | process
+node: n3 | Built-in roles | 2 | 0 | Start with built-in roles such as Reader, Contributor and Owner, and narrower ones like Storage Blob Data Reader. | Leaving permanent Owner rights. | process
+node: n4 | Managed identities | 3 | 1 | A managed identity is an identity that Azure creates for a resource, such as a virtual machine, app service or function, and manages for you. | Storing client secrets when a managed identity works. | process
+node: n5 | Protecting sign-ins | 4 | 0 | Conditional access policies require MFA, compliant devices or trusted locations. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: Contributor at the subscription
 
 > **Incident:** A contractor needed to restart one web app and was made Contributor on the whole subscription.

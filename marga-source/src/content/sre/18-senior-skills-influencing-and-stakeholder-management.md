@@ -55,6 +55,21 @@ Ask why. Learn their constraints, address them (tooling, migration help, a pilot
 > Understand the objection first.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Senior skills: influencing without authority and... fits together
+node: n1 | Map the people | 0 | 0 | For any initiative, list who is affected, who decides, who can block and who can help. | Surprising stakeholders with bad news late. | process
+node: n2 | Build the case | 1 | 1 | Lead with the problem and its cost to the listener: pages per week, hours lost, risk to revenue, audit findings. | Describing your needs, not theirs. | process
+node: n3 | Negotiate and decline well | 2 | 0 | Understand the interest behind a demand: "we need this by Friday" may really mean "we have a customer demo". | Springing proposals on people in meetings. | client
+node: n4 | No surprises | 3 | 1 | Share bad news early with your plan: "The migration is two weeks late because of X. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The mandate that was ignored
 
 > **Incident:** A platform team announced a mandatory new CI template by email, and six months later only three of forty teams had adopted it.

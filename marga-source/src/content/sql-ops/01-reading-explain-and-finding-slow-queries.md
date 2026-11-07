@@ -63,6 +63,19 @@ $ psql -c "EXPLAIN (ANALYZE) SELECT * FROM orders WHERE customer_id = 4711;" | g
 
 `CONCURRENTLY` builds the index without blocking writes. It takes longer and cannot run inside a transaction block.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Reading EXPLAIN and finding slow queries fits together
+node: n1 | Find the queries first | 0 | 0 | Enable the pg_stat_statements extension. | Tuning the slowest single query and ignoring the one that runs a million times. | process
+node: n2 | EXPLAIN | 1 | 1 | EXPLAIN shows the plan the database chooses. | Running EXPLAIN ANALYZE on writes in production without a rollback. | process
+node: n3 | Change one thing | 2 | 0 | After a change, run the same EXPLAIN again and compare the time and the buffers. | Adding indexes before reading the plan. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The query that was fast yesterday
 
 > **Incident:** A checkout query went from 5 ms to 4 seconds overnight with no code change.

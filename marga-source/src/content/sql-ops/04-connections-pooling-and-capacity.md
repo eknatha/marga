@@ -69,6 +69,21 @@ With these settings 2 000 clients can connect and at most 20 server connections 
 - **maintenance_work_mem**: used by vacuum and index builds.
 - **effective_cache_size**: tells the planner how much the OS is likely to cache. It allocates nothing.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Connections, pooling and capacity fits together
+node: n1 | Why connections cost | 0 | 0 | PostgreSQL starts a separate process for each client connection. | Using transaction pooling with an application that depends on session state. | process
+node: n2 | Pool maths | 1 | 1 | Each application process has its own pool. | Not leaving reserved connections for administrators. | process
+node: n3 | PgBouncer | 2 | 0 | A pooler sits between applications and the database. | Raising max_connections instead of fixing the pool sizes. | process
+node: n4 | Memory settings | 3 | 1 | shared_buffers: the shared cache. A common starting point is about a quarter of RAM on a dedicated server. | Setting work_mem very high globally. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Everyone reconnected at once
 
 > **Incident:** After a deploy the database stopped accepting connections for ten minutes.

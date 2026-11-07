@@ -51,6 +51,21 @@ Offer a range, name the assumptions and risks, propose a short spike to reduce u
 > Reduce uncertainty, then commit.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Senior skills: estimating and planning work fits together
+node: n1 | Why estimates are wrong | 0 | 0 | People estimate the happy path and forget reviews, testing, deployment, waiting for others, meetings, incidents and the discovery of unknowns. | Giving one number with no assumptions. | process
+node: n2 | Give a range and state assumptions | 1 | 1 | Say "two to four weeks, most likely three, assuming the API owner reviews within two days and we reuse the existing auth module". | Estimating only coding time. | store
+node: n3 | Slice and de-risk | 2 | 0 | Break the work into slices that each deliver something testable, ideally in a few days. | Leaving the riskiest part to last. | process
+node: n4 | Plan for the unknown and say no | 3 | 1 | Keep slack: a plan fully booked at 100 percent fails at the first surprise. | Planning at 100 percent capacity. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The three-week migration
 
 > **Incident:** An engineer estimated three weeks for moving a service to a new platform, and it took four months.

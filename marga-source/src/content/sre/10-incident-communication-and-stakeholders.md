@@ -61,6 +61,25 @@ Point them to the updates channel, give them a short answer through the communic
 > Protect the responders' attention while keeping stakeholders informed on a schedule.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Incident communication and stakeholder management fits together
+node: n1 | Severity levels | 0 | 0 | Define levels by impact, not by cause, and say what each level triggers (who is paged, who must join, how often updates go out). | Everyone talking in the response channel. | process
+node: n2 | Channels | 1 | 1 | Use a dedicated incident channel for responders, with a pinned summary: what is happening, who is commander, where the dashboard and the document are. | A separate updates channel (or a mailing list) carries the periodic summaries for everyone else, so executives and support do not interrupt... | process
+node: n3 | A good status update | 2 | 0 | Short, factual and on a schedule, even when there is nothing new ("no change, next update at 15:30"). | No update schedule. | process
+node: n4 | Customers | 3 | 1 | Post on the status page early, within minutes of confirming impact. | No handover in long incidents. | process
+node: n5 | Long incidents and handover | 4 | 0 | After a few hours, people make mistakes. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | Afterwards | 5 | 1 | Send a final summary, thank those involved, schedule the postmortem within a few days while memory is fresh, and track actions to completion. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: the silent outage
 
 > **Incident:** A checkout bug affects customers for 90 minutes. Engineers fix it quickly, but support learns about it from angry social media posts.

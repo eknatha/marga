@@ -51,6 +51,21 @@ trivy fs --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 .
 
 Route each finding to the owning team, not a central queue. Track mean time to remediate, open findings by age and false positive rate per tool. Retire tools whose findings are mostly ignored, and review the rules every quarter.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How SAST, DAST and dependency scanning gates fits together
+node: n1 | The tools | 0 | 0 | SAST: analyzes source code for flaws such as injection and unsafe functions. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n2 | In the pipeline | 1 | 1 | Run quick scans where developers see results in the pull request. | Slow scans on every pull request. | queue
+node: n3 | Thresholds | 2 | 0 | Block on findings that are severe, fixable and reachable. | Permanent suppressions with no owner. | process
+node: n4 | Own and measure | 3 | 1 | Route each finding to the owning team, not a central queue. | Blocking on every severity. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Everything blocked, everything suppressed
 
 > **Incident:** A strict gate led to blanket suppressions that hid a real flaw.

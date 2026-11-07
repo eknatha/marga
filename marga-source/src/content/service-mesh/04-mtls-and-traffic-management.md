@@ -111,6 +111,19 @@ istioctl analyze -n shop
 @after Create the DestinationRule first, then the VirtualService, and run analyze before you watch the dashboards.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How mTLS and traffic management fits together
+node: n1 | Mutual TLS | 0 | 0 | With ordinary TLS only the server proves who it is. | Switching to STRICT before every caller has a sidecar. | security
+node: n2 | Routing: VirtualService and | 1 | 1 | A DestinationRule defines subsets of a service, usually by pod label (version: v1, version: v2), and policies such as connection limits. | Forgetting that a VirtualService needs its subsets to exist. | process
+node: n3 | Timeouts, retries and circuit | 2 | 0 | A timeout stops a call from waiting forever. | Weights that do not add up to 100. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Retries made the outage worse
 
 > **Incident:** A slow database caused a full outage of the storefront.

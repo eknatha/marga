@@ -52,6 +52,19 @@ SELECT pg_stat_statements_reset();
 
 Reset the counters before a change and compare after a representative period. Record the before and after total time so the improvement is evidence rather than a feeling.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Finding the worst queries with pg_stat_statements fits together
+node: n1 | Enable and read | 0 | 0 | Queries are normalized, so WHERE id = 7 and WHERE id = 9 count as one entry with a placeholder. | Tuning only the slowest single query. | process
+node: n2 | From query to fix | 1 | 1 | Look for sequential scans on large tables, row estimates far from actual rows and many shared buffers read. | Reading plans without ANALYZE and BUFFERS. | process
+node: n3 | Measure | 2 | 0 | Reset the counters before a change and compare after a representative period. | Not resetting statistics before a test. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The fast query that used all the CPU
 
 > **Incident:** A cheap query called constantly dominated database load.

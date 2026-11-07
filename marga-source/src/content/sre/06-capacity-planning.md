@@ -104,6 +104,23 @@ $ aws ec2 describe-subnets --subnet-ids subnet-0abc --query 'Subnets[0].Availabl
 
 Review utilisation regularly. Persistently low usage means over-provisioning, and persistently high usage means risk. Use commitments such as reserved capacity or savings plans for the steady base, on-demand or spot for the variable part, and tag resources so cost is attributed to the teams who control it.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Capacity planning and performance testing fits together
+node: n1 | Know your demand | 0 | 0 | Start with measurements: requests per second (peak, not average), growth over months, and seasonal events such as sales or month-end processing. | Forecasting only from history, with no input from the business. | process
+node: n2 | Find the limits | 1 | 1 | You cannot plan capacity without knowing what one unit can handle. | Planning for average load instead of peak. | process
+node: n3 | Headroom and redundancy | 2 | 0 | If one instance handles 200 requests per second at the SLO, and peak demand is 900, you need five instances for the load. | No headroom or N+1, so one failure causes an overload. | process
+node: n4 | Lead time and autoscaling | 3 | 1 | Capacity must arrive before demand. Ask how long it takes to add some: autoscaling takes minutes, ordering hardware or a large cloud commitment takes weeks, and database... | Ignoring quotas and address space limits. | process
+node: n5 | Capacity and cost | 4 | 0 | Review utilisation regularly. Persistently low usage means over-provisioning, and persistently high usage means risk. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the launch day that overwhelmed the database
 
 > **Incident:** Marketing launches a campaign without telling engineering. Web servers autoscale from 10 to 60 instances within minutes, but the database hits its connection limit of 500, queries queue up, and every instance starts failing health checks. The site is down for the launch.

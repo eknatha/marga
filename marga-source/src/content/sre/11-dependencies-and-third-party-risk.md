@@ -50,6 +50,21 @@ About 99.6 percent (0.999 to the power of four), before your own failures.
 > Availabilities multiply when all must work.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Dependencies and third-party risk fits together
+node: n1 | The arithmetic of dependencies | 0 | 0 | If a request needs services A and B, and both must work, the availability is the product: 99.9% x 99.9% = 99.8%. | Promising more than the product of your hard dependencies. | process
+node: n2 | Draw the dependency map | 1 | 1 | List what a request needs: databases, caches, internal services, cloud services, DNS, identity providers, payment and email vendors. | Forgetting hidden dependencies such as DNS and identity. | process
+node: n3 | Make soft what you can | 2 | 0 | Turn hard dependencies into soft ones where the product allows it. | Fallbacks that were never tested. | process
+node: n4 | Third-party providers | 3 | 1 | For external vendors, read the SLA: what is measured, what credit you get, and what is excluded. | Trusting a vendor status page alone. | external
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Our 99.95 depended on a 99.5
 
 > **Incident:** A product promised customers 99.95 percent availability, then missed it every quarter.

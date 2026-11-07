@@ -79,6 +79,19 @@ kubectl describe httproute shop-web -n shop
 
 Read the route **status conditions**: they say whether it was accepted and which parent it attached to. Roll out route changes with review, and test a canary host before moving real traffic.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Ingress gateways and the Gateway API fits together
+node: n1 | Resources | 0 | 0 | The GatewayClass names the implementation, the Gateway defines listeners and is owned by the platform team, and HTTPRoute objects are owned by application teams and... | One shared route object edited by many teams. | process
+node: n2 | TLS and limits | 1 | 1 | Terminate TLS at the gateway with certificates managed by an automated issuer, and keep mTLS inside the mesh. | No timeouts or limits at the edge. | security
+node: n3 | Operating | 2 | 0 | Read the route status conditions: they say whether it was accepted and which parent it attached to. | Not reading route status conditions. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: One route hid another
 
 > **Incident:** A new route with an overlapping prefix took traffic from the checkout service.

@@ -71,6 +71,25 @@ Add secret scanning in three places: a local pre-commit hook for fast feedback, 
 
 > **Warning:** Rewriting repository history does not make a leaked key safe. Rotate the key before anything else.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Secrets management fits together
+node: n1 | What counts as a secret | 0 | 0 | Passwords, API tokens, private keys, certificates, database connection strings, signing keys, and session cookies. | Giving every application permission to read every secret. | security
+node: n2 | Where secrets leak | 1 | 1 | Source code and configuration files committed to a repository, including old history. | Putting secrets in ENV lines, build arguments or committed .env files. | security
+node: n3 | Inject at run time | 2 | 0 | The application should receive secrets when it starts, from a store that controls and records access, rather than carry them inside the artifact. | Sharing one credential across many services so that it can never be rotated. | process
+node: n4 | Prefer short-lived, identity-based | 3 | 1 | A long-lived key that sits in a variable is a standing risk. | When you cannot avoid a long-lived secret, rotate it on a schedule and make rotation routine, so that rotating after an incident is not a... | security
+node: n5 | Scanning for leaks | 4 | 0 | Add secret scanning in three places: a local pre-commit hook for fast feedback, a pull request check, and a periodic scan of full history and of container images. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | When a secret leaks | 5 | 1 | Revoke or rotate first. Assume it was copied. | Check the Common mistakes list below this diagram for what usually goes wrong here. | security
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: the key in the test script
 
 > **Incident:** At 03:10 the cloud billing alert fires: 140 new large instances in a region the company has never used. The audit log shows they were launched with a deploy key that an engineer had pasted into a test script two days earlier.

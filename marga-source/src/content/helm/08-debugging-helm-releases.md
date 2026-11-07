@@ -75,6 +75,21 @@ First check helm history and roll back to the last deployed revision. As a last 
 > Prefer rollback; do not delete the workload.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Debugging Helm releases, hooks and tests fits together
+node: n1 | Where did it fail? | 0 | 0 | Work from the left of this pipeline: render, validate, apply, roll out. | Killing pipeline jobs during a helm operation. | process
+node: n2 | Stuck releases | 1 | 1 | If an upgrade was interrupted (a CI job was killed), the release can stay in pending-upgrade or pending-install, and the next command says another operation... | Deleting resources by hand to make an upgrade pass. | process
+node: n3 | Hooks and tests | 2 | 0 | Hooks run Jobs or Pods at points in the lifecycle, marked by annotations. | Ignoring failed hooks. | observe
+node: n4 | Drift and diff | 3 | 1 | Someone edited a Deployment with kubectl, and the next upgrade surprises everyone. | Making manual edits in the cluster. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Another operation is in progress
 
 > **Incident:** A pipeline failed on every run after a runner was terminated in the middle of a deploy.

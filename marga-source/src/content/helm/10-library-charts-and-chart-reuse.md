@@ -76,6 +76,19 @@ helm dependency update ./orders
 helm template orders ./orders | head -30
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Library charts and reuse across services fits together
+node: n1 | Library chart | 0 | 0 | A library chart cannot be installed by itself. | Huge library templates with many switches. | process
+node: n2 | Umbrella charts | 1 | 1 | An umbrella chart lists other charts as dependencies and installs them together, which suits a set of services that always deploy as one unit. | Using umbrella charts for independent services. | process
+node: n3 | Versioning | 2 | 0 | Use semantic versions for the library. Add new options with safe defaults, and treat changes in rendered output as breaking. | New library options without defaults. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: One library change, forty broken releases
 
 > **Incident:** A new required value in the shared chart broke every service.

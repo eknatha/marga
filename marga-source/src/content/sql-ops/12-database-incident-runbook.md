@@ -48,6 +48,19 @@ Pick the smallest safe action: cancel a runaway query with `pg_cancel_backend`, 
 
 Before changing anything, save the output of the queries above with a timestamp. Note each action and its effect. This record turns a stressful hour into a clear timeline for the review.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How A database incident runbook fits together
+node: n1 | Runbook order | 0 | 0 | Scope: who is affected, since when, which endpoints. | Deleting WAL or data files to free space. | process
+node: n2 | Mitigate | 1 | 1 | Pick the smallest safe action: cancel a runaway query with pg_cancel_backend, terminate a blocker with pg_terminate_backend, pause a job, shed load or fail over if the... | Restarting before collecting evidence. | process
+node: n3 | Evidence | 2 | 0 | Before changing anything, save the output of the queries above with a timestamp. | Killing queries without finding the blocker. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Afternoon latency spikes
 
 > **Incident:** A report query held locks and used all connections each afternoon.

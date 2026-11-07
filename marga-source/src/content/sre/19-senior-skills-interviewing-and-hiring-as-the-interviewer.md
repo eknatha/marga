@@ -50,6 +50,21 @@ Anchoring and groupthink: later opinions bend toward the first strong view. Subm
 > Independent evidence before discussion.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Senior skills: interviewing and hiring as the... fits together
+node: n1 | Start with the role | 0 | 0 | Write what success looks like at six and twelve months, and turn it into three to five competencies: for example troubleshooting, system design, automation... | Discussing before submitting scores. | process
+node: n2 | Questions that show how someone | 1 | 1 | Prefer realistic scenarios over trivia: "A service's latency doubled at 14:00. | Judging on trivia and gut feeling. | process
+node: n3 | Score fairly | 2 | 0 | Take notes of what was said and done, not impressions. | Submit your score before talking to other interviewers, to avoid anchoring on the loudest opinion. | process
+node: n4 | The candidate's experience | 3 | 1 | Be on time, introduce yourself and the format, explain what you will do and leave time for their questions. | A poor candidate experience. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The brilliant jerk who nearly got hired
 
 > **Incident:** A candidate impressed one interviewer so much with trivia that the panel overlooked repeated signs of poor collaboration in other rounds.

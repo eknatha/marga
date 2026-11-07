@@ -49,6 +49,21 @@ grep -E "(union.*select|\.\./|<script)" -i access.log | head
 
 Apply rate limits, a web application firewall in front of the application, strong authentication and monitoring of authorization failures. Treat repeated 401 and 403 responses from one source as a signal.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Web and API attacks every operator should know fits together
+node: n1 | Injection | 0 | 0 | In logs it looks like requests containing quotes, UNION SELECT, ../ or shell characters. | Building queries by string concatenation. | process
+node: n2 | Broken access control | 1 | 1 | The most common serious flaw is a missing check that a user may access an object. | Checking authentication but not object ownership. | security
+node: n3 | SSRF | 2 | 0 | A feature that fetches a URL for the user, such as image import or webhooks, can be abused to reach internal services and the cloud metadata address 169.254.169.254. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Operate | 3 | 1 | Apply rate limits, a web application firewall in front of the application, strong authentication and monitoring of authorization failures. | No alerts on repeated authorization failures. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Sequential order numbers
 
 > **Incident:** One account downloaded thousands of other customers' orders.

@@ -49,6 +49,21 @@ Failures happen. Record each exception with a reason, an approver, a mitigation 
 
 Give the auditor a map of controls to evidence, a named contact for each area and read-only access to the evidence store. Run an internal review a month before to find gaps. After the audit, turn findings into backlog items with owners.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Audit readiness and continuous compliance evidence fits together
+node: n1 | From control to check | 0 | 0 | A control is a stated rule, such as "access is reviewed quarterly" or "changes are approved before production". | Collecting evidence only before the audit. | observe
+node: n2 | Collect automatically | 1 | 1 | Run collection on a schedule from CI, store results in write-once storage with dates and hashes, and keep the scripts under version control. | Controls with no owner. | process
+node: n3 | Exceptions and drift | 2 | 0 | Failures happen. Record each exception with a reason, an approver, a mitigation and an end date. | Exceptions with no end date. | process
+node: n4 | The audit | 3 | 1 | Give the auditor a map of controls to evidence, a named contact for each area and read-only access to the evidence store. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Screenshots in a panic
 
 > **Incident:** Evidence gathering consumed weeks before an audit and still missed a control.

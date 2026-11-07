@@ -43,6 +43,21 @@ Improve the process or the design (automation, replication, faster storage) unti
 > Objectives must match what you can actually do.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Disaster recovery exercises fits together
+node: n1 | Objectives first | 0 | 0 | RTO (recovery time objective) is how long you can be down. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n2 | Kinds of exercises | 1 | 1 | Start small and grow. | Never exercising the plan. | process
+node: n3 | Run it safely | 2 | 0 | Treat a drill like a change. Define the scenario and the success criteria (for example RTO 30 minutes, RPO 5 minutes), name a lead, a scribe and observers, and write... | Helping the team during the drill so gaps stay hidden. | process
+node: n4 | Learn and fix | 3 | 1 | The most valuable output is a list of surprises: an expired credential, a missing DNS record, a runbook step that needs a person who is on holiday, a restore that took... | Success criteria that are not measurable. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The restore that took two days
 
 > **Incident:** After a storage failure in a test environment, restoring the main database from backup took two days instead of the planned two hours.

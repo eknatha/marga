@@ -55,6 +55,21 @@ Common failures are a wrong audience, a subject that differs from the policy bec
 
 Give each pipeline a separate role with minimal permissions, log every assumed role session and alert on use from unexpected subjects.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Workload identity federation and OIDC trust fits together
+node: n1 | The flow | 0 | 0 | The job requests an ID token from its platform, with an audience such as sts.amazonaws.com. | Wildcard subjects in trust policies. | process
+node: n2 | A narrow trust policy | 1 | 1 | Always check audience and subject. Use exact StringEquals where you can. | Not checking the audience. | security
+node: n3 | Inspect and debug | 2 | 0 | Common failures are a wrong audience, a subject that differs from the policy because of the environment or branch name, an issuer certificate change or a clock... | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+node: n4 | Operate | 3 | 1 | Give each pipeline a separate role with minimal permissions, log every assumed role session and alert on use from unexpected subjects. | One role for all pipelines. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Any repository could deploy
 
 > **Incident:** A trust policy used a wildcard subject.

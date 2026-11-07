@@ -61,6 +61,21 @@ No. Rollback restores Kubernetes objects, not data or schema. Migrations must be
 > Helm manages manifests, not your data.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Upgrade, rollback and release history fits together
+node: n1 | Upgrade | 0 | 0 | upgrade --install installs if the release does not exist and upgrades if it does, so one command works for first and later deployments. | Upgrading without --wait or --atomic. | process
+node: n2 | History | 1 | 1 | Every change creates a revision, stored as a Secret. | Assuming rollback restores data. | process
+node: n3 | Rollback | 2 | 0 | A rollback creates a new revision (4 in the example) that re-applies the manifest of revision 2. | Also remember that a rollback can fail if a release is stuck in pending-upgrade; the debugging lesson covers that. | process
+node: n4 | Uninstall | 3 | 1 | Uninstall deletes the objects of the release. | Uninstalling production releases without protection. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The upgrade that said Happy Helming
 
 > **Incident:** A release reported success while all pods were crash-looping.

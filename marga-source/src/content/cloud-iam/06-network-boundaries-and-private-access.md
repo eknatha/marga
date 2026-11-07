@@ -36,6 +36,21 @@ Keep it in a private subnet and allow its port only from the application securit
 > Reference the group, not an address range.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Network boundaries and private access fits together
+node: n1 | Private by default | 0 | 0 | Place application servers and databases in private subnets without public addresses. | Public IPs on databases. | process
+node: n2 | Security groups and rules | 1 | 1 | A security group is a stateful firewall attached to a resource. | Wide source ranges on management ports. | security
+node: n3 | Private endpoints | 2 | 0 | Cloud services such as object storage, key vaults and databases are normally reached through public addresses. | Assuming a private network replaces authentication. | process
+node: n4 | Public exposure checklist | 3 | 1 | Block public access on storage accounts and buckets at the account level; check for public snapshots and images; review public IP addresses regularly; protect web... | No account-level block on public storage. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The public bucket
 
 > **Incident:** A storage bucket holding customer exports was reachable by anyone with the link.

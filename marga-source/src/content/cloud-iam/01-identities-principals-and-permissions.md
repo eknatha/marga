@@ -25,6 +25,19 @@ Think of four fields. The **principal** is who asks (a person, a service, a pipe
 
 People sign in through a central identity provider, ideally with single sign-on and MFA, and receive short-lived sessions. Workloads such as a virtual machine, a function or a Kubernetes pod need identities too. The safe pattern is an identity that the platform attaches to the workload, which gives it temporary credentials automatically. The unsafe pattern is a long-lived access key copied into a configuration file or a repository, where it is leaked, shared and never rotated.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Identities, principals and permissions fits together
+node: n1 | Authentication and authorization | 0 | 0 | Authentication answers "who are you?" with a password, a hardware key, a token or a certificate. | Check the Common mistakes list below this diagram for what usually goes wrong here. | security
+node: n2 | The parts of a decision | 1 | 1 | Think of four fields. The principal is who asks (a person, a service, a pipeline). | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n3 | Humans and workloads | 2 | 0 | People sign in through a central identity provider, ideally with single sign-on and MFA, and receive short-lived sessions. | Long-lived keys in code or files. | edge
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Common mistakes
 
 Using the root or owner account for daily work; creating one shared login for a team; giving administrator rights "just to get it working"; leaving keys with no expiry; and never removing access when someone changes team. Treat identities like inventory: know who has what, why, and when it ends.

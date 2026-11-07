@@ -36,6 +36,21 @@ Replace the policy with one that grants those 12 actions after confirming with t
 > Remove unused access.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Least privilege and access reviews fits together
+node: n1 | Start narrow, then measure | 0 | 0 | Begin with the permissions you know are needed. | Reviews without usage data. | process
+node: n2 | Roles for jobs | 1 | 1 | Create roles for functions (read-only auditor, deployer for one application, database operator) and assign people to them through groups. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n3 | Temporary and conditional access | 2 | 0 | Prefer time-limited access for rare tasks, with approval and automatic expiry. | Granting broad rights because tuning takes time. | security
+node: n4 | Access reviews | 3 | 1 | Every quarter, list who has privileged access and ask the owner to confirm. | No owner for service accounts. | security
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Nobody remembers why
 
 > **Incident:** A security review found 31 service accounts with administrator rights and no owner.

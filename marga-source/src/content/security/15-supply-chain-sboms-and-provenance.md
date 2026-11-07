@@ -56,6 +56,21 @@ Stored SBOMs for every artifact, indexed so you can search by package and versio
 > You cannot protect what you cannot list.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Supply chain security: SBOMs, signing and... fits together
+node: n1 | Know what you ship | 0 | 0 | An SBOM is a machine-readable list of the components inside an artifact: libraries, versions, licences and where they came from. | Pulling dependencies straight from the public internet in every build. | process
+node: n2 | Sign and verify | 1 | 1 | A signature proves that an artifact came from a known identity and was not changed afterwards. | Signing images without verifying the signature anywhere. | observe
+node: n3 | Provenance | 2 | 0 | Provenance is a signed statement of how an artifact was made: which source revision, which builder, which build steps and inputs. | The SLSA framework describes levels: at the lowest you have a build script, at higher levels the build runs on a hosted, isolated builder... | process
+node: n4 | Everyday controls | 3 | 1 | Use lockfiles and pin versions, with hashes where the tool supports it. | Generating SBOMs and never searching them. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Which services use this library?
 
 > **Incident:** On the day a critical flaw in a logging library was announced, management asked for the list of affected services. It took the team three days.

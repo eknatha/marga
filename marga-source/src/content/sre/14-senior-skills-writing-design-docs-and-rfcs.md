@@ -52,6 +52,21 @@ The alternatives section. Add the managed option with fair criteria and a clear 
 > Reviewers will supply the options you did not.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Senior skills: writing design docs and RFCs fits together
+node: n1 | When to write one | 0 | 0 | Write a design document when a change is hard to reverse, affects several teams, has security or cost impact, or when you cannot explain the approach in a few sentences. | Writing a design after the code is done. | process
+node: n2 | A structure that works | 1 | 1 | Start with the context and goals, because reviewers cannot judge a solution without the problem. | Burying the key decision in a long document. | process
+node: n3 | Options and trade-offs | 2 | 0 | The most useful section is alternatives. | One option, presented as the only one. | process
+node: n4 | Review and decision | 3 | 1 | Share early as a draft, ask named people for specific input ("security: does this meet the key-handling rule?"), and set a review deadline. | No named reviewers and no deadline. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The design nobody read
 
 > **Incident:** A 30-page design for a new deployment system was circulated on Friday and approved on Monday with two comments, and then a month later the on-call team refused to run it.

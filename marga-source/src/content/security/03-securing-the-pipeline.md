@@ -66,6 +66,23 @@ No. The tag latest moved, so the base layers may differ, and so may the vulnerab
 
 > **Danger:** Never run untrusted code, such as a pull request from an outside fork, on a runner that holds production credentials.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Securing the delivery pipeline and supply chain fits together
+node: n1 | The scanning toolbox | 0 | 0 | No single tool covers everything. Pick one per category and wire it into the same place engineers already look, the pull request. | Running the whole pipeline with one powerful shared credential. | process
+node: n2 | Make scanning useful | 1 | 1 | Thousands of findings are the same as none, because people stop reading. | Trusting a dependency because it is popular. | process
+node: n3 | Know what you ship: SBOM | 2 | 0 | A software bill of materials (SBOM) lists every component in an artifact, with versions. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Prove where it came from: signing | 3 | 1 | Signing an image with a tool such as Cosign ties it to an identity. | Using the latest tag for base images and tools. | process
+node: n5 | Protect the pipeline itself | 4 | 0 | Least privilege for jobs. A test job needs no deploy rights. | Build on fresh machines that are destroyed after the job, so one job cannot leave something for the next. | queue
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: a poisoned dependency
 
 > **Incident:** A build starts to fail on a new check. A routine update pulled in version 4.1.2 of a small, popular library. Its install script now sends the contents of environment variables to a remote host.

@@ -81,6 +81,25 @@ When demand exceeds capacity, doing nothing makes every request slow and then fa
 
 Start small: pick a hypothesis ("if the cache is unavailable, checkout still works, only slower"), limit the blast radius, run it in a quiet period, and stop immediately if customer impact appears.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Reliability patterns fits together
+node: n1 | Timeouts | 0 | 0 | Every call over a network needs a timeout. | Retries at every layer, without backoff or jitter. | process
+node: n2 | Retries, with care | 1 | 1 | Retrying helps with brief, transient failures. | Retrying non-idempotent operations. | process
+node: n3 | Circuit breakers | 2 | 0 | A circuit breaker watches calls to a dependency. | No timeouts on outbound calls. | process
+node: n4 | Bulkheads and graceful degradation | 3 | 1 | A bulkhead isolates resources, as a ship's compartments keep one leak from sinking it. | One shared pool for all dependencies. | process
+node: n5 | Load shedding and limits | 4 | 0 | When demand exceeds capacity, doing nothing makes every request slow and then fail. | Load shedding and limits When demand exceeds capacity, doing nothing makes every request slow and then fail. | edge
+node: n6 | Capacity and testing failure | 5 | 1 | Know your limits with load tests that match production traffic shapes. | Never testing failure on purpose. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: a retry storm after a short blip
 
 > **Incident:** The inventory database has a 20-second hiccup. Inventory recovers, but the system stays down for 40 minutes with the API at 100% CPU.

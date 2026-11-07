@@ -49,6 +49,21 @@ No, because the organization policy limits the account and an explicit restricti
 > Guardrails restrict what policies can allow.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How AWS IAM: policies, roles and assume-role fits together
+node: n1 | Reading a policy | 0 | 0 | A policy lists statements. Each has an effect (Allow or Deny), actions, resources and optional conditions. | Using IAM users with keys for workloads. | security
+node: n2 | Two kinds of policy | 1 | 1 | An identity-based policy is attached to a user, group or role and says what that identity may do. | Forgetting resource-based policies when debugging. | security
+node: n3 | Roles and assume-role | 2 | 0 | A role has two parts: a trust policy saying who may assume it, and permission policies saying what it can do. | Trust policies that allow any principal. | process
+node: n4 | Limits above policies | 3 | 1 | A permissions boundary caps what an identity can ever be granted. | They never grant by themselves; they only restrict. | security
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The wildcard that opened the bucket
 
 > **Incident:** A developer fixed an access error by granting s3:* on all buckets to a build role.

@@ -65,6 +65,23 @@ ALTER ROLE app SET idle_in_transaction_session_timeout = '60s';
 ALTER ROLE app SET statement_timeout = '30s';
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Locks, deadlocks and long transactions fits together
+node: n1 | Locks in short | 0 | 0 | When a transaction updates a row, it holds a lock on it until the transaction ends. | Running migrations with no lock_timeout. | process
+node: n2 | Find the blocker | 1 | 1 | Process 2488 waits for a lock held by 2210. | Ignoring deadlock errors instead of fixing lock order and retrying. | process
+node: n3 | Long transactions hurt in other ways | 2 | 0 | A transaction that stays open holds back the cleanup of old row versions across the database, so tables grow and vacuum cannot remove dead rows. | Leaving transactions open while waiting for user input or HTTP calls. | process
+node: n4 | Deadlocks | 3 | 1 | A deadlock happens when two transactions each hold a lock the other needs. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Timeouts that protect you | 4 | 0 | lock_timeout: how long a statement waits for a lock before giving up. | Killing the victim instead of the blocker. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: The migration that froze checkout
 
 > **Incident:** A one-line schema change brought checkout to a halt for four minutes.

@@ -40,6 +40,21 @@ One server exposing the ticket tools can be used by all compatible applications 
 > Write once, connect many.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Why tools, and what MCP is fits together
+node: n1 | Tools in one paragraph | 0 | 0 | You describe functions to the model (name, purpose, inputs). | Thinking the model runs the tools itself. | process
+node: n2 | The integration problem | 1 | 1 | Without a standard, connecting five AI applications to ten systems needs fifty custom integrations, each with its own format, authentication and bugs. | Trusting any server because the protocol is standard. | process
+node: n3 | Three roles | 2 | 0 | The host is the AI application the user works in, such as a chat app, an editor or an agent runner. | Exposing too many tools at once. | process
+node: n4 | What MCP does not do | 3 | 1 | MCP standardises connecting; it does not make a tool safe, a prompt good or a model reliable. | You still decide which servers to trust, what permissions to give, how to authenticate, what the model may do without approval, and how to... | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Fifty integrations
 
 > **Incident:** A platform team maintained separate plugins for each AI assistant its engineers used.

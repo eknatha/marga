@@ -58,6 +58,19 @@ helm test shop -n shop
 
 Test **upgrades** from the previous chart version too, because most real failures are upgrade failures. Fail the pull request when any step fails.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Testing and linting Helm charts fits together
+node: n1 | Lint and render | 0 | 0 | helm lint checks structure and common mistakes. | Rendering with default values only. | process
+node: n2 | Schema for values | 1 | 1 | A values.schema.json file makes Helm reject bad values early with a clear message instead of failing during rendering or deployment. | No schema for values. | process
+node: n3 | Unit and cluster tests | 2 | 0 | Template unit tests, for example with the helm-unittest plugin, assert on the rendered output. | Skipping tests because the chart is small. | observe
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The label that disappeared
 
 > **Incident:** A refactor removed a selector label and the upgrade failed in production.

@@ -44,6 +44,23 @@ For each new feature, spend thirty minutes asking four questions: what are we bu
 
 Track what keeps recurring. If many findings are the same mistake, fix it in a shared library, template or pipeline check rather than in each service. Share incidents blamelessly as short stories, and celebrate good catches.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Security champions and secure code review fits together
+node: n1 | Champions | 0 | 0 | A security champion is a developer or operator in a product team who has a bit of time and training to help with security questions, reviews and triage. | A champion program with no time or support. | process
+node: n2 | A review checklist | 1 | 1 | Keep it short enough that people use it. | - Failure: do errors reveal internals, and does failure fail closed? | observe
+node: n3 | Security review (PR template) | 2 | 0 | [ ] New or changed endpoints have authorization tests. | Check the Common mistakes list below this diagram for what usually goes wrong here. | security
+node: n4 | Quick threat modeling | 3 | 1 | For each new feature, spend thirty minutes asking four questions: what are we building, what can go wrong, what will we do about it and did we do a good job. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Improve the platform | 4 | 0 | Track what keeps recurring. If many findings are the same mistake, fix it in a shared library, template or pipeline check rather than in each service. | Never fixing recurring issues at the platform level. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: Caught in review, not in a pentest
 
 > **Incident:** A missing ownership check was found in code review.

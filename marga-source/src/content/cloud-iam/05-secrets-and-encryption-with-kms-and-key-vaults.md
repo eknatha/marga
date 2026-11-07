@@ -36,6 +36,21 @@ In a secrets manager; the service fetches it at start-up using its workload iden
 > No password in code or images.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Secrets and encryption with KMS and key vaults fits together
+node: n1 | Secrets stores | 0 | 0 | AWS Secrets Manager, AWS Systems Manager Parameter Store and Azure Key Vault store secrets and return them to authorised identities at run time. | Secrets in code, images or logs. | security
+node: n2 | Keys and envelope encryption | 1 | 1 | A key management service (AWS KMS, Azure Key Vault keys, Google Cloud KMS) creates keys and performs encryption without exposing the key. | Keys and envelope encryption A key management service (AWS KMS, Azure Key Vault keys, Google Cloud KMS) creates keys and performs... | security
+node: n3 | At rest and in transit | 2 | 0 | Encrypt storage at rest by default for disks, databases and object storage, using managed or customer-managed keys when rules demand control. | Giving everyone permission to decrypt. | process
+node: n4 | Rotation | 3 | 1 | Rotate credentials on a schedule and immediately after exposure. | No rotation plan. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The environment variable in the image
 
 > **Incident:** A container image published to a registry contained a database password in an environment variable.

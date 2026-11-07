@@ -46,6 +46,21 @@ kubectl get secrets -n shop -l owner=helm
 helm get values shop -n shop
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Helm security and supply chain fits together
+node: n1 | Review before you install | 0 | 0 | Read the rendered output, not only the values. | Unpinned chart and image versions. | process
+node: n2 | Scan | 1 | 1 | Scan manifests for misconfiguration and images for vulnerabilities in CI, and fail on agreed severities. | Scan Scan manifests for misconfiguration and images for vulnerabilities in CI, and fail on agreed severities. | process
+node: n3 | Limit the blast radius | 2 | 0 | Run Helm with credentials limited to the target namespace. | Using cluster-admin for Helm installs. | process
+node: n4 | Secrets | 3 | 1 | Do not put secrets in values files committed to Git. | Secrets in committed values files. | security
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The chart that wanted root
 
 > **Incident:** An untrusted chart defaulted to privileged containers.

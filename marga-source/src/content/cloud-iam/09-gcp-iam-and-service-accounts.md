@@ -41,6 +41,21 @@ gcloud auth print-access-token --impersonate-service-account=api@shop-prod.iam.g
 
 Downloaded JSON keys are long-lived secrets. Prefer service accounts attached to Compute, Cloud Run or GKE through **Workload Identity**, and **Workload Identity Federation** for workloads outside Google Cloud. Enforce an organization policy that disables key creation.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How GCP IAM and service accounts fits together
+node: n1 | Hierarchy | 0 | 0 | Policies are attached to organization, folder, project or individual resources, and grants are inherited downward. | Granting roles at the folder when a project is enough. | process
+node: n2 | Roles | 1 | 1 | Basic roles such as Owner, Editor and Viewer are very broad and should be avoided in production. | Using Owner or Editor in production. | process
+node: n3 | Service accounts | 2 | 0 | A workload runs as a service account. Create one per workload, give it minimal roles and attach it to the resource. | Downloaded service account keys. | process
+node: n4 | No keys | 3 | 1 | Downloaded JSON keys are long-lived secrets. | One service account shared by many workloads. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The key in the repository
 
 > **Incident:** A service account key was committed and abused.

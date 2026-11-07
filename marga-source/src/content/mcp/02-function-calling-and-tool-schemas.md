@@ -63,6 +63,21 @@ The model cannot choose it reliably. Split it into focused tools with clear name
 > Specific verbs and nouns.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Function calling and tool schemas fits together
+node: n1 | A tool definition | 0 | 0 | The three parts are a name, a description and an input schema written in JSON Schema. | Vague tool names and descriptions. | process
+node: n2 | Descriptions that work | 1 | 1 | State what the tool does, what it returns, when to use it, and when not to. | Too many overlapping tools. | process
+node: n3 | Schemas | 2 | 0 | Use precise types; use enums for fixed choices ("status": {"enum": ["open", "closed"]}). | No validation of arguments. | process
+node: n4 | Small, focused toolset | 3 | 1 | Give the model the tools it needs and no more. | Returning huge unfiltered results. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The model picked the wrong tool
 
 > **Incident:** An assistant kept calling search_logs when users gave a request ID.

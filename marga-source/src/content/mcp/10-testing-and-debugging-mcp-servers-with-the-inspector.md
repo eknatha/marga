@@ -56,6 +56,21 @@ logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 - **Timeouts:** slow external calls with no timeout.
 - **Works in Inspector only:** different working directory or environment variables in the client.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Testing and debugging MCP servers fits together
+node: n1 | The Inspector | 0 | 0 | The Inspector starts a web interface connected to your server. | Printing to stdout in a stdio server. | process
+node: n2 | Unit and integration tests | 1 | 1 | Test the tool functions as ordinary code. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+node: n3 | Stdio rules | 2 | 0 | With the stdio transport, the client reads protocol messages from the server's standard output. | Anything else printed there breaks the stream. | process
+node: n4 | Failure patterns | 3 | 1 | Server not listed: the command path or environment is wrong. | No timeouts on external calls. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: A print statement broke the server
 
 > **Incident:** Debug output on stdout corrupted the protocol.

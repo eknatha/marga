@@ -63,6 +63,21 @@ A short, structured error such as "no ticket with ID X" that tells the model wha
 > Errors are data for the model.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Building an MCP server in Python fits together
+node: n1 | Minimal server | 0 | 0 | Install the SDK with pip install "mcp[cli]" in a virtual environment. | Relative paths and the wrong Python in host config. | process
+node: n2 | Schema from the function | 1 | 1 | The SDK builds the tool's input schema from the parameter names and type hints, and uses the docstring as the description. | Returning raw tracebacks. | process
+node: n3 | Test it alone | 2 | 0 | Test the server without a model. The MCP Inspector lets you connect, list tools and call them by hand; run it with the command from the SDK docs. | Skipping tests without a model. | observe
+node: n4 | Connect to a host | 3 | 1 | Hosts read a configuration that says how to start each server, typically a command and arguments, and sometimes environment variables for settings. | Pass secrets through environment variables or the host's secret store, never in tool arguments. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The server that could not be found
 
 > **Incident:** A host showed "failed to start server" for a new tool.

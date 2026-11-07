@@ -90,6 +90,23 @@ $ curl -s -H "Authorization: Token token=$PD_TOKEN" "https://api.pagerduty.com/a
 
 Hold a weekly review of every page: Was it actionable? Could automation have fixed it? Should the alert change? Delete or downgrade alerts that nobody acted on. Pages that repeat belong in the toil backlog with an owner.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Running a healthy on-call rotation fits together
+node: n1 | Designing the rotation | 0 | 0 | Size: with fewer than five or six people, shifts come around too often. | Alerts with no runbook or no clear owner. | process
+node: n2 | What deserves a page | 1 | 1 | A page interrupts a human, possibly at night. | Paging on causes such as CPU and memory instead of symptoms. | process
+node: n3 | Runbooks | 2 | 0 | Each paging alert links to a runbook that works for a tired person who did not write the service. | Blaming the individual for missing a page in a noisy system. | process
+node: n4 | The first fifteen minutes | 3 | 1 | Acknowledge so others know someone owns it. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Measuring and reducing load | 4 | 0 | Track per rotation: pages per shift, pages outside working hours, time to acknowledge, and the share of pages that needed no action. | Nobody reviewing pages, so noise only grows. | edge
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the alert that cried wolf
 
 > **Incident:** Over three months the team's pager has grown to 40 pages a week, mostly disk alerts at 80 percent that clear themselves. A real database failover alert fires at 02:10 and the on-call engineer, having been woken four times already that week by false alarms, silences it and goes back to sleep. Orders fail until 06:00.

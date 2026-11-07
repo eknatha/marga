@@ -53,6 +53,21 @@ A resource, since it is reference data the user or app attaches; a tool would fo
 > Data to attach is a resource.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Resources, prompts and other primitives fits together
+node: n1 | Three primitives | 0 | 0 | Tools are chosen by the model and perform actions or computations (model-controlled). | Assuming all hosts support resources and prompts. | process
+node: n2 | Resources | 1 | 1 | A resource has a URI (tickets://TCK-1042), a name, a description and a MIME type, and the server returns its content when read. | Making every read a tool. | process
+node: n3 | Prompts | 2 | 0 | A prompt is a named template with typed arguments that returns messages for the conversation. | Large resources with no limits. | process
+node: n4 | Choosing | 3 | 1 | Ask: does it change something or compute? | Dishonest or manipulative descriptions. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Everything was a tool
 
 > **Incident:** A server exposed 40 tools, including one per document, and the model chose badly.

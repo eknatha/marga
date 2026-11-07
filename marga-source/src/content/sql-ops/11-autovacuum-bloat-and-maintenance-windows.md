@@ -54,6 +54,21 @@ The default triggers at 20 percent dead rows, which is too late for huge tables.
 
 Transaction IDs are finite. Monitor `age(datfrozenxid)` and keep it far from the limit. To shrink an already bloated table, use `pg_repack` or plan a `VACUUM FULL`, which locks the table, in a maintenance window with a rollback plan.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Autovacuum, bloat and maintenance windows fits together
+node: n1 | Watch vacuum | 0 | 0 | A growing n_dead_tup with an old last_autovacuum means vacuum is behind. | Only raising autovacuum frequency when something blocks it. | process
+node: n2 | What blocks cleanup | 1 | 1 | Vacuum cannot remove a row version that some transaction might still see. | Forgetting inactive replication slots. | process
+node: n3 | Tuning | 2 | 0 | The default triggers at 20 percent dead rows, which is too late for huge tables. | Running VACUUM FULL during business hours. | process
+node: n4 | Wraparound and maintenance | 3 | 1 | Transaction IDs are finite. Monitor age(datfrozenxid) and keep it far from the limit. | Ignoring transaction ID age. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The transaction that never ended
 
 > **Incident:** An idle transaction blocked cleanup for three weeks.

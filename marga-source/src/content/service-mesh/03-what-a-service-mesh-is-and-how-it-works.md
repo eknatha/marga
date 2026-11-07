@@ -71,6 +71,23 @@ istioctl proxy-status
 @after Restart the workloads so the webhook can add the sidecar, then check that every pod reads 2/2 and every proxy shows SYNCED.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How What a service mesh is and how it works fits together
+node: n1 | The problem | 0 | 0 | Without a mesh, each team writes its own retry logic, its own TLS setup and its own metrics. | Adopting a mesh with no concrete problem to solve. | process
+node: n2 | Two planes | 1 | 1 | The data plane is the proxies that carry the real traffic. | Upgrading the control plane with no staged rollout. | process
+node: n3 | Sidecar and ambient | 2 | 0 | Sidecar: a proxy in every pod. It is simple to reason about and gives per-pod control, but it costs memory and CPU in every pod, and pods must be restarted to pick up... | Expecting existing pods to get sidecars without a restart. | process
+node: n4 | The main meshes | 3 | 1 | . | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | When not to use one | 4 | 0 | A mesh adds moving parts, a new failure mode and a learning curve. | Ignoring the extra CPU and memory the proxies need. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: A mesh upgrade that took the checkout down
 
 > **Incident:** After a control plane upgrade, some services returned 503 errors.

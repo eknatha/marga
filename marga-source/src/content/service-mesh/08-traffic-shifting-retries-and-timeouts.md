@@ -61,6 +61,19 @@ spec:
 
 **Connection limits** act as circuit breakers by failing fast when a service is overloaded. **Outlier detection** ejects unhealthy endpoints for a time. Together with a **retry budget**, they stop callers from piling more load onto a failing service.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Traffic shifting, retries and timeouts fits together
+node: n1 | Weighted routing | 0 | 0 | Start the canary at a small weight, compare error rate and latency of the two subsets, and increase in steps. | Per-try timeouts longer than the overall timeout. | process
+node: n2 | Timeouts and retries | 1 | 1 | Work backwards from the user's deadline. | Retrying non-idempotent requests. | process
+node: n3 | Protecting the dependency | 2 | 0 | Connection limits act as circuit breakers by failing fast when a service is overloaded. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Retries tripled the load
 
 > **Incident:** A small slowdown became an outage because every layer retried.

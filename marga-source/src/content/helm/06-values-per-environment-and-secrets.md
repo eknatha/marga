@@ -74,6 +74,21 @@ In the repository history, and in the release history stored in the cluster (vis
 > Values are not a secret store.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Values per environment and keeping secrets out fits together
+node: n1 | Layering | 0 | 0 | A repository layout that scales. | Copy-pasted environment files with unnoticed drift. | process
+node: n2 | Validate | 1 | 1 | Add values.schema.json to the chart so wrong types or missing keys fail at install time. | Secrets in values files or --set. | process
+node: n3 | Secrets and values | 2 | 0 | Values are stored in release history (as Secrets, base64 encoded, not encrypted by Helm), appear in helm get values, and often sit in a repository. | Giving everyone read access to release Secrets. | security
+node: n4 | Better patterns | 3 | 1 | Reference an existing Secret: the chart takes existingSecret: shop-db and the Secret is created separately, by an operator or a secure pipeline step. | No validation of values. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The password in helm get values
 
 > **Incident:** A contractor with read access to one namespace could see the production database password.

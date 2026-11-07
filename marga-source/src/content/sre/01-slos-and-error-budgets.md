@@ -86,6 +86,23 @@ sum(rate(http_requests_total{service="shop-api"}[30d]))
 
 Long-range queries like these are costly, so teams precompute them with recording rules. Display the remaining budget on the service dashboard where everyone can see it.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How SLIs, SLOs and error budgets fits together
+node: n1 | Three terms | 0 | 0 | The SLO is stricter than the SLA, so you notice trouble before you owe a customer anything. | Setting SLOs at 100% or at whatever the service happens to do today. | process
+node: n2 | Choosing SLIs | 1 | 1 | Measure what users experience, from as close to the user as practical (load balancer or client, not an internal health check). | Measuring server health instead of user experience. | process
+node: n3 | Setting the target | 2 | 0 | Higher is not always better. Each extra nine costs far more and slows delivery. | SLOs with no policy for what happens when the budget is spent. | process
+node: n4 | The error budget | 3 | 1 | The error budget is the amount of unreliability the SLO allows. | Too many SLOs, none of them used to make decisions. | process
+node: n5 | Measuring it | 4 | 0 | Long-range queries like these are costly, so teams precompute them with recording rules. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the budget is gone on day twelve
 
 > **Incident:** The checkout SLO is 99.9% over 30 days. On day 12 the dashboard shows the budget at -20%: more failures have occurred than the whole month allows.

@@ -40,6 +40,19 @@ Applications are not restarted to join, and the shared proxies are upgraded with
 
 Measure the real overhead of proxies in a test cluster. Use sidecars for strict per-workload isolation and mature features. Consider ambient for many small pods or when restarting workloads is costly. Whichever you choose, keep a plan for upgrading the data plane safely.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Sidecar and ambient mesh data planes fits together
+node: n1 | Sidecar model | 0 | 0 | A mutating webhook adds a proxy container to each pod. | Forgetting that proxy upgrades need pod restarts in the sidecar model. | process
+node: n2 | Ambient model | 1 | 1 | In ambient mode a small per-node component handles encryption and basic layer 4 policy for all pods on that node. | Using layer 7 features without a waypoint in ambient mode. | process
+node: n3 | Choosing | 2 | 0 | Measure the real overhead of proxies in a test cluster. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Memory eaten by proxies
 
 > **Incident:** Sidecar proxies used more memory than the applications they served.

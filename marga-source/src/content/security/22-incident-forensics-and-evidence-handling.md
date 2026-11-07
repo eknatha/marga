@@ -46,6 +46,21 @@ Record who collected what, when, from where and how, and hash each item. Store o
 
 Merge events from cloud audit logs, authentication logs, host logs and network data into one UTC timeline: first access, actions taken, data touched and persistence. Mark what is confirmed and what is suspected. Involve legal and management early, and follow your notification obligations.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Incident forensics and evidence handling fits together
+node: n1 | Order of volatility | 0 | 0 | Collect the most fleeting data first: running processes and network connections, memory if feasible, then logs and temporary files, then disk contents. | Writing evidence to the compromised disk. | process
+node: n2 | Cloud evidence | 1 | 1 | Snapshot disks, isolate the instance with a quarantine security group instead of terminating it, and export audit logs and flow logs to a locked evidence bucket with... | Terminating or reimaging before collecting evidence. | external
+node: n3 | Chain of custody | 2 | 0 | Record who collected what, when, from where and how, and hash each item. | Informing legal late. | process
+node: n4 | Timeline | 3 | 1 | Merge events from cloud audit logs, authentication logs, host logs and network data into one UTC timeline: first access, actions taken, data touched and persistence. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Wiped before anyone looked
 
 > **Incident:** A compromised server was reimaged immediately and evidence was lost.

@@ -54,6 +54,21 @@ Alert when `pg_stat_archiver` shows failures or when the newest archived WAL is 
 SELECT last_archived_time, failed_count, last_failed_time FROM pg_stat_archiver;
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Backup and point-in-time recovery operations for... fits together
+node: n1 | The pieces | 0 | 0 | A base backup is a full copy of the data directory at one moment. | Never testing a full restore. | process
+node: n2 | Restore to a point in time | 1 | 1 | Never restore over the live server. Restore alongside, verify the data, then export what you need or switch traffic after careful checks. | Restoring over the live server. | store
+node: n3 | RPO and RTO | 2 | 0 | RPO is how much data you can lose, bounded by how far behind WAL archiving can lag. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Keep it healthy | 3 | 1 | Alert when pg_stat_archiver shows failures or when the newest archived WAL is old. | Backups stored on the same failure domain. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Archiving had been failing for nine days
 
 > **Incident:** A restore needed WAL that was never archived.

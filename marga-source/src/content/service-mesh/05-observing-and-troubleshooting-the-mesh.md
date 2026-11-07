@@ -82,6 +82,21 @@ kubectl get peerauthentication -A
 @after Read the response flag before changing anything. UF with a recent mTLS change is a mismatch between a plain text caller and a STRICT destination.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Observing and troubleshooting the mesh fits together
+node: n1 | What you get for free | 0 | 0 | Every proxy reports the golden signals for each service pair: request rate, error rate, latency and saturation. | Looking at the app first when the proxy configuration is stale. | process
+node: n2 | Is the configuration there? | 1 | 1 | Before blaming the app, check that the proxy has the configuration you wrote. | Port names without a protocol prefix. | process
+node: n3 | Reading response flags | 2 | 0 | Envoy access logs show a short response flag that says why a request failed. | Ignoring response flags. | process
+node: n4 | A method for a failing call | 3 | 1 | Which hop?. Use the trace or the access logs to find the first failing hop. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Everything is up, nothing works
 
 > **Incident:** The checkout page returned errors, but every pod was Running.

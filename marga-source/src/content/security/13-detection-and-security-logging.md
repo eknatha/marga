@@ -75,6 +75,25 @@ Logs already shipped to a separate central account the attacker cannot reach, pl
 > Evidence and alerting must live outside the system that may be compromised.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Threat detection and security logging fits together
+node: n1 | What to log | 0 | 0 | Include who, what, where from, when, and result. | Logs stored where an attacker can delete them. | observe
+node: n2 | Protect the logs | 1 | 1 | Attackers delete logs. Send them off the system quickly to a central store in a separate account that workload administrators cannot change. | Logging that is on but never read. | observe
+node: n3 | Detections | 2 | 0 | Good detections look for behaviour that is rare and meaningful for your environment. | Detections without runbooks. | process
+node: n4 | Fewer false alarms | 3 | 1 | Alerts nobody trusts are worse than none. | Counting rules rather than measuring useful alerts. | process
+node: n5 | Response links | 4 | 0 | Each detection needs a short runbook: what it means, how to confirm, how to contain, and who to call. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | Coverage with ATT&CK | 5 | 1 | MITRE ATT&CK catalogues attacker techniques by stage. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: found after seven months
 
 > **Incident:** An external researcher reports that a company's storage bucket was public, and investigators cannot tell who accessed it.

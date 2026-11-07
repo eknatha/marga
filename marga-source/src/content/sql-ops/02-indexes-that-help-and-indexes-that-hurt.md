@@ -71,6 +71,21 @@ Duplicate indexes are common too: an index on `(customer_id)` is redundant when 
 - Statistics are stale and the planner thinks the table is small.
 - A leading wildcard: `LIKE '%smith'` cannot use a plain B-tree.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Indexes that help and indexes that hurt fits together
+node: n1 | How a B-tree works for you | 0 | 0 | A B-tree index keeps values sorted. It answers equality, ranges and ORDER BY on the indexed columns. | Putting the range column before the equality column in a composite index. | process
+node: n2 | Partial and covering indexes | 1 | 1 | A partial index covers only some rows. If 2 percent of orders are status='open' and queries look only for those, a smaller index is faster to scan and cheaper to... | Adding an index for every slow query without checking existing ones. | store
+node: n3 | The cost of indexes | 2 | 0 | Every insert updates every index on the table. | Dropping an index that backs a unique or foreign key constraint. | store
+node: n4 | When the planner ignores an index | 3 | 1 | The query returns a large part of the table, so reading the table directly is cheaper. | Wrapping an indexed column in a function. | store
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Twenty indexes and a slow import
 
 > **Incident:** A nightly import that took 20 minutes grew to 5 hours over a year.

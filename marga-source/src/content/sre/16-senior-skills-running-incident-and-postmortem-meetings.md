@@ -52,6 +52,21 @@ Pause the debate, ask for the cheapest mitigation (such as rollback), assign one
 > Mitigate first, then investigate.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Senior skills: running incident calls and... fits together
+node: n1 | The incident call | 0 | 0 | Open with a single sentence of the problem and who is the incident commander (IC). | Treating theories as facts. | process
+node: n2 | Calm and clear | 1 | 1 | Tone is contagious. Use plain language, avoid blame, and keep updates factual: what we know, what we do not know, what we are doing, when the next update comes. | No clear IC, or an IC who also debugs. | process
+node: n3 | The post-mortem meeting | 2 | 0 | Send the draft timeline before the meeting, so the time is spent on understanding, not on reading. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Actions that happen | 3 | 1 | Aim for a few, specific, owned actions, each with a date and a way to verify: "Add an alert on queue age above 5 minutes, owner Omar, by 30 April" is good; "improve... | Blaming people in the review. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The call with seven voices
 
 > **Incident:** A major outage lasted 90 minutes, and the review found the fix was available at minute 20.

@@ -43,6 +43,21 @@ Configure the registry so tags cannot be overwritten. Publish to a development r
 
 Allow only the CI identity to push to the release repository. Give consumers read-only access, scan charts for misconfiguration and keep an inventory of which charts and versions are used where.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Publishing and signing Helm charts fits together
+node: n1 | Package and push | 0 | 0 | Charts are stored as OCI artifacts next to container images. | Mutable chart versions. | process
+node: n2 | Sign and verify | 1 | 1 | Signing with an identity from CI ties the chart to a specific pipeline. | Pushing from laptops. | observe
+node: n3 | Immutable versions and promotion | 2 | 0 | Configure the registry so tags cannot be overwritten. | Rebuilding for production instead of promoting. | process
+node: n4 | Access | 3 | 1 | Allow only the CI identity to push to the release repository. | Check the Common mistakes list below this diagram for what usually goes wrong here. | security
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The overwritten version
 
 > **Incident:** A chart version was replaced with different content.

@@ -65,6 +65,25 @@ No. The database decrypts data for any authenticated user, so the attacker reads
 > Protect credentials, limit what the application account can read, and consider field-level encryption for the most sensitive data.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Encryption and key management in practice fits together
+node: n1 | What it protects against | 0 | 0 | Choose by threat. Encrypt everything at rest by default because it is cheap, but know that it is mainly a compliance and basic-hygiene control. | Keys stored with the data they protect. | process
+node: n2 | Building blocks | 1 | 1 | Symmetric encryption (such as AES-256-GCM) uses one key to encrypt and decrypt; fast, used for data. | - Hashing produces a fixed fingerprint that cannot be reversed; use slow, salted password hashing (Argon2, bcrypt) for passwords, never... | process
+node: n3 | Key management and envelope | 2 | 0 | Use a key management service (a cloud KMS, or a hardware-backed vault) so that keys are created, stored and used inside a protected service. | Treating "encrypted at rest" as protection against all attackers. | process
+node: n4 | Access and separation of duties | 3 | 1 | Key policy decides who can use a key and who can administer it; keep these roles separate. | One key for everything. | security
+node: n5 | Rotation and recovery | 4 | 0 | Rotate keys on a schedule and after suspected exposure. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | TLS everywhere | 5 | 1 | Use TLS 1.2 or newer for all connections, including inside the network. | Disabling certificate verification. | security
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: the key in the repository
 
 > **Incident:** A security scan finds an encryption key in a configuration file in the same repository as the encrypted exports.

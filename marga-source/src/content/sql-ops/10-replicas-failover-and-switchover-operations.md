@@ -46,6 +46,21 @@ Use a **consensus** store and **fencing**: the old primary must be unable to acc
 
 An old primary may have extra transactions. Rewind it with `pg_rewind` or rebuild it from a base backup, then join it as a replica. Never simply restart it as a primary.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Replicas, switchover and failover operations fits together
+node: n1 | Replication and lag | 0 | 0 | Lag grows when replicas are slow, the network is busy or a long query on the replica conflicts with replay. | Ignoring replica lag in application reads. | process
+node: n2 | Switchover and failover | 1 | 1 | A switchover is planned: stop writes, let the replica catch up fully, promote it and demote the old primary with no data loss. | Automatic failover that was never tested. | process
+node: n3 | Avoiding split brain | 2 | 0 | Use a consensus store and fencing: the old primary must be unable to accept writes before another is promoted, for example by losing its leader lock, being shut down or... | Promoting without fencing the old primary. | process
+node: n4 | Rebuild | 3 | 1 | An old primary may have extra transactions. | Restarting a failed primary as a primary. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Two primaries
 
 > **Incident:** A partitioned old primary kept accepting writes after promotion.

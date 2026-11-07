@@ -51,6 +51,23 @@ Ask what they have checked and what the logs say, guide them to the next check, 
 > Teach the method, not just the answer.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Senior skills: mentoring and growing other... fits together
+node: n1 | Start with goals | 0 | 0 | In the first conversation ask what the person wants in the next six to twelve months: a skill, a role, more scope, a certification. | Vague feedback ("do better") or only negative feedback. | process
+node: n2 | Teach with questions and pairing | 1 | 1 | When someone brings a problem, resist solving it immediately. | Solving everything yourself. | process
+node: n3 | Stretch and delegate | 2 | 0 | Growth happens just beyond comfort. Give a task that is slightly bigger than the last one, with clear outcomes, boundaries and checkpoints, and stay available. | Delegating a task without context or boundaries. | process
+node: n4 | Feedback that works | 3 | 1 | Make it timely, specific, about behavior and impact, and offer a path forward. | Reviews that only list defects. | process
+node: n5 | Reviews that teach | 4 | 0 | In code and design reviews, separate must-fix from suggestions and learning notes, explain the reason ("this retry has no backoff, which can overload the service during... | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: The helpful rescuer
 
 > **Incident:** A senior engineer fixed every problem that a new teammate brought, and after a year the teammate still could not handle an on-call shift alone.

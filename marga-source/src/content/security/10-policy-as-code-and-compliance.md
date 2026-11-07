@@ -102,6 +102,25 @@ s3-bucket-public-read-prohibited    COMPLIANT
 encrypted-volumes                   NON_COMPLIANT
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Policy as code, compliance and audit evidence fits together
+node: n1 | Where policy runs | 0 | 0 | The earlier in the line, the cheaper the fix. | Enforcing a new policy without an audit period. | security
+node: n2 | A policy in Rego | 1 | 1 | Open Policy Agent uses a language called Rego. | Writing policies in documents that nobody checks. | security
+node: n3 | A policy for Kubernetes | 2 | 0 | Kyverno writes policies as Kubernetes objects. | Granting exceptions with no owner or expiry. | security
+node: n4 | Guardrails versus gates | 3 | 1 | A gate blocks a change until a person approves. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Frameworks in plain words | 4 | 0 | CIS Benchmarks: detailed lists of secure settings for operating systems, clusters and cloud accounts. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | Continuous evidence | 5 | 1 | Auditors want to see that a control worked over time. | Collecting screenshots for audits instead of automatic evidence. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: the exception that never expired
 
 > **Incident:** A temporary exception to the "no public storage" rule was granted for a launch. Two years later an audit finds the bucket still public, with customer exports inside.

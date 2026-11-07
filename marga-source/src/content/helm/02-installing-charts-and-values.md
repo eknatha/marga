@@ -83,6 +83,21 @@ Lists are replaced, not merged, so you must give the whole list you want; the se
 > Values merge by map key, but lists replace.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Installing charts and overriding values fits together
+node: n1 | Look before you install | 0 | 0 | Always pin --version, so a repository update does not change what you install. | Not pinning chart versions. | process
+node: n2 | Override with a values file | 1 | 1 | Write only the keys you change, in a file under version control. | Upgrading with only --set and losing earlier overrides. | process
+node: n3 | --set and precedence | 2 | 0 | For a one-off change use --set. | Installing with unread defaults. | process
+node: n4 | Preview and verify | 3 | 1 | helm template renders locally without a cluster, so you can lint it, run it through policy checks and review the diff in a pull request. | Using floating tags such as latest in values. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The upgrade that reset the settings
 
 > **Incident:** After a routine image bump, the production site lost its custom hostname and resource limits.

@@ -45,6 +45,21 @@ aws iam simulate-principal-policy --policy-source-arn "$ROLE_ARN" \
 
 Run unused access reports monthly, assign each finding to an owner and track closure. Review external access findings immediately and document any intentional public resource.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How IAM policy analysis and unused access fits together
+node: n1 | What the tools show | 0 | 0 | External access findings: resources such as buckets or roles reachable from outside your organization. | Ignoring external access findings. | process
+node: n2 | Generate a tighter policy | 1 | 1 | Providers can analyze CloudTrail or audit logs for a role over a period and propose a policy limited to the actions seen. | Removing permissions without checking rare jobs. | security
+node: n3 | Roll out in stages | 2 | 0 | Create the new, smaller policy beside the old one. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Review regularly | 3 | 1 | Run unused access reports monthly, assign each finding to an owner and track closure. | Applying generated policies without review. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Eleven permissions in use
 
 > **Incident:** A role had hundreds of permissions and used almost none.

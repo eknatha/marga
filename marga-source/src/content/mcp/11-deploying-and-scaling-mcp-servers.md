@@ -48,6 +48,21 @@ Add rate limits per client and per tool, timeouts on every external call, and re
 
 Log each tool call with the caller identity, tool name, arguments with sensitive values removed, duration and result status. Export metrics such as calls, errors and latency per tool. Alert on error spikes and on unusual call volume from one identity. Keep logs as an audit trail.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Deploying and scaling MCP servers fits together
+node: n1 | Transports | 0 | 0 | stdio servers run as a child process of the client, which is simple and private. | Remote servers with no authentication. | process
+node: n2 | Authentication | 1 | 1 | Authenticate every request. The MCP specification uses OAuth for remote servers: the client obtains a token and sends it as a bearer token, and the server validates the... | Shared superuser credentials for downstream systems. | security
+node: n3 | Run it like a service | 2 | 0 | Add rate limits per client and per tool, timeouts on every external call, and request size limits. | No rate limits or timeouts. | process
+node: n4 | Observe | 3 | 1 | Log each tool call with the caller identity, tool name, arguments with sensitive values removed, duration and result status. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: One agent, ten thousand calls
 
 > **Incident:** A looping agent overloaded a shared tool server.

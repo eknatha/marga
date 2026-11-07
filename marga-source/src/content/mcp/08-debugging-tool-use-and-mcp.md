@@ -54,6 +54,21 @@ Whether the host lists the tool (cache, reconnect), and the tool's name and desc
 > Server fine, so look at discovery and definitions.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Debugging tool use and MCP fits together
+node: n1 | Bottom-up checklist | 0 | 0 | Server alone: run it, use the inspector, call each tool by hand with good and bad inputs. | No tests for the tool list. | observe
+node: n2 | Tools for the job | 1 | 1 | . | Ignoring host-side logs. | process
+node: n3 | Common causes | 2 | 0 | Server does not start: wrong Python, missing packages, relative paths, missing environment variables. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Prove and prevent | 3 | 1 | Reproduce the failure from a stored trace. | Blaming the model first. | queue
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The tool that vanished after an update
 
 > **Incident:** After a server update, users reported the assistant no longer created tickets.

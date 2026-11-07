@@ -77,6 +77,23 @@ Not toil: engineering projects, design, and the overhead of meetings and plannin
 
 A common guideline is to keep toil **below about half** of an operations engineer's time, and to put the rest into engineering that reduces future toil. Measure it: ask the team to tag time spent, and rank sources of toil by hours per month. Automate the biggest first, and where automation costs more than the toil will ever, do not.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Blameless postmortems and toil fits together
+node: n1 | Blameless does not mean | 0 | 0 | Complex systems fail because of many contributing factors, not a single careless person. | Naming a person as the cause. | process
+node: n2 | Structure of a postmortem | 1 | 1 | Write it within a few days while memories are fresh. | Stopping at one "root cause". | process
+node: n3 | Finding causes without stopping | 2 | 0 | Use a "five whys" style chain, but treat it as a way to explore branches, not to find one "root cause". | Finding causes without stopping early Use a "five whys" style chain, but treat it as a way to explore branches, not to find one "root... | process
+node: n4 | Action items that get done | 3 | 1 | Weak: "Improve monitoring." Strong. | Vague actions with no owner or date. | process
+node: n5 | Toil | 4 | 0 | Toil is work that is manual, repetitive, automatable, tactical (reactive), without lasting value, and that grows as the service grows. | Letting toil crowd out all engineering time. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the same outage three times
 
 > **Incident:** An expired TLS certificate takes down the customer portal. It is the third certificate expiry in 18 months. The previous two postmortems each recorded the action "be more careful with renewals".

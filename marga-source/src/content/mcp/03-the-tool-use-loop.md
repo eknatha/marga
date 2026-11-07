@@ -58,6 +58,21 @@ A maximum step count, detection of repeated identical calls, and a message to th
 > Loops need brakes.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How The tool-use loop fits together
+node: n1 | The cycle | 0 | 0 | Send messages and tools to the model. | No step limit. | process
+node: n2 | Results and errors | 1 | 1 | Return results as compact text or JSON. When a tool fails, return an error result with a helpful message ("no ticket with ID TCK-9999") rather than raising out of the... | Raising exceptions instead of returning tool errors. | process
+node: n3 | Limit the loop | 2 | 0 | Always cap the number of steps, the total tokens and the time. | Not logging steps. | process
+node: n4 | Observe | 3 | 1 | Log each step: the model reply, tool name, arguments, result size, duration and errors, with a request ID linking them. | Huge tool outputs. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The agent that would not stop
 
 > **Incident:** A support agent called a search tool 60 times for one question.

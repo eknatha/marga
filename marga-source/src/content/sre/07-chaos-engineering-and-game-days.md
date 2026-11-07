@@ -103,6 +103,23 @@ $ aws rds delete-db-instance --db-instance-identifier shop-restore-test --skip-f
 
 Automate this restore test on a schedule and alert if it fails. Measure the actual time and compare it with the RTO.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Chaos engineering, game days and disaster recovery fits together
+node: n1 | The experiment loop | 0 | 0 | Chaos engineering is not breaking things at random. | Game days that nobody follows up with fixes. | process
+node: n2 | Safety rules | 1 | 1 | Have a hypothesis, an owner and an abort condition before starting (for example "stop if the error rate exceeds 2 percent"). | Running experiments without a hypothesis or abort condition. | process
+node: n3 | Injecting failure | 2 | 0 | Dedicated tools make experiments repeatable and safer. | Chaos testing before basic monitoring works. | process
+node: n4 | Game days | 3 | 1 | A game day is a scheduled exercise where the team responds to a simulated failure, practising the human side: detection, communication, escalation and runbooks. | Stating RTO and RPO that have never been measured. | process
+node: n5 | Disaster recovery | 4 | 0 | Two numbers define what you must achieve. | Treating a successful backup job as proof of restorability. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the backup that did not restore
 
 > **Incident:** The primary database is corrupted by a faulty migration. The team starts the restore, and discovers the nightly backups have been empty files for five weeks because a credential expired and the job reported success anyway. The newest usable copy is from a month ago.

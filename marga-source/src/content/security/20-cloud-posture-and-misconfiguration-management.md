@@ -51,6 +51,21 @@ resource "aws_s3_bucket_public_access_block" "exports" {
 
 Change the Terraform or template and redeploy, otherwise drift returns. Add organization-level guardrails that deny the risky action, and a policy check in CI. Measure time to remediate by severity and report trends to owners.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Cloud posture and misconfiguration management fits together
+node: n1 | Common problems | 0 | 0 | Public storage buckets and snapshots. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n2 | Detect | 1 | 1 | Run posture checks continuously on live accounts, and scan infrastructure code in pull requests so mistakes never get deployed. | Scanning accounts but not infrastructure code. | process
+node: n3 | Prioritize | 2 | 0 | Not all findings are equal. Rank by internet exposure, data sensitivity, privilege and ease of exploitation. | Ranking all findings equally. | process
+node: n4 | Fix at the source | 3 | 1 | Change the Terraform or template and redeploy, otherwise drift returns. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The export bucket that was public
 
 > **Incident:** A test bucket with customer exports was publicly readable.
