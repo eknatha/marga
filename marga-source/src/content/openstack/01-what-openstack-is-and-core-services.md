@@ -69,6 +69,23 @@ A successful `token issue` proves that Keystone works and your credentials are r
 
 A private cloud gives control and predictable cost at scale. The price is operations: you run the control plane, plan upgrades every six months or so, and manage hardware. Many teams use a distribution or deployment tool (Kolla-Ansible, OpenStack-Ansible, vendor products) to reduce that work.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How What OpenStack is and its core services fits together
+node: n1 | The core services | 0 | 0 | Every service has a REST API, and all of them accept the same token from Keystone. | Treating each service as independent and ignoring the queue and database. | process
+node: n2 | Control plane and compute | 1 | 1 | Controller nodes run the API services, schedulers, the database and the message queue. | Running a single controller in production. | process
+node: n3 | What they all depend on | 2 | 0 | Two pieces of shared infrastructure sit under almost every service. | Expecting public-cloud features (such as managed databases) to exist without installing them. | process
+node: n4 | What a first request looks like | 3 | 1 | A successful token issue proves that Keystone works and your credentials are right. | If that fails, nothing else will work. | client
+node: n5 | Why choose it, and what it costs | 4 | 0 | A private cloud gives control and predictable cost at scale. | Skipping upgrades until the gap is too big. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: Every service broke at once
 
 > **Incident:** Nova, Neutron and Cinder all reported errors within the same minute.

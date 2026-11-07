@@ -59,6 +59,21 @@ Reviewers cannot review it properly. Split it into smaller pull requests, separa
 > Review quality falls quickly as size grows.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Team workflows: branching strategies, pull... fits together
+node: n1 | Three common strategies | 0 | 0 | Trunk-based development: everyone merges small changes to main at least daily, often behind feature flags. | Long-lived branches with unclear owners. | process
+node: n2 | A pull request people can review | 1 | 1 | A pull request (also called a merge request) proposes merging one branch into another and is the place for discussion, review and automated checks. | Required checks that are flaky, so people bypass them. | client
+node: n3 | Protect the main branch | 2 | 0 | Hosting platforms let you set rules on main that nobody can bypass by accident. | Allowing direct pushes to main. | process
+node: n4 | Commit and merge conventions | 3 | 1 | Pick one merge style (squash, rebase or merge commit) and use it consistently. | Huge pull requests. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The unreviewed hotfix
 
 > **Incident:** A late-night fix was pushed straight to main because the rule was only a convention.

@@ -51,6 +51,21 @@ Release it as a new version, test on a few canary services, report findings with
 > Shared changes need versioning, canaries and a soft launch.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Reusable pipelines and templates fits together
+node: n1 | The cost of copied pipelines | 0 | 0 | Copying a pipeline looks free on day one. | Making every team copy the file because the shared one is hard to change. | queue
+node: n2 | Templates with inputs | 1 | 1 | Most CI systems let one pipeline include another and pass inputs. | Giving the template dozens of options. | process
+node: n3 | Version the shared code | 2 | 0 | A change to a shared pipeline affects every user at once, so treat it like a library release. | Referring to a template by a moving branch name. | process
+node: n4 | Guard rails, not handcuffs | 3 | 1 | Decide what must be the same everywhere: the security scan, artifact signing, the rule that production deploys need a reviewed commit on the main branch, and the audit... | Enforcing nothing centrally, so the scan quietly disappears from some services. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: One edit, forty broken builds
 
 > **Incident:** A platform engineer renamed a variable in the shared template. Within an hour, forty services could not deploy.

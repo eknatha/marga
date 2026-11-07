@@ -135,6 +135,23 @@ $ kubectl diff -k overlays/production
 
 They combine well: render a Helm chart and patch the output with Kustomize, or let Argo CD deploy either. Whatever you pick, deploy through a pipeline, never by hand from a laptop.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Helm and Kustomize fits together
+node: n1 | Helm concepts | 0 | 0 | A chart is a package of templates plus default values. | Using --set for production settings that are not stored anywhere. | process
+node: n2 | Upgrade, diff and rollback | 1 | 1 | helm template renders the final YAML without touching the cluster, which is the quickest way to see what a change will do. | Upgrading charts without reading the changelog and diff. | process
+node: n3 | Writing a chart | 2 | 0 | helm create shop scaffolds a chart. The key files are Chart.yaml (name and version), values.yaml (defaults) and templates/ (Go templates). | Template indentation errors that produce invalid YAML. | process
+node: n4 | Kustomize | 3 | 1 | Kustomize starts from plain, valid YAML (the base) and applies overlays that patch it. | Putting secrets in values files in plain text. | process
+node: n5 | Choosing between them | 4 | 0 | They combine well: render a Helm chart and patch the output with Kustomize, or let Argo CD deploy either. | Using both Helm and manual kubectl edit on the same objects. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the upgrade that wiped the customisations
 
 > **Incident:** An engineer upgrades a release with `helm upgrade web bitnami/nginx --version 18.2.0` and no values file. The site reverts to one replica and the default hostname, because the previous overrides were passed with `--set` and were not retained.

@@ -64,6 +64,21 @@ Actions and GitLab CI read a YAML file from the repository and run it on runners
 
 Use the platform that sits next to your code and reviews, unless you have a clear reason not to. Choose Tekton when you must run CI inside your own clusters, need Kubernetes-native scheduling and policies, or are building an internal delivery platform. Avoid mixing three tools without a reason, because every extra system is another thing to patch, secure and teach.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How How CI platforms work and how the three differ fits together
+node: n1 | The shared model | 0 | 0 | An event (a push, a pull request, a tag, a schedule or a manual click) starts a pipeline. | Putting all build logic inside platform-specific YAML. | process
+node: n2 | Three dialects | 1 | 1 | Actions and GitLab CI read a YAML file from the repository and run it on runners the platform schedules. | Ignoring who patches and isolates self-hosted runners. | process
+node: n3 | What really differs | 2 | 0 | Where it lives: Actions is built into the hosted code service, GitLab CI into the GitLab product, Tekton into any cluster. | Choosing a tool by popularity instead of where code and workers live. | process
+node: n4 | A simple choice rule | 3 | 1 | Use the platform that sits next to your code and reviews, unless you have a clear reason not to. | Running three CI systems with no owner for any. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The pipeline that did not translate
 
 > **Incident:** A migration stalled because the new platform handled caching and approvals differently.

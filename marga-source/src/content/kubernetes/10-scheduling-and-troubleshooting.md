@@ -82,6 +82,19 @@ $ kubectl top pod -n shop                       # resource use, if metrics are i
 
 For a node that is unhealthy, `kubectl describe node` shows conditions such as `MemoryPressure` and `DiskPressure`. To empty a node for maintenance without downtime, use `kubectl drain worker-2 --ignore-daemonsets --delete-emptydir-data`, which respects PodDisruptionBudgets, then `kubectl uncordon worker-2` when finished.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Scheduling and troubleshooting fits together
+node: n1 | Placement | 0 | 0 | Taints and tolerations are for keeping others away: dedicate GPU nodes by tainting them, and only GPU workloads tolerate the taint. | Draining nodes with no PodDisruptionBudget on critical services. | process
+node: n2 | The diagnostic order | 1 | 1 | Do the same steps every time, from broad to specific. | Forcing deletion of Pods without understanding why they are stuck. | process
+node: n3 | Incident: a Pod will not schedule | 2 | 0 | Read the message literally: of four nodes, one is tainted and the Pod has no toleration, and the other three do not have enough free memory for the request (the... | Reading kubectl logs without --previous after a crash. | queue
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: a Pod will not schedule
 
 > **Incident:** The new `batch` Deployment shows 0 of 3 Pods running. All three are `Pending`.

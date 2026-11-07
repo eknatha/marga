@@ -75,6 +75,19 @@ $ kubectl get sc
 
 If you only need a single database for a small service, a managed database service from your cloud provider is usually safer than operating one yourself on Kubernetes.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Storage and StatefulSets fits together
+node: n1 | The three objects | 0 | 0 | With dynamic provisioning you only write the claim; the StorageClass creates the disk and the PV for you. | Assuming a PVC is deleted with its Pod (it is not) or that data survives claim deletion (it may not). | process
+node: n2 | Access modes and reclaim policy | 1 | 1 | The reclaim policy decides what happens to the disk when the claim is deleted. | Using ReadWriteOnce volumes for a multi-replica Deployment on different nodes. | security
+node: n3 | StatefulSets | 2 | 0 | A Deployment treats Pods as interchangeable. | Running databases on emptyDir, which dies with the Pod. | store
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: the Pod is stuck Pending with an unbound claim
 
 > **Incident:** A new Pod stays `Pending` for ten minutes after you added a volume.

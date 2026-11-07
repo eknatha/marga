@@ -67,6 +67,19 @@ kubectl get pipelineruns -n ci --sort-by=.metadata.creationTimestamp | tail
 tkn pipelinerun delete --keep 50 -n ci -f
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Tekton: triggers, supply chain and production use fits together
+node: n1 | Triggers | 0 | 0 | An EventListener is a service that receives webhooks. | Webhook endpoints with no secret validation. | process
+node: n2 | Chains | 1 | 1 | Tekton Chains watches completed TaskRuns, signs images and results and stores provenance that records what built what. | Mutable step images such as latest. | process
+node: n3 | Production practices | 2 | 0 | Run each team's pipelines in its own namespace with a dedicated service account and the least RBAC it needs. | One shared service account with broad rights. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Ten thousand finished runs
 
 > **Incident:** Old runs piled up in the cluster and slowed the API server.

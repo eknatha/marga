@@ -68,6 +68,21 @@ deploy:
 
 An **ID token** is a short-lived signed token that the job can exchange with a cloud provider that trusts your GitLab, replacing stored keys.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How GitLab CI: runners, environments and security fits together
+node: n1 | Runners | 0 | 0 | A runner polls GitLab for jobs. It can be shared across an instance, assigned to a group or dedicated to one project. | Privileged Docker runners for everything. | process
+node: n2 | Variables | 1 | 1 | Set secrets under project or group CI/CD variables, not in the YAML. | Secrets that are not protected or masked. | process
+node: n3 | Environments and approvals | 2 | 0 | An environment records deployments, links to the running site and can require approval before a job starts. | Production jobs that any branch can start. | process
+node: n4 | Identity without stored keys | 3 | 1 | An ID token is a short-lived signed token that the job can exchange with a cloud provider that trusts your GitLab, replacing stored keys. | Identity without stored keys An ID token is a short-lived signed token that the job can exchange with a cloud provider that trusts your... | security
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The variable in the merge request log
 
 > **Incident:** A fork's merge request pipeline printed a production token.

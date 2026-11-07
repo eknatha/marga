@@ -78,6 +78,21 @@ An egress rule that allows DNS (port 53 to the cluster DNS pods).
 > Egress deny blocks DNS queries too.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Network policies in practice fits together
+node: n1 | What a policy does | 0 | 0 | A NetworkPolicy selects pods with labels and says which traffic is allowed to or from them. | Assuming policies work without a plugin that enforces them. | security
+node: n2 | Start with default deny | 1 | 1 | Begin each namespace with a policy that denies all ingress to all pods, then add what is needed. | Forgetting DNS when restricting egress. | process
+node: n3 | Allow what is needed | 2 | 0 | Add policies that name the exact paths. | Writing policies once and never testing the blocked paths. | process
+node: n4 | Egress, DNS and testing | 3 | 1 | If you restrict egress, remember DNS. Pods must reach the cluster DNS service on port 53 (UDP and TCP), or every name lookup fails and the application looks broken for... | Mixing up selector lists, so a rule is far wider than intended. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Lateral movement in one hop
 
 > **Incident:** A vulnerable image in the `marketing` namespace was exploited, and the attacker connected straight to the payments database.

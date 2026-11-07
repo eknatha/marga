@@ -127,6 +127,23 @@ $ kubectl get events -n shop --sort-by=.lastTimestamp | tail
 - Give operators only the RBAC they need; they are powerful controllers
 - Back up the data operators manage, not just their YAML
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Custom resources, controllers and operators fits together
+node: n1 | CustomResourceDefinitions | 0 | 0 | A CRD registers a new resource type with the API server. | Debugging only the custom resource and never the operator's logs. | process
+node: n2 | The controller pattern | 1 | 1 | A controller is a program that runs a loop: observe the actual state, compare it with the desired state in the object's spec, and act to close the gap. | Treating a custom resource as if it had no controller behind it. | process
+node: n3 | Operators | 2 | 0 | An operator is a controller plus a CRD that encodes human operational knowledge for a specific application: how to install it, back it up, scale it, upgrade it and... | Installing operators from unreviewed manifests with cluster-admin rights. | process
+node: n4 | Working with custom resources | 3 | 1 | kubectl explain documents the schema of any resource, including custom ones. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Running operators responsibly | 4 | 0 | Pin operator and CRD versions and test upgrades in staging. | Deleting CRDs without understanding the cascade. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the CRD that took the database with it
 
 > **Incident:** During a clean-up an engineer deletes the PostgreSQL operator's CRDs with `kubectl delete crd` to "reinstall them fresh". Every database custom resource disappears, and the operator, seeing them removed, begins deleting the managed clusters.

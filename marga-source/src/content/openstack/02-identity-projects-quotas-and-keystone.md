@@ -71,6 +71,21 @@ A quota error is not a fault in the cloud: it is a rule. The remedies are to del
 - **Could not find project**: the project name is wrong, or the project is in a different domain.
 - **Clock skew**: tokens carry timestamps. A server whose clock is far off will reject valid tokens. Keep NTP running on every node.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Identity, projects and quotas fits together
+node: n1 | The model | 0 | 0 | A domain groups users and projects, which lets one cloud serve several organisations. | Using the admin account for everyday work. | process
+node: n2 | Tokens and the catalog | 1 | 1 | You sign in and receive a token (a temporary credential), which you present to every service. | Forgetting that names are per domain. | observe
+node: n3 | Quotas | 2 | 0 | Each project has limits on instances, vCPUs, RAM, volumes, floating IPs, security groups and more. | Giving the admin role to make an error go away. | process
+node: n4 | Reading authentication errors | 3 | 1 | HTTP 401 Unauthorized: the token or password is wrong or expired. | A password right for one domain fails in another. | security
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Everything worked yesterday
 
 > **Incident:** A deployment script began failing at 08:00 with 401 errors.

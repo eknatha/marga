@@ -73,6 +73,21 @@ $ kubectl explain pod.spec.containers
 
 Always check `current-context` first. Running a command against the wrong cluster is a classic and expensive mistake. `kubectl explain` documents any field from inside the terminal, which is also what you will rely on in an exam.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Kubernetes architecture fits together
+node: n1 | The components | 0 | 0 | A cluster is a set of machines called nodes. | Editing Pods directly instead of the Deployment that owns them. | process
+node: n2 | Declarative and reconciling | 1 | 1 | You do not tell Kubernetes how to do something. | Declarative and reconciling You do not tell Kubernetes how to do something. | process
+node: n3 | Core objects | 2 | 0 | Objects are written as YAML with four top-level parts: apiVersion, kind, metadata and spec. | Forgetting the namespace (-n) and concluding that a resource is missing. | process
+node: n4 | First commands on any cluster | 3 | 1 | Always check current-context first. Running a command against the wrong cluster is a classic and expensive mistake. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: kubectl is pointed at the wrong cluster
 
 > **Incident:** You run `kubectl delete deployment web` to clean up a test, and an alert fires: the production website is down.

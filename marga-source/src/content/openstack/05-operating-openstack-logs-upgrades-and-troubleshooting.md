@@ -64,6 +64,23 @@ OpenStack releases about every six months. Upgrading means moving service by ser
 
 Watch the ratio of used to allocatable vCPU, RAM and storage, with headroom to lose a compute node and still re-run its servers. Track the number of ERROR servers, failed API requests, queue depth and database size. A cloud that is at 90 percent in one flavor class will fail large requests even when totals look fine.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Operating OpenStack: logs, upgrades and... fits together
+node: n1 | Following a request | 0 | 0 | Every API request has a request id that appears in the logs of each service it touches. | Check the Common mistakes list below this diagram for what usually goes wrong here. | client
+node: n2 | Health of the shared parts | 1 | 1 | A down agent means that host's part of the service is gone. | No alert on queue depth or Galera cluster size. | process
+node: n3 | Stuck states | 2 | 0 | Servers can stay in BUILD, DELETING or ERROR. | Resetting states without checking the hypervisor. | store
+node: n4 | Upgrades and backups | 3 | 1 | OpenStack releases about every six months. | Upgrading without a tested restore of the database. | store
+node: n5 | Capacity | 4 | 0 | Watch the ratio of used to allocatable vCPU, RAM and storage, with headroom to lose a compute node and still re-run its servers. | Treating a three-controller cluster as safe while one node is down and unnoticed. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: The volume that would not detach
 
 > **Incident:** A volume stuck in `detaching` blocked a database migration.

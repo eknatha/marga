@@ -78,6 +78,23 @@ It reports "no changes added to commit" and makes no commit, because nothing is 
 > Commits contain only staged changes; `git commit -a` stages tracked files for you but is a shortcut, not a habit to rely on blindly.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Your first repository: snapshots, commits and... fits together
+node: n1 | Snapshots, not copies of files | 0 | 0 | Git is a distributed version control system. | Committing generated files, logs or secrets. | process
+node: n2 | Create a repository and commit | 1 | 1 | Tell Git who you are once, then start a repository. | Making one huge commit that mixes unrelated changes. | external
+node: n3 | The three areas | 2 | 0 | Files move through three places. The working tree is the files you edit. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Read the history | 3 | 1 | A good commit does one thing and its message says why. | Writing messages like "update" or "fix stuff". | process
+node: n5 | Leave things out with .gitignore | 4 | 0 | Some files do not belong in history: compiled output, virtual environments, logs, editor settings and above all secrets. | Skipping git status before committing. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: Two gigabytes of build output
 
 > **Incident:** A new teammate cloned the deployment repository and waited twenty minutes for a download that should have been seconds.

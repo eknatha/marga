@@ -114,6 +114,21 @@ $ kubectl describe quota shop-quota -n shop
 $ kubectl describe limitrange defaults -n shop
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Resource requests, limits, QoS and quotas fits together
+node: n1 | Requests versus limits | 0 | 0 | A request is the amount the scheduler reserves for the container. | Setting memory limits far below real peak usage, causing OOM kills. | client
+node: n2 | Seeing real usage | 1 | 1 | kubectl top needs the metrics server. Compare usage over days in Prometheus, not a single moment, before changing requests. | Believing kubectl top usage determines scheduling. | process
+node: n3 | QoS classes | 2 | 0 | Kubernetes assigns each Pod a Quality of Service class from its requests and limits, which determines who is evicted first under node memory pressure. | Leaving workloads BestEffort. | process
+node: n4 | LimitRange and ResourceQuota | 3 | 1 | Without guard rails, one team can consume a whole shared cluster. | Forgetting that a quota forces every Pod to declare resources. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Pending Pods and a cluster that looks empty
 
 > **Incident:** New Pods stay `Pending` with `0/6 nodes are available: 6 Insufficient cpu`. Yet `kubectl top nodes` shows every node at 15 percent CPU use. A finance meeting is waiting on the new reporting service.

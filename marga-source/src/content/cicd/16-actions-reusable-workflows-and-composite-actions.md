@@ -73,6 +73,19 @@ A composite action packages several **steps** that you call inside any job with 
 
 Use a reusable workflow to standardize a whole pipeline stage, such as build and deploy. Use a composite action for a few steps inside a job. Callers should pin to a release tag, or a full commit SHA when the source is outside your control, never to a moving branch. Publish changelogs and keep old major versions working for a while, so one change does not break forty pipelines at once.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How GitHub Actions: reusable workflows and composite... fits together
+node: n1 | Reusable workflows | 0 | 0 | A reusable workflow is a whole job set triggered by workflow_call. | Calling shared workflows at a moving branch. | queue
+node: n2 | Composite actions | 1 | 1 | A composite action packages several steps that you call inside any job with uses. | Using a composite action where separate jobs are needed. | process
+node: n3 | Choosing and versioning | 2 | 0 | Use a reusable workflow to standardize a whole pipeline stage, such as build and deploy. | Passing every secret with inherit when two are needed. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The shared workflow that changed overnight
 
 > **Incident:** A moving branch reference let a shared change break every service.

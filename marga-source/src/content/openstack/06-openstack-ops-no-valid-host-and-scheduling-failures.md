@@ -54,6 +54,19 @@ A scheduler filter rejected the candidates. Search the scheduler log by the requ
 > Placement says who has room; filters say who is allowed.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How OpenStack operations: "No valid host" and... fits together
+node: n1 | The path of a request | 0 | 0 | nova-api accepts the request and stores the instance. | Not following the request ID across services. | client
+node: n2 | Ask Placement | 1 | 1 | The candidate list answers: for this size, which providers fit? | Reading No valid host as a pure capacity problem. | process
+node: n3 | Common causes | 2 | 0 | No capacity at the configured allocation ratios, or hosts disabled or down (compute service list shows State: down or Status: disabled). | Showing total capacity without breaking it down by flavor class. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Plenty of room, nowhere to put it
 
 > **Incident:** A project could not create instances of its new flavor, while the dashboard showed 40 percent free capacity.

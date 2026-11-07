@@ -53,6 +53,21 @@ grep -rl "docker build" --include="*.yml" . | wc -l
 
 Track lead time, failure rate, queue time and cost before and after. If the numbers do not improve, find out why before moving the next wave.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Choosing and migrating between CI platforms fits together
+node: n1 | Comparison | 0 | 0 | Tekton is rarely a developer's first choice on its own. | Leaving logic in platform-specific YAML. | process
+node: n2 | Questions that decide | 1 | 1 | Where do code and reviews live now?. Staying close removes integration work. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n3 | Migration plan | 2 | 0 | Inventory pipelines, secrets, runners, schedules and integrations. | No success metrics for the move. | process
+node: n4 | Measure | 3 | 1 | Track lead time, failure rate, queue time and cost before and after. | If the numbers do not improve, find out why before moving the next wave. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Ten months for a three month plan
 
 > **Incident:** A migration dragged on because every pipeline had hidden dependencies.

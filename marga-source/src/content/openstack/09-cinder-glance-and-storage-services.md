@@ -50,6 +50,21 @@ rbd -p volumes ls | head
 
 Typical states: **error_attaching** (compute or iSCSI or RBD access problem), **stuck in deleting** (a snapshot still exists), **creating** for a long time (backend full or the scheduler found no valid backend). Check quotas, backend capacity and the volume service logs, and reset states only after confirming the real state on the backend.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Cinder, Glance and OpenStack storage fits together
+node: n1 | Cinder | 0 | 0 | A volume type maps to a backend and its settings, such as performance tier. | Resetting volume states without checking the backend. | process
+node: n2 | Glance | 1 | 1 | Image properties control hardware and scheduling, such as disk bus and required features. | Converting images on every boot. | process
+node: n3 | With Ceph | 2 | 0 | When Glance, Cinder and Nova all use Ceph RBD, creating a volume from an image is a copy-on-write clone in the same cluster, and instances can boot from volume without... | With Ceph When Glance, Cinder and Nova all use Ceph RBD, creating a volume from an image is a copy-on-write clone in the same cluster, and... | process
+node: n4 | Troubleshooting | 3 | 1 | Typical states: error_attaching (compute or iSCSI or RBD access problem), stuck in deleting (a snapshot still exists), creating for a long time (backend full or the... | Ignoring pool capacity. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Volume stuck in error_attaching
 
 > **Incident:** A database volume would not attach after a compute host replacement.

@@ -97,6 +97,19 @@ spec:
 
 These mirror the container hardening you met in the Docker module. **Pod Security Admission** can enforce them per namespace by labelling it, for example `pod-security.kubernetes.io/enforce=restricted`, so non-compliant Pods are rejected at creation.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How RBAC and workload security fits together
+node: n1 | RBAC building blocks | 0 | 0 | RBAC is additive: there are no deny rules. | Believing a Role denies things; RBAC only allows. | security
+node: n2 | ServiceAccounts for Pods | 1 | 1 | Every Pod runs as a ServiceAccount, and its token lets it call the API. | Leaving the default ServiceAccount token mounted in every Pod. | process
+node: n3 | securityContext | 2 | 0 | These mirror the container hardening you met in the Docker module. | Running containers as root with a writable filesystem. | security
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: a CI job fails with "forbidden"
 
 > **Incident:** The deploy job reports `deployments.apps "shop-api" is forbidden: User "system:serviceaccount:shop:deployer" cannot patch resource "deployments" in API group "apps" in the namespace "shop"`.

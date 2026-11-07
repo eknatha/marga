@@ -117,6 +117,19 @@ Notice the single quotes around shell commands that use `$IMAGE`. With single qu
 - Archive test reports and keep logs, so failures can be diagnosed afterward.
 - Verify after deploy. `rollout status` makes the pipeline fail if the new version never becomes ready.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Building a pipeline with a Jenkinsfile fits together
+node: n1 | A complete pipeline | 0 | 0 | . | No timeout, so a hung step blocks the agent forever. | queue
+node: n2 | Reading it | 1 | 1 | Notice the single quotes around shell commands that use $IMAGE. | Using double-quoted shell strings with secrets. | process
+node: n3 | Habits that keep pipelines healthy | 2 | 0 | Keep the pipeline file small by moving logic into scripts (make test, ./ci/deploy.sh) that developers can run locally the same way. | Tests that depend on tools installed manually on the worker. | queue
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: the build passes locally but fails in CI
 
 > **Incident:** `make test` passes on your laptop. In the pipeline the Test stage fails with `ModuleNotFoundError: No module named 'psycopg2'`.

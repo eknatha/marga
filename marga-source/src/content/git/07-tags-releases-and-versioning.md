@@ -68,6 +68,21 @@ Use git tag --contains COMMIT to list the tags that include that commit.
 > Tags make "is it in this release?" a one-line question.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Tags, releases and version numbers fits together
+node: n1 | Tags | 0 | 0 | A tag is a fixed name for a commit. A lightweight tag is only a pointer. | Lightweight tags for releases. | process
+node: n2 | Semantic versioning | 1 | 1 | Semantic versioning (SemVer) uses MAJOR.MINOR.PATCH. | Breaking changes in a minor version. | process
+node: n3 | Releases and hotfixes | 2 | 0 | A simple flow: develop on short branches, merge to main, tag the release commit, build the artifact from that tag, and deploy the same artifact everywhere. | Hotfixes that never reach main. | process
+node: n4 | Changelogs and questions you can | 3 | 1 | Keep a human-written changelog that lists notable changes per version under headings such as Added, Changed, Fixed and Security. | Moving or deleting published tags. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The tag that moved
 
 > **Incident:** Two builds both said version 2.1.0, and they behaved differently.

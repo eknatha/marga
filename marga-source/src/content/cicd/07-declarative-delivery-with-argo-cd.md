@@ -94,6 +94,23 @@ You cannot store plain Secret manifests in a shared configuration repository. Us
 - **External secret management**: an operator reads values from your cloud secret manager and creates the Kubernetes Secret
 - **Sealed or encrypted secrets**: the stored value is encrypted and only the cluster can decrypt it
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Declarative delivery with Argo CD and Flux fits together
+node: n1 | Push versus pull | 0 | 0 | This is the same reconcile loop you met in the first Kubernetes lesson, applied to deployment itself. | Storing real secrets in the configuration repository. | process
+node: n2 | The flow | 1 | 1 | CI builds and tests the application and publishes an image with a unique tag. | Letting application commits trigger production changes directly. | process
+node: n3 | Argo CD and Flux | 2 | 0 | Both are widely used, CNCF-hosted controllers for this model. | Turning off selfHeal permanently and returning to drift. | process
+node: n4 | Everyday operations | 3 | 1 | Rolling back by reverting the configuration change is better than the rollback command, because it keeps the stored configuration and the cluster in agreement. | Making emergency changes by hand and never recording them. | process
+node: n5 | Secrets | 4 | 0 | You cannot store plain Secret manifests in a shared configuration repository. | Secrets You cannot store plain Secret manifests in a shared configuration repository. | security
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the controller keeps undoing an urgent fix
 
 > **Incident:** During an outage you scale the deployment to 10 replicas with `kubectl scale`. A minute later it is back at 3, and the site is still struggling.

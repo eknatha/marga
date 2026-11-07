@@ -56,6 +56,21 @@ Each run lists jobs, steps and logs. A failing step turns the job red and skips 
 
 Every run gets a `GITHUB_TOKEN`. Set `permissions:` at the top to the minimum, usually `contents: read`, and raise it per job only where needed, for example `packages: write` to push an image. A default that is too broad turns a compromised step into write access to your repository.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How GitHub Actions: workflows, jobs and steps fits together
+node: n1 | Structure | 0 | 0 | A workflow is one YAML file in .github/workflows/. | Assuming jobs share a filesystem. | process
+node: n2 | Passing data | 1 | 1 | Steps write name=value lines to the file named by $GITHUB_OUTPUT, and a job exposes them through outputs. | Forgetting that later steps skip after a failure. | store
+node: n3 | Reading a run | 2 | 0 | Each run lists jobs, steps and logs. A failing step turns the job red and skips later steps unless they use if: always(). | A failing step turns the job red and skips later steps unless they use if: always(). | process
+node: n4 | The default token | 3 | 1 | Every run gets a GITHUB_TOKEN. Set permissions: at the top to the minimum, usually contents: read, and raise it per job only where needed, for example packages: write to... | Leaving the default token permissions broad. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The job that could not find its build
 
 > **Incident:** A test job failed because the build output did not exist there.

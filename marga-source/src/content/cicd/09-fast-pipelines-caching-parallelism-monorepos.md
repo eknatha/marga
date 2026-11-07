@@ -67,6 +67,23 @@ When the lockfile changes, the old cache is reused, so builds use outdated depen
 > Include a hash of the lockfile in the key.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Fast pipelines: caching, parallelism and monorepos fits together
+node: n1 | Measure first | 0 | 0 | Write down the duration of each stage over the last twenty runs. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n2 | Parallelism | 1 | 1 | Jobs that do not depend on each other should run at the same time: lint, unit tests, type checks, and security scans. | More parallel jobs than runners. | process
+node: n3 | Caching correctly | 2 | 0 | A cache must be fast and must never serve stale or poisoned data. | Caches that can be poisoned or stale. | process
+node: n4 | Monorepos: only run what changed | 3 | 1 | In a repository with many services, build and test only what a change can affect. | Skipping the full run for the monorepo. | process
+node: n5 | Other savings | 4 | 0 | Use a small, prebuilt image with your tools instead of installing them in each run. | - Fail fast: run the cheapest checks first. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the thirty-eight minute pipeline
 
 > **Incident:** A team's merge request pipeline grows to 38 minutes, and developers start merging without waiting for it.

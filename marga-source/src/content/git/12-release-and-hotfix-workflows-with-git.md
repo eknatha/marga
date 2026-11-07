@@ -54,6 +54,21 @@ git log v2.8.0..v2.8.1 --oneline
 git tag --contains 4b1c9e2
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Release and hotfix workflows with Git fits together
+node: n1 | Tag releases | 0 | 0 | An annotated, signed tag records who released what and when. | Building fixes from main without a release tag. | process
+node: n2 | Hotfix | 1 | 1 | Starting from the release tag means the hotfix contains only the fix. | Forgetting to merge hotfixes back. | process
+node: n3 | Cherry-pick | 2 | 0 | -x adds the original commit hash to the message, which helps trace where a fix came from. | Cherry-picks without recording the source. | process
+node: n4 | Automate | 3 | 1 | Use Conventional Commits so tools can derive the next version and a changelog from commit messages. | Unprotected release tags. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The hotfix that shipped half the backlog
 
 > **Incident:** A fix was built from main and included unfinished features.

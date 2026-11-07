@@ -73,6 +73,21 @@ A fast-forward. The pointer just moves forward and no merge commit is created un
 > Fast-forward is possible only when history is a straight line.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Branches and merging fits together
+node: n1 | A branch is a pointer | 0 | 0 | A branch is a small file containing the hash of one commit. | Long-lived branches that drift. | process
+node: n2 | Merging | 1 | 1 | Merging combines the work of another branch into the current one. | Resolving conflicts without understanding both sides. | process
+node: n3 | Conflicts | 2 | 0 | A conflict happens when both branches changed the same lines. | Leaving conflict markers in a file and committing it. | process
+node: n4 | Keeping branches healthy | 3 | 1 | Short-lived branches conflict less. Merge main into your branch (or rebase, see the next lesson) often, so differences stay small. | Merging without running tests on the result. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The conflict that was resolved wrongly
 
 > **Incident:** A deploy script merged cleanly and failed in production an hour later.

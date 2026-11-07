@@ -62,6 +62,21 @@ The four widely used delivery metrics (from DORA research) give you a shared lan
 
 Frequent small releases generally improve **all four**, because small changes are easier to review, test and roll back.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Pipeline fundamentals fits together
+node: n1 | Three terms, often confused | 0 | 0 | Most teams practise CI everywhere, continuous delivery as a baseline, and continuous deployment where their tests and monitoring are strong enough to trust it. | Giving the pipeline broad production credentials. | process
+node: n2 | Stages of a pipeline | 1 | 1 | Checkout the source at the exact revision. | Rebuilding the artifact per environment. | queue
+node: n3 | Principles | 2 | 0 | . | Treating a flaky test as noise instead of fixing or removing it. | process
+node: n4 | Measuring delivery health | 3 | 1 | The four widely used delivery metrics (from DORA research) give you a shared language. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: tests pass, production breaks
 
 > **Incident:** The pipeline is green for version 2.4.0, but production returns errors immediately after the release. Staging was fine yesterday.

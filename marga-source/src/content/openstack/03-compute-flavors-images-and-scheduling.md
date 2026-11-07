@@ -75,6 +75,21 @@ The scheduler log (`nova-scheduler.log` on the controller) lists how many hosts 
 
 By default OpenStack allows more vCPUs than physical cores (the allocation ratio for CPU is 16 to 1) and some RAM overcommit (the default ratio is 1.5 to 1 in current releases). Operators change these ratios per cluster. Aggregates group hosts with different settings, such as a "gold" group at 1 to 1 for databases.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Compute: flavors, images and scheduling fits together
+node: n1 | Flavors and images | 0 | 0 | A flavor defines size: vCPUs, RAM and root disk. | Changing flavors that live servers use. | process
+node: n2 | The boot sequence | 1 | 1 | The API checks the request and your quota, and stores the server in the database. | Reading "No valid host" as meaning the cloud is full. | process
+node: n3 | "No valid host was found" | 2 | 0 | This is the scheduler saying that no compute node passed every check. | Leaving failed ERROR servers around: they still count against quota. | process
+node: n4 | Overcommit | 3 | 1 | By default OpenStack allows more vCPUs than physical cores (the allocation ratio for CPU is 16 to 1) and some RAM overcommit (the default ratio is 1.5 to 1 in current... | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: A big flavor and a half-empty cloud
 
 > **Incident:** A team could not boot a 16 GB server even though the cloud showed 200 GB free.

@@ -64,6 +64,21 @@ Both your local branch and the remote had new commits, so pull merged them. Use 
 > Pull is fetch plus an integration step.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Remotes: clone, fetch, pull and push fits together
+node: n1 | Clone and remotes | 0 | 0 | git clone copies the full history and creates a remote named origin pointing to where you cloned from. | Pulling without knowing whether it merges or rebases. | process
+node: n2 | Remote-tracking branches | 1 | 1 | After a clone, Git keeps a read-only copy of the remote's branches as origin/main, origin/feature-x and so on. | Putting access tokens in remote URLs. | process
+node: n3 | Fetch versus pull | 2 | 0 | git fetch downloads new commits and updates remote-tracking branches. | Forgetting to set the upstream so push and pull need arguments. | process
+node: n4 | Push and rejected pushes | 3 | 1 | A push succeeds only if it is a fast-forward of the remote branch. | Using --force to get past a rejected push. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The push that overwrote a release branch
 
 > **Incident:** A hurried engineer saw a rejected push and fixed it the quick way.

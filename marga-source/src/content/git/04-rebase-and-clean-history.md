@@ -61,6 +61,21 @@ Duplicate commits or conflicts, because the history they have no longer matches 
 > Rebase makes new commits. Only rebase work nobody else has based changes on.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Rebase and a clean history fits together
+node: n1 | Rebase replays your commits | 0 | 0 | Suppose main moved on while you worked on feature. | Using git push --force instead of --force-with-lease. | process
+node: n2 | Interactive rebase | 1 | 1 | Before asking for a review, clean up your own work. | Squashing everything into a single huge commit. | process
+node: n3 | The golden rule | 2 | 0 | Never rebase commits that exist in a shared branch others have pulled. | Rebasing a branch that others use. | process
+node: n4 | Merge or rebase? | 3 | 1 | Both are valid, and teams choose a policy. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The force push that removed a colleague's commit
 
 > **Incident:** Two engineers worked on the same branch and one rebased and force-pushed.

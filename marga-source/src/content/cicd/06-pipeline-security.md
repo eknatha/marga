@@ -101,6 +101,23 @@ Use lock files and install exactly what they list. Pull through an internal prox
 
 No single control is enough. Each layer assumes another one may fail.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Securing the pipeline and the software supply... fits together
+node: n1 | Secrets in pipelines | 0 | 0 | Secrets must come from a secret store or the CI system's protected variables, be masked in logs and be scoped to the jobs that need them. | Running untrusted pull requests with production secrets. | security
+node: n2 | Runners and isolation | 1 | 1 | Build agents run untrusted code, since any pull request may contain a malicious test or build script. | Persistent runners that keep state and credentials between jobs. | process
+node: n3 | Least privilege for deployment | 2 | 0 | The deploy job needs permission to update specific workloads, not to administer the account. | Using floating tags for third-party pipeline plugins. | process
+node: n4 | Securing what you consume | 3 | 1 | Dependencies are code you did not write. | Treating the pipeline configuration as less important than application code. | security
+node: n5 | A layered pipeline | 4 | 0 | No single control is enough. Each layer assumes another one may fail. | Long-lived admin keys stored as CI variables. | queue
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the leaked deploy key
 
 > **Incident:** A contractor's pull request adds a debug line `env | sort` to a test script. The pipeline runs it and prints every environment variable into a publicly viewable log, including a long-lived cloud access key with admin rights. Within an hour, unfamiliar instances start in an unused region.

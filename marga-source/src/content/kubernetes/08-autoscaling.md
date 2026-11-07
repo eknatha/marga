@@ -108,6 +108,21 @@ $ kubectl -n kube-system logs deploy/cluster-autoscaler | tail -5
 
 New nodes take minutes to start, so keep some headroom and use PodDisruptionBudgets so scale-down does not remove too many replicas of one service at once.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Autoscaling: HPA, VPA, KEDA and the cluster... fits together
+node: n1 | Horizontal Pod Autoscaler | 0 | 0 | The HPA changes the replica count of a Deployment based on observed metrics. | No scale-down stabilisation, causing flapping. | process
+node: n2 | Vertical Pod Autoscaler | 1 | 1 | The VPA adjusts container requests and limits. | HPA and VPA both controlling CPU on the same workload. | process
+node: n3 | Event-driven scaling with KEDA | 2 | 0 | KEDA scales workloads from external event sources such as queue length, Kafka lag or a cron schedule, and can scale to zero. | Using the HPA with no CPU request set. | queue
+node: n4 | Scaling nodes | 3 | 1 | Pod autoscaling only helps if nodes exist to hold the new Pods. | A maximum replica count that exceeds node capacity or quota. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the HPA that could not scale
 
 > **Incident:** A marketing email triples traffic. Latency climbs, but the HPA stays at 3 replicas. `kubectl get hpa` shows `cpu: <unknown>/60%` and the team sees no scaling events.

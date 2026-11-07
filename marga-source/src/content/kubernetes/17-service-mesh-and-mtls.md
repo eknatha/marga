@@ -80,6 +80,23 @@ The job sends plain traffic and has no mesh certificate, and strict mode rejects
 > Use permissive mode while migrating, find non-mesh clients from telemetry, then enable strict.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Service mesh, mutual TLS and traffic control fits together
+node: n1 | Parts of a mesh | 0 | 0 | The data plane is a set of proxies that handle service-to-service traffic. | No alert on mesh certificate expiry. | process
+node: n2 | Mutual TLS and identity | 1 | 1 | With mutual TLS (mTLS) both sides present certificates, so each service knows who is calling and the traffic is encrypted. | Enabling strict mTLS without migration. | security
+node: n3 | Traffic control | 2 | 0 | This sends 10 percent of traffic to version 2, with a timeout and limited retries. | Unlimited retries. | process
+node: n4 | Telemetry | 3 | 1 | Because proxies see every call, the mesh can report request rate, errors and latency per service pair without code changes, and can create trace spans. | Adopting a mesh for two services. | process
+node: n5 | The cost | 4 | 0 | Extra resources: each sidecar uses CPU and memory, and adds a little latency. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the certificate that expired inside the mesh
 
 > **Incident:** At 02:10 many internal calls fail with 503 and "upstream connect error", but applications look healthy.

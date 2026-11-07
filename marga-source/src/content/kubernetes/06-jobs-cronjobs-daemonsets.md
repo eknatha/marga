@@ -131,6 +131,21 @@ Because control-plane nodes and special nodes carry taints, a DaemonSet needs `t
 | Run on a schedule | CronJob |
 | One copy per node | DaemonSet |
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Jobs, CronJobs, DaemonSets and StatefulSet... fits together
+node: n1 | Jobs | 0 | 0 | A Job creates Pods and keeps retrying until a set number complete successfully. | Using restartPolicy: Always in a Job template, which is invalid. | process
+node: n2 | CronJobs | 1 | 1 | A CronJob creates a Job on a schedule, using the same five-field syntax as cron. | Assuming CronJob times are in your local timezone. | process
+node: n3 | DaemonSets | 2 | 0 | A DaemonSet runs one Pod on every node, or on every node that matches a selector. | Forgetting tolerations so a DaemonSet misses tainted nodes. | process
+node: n4 | Picking the right controller | 3 | 1 | . | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the report that ran twice and doubled the invoices
 
 > **Incident:** A nightly invoicing CronJob takes longer than usual because of a slow database. At the next scheduled time the controller starts a second Job while the first is still running. Both read the same unprocessed invoices and customers are billed twice.

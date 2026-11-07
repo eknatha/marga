@@ -67,6 +67,21 @@ git reflog. It lists where HEAD pointed before, including the hashes of the lost
 > Committed work can nearly always be recovered.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Debugging Git problems: reflog, bisect, blame and... fits together
+node: n1 | Recover with the reflog | 0 | 0 | The reflog records every time HEAD or a branch moved on your machine: commits, resets, rebases, checkouts. | Committing in detached HEAD and losing the work. | observe
+node: n2 | Find the guilty commit with bisect | 1 | 1 | You know version 1.3 worked and the current one does not, with 200 commits between. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n3 | Who changed this, and why | 2 | 0 | Blame shows the last commit to touch a line, which may only be a reformat. | Using blame to assign fault instead of to learn the reason. | process
+node: n4 | Confusing states | 3 | 1 | Detached HEAD: you checked out a commit or tag, not a branch. | Panicking and re-cloning instead of checking the reflog. | store
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Which release broke the report?
 
 > **Incident:** The monthly billing report began producing wrong totals, and nobody knew which of 214 commits since the last good release was responsible.

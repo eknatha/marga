@@ -99,6 +99,23 @@ $ kubectl uncordon worker-2
 
 `cordon` stops new Pods landing on a node; `drain` also evicts the existing ones safely; `uncordon` returns it to service.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Building, upgrading and backing up a cluster fits together
+node: n1 | Preparing nodes | 0 | 0 | Each node needs a container runtime, the kubelet, kubeadm and kubectl at compatible versions, swap disabled, the right kernel modules and sysctl settings, and unique... | Skipping minor versions during an upgrade. | process
+node: n2 | Bootstrapping with kubeadm | 1 | 1 | kubeadm init generates certificates, writes static Pod manifests for the API server, controller manager, scheduler and etcd into /etc/kubernetes/manifests/, and starts... | Upgrading workers before the control plane. | process
+node: n3 | Upgrading | 2 | 0 | Kubernetes supports upgrading one minor version at a time (for example 1.30 to 1.31, never 1.29 to 1.31). | No tested etcd restore procedure. | process
+node: n4 | Backing up etcd | 3 | 1 | etcd stores every object in the cluster. | Draining without PodDisruptionBudgets for critical services. | process
+node: n5 | Certificates and maintenance | 4 | 0 | kubeadm certificates expire after a year unless renewed, and upgrades renew them. | Ignoring certificate expiry dates. | security
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: kubectl stops working one year after install
 
 > **Incident:** On a Monday morning every `kubectl` command fails with `x509: certificate has expired or is not yet valid`. The cluster was built exactly a year ago and nobody upgraded it since.

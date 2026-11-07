@@ -65,6 +65,19 @@ test:
 
 Do not put build outputs in the cache and expect them later. Set `expire_in` on artifacts so storage does not grow without bound. Never place secrets in artifacts, because anyone with access can download them.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How GitLab CI: rules, artifacts and caches fits together
+node: n1 | Rules | 0 | 0 | rules are checked in order and the first match decides. | Mixing only and except with rules in one job. | process
+node: n2 | Artifacts and caches | 1 | 1 | Artifacts are uploaded to GitLab, passed to later jobs and downloadable, so use them for results you must rely on: binaries, reports and test output. | Cache keys that never change. | store
+node: n3 | Pitfalls | 2 | 0 | Do not put build outputs in the cache and expect them later. | Relying on cache for build outputs. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Two pipelines for one change
 
 > **Incident:** Every merge request ran a branch pipeline and a merge request pipeline.

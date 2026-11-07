@@ -73,6 +73,19 @@ The path MTU. Overlay tunnels reduce MTU. Test with ping and the do-not-fragment
 > Small works, large hangs: think MTU.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How OpenStack operations: Neutron and Ceph... fits together
+node: n1 | Neutron: follow the packet | 0 | 0 | First check the control plane: are the agents alive, and is the port bound and active? | Capturing packets at only one point. | process
+node: n2 | Ceph: read the health | 1 | 1 | ceph -s shows overall health, monitor quorum, OSDs up and in, and placement group (PG) states. | Restarting instances before checking Ceph health. | process
+node: n3 | From the OpenStack side | 2 | 0 | Cinder volumes and Nova ephemeral disks backed by RBD are slow or stuck when the Ceph pool is unhealthy. | Forgetting overlay overhead when setting MTUs. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The cluster that stopped accepting writes
 
 > **Incident:** At 14:00 many instances froze, and Cinder operations timed out.

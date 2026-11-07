@@ -72,6 +72,21 @@ With `needs`, a job starts as soon as the jobs it names finish, even if the rest
 
 The pipeline page shows jobs as boxes by stage. Open a job to see the log, the image and the runner that ran it. Use `CI Lint` in the editor to check syntax before pushing, and retry only the failed job instead of the whole pipeline.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How GitLab CI: pipelines, stages and jobs fits together
+node: n1 | The file | 0 | 0 | Stages run in order and jobs inside a stage run in parallel. | Storing secrets in the YAML file. | process
+node: n2 | Variables | 1 | 1 | GitLab provides predefined variables such as CI_COMMIT_SHA, CI_COMMIT_BRANCH and CI_PIPELINE_ID. | Hard-coding values instead of variables. | process
+node: n3 | Faster pipelines with needs | 2 | 0 | With needs, a job starts as soon as the jobs it names finish, even if the rest of its stage is still running. | Not using needs, so jobs wait unnecessarily. | queue
+node: n4 | Reading a pipeline | 3 | 1 | The pipeline page shows jobs as boxes by stage. | Putting slow jobs first so feedback is late. | queue
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The stage that waited for nothing
 
 > **Incident:** A pipeline took 40 minutes because every stage waited for the one before it.

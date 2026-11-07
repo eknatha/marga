@@ -98,6 +98,21 @@ region=eu-west
 $ kubectl get secret shop-db -n shop -o jsonpath='{.data.password}' | base64 -d
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How ConfigMaps and Secrets fits together
+node: n1 | ConfigMap | 0 | 0 | Values are strings, so booleans and numbers are quoted. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n2 | Secret | 1 | 1 | stringData accepts plain text and Kubernetes stores it Base64-encoded in data. | Putting secrets in images, ConfigMaps or Deployment manifests. | security
+node: n3 | Using them in a Pod | 2 | 0 | Mounted files are usually the better choice for secrets, because environment variables leak easily into crash dumps and debug output. | Expecting environment variables to refresh without a restart. | process
+node: n4 | Verifying what a Pod sees | 3 | 1 | . | Treating Base64 as secure. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: changing the ConfigMap did nothing
 
 > **Incident:** You change `LOG_LEVEL` from `info` to `debug` in the ConfigMap and apply it. The application keeps logging at `info`.

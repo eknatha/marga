@@ -70,6 +70,21 @@ The PersistentVolumeClaims remain, so data is kept, and the recreated pods reatt
 > Claims are not deleted with the StatefulSet unless you configure a retention policy.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How StatefulSets and stateful workloads fits together
+node: n1 | Stable identity | 0 | 0 | A StatefulSet creates pods named name-0, name-1, name-2. | Treating a StatefulSet as a complete database solution. | security
+node: n2 | Headless service and DNS | 1 | 1 | A headless service (clusterIP: None) does not load balance. | Check the Common mistakes list below this diagram for what usually goes wrong here. | edge
+node: n3 | Storage and what happens on failure | 2 | 0 | Each pod gets its own PersistentVolumeClaim from the volumeClaimTemplates. | Assuming storage can follow a pod to another zone. | store
+node: n4 | Be honest about databases | 3 | 1 | StatefulSets give identity and storage. They do not give you backups, failover, upgrades, tuning or point-in-time recovery. | Forgetting backups and restore tests. | store
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The replica that came back empty
 
 > **Incident:** After a node failure, a database replica restarted and began a full resync that took six hours and slowed the primary.

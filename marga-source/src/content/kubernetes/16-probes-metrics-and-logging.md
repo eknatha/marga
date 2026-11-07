@@ -89,6 +89,19 @@ All Pods fail liveness and are restarted repeatedly, which adds load and delays 
 > Keep liveness limited to the process. Put dependency checks in readiness, or in alerts.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Probes, metrics and logging on Kubernetes fits together
+node: n1 | The three probes | 0 | 0 | Rules that prevent trouble. | Liveness probes that check dependencies. | process
+node: n2 | Metrics | 1 | 1 | The metrics server gives kubectl top and feeds the horizontal Pod autoscaler with CPU and memory use. | Treating the metrics server as monitoring. | observe
+node: n3 | Logging | 2 | 0 | Applications write to standard output, and the node keeps the files under /var/log/containers. | No readiness probe, so traffic goes to Pods still starting. | observe
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: the restart storm
 
 > **Incident:** A short database failover causes every API Pod to restart, and the service stays down for ten minutes after the database is back.

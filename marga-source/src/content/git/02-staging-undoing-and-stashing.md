@@ -86,6 +86,23 @@ Revert. It adds a new commit that reverses the change, so nobody has to repair a
 > Never rewrite commits other people already have.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Undoing changes safely: restore, amend, revert... fits together
+node: n1 | Undo before you commit | 0 | 0 | Two modern commands cover the common cases. | Amending or force-pushing commits that others already pulled. | process
+node: n2 | Fix the last commit | 1 | 1 | If you forgot a file or made a typo in the message and have not pushed, amend. | Leaving work in a stash for weeks. | process
+node: n3 | Undo something that is already | 2 | 0 | When a commit is already on a shared branch, do not rewrite history. | Reverting a merge without choosing the mainline parent. | process
+node: n4 | Reset: moving the branch | 3 | 1 | git reset moves the current branch pointer to another commit. | Using reset --hard casually. | process
+node: n5 | Park work with stash | 4 | 0 | You are in the middle of a change and need to switch tasks. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: The hard reset that erased a day of work
 
 > **Incident:** An engineer tried to "clean up" before a meeting and ran a hard reset on the wrong branch.

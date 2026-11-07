@@ -83,6 +83,23 @@ Exams commonly contain 15 to 20 tasks in about two hours, each with a weight. A 
 4. Verify each answer: run `get`, `describe`, or a test request before moving on.
 5. Keep the last ten minutes for flagged tasks.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How CKA and CKS exam strategy fits together
+node: n1 | What the exams cover | 0 | 0 | Every lesson in this module maps to CKA areas. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n2 | Terminal setup | 1 | 1 | Spend the first minute on a small set of aliases and completion. | Typing YAML from scratch instead of generating it. | process
+node: n3 | Generate YAML, do not type it | 2 | 0 | Imperative commands create manifests for you in seconds. | Generate YAML, do not type it Imperative commands create manifests for you in seconds. | process
+node: n4 | Tasks to be able to do from memory | 3 | 1 | Upgrade a cluster with the node-by-node procedure (kubeadm upgrade, drain, upgrade kubelet, uncordon). | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Time plan | 4 | 0 | Exams commonly contain 15 to 20 tasks in about two hours, each with a weight. | Not setting the context for each task. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: right answer, wrong cluster
 
 > **Incident:** You spend ten minutes solving a task perfectly, then the check fails. The task said to use context `k8s-b`, and you were still on `k8s-a`.

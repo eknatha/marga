@@ -52,6 +52,21 @@ An **environment** can require reviewers, add a wait timer, limit which branches
 
 Deploy the artifact you tested, by digest or version, not a fresh rebuild. Run a smoke test after deploy and make rollback a normal path: redeploy the previous version through the same workflow. Record who approved and what shipped.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How GitHub Actions: runners, environments and... fits together
+node: n1 | Choosing runners | 0 | 0 | Hosted runners are fresh virtual machines that the platform patches and discards, with fixed sizes and per-minute billing. | Long-lived self-hosted runners shared across trust levels. | process
+node: n2 | Make self-hosted runners ephemeral | 1 | 1 | A long-lived runner keeps files, caches and credentials from earlier jobs. | Self-hosted runners on public repositories. | process
+node: n3 | Environments | 2 | 0 | An environment can require reviewers, add a wait timer, limit which branches may deploy and hold its own secrets. | Production deploys with no approval or branch restriction. | process
+node: n4 | Deployment habits | 3 | 1 | Deploy the artifact you tested, by digest or version, not a fresh rebuild. | Rebuilding for deploy instead of promoting the tested artifact. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The runner that remembered
 
 > **Incident:** A leftover credential on a long-lived runner was used by a later job.

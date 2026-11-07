@@ -70,6 +70,21 @@ docker ps --format 'table {{.Names}}\t{{.Status}}' | head
 
 Upgrade one release at a time, read the release notes, back up databases and configuration, run `pull` to fetch images ahead of time and then `upgrade`. Test the procedure in a staging cloud that mirrors production.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Deploying OpenStack with Kolla-Ansible fits together
+node: n1 | Files | 0 | 0 | globals.yml holds cluster-wide choices. passwords.yml holds generated secrets and must be protected and backed up. | Losing passwords.yml. | process
+node: n2 | Workflow | 1 | 1 | Prechecks catch missing interfaces, wrong addresses, port conflicts and missing packages before anything changes. | Skipping prechecks. | queue
+node: n3 | Override configuration | 2 | 0 | Place files under /etc/kolla/config/<service>/ to add or override service settings, for example nova.conf. | Hand-editing files inside containers. | process
+node: n4 | Upgrade | 3 | 1 | Upgrade one release at a time, read the release notes, back up databases and configuration, run pull to fetch images ahead of time and then upgrade. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: A precheck that saved the day
 
 > **Incident:** Prechecks found a wrong interface name before a deploy.

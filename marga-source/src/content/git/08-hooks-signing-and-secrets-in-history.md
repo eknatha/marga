@@ -67,6 +67,21 @@ No. It remains in history and in every clone. You must rotate the password first
 > Deleting in a later commit does not erase the earlier version.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Hooks, signed commits and secrets in history fits together
+node: n1 | Hooks | 0 | 0 | Hooks are scripts that Git runs at certain moments. | Rotating nothing and only deleting the file. | process
+node: n2 | Server-side protection | 1 | 1 | Run the same checks in the pipeline on every pull request, and turn on push protection or secret scanning on the hosting platform so that known token formats are blocked... | Relying on a local hook that can be skipped. | process
+node: n3 | Signed commits | 2 | 0 | Anyone can set user.name to anything, so the author line proves nothing. | Using shared long-lived keys in repositories. | process
+node: n4 | A secret was committed: the order | 3 | 1 | Revoke and rotate the secret immediately. | Rewriting history without telling the team. | security
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The key in the config file
 
 > **Incident:** A scanner raised an alert on a repository that had been public for three days.

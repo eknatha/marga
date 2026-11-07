@@ -93,6 +93,23 @@ $ kubectl rollout undo deployment/shop-api -n shop --to-revision=12
 $ kubectl rollout status deployment/shop-api -n shop
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Versioning, artifacts and release management fits together
+node: n1 | Build once, promote the artifact | 0 | 0 | A pipeline should produce an immutable artifact (a container image, a package, a binary) exactly once. | Keeping the only copy of an artifact on a build agent. | process
+node: n2 | Semantic versioning | 1 | 1 | SemVer uses MAJOR.MINOR.PATCH: increase MAJOR for incompatible changes, MINOR for backward-compatible features and PATCH for backward-compatible fixes. | Rebuilding the artifact for each environment. | process
+node: n3 | Recording what was built | 2 | 0 | Store metadata with the artifact: source revision, build number, build time, test results and scan results. | Cleaning up old artifacts so a rollback is impossible. | process
+node: n4 | Caches and artifact storage | 3 | 1 | Dependency downloads dominate build time. | Mutable tags such as prod or latest as release identifiers. | store
+node: n5 | Changelog and rollback | 4 | 0 | Automate release notes from the changes included, and require a rollback plan for risky ones. | Breaking database compatibility so the previous version cannot run. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: nobody knows what is in production
 
 > **Incident:** A customer reports a bug that was fixed last week. Support says the fix is released. Engineers cannot tell whether production runs the fix because images are tagged `prod` and the pipeline rebuilt from the main branch during the last deployment.

@@ -74,6 +74,21 @@ A shallow clone (--depth 1), a partial clone, or sparse checkout of just the nee
 > Do not fetch history the job never uses.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Large repositories, submodules and worktrees fits together
+node: n1 | Clone less | 0 | 0 | Not every job needs the full history. | Cloning full history in every CI job. | process
+node: n2 | Large files | 1 | 1 | Git stores every version of every file. A 200 MB binary changed ten times is 2 GB of history. | Committing large binaries without LFS or an artifact store. | process
+node: n3 | Submodules and alternatives | 2 | 0 | A submodule embeds another repository at a fixed commit inside yours. | Forgetting --recurse-submodules and building with empty folders. | process
+node: n4 | Worktrees | 3 | 1 | Switching branches in the middle of work means stashing or committing. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The pipeline that cloned for eleven minutes
 
 > **Incident:** Builds became slower each month, and a pipeline run spent most of its time before the first build step.

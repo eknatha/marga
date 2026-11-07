@@ -71,6 +71,19 @@ run-generated:
 
 A script writes a YAML file as an artifact, and the next job triggers it as a pipeline. Use this when the set of jobs depends on the change, such as one job per modified package. Keep generators simple and test the generated YAML, because an error appears only at run time.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How GitLab CI: includes, templates and child pipelines fits together
+node: n1 | Include and extends | 0 | 0 | include pulls in files from the same project, another project, a remote URL or GitLab's own templates. | Including shared templates from a moving branch. | process
+node: n2 | Parent and child pipelines | 1 | 1 | A child pipeline is a separate pipeline started by a job in the parent. | Dynamic pipelines with no tests for the generator. | queue
+node: n3 | Dynamic child pipelines | 2 | 0 | A script writes a YAML file as an artifact, and the next job triggers it as a pipeline. | Running all services on every change in a monorepo. | queue
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The template that broke every project
 
 > **Incident:** An unpinned shared template change failed pipelines across the company.

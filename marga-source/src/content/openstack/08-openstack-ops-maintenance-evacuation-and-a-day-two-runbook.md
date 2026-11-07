@@ -67,6 +67,21 @@ That the host is really down and fenced, so the old instances cannot still write
 > Avoid two copies of one instance.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How OpenStack operations: maintenance, evacuation and... fits together
+node: n1 | Planned maintenance: drain | 0 | 0 | Check that other hosts in the aggregate have capacity (N+1). | Draining a host without checking spare capacity. | process
+node: n2 | Host failure: evacuate | 1 | 1 | If a host dies, instances on it are stuck in their last state. | Using local ephemeral disks for important data. | process
+node: n3 | Health checks around every change | 2 | 0 | Before: all compute services up, all network agents alive, Ceph HEALTH_OK, no running migrations, no active alerts, recent backups of the database and configuration. | Skipping the canary test after a change. | observe
+node: n4 | The day-two runbook | 3 | 1 | Keep it short, versioned and tested: contact and escalation list, architecture map, how to drain and evacuate, how to restart each service safely, how to find logs... | Evacuating without fencing the failed host. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The evacuation that created duplicates
 
 > **Incident:** A compute host lost its network but kept running, an operator evacuated its instances, and several databases wrote to the same volumes from two hosts.

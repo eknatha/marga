@@ -45,6 +45,21 @@ Alert on service down for more than a few minutes, RabbitMQ queues rising, API e
 
 Use growth trends and upcoming projects to forecast when capacity runs out, and account for procurement lead time. Set project quotas so that the sum is consistent with the overcommit you accept, and review them regularly.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How OpenStack monitoring and capacity planning fits together
+node: n1 | Control plane | 0 | 0 | API health: request latency and 5xx rates per service, through HAProxy or exporters. | No alert on queue depth. | process
+node: n2 | Capacity | 1 | 1 | Track vCPU and memory used against capacity per host aggregate, the overcommit ratio and the number of instances of each flavor that could still be scheduled. | Ignoring storage and network capacity. | process
+node: n3 | Alerts | 2 | 0 | Alert on service down for more than a few minutes, RabbitMQ queues rising, API error rates, Ceph warnings, compute hosts above a utilization threshold and failed... | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+node: n4 | Plan | 3 | 1 | Use growth trends and upcoming projects to forecast when capacity runs out, and account for procurement lead time. | Quotas that exceed physical capacity by a lot. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Instances stuck in scheduling
 
 > **Incident:** A swollen message queue slowed every operation.

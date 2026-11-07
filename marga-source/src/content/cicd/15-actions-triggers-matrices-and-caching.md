@@ -73,6 +73,19 @@ This cancels an older run when a newer commit lands on the same branch. Do not u
 
 The **key** must change when dependencies change, so hash the lockfile. `restore-keys` allow a partial hit that still saves time. Caches are shared by branch scope and are not for secrets or build outputs you rely on being fresh.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How GitHub Actions: triggers, matrices and caching fits together
+node: n1 | Triggers | 0 | 0 | push and pull_request are the everyday triggers. | Using pull_request_target to run untrusted code. | process
+node: n2 | Matrices | 1 | 1 | A matrix creates one job per combination. | Running every workflow on every push. | process
+node: n3 | Concurrency and caching | 2 | 0 | This cancels an older run when a newer commit lands on the same branch. | Cache keys that never change, so stale dependencies persist. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Two deploys at once
 
 > **Incident:** Two runs deployed to production at the same time and left a mixed release.

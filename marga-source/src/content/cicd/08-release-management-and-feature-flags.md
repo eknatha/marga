@@ -59,6 +59,23 @@ The old code expects the old column name, which no longer exists, so rolling bac
 > Use an expand and contract approach: add the new column, write to both, switch reads, and remove the old column in a later release.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Release management, environments and feature flags fits together
+node: n1 | Deploy is not release | 0 | 0 | Deploying puts a new version on servers. | No safe default when the flag service fails. | process
+node: n2 | Kinds of flags | 1 | 1 | Each flag needs an owner, a purpose and a removal date. | Flags without owners or removal dates. | process
+node: n3 | Environments and promotion | 2 | 0 | Keep environments few and similar: development, staging (production-like), production. | Rebuilding the artifact for each environment. | process
+node: n4 | Progressive delivery | 3 | 1 | Canary: send a small share of traffic to the new version and watch error rate and latency. | Database changes that block rollback. | process
+node: n5 | Versions and rollbacks | 4 | 0 | Use semantic versions or build ids that map exactly to a commit. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the feature that could not be switched off
 
 > **Incident:** A new pricing calculation shows wrong totals to 30 percent of customers after a release, and turning it off takes two hours.

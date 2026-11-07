@@ -57,6 +57,21 @@ git branch recovered a1b2c3d   # make them reachable again
 
 Unreachable objects remain until garbage collection, usually for weeks, so lost commits are often recoverable.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Git internals: objects, refs and the index fits together
+node: n1 | Objects | 0 | 0 | A blob holds file contents, a tree lists names and blobs or other trees, a commit points to a tree and parent commits and a tag names a commit. | Thinking branches are copies of files. | process
+node: n2 | Refs and HEAD | 1 | 1 | A branch is a file containing a commit hash. | Committing in detached HEAD and moving away. | process
+node: n3 | The index | 2 | 0 | The index is the staging area, a list of paths and blob hashes that will become the next commit's tree. | Check the Common mistakes list below this diagram for what usually goes wrong here. | store
+node: n4 | Recovery | 3 | 1 | Unreachable objects remain until garbage collection, usually for weeks, so lost commits are often recoverable. | Panicking after deleting a branch. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The branch that seemed to vanish
 
 > **Incident:** A deleted branch still held unmerged work, which was recovered.

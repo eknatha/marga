@@ -113,6 +113,21 @@ spec:
 
 Notice the DNS egress rule. After a default-deny on egress, forgetting DNS breaks name resolution for every Pod.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How CNI, Pod networking and network policies fits together
+node: n1 | The network model | 0 | 0 | Every Pod gets a unique, cluster-wide IP address. | Pod CIDR that overlaps with VPC or on-premises ranges. | edge
+node: n2 | The CNI plugin | 1 | 1 | The Container Network Interface (CNI) is a standard that lets the kubelet ask a plugin to give a new Pod a network interface and an address. | Running out of subnet addresses with a VPC-native CNI. | process
+node: n3 | How Services work | 2 | 0 | kube-proxy runs on every node, watches Services and EndpointSlices, and programs the kernel (iptables or IPVS rules, or nothing at all when Cilium replaces it) to... | Confusing a Service with no endpoints for a network problem. | process
+node: n4 | NetworkPolicy | 3 | 1 | By default every Pod can reach every other Pod. | Default-deny egress without allowing DNS. | security
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: everything times out after the security hardening
 
 > **Incident:** A security sprint adds a default-deny NetworkPolicy to the `shop` namespace. Minutes later the API reports `Temporary failure in name resolution` and checkout stops working.

@@ -50,6 +50,21 @@ Production runs code and dependencies that were never tested in staging. Promote
 > Rebuilding for each environment breaks the link between test and release.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Environments, promotion and approvals fits together
+node: n1 | Environments and their purpose | 0 | 0 | An environment is a place where the application runs with its own configuration and data. | Letting staging drift away from production. | process
+node: n2 | Build once, promote many times | 1 | 1 | The pipeline builds an artifact (a container image or package) one time, gives it a version, and records its digest. | Rebuilding the artifact for each environment. | process
+node: n3 | Gates: automatic and human | 2 | 0 | A gate is a condition for moving to the next environment. | Approvals without evidence, so people click through. | process
+node: n4 | Know what runs where | 3 | 1 | At any moment you should be able to answer: which version runs in production, who approved it, and which commit it came from. | No emergency path, which leads to bypassing the pipeline. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Tested in staging, broken in production
 
 > **Incident:** A release passed every staging check and failed on its first request in production with a missing library.

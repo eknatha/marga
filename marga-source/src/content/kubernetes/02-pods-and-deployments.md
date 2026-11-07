@@ -98,6 +98,21 @@ $ kubectl rollout undo deployment/shop-api -n shop
 deployment.apps/shop-api rolled back
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Pods, Deployments and probes fits together
+node: n1 | A production-shaped Deployment | 0 | 0 | The selector must match the Pod template's labels; that link is how the Deployment knows which Pods it owns. | Selector and template labels that do not match. | process
+node: n2 | Requests and limits | 1 | 1 | Set a memory request near typical use and a memory limit with headroom. | No memory limit, or a limit equal to average use. | client
+node: n3 | Probes | 2 | 0 | Probes let Kubernetes ask your application how it is doing. | No readiness probe, so traffic arrives before the app can handle it. | process
+node: n4 | Rolling updates and rollbacks | 3 | 1 | With maxUnavailable: 0 and maxSurge: 1, Kubernetes starts one new Pod, waits until it is ready, then removes one old Pod, and repeats. | Liveness probes that check dependencies. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: a bad release stalls halfway
 
 > **Incident:** After deploying 1.9.0, `rollout status` hangs. Users are fine, but the release never finishes.

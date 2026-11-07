@@ -70,6 +70,21 @@ Check from the inside out:
 
 A frequent cause is steps 3 and 4: either the rule is missing or the floating IP is not attached.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Networking: Neutron, security groups and floating... fits together
+node: n1 | The building blocks | 0 | 0 | A network is a virtual layer-2 segment, and a subnet is an address range on it, with DHCP. | Assuming a floating IP exists because the server has a private address. | process
+node: n2 | Security groups | 1 | 1 | A security group is a set of allow rules applied to a server's port. | Forgetting that security groups only allow, and default denies inbound. | security
+node: n3 | Floating IPs | 2 | 0 | Servers on private networks have private addresses. | Changing the router when the security group is the cause. | process
+node: n4 | "I cannot reach my server" | 3 | 1 | Check from the inside out. | "I cannot reach my server" Check from the inside out: 1. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: SSH works from the office but not from home
 
 > **Incident:** An engineer working from home could not SSH to a server that colleagues in the office reached fine.

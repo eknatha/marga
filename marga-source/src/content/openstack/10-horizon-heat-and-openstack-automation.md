@@ -68,6 +68,21 @@ A **stack** groups resources that are created and deleted together. Heat tracks 
 
 Horizon is useful for exploration, quotas and showing topology to new users. Do not rely on it for repeatable changes.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Horizon, Heat and OpenStack automation fits together
+node: n1 | CLI and credentials | 0 | 0 | Use application credentials for automation instead of a user password. | Using personal passwords in automation. | client
+node: n2 | Python SDK | 1 | 1 | . | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n3 | Heat | 2 | 0 | A stack groups resources that are created and deleted together. | Skipping stack events when debugging. | process
+node: n4 | Dashboard | 3 | 1 | Horizon is useful for exploration, quotas and showing topology to new users. | Do not rely on it for repeatable changes. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The lab nobody could rebuild
 
 > **Incident:** A hand-built environment was lost with its documentation.

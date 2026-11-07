@@ -79,6 +79,19 @@ kubectl get pipelineruns,taskruns
 
 A **PipelineRun** supplies real params and volumes and creates one TaskRun per task. Inspect logs with `tkn pipelinerun logs`, and use `kubectl describe` to see scheduling and volume problems.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Tekton: tasks, pipelines and workspaces fits together
+node: n1 | Task | 0 | 0 | A Task runs as one pod, and each step is a container in it. | Using large results instead of workspaces. | process
+node: n2 | Pipeline | 1 | 1 | A Pipeline lists tasks and orders them with runAfter or by using another task's result. | Assuming tasks share a filesystem. | queue
+node: n3 | Running | 2 | 0 | A PipelineRun supplies real params and volumes and creates one TaskRun per task. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The task that could not see the source
 
 > **Incident:** A second task found an empty directory because tasks run in separate pods.

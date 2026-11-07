@@ -104,6 +104,23 @@ $ docker build --cache-from registry.example.com/shop/api:cache -t shop-api:test
 
 Aim for the commit-to-feedback loop under ten minutes. Cache dependencies, run tests in parallel, run only affected tests where tooling supports it, and move slow suites to a nightly job while keeping a representative subset on every change.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Testing strategy and quality gates fits together
+node: n1 | The test pyramid | 0 | 0 | The shape matters. Many fast unit tests find most defects cheaply. | Mocking everything so tests never touch real behaviour. | observe
+node: n2 | Ordering stages for fast feedback | 1 | 1 | Run the cheapest, most informative checks first and stop at the first failure. | Running end-to-end tests against shared, unstable environments. | process
+node: n3 | Quality gates | 2 | 0 | A gate is an automatic pass or fail rule. | Coverage thresholds that are never enforced or are gamed. | process
+node: n4 | Flaky tests | 3 | 1 | A flaky test passes and fails with no code change. | Automatically retrying flaky tests instead of fixing them. | observe
+node: n5 | Keeping the pipeline fast | 4 | 0 | Aim for the commit-to-feedback loop under ten minutes. | Letting the pipeline get slower until people skip it. | queue
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the green build that broke production
 
 > **Incident:** A change passes every check and deploys. Within minutes checkout fails: the new code reads a database column that exists in the test database but not in production, because a migration was never applied to the production schema.
