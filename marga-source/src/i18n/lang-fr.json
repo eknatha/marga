@@ -1919,6 +1919,18 @@
   "gcp": {
    "title": "Google Cloud",
    "summary": "Apprenez le modèle Google Cloud : projets, VPC, Compute Engine, Cloud Storage, GKE, Cloud Run, services de données et de messagerie, exploitation et coûts, avec la CLI gcloud."
+  },
+  "kubevirt": {
+   "title": "KubeVirt : des VM sur Kubernetes",
+   "summary": "Exécutez des machines virtuelles sur Kubernetes : architecture, installation, disques et CDI, stockage et migration à chaud, réseau, performance, sauvegarde, exploitation et passage depuis VMware."
+  },
+  "ceph": {
+   "title": "Ceph et stockage défini par logiciel",
+   "summary": "Comprenez et exploitez Ceph : RADOS, OSD et moniteurs, CRUSH et groupes de placement, RBD, CephFS, RGW, Rook sur Kubernetes, performance, reprise après panne et planification de capacité."
+  },
+  "vault": {
+   "title": "Vault et gestion des secrets",
+   "summary": "Gérez les secrets avec HashiCorp Vault : scellement, méthodes d'authentification, politiques, KV, secrets dynamiques, PKI, chiffrement Transit, intégration Kubernetes, haute disponibilité et réponse aux incidents."
   }
  },
  "paths": {
@@ -2514,6 +2526,42 @@
   "gcp/pub-sub-eventarc-and-cloud-tasks": "Utilisez les sujets et abonnements Pub/Sub, les déclencheurs Eventarc et les files Cloud Tasks pour relier des services Google Cloud en asynchrone et gérer les échecs.",
   "gcp/observability-with-cloud-logging-monitoring-and-slos": "Utilisez Cloud Logging, Cloud Monitoring, Trace et Error Reporting pour trouver les problèmes, écrire des politiques d'alerte et définir des objectifs de niveau de service.",
   "gcp/terraform-on-google-cloud": "Gérez Google Cloud avec Terraform : le fournisseur google, l'état distant dans Cloud Storage, les comptes de service pour les pipelines et les fabriques de projets.",
-  "gcp/security-cost-and-debugging-on-google-cloud": "Appliquez les contrôles de sécurité Google Cloud comme IAM, politiques d'organisation et VPC Service Controls, maîtrisez les coûts et déboguez les erreurs de permission et de quota."
+  "gcp/security-cost-and-debugging-on-google-cloud": "Appliquez les contrôles de sécurité Google Cloud comme IAM, politiques d'organisation et VPC Service Controls, maîtrisez les coûts et déboguez les erreurs de permission et de quota.",
+  "kubevirt/why-vms-on-kubernetes-and-how-kubevirt-works": "Pourquoi les équipes exécutent des machines virtuelles sur Kubernetes et comment les composants de KubeVirt transforment une VM en pod.",
+  "kubevirt/installing-kubevirt-and-using-virtctl": "Installez l'opérateur KubeVirt, vérifiez la virtualisation matérielle et utilisez virtctl.",
+  "kubevirt/virtualmachines-vmis-and-run-strategies": "Écrivez un manifeste VirtualMachine, distinguez VM et VMI et choisissez une stratégie d'exécution.",
+  "kubevirt/vm-disks-datavolumes-and-cdi": "Fournissez des disques aux VM avec des PVC, importez des images avec CDI et DataVolumes et clonez des images de référence.",
+  "kubevirt/storage-for-vms-access-modes-block-mode-and-snapshots": "Choisissez modes d'accès, mode bloc et snapshots ; la migration à chaud exige ReadWriteMany.",
+  "kubevirt/vm-networking-masquerade-bridge-and-multus": "Connectez les VM avec masquerade, bridge et Multus, et exposez-les avec des Services.",
+  "kubevirt/cloud-init-instance-types-and-vm-image-pipelines": "Configurez le premier démarrage avec cloud-init, dimensionnez les VM avec des types d'instance et bâtissez des pipelines d'images.",
+  "kubevirt/live-migration-node-drains-and-eviction": "Migration à chaud, vidage de nœud, éviction et politiques de migration.",
+  "kubevirt/cpu-memory-hugepages-and-vm-performance": "Dimensionnez CPU et mémoire, comprenez la surcharge, les CPU dédiés, les hugepages et NUMA.",
+  "kubevirt/vm-snapshots-backup-and-restore": "Snapshots, sauvegarde et restauration avec CSI et Velero.",
+  "kubevirt/operating-kubevirt-monitoring-upgrades-and-troubleshooting": "Surveillez, mettez à jour et dépannez KubeVirt dans un ordre fixe.",
+  "kubevirt/migrating-from-vmware-to-kubevirt": "Planifiez la migration depuis VMware : inventaire, conversion avec Forklift, pilotes et ce qui n'a pas d'équivalent.",
+  "ceph/what-ceph-is-rados-and-the-architecture": "Ceph comme un seul magasin d'objets, RADOS, avec services bloc, fichier et objet, et ses démons.",
+  "ceph/monitors-managers-osds-and-quorum": "Moniteurs, gestionnaires, OSD, quorum et BlueStore.",
+  "ceph/crush-pools-and-placement-groups": "CRUSH, pools, groupes de placement et domaines de panne.",
+  "ceph/deploying-ceph-with-cephadm": "Déployez avec cephadm : amorçage, hôtes, OSD et services.",
+  "ceph/rbd-block-storage-for-vms-and-kubernetes": "Images RBD, snapshots, clones, ceph-csi et miroir entre clusters.",
+  "ceph/cephfs-shared-file-systems-and-mds": "CephFS, le MDS, montages, sous-volumes et quotas.",
+  "ceph/rgw-s3-compatible-object-storage-with-ceph": "Stockage objet S3 avec RGW : utilisateurs, buckets, partitionnement d'index et multisite.",
+  "ceph/rook-ceph-on-kubernetes": "Rook : exécutez Ceph sur Kubernetes avec un opérateur.",
+  "ceph/replication-erasure-coding-and-durability": "Réplication et codage d'effacement : surcoût et durabilité.",
+  "ceph/bluestore-networks-and-ceph-performance": "BlueStore, réseaux, benchmarks et limitation de la récupération.",
+  "ceph/ceph-failures-recovery-and-health-warnings": "Pannes, récupération, alertes de santé et maintenance sûre.",
+  "ceph/capacity-planning-upgrades-and-operating-ceph": "Planification de capacité, mises à jour et exploitation quotidienne.",
+  "vault/what-vault-is-and-the-secrets-problem": "Pourquoi les secrets statiques sont risqués et comment Vault utilise moteurs, authentification, politiques, baux et audit.",
+  "vault/starting-vault-seal-unseal-and-storage": "Scellement, descellement, parts de Shamir, auto-unseal et stockage.",
+  "vault/authentication-methods-and-tokens": "Méthodes d'authentification pour humains et machines, jetons et TTL.",
+  "vault/policies-and-least-privilege-access": "Politiques par chemin, capacités, chemins KV v2 et tests.",
+  "vault/kv-secrets-engine-and-secret-versioning": "Versions KV v2, suppression logique, patch et check-and-set.",
+  "vault/dynamic-secrets-for-databases-and-clouds": "Identifiants dynamiques pour bases de données et cloud, baux et rotation du compte racine.",
+  "vault/pki-short-lived-certificates-with-vault": "Une CA privée avec PKI et des certificats de courte durée.",
+  "vault/transit-encryption-as-a-service": "Transit : chiffrement en tant que service, rotation et rewrap.",
+  "vault/vault-on-kubernetes-injector-csi-and-operators": "Vault sur Kubernetes : injector, CSI et Vault Secrets Operator.",
+  "vault/vault-high-availability-raft-and-disaster-recovery": "Haute disponibilité avec Raft, snapshots, réplication et reprise après sinistre.",
+  "vault/audit-logging-monitoring-and-hardening-vault": "Journaux d'audit, supervision et durcissement de Vault.",
+  "vault/incident-response-rotating-and-revoking-secrets": "Réponse aux incidents : révoquer, renouveler et enquêter."
  }
 }

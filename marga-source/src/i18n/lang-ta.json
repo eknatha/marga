@@ -1903,6 +1903,18 @@
   "gcp": {
    "title": "Google Cloud",
    "summary": "Google Cloud மாதிரியைக் கற்றுக்கொள்ளுங்கள்: திட்டங்கள், VPC, Compute Engine, Cloud Storage, GKE, Cloud Run, தரவு மற்றும் மெசேஜிங் சேவைகள், செயல்பாடு மற்றும் செலவு, gcloud CLI உடன்."
+  },
+  "kubevirt": {
+   "title": "KubeVirt: Kubernetes இல் VM கள்",
+   "summary": "Kubernetes இல் மெய்நிகர் இயந்திரங்களை இயக்குங்கள்: கட்டமைப்பு, நிறுவல், வட்டுகள் மற்றும் CDI, சேமிப்பு மற்றும் நேரடி இடம்பெயர்வு, நெட்வொர்க்கிங், செயல்திறன், காப்புப்பிரதி, இயக்கம் மற்றும் VMware இலிருந்து மாறுதல்."
+  },
+  "ceph": {
+   "title": "Ceph மற்றும் மென்பொருள் வரையறுக்கப்பட்ட சேமிப்பு",
+   "summary": "Ceph ஐப் புரிந்து இயக்குங்கள்: RADOS, OSD மற்றும் மானிட்டர்கள், CRUSH மற்றும் இடம் குழுக்கள், RBD, CephFS, RGW, Kubernetes இல் Rook, செயல்திறன், தோல்வி மீட்பு மற்றும் திறன் திட்டமிடல்."
+  },
+  "vault": {
+   "title": "Vault மற்றும் ரகசிய மேலாண்மை",
+   "summary": "HashiCorp Vault மூலம் ரகசியங்களை நிர்வகியுங்கள்: சீல் மற்றும் அன்சீல், அங்கீகார முறைகள், கொள்கைகள், KV, இயக்கநிலை ரகசியங்கள், PKI, Transit குறியாக்கம், Kubernetes ஒருங்கிணைப்பு, உயர் கிடைப்புத்தன்மை மற்றும் சம்பவ பதில்."
   }
  },
  "paths": {
@@ -2498,6 +2510,42 @@
   "gcp/pub-sub-eventarc-and-cloud-tasks": "Pub/Sub தலைப்புகள், சந்தாக்கள், Eventarc தூண்டிகள், Cloud Tasks வரிசைகளால் Google Cloud சேவைகளை ஒத்திசைவற்ற முறையில் இணைத்து தோல்விகளைக் கையாளுங்கள்.",
   "gcp/observability-with-cloud-logging-monitoring-and-slos": "சிக்கல்களைக் கண்டறிய, எச்சரிக்கைக் கொள்கைகள் எழுத, சேவை நிலை இலக்குகளை வரையறுக்க Cloud Logging, Cloud Monitoring, Trace, Error Reporting பயன்படுத்துங்கள்.",
   "gcp/terraform-on-google-cloud": "Terraform மூலம் Google Cloud ஐ நிர்வகியுங்கள்: google வழங்குநர், Cloud Storage இல் தொலை நிலை, பைப்லைன்களுக்கான சேவை கணக்குகள், திட்ட தொழிற்சாலைகள்.",
-  "gcp/security-cost-and-debugging-on-google-cloud": "IAM, நிறுவனக் கொள்கை, VPC Service Controls போன்ற Google Cloud பாதுகாப்புக் கட்டுப்பாடுகளைப் பயன்படுத்தி, செலவைக் கட்டுப்படுத்தி, அனுமதி மற்றும் ஒதுக்கீட்டுப் பிழைகளைப் பிழைதிருத்துங்கள்."
+  "gcp/security-cost-and-debugging-on-google-cloud": "IAM, நிறுவனக் கொள்கை, VPC Service Controls போன்ற Google Cloud பாதுகாப்புக் கட்டுப்பாடுகளைப் பயன்படுத்தி, செலவைக் கட்டுப்படுத்தி, அனுமதி மற்றும் ஒதுக்கீட்டுப் பிழைகளைப் பிழைதிருத்துங்கள்.",
+  "kubevirt/why-vms-on-kubernetes-and-how-kubevirt-works": "குழுக்கள் Kubernetes இல் மெய்நிகர் இயந்திரங்களை ஏன் இயக்குகின்றன, KubeVirt கூறுகள் VM ஐ பாடாக எப்படி மாற்றுகின்றன.",
+  "kubevirt/installing-kubevirt-and-using-virtctl": "KubeVirt ஆபரேட்டரை நிறுவி, வன்பொருள் மெய்நிகராக்கத்தைச் சரிபார்த்து, virtctl ஐப் பயன்படுத்துங்கள்.",
+  "kubevirt/virtualmachines-vmis-and-run-strategies": "VirtualMachine மேனிஃபெஸ்ட் எழுதுங்கள், VM மற்றும் VMI வேறுபாட்டை அறிந்து, இயக்க உத்தியைத் தேர்ந்தெடுங்கள்.",
+  "kubevirt/vm-disks-datavolumes-and-cdi": "PVC மூலம் VM களுக்கு வட்டுகள் வழங்கி, CDI மற்றும் DataVolume மூலம் படங்களை இறக்குமதி செய்து, தங்கப் படங்களை நகலெடுங்கள்.",
+  "kubevirt/storage-for-vms-access-modes-block-mode-and-snapshots": "அணுகல் முறைகள், பிளாக் முறை, ஸ்னாப்ஷாட்கள்; நேரடி இடம்பெயர்வுக்கு ReadWriteMany தேவை.",
+  "kubevirt/vm-networking-masquerade-bridge-and-multus": "masquerade, bridge, Multus மூலம் VM களை இணைத்து Service மூலம் வெளிப்படுத்துங்கள்.",
+  "kubevirt/cloud-init-instance-types-and-vm-image-pipelines": "cloud-init மூலம் முதல் துவக்கத்தை அமைத்து, நிகழ்வு வகைகளால் VM அளவை நிர்ணயித்து, பட பைப்லைன்களை உருவாக்குங்கள்.",
+  "kubevirt/live-migration-node-drains-and-eviction": "நேரடி இடம்பெயர்வு, நோட் வடிகட்டல், வெளியேற்றம் மற்றும் இடம்பெயர்வு கொள்கைகள்.",
+  "kubevirt/cpu-memory-hugepages-and-vm-performance": "CPU மற்றும் நினைவக அளவு, மேல்செலவு, பிரத்யேக CPU, hugepages மற்றும் NUMA ஐப் புரிந்துகொள்ளுங்கள்.",
+  "kubevirt/vm-snapshots-backup-and-restore": "CSI மற்றும் Velero மூலம் ஸ்னாப்ஷாட்கள், காப்புப்பிரதி மற்றும் மீட்பு.",
+  "kubevirt/operating-kubevirt-monitoring-upgrades-and-troubleshooting": "நிலையான வரிசையில் KubeVirt ஐக் கண்காணித்து, மேம்படுத்தி, சிக்கல்களைத் தீருங்கள்.",
+  "kubevirt/migrating-from-vmware-to-kubevirt": "VMware இலிருந்து இடம்பெயர்வு திட்டம்: பட்டியல், Forklift மூலம் மாற்றம், இயக்கிகள், இணையற்றவை.",
+  "ceph/what-ceph-is-rados-and-the-architecture": "ஒரே பொருள் சேமிப்பகம் RADOS ஆக Ceph, பிளாக், கோப்பு, பொருள் சேவைகள் மற்றும் அதன் டெமன்கள்.",
+  "ceph/monitors-managers-osds-and-quorum": "மானிட்டர்கள், மேலாளர்கள், OSD கள், கோரம் மற்றும் BlueStore.",
+  "ceph/crush-pools-and-placement-groups": "CRUSH, பூல்கள், இடம் குழுக்கள் மற்றும் தோல்வி களங்கள்.",
+  "ceph/deploying-ceph-with-cephadm": "cephadm மூலம் வரிசைப்படுத்துங்கள்: பூட்ஸ்ட்ராப், ஹோஸ்ட்கள், OSD கள் மற்றும் சேவைகள்.",
+  "ceph/rbd-block-storage-for-vms-and-kubernetes": "RBD படங்கள், ஸ்னாப்ஷாட்கள், நகல்கள், ceph-csi மற்றும் கிளஸ்டர்களுக்கிடையே மிரரிங்.",
+  "ceph/cephfs-shared-file-systems-and-mds": "CephFS, MDS, மவுண்ட்கள், துணை தொகுதிகள் மற்றும் ஒதுக்கீடுகள்.",
+  "ceph/rgw-s3-compatible-object-storage-with-ceph": "RGW மூலம் S3 பொருள் சேமிப்பு: பயனர்கள், பக்கெட்கள், குறியீட்டு ஷார்டிங் மற்றும் மல்டிசைட்.",
+  "ceph/rook-ceph-on-kubernetes": "Rook: ஆபரேட்டர் மூலம் Kubernetes இல் Ceph ஐ இயக்குங்கள்.",
+  "ceph/replication-erasure-coding-and-durability": "பிரதியெடுப்பு மற்றும் அழிப்பு குறியாக்கம்: மேல்செலவு மற்றும் நீடித்த தன்மை.",
+  "ceph/bluestore-networks-and-ceph-performance": "BlueStore, நெட்வொர்க்குகள், பெஞ்ச்மார்க்குகள் மற்றும் மீட்பு வரம்பு.",
+  "ceph/ceph-failures-recovery-and-health-warnings": "தோல்விகள், மீட்பு, சுகாதார எச்சரிக்கைகள் மற்றும் பாதுகாப்பான பராமரிப்பு.",
+  "ceph/capacity-planning-upgrades-and-operating-ceph": "திறன் திட்டமிடல், மேம்படுத்தல்கள் மற்றும் தினசரி செயல்பாடு.",
+  "vault/what-vault-is-and-the-secrets-problem": "நிலையான ரகசியங்கள் ஏன் ஆபத்தானவை, Vault இன்ஜின்கள், அங்கீகாரம், கொள்கைகள், குத்தகைகள், தணிக்கையை எப்படிப் பயன்படுத்துகிறது.",
+  "vault/starting-vault-seal-unseal-and-storage": "சீல், அன்சீல், Shamir பகுதிகள், auto-unseal மற்றும் சேமிப்பகம்.",
+  "vault/authentication-methods-and-tokens": "மக்கள் மற்றும் இயந்திரங்களுக்கான அங்கீகார முறைகள், டோக்கன்கள் மற்றும் TTL.",
+  "vault/policies-and-least-privilege-access": "பாதை அடிப்படையிலான கொள்கைகள், திறன்கள், KV v2 பாதைகள் மற்றும் சோதனை.",
+  "vault/kv-secrets-engine-and-secret-versioning": "KV v2 பதிப்புகள், மென்மையான நீக்கம், patch மற்றும் check-and-set.",
+  "vault/dynamic-secrets-for-databases-and-clouds": "தரவுத்தளம் மற்றும் மேகத்திற்கான இயக்கநிலை சான்றுகள், குத்தகைகள் மற்றும் ரூட் கணக்கு சுழற்சி.",
+  "vault/pki-short-lived-certificates-with-vault": "PKI உடன் தனியார் CA மற்றும் குறுகிய கால சான்றிதழ்கள்.",
+  "vault/transit-encryption-as-a-service": "Transit: சேவையாக குறியாக்கம், சுழற்சி மற்றும் rewrap.",
+  "vault/vault-on-kubernetes-injector-csi-and-operators": "Kubernetes இல் Vault: injector, CSI மற்றும் Vault Secrets Operator.",
+  "vault/vault-high-availability-raft-and-disaster-recovery": "Raft உடன் உயர் கிடைப்புத்தன்மை, ஸ்னாப்ஷாட்கள், பிரதியெடுப்பு மற்றும் பேரிடர் மீட்பு.",
+  "vault/audit-logging-monitoring-and-hardening-vault": "தணிக்கைப் பதிவுகள், கண்காணிப்பு மற்றும் Vault வலுப்படுத்தல்.",
+  "vault/incident-response-rotating-and-revoking-secrets": "சம்பவ பதில்: ரத்து செய்யுங்கள், மாற்றுங்கள், விசாரியுங்கள்."
  }
 }

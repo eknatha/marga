@@ -1903,6 +1903,18 @@
   "gcp": {
    "title": "Google Cloud",
    "summary": "Google Cloud এর মডেল শিখুন: প্রকল্প, VPC, Compute Engine, Cloud Storage, GKE, Cloud Run, ডেটা ও মেসেজিং সেবা, পরিচালনা ও খরচ, gcloud CLI সহ।"
+  },
+  "kubevirt": {
+   "title": "KubeVirt: Kubernetes এ VM",
+   "summary": "Kubernetes এ ভার্চুয়াল মেশিন চালান: স্থাপত্য, ইনস্টল, ডিস্ক ও CDI, স্টোরেজ ও লাইভ মাইগ্রেশন, নেটওয়ার্কিং, কর্মক্ষমতা, ব্যাকআপ, পরিচালনা এবং VMware থেকে স্থানান্তর।"
+  },
+  "ceph": {
+   "title": "Ceph ও সফটওয়্যার-নির্ধারিত স্টোরেজ",
+   "summary": "Ceph বুঝে চালান: RADOS, OSD ও মনিটর, CRUSH ও প্লেসমেন্ট গ্রুপ, RBD, CephFS, RGW, Kubernetes এ Rook, কর্মক্ষমতা, ব্যর্থতা রিকভারি এবং ক্ষমতা পরিকল্পনা।"
+  },
+  "vault": {
+   "title": "Vault ও গোপন তথ্য ব্যবস্থাপনা",
+   "summary": "HashiCorp Vault দিয়ে গোপন তথ্য পরিচালনা করুন: সিল ও আনসিল, অথ পদ্ধতি, নীতি, KV, ডাইনামিক গোপন তথ্য, PKI, Transit এনক্রিপশন, Kubernetes সংযোগ, উচ্চ প্রাপ্যতা ও ঘটনার প্রতিক্রিয়া।"
   }
  },
  "paths": {
@@ -2498,6 +2510,42 @@
   "gcp/pub-sub-eventarc-and-cloud-tasks": "Pub/Sub টপিক ও সাবস্ক্রিপশন, Eventarc ট্রিগার ও Cloud Tasks কিউ দিয়ে Google Cloud সেবা অ্যাসিনক্রোনাসভাবে যুক্ত করুন এবং ব্যর্থতা সামলান।",
   "gcp/observability-with-cloud-logging-monitoring-and-slos": "সমস্যা খুঁজতে, সতর্কতা নীতি লিখতে ও সার্ভিস লেভেল লক্ষ্য নির্ধারণ করতে Cloud Logging, Cloud Monitoring, Trace ও Error Reporting ব্যবহার করুন।",
   "gcp/terraform-on-google-cloud": "Terraform দিয়ে Google Cloud পরিচালনা করুন: google প্রোভাইডার, Cloud Storage এ রিমোট স্টেট, পাইপলাইনের জন্য সার্ভিস অ্যাকাউন্ট ও প্রকল্প কারখানা।",
-  "gcp/security-cost-and-debugging-on-google-cloud": "IAM, সংস্থা নীতি ও VPC Service Controls এর মতো Google Cloud নিরাপত্তা নিয়ন্ত্রণ প্রয়োগ করুন, খরচ নিয়ন্ত্রণ করুন এবং অনুমতি ও কোটার ত্রুটি ডিবাগ করুন।"
+  "gcp/security-cost-and-debugging-on-google-cloud": "IAM, সংস্থা নীতি ও VPC Service Controls এর মতো Google Cloud নিরাপত্তা নিয়ন্ত্রণ প্রয়োগ করুন, খরচ নিয়ন্ত্রণ করুন এবং অনুমতি ও কোটার ত্রুটি ডিবাগ করুন।",
+  "kubevirt/why-vms-on-kubernetes-and-how-kubevirt-works": "টিমগুলো কেন Kubernetes এ ভার্চুয়াল মেশিন চালায় এবং KubeVirt এর উপাদান কীভাবে VM কে পডে পরিণত করে।",
+  "kubevirt/installing-kubevirt-and-using-virtctl": "KubeVirt অপারেটর ইনস্টল করুন, হার্ডওয়্যার ভার্চুয়ালাইজেশন দেখুন এবং virtctl ব্যবহার করুন।",
+  "kubevirt/virtualmachines-vmis-and-run-strategies": "VirtualMachine ম্যানিফেস্ট লিখুন, VM ও VMI এর পার্থক্য বুঝুন এবং রান কৌশল বেছে নিন।",
+  "kubevirt/vm-disks-datavolumes-and-cdi": "PVC দিয়ে VM ডিস্ক দিন, CDI ও DataVolume দিয়ে ইমেজ ইমপোর্ট করুন এবং গোল্ডেন ইমেজ ক্লোন করুন।",
+  "kubevirt/storage-for-vms-access-modes-block-mode-and-snapshots": "অ্যাক্সেস মোড, ব্লক মোড ও স্ন্যাপশট বেছে নিন; লাইভ মাইগ্রেশনে ReadWriteMany লাগে।",
+  "kubevirt/vm-networking-masquerade-bridge-and-multus": "masquerade, bridge ও Multus দিয়ে VM যুক্ত করুন এবং Service দিয়ে প্রকাশ করুন।",
+  "kubevirt/cloud-init-instance-types-and-vm-image-pipelines": "cloud-init দিয়ে প্রথম বুট ঠিক করুন, ইনস্ট্যান্স টাইপ দিয়ে VM এর আকার ঠিক করুন এবং ইমেজ পাইপলাইন বানান।",
+  "kubevirt/live-migration-node-drains-and-eviction": "লাইভ মাইগ্রেশন, নোড ড্রেন, ইভিকশন এবং মাইগ্রেশন নীতি।",
+  "kubevirt/cpu-memory-hugepages-and-vm-performance": "CPU ও মেমরির আকার, ওভারহেড, নির্দিষ্ট CPU, hugepages ও NUMA বুঝুন।",
+  "kubevirt/vm-snapshots-backup-and-restore": "CSI ও Velero দিয়ে স্ন্যাপশট, ব্যাকআপ ও রিস্টোর।",
+  "kubevirt/operating-kubevirt-monitoring-upgrades-and-troubleshooting": "নির্দিষ্ট ক্রমে KubeVirt এর পর্যবেক্ষণ, আপগ্রেড ও সমস্যা নির্ণয় করুন।",
+  "kubevirt/migrating-from-vmware-to-kubevirt": "VMware থেকে মাইগ্রেশনের পরিকল্পনা: ইনভেন্টরি, Forklift দিয়ে রূপান্তর, ড্রাইভার এবং যার সমতুল্য নেই।",
+  "ceph/what-ceph-is-rados-and-the-architecture": "একটি অবজেক্ট স্টোর RADOS হিসেবে Ceph, ব্লক, ফাইল ও অবজেক্ট সেবা এবং এর ডেমন।",
+  "ceph/monitors-managers-osds-and-quorum": "মনিটর, ম্যানেজার, OSD, কোরাম ও BlueStore।",
+  "ceph/crush-pools-and-placement-groups": "CRUSH, পুল, প্লেসমেন্ট গ্রুপ ও ব্যর্থতা ডোমেন।",
+  "ceph/deploying-ceph-with-cephadm": "cephadm দিয়ে ডিপ্লয় করুন: বুটস্ট্র্যাপ, হোস্ট, OSD ও সেবা।",
+  "ceph/rbd-block-storage-for-vms-and-kubernetes": "RBD ইমেজ, স্ন্যাপশট, ক্লোন, ceph-csi এবং ক্লাস্টারের মধ্যে মিররিং।",
+  "ceph/cephfs-shared-file-systems-and-mds": "CephFS, MDS, মাউন্ট, সাবভলিউম ও কোটা।",
+  "ceph/rgw-s3-compatible-object-storage-with-ceph": "RGW দিয়ে S3 অবজেক্ট স্টোরেজ: ব্যবহারকারী, বাকেট, ইনডেক্স শার্ডিং ও মাল্টিসাইট।",
+  "ceph/rook-ceph-on-kubernetes": "Rook: অপারেটর দিয়ে Kubernetes এ Ceph চালান।",
+  "ceph/replication-erasure-coding-and-durability": "রেপ্লিকেশন বনাম ইরেজার কোডিং: ওভারহেড ও স্থায়িত্ব।",
+  "ceph/bluestore-networks-and-ceph-performance": "BlueStore, নেটওয়ার্ক, বেঞ্চমার্ক ও রিকভারিতে সীমা।",
+  "ceph/ceph-failures-recovery-and-health-warnings": "ব্যর্থতা, রিকভারি, স্বাস্থ্য সতর্কতা ও নিরাপদ রক্ষণাবেক্ষণ।",
+  "ceph/capacity-planning-upgrades-and-operating-ceph": "ক্ষমতা পরিকল্পনা, আপগ্রেড ও দৈনন্দিন পরিচালনা।",
+  "vault/what-vault-is-and-the-secrets-problem": "স্থির গোপন তথ্য কেন ঝুঁকিপূর্ণ এবং Vault কীভাবে ইঞ্জিন, ঘোষণা, নীতি, লিজ ও অডিট ব্যবহার করে।",
+  "vault/starting-vault-seal-unseal-and-storage": "সিল, আনসিল, Shamir অংশ, auto-unseal ও স্টোরেজ।",
+  "vault/authentication-methods-and-tokens": "মানুষ ও মেশিনের জন্য অথ পদ্ধতি, টোকেন ও TTL।",
+  "vault/policies-and-least-privilege-access": "পাথ ভিত্তিক নীতি, ক্ষমতা, KV v2 পাথ ও পরীক্ষা।",
+  "vault/kv-secrets-engine-and-secret-versioning": "KV v2 সংস্করণ, সফট ডিলিট, patch ও check-and-set।",
+  "vault/dynamic-secrets-for-databases-and-clouds": "ডেটাবেস ও ক্লাউডের ডাইনামিক ক্রেডেনশিয়াল, লিজ ও রুট অ্যাকাউন্টের রোটেশন।",
+  "vault/pki-short-lived-certificates-with-vault": "PKI দিয়ে ব্যক্তিগত CA এবং স্বল্পমেয়াদি সার্টিফিকেট।",
+  "vault/transit-encryption-as-a-service": "Transit: সেবা হিসেবে এনক্রিপশন, রোটেশন ও rewrap।",
+  "vault/vault-on-kubernetes-injector-csi-and-operators": "Kubernetes এ Vault: injector, CSI ও Vault Secrets Operator।",
+  "vault/vault-high-availability-raft-and-disaster-recovery": "Raft সহ উচ্চ প্রাপ্যতা, স্ন্যাপশট, রেপ্লিকেশন ও দুর্যোগ পুনরুদ্ধার।",
+  "vault/audit-logging-monitoring-and-hardening-vault": "অডিট লগ, পর্যবেক্ষণ এবং Vault এর শক্তিশালীকরণ।",
+  "vault/incident-response-rotating-and-revoking-secrets": "ঘটনার প্রতিক্রিয়া: বাতিল করুন, বদলান ও তদন্ত করুন।"
  }
 }

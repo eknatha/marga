@@ -1903,6 +1903,18 @@
   "gcp": {
    "title": "Google Cloud",
    "summary": "Google Cloud નું મોડેલ શીખો: પ્રોજેક્ટ, VPC, Compute Engine, Cloud Storage, GKE, Cloud Run, ડેટા અને મેસેજિંગ સેવાઓ, સંચાલન અને ખર્ચ, gcloud CLI સાથે."
+  },
+  "kubevirt": {
+   "title": "KubeVirt: Kubernetes પર VM",
+   "summary": "Kubernetes પર વર્ચ્યુઅલ મશીન ચલાવો: આર્કિટેક્ચર, ઇન્સ્ટોલ, ડિસ્ક અને CDI, સ્ટોરેજ અને લાઇવ માઇગ્રેશન, નેટવર્કિંગ, કામગીરી, બેકઅપ, સંચાલન અને VMware થી સ્થળાંતર."
+  },
+  "ceph": {
+   "title": "Ceph અને સોફ્ટવેર-વ્યાખ્યાયિત સ્ટોરેજ",
+   "summary": "Ceph સમજીને ચલાવો: RADOS, OSD અને મોનિટર, CRUSH અને પ્લેસમેન્ટ ગ્રુપ, RBD, CephFS, RGW, Kubernetes પર Rook, કામગીરી, નિષ્ફળતા રિકવરી અને ક્ષમતા આયોજન."
+  },
+  "vault": {
+   "title": "Vault અને ગુપ્ત માહિતી વ્યવસ્થાપન",
+   "summary": "HashiCorp Vault વડે ગુપ્ત માહિતી સંભાળો: સીલ અને અનસીલ, ઓથ પદ્ધતિઓ, નીતિઓ, KV, ડાયનેમિક ગુપ્ત માહિતી, PKI, Transit એન્ક્રિપ્શન, Kubernetes એકીકરણ, ઉચ્ચ ઉપલબ્ધતા અને ઘટના પ્રતિભાવ."
   }
  },
  "paths": {
@@ -2498,6 +2510,42 @@
   "gcp/pub-sub-eventarc-and-cloud-tasks": "Pub/Sub ટોપિક અને સબ્સ્ક્રિપ્શન, Eventarc ટ્રિગર અને Cloud Tasks ક્યૂ વડે Google Cloud સેવાઓને અસિંક્રોનસ રીતે જોડો અને નિષ્ફળતા સંભાળો.",
   "gcp/observability-with-cloud-logging-monitoring-and-slos": "સમસ્યાઓ શોધવા, ચેતવણી નીતિઓ લખવા અને સેવા સ્તર લક્ષ્યો નક્કી કરવા Cloud Logging, Cloud Monitoring, Trace અને Error Reporting વાપરો.",
   "gcp/terraform-on-google-cloud": "Terraform વડે Google Cloud સંભાળો: google પ્રોવાઇડર, Cloud Storage માં રિમોટ સ્ટેટ, પાઇપલાઇન માટે સર્વિસ એકાઉન્ટ અને પ્રોજેક્ટ ફેક્ટરી.",
-  "gcp/security-cost-and-debugging-on-google-cloud": "IAM, સંસ્થા નીતિ અને VPC Service Controls જેવા Google Cloud સુરક્ષા નિયંત્રણો લાગુ કરો, ખર્ચ નિયંત્રિત કરો અને પરવાનગી અને ક્વોટા ભૂલો ડીબગ કરો."
+  "gcp/security-cost-and-debugging-on-google-cloud": "IAM, સંસ્થા નીતિ અને VPC Service Controls જેવા Google Cloud સુરક્ષા નિયંત્રણો લાગુ કરો, ખર્ચ નિયંત્રિત કરો અને પરવાનગી અને ક્વોટા ભૂલો ડીબગ કરો.",
+  "kubevirt/why-vms-on-kubernetes-and-how-kubevirt-works": "ટીમો Kubernetes પર વર્ચ્યુઅલ મશીન કેમ ચલાવે છે અને KubeVirt ના ઘટકો VM ને પોડમાં કેવી રીતે ફેરવે છે.",
+  "kubevirt/installing-kubevirt-and-using-virtctl": "KubeVirt ઓપરેટર ઇન્સ્ટોલ કરો, હાર્ડવેર વર્ચ્યુઅલાઇઝેશન તપાસો અને virtctl વાપરો.",
+  "kubevirt/virtualmachines-vmis-and-run-strategies": "VirtualMachine મેનિફેસ્ટ લખો, VM અને VMI નો તફાવત સમજો અને રન વ્યૂહરચના પસંદ કરો.",
+  "kubevirt/vm-disks-datavolumes-and-cdi": "PVC વડે VM ને ડિસ્ક આપો, CDI અને DataVolume વડે ઇમેજ ઇમ્પોર્ટ કરો અને ગોલ્ડન ઇમેજ ક્લોન કરો.",
+  "kubevirt/storage-for-vms-access-modes-block-mode-and-snapshots": "એક્સેસ મોડ, બ્લોક મોડ અને સ્નેપશોટ પસંદ કરો; લાઇવ માઇગ્રેશન માટે ReadWriteMany જોઈએ.",
+  "kubevirt/vm-networking-masquerade-bridge-and-multus": "masquerade, bridge અને Multus વડે VM જોડો અને Service વડે ઉપલબ્ધ કરાવો.",
+  "kubevirt/cloud-init-instance-types-and-vm-image-pipelines": "cloud-init વડે પહેલું બૂટ ગોઠવો, ઇન્સ્ટન્સ પ્રકાર વડે VM નું કદ નક્કી કરો અને ઇમેજ પાઇપલાઇન બનાવો.",
+  "kubevirt/live-migration-node-drains-and-eviction": "લાઇવ માઇગ્રેશન, નોડ ડ્રેન, ઇવિક્શન અને માઇગ્રેશન નીતિઓ.",
+  "kubevirt/cpu-memory-hugepages-and-vm-performance": "CPU અને મેમરીનું કદ, ઓવરહેડ, સમર્પિત CPU, hugepages અને NUMA સમજો.",
+  "kubevirt/vm-snapshots-backup-and-restore": "CSI અને Velero વડે સ્નેપશોટ, બેકઅપ અને રિસ્ટોર.",
+  "kubevirt/operating-kubevirt-monitoring-upgrades-and-troubleshooting": "નિશ્ચિત ક્રમમાં KubeVirt નું નિરીક્ષણ, અપગ્રેડ અને સમસ્યા નિવારણ કરો.",
+  "kubevirt/migrating-from-vmware-to-kubevirt": "VMware થી માઇગ્રેશનનું આયોજન: ઇન્વેન્ટરી, Forklift વડે રૂપાંતર, ડ્રાઇવર અને જેનો સમકક્ષ નથી તે.",
+  "ceph/what-ceph-is-rados-and-the-architecture": "એક જ ઑબ્જેક્ટ સ્ટોર RADOS તરીકે Ceph, બ્લોક, ફાઇલ અને ઑબ્જેક્ટ સેવાઓ અને તેના ડેમન.",
+  "ceph/monitors-managers-osds-and-quorum": "મોનિટર, મેનેજર, OSD, કોરમ અને BlueStore.",
+  "ceph/crush-pools-and-placement-groups": "CRUSH, પૂલ, પ્લેસમેન્ટ ગ્રુપ અને નિષ્ફળતા ડોમેન.",
+  "ceph/deploying-ceph-with-cephadm": "cephadm વડે ડિપ્લોય કરો: બૂટસ્ટ્રેપ, હોસ્ટ, OSD અને સેવાઓ.",
+  "ceph/rbd-block-storage-for-vms-and-kubernetes": "RBD ઇમેજ, સ્નેપશોટ, ક્લોન, ceph-csi અને ક્લસ્ટર વચ્ચે મિરરિંગ.",
+  "ceph/cephfs-shared-file-systems-and-mds": "CephFS, MDS, માઉન્ટ, સબવોલ્યુમ અને ક્વોટા.",
+  "ceph/rgw-s3-compatible-object-storage-with-ceph": "RGW વડે S3 ઑબ્જેક્ટ સ્ટોરેજ: વપરાશકર્તા, બકેટ, ઇન્ડેક્સ શાર્ડિંગ અને મલ્ટિસાઇટ.",
+  "ceph/rook-ceph-on-kubernetes": "Rook: ઓપરેટર વડે Kubernetes પર Ceph ચલાવો.",
+  "ceph/replication-erasure-coding-and-durability": "રેપ્લિકેશન વિરુદ્ધ ઇરેઝર કોડિંગ: ઓવરહેડ અને ટકાઉપણું.",
+  "ceph/bluestore-networks-and-ceph-performance": "BlueStore, નેટવર્ક, બેન્ચમાર્ક અને રિકવરી પર મર્યાદા.",
+  "ceph/ceph-failures-recovery-and-health-warnings": "નિષ્ફળતા, રિકવરી, આરોગ્ય ચેતવણીઓ અને સુરક્ષિત જાળવણી.",
+  "ceph/capacity-planning-upgrades-and-operating-ceph": "ક્ષમતા આયોજન, અપગ્રેડ અને રોજિંદું સંચાલન.",
+  "vault/what-vault-is-and-the-secrets-problem": "સ્થિર ગુપ્ત માહિતી જોખમી કેમ છે અને Vault એન્જિન, ઓથ, નીતિ, લીઝ અને ઓડિટ કેવી રીતે વાપરે છે.",
+  "vault/starting-vault-seal-unseal-and-storage": "સીલ, અનસીલ, Shamir ભાગ, auto-unseal અને સ્ટોરેજ.",
+  "vault/authentication-methods-and-tokens": "લોકો અને મશીન માટે ઓથ પદ્ધતિઓ, ટોકન અને TTL.",
+  "vault/policies-and-least-privilege-access": "પાથ આધારિત નીતિઓ, ક્ષમતાઓ, KV v2 પાથ અને પરીક્ષણ.",
+  "vault/kv-secrets-engine-and-secret-versioning": "KV v2 આવૃત્તિઓ, સોફ્ટ ડિલીટ, patch અને check-and-set.",
+  "vault/dynamic-secrets-for-databases-and-clouds": "ડેટાબેસ અને ક્લાઉડ માટે ડાયનેમિક ક્રેડેન્શિયલ, લીઝ અને રૂટ ખાતાનું રોટેશન.",
+  "vault/pki-short-lived-certificates-with-vault": "PKI સાથે ખાનગી CA અને ટૂંકા ગાળાના પ્રમાણપત્રો.",
+  "vault/transit-encryption-as-a-service": "Transit: સેવા તરીકે એન્ક્રિપ્શન, રોટેશન અને rewrap.",
+  "vault/vault-on-kubernetes-injector-csi-and-operators": "Kubernetes પર Vault: injector, CSI અને Vault Secrets Operator.",
+  "vault/vault-high-availability-raft-and-disaster-recovery": "Raft સાથે ઉચ્ચ ઉપલબ્ધતા, સ્નેપશોટ, રેપ્લિકેશન અને આપત્તિ રિકવરી.",
+  "vault/audit-logging-monitoring-and-hardening-vault": "ઓડિટ લોગ, નિરીક્ષણ અને Vault નું મજબૂતીકરણ.",
+  "vault/incident-response-rotating-and-revoking-secrets": "ઘટના પ્રતિભાવ: રદ કરો, બદલો અને તપાસ કરો."
  }
 }

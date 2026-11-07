@@ -1903,6 +1903,18 @@
   "gcp": {
    "title": "Google Cloud",
    "summary": "Изучите модель Google Cloud: проекты, VPC, Compute Engine, Cloud Storage, GKE, Cloud Run, сервисы данных и сообщений, эксплуатация и затраты, с CLI gcloud."
+  },
+  "kubevirt": {
+   "title": "KubeVirt: виртуальные машины в Kubernetes",
+   "summary": "Запускайте виртуальные машины в Kubernetes: архитектура, установка, диски и CDI, хранилище и живая миграция, сеть, производительность, резервное копирование, эксплуатация и переход с VMware."
+  },
+  "ceph": {
+   "title": "Ceph и программно-определяемые хранилища",
+   "summary": "Изучите и эксплуатируйте Ceph: RADOS, OSD и мониторы, CRUSH и группы размещения, RBD, CephFS, RGW, Rook в Kubernetes, производительность, восстановление после сбоев и планирование ёмкости."
+  },
+  "vault": {
+   "title": "Vault и управление секретами",
+   "summary": "Управляйте секретами с HashiCorp Vault: запечатывание, методы аутентификации, политики, KV, динамические секреты, PKI, шифрование Transit, интеграция с Kubernetes, высокая доступность и реагирование на инциденты."
   }
  },
  "paths": {
@@ -2498,6 +2510,42 @@
   "gcp/pub-sub-eventarc-and-cloud-tasks": "Используйте темы и подписки Pub/Sub, триггеры Eventarc и очереди Cloud Tasks для асинхронной связи сервисов Google Cloud и обработки сбоев.",
   "gcp/observability-with-cloud-logging-monitoring-and-slos": "Используйте Cloud Logging, Cloud Monitoring, Trace и Error Reporting, чтобы находить проблемы, писать политики оповещений и задавать цели уровня сервиса.",
   "gcp/terraform-on-google-cloud": "Управляйте Google Cloud через Terraform: провайдер google, удалённое состояние в Cloud Storage, сервисные аккаунты для пайплайнов и фабрики проектов.",
-  "gcp/security-cost-and-debugging-on-google-cloud": "Применяйте средства безопасности Google Cloud: IAM, политики организации и VPC Service Controls, контролируйте расходы и отлаживайте ошибки прав и квот."
+  "gcp/security-cost-and-debugging-on-google-cloud": "Применяйте средства безопасности Google Cloud: IAM, политики организации и VPC Service Controls, контролируйте расходы и отлаживайте ошибки прав и квот.",
+  "kubevirt/why-vms-on-kubernetes-and-how-kubevirt-works": "Почему команды запускают виртуальные машины в Kubernetes и как компоненты KubeVirt превращают VM в под.",
+  "kubevirt/installing-kubevirt-and-using-virtctl": "Установите оператор KubeVirt, проверьте аппаратную виртуализацию и используйте virtctl.",
+  "kubevirt/virtualmachines-vmis-and-run-strategies": "Напишите манифест VirtualMachine, различайте VM и VMI и выберите стратегию запуска.",
+  "kubevirt/vm-disks-datavolumes-and-cdi": "Выдавайте VM диски через PVC, импортируйте образы через CDI и DataVolume и клонируйте эталонные образы.",
+  "kubevirt/storage-for-vms-access-modes-block-mode-and-snapshots": "Выберите режимы доступа, блочный режим и снимки; живая миграция требует ReadWriteMany.",
+  "kubevirt/vm-networking-masquerade-bridge-and-multus": "Подключайте VM через masquerade, bridge и Multus и открывайте их через Service.",
+  "kubevirt/cloud-init-instance-types-and-vm-image-pipelines": "Настройте первый запуск через cloud-init, задавайте размеры VM типами экземпляров и стройте конвейеры образов.",
+  "kubevirt/live-migration-node-drains-and-eviction": "Живая миграция, опустошение узлов, вытеснение и политики миграции.",
+  "kubevirt/cpu-memory-hugepages-and-vm-performance": "Подбор CPU и памяти, накладные расходы, выделенные CPU, hugepages и NUMA.",
+  "kubevirt/vm-snapshots-backup-and-restore": "Снимки, резервные копии и восстановление через CSI и Velero.",
+  "kubevirt/operating-kubevirt-monitoring-upgrades-and-troubleshooting": "Мониторинг, обновление и диагностика KubeVirt в фиксированном порядке.",
+  "kubevirt/migrating-from-vmware-to-kubevirt": "Планирование миграции с VMware: инвентаризация, конвертация через Forklift, драйверы и то, что не имеет аналога.",
+  "ceph/what-ceph-is-rados-and-the-architecture": "Ceph как единое объектное хранилище RADOS с блочными, файловыми и объектными службами и его демоны.",
+  "ceph/monitors-managers-osds-and-quorum": "Мониторы, менеджеры, OSD, кворум и BlueStore.",
+  "ceph/crush-pools-and-placement-groups": "CRUSH, пулы, группы размещения и домены отказа.",
+  "ceph/deploying-ceph-with-cephadm": "Развёртывание через cephadm: начальная загрузка, хосты, OSD и службы.",
+  "ceph/rbd-block-storage-for-vms-and-kubernetes": "Образы RBD, снимки, клоны, ceph-csi и зеркалирование между кластерами.",
+  "ceph/cephfs-shared-file-systems-and-mds": "CephFS, MDS, монтирование, подтома и квоты.",
+  "ceph/rgw-s3-compatible-object-storage-with-ceph": "Объектное хранилище S3 на RGW: пользователи, бакеты, шардирование индекса и multisite.",
+  "ceph/rook-ceph-on-kubernetes": "Rook: запуск Ceph в Kubernetes с помощью оператора.",
+  "ceph/replication-erasure-coding-and-durability": "Репликация и стирающее кодирование: накладные расходы и надёжность.",
+  "ceph/bluestore-networks-and-ceph-performance": "BlueStore, сети, тесты производительности и ограничение восстановления.",
+  "ceph/ceph-failures-recovery-and-health-warnings": "Сбои, восстановление, предупреждения о состоянии и безопасное обслуживание.",
+  "ceph/capacity-planning-upgrades-and-operating-ceph": "Планирование ёмкости, обновления и ежедневная эксплуатация.",
+  "vault/what-vault-is-and-the-secrets-problem": "Почему статические секреты опасны и как Vault использует движки, аутентификацию, политики, аренду и аудит.",
+  "vault/starting-vault-seal-unseal-and-storage": "Запечатывание, распечатывание, части Шамира, auto-unseal и хранилище.",
+  "vault/authentication-methods-and-tokens": "Методы аутентификации для людей и машин, токены и TTL.",
+  "vault/policies-and-least-privilege-access": "Политики по путям, права, пути KV v2 и тестирование.",
+  "vault/kv-secrets-engine-and-secret-versioning": "Версии KV v2, мягкое удаление, patch и check-and-set.",
+  "vault/dynamic-secrets-for-databases-and-clouds": "Динамические учётные данные для баз данных и облаков, аренда и ротация корневой учётной записи.",
+  "vault/pki-short-lived-certificates-with-vault": "Частный центр сертификации на PKI и короткоживущие сертификаты.",
+  "vault/transit-encryption-as-a-service": "Transit: шифрование как услуга, ротация и rewrap.",
+  "vault/vault-on-kubernetes-injector-csi-and-operators": "Vault в Kubernetes: injector, CSI и Vault Secrets Operator.",
+  "vault/vault-high-availability-raft-and-disaster-recovery": "Высокая доступность на Raft, снимки, репликация и аварийное восстановление.",
+  "vault/audit-logging-monitoring-and-hardening-vault": "Журналы аудита, мониторинг и укрепление Vault.",
+  "vault/incident-response-rotating-and-revoking-secrets": "Реагирование на инциденты: отзыв, ротация и расследование."
  }
 }

@@ -1903,6 +1903,18 @@
   "gcp": {
    "title": "Google Cloud",
    "summary": "Google Cloud മാതൃക പഠിക്കുക: പ്രോജക്റ്റുകൾ, VPC, Compute Engine, Cloud Storage, GKE, Cloud Run, ഡാറ്റ, മെസേജിംഗ് സേവനങ്ങൾ, പ്രവർത്തനവും ചെലവും, gcloud CLI ഉപയോഗിച്ച്."
+  },
+  "kubevirt": {
+   "title": "KubeVirt: Kubernetes ൽ VM കൾ",
+   "summary": "Kubernetes ൽ വെർച്വൽ മെഷീനുകൾ പ്രവർത്തിപ്പിക്കുക: ആർക്കിടെക്ചർ, ഇൻസ്റ്റാൾ, ഡിസ്കുകളും CDI, സംഭരണവും ലൈവ് മൈഗ്രേഷനും, നെറ്റ്‌വർക്കിംഗ്, പ്രകടനം, ബാക്കപ്പ്, പ്രവർത്തനം, VMware ൽ നിന്നുള്ള മാറ്റം."
+  },
+  "ceph": {
+   "title": "Ceph, സോഫ്റ്റ്‌വെയർ നിർവചിത സംഭരണം",
+   "summary": "Ceph മനസ്സിലാക്കി പ്രവർത്തിപ്പിക്കുക: RADOS, OSD, മോണിറ്ററുകൾ, CRUSH, പ്ലേസ്മെന്റ് ഗ്രൂപ്പുകൾ, RBD, CephFS, RGW, Kubernetes ൽ Rook, പ്രകടനം, പരാജയ റിക്കവറി, ശേഷി ആസൂത്രണം."
+  },
+  "vault": {
+   "title": "Vault, രഹസ്യ നിയന്ത്രണം",
+   "summary": "HashiCorp Vault ഉപയോഗിച്ച് രഹസ്യങ്ങൾ നിയന്ത്രിക്കുക: സീൽ, അൺസീൽ, ഓത് രീതികൾ, നയങ്ങൾ, KV, ഡൈനാമിക് രഹസ്യങ്ങൾ, PKI, Transit എൻക്രിപ്ഷൻ, Kubernetes സംയോജനം, ഉയർന്ന ലഭ്യത, സംഭവ പ്രതികരണം."
   }
  },
  "paths": {
@@ -2498,6 +2510,42 @@
   "gcp/pub-sub-eventarc-and-cloud-tasks": "Pub/Sub ടോപ്പിക്കുകൾ, സബ്സ്ക്രിപ്ഷനുകൾ, Eventarc ട്രിഗറുകൾ, Cloud Tasks ക്യൂകൾ എന്നിവ ഉപയോഗിച്ച് Google Cloud സേവനങ്ങളെ അസിൻക്രണസായി ബന്ധിപ്പിച്ച് പരാജയങ്ങൾ കൈകാര്യം ചെയ്യുക.",
   "gcp/observability-with-cloud-logging-monitoring-and-slos": "പ്രശ്നങ്ങൾ കണ്ടെത്താനും അലേർട്ട് നയങ്ങൾ എഴുതാനും സേവന നില ലക്ഷ്യങ്ങൾ നിർവചിക്കാനും Cloud Logging, Cloud Monitoring, Trace, Error Reporting എന്നിവ ഉപയോഗിക്കുക.",
   "gcp/terraform-on-google-cloud": "Terraform ഉപയോഗിച്ച് Google Cloud നിയന്ത്രിക്കുക: google പ്രൊവൈഡർ, Cloud Storage ലെ റിമോട്ട് സ്റ്റേറ്റ്, പൈപ്പ്‌ലൈനുകൾക്കുള്ള സർവീസ് അക്കൗണ്ടുകൾ, പ്രോജക്റ്റ് ഫാക്ടറികൾ.",
-  "gcp/security-cost-and-debugging-on-google-cloud": "IAM, ഓർഗനൈസേഷൻ നയം, VPC Service Controls പോലുള്ള Google Cloud സുരക്ഷാ നിയന്ത്രണങ്ങൾ പ്രയോഗിച്ച്, ചെലവ് നിയന്ത്രിച്ച്, അനുമതി, ക്വോട്ട പിശകുകൾ ഡീബഗ് ചെയ്യുക."
+  "gcp/security-cost-and-debugging-on-google-cloud": "IAM, ഓർഗനൈസേഷൻ നയം, VPC Service Controls പോലുള്ള Google Cloud സുരക്ഷാ നിയന്ത്രണങ്ങൾ പ്രയോഗിച്ച്, ചെലവ് നിയന്ത്രിച്ച്, അനുമതി, ക്വോട്ട പിശകുകൾ ഡീബഗ് ചെയ്യുക.",
+  "kubevirt/why-vms-on-kubernetes-and-how-kubevirt-works": "ടീമുകൾ Kubernetes ൽ വെർച്വൽ മെഷീനുകൾ എന്തിന് പ്രവർത്തിപ്പിക്കുന്നു, KubeVirt ഘടകങ്ങൾ VM നെ പോഡ് ആക്കുന്നത് എങ്ങനെ.",
+  "kubevirt/installing-kubevirt-and-using-virtctl": "KubeVirt ഓപ്പറേറ്റർ ഇൻസ്റ്റാൾ ചെയ്യുക, ഹാർഡ്‌വെയർ വെർച്വലൈസേഷൻ പരിശോധിക്കുക, virtctl ഉപയോഗിക്കുക.",
+  "kubevirt/virtualmachines-vmis-and-run-strategies": "VirtualMachine മാനിഫെസ്റ്റ് എഴുതുക, VM നും VMI ക്കും ഉള്ള വ്യത്യാസം അറിയുക, റൺ തന്ത്രം തിരഞ്ഞെടുക്കുക.",
+  "kubevirt/vm-disks-datavolumes-and-cdi": "PVC ഉപയോഗിച്ച് VM കൾക്ക് ഡിസ്കുകൾ നൽകുക, CDI, DataVolume വഴി ഇമേജുകൾ ഇറക്കുമതി ചെയ്യുക, ഗോൾഡൻ ഇമേജ് ക്ലോൺ ചെയ്യുക.",
+  "kubevirt/storage-for-vms-access-modes-block-mode-and-snapshots": "ആക്സസ് മോഡുകൾ, ബ്ലോക്ക് മോഡ്, സ്നാപ്ഷോട്ടുകൾ; ലൈവ് മൈഗ്രേഷന് ReadWriteMany വേണം.",
+  "kubevirt/vm-networking-masquerade-bridge-and-multus": "masquerade, bridge, Multus വഴി VM കൾ ബന്ധിപ്പിച്ച് Service വഴി ലഭ്യമാക്കുക.",
+  "kubevirt/cloud-init-instance-types-and-vm-image-pipelines": "cloud-init ഉപയോഗിച്ച് ആദ്യ ബൂട്ട് ക്രമീകരിക്കുക, ഇൻസ്റ്റൻസ് തരങ്ങളാൽ VM വലുപ്പം നിശ്ചയിക്കുക, ഇമേജ് പൈപ്പ്‌ലൈൻ നിർമ്മിക്കുക.",
+  "kubevirt/live-migration-node-drains-and-eviction": "ലൈവ് മൈഗ്രേഷൻ, നോഡ് ഡ്രെയിൻ, എവിക്ഷൻ, മൈഗ്രേഷൻ നയങ്ങൾ.",
+  "kubevirt/cpu-memory-hugepages-and-vm-performance": "CPU, മെമ്മറി വലുപ്പം, ഓവർഹെഡ്, പ്രത്യേക CPU, hugepages, NUMA എന്നിവ മനസ്സിലാക്കുക.",
+  "kubevirt/vm-snapshots-backup-and-restore": "CSI, Velero എന്നിവ ഉപയോഗിച്ച് സ്നാപ്ഷോട്ട്, ബാക്കപ്പ്, പുനഃസ്ഥാപനം.",
+  "kubevirt/operating-kubevirt-monitoring-upgrades-and-troubleshooting": "നിശ്ചിത ക്രമത്തിൽ KubeVirt നിരീക്ഷിക്കുക, അപ്ഗ്രേഡ് ചെയ്യുക, പ്രശ്നം പരിഹരിക്കുക.",
+  "kubevirt/migrating-from-vmware-to-kubevirt": "VMware ൽ നിന്നുള്ള മൈഗ്രേഷൻ ആസൂത്രണം: ഇൻവെന്ററി, Forklift വഴി പരിവർത്തനം, ഡ്രൈവറുകൾ, തുല്യമില്ലാത്തവ.",
+  "ceph/what-ceph-is-rados-and-the-architecture": "ഒറ്റ ഒബ്ജക്റ്റ് സ്റ്റോർ RADOS ആയി Ceph, ബ്ലോക്ക്, ഫയൽ, ഒബ്ജക്റ്റ് സേവനങ്ങളും അതിന്റെ ഡീമണുകളും.",
+  "ceph/monitors-managers-osds-and-quorum": "മോണിറ്ററുകൾ, മാനേജർമാർ, OSD കൾ, കോറം, BlueStore.",
+  "ceph/crush-pools-and-placement-groups": "CRUSH, പൂളുകൾ, പ്ലേസ്മെന്റ് ഗ്രൂപ്പുകൾ, പരാജയ ഡൊമെയ്‌നുകൾ.",
+  "ceph/deploying-ceph-with-cephadm": "cephadm ഉപയോഗിച്ച് വിന്യസിക്കുക: ബൂട്ട്സ്ട്രാപ്പ്, ഹോസ്റ്റുകൾ, OSD കൾ, സേവനങ്ങൾ.",
+  "ceph/rbd-block-storage-for-vms-and-kubernetes": "RBD ഇമേജുകൾ, സ്നാപ്ഷോട്ടുകൾ, ക്ലോണുകൾ, ceph-csi, ക്ലസ്റ്ററുകൾ തമ്മിലുള്ള മിററിംഗ്.",
+  "ceph/cephfs-shared-file-systems-and-mds": "CephFS, MDS, മൗണ്ടുകൾ, സബ്‌വോള്യങ്ങൾ, ക്വാട്ടകൾ.",
+  "ceph/rgw-s3-compatible-object-storage-with-ceph": "RGW ഉപയോഗിച്ച് S3 ഒബ്ജക്റ്റ് സംഭരണം: ഉപയോക്താക്കൾ, ബക്കറ്റുകൾ, ഇൻഡെക്സ് ഷാർഡിംഗ്, മൾട്ടിസൈറ്റ്.",
+  "ceph/rook-ceph-on-kubernetes": "Rook: ഓപ്പറേറ്റർ ഉപയോഗിച്ച് Kubernetes ൽ Ceph പ്രവർത്തിപ്പിക്കുക.",
+  "ceph/replication-erasure-coding-and-durability": "റെപ്ലിക്കേഷൻ, ഇറേഷർ കോഡിംഗ്: ഓവർഹെഡും ഈടും.",
+  "ceph/bluestore-networks-and-ceph-performance": "BlueStore, നെറ്റ്‌വർക്കുകൾ, ബെഞ്ച്മാർക്കുകൾ, റിക്കവറി പരിധി.",
+  "ceph/ceph-failures-recovery-and-health-warnings": "പരാജയങ്ങൾ, റിക്കവറി, ആരോഗ്യ മുന്നറിയിപ്പുകൾ, സുരക്ഷിത അറ്റകുറ്റപ്പണി.",
+  "ceph/capacity-planning-upgrades-and-operating-ceph": "ശേഷി ആസൂത്രണം, അപ്ഗ്രേഡുകൾ, ദൈനംദിന പ്രവർത്തനം.",
+  "vault/what-vault-is-and-the-secrets-problem": "സ്ഥിര രഹസ്യങ്ങൾ എന്തുകൊണ്ട് അപകടകരം, Vault എൻജിനുകൾ, ഓത്, നയങ്ങൾ, ലീസ്, ഓഡിറ്റ് എന്നിവ എങ്ങനെ ഉപയോഗിക്കുന്നു.",
+  "vault/starting-vault-seal-unseal-and-storage": "സീൽ, അൺസീൽ, Shamir ഭാഗങ്ങൾ, auto-unseal, സംഭരണം.",
+  "vault/authentication-methods-and-tokens": "ആളുകൾക്കും മെഷീനുകൾക്കുമുള്ള ഓത് രീതികൾ, ടോക്കണുകൾ, TTL.",
+  "vault/policies-and-least-privilege-access": "പാത്ത് അടിസ്ഥാന നയങ്ങൾ, ശേഷികൾ, KV v2 പാത്തുകൾ, പരിശോധന.",
+  "vault/kv-secrets-engine-and-secret-versioning": "KV v2 പതിപ്പുകൾ, സോഫ്റ്റ് ഡിലീറ്റ്, patch, check-and-set.",
+  "vault/dynamic-secrets-for-databases-and-clouds": "ഡാറ്റാബേസിനും ക്ലൗഡിനും ഡൈനാമിക് ക്രെഡൻഷ്യലുകൾ, ലീസ്, റൂട്ട് അക്കൗണ്ട് റൊട്ടേഷൻ.",
+  "vault/pki-short-lived-certificates-with-vault": "PKI ഉപയോഗിച്ച് സ്വകാര്യ CA, ഹ്രസ്വകാല സർട്ടിഫിക്കറ്റുകൾ.",
+  "vault/transit-encryption-as-a-service": "Transit: സേവനമായി എൻക്രിപ്ഷൻ, റൊട്ടേഷൻ, rewrap.",
+  "vault/vault-on-kubernetes-injector-csi-and-operators": "Kubernetes ൽ Vault: injector, CSI, Vault Secrets Operator.",
+  "vault/vault-high-availability-raft-and-disaster-recovery": "Raft ഉപയോഗിച്ച് ഉയർന്ന ലഭ്യത, സ്നാപ്ഷോട്ടുകൾ, റെപ്ലിക്കേഷൻ, ദുരന്ത പുനഃസ്ഥാപനം.",
+  "vault/audit-logging-monitoring-and-hardening-vault": "ഓഡിറ്റ് ലോഗുകൾ, നിരീക്ഷണം, Vault ശക്തിപ്പെടുത്തൽ.",
+  "vault/incident-response-rotating-and-revoking-secrets": "സംഭവ പ്രതികരണം: റദ്ദാക്കുക, മാറ്റുക, അന്വേഷിക്കുക."
  }
 }

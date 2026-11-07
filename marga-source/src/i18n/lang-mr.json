@@ -1903,6 +1903,18 @@
   "gcp": {
    "title": "Google Cloud",
    "summary": "Google Cloud चे मॉडेल शिका: प्रकल्प, VPC, Compute Engine, Cloud Storage, GKE, Cloud Run, डेटा आणि मेसेजिंग सेवा, संचालन व खर्च, gcloud CLI सह."
+  },
+  "kubevirt": {
+   "title": "KubeVirt: Kubernetes वर VM",
+   "summary": "Kubernetes वर व्हर्च्युअल मशीन चालवा: आर्किटेक्चर, इन्स्टॉल, डिस्क व CDI, स्टोरेज व लाइव्ह मायग्रेशन, नेटवर्किंग, कामगिरी, बॅकअप, संचालन आणि VMware वरून स्थलांतर."
+  },
+  "ceph": {
+   "title": "Ceph आणि सॉफ्टवेअर-परिभाषित स्टोरेज",
+   "summary": "Ceph समजून चालवा: RADOS, OSD व मॉनिटर, CRUSH व प्लेसमेंट ग्रुप, RBD, CephFS, RGW, Kubernetes वर Rook, कामगिरी, अपयश रिकव्हरी आणि क्षमता नियोजन."
+  },
+  "vault": {
+   "title": "Vault आणि गुपिते व्यवस्थापन",
+   "summary": "HashiCorp Vault ने गुपिते सांभाळा: सील व अनसील, ऑथ पद्धती, धोरणे, KV, डायनॅमिक गुपिते, PKI, Transit एन्क्रिप्शन, Kubernetes एकीकरण, उच्च उपलब्धता आणि घटना प्रतिसाद."
   }
  },
  "paths": {
@@ -2498,6 +2510,42 @@
   "gcp/pub-sub-eventarc-and-cloud-tasks": "Pub/Sub टॉपिक व सबस्क्रिप्शन, Eventarc ट्रिगर आणि Cloud Tasks क्यू वापरून Google Cloud सेवा असिंक्रोनस जोडा आणि अपयश हाताळा.",
   "gcp/observability-with-cloud-logging-monitoring-and-slos": "समस्या शोधण्यासाठी, अलर्ट धोरणे लिहिण्यासाठी आणि सेवा पातळी उद्दिष्टे ठरवण्यासाठी Cloud Logging, Cloud Monitoring, Trace व Error Reporting वापरा.",
   "gcp/terraform-on-google-cloud": "Terraform ने Google Cloud व्यवस्थापित करा: google प्रोव्हायडर, Cloud Storage मधील रिमोट स्टेट, पाइपलाइनसाठी सर्व्हिस अकाउंट आणि प्रकल्प कारखाने.",
-  "gcp/security-cost-and-debugging-on-google-cloud": "IAM, संस्था धोरण आणि VPC Service Controls सारखे Google Cloud सुरक्षा नियंत्रण लागू करा, खर्च नियंत्रित करा आणि परवानगी व कोटा त्रुटी डीबग करा."
+  "gcp/security-cost-and-debugging-on-google-cloud": "IAM, संस्था धोरण आणि VPC Service Controls सारखे Google Cloud सुरक्षा नियंत्रण लागू करा, खर्च नियंत्रित करा आणि परवानगी व कोटा त्रुटी डीबग करा.",
+  "kubevirt/why-vms-on-kubernetes-and-how-kubevirt-works": "टीम्स Kubernetes वर काम करणाऱ्या व्हर्च्युअल मशीन का चालवतात आणि KubeVirt चे घटक VM ला पॉडमध्ये कसे बदलतात.",
+  "kubevirt/installing-kubevirt-and-using-virtctl": "KubeVirt ऑपरेटर इन्स्टॉल करा, हार्डवेअर व्हर्च्युअलायझेशन तपासा आणि virtctl वापरा.",
+  "kubevirt/virtualmachines-vmis-and-run-strategies": "VirtualMachine मॅनिफेस्ट लिहा, VM आणि VMI मधला फरक समजा आणि रन धोरण निवडा.",
+  "kubevirt/vm-disks-datavolumes-and-cdi": "PVC ने VM ला डिस्क द्या, CDI व DataVolume ने इमेज इम्पोर्ट करा आणि गोल्डन इमेज क्लोन करा.",
+  "kubevirt/storage-for-vms-access-modes-block-mode-and-snapshots": "ॲक्सेस मोड, ब्लॉक मोड आणि स्नॅपशॉट निवडा; लाइव्ह मायग्रेशनसाठी ReadWriteMany हवे.",
+  "kubevirt/vm-networking-masquerade-bridge-and-multus": "masquerade, bridge आणि Multus ने VM जोडा आणि Service ने उपलब्ध करा.",
+  "kubevirt/cloud-init-instance-types-and-vm-image-pipelines": "cloud-init ने पहिला बूट ठरवा, इन्स्टन्स प्रकाराने VM चा आकार ठरवा आणि इमेज पाइपलाइन बनवा.",
+  "kubevirt/live-migration-node-drains-and-eviction": "लाइव्ह मायग्रेशन, नोड ड्रेन, इव्हिक्शन आणि मायग्रेशन धोरणे.",
+  "kubevirt/cpu-memory-hugepages-and-vm-performance": "CPU व मेमरीचा आकार, ओव्हरहेड, समर्पित CPU, hugepages आणि NUMA समजा.",
+  "kubevirt/vm-snapshots-backup-and-restore": "CSI आणि Velero ने स्नॅपशॉट, बॅकअप आणि रिस्टोअर.",
+  "kubevirt/operating-kubevirt-monitoring-upgrades-and-troubleshooting": "ठरावीक क्रमाने KubeVirt चे निरीक्षण, अपग्रेड आणि समस्यानिवारण करा.",
+  "kubevirt/migrating-from-vmware-to-kubevirt": "VMware वरून मायग्रेशनचे नियोजन: इन्व्हेंटरी, Forklift ने रूपांतर, ड्रायव्हर आणि ज्याला समकक्ष नाही ते.",
+  "ceph/what-ceph-is-rados-and-the-architecture": "एकच ऑब्जेक्ट स्टोअर RADOS म्हणून Ceph, ब्लॉक, फाइल व ऑब्जेक्ट सेवा आणि त्याचे डेमन.",
+  "ceph/monitors-managers-osds-and-quorum": "मॉनिटर, मॅनेजर, OSD, कोरम आणि BlueStore.",
+  "ceph/crush-pools-and-placement-groups": "CRUSH, पूल, प्लेसमेंट ग्रुप आणि अपयश डोमेन.",
+  "ceph/deploying-ceph-with-cephadm": "cephadm ने डिप्लॉय करा: बूटस्ट्रॅप, होस्ट, OSD आणि सेवा.",
+  "ceph/rbd-block-storage-for-vms-and-kubernetes": "RBD इमेज, स्नॅपशॉट, क्लोन, ceph-csi आणि क्लस्टरमधील मिररिंग.",
+  "ceph/cephfs-shared-file-systems-and-mds": "CephFS, MDS, माउंट, सबव्हॉल्यूम आणि कोटा.",
+  "ceph/rgw-s3-compatible-object-storage-with-ceph": "RGW ने S3 ऑब्जेक्ट स्टोरेज: वापरकर्ते, बकेट, इंडेक्स शार्डिंग आणि मल्टीसाइट.",
+  "ceph/rook-ceph-on-kubernetes": "Rook: ऑपरेटरने Kubernetes वर Ceph चालवा.",
+  "ceph/replication-erasure-coding-and-durability": "रेप्लिकेशन विरुद्ध इरेजर कोडिंग: ओव्हरहेड आणि टिकाऊपणा.",
+  "ceph/bluestore-networks-and-ceph-performance": "BlueStore, नेटवर्क, बेंचमार्क आणि रिकव्हरीवर मर्यादा.",
+  "ceph/ceph-failures-recovery-and-health-warnings": "अपयश, रिकव्हरी, आरोग्य इशारे आणि सुरक्षित देखभाल.",
+  "ceph/capacity-planning-upgrades-and-operating-ceph": "क्षमता नियोजन, अपग्रेड आणि दैनंदिन संचालन.",
+  "vault/what-vault-is-and-the-secrets-problem": "स्थिर गुपिते धोकादायक का आहेत आणि Vault इंजिन, ऑथ, धोरणे, लीज आणि ऑडिट कसे वापरते.",
+  "vault/starting-vault-seal-unseal-and-storage": "सील, अनसील, Shamir भाग, auto-unseal आणि स्टोरेज.",
+  "vault/authentication-methods-and-tokens": "लोक आणि मशीनसाठी ऑथ पद्धती, टोकन आणि TTL.",
+  "vault/policies-and-least-privilege-access": "पाथ आधारित धोरणे, क्षमता, KV v2 पाथ आणि चाचणी.",
+  "vault/kv-secrets-engine-and-secret-versioning": "KV v2 आवृत्त्या, सॉफ्ट डिलीट, patch आणि check-and-set.",
+  "vault/dynamic-secrets-for-databases-and-clouds": "डेटाबेस आणि क्लाउडसाठी डायनॅमिक क्रेडेन्शियल, लीज आणि रूट खात्याचे रोटेशन.",
+  "vault/pki-short-lived-certificates-with-vault": "PKI सह खाजगी CA आणि अल्पायुषी प्रमाणपत्रे.",
+  "vault/transit-encryption-as-a-service": "Transit: सेवा म्हणून एन्क्रिप्शन, रोटेशन आणि rewrap.",
+  "vault/vault-on-kubernetes-injector-csi-and-operators": "Kubernetes वर Vault: injector, CSI आणि Vault Secrets Operator.",
+  "vault/vault-high-availability-raft-and-disaster-recovery": "Raft सह उच्च उपलब्धता, स्नॅपशॉट, रेप्लिकेशन आणि आपत्ती रिकव्हरी.",
+  "vault/audit-logging-monitoring-and-hardening-vault": "ऑडिट लॉग, निरीक्षण आणि Vault चे मजबुतीकरण.",
+  "vault/incident-response-rotating-and-revoking-secrets": "घटना प्रतिसाद: रद्द करा, बदला आणि तपास करा."
  }
 }

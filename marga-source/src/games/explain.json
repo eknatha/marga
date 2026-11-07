@@ -832,5 +832,23 @@
   "signs": "Objects open without credentials and audit logs show reads from unknown external addresses.",
   "fix": "Remove the public binding, enable public access prevention, review the logs and follow the incident process.",
   "example": "The storage.publicAccessPrevention organization policy blocks allUsers bindings and a log alert fires on any attempt."
+ },
+ "the-drain-that-stopped-every-vm": {
+  "cause": "The VM disks were on ReadWriteOnce storage, so KubeVirt could not live-migrate the VMs and the drain stopped them instead.",
+  "signs": "The LiveMigratable condition is False with a message about a shared ReadWriteMany PVC, and VMs on the draining node begin to stop.",
+  "fix": "Stop the drain, cordon the node, move migratable VMs, plan a short stop for the rest, and move disks to RWX block storage.",
+  "example": "kubectl get vmi db1 shows LiveMigratable False, and after moving the disk to a ceph-rbd RWX class the next drain migrates every VM."
+ },
+ "the-cluster-that-filled-after-one-failure": {
+  "cause": "The cluster was at 82 percent used, so recovering a failed host pushed the surviving OSDs past the full ratio.",
+  "signs": "ceph health shows full OSDs and pools full, writes fail, and ceph osd df shows survivors at 93 to 95 percent.",
+  "fix": "Bring the host back or add capacity, free safe data, let recovery finish, and keep headroom for a host failure.",
+  "example": "After the host returned, misplaced objects fell to zero over two hours, and alerts at 65 and 75 percent now trigger expansion."
+ },
+ "the-token-in-the-public-repository": {
+  "cause": "A Vault token with a long TTL was committed to a public repository.",
+  "signs": "A scanner alert, and an audit log entry showing reads from an unknown address using the token's accessor.",
+  "fix": "Revoke the token and its leases, read the audit log, rotate every static secret it could read, and shorten TTLs.",
+  "example": "vault token revoke -accessor 7c1a3d6e took two minutes, and one vendor API key was regenerated and rewritten to KV."
  }
 }

@@ -2266,5 +2266,149 @@
  "gcp/security-cost-and-debugging-on-google-cloud": {
   "te": "IAM, సంస్థ పాలసీ, VPC Service Controls వంటి Google Cloud భద్రతా నియంత్రణలు వర్తింపజేసి, ఖర్చు నియంత్రించి, అనుమతి మరియు కోటా లోపాలను డీబగ్ చేయండి.",
   "hi": "IAM, संगठन नीति और VPC Service Controls जैसे Google Cloud सुरक्षा नियंत्रण लागू करें, लागत सँभालें और अनुमति व कोटा त्रुटियाँ डीबग करें।"
+ },
+ "kubevirt/why-vms-on-kubernetes-and-how-kubevirt-works": {
+  "te": "బృందాలు Kubernetes పై వర్చువల్ మెషీన్లను ఎందుకు నడుపుతాయి మరియు KubeVirt భాగాలు VM ను పాడ్‌గా ఎలా మారుస్తాయి.",
+  "hi": "टीमें Kubernetes पर वर्चुअल मशीन क्यों चलाती हैं और KubeVirt के घटक VM को पॉड में कैसे बदलते हैं।"
+ },
+ "kubevirt/installing-kubevirt-and-using-virtctl": {
+  "te": "KubeVirt ఆపరేటర్‌ను ఇన్‌స్టాల్ చేయండి, హార్డ్‌వేర్ వర్చువలైజేషన్ తనిఖీ చేయండి మరియు virtctl వాడండి.",
+  "hi": "KubeVirt ऑपरेटर इंस्टॉल करें, हार्डवेयर वर्चुअलाइज़ेशन जाँचें और virtctl का उपयोग करें।"
+ },
+ "kubevirt/virtualmachines-vmis-and-run-strategies": {
+  "te": "VirtualMachine మ్యానిఫెస్ట్ రాయండి, VM మరియు VMI తేడా తెలుసుకోండి, రన్ వ్యూహం ఎంచుకోండి.",
+  "hi": "VirtualMachine मैनिफ़ेस्ट लिखें, VM और VMI का अंतर समझें और रन रणनीति चुनें।"
+ },
+ "kubevirt/vm-disks-datavolumes-and-cdi": {
+  "te": "PVC లతో VM లకు డిస్క్‌లు ఇవ్వండి, CDI మరియు DataVolume తో ఇమేజ్‌లు దిగుమతి చేసి గోల్డెన్ ఇమేజ్‌లను క్లోన్ చేయండి.",
+  "hi": "PVC से VM को डिस्क दें, CDI और DataVolume से इमेज इम्पोर्ट करें और गोल्डन इमेज क्लोन करें।"
+ },
+ "kubevirt/storage-for-vms-access-modes-block-mode-and-snapshots": {
+  "te": "యాక్సెస్ మోడ్‌లు, బ్లాక్ మోడ్ మరియు స్నాప్‌షాట్‌లు ఎంచుకోండి; లైవ్ మైగ్రేషన్‌కు ReadWriteMany అవసరం.",
+  "hi": "एक्सेस मोड, ब्लॉक मोड और स्नैपशॉट चुनें; लाइव माइग्रेशन के लिए ReadWriteMany चाहिए।"
+ },
+ "kubevirt/vm-networking-masquerade-bridge-and-multus": {
+  "te": "masquerade, bridge మరియు Multus తో VM లను కలపండి, Service తో అందుబాటులోకి తేండి.",
+  "hi": "masquerade, bridge और Multus से VM जोड़ें और Service से उन्हें उपलब्ध कराएँ।"
+ },
+ "kubevirt/cloud-init-instance-types-and-vm-image-pipelines": {
+  "te": "cloud-init తో మొదటి బూట్‌ను అమర్చండి, ఇన్‌స్టెన్స్ రకాలతో VM పరిమాణం నిర్ణయించండి, ఇమేజ్ పైప్‌లైన్‌లు నిర్మించండి.",
+  "hi": "cloud-init से पहला बूट सेट करें, इंस्टेंस टाइप से VM का आकार तय करें और इमेज पाइपलाइन बनाएँ।"
+ },
+ "kubevirt/live-migration-node-drains-and-eviction": {
+  "te": "లైవ్ మైగ్రేషన్, నోడ్ డ్రెయిన్, ఎవిక్షన్ మరియు మైగ్రేషన్ విధానాలు.",
+  "hi": "लाइव माइग्रेशन, नोड ड्रेन, इविक्शन और माइग्रेशन नीतियाँ।"
+ },
+ "kubevirt/cpu-memory-hugepages-and-vm-performance": {
+  "te": "CPU మరియు మెమరీ పరిమాణం, ఓవర్‌హెడ్, ప్రత్యేక CPU, hugepages మరియు NUMA అర్థం చేసుకోండి.",
+  "hi": "CPU और मेमोरी का आकार, ओवरहेड, समर्पित CPU, hugepages और NUMA समझें।"
+ },
+ "kubevirt/vm-snapshots-backup-and-restore": {
+  "te": "CSI మరియు Velero తో స్నాప్‌షాట్‌లు, బ్యాకప్ మరియు రీస్టోర్.",
+  "hi": "CSI और Velero से स्नैपशॉट, बैकअप और रिस्टोर।"
+ },
+ "kubevirt/operating-kubevirt-monitoring-upgrades-and-troubleshooting": {
+  "te": "నిర్ణీత క్రమంలో KubeVirt ను పర్యవేక్షించండి, అప్‌గ్రేడ్ చేయండి, సమస్యలు పరిష్కరించండి.",
+  "hi": "तय क्रम में KubeVirt की निगरानी, अपग्रेड और समस्या निवारण करें।"
+ },
+ "kubevirt/migrating-from-vmware-to-kubevirt": {
+  "te": "VMware నుండి మైగ్రేషన్ ప్రణాళిక: ఇన్వెంటరీ, Forklift తో మార్పిడి, డ్రైవర్లు మరియు సమానమైనది లేనివి.",
+  "hi": "VMware से माइग्रेशन की योजना: इन्वेंटरी, Forklift से कन्वर्ज़न, ड्राइवर और जिनका कोई समकक्ष नहीं।"
+ },
+ "ceph/what-ceph-is-rados-and-the-architecture": {
+  "te": "ఒకే ఆబ్జెక్ట్ స్టోర్ RADOS గా Ceph, బ్లాక్, ఫైల్, ఆబ్జెక్ట్ సేవలు మరియు దాని డెమన్లు.",
+  "hi": "एक ही ऑब्जेक्ट स्टोर RADOS के रूप में Ceph, ब्लॉक, फ़ाइल और ऑब्जेक्ट सेवाओं और उसके डेमन के साथ।"
+ },
+ "ceph/monitors-managers-osds-and-quorum": {
+  "te": "మానిటర్లు, మేనేజర్లు, OSD లు, కోరం మరియు BlueStore.",
+  "hi": "मॉनिटर, मैनेजर, OSD, कोरम और BlueStore।"
+ },
+ "ceph/crush-pools-and-placement-groups": {
+  "te": "CRUSH, పూల్స్, ప్లేస్‌మెంట్ గ్రూపులు మరియు వైఫల్య డొమైన్లు.",
+  "hi": "CRUSH, पूल, प्लेसमेंट ग्रुप और विफलता डोमेन।"
+ },
+ "ceph/deploying-ceph-with-cephadm": {
+  "te": "cephadm తో డిప్లాయ్ చేయండి: బూట్‌స్ట్రాప్, హోస్ట్‌లు, OSD లు మరియు సేవలు.",
+  "hi": "cephadm से डिप्लॉय करें: बूटस्ट्रैप, होस्ट, OSD और सेवाएँ।"
+ },
+ "ceph/rbd-block-storage-for-vms-and-kubernetes": {
+  "te": "RBD ఇమేజ్‌లు, స్నాప్‌షాట్‌లు, క్లోన్‌లు, ceph-csi మరియు క్లస్టర్ల మధ్య మిర్రరింగ్.",
+  "hi": "RBD इमेज, स्नैपशॉट, क्लोन, ceph-csi और क्लस्टरों के बीच मिररिंग।"
+ },
+ "ceph/cephfs-shared-file-systems-and-mds": {
+  "te": "CephFS, MDS, మౌంట్‌లు, సబ్‌వాల్యూమ్‌లు మరియు కోటాలు.",
+  "hi": "CephFS, MDS, माउंट, सबवॉल्यूम और कोटा।"
+ },
+ "ceph/rgw-s3-compatible-object-storage-with-ceph": {
+  "te": "RGW తో S3 ఆబ్జెక్ట్ స్టోరేజ్: వినియోగదారులు, బకెట్లు, ఇండెక్స్ షార్డింగ్ మరియు మల్టీసైట్.",
+  "hi": "RGW से S3 ऑब्जेक्ट स्टोरेज: उपयोगकर्ता, बकेट, इंडेक्स शार्डिंग और मल्टीसाइट।"
+ },
+ "ceph/rook-ceph-on-kubernetes": {
+  "te": "Rook: ఆపరేటర్‌తో Kubernetes పై Ceph నడపండి.",
+  "hi": "Rook: ऑपरेटर से Kubernetes पर Ceph चलाएँ।"
+ },
+ "ceph/replication-erasure-coding-and-durability": {
+  "te": "రెప్లికేషన్ వర్సెస్ ఎరేజర్ కోడింగ్: ఓవర్‌హెడ్ మరియు మన్నిక.",
+  "hi": "रेप्लिकेशन बनाम इरेज़र कोडिंग: ओवरहेड और टिकाऊपन।"
+ },
+ "ceph/bluestore-networks-and-ceph-performance": {
+  "te": "BlueStore, నెట్‌వర్క్‌లు, బెంచ్‌మార్క్‌లు మరియు రికవరీ పరిమితి.",
+  "hi": "BlueStore, नेटवर्क, बेंचमार्क और रिकवरी पर सीमा।"
+ },
+ "ceph/ceph-failures-recovery-and-health-warnings": {
+  "te": "వైఫల్యాలు, రికవరీ, ఆరోగ్య హెచ్చరికలు మరియు సురక్షిత నిర్వహణ.",
+  "hi": "विफलताएँ, रिकवरी, हेल्थ चेतावनियाँ और सुरक्षित रखरखाव।"
+ },
+ "ceph/capacity-planning-upgrades-and-operating-ceph": {
+  "te": "సామర్థ్య ప్రణాళిక, అప్‌గ్రేడ్‌లు మరియు రోజువారీ నిర్వహణ.",
+  "hi": "क्षमता योजना, अपग्रेड और रोज़ का संचालन।"
+ },
+ "vault/what-vault-is-and-the-secrets-problem": {
+  "te": "స్థిర రహస్యాలు ఎందుకు ప్రమాదకరం మరియు Vault ఇంజిన్లు, ఆథ్, విధానాలు, లీజులు, ఆడిట్ ఎలా వాడుతుంది.",
+  "hi": "स्थिर सीक्रेट जोखिम भरे क्यों हैं और Vault इंजन, ऑथ, नीतियों, लीज़ और ऑडिट का उपयोग कैसे करता है।"
+ },
+ "vault/starting-vault-seal-unseal-and-storage": {
+  "te": "సీల్, అన్‌సీల్, Shamir భాగాలు, auto-unseal మరియు స్టోరేజ్.",
+  "hi": "सील, अनसील, Shamir हिस्से, auto-unseal और स्टोरेज।"
+ },
+ "vault/authentication-methods-and-tokens": {
+  "te": "మనుషులు మరియు యంత్రాల కోసం ఆథ్ పద్ధతులు, టోకెన్లు మరియు TTL.",
+  "hi": "लोगों और मशीनों के लिए ऑथ विधियाँ, टोकन और TTL।"
+ },
+ "vault/policies-and-least-privilege-access": {
+  "te": "పాత్ ఆధారిత విధానాలు, సామర్థ్యాలు, KV v2 పాత్‌లు మరియు పరీక్ష.",
+  "hi": "पाथ आधारित नीतियाँ, क्षमताएँ, KV v2 पाथ और परीक्षण।"
+ },
+ "vault/kv-secrets-engine-and-secret-versioning": {
+  "te": "KV v2 వెర్షన్లు, సాఫ్ట్ డిలీట్, patch మరియు check-and-set.",
+  "hi": "KV v2 संस्करण, सॉफ़्ट डिलीट, patch और check-and-set।"
+ },
+ "vault/dynamic-secrets-for-databases-and-clouds": {
+  "te": "డేటాబేస్ మరియు క్లౌడ్ డైనమిక్ క్రెడెన్షియల్స్, లీజులు మరియు రూట్ ఖాతా రొటేషన్.",
+  "hi": "डेटाबेस और क्लाउड के डायनामिक क्रेडेंशियल, लीज़ और रूट खाते का रोटेशन।"
+ },
+ "vault/pki-short-lived-certificates-with-vault": {
+  "te": "PKI తో ప్రైవేట్ CA మరియు స్వల్పకాల సర్టిఫికెట్లు.",
+  "hi": "PKI के साथ निजी CA और अल्पकालिक सर्टिफ़िकेट।"
+ },
+ "vault/transit-encryption-as-a-service": {
+  "te": "Transit: సేవగా ఎన్‌క్రిప్షన్, రొటేషన్ మరియు rewrap.",
+  "hi": "Transit: सेवा के रूप में एन्क्रिप्शन, रोटेशन और rewrap।"
+ },
+ "vault/vault-on-kubernetes-injector-csi-and-operators": {
+  "te": "Kubernetes పై Vault: injector, CSI మరియు Vault Secrets Operator.",
+  "hi": "Kubernetes पर Vault: injector, CSI और Vault Secrets Operator।"
+ },
+ "vault/vault-high-availability-raft-and-disaster-recovery": {
+  "te": "Raft తో అధిక లభ్యత, స్నాప్‌షాట్‌లు, రెప్లికేషన్ మరియు విపత్తు పునరుద్ధరణ.",
+  "hi": "Raft के साथ उच्च उपलब्धता, स्नैपशॉट, रेप्लिकेशन और आपदा रिकवरी।"
+ },
+ "vault/audit-logging-monitoring-and-hardening-vault": {
+  "te": "ఆడిట్ లాగ్‌లు, పర్యవేక్షణ మరియు Vault బలోపేతం.",
+  "hi": "ऑडिट लॉग, निगरानी और Vault की सुदृढ़ीकरण।"
+ },
+ "vault/incident-response-rotating-and-revoking-secrets": {
+  "te": "ఘటన స్పందన: రద్దు చేయండి, మార్చండి, దర్యాప్తు చేయండి.",
+  "hi": "घटना प्रतिक्रिया: निरस्त करें, बदलें और जाँच करें।"
  }
 }

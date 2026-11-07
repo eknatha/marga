@@ -1903,6 +1903,18 @@
   "gcp": {
    "title": "Google Cloud",
    "summary": "Pelajari model Google Cloud: project, VPC, Compute Engine, Cloud Storage, GKE, Cloud Run, layanan data dan messaging, operasi dan biaya, dengan CLI gcloud."
+  },
+  "kubevirt": {
+   "title": "KubeVirt: VM di Kubernetes",
+   "summary": "Jalankan mesin virtual di Kubernetes: arsitektur, instalasi, disk dan CDI, penyimpanan dan migrasi langsung, jaringan, kinerja, backup, operasi, dan perpindahan dari VMware."
+  },
+  "ceph": {
+   "title": "Ceph dan penyimpanan terdefinisi perangkat lunak",
+   "summary": "Pahami dan kelola Ceph: RADOS, OSD dan monitor, CRUSH dan placement group, RBD, CephFS, RGW, Rook di Kubernetes, kinerja, pemulihan kegagalan, dan perencanaan kapasitas."
+  },
+  "vault": {
+   "title": "Vault dan manajemen rahasia",
+   "summary": "Kelola rahasia dengan HashiCorp Vault: seal, metode autentikasi, kebijakan, KV, rahasia dinamis, PKI, enkripsi Transit, integrasi Kubernetes, ketersediaan tinggi, dan respons insiden."
   }
  },
  "paths": {
@@ -2498,6 +2510,42 @@
   "gcp/pub-sub-eventarc-and-cloud-tasks": "Gunakan topik dan langganan Pub/Sub, trigger Eventarc, dan antrean Cloud Tasks untuk menghubungkan layanan Google Cloud secara asinkron dan menangani kegagalan.",
   "gcp/observability-with-cloud-logging-monitoring-and-slos": "Gunakan Cloud Logging, Cloud Monitoring, Trace, dan Error Reporting untuk menemukan masalah, menulis kebijakan peringatan, dan menetapkan service level objective.",
   "gcp/terraform-on-google-cloud": "Kelola Google Cloud dengan Terraform: provider google, state jarak jauh di Cloud Storage, service account untuk pipeline, dan pabrik proyek.",
-  "gcp/security-cost-and-debugging-on-google-cloud": "Terapkan kontrol keamanan Google Cloud seperti IAM, kebijakan organisasi, dan VPC Service Controls, kendalikan biaya, dan debug error izin dan kuota."
+  "gcp/security-cost-and-debugging-on-google-cloud": "Terapkan kontrol keamanan Google Cloud seperti IAM, kebijakan organisasi, dan VPC Service Controls, kendalikan biaya, dan debug error izin dan kuota.",
+  "kubevirt/why-vms-on-kubernetes-and-how-kubevirt-works": "Mengapa tim menjalankan mesin virtual di Kubernetes dan bagaimana komponen KubeVirt mengubah VM menjadi pod.",
+  "kubevirt/installing-kubevirt-and-using-virtctl": "Pasang operator KubeVirt, periksa virtualisasi perangkat keras, dan gunakan virtctl.",
+  "kubevirt/virtualmachines-vmis-and-run-strategies": "Tulis manifes VirtualMachine, bedakan VM dan VMI, dan pilih strategi eksekusi.",
+  "kubevirt/vm-disks-datavolumes-and-cdi": "Sediakan disk VM dengan PVC, impor image dengan CDI dan DataVolume, dan klon golden image.",
+  "kubevirt/storage-for-vms-access-modes-block-mode-and-snapshots": "Pilih mode akses, mode blok, dan snapshot; migrasi langsung memerlukan ReadWriteMany.",
+  "kubevirt/vm-networking-masquerade-bridge-and-multus": "Hubungkan VM dengan masquerade, bridge, dan Multus, lalu ekspos dengan Service.",
+  "kubevirt/cloud-init-instance-types-and-vm-image-pipelines": "Atur boot pertama dengan cloud-init, tentukan ukuran VM dengan tipe instans, dan bangun pipeline image.",
+  "kubevirt/live-migration-node-drains-and-eviction": "Migrasi langsung, pengosongan node, eviction, dan kebijakan migrasi.",
+  "kubevirt/cpu-memory-hugepages-and-vm-performance": "Tentukan ukuran CPU dan memori, pahami overhead, CPU khusus, hugepages, dan NUMA.",
+  "kubevirt/vm-snapshots-backup-and-restore": "Snapshot, backup, dan pemulihan dengan CSI dan Velero.",
+  "kubevirt/operating-kubevirt-monitoring-upgrades-and-troubleshooting": "Pantau, perbarui, dan pecahkan masalah KubeVirt dengan urutan tetap.",
+  "kubevirt/migrating-from-vmware-to-kubevirt": "Rencanakan migrasi dari VMware: inventaris, konversi dengan Forklift, driver, dan hal yang tidak punya padanan.",
+  "ceph/what-ceph-is-rados-and-the-architecture": "Ceph sebagai satu penyimpanan objek, RADOS, dengan layanan blok, berkas, dan objek, serta daemon-nya.",
+  "ceph/monitors-managers-osds-and-quorum": "Monitor, manager, OSD, kuorum, dan BlueStore.",
+  "ceph/crush-pools-and-placement-groups": "CRUSH, pool, placement group, dan domain kegagalan.",
+  "ceph/deploying-ceph-with-cephadm": "Deploy dengan cephadm: bootstrap, host, OSD, dan layanan.",
+  "ceph/rbd-block-storage-for-vms-and-kubernetes": "Image RBD, snapshot, klon, ceph-csi, dan mirroring antar klaster.",
+  "ceph/cephfs-shared-file-systems-and-mds": "CephFS, MDS, mount, subvolume, dan kuota.",
+  "ceph/rgw-s3-compatible-object-storage-with-ceph": "Penyimpanan objek S3 dengan RGW: pengguna, bucket, sharding indeks, dan multisite.",
+  "ceph/rook-ceph-on-kubernetes": "Rook: jalankan Ceph di Kubernetes dengan operator.",
+  "ceph/replication-erasure-coding-and-durability": "Replikasi versus erasure coding: overhead dan ketahanan.",
+  "ceph/bluestore-networks-and-ceph-performance": "BlueStore, jaringan, benchmark, dan pembatasan pemulihan.",
+  "ceph/ceph-failures-recovery-and-health-warnings": "Kegagalan, pemulihan, peringatan kesehatan, dan pemeliharaan aman.",
+  "ceph/capacity-planning-upgrades-and-operating-ceph": "Perencanaan kapasitas, pembaruan, dan operasi harian.",
+  "vault/what-vault-is-and-the-secrets-problem": "Mengapa rahasia statis berisiko dan bagaimana Vault memakai engine, autentikasi, kebijakan, lease, dan audit.",
+  "vault/starting-vault-seal-unseal-and-storage": "Seal, unseal, bagian Shamir, auto-unseal, dan penyimpanan.",
+  "vault/authentication-methods-and-tokens": "Metode autentikasi untuk manusia dan mesin, token, dan TTL.",
+  "vault/policies-and-least-privilege-access": "Kebijakan berbasis path, kapabilitas, path KV v2, dan pengujian.",
+  "vault/kv-secrets-engine-and-secret-versioning": "Versi KV v2, soft delete, patch, dan check-and-set.",
+  "vault/dynamic-secrets-for-databases-and-clouds": "Kredensial dinamis untuk database dan cloud, lease, dan rotasi akun root.",
+  "vault/pki-short-lived-certificates-with-vault": "CA privat dengan PKI dan sertifikat berumur pendek.",
+  "vault/transit-encryption-as-a-service": "Transit: enkripsi sebagai layanan, rotasi, dan rewrap.",
+  "vault/vault-on-kubernetes-injector-csi-and-operators": "Vault di Kubernetes: injector, CSI, dan Vault Secrets Operator.",
+  "vault/vault-high-availability-raft-and-disaster-recovery": "Ketersediaan tinggi dengan Raft, snapshot, replikasi, dan pemulihan bencana.",
+  "vault/audit-logging-monitoring-and-hardening-vault": "Log audit, pemantauan, dan penguatan Vault.",
+  "vault/incident-response-rotating-and-revoking-secrets": "Respons insiden: cabut, rotasi, dan selidiki."
  }
 }
