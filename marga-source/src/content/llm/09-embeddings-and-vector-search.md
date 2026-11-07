@@ -41,6 +41,21 @@ Comparing a query with millions of vectors is slow, so databases use **approxima
 
 Pure vector search can miss exact terms like error codes and product names. **Hybrid search** combines keyword and vector scores. Build a small test set of real queries with known right documents and measure whether the right chunk appears in the top results, before and after each change to chunking or the model.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Embeddings and vector search fits together
+node: n1 | Vectors and similarity | 0 | 0 | An embedding model returns a vector of hundreds or thousands of numbers. | Using only vector search for codes and names. | process
+node: n2 | Chunking and metadata | 1 | 1 | Split documents into pieces of a few hundred tokens along natural boundaries such as headings, with a small overlap. | No metadata or access filters. | store
+node: n3 | Indexes | 2 | 0 | Comparing a query with millions of vectors is slow, so databases use approximate nearest neighbor indexes such as HNSW or IVF. | Chunks too large or cut mid-sentence. | store
+node: n4 | Hybrid and evaluation | 3 | 1 | Pure vector search can miss exact terms like error codes and product names. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The right document ranked tenth
 
 > **Incident:** A support assistant could not find an answer that existed.

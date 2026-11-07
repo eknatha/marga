@@ -45,6 +45,21 @@ Redact secrets, tokens and personal data before sending text to a model, use an 
 
 The assistant **suggests**, the engineer **decides**. Never let it run commands, change configuration or page people without explicit approval. Measure usefulness with feedback buttons and review wrong answers in the postmortem, since they teach you where grounding is weak.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How LLM assistants for incident response fits together
+node: n1 | Good tasks | 0 | 0 | Summarize a long chat or log excerpt into a few lines. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n2 | Ground the answers | 1 | 1 | Require citations and refuse answers without sources. | Answers without cited sources. | process
+node: n3 | Privacy | 2 | 0 | Redact secrets, tokens and personal data before sending text to a model, use an approved provider with the right data terms and limit which channels the assistant can... | Sending secrets or customer data to a model. | process
+node: n4 | Keep humans in charge | 3 | 1 | The assistant suggests, the engineer decides. | Not reviewing wrong answers. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The command that did not exist
 
 > **Incident:** An assistant suggested a made-up flag during an outage.

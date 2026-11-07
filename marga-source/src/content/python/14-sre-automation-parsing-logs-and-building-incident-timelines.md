@@ -78,6 +78,19 @@ One source uses local time (for example India) and the other UTC. Normalize both
 > Always compare in one time zone.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How SRE automation: parsing logs and building... fits together
+node: n1 | Read and parse safely | 0 | 0 | Logs are messy: partial lines, mixed formats, binary noise. | Crashing on one malformed line. | process
+node: n2 | Count and group | 1 | 1 | Replace numbers and ids with a placeholder so that similar messages group together. | Sorting events with mixed time zones. | process
+node: n3 | One timeline | 2 | 0 | Convert every timestamp to UTC before sorting; mixed time zones are the most common reason timelines look wrong. | Hand-copying times into a document instead of generating them. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The timeline that blamed the wrong release
 
 > **Incident:** A post-mortem draft said errors started 10 minutes before the deploy, so the team nearly ruled out the release.

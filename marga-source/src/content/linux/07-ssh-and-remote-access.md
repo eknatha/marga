@@ -82,6 +82,21 @@ $ rsync -avzn ./site/ app-1:/var/www/site/
 
 `-L` forwards a local port to a remote destination, useful for reaching a private database from your laptop. `rsync` copies only differences, and `-n` is a dry run, which you should use before any `--delete`.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How SSH and secure remote access fits together
+node: n1 | Keys instead of passwords | 0 | 0 | A key pair has a private key that never leaves your machine and a public key placed on servers. | Permissions on ~/.ssh or the private key that are too open (SSH refuses them). | process
+node: n2 | The client config | 1 | 1 | With this, ssh app-1 connects through the bastion automatically. | Forwarding the agent to hosts you do not fully trust. | client
+node: n3 | Hardening the server | 2 | 0 | Edit /etc/ssh/sshd_config (or a file in sshd_config.d/) and test before reloading. | Editing sshd_config and reloading without testing. | security
+node: n4 | Tunnels and file transfer | 3 | 1 | -L forwards a local port to a remote destination, useful for reaching a private database from your laptop. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the leaked key on a shared bastion
 
 > **Incident:** Engineers copy their private keys to a shared bastion so they can hop to internal servers. A contractor's account on the bastion is compromised, and the attacker reads every key in every home directory.

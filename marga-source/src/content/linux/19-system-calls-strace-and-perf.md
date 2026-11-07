@@ -54,6 +54,21 @@ The process is waiting on a lock or condition held by another thread, likely a d
 > Look at all threads with strace -f or a thread dump.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How System calls, strace and perf fits together
+node: n1 | User space and kernel space | 0 | 0 | Programs run in user space with limited rights. | Running strace on a busy production process for a long time. | client
+node: n2 | Using strace | 1 | 1 | -f follows child processes and threads, -tt adds timestamps, -T shows the time spent inside each call, -e trace= filters by call or group, and -c prints a summary of... | Ignoring return values and error names. | process
+node: n3 | Typical findings | 2 | 0 | Wrong file or permissions: ENOENT or EACCES on openat; shows the exact path the program really tried. | Forgetting -f and tracing only the parent. | process
+node: n4 | perf for CPU time | 3 | 1 | perf samples what the CPU is doing 99 times per second and shows which functions use the most time, including kernel code. | Profiling without symbols or for too short a time. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The config file nobody could find
 
 > **Incident:** An application started with default settings, ignoring the settings in its configuration file.

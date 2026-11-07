@@ -91,6 +91,23 @@ $ sudo lastb | head
 
 `auditd` records who changed watched files. `lynis` and CIS benchmarks give a prioritised checklist. Ship audit logs off the host, because an attacker's first move is to edit local logs.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Server hardening and auditing fits together
+node: n1 | Shrink the attack surface | 0 | 0 | Start by finding what is listening, then decide whether each service is needed on this host. | Shared accounts, and sudo rules that grant everything. | process
+node: n2 | A default-deny firewall | 1 | 1 | On RHEL-family systems the same idea uses firewalld. | Disabling SELinux or the firewall to "fix" a problem. | process
+node: n3 | Least privilege | 2 | 0 | Give each application its own non-login user and keep files owned by it. | Hardening a server once, then never re-checking after changes. | process
+node: n4 | SELinux and AppArmor | 3 | 1 | Standard permissions answer "does this user own the file". | When SELinux blocks something, do not disable it. | process
+node: n5 | Audit and verify | 4 | 0 | auditd records who changed watched files. | Keeping audit logs only on the server being attacked. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the forgotten test database
 
 > **Incident:** A security scan finds MongoDB answering on a public IP with no authentication. It was started for a quick test months ago with `--bind_ip_all`, and the security group allowed all traffic. Customer records are exposed.

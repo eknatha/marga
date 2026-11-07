@@ -69,6 +69,21 @@ Request pages with the limit parameter and follow the continue token, or narrow 
 > Page large lists.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How SRE automation: Kubernetes client scripts and... fits together
+node: n1 | Connecting | 0 | 0 | Inside a pod the client uses the service account token. | Running with cluster-admin for a read-only report. | process
+node: n2 | A health report | 1 | 1 | The objects mirror the API: metadata, spec, status. | Loading huge lists in one request. | process
+node: n3 | Policy checks | 2 | 0 | Reports like this find pods without memory limits, images using latest, or pods pending for a long time. | Policy checks Reports like this find pods without memory limits, images using latest, or pods pending for a long time. | observe
+node: n4 | Read-only by default | 3 | 1 | Give the service account only get, list and watch permissions on the resources it reports on. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The report that missed the problem
 
 > **Incident:** A daily report said "no restarts above threshold", yet a service was crash-looping all week.

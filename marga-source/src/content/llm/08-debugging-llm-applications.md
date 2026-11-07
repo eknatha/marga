@@ -46,6 +46,21 @@ Retrieval and context: check whether the relevant document is still being found 
 > Is the fact in the prompt?
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Debugging LLM applications fits together
+node: n1 | Capture everything | 0 | 0 | You cannot debug what you cannot see. For every request, log the request ID, model and version, the full assembled prompt (with personal data protected), parameters... | Blaming the model before checking the prompt contents. | process
+node: n2 | First checks | 1 | 1 | Look for: an error or a 429/529; stop_reason other than a normal end (cut off by length); the model version changed; the prompt contains stale or missing text; a very... | Not logging the assembled prompt. | observe
+node: n3 | Which layer failed? | 2 | 0 | Retrieval or context: is the needed fact in the prompt? | The model cannot use what it never saw. | process
+node: n4 | Fix and lock it in | 3 | 1 | Reproduce with the stored request, change one thing, and re-run. | Fixing one case without a regression test. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The bot that stopped finding the policy
 
 > **Incident:** After a documentation update, a support assistant began refusing policy questions.

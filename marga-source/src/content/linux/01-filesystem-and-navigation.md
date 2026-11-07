@@ -91,6 +91,23 @@ lrwxrwxrwx 1 root root 38 Oct 20 08:12 shop.conf -> /etc/nginx/sites-available/s
 
 If you delete the target of a symlink, the link keeps pointing at nothing and is called *broken*. Hard links cannot cross filesystems, and deleting one name does not remove the data until every name is gone.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Filesystem and navigation fits together
+node: n1 | One tree, many purposes | 0 | 0 | Linux has a single directory tree that starts at / (root). | Forgetting -n when replacing a symlink that points to a directory. | process
+node: n2 | Move around and look | 1 | 1 | Read the ls -l columns left to right: file type and permissions, link count, owner, group, size, modified time, name. | Searching with find / on a busy server instead of a narrower directory. | process
+node: n3 | Find things | 2 | 0 | You will often know a file name but not its location, or the reverse. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Copy, move and delete without regret | 3 | 1 | . | Editing a config in /etc without a backup, then forgetting what the original said. | process
+node: n5 | Links: one name pointing at another | 4 | 0 | A symbolic link (symlink) is a small file that holds a path. | Hard links cannot cross filesystems, and deleting one name does not remove the data until every name is gone. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the new release is deployed but the old config is live
 
 The deploy script finished without errors, yet the service still behaves like last week's build. Symlinks are a common cause because many teams point `current` at the active release.

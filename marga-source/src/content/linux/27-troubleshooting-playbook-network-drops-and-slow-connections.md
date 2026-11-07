@@ -64,6 +64,21 @@ A path MTU problem: packets larger than the path allows are dropped. Fix the MTU
 > Test with the do-not-fragment flag.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Troubleshooting playbook: network drops and slow... fits together
+node: n1 | Layer by layer | 0 | 0 | Work from the bottom up. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n2 | Retransmits and MTU | 1 | 1 | A rising retransmit count means packets are lost somewhere on the path. | Ignoring MTU on tunnels and overlays. | process
+node: n3 | Is it DNS? | 2 | 0 | Measure the phases separately. | Blaming the network without measuring DNS, connect and TLS time. | edge
+node: n4 | Connection tracking and capture | 3 | 1 | Run conntrack -C against nf_conntrack_max, and check dmesg for nf_conntrack: table full. | Leaving packet captures with sensitive data lying around. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Five seconds, every time
 
 > **Incident:** A service made calls to an internal API that took exactly five seconds now and then, while the API itself answered in 20 ms.

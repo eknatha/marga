@@ -89,6 +89,23 @@ Calling add(2) returns [1, 2]. The default list is created once and reused.
 
 Copy the failing input into a small test. Remove parts until the failure disappears, and the last part removed is the cause. A failing test that you keep is the best record of the bug.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Debugging Python scripts and services fits together
+node: n1 | Read the traceback from the bottom | 0 | 0 | The last line names the error and the value (KeyError: 'qty'). | Debugging with the full data set instead of a small failing example. | process
+node: n2 | Logging beats print | 1 | 1 | Levels let you keep debug detail switched off in normal runs. | Catching Exception and doing nothing, which hides the real error. | observe
+node: n3 | Stop and look: the debugger | 2 | 0 | At the (Pdb) prompt: n next line, s step into a call, c continue, p expr print a value, l list code, w show the stack, q quit. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+node: n4 | When a script hangs | 3 | 1 | A stack that ends in recv for a long time means the program is waiting on the network. | Mutable default arguments. | process
+node: n5 | Shrink the problem | 4 | 0 | Copy the failing input into a small test. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the job that never finished
 
 > **Incident:** A nightly sync usually takes ten minutes. One night it is still running at noon and blocks the next run.

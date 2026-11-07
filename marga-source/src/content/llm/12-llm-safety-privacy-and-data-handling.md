@@ -43,6 +43,21 @@ Text from emails, web pages and documents can contain instructions that try to h
 
 Logs help debugging and can leak data. Redact before logging, restrict access and set retention. Validate model output before using it: escape it before displaying, check JSON against a schema and never execute generated code or SQL without review and sandboxing.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How LLM safety, privacy and data handling fits together
+node: n1 | Data in prompts | 0 | 0 | Decide which classes of data may go to which provider. | Logging full prompts forever. | store
+node: n2 | Provider and retention | 1 | 1 | Check contract terms: whether inputs are used for training, how long they are retained, where they are processed and what audit options exist. | Skipping provider retention checks. | external
+node: n3 | Prompt injection | 2 | 0 | Text from emails, web pages and documents can contain instructions that try to hijack the model. | Giving a model that reads untrusted text powerful tools. | process
+node: n4 | Logging and outputs | 3 | 1 | Logs help debugging and can leak data. Redact before logging, restrict access and set retention. | Using output without validation. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Customer emails in the debug logs
 
 > **Incident:** Prompt logging stored private data with weak access controls.

@@ -56,6 +56,21 @@ No. The CPUs are waiting for storage. Investigate the disk or network filesystem
 > More cores do not fix I/O waits.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Troubleshooting playbook: high load and CPU... fits together
+node: n1 | What load average counts | 0 | 0 | Load average is the average number of tasks that are runnable or in uninterruptible sleep (state D, usually waiting for I/O) over 1, 5 and 15 minutes. | Reading load average without comparing it with the core count. | edge
+node: n2 | Read the CPU split | 1 | 1 | In mpstat or top. | Adding CPUs for a problem that is I/O wait. | process
+node: n3 | Find the culprit | 2 | 0 | top -H shows threads, which matters for runtimes with thread pools. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Decide: fix, limit or scale | 3 | 1 | If one process is wrong (an infinite loop, a bad query, a retry storm), fix or restart it and keep evidence. | Restarting the service before capturing stack or profile evidence. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Load 80 and an idle CPU
 
 > **Incident:** A build server showed load 80, yet `top` reported 95 percent idle, and builds hung.

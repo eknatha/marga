@@ -97,6 +97,19 @@ For different environments, keep one base file and override pieces with `-f comp
 
 `docker compose --profile dev up -d` includes it, and a plain `up -d` leaves it out.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Multi-container apps with Compose fits together
+node: n1 | A complete example | 0 | 0 | Read it top to bottom. Each entry under services becomes a container. | Putting passwords directly in the Compose file. | process
+node: n2 | Health checks and ordering | 1 | 1 | depends_on alone only waits for the container to start, not for the program inside to be ready. | Using depends_on without a health check and assuming the dependency is ready. | observe
+node: n3 | Everyday commands | 2 | 0 | This is sample output. up -d --build rebuilds changed images and starts everything in the background. | Running docker compose down -v out of habit. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: the app crashes on every first start
 
 > **Incident:** After `docker compose up -d`, the app container exits with a connection error and restarts a few times before it works. On a slow laptop it never recovers.

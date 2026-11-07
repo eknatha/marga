@@ -98,6 +98,21 @@ $ python -m pip install boto3 azure-identity azure-mgmt-compute
 $ python -m pip freeze | grep -E "boto3|azure"
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Cloud SDKs: boto3 and the Azure SDK fits together
+node: n1 | Authentication first | 0 | 0 | Never put access keys in a script. On a developer machine use SSO or a profile. | Hard-coding access keys in scripts or committing them. | security
+node: n2 | boto3 essentials | 1 | 1 | API calls return at most one page of results. | Ignoring pagination and processing only the first page. | process
+node: n3 | A safe, repeatable task | 2 | 0 | Scripts that change infrastructure should be idempotent: running them twice has the same result as once. | Writing scripts that fail when a resource already exists. | process
+node: n4 | The Azure equivalent | 3 | 1 | DefaultAzureCredential tries several sources in order, so the same code works on a laptop after az login and in Azure with a managed identity. | Running without checking the account or subscription. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the script that ran in the wrong account
 
 > **Incident:** An engineer runs a cleanup script that deletes untagged volumes. Their shell still has the production profile exported from the previous day. Forty production volumes are removed before the first alert fires.

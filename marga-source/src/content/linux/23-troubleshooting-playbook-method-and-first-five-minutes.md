@@ -51,6 +51,19 @@ Load counts tasks in uninterruptible sleep too. Look at the blocked column in vm
 > Load is not the same as CPU use.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Troubleshooting playbook: method and the first... fits together
+node: n1 | Start with questions, not commands | 0 | 0 | Before the shell, spend one minute on: What is the symptom, exactly? | Reading only utilization and ignoring queues and errors. | process
+node: n2 | The USE method | 1 | 1 | For every resource (CPU, memory, disks, network, and also queues and locks) check three things. | Skipping dmesg, where the kernel often already named the problem. | process
+node: n3 | Narrow and then confirm | 2 | 0 | Pick the resource with the clearest saturation or error, find the process or workload behind it, and form one hypothesis. | Changing settings before you know the resource that is saturated. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The nightly slowdown
 
 > **Incident:** Every night at 02:10 an API on one server became slow for about 15 minutes, and the team blamed the new release.

@@ -67,6 +67,21 @@ Raise the limit after measuring real use, or reduce the application's memory use
 > A restart policy only hides the problem. Fix the limit or the memory use, and alert on memory approaching the limit.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Container logging, health checks and resource... fits together
+node: n1 | Logging | 0 | 0 | A container's main process should write logs to standard output and standard error, not to files inside the container. | Logging to files inside containers. | observe
+node: n2 | Health checks | 1 | 1 | A good health endpoint checks that the app can do its job (for example, reach its database), but not so much that a slow dependency makes every instance unhealthy at... | Health checks that check nothing, or everything. | observe
+node: n3 | Limits | 2 | 0 | --memory is a hard limit: going over it ends in an OOM kill (exit code 137). | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Restart policies | 3 | 1 | --restart unless-stopped restarts a container that exits. | Restart policies without restart alerts. | security
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the disk that filled with logs
 
 > **Incident:** A host's disk reaches 100 percent overnight and all containers on it stop working.

@@ -44,6 +44,21 @@ A **service catalog** lists every service with owner, tier, dependencies and run
 
 Track the share of services with complete labels, the number of unnamed or duplicate services, scrape success rate and log parsing success. Treat falling data quality like any other incident source, and review it monthly.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Telemetry quality: the data AIOps depends on fits together
+node: n1 | Consistent names | 0 | 0 | Use one name per service across metrics, logs, traces and tickets, with standard labels such as service, env, team and version. | Different names for one service. | process
+node: n2 | Time and gaps | 1 | 1 | Correlating events needs clocks that agree. | Clock skew between hosts. | process
+node: n3 | Catalog and ownership | 2 | 0 | A service catalog lists every service with owner, tier, dependencies and runbook. | Buying AIOps tools before fixing data. | observe
+node: n4 | Measure quality | 3 | 1 | Track the share of services with complete labels, the number of unnamed or duplicate services, scrape success rate and log parsing success. | No owner metadata on services. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Five names for one service
 
 > **Incident:** The same service appeared under different names in metrics, logs and traces.

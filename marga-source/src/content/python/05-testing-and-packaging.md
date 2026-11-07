@@ -123,6 +123,21 @@ test:
 
 Linting catches mistakes before runtime, and the test job blocks a merge when behaviour breaks.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Testing and packaging a command-line tool fits together
+node: n1 | A small CLI | 0 | 0 | argparse generates --help, validates types and gives clear errors for free. | Putting all logic under if __name__ == "__main__" where it cannot be tested. | client
+node: n2 | Testing with pytest | 1 | 1 | Keep logic in small functions, then test them. | Testing against real servers or production data. | observe
+node: n3 | Packaging | 2 | 0 | A pyproject.toml describes the project. Installing it creates a real command on the PATH. | Pinning nothing, so a new dependency release breaks the build. | process
+node: n4 | Checks in a pipeline | 3 | 1 | Linting catches mistakes before runtime, and the test job blocks a merge when behaviour breaks. | Checks in a pipeline Linting catches mistakes before runtime, and the test job blocks a merge when behaviour breaks. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the quiet change to a shared script
 
 > **Incident:** Someone improves a shared `rotate_logs.py` to compress files in place. Nobody tests it. The next night it raises an exception on a file name with spaces, stops halfway, and leaves partial archives. Disk fills up on three hosts by morning.

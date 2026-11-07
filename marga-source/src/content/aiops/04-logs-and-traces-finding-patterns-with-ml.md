@@ -51,6 +51,25 @@ The tool lists message templates that first appeared after release 2.4.1. A jump
 
 Logs have no version or request id, so grouping is impossible. A clustering model merges unrelated messages. Sensitive data in logs gets copied into new systems. Sampling drops the rare line you needed.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Logs and traces: finding patterns with ML fits together
+node: n1 | From lines to templates | 0 | 0 | Many log lines differ only in values: "user 4412 timed out after 3000 ms" and "user 8123 timed out after 2900 ms". | Logs with no version, host or request id. | process
+node: n2 | New and rare messages | 1 | 1 | After a release, list templates that did not exist before, and templates whose rate jumped. | Sampling away rare errors. | queue
+node: n3 | Count by version and host | 2 | 0 | Group counts by software version, region and host. | Trusting clusters without reading examples. | process
+node: n4 | Traces find the slow path | 3 | 1 | Traces record each step of a request with its duration. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Tie it to change | 4 | 0 | Overlay deployments, configuration pushes and feature flag changes on your charts. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | New templates since the last release | 5 | 1 | The tool lists message templates that first appeared after release 2.4.1. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: The error nobody had seen before
 
 > **Incident:** After a release, a new error line appeared at a low rate. It was buried among millions of lines and nobody noticed until the rate grew and customers complained. The line had never appeared before the release.

@@ -51,6 +51,25 @@ Each hint shows its time gap, relation and evidence, so an engineer can confirm 
 
 A model states a cause with no evidence. Private data is pasted into an outside service. The assistant is allowed to run commands. The team stops thinking and follows hints. Nobody records whether the hints were right.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Root cause hints and incident assistants fits together
+node: n1 | Start from change | 0 | 0 | Most incidents follow a change: a deployment, a configuration push, a flag, a certificate expiry or a traffic shift. | Trusting a hint without checking evidence. | process
+node: n2 | Add dependency health | 1 | 1 | Overlay the dependency graph. A service whose dependency started failing a moment earlier is a better suspect than one with no relation. | Pasting private data into tools without a policy. | process
+node: n3 | Language models as summarisers | 2 | 0 | A model can read the timeline, alerts and chat and write a clear status update, or find the matching runbook. | Giving an assistant write access to production. | process
+node: n4 | Guardrails | 3 | 1 | Keep incident data private: send only what the policy allows. | Do not give the model write access to production. | process
+node: n5 | Learn from outcomes | 4 | 0 | After each incident, record the real cause and whether the hint was right, missed or misleading. | Never scoring hints against real causes. | process
+node: n6 | A hint report with evidence | 5 | 1 | Each hint shows its time gap, relation and evidence, so an engineer can confirm or reject it quickly. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: The confident wrong answer
 
 > **Incident:** During an outage an assistant suggested that a database was the cause. The team spent twenty minutes on the database. The real cause was a configuration change on a load balancer, which had been in the change list but ranked low.

@@ -79,6 +79,21 @@ No. The first layer still contains the archive. Download, use and delete it in a
 > Layers are additive; a later delete only hides the file.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Slim images: smaller, faster and safer fits together
+node: n1 | Pick the base on purpose | 0 | 0 | The base image is usually most of the size. | Choosing Alpine for Python and then fighting native build errors. | process
+node: n2 | Multi-stage builds | 1 | 1 | Build tools are needed to create the program, not to run it. | Using the full language image as the final image. | process
+node: n3 | Layers and what hides in them | 2 | 0 | Every instruction can add a layer, and a file deleted in a later layer still takes space in the earlier one. | Deleting files in a later layer and expecting the size to drop. | process
+node: n4 | See where the size comes from | 3 | 1 | Measure before you optimize. | Copying the whole project, including secrets and caches, into the image. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: A 1.4 GB image on every node
 
 > **Incident:** Scale-out events took ten minutes because each new node pulled the application image from the registry first.

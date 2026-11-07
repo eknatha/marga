@@ -64,6 +64,19 @@ A saved state file of completed targets and idempotent actions: restart, skip fi
 > Make long runs resumable.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How SRE automation: safe bulk operations and audit... fits together
+node: n1 | Plan, then apply | 0 | 0 | Separate the decision of what to change from the act of changing. | No canary, no health check and no stop button. | process
+node: n2 | Batches, limits and a health gate | 1 | 1 | Start with one canary target, then a small batch, then larger ones. | No record of who changed what and when. | process
+node: n3 | Resume and audit | 2 | 0 | Record each result as it happens, in an append-only file, with time, operator, target, action and outcome. | Hidden state that makes reruns repeat work. | observe
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The change that went everywhere
 
 > **Incident:** A script that updated an agent configuration on all hosts applied a bad value to 600 machines in four minutes.

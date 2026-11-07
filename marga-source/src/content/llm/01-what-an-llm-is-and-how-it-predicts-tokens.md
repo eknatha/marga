@@ -40,6 +40,21 @@ The model predicts plausible text; it does not run the hash algorithm. Use a too
 > Language task versus exact task.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How What an LLM is and how it predicts tokens fits together
+node: n1 | The loop | 0 | 0 | The model receives text, converted to numbers, and produces a score for every possible next piece of text. | Asking the model for exact arithmetic or recent facts without tools. | process
+node: n2 | Why it feels smart | 1 | 1 | Predicting text well requires capturing grammar, facts, style, reasoning patterns and code structure that appear in the training text. | Not looking at the exact input the model received. | process
+node: n3 | Strengths and weak spots | 2 | 0 | Strong: summarising, rewriting, classifying, extracting fields from messy text, drafting code and explanations, translating between formats. | Putting model output straight into a shell or database. | process
+node: n4 | A mental model that helps debugging | 3 | 1 | When a result is wrong, ask three questions. | Treating fluent output as verified output. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The confident wrong flag
 
 > **Incident:** An on-call engineer pasted a model answer into a runbook without checking it.

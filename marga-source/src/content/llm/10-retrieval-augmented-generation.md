@@ -45,6 +45,21 @@ Apply permissions at **retrieval time** with metadata filters, not only in the p
 
 Measure **retrieval** (did the right chunk appear in the top results) and **generation** (is the answer correct and faithful to the chunks). When quality drops, this tells you whether to improve chunking, search or prompts. Keep a regression set and update documents on a schedule, since stale sources create confident wrong answers.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Retrieval-augmented generation (RAG) fits together
+node: n1 | The pipeline | 0 | 0 | Ingest: load documents, clean them, chunk them, embed them and store them with metadata. | Enforcing access only in the prompt. | queue
+node: n2 | Grounded answers | 1 | 1 | Tell the model to use only the context, cite sources and admit gaps. | Measuring only final answers, not retrieval. | process
+node: n3 | Access control | 2 | 0 | Apply permissions at retrieval time with metadata filters, not only in the prompt. | A model cannot keep a secret that you put in its context. | security
+node: n4 | Evaluate in two parts | 3 | 1 | Measure retrieval (did the right chunk appear in the top results) and generation (is the answer correct and faithful to the chunks). | No answer when nothing relevant is found. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The assistant that quoted a confidential file
 
 > **Incident:** Retrieval ignored permissions and exposed a restricted document.

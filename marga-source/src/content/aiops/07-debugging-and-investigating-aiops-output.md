@@ -58,6 +58,25 @@ The assistant blamed a deploy, but the error rate is low and the only recent cha
 
 The summary is accepted because it reads well. The suggested action is run with no check. Wrong suggestions are not recorded, so the same error repeats. The tool is given write access too early.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Debugging and investigating AIOps output fits together
+node: n1 | Ask for the evidence | 0 | 0 | Every claim in a summary should point to something: a log line, a metric, a change record. | Accepting a fluent summary without evidence. | process
+node: n2 | Test the claim | 1 | 1 | Turn the suggested cause into a question you can check in the data. | Running a suggested action with no check. | observe
+node: n3 | Compare with the timeline | 2 | 0 | Line up alerts, deploys, config changes and traffic on one timeline. | Not recording wrong suggestions. | process
+node: n4 | Watch the false positives and misses | 3 | 1 | Count how often a suggestion was right, wrong, or missing. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Keep a person on the action | 4 | 0 | Reading is cheap and reversible. Restarting, scaling or rolling back is not. | Giving the tool write access before it is trusted. | process
+node: n6 | Checking a claim against the data | 5 | 1 | The assistant blamed a deploy, but the error rate is low and the only recent change is a cache setting. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: The confident rollback
 
 > **Incident:** During a slow-checkout alert an assistant named a deploy as the cause. The on-call engineer rolled back without checking. The real cause was a database lock, and the rollback added ten minutes of disruption.

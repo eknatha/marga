@@ -79,6 +79,19 @@ journalctl -u shop -f             # follow the service's logs
 
 > **Tip:** `systemctl status` shows the last few log lines, but `journalctl -u shop -n 50 --no-pager` shows more context. Combine `-p err` to show only errors.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Processes and services with systemd fits together
+node: n1 | Processes in practice | 0 | 0 | A process is a running program with a process ID (PID), an owner and a parent. | Editing a unit file and forgetting systemctl daemon-reload. | process
+node: n2 | Signals | 1 | 1 | Signals are messages sent to a process. | Using kill -9 as the first step. | process
+node: n3 | Services with systemd | 2 | 0 | A unit file tells systemd how to run a service. | Reading only systemctl status and missing earlier errors in journalctl. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: the service restarts every five seconds
 
 > **Incident:** After a release, `shop.service` never becomes active. Users get connection refused.

@@ -49,6 +49,21 @@ Use a small model for classification and extraction, cache the stable prefix, an
 > Match model size to the step.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Cost, latency and caching fits together
+node: n1 | Back-of-envelope cost | 0 | 0 | Cost per request = input tokens times the input price, plus output tokens times the output price. | No token or cost tracking. | process
+node: n2 | Latency | 1 | 1 | Total time is roughly: network and queueing, time to first token (processing your input), and then output length divided by tokens per second. | Using the largest model for every step. | process
+node: n3 | Reducing cost and delay | 2 | 0 | Right-size the model: easy steps (classify, extract) on a small model, hard steps on a large one. | Putting changing text before the stable prefix. | process
+node: n4 | Budgets and visibility | 3 | 1 | Track tokens and cost per feature, per customer and per model. | No budget limit on automated loops. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The overnight bill
 
 > **Incident:** A scheduled job re-sent the same 40,000-token document 2,000 times.

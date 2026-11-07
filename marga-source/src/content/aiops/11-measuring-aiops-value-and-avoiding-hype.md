@@ -40,6 +40,21 @@ Compare with a simple rule, such as a static threshold with a sensible window, o
 
 Include licences, compute, integration work, tuning time, and the cost of a missed incident. Define a **rollback** plan and review results quarterly. Stop or shrink anything that does not show a measurable gain.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Measuring AIOps value and avoiding hype fits together
+node: n1 | Metrics | 0 | 0 | Precision: of the alerts it raised, how many were real. | Judging only by alert reduction. | observe
+node: n2 | Run an honest pilot | 1 | 1 | Start in shadow mode: the tool runs and records what it would do, but humans still handle incidents. | Skipping a shadow period. | process
+node: n3 | Baselines | 2 | 0 | Compare with a simple rule, such as a static threshold with a sensible window, or a plain deduplication rule. | No comparison with a simple rule. | process
+node: n4 | Total cost and risk | 3 | 1 | Include licences, compute, integration work, tuning time, and the cost of a missed incident. | Ignoring the work of maintaining the tool. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Ninety percent less noise, two missed incidents
 
 > **Incident:** Shadow mode revealed that suppression hid real incidents.

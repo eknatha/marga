@@ -50,6 +50,21 @@ Every turn resends all earlier tokens, so input grows each time. Summarise or tr
 > Input tokens add up.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Tokens, context windows and limits fits together
+node: n1 | Tokens | 0 | 0 | A tokenizer splits text into pieces such as whole common words, parts of rare words, punctuation and spaces. | Guessing token counts instead of measuring. | process
+node: n2 | The context window | 1 | 1 | The context window is the total number of tokens the model can consider in one request: the system prompt, the conversation so far, any documents or tool results you... | Putting entire documents in when a few paragraphs would do. | process
+node: n3 | Input and output limits | 2 | 0 | Providers set a maximum number of output tokens per reply, separate from the context size. | Ignoring the stop reason. | process
+node: n4 | When text does not fit | 3 | 1 | Select: send only relevant parts, found by search or by simple rules. | Resending unlimited history. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The report that stopped in the middle
 
 > **Incident:** A nightly job that asked a model for a JSON report failed to parse its output.

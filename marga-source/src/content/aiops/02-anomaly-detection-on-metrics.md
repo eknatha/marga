@@ -53,6 +53,25 @@ Comparing with the same time last week removes the daily pattern. Pair it with a
 
 A model is trained on an unusual period. A launch or holiday looks like an attack. Alerts fire on tiny changes in low-traffic services. Nobody reviews the detector, so false alarms pile up until it is ignored.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Anomaly detection on metrics fits together
+node: n1 | Why static thresholds struggle | 0 | 0 | A single limit ignores daily and weekly rhythm. | Comparing with the previous hour only. | process
+node: n2 | Rolling baselines | 1 | 1 | Compute the average and spread of a metric over a recent window, then flag values many spreads away. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n3 | Seasonality | 2 | 0 | Compare the metric with the same time on previous days or weeks. | Ignoring holidays and launches. | process
+node: n4 | Cut false alarms | 3 | 1 | Require the anomaly to last for several minutes, smooth spikes with a median, set a minimum size so tiny absolute changes are ignored, and alert on symptoms users feel... | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | When to use models | 4 | 0 | If simple seasonal baselines are not enough, forecasting models or isolation forests can help with many series at once. | Never reviewing past alerts. | process
+node: n6 | A seasonal baseline in PromQL | 5 | 1 | Comparing with the same time last week removes the daily pattern. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: The Monday that looked like an outage
 
 > **Incident:** A detector compared each hour with the previous hour. Every Monday morning, when traffic rose sharply, it raised a high-severity alert. On-call engineers learned to ignore Monday alerts, and one Monday a real fault was missed.

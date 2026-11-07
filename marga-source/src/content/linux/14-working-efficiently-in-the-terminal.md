@@ -71,6 +71,23 @@ Use Ctrl+A or Alt+B to move to the typo and fix it, or press Ctrl+X Ctrl+E to op
 > Editing the line avoids retyping and avoids running a half-typed command. Ctrl+X Ctrl+E opens the command in $EDITOR in bash.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Working efficiently in the terminal fits together
+node: n1 | History and shortcuts | 0 | 0 | A command starting with a space is not saved, which is useful when a secret appears on the command line (better still: avoid secrets on command lines). | Secrets typed on the command line and kept in history. | process
+node: n2 | Sessions that survive: tmux | 1 | 1 | A long job started inside tmux is not lost if your connection drops, and a colleague can attach to the same session to watch or help. | Long jobs run without tmux or nohup. | process
+node: n3 | Editing on a server | 2 | 0 | Learn the few keys of one editor that exists everywhere. | Editing system files as root in a full editor session. | process
+node: n4 | Aliases, functions and a safer | 3 | 1 | Show the host name clearly, and use a different colour for production hosts, so you notice before running a destructive command. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Dotfiles | 4 | 0 | Keep .bashrc, .vimrc, .tmux.conf and similar files in one directory under version control, and install them with a small script that creates symbolic links. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the wrong host
 
 > **Incident:** An engineer runs `rm -rf /var/lib/app/cache` to free space, in a terminal that was connected to production instead of staging.

@@ -41,6 +41,21 @@ Retrieve the current policy text and put it in the prompt. Fine-tuning is slow t
 > Facts change; keep them in context.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Training, knowledge and hallucination fits together
+node: n1 | Stages of training | 0 | 0 | Pre-training teaches the model to predict text from a huge collection of documents and code. | Assuming the model knows recent or private facts. | process
+node: n2 | The cutoff | 1 | 1 | The training data ends at a date, called the knowledge cutoff. | Fine-tuning to add facts that change. | process
+node: n3 | Why it makes things up | 2 | 0 | The model is trained to produce plausible text, and when the answer is not in its training or in your prompt, a plausible-sounding answer is still the most likely... | Not allowing the model to say it does not know. | process
+node: n4 | Adding knowledge | 3 | 1 | Put it in the prompt (context): best for small, current, private facts. | Trusting citations without opening them. | edge
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The library that did not exist
 
 > **Incident:** A model suggested a function that failed on first use.

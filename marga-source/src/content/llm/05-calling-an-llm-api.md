@@ -63,6 +63,21 @@ Backoff with jitter, a limit on concurrency, and respect for retry-after; consid
 > Slow down instead of hammering.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Calling an LLM API fits together
+node: n1 | A first call | 0 | 0 | A request names a model, a limit on output tokens, an optional system prompt and a list of messages. | Retrying client errors. | process
+node: n2 | Roles and conversation state | 1 | 1 | Messages alternate between the user and the assistant. | Logging full prompts that contain personal data. | store
+node: n3 | Streaming and timeouts | 2 | 0 | Long answers take seconds. Streaming returns tokens as they are generated, so users see text immediately and your server can stop early. | No timeout on API calls. | queue
+node: n4 | Errors, limits and keys | 3 | 1 | Rate limits return a 429 status: slow down, and retry with exponential backoff and jitter. | Hard-coding keys. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The key in the screenshot
 
 > **Incident:** A teammate shared a terminal screenshot in a public channel that included an API key.

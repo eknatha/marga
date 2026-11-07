@@ -41,6 +41,21 @@ Add launches, campaigns and holidays as separate adjustments rather than letting
 
 Record each forecast and compare with what happened. If error is large, widen the safety margin or use a different method. Show a range, not one number, and review the main forecasts with the owners. Plan lead times: ordering hardware or raising a cloud quota can take longer than the forecast horizon.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Forecasting capacity and saturation fits together
+node: n1 | Time to full | 0 | 0 | Alerting on > 85 percent fires for slow, harmless usage and misses fast growth. | Alerting only on percent used. | process
+node: n2 | Trend and seasonality | 1 | 1 | Most traffic has daily and weekly cycles. | Ignoring seasonality and known events. | process
+node: n3 | Known events | 2 | 0 | Add launches, campaigns and holidays as separate adjustments rather than letting the model treat them as noise. | Forecast horizons shorter than procurement lead time. | queue
+node: n4 | Check the forecast | 3 | 1 | Record each forecast and compare with what happened. | Forecasts with no error tracking. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Seventy percent and nine days left
 
 > **Incident:** A disk looked healthy but was growing quickly.

@@ -76,6 +76,21 @@ Not necessarily. Responses are paged, so use a paginator or follow the next toke
 > Always paginate.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How SRE automation: AWS with boto3, safely fits together
+node: n1 | Sessions, roles and regions | 0 | 0 | Never hard-code keys. Use a named profile or an assumed role, and set the region explicitly, since a script that quietly uses the default region will inspect the wrong... | Relying on the default region or credentials. | process
+node: n2 | Always paginate | 1 | 1 | API calls return limited pages. A loop that reads only the first response will miss resources and make your report wrong. | Reading only the first page of results. | process
+node: n3 | Dry run first | 2 | 0 | Many EC2 calls support DryRun, which returns the error DryRunOperation when the call would have succeeded. | Deleting on "no owner tag" without asking. | process
+node: n4 | Least privilege | 3 | 1 | Give automation its own role that can do only the listed actions in the accounts it needs, and no more. | Using one powerful role for everything. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The cleanup that found nothing and then too much
 
 > **Incident:** A script meant to delete unattached volumes reported "0 candidates" in the test account and deleted volumes in production.

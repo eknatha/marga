@@ -59,6 +59,25 @@ Alerts for the same cluster and service are grouped for 30 seconds before the fi
 
 Alerts have no labels, so nothing can be grouped. Silences never expire. Inhibition hides a real second fault. Dependency data is out of date, so the cause shown is wrong. Nobody measures noise.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Alert correlation and noise reduction fits together
+node: n1 | Why storms hurt | 0 | 0 | Each extra alert costs attention. When many fire at once, the engineer must read, sort and guess. | No ownership of alert noise. | process
+node: n2 | Deduplicate and group | 1 | 1 | Give every alert stable labels: service, environment, team and a fingerprint of the problem. | Alerts without consistent labels. | process
+node: n3 | Use topology | 2 | 0 | If you know that checkout calls payments, and payments calls the database, then a database fault explains alerts above it. | Inhibition rules that hide real faults. | observe
+node: n4 | Inhibit and silence by design | 3 | 1 | Inhibition rules suppress low-value alerts while a high-value one is active, for example, mute pod alerts when the whole node is down. | Permanent silences. | process
+node: n5 | Measure and prune | 4 | 0 | Track alerts per incident, the share that led to an action, and alerts that always resolve alone. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | Grouping and inhibition in | 5 | 1 | Alerts for the same cluster and service are grouped for 30 seconds before the first page. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: Two hundred pages for one disk
 
 > **Incident:** A shared storage volume filled up and many services began failing. The on-call engineer received around two hundred alerts in ten minutes and spent the first part of the incident reading them instead of looking at the disk.

@@ -53,6 +53,21 @@ It is waiting in the kernel for I/O, often on a failing disk or an unreachable n
 > D means uninterruptible sleep.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Filesystems, the page cache and I/O fits together
+node: n1 | The path of a read and a write | 0 | 0 | Programs call read and write on a file descriptor. | Assuming a successful write is on disk. | process
+node: n2 | fsync and durability | 1 | 1 | Applications that must not lose data call fsync (or open files with O_SYNC) so the kernel writes the file to stable storage before returning. | fsync and durability Applications that must not lose data call fsync (or open files with O_SYNC) so the kernel writes the file to stable... | process
+node: n3 | Finding a slow disk | 2 | 0 | Columns to watch: await (average time per request including queueing, in ms), aqu-sz (queue length) and %util (how busy the device is; on SSDs and arrays near 100... | Using %util alone to judge SSDs. | store
+node: n4 | Limits that surprise people | 3 | 1 | Inodes: df -i shows inode use; millions of tiny files can exhaust inodes while df -h shows free space. | Trying to kill processes stuck on a dead network mount. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The log disk that went read-only
 
 > **Incident:** An application started failing with errors writing to its log directory, although df showed free space.

@@ -79,6 +79,19 @@ docker run --rm -it --entrypoint sh registry.example.com/shop-api:1.8.2
 
 If the image has no shell (distroless), use `docker logs`, `docker inspect`, or Docker's debug tooling to attach a shell from another image sharing the same namespaces. Do not add a shell to the production image just for convenience.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Container security and troubleshooting fits together
+node: n1 | Hardening checklist | 0 | 0 | Every package in an image is something to patch. | Running with --privileged or mounting the Docker socket. | observe
+node: n2 | Why did my container stop? | 1 | 1 | Start with the state Docker recorded. | Restarting a crashing container repeatedly without reading the exit code. | process
+node: n3 | Incident: the container is killed | 2 | 0 | The output above already contains the answer: exit=137 oom=true. | Setting no memory limit and letting one container starve the host. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: the container is killed every few hours
 
 > **Incident:** `api` restarts about every four hours with `Exited (137)`. The logs show nothing unusual before the restart.

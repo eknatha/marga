@@ -61,6 +61,21 @@ Only with an idempotency key or a check that the payment does not exist, because
 > A timeout does not mean the request failed.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How SRE automation: retries, backoff, timeouts and... fits together
+node: n1 | Timeouts everywhere | 0 | 0 | Most HTTP libraries have no default timeout. | Calls with no timeout. | process
+node: n2 | Backoff with jitter | 1 | 1 | Retry transient failures only: connection errors, timeouts, 429 and 5xx. | Retrying errors that can never succeed. | process
+node: n3 | Idempotency | 2 | 0 | An operation is idempotent when running it twice has the same effect as running it once. | Retrying non-idempotent writes with no key. | process
+node: n4 | Circuit breaking and giving up | 3 | 1 | If a dependency is down, hammering it prevents recovery. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The retry storm
 
 > **Incident:** A short database failover turned into a 40-minute outage because every client retried immediately and in a tight loop.

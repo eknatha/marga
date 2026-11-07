@@ -57,6 +57,21 @@ Files that were deleted while a process still has them open. Use lsof +L1, then 
 > Deleted-but-open files hold space.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Troubleshooting playbook: disk full, inodes and... fits together
+node: n1 | Where did the space go? | 0 | 0 | Use df -h for space and df -i for inodes. | Forgetting inodes when space looks free. | process
+node: n2 | Space that du cannot see | 1 | 1 | If df says 100 percent but du finds far less, a process may still hold a deleted file open. | Deleting a log that a process still holds open. | process
+node: n3 | Slow disks | 2 | 0 | await is the average time a request waits and is served, in milliseconds. | Judging an SSD only by %util instead of await and queue depth. | store
+node: n4 | Protect production from heavy jobs | 3 | 1 | Run backups, compression and index builds with ionice -c3 nice -n19 command so they use only idle I/O. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Full disk with nothing in it
 
 > **Incident:** A database host reported "no space left on device", yet the data directory was only 40 percent of the disk.

@@ -68,6 +68,21 @@ The change applied only to the running kernel. It must be saved in /etc/sysctl.d
 > sysctl -w is temporary.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Kernel modules, sysctl and boot parameters fits together
+node: n1 | Modules | 0 | 0 | A module is a piece of kernel code loaded on demand, such as a filesystem, a network driver or the module that implements overlay mounts for containers. | Loading unsigned or unknown modules on production servers. | process
+node: n2 | sysctl: runtime tuning | 1 | 1 | Kernel parameters appear as files under /proc/sys and are read and written with sysctl. | Changing many parameters at once. | process
+node: n3 | Boot parameters | 2 | 0 | Some settings are read once, at boot, from the kernel command line. | Editing the boot command line without a fallback entry. | process
+node: n4 | Kernel messages | 3 | 1 | The kernel keeps a ring buffer of messages: hardware detection, driver errors, filesystem problems, out-of-memory kills and network warnings such as nf_conntrack: table... | Using sysctl -w and forgetting to persist it. | queue
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Packets dropped, nothing in the application logs
 
 > **Incident:** A gateway dropped new connections during peak hours while CPU was low.

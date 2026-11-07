@@ -62,6 +62,25 @@ The rule only acts if the alert is still active and no deployment is running. It
 
 A rule has no cooldown and loops. It acts on the wrong environment. It hides a recurring problem because it always fixes the symptom. A kill switch does not exist. Nobody reviews what the automation did.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Safe automation and auto-remediation fits together
+node: n1 | Pick the right candidates | 0 | 0 | Good candidates are frequent, well understood, low risk and easy to verify: restarting a known stuck worker, rotating a log, clearing a cache. | Automating rare, risky actions first. | process
+node: n2 | Verify before you act | 1 | 1 | Before the action, check the condition again: is the alert still firing, is the target the right one, is a change in progress? | No verification after the action. | observe
+node: n3 | Limits that contain mistakes | 2 | 0 | Set a maximum number of actions per hour, a cooldown between actions, a cap on how many targets at once and a blast radius rule such as never more than ten percent of a... | No cooldown or action limits. | process
+node: n4 | Approval levels | 3 | 1 | Introduce automation in stages: suggest the action, then run it with one-click approval, then run it unattended for the safest cases. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Visibility and rollback | 4 | 0 | Every automated action writes who or what did it, why, what it changed and how to undo it, in the incident channel and the audit log. | For those that cannot, require approval. | process
+node: n6 | A remediation rule with limits | 5 | 1 | The rule only acts if the alert is still active and no deployment is running. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: The cleanup that deleted too much
 
 > **Incident:** An automation was meant to delete old temporary files when a disk filled. A path variable was empty, so the command ran against a much larger directory, and it deleted data that other services needed.

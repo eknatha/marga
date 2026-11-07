@@ -56,6 +56,19 @@ User text reaches a shell, so a crafted name can run any command. Use an allow l
 > Never build commands from chat input.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How SRE automation: chatops, alert handlers and... fits together
+node: n1 | A minimal receiver with verification | 0 | 0 | A webhook URL can leak, so never trust the body alone. | Accepting webhooks without a signature check. | observe
+node: n2 | Keep the channel readable | 1 | 1 | Send one message per incident, not per alert. | Posting every alert as a separate message. | process
+node: n3 | Actions with guard rails | 2 | 0 | A button that restarts a service is useful and dangerous. | Actions without approval or an audit trail. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The channel nobody read
 
 > **Incident:** During a real outage the on-call engineer missed the key alert because the channel had 900 messages in an hour.

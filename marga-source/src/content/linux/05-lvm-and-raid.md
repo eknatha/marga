@@ -85,6 +85,23 @@ $ watch cat /proc/mdstat
 
 The array resynchronises in the background. Until it finishes you have no redundancy, so watch the progress and avoid heavy jobs.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How LVM and software RAID fits together
+node: n1 | The three LVM layers | 0 | 0 | Think of LVM as a pool of storage you carve up. | Using up all free extents so you cannot extend or snapshot later. | process
+node: n2 | Growing a volume online | 1 | 1 | This is why LVM exists. | Trying to shrink XFS. | store
+node: n3 | Snapshots | 2 | 0 | An LVM snapshot freezes a point-in-time view of a volume using copy-on-write, handy before a risky upgrade or for a consistent backup. | Letting a snapshot fill up and become invalid. | process
+node: n4 | RAID in one table | 3 | 1 | RAID is about availability, not backup. It does not protect against deletion, corruption or ransomware. | Treating RAID as a backup. | process
+node: n5 | Replacing a failed disk | 4 | 0 | The array resynchronises in the background. | Forgetting to update fstab or mdadm.conf, so volumes vanish after a reboot. | store
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: /var is full and the disk is not
 
 > **Incident:** The database host stops writing because /var is 100% full. The server has a free 200 GB disk, but /var is a plain partition on a different disk, and the team plans a maintenance window to repartition.

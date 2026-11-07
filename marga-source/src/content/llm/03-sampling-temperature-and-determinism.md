@@ -49,6 +49,21 @@ A property of the answer, such as valid JSON with an allowed category, run sever
 > Test behaviour, not wording.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Sampling, temperature and determinism fits together
+node: n1 | Probabilities | 0 | 0 | For each step the model produces a probability for every token. | Not pinning the model version. | process
+node: n2 | Temperature and top-p | 1 | 1 | Temperature rescales probabilities before choosing. | Using high temperature for extraction or classification. | process
+node: n3 | Determinism has limits | 2 | 0 | Even at temperature 0, results can differ slightly between calls, because of how requests are batched and how hardware does arithmetic, and any change to the model... | Expecting exact repeatability. | process
+node: n4 | Designing around variation | 3 | 1 | Ask for structured output and validate it; the format stays stable even when wording varies. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The flaky classifier
 
 > **Incident:** A ticket router sent the same message to different queues on different days.

@@ -70,6 +70,21 @@ No. Most memory is page cache that the kernel can reclaim. Look at available and
 > Free is not the right number.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Memory, swap and the OOM killer fits together
+node: n1 | What the numbers mean | 0 | 0 | The free column is memory that nothing uses; buff/cache is file data kept in memory to speed up reads, which the kernel gives back when programs need it. | Reading the free column as the amount of memory left. | process
+node: n2 | Swap and pressure | 1 | 1 | Swap is disk space the kernel can use to move rarely used pages out of RAM. | Disabling swap or the OOM killer without a plan. | process
+node: n3 | The OOM killer | 2 | 0 | When the kernel cannot find memory, it picks a process to kill so that the system can survive. | Giving a process oom_score_adj of -1000 without thought. | process
+node: n4 | Containers and prevention | 3 | 1 | In containers and Kubernetes pods, the memory limit becomes a cgroup limit, and exceeding it gets the container killed (status OOMKilled, exit code 137) even when the... | Setting container limits below the real working set. | queue
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The pod killed with plenty of host memory
 
 > **Incident:** A Java service restarted every few hours with exit code 137.

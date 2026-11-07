@@ -104,6 +104,21 @@ $ echo $?
 0
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Files, processes and error handling fits together
+node: n1 | Files with pathlib | 0 | 0 | pathlib.Path treats paths as objects, so you avoid string concatenation and platform differences. | Using print for everything instead of logging with levels. | process
+node: n2 | Running programs | 1 | 1 | subprocess.run is the safe default. Pass the command as a list, not a string, so the shell never interprets it. | Using shell=True with interpolated values. | process
+node: n3 | Exceptions you expect | 2 | 0 | Catch the specific errors you can handle and let everything else stop the script with a traceback. | Swallowing exceptions so the script reports success when it failed. | process
+node: n4 | Logging | 3 | 1 | logging gives timestamps and levels, and can be redirected to files or the journal without changing the code. | Opening files without a context manager, leaving them unclosed. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the cleanup that deleted too much
 
 > **Incident:** A cleanup script runs `subprocess.run(f"rm -rf {base}/{name}", shell=True)`. One night `name` comes back empty from a config file, and the command becomes `rm -rf /data/`. Half of the shared volume is deleted before anyone notices.

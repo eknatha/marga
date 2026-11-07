@@ -63,6 +63,21 @@ Whether the program is PID 1 and handles SIGTERM. The shell form of ENTRYPOINT o
 > A process that ignores SIGTERM is killed by SIGKILL after the grace period.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Running containers in production fits together
+node: n1 | Reduce what a container may do | 0 | 0 | Containers share the host kernel, so you narrow their rights. | Running as root with a writable filesystem. | process
+node: n2 | Stop gracefully | 1 | 1 | docker stop sends SIGTERM and waits ten seconds before SIGKILL. | Using the shell form of ENTRYPOINT or CMD. | process
+node: n3 | Limits, health and restarts | 2 | 0 | The memory limit makes the kernel kill only this container if it grows without bound. | Skipping resource limits and health checks. | process
+node: n4 | Logs and data | 3 | 1 | Write logs to standard output and standard error and let the runtime collect them; do not write log files inside the container. | Writing logs and data inside the container filesystem. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Requests lost on every deploy
 
 > **Incident:** Each rolling restart produced a burst of 502 errors for about ten seconds.

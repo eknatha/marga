@@ -82,6 +82,21 @@ $ sudo needs-restarting -r
 
 A reasonable routine is: patch a staging host, run smoke tests, roll through production in small batches behind a load balancer, and reboot where the kernel or libc changed. Enable **unattended security updates** for low-risk hosts, with alerts when they fail.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Package management and repositories fits together
+node: n1 | Two families | 0 | 0 | Debian and Ubuntu use apt with .deb packages. | Running apt upgrade on production without testing first. | process
+node: n2 | Repositories and trust | 1 | 1 | A repository is a server of packages plus an index. | Disabling GPG checks or using --allow-unauthenticated. | process
+node: n3 | Pinning and holding | 2 | 0 | Production rarely wants the newest version of everything. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Patching safely | 3 | 1 | A reasonable routine is: patch a staging host, run smoke tests, roll through production in small batches behind a load balancer, and reboot where the kernel or libc... | Forgetting to restart services or reboot after library and kernel updates. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the held package and the CVE
 
 > **Incident:** A security scanner flags an OpenSSL vulnerability on forty servers. Patch automation reports success, but the scanner still fails them. Investigation shows `apt-mark hold openssl` was set a year ago during a compatibility problem and never removed.

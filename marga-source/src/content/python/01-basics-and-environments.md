@@ -79,6 +79,19 @@ if __name__ == "__main__":
 
 The `if __name__ == "__main__"` guard means the file runs when executed but does nothing when another file imports a function from it. Returning an integer and passing it to `SystemExit` gives the shell a proper exit code, which pipelines rely on.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Python basics and virtual environments fits together
+node: n1 | The core you actually use | 0 | 0 | Python is indentation-sensitive: four spaces define a block. | Using mutable default arguments such as def f(items=[]). | process
+node: n2 | Virtual environments | 1 | 1 | Python packages install into a Python interpreter. | Installing packages into the system Python with sudo pip. | process
+node: n3 | A script that can also be imported | 2 | 0 | The if __name__ == "__main__" guard means the file runs when executed but does nothing when another file imports a function from it. | Forgetting to pin versions, so a new release breaks a working script. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: the upgrade that broke the backup script
 
 > **Incident:** After a routine OS update, the nightly backup script fails with `ModuleNotFoundError: No module named 'boto3'`. The script ran for two years. Nobody remembers installing boto3, and a quick `pip install` as root makes the error go away until the next update.

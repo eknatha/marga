@@ -59,6 +59,21 @@ Correct the fstab entry for that disk, and add nofail with a short device timeou
 > A bad mount line blocks boot.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Troubleshooting playbook: boot failures and... fits together
+node: n1 | A service will not start | 0 | 0 | status shows the state, the last exit code and recent log lines. | Reading only status and never the full journal for that boot. | process
+node: n2 | What slowed the boot | 1 | 1 | blame lists units by the time they took, and critical-chain shows the sequence that actually decided boot time. | Making every mount essential for boot. | process
+node: n3 | Emergency mode and fstab | 2 | 0 | If a filesystem in /etc/fstab cannot be mounted, systemd may drop to emergency mode and wait at a prompt. | Using device names like /dev/sdc1 in fstab. | process
+node: n4 | Before you reboot | 3 | 1 | Validate changes before the reboot that will test them: findmnt --verify for mounts, systemd-analyze verify for units, sshd -t for SSH config, nginx -t for web configs. | Rebooting with unvalidated changes and no console access. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The extra disk that stopped the boot
 
 > **Incident:** After a routine kernel patch and reboot, a server did not come back on the network.

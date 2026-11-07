@@ -84,6 +84,21 @@ It returns the boolean False in YAML 1.1 parsers such as PyYAML. Quote it: `coun
 > Unquoted yes, no, on and off are booleans in YAML 1.1.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Working with YAML, CSV and configuration files fits together
+node: n1 | YAML: always safe_load | 0 | 0 | YAML is not in the standard library; install PyYAML. | Using yaml.load on files you did not write. | edge
+node: n2 | CSV: use the module | 1 | 1 | Splitting a line on commas breaks as soon as a value contains a comma or a quote. | Splitting CSV lines with split(","). | process
+node: n3 | INI files with configparser | 2 | 0 | Many tools still use [section] files with key = value lines. | Forgetting newline="" when opening CSV files. | process
+node: n4 | Validate before you trust | 3 | 1 | A file that parses is not necessarily valid. | Trusting parsed data without checking required keys. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The list that lost a server
 
 > **Incident:** A script that read an inventory exported from a spreadsheet silently dropped one server from a maintenance run.

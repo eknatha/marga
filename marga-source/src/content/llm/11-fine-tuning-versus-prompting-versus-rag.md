@@ -48,6 +48,21 @@ Fine-tuning needs good labeled data, a training and evaluation pipeline, and ret
 3. Add retrieval if facts are the problem.
 4. Consider fine-tuning only for a measured gap, with enough clean data.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Prompting, RAG or fine-tuning: choosing fits together
+node: n1 | What each one changes | 0 | 0 | Prompting: instructions, examples, format and constraints. | Fine-tuning to teach changing facts. | process
+node: n2 | Diagnose first | 1 | 1 | . | Fine-tuning with a small, messy dataset. | process
+node: n3 | Cost and maintenance | 2 | 0 | Fine-tuning needs good labeled data, a training and evaluation pipeline, and retraining when requirements or base models change. | No evaluation set before changing anything. | process
+node: n4 | Order of attempts | 3 | 1 | Write an evaluation set from real examples. | Skipping prompt improvements. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Fine-tuned on yesterday's prices
 
 > **Incident:** A tuned model gave outdated answers because knowledge was baked into the weights.

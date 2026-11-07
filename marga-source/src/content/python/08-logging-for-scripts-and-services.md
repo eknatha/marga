@@ -78,6 +78,21 @@ The first builds the message only when INFO is enabled, and lets handlers see th
 > Lazy formatting avoids wasted work and keeps the template available for grouping similar messages.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Logging for scripts and services fits together
+node: n1 | Basic setup | 0 | 0 | Configure logging once, in the main program, not in libraries. | Calling basicConfig inside a library, which fights the application settings. | process
+node: n2 | Choose levels on purpose | 1 | 1 | Production usually runs at INFO. Make the level a setting (for example the LOG_LEVEL environment variable) so that you can raise it to DEBUG for one run without changing... | Catching an exception and logging nothing. | process
+node: n3 | Log failures with context | 2 | 0 | log.exception records an error message together with the full traceback, and is meant to be used inside an except block. | Logging secrets or personal data. | observe
+node: n4 | Files, rotation and JSON | 3 | 1 | Scripts that run under systemd or in a container should write to standard output and let the platform collect it. | Using print for diagnostics and results at the same time. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Done, but did it work?
 
 > **Incident:** A nightly sync ended with the line "done", yet customers were missing from the next morning report.

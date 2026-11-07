@@ -70,6 +70,21 @@ An image reference has a repository, a **tag** and optionally a **digest**: `ngi
 | `myapp:1.8.2` | A specific release, usually stable but still movable |
 | `myapp@sha256:9b2...` | Exact bytes, immutable |
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Containers and images fits together
+node: n1 | A container is an isolated process | 0 | 0 | A container is not a small virtual machine. | Storing important data in the container's writable layer, which is lost on docker rm. | process
+node: n2 | Images and layers | 1 | 1 | An image is a read-only template. It is built from layers, where each instruction in a Dockerfile adds a layer on top of the last. | Treating a container like a VM: logging in to change things by hand instead of rebuilding the image. | process
+node: n3 | Everyday commands | 2 | 0 | -d runs in the background, --name gives the container a readable name, and -p 8080:80 publishes container port 80 on host port 8080. | Publishing ports you do not need to the whole network. | process
+node: n4 | Tags are labels, not versions | 3 | 1 | An image reference has a repository, a tag and optionally a digest: nginx:1.27 or nginx@sha256:.... | Using latest in production. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: two servers run different code from the same tag
 
 > **Incident:** Production runs `myapp:latest` on three hosts. After a release, one host serves the new behaviour and two serve the old, and nobody changed the deploy command.

@@ -61,6 +61,21 @@ The accept queue is full: the application is not calling accept fast enough, so 
 > Recv-Q above Send-Q on a listener means overflow.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Networking in the kernel: sockets, queues and... fits together
+node: n1 | Sockets and queues | 0 | 0 | A socket is the kernel object behind a connection. | Blaming the network for application accept delays. | queue
+node: n2 | TCP states with ss | 1 | 1 | ss replaces netstat. States to know: ESTABLISHED (active), SYN-SENT (connecting, no answer yet), SYN-RECV, TIME-WAIT (closed connection kept briefly to catch late... | Treating TIME_WAIT as a bug. | store
+node: n3 | Ports and timeouts | 2 | 0 | A client uses one local port per connection to the same destination. | A client making many short connections to one server can run out, giving Cannot assign requested address. | process
+node: n4 | Netfilter and conntrack | 3 | 1 | Firewall rules and NAT (iptables, nftables, Kubernetes service routing) rely on connection tracking: the kernel remembers every flow in a table. | Raising conntrack limits without checking memory. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Thousands of CLOSE_WAIT
 
 > **Incident:** A service gradually stopped accepting new work and file descriptors ran out.

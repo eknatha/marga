@@ -89,6 +89,21 @@ The API throttles or fails some calls, and your script may run out of connection
 > Concurrency needs a ceiling. Pair it with timeouts and retries with backoff.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Concurrency for operations: threads, asyncio and... fits together
+node: n1 | Which tool | 0 | 0 | The global interpreter lock stops threads from running Python code in parallel, but threads waiting on I/O release it, so thread pools work well for operations tasks. | Using shell=True with input from outside. | process
+node: n2 | A thread pool with limits | 1 | 1 | max_workers is the limit. Without one, a hundred workers may overload the target or exhaust your file handles. | Stopping the whole run on the first error. | process
+node: n3 | asyncio | 2 | 0 | Everything in the call chain must be async, and one blocking call stalls the whole loop. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Running commands | 3 | 1 | Pass a list, not a string with shell=True, so that input cannot inject commands. | Unlimited concurrency. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the audit that took down the inventory API
 
 > **Incident:** A new audit script queries every instance's details at once and the internal inventory API starts returning errors for everyone.

@@ -71,6 +71,19 @@ It is throttled: it runs for part of each scheduling period and waits for the re
 > CPU is a rate limit. Memory is the resource that causes kills. Look at nr_throttled in cpu.stat to confirm throttling.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Namespaces and cgroups: what a container really is fits together
+node: n1 | Namespaces: a restricted view | 0 | 0 | Inside the new shell only two processes exist, because the pid namespace hides the rest. | Reading free inside a container and trusting it as the limit. | process
+node: n2 | cgroups: a limited budget | 1 | 1 | Control groups account for and limit resources of a set of processes. | Setting a memory limit equal to the heap size. | process
+node: n3 | What this means in practice | 2 | 0 | A container shares the host kernel, so a kernel bug affects every container. | Thinking a container is a virtual machine. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: the Java service that kept dying
 
 > **Incident:** A service in a container with a 1 GB limit is killed every few hours with exit code 137, while its own heap setting looks safe.

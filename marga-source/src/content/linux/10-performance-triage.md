@@ -68,6 +68,23 @@ This is sample output. Focus on a few columns:
 - `us`/`sy`: CPU time in user code and kernel code. `id` is idle.
 - `wa`: CPU time spent waiting for I/O to complete.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Performance triage fits together
+node: n1 | Load average is a queue length | 0 | 0 | The three numbers are the average count of tasks that were running or waiting to run over the last 1, 5 and 15 minutes. | Reading load average without comparing it to the number of cores. | queue
+node: n2 | The USE method | 1 | 1 | For each resource (CPU, memory, disk, network) ask three questions. | Treating low free memory as a problem when available is large. | process
+node: n3 | A five-command triage | 2 | 0 | free -h has a column named available. It estimates how much memory can be used without swapping, including reclaimable cache. | Looking at averages only, instead of watching vmstat 1 for a few seconds. | process
+node: n4 | Reading vmstat | 3 | 1 | This is sample output. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | What to check when it is not the | 4 | 0 | CPU saturated: high us and r above core count. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: load is 12 but the CPUs are idle
 
 > **Incident:** The reporting server has load 11.86 on 4 cores, yet users say only exports are slow.

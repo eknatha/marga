@@ -51,6 +51,21 @@ Not before running your own evaluation set; check quality, cost and latency on y
 > Your data decides.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Choosing and evaluating models fits together
+node: n1 | Why your own tests | 0 | 0 | Benchmarks can be outdated, narrow, or leaked into training data, and they use tasks unlike yours. | Choosing a model by leaderboard alone. | observe
+node: n2 | Build the set | 1 | 1 | Collect real inputs (with personal data removed), include normal cases, hard cases, and cases where the right answer is "I don't know" or "escalate". | Using only model-based grading with no human check. | process
+node: n3 | Score the answers | 2 | 0 | Exact checks for structured fields: category in the allowed list, number in range, valid JSON. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Decide and keep testing | 3 | 1 | Run each candidate model and prompt on the same set, several times, and compare pass rate, cost and latency. | Tuning on the same examples you evaluate on. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The upgrade that broke the router
 
 > **Incident:** A model upgrade changed how the ticket router phrased its categories.

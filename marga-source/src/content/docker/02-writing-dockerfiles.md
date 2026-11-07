@@ -94,6 +94,19 @@ ENTRYPOINT ["/server"]
 
 The first stage includes the whole Go toolchain, which is hundreds of megabytes. The final stage contains only the compiled binary on a minimal base with no shell or package manager, so it is both small (often under 20 MB) and exposes far less to an attacker. For interpreted languages, use a `-slim` base and install only runtime dependencies in the final stage.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Writing good Dockerfiles fits together
+node: n1 | The core instructions | 0 | 0 | ENTRYPOINT is the program, and CMD provides default arguments to it (or the whole command if there is no entrypoint). | Using the shell form of CMD, which makes /bin/sh PID 1 and swallows stop signals. | process
+node: n2 | How the cache works | 1 | 1 | Docker runs instructions in order and reuses a cached layer if the instruction and the files it depends on are unchanged. | Copying the whole source tree before installing dependencies. | store
+node: n3 | Multi-stage builds | 2 | 0 | A build needs compilers and tools that the running application does not. | Leaving build tools and caches in the final image. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: a bloated, slow, root-running image
 
 > **Incident:** The platform team scans the shop image and flags a long list of vulnerabilities in tools nobody uses. The image is 1.2 GB, pulls take minutes on new nodes, and the container runs as root.

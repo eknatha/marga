@@ -67,6 +67,21 @@ $ systemctl status containerd
 
 Isolation can also be strengthened with alternative low-level runtimes such as gVisor or Kata Containers, which add a user-space kernel or a lightweight virtual machine between the workload and the host. They trade some performance for stronger separation and are chosen with a `RuntimeClass`.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Container runtimes, the OCI standard and Podman fits together
+node: n1 | The layers | 0 | 0 | When you run docker run, several programs cooperate. | Confusing the runtime spec with the image spec. | process
+node: n2 | The Open Container Initiative | 1 | 1 | The OCI publishes two specifications. The image spec defines how an image is laid out: a manifest, a configuration and a stack of layer tarballs. | Mounting the Docker socket into containers, which is equivalent to root on the host. | process
+node: n3 | Podman | 2 | 0 | Podman runs containers without a long-running daemon, and can do so as a normal user (rootless). | Running containers as root on the host when rootless is possible. | process
+node: n4 | Runtimes under Kubernetes | 3 | 1 | Modern Kubernetes talks to a runtime through the Container Runtime Interface (CRI). | Assuming every node has the Docker daemon. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: docker command not found on the node
 
 > **Incident:** A Pod is stuck in `ImagePullBackOff`. The on-call engineer connects to the node, runs `docker pull` to test the registry, and gets `command not found`. They conclude the node is broken and drain it.

@@ -52,6 +52,25 @@ Numbers like these are what a tool must improve. Without a baseline, nobody can 
 
 A tool is bought before telemetry is fixed. Results are not measured, so people argue from opinion. A model flags everything as unusual and is muted. A confident suggestion is trusted without checking.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How What AIOps is and is not fits together
+node: n1 | What it covers | 0 | 0 | Four jobs appear again and again: anomaly detection on metrics and logs, alert correlation and noise reduction, root cause hints, and automated or assisted remediation. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n2 | What it needs first | 1 | 1 | Algorithms can only learn from the data you give them. | Buying a tool before fixing telemetry. | process
+node: n3 | Where it helps | 2 | 0 | It helps where humans cannot keep up: thousands of metrics with daily patterns, alert storms that bury the one that matters, and repetitive checks during an incident. | Where it helps It helps where humans cannot keep up: thousands of metrics with daily patterns, alert storms that bury the one that matters... | process
+node: n4 | Where it does not | 3 | 1 | A model cannot know your business rules, a planned launch or why traffic doubled. | Trusting confident suggestions without checking. | process
+node: n5 | Judging a tool | 4 | 0 | Define measures before you start: alerts per incident, time to acknowledge, time to find the cause, false positives, missed incidents. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | A baseline you can measure | 5 | 1 | Numbers like these are what a tool must improve. | Having no baseline to compare against. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: A tool that learned the wrong normal
 
 > **Incident:** A team trained an anomaly detector on three quiet weeks. When a busy sales period began, it flagged every metric as abnormal. The on-call engineers muted it, and later a real fault went unnoticed.

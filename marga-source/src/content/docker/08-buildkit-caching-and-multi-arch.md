@@ -81,6 +81,23 @@ Every code change invalidates the cache before the install step, so dependencies
 > Put the files that change least first.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How BuildKit, build caching and multi-architecture... fits together
+node: n1 | How the cache works | 0 | 0 | Each instruction in a Dockerfile creates a layer. | COPY . . before dependency installation. | store
+node: n2 | Cache mounts | 1 | 1 | RUN --mount=type=cache keeps a directory (pip, npm, apt, Go build cache) between builds without storing it in the image. | Publishing a single-architecture image to mixed fleets. | store
+node: n3 | Secrets | 2 | 0 | Never use ARG or ENV for a secret, or COPY a credentials file: they stay in image layers and history. | Secrets in ARG, ENV or files copied into layers. | security
+node: n4 | Cache in pipelines | 3 | 1 | Pipeline runners start clean, so local layer cache is empty. | Check the Common mistakes list below this diagram for what usually goes wrong here. | queue
+node: n5 | Multi-architecture images | 4 | 0 | Teams now run on both amd64 servers and arm64 machines (developer laptops, cloud processors that cost less). | An image built for one fails on the other with "exec format error". | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the token in the layer
 
 > **Incident:** A security scan finds a package registry token in a public image, though the Dockerfile's last line removes the file.

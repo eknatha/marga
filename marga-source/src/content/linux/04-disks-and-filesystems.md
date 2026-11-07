@@ -61,6 +61,19 @@ $ sudo du -xh --max-depth=1 /var | sort -h | tail -4
 
 `-x` stays on one filesystem, and `sort -h` understands sizes like `1.2G`. Drill down level by level with the same command.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Disks and filesystems fits together
+node: n1 | From device to directory | 0 | 0 | A disk appears as a block device, such as /dev/sda or /dev/nvme0n1. | Running du on / without -x, which crosses into other mounts and /proc. | process
+node: n2 | Measuring space | 1 | 1 | df -h reports blocks used. df -i reports inodes, the records that describe each file. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n3 | Creating and growing storage | 2 | 0 | For a new disk, the sequence is: partition, create a filesystem, mount, persist in fstab. | Editing /etc/fstab without testing mount -a. | store
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: df says full, du disagrees
 
 > **Incident:** `df` reports 49 GB used on `/`, but the largest directories add up to about 12 GB.

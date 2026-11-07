@@ -79,6 +79,21 @@ $ systemctl default
 
 If you cannot get a shell at all, boot with a rescue ISO, mount the root volume at `/mnt` and `chroot` into it. In the cloud, detach the root volume, attach it to a healthy instance, fix the file and reattach it. At the GRUB menu, pressing `e` lets you edit the kernel line once, for example adding `systemd.unit=rescue.target` to reach single-user mode.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Boot process, kernel and recovery fits together
+node: n1 | The sequence | 0 | 0 | Firmware (UEFI or BIOS) runs hardware checks and finds a boot device. | Editing fstab without running mount -a to test it. | process
+node: n2 | Reading the boot | 1 | 1 | journalctl -b -1 shows the previous boot, which is essential after a crash. | Leaving the journal non-persistent, so crash logs disappear. | process
+node: n3 | The kernel and its tunables | 2 | 0 | sysctl -w changes a value until reboot. | Changing sysctl values with -w and forgetting to persist them. | process
+node: n4 | Recovery | 3 | 1 | If the system drops to an emergency shell, the root filesystem is usually mounted read-only. | Updating the kernel without keeping a previous one to fall back to. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the reboot that never came back
 
 > **Incident:** After patching, a database server does not respond. The cloud console shows it running, but the serial console is stuck on "A start job is running for /dev/disk/by-uuid/..." for 1m 30s repeated. Someone had replaced a data disk last week, and its old UUID is still in fstab.

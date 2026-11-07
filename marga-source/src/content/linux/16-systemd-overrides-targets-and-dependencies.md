@@ -94,6 +94,21 @@ Run `sudo systemctl daemon-reload` so systemd re-reads the files, then restart t
 > systemctl edit reloads for you, but a manual edit does not. Check the result with systemctl cat and systemctl show.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How systemd in depth: overrides, targets and... fits together
+node: n1 | Where unit files live and who wins | 0 | 0 | Packages install units in /usr/lib/systemd/system/. | Editing files in /usr/lib/systemd/system instead of using an override. | process
+node: n2 | Ordering is not the same as | 1 | 1 | Two ideas are often confused. | Writing After= without Wants=, so the dependency never starts. | process
+node: n3 | Targets and boot | 2 | 0 | A target is a named group of units, a goal for boot. | Using Restart=always with no start limit, which hides crash loops. | process
+node: n4 | Restarts and limits | 3 | 1 | A unit can describe how it should behave when things go wrong, so that you do not need a separate watchdog script. | Forgetting daemon-reload after a manual edit. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The setting that vanished
 
 > **Incident:** After a routine package update, the shop service started failing at 03:00 because a database password variable was missing.

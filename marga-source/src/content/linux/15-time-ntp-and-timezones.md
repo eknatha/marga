@@ -81,6 +81,21 @@ Check that the time service is running (systemctl status chrony) and that it can
 > Synchronization needs a running client and a reachable source. NTP uses UDP port 123, which strict outbound firewalls often block.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Time, NTP and time zones fits together
+node: n1 | Clocks and zones | 0 | 0 | Linux keeps a system clock that counts time since 1970 in UTC. | Using local time with daylight saving on servers, so logs repeat or skip an hour. | process
+node: n2 | How NTP keeps time | 1 | 1 | The Network Time Protocol asks several time servers for the time, estimates the network delay, and adjusts the local clock. | Forgetting that a restored or paused virtual machine may start with an old clock. | process
+node: n3 | What breaks when time is wrong | 2 | 0 | Many systems trust the clock more than you might expect. | Setting the clock by hand and not fixing the time service. | process
+node: n4 | Fixing and checking drift | 3 | 1 | Check first, then fix the cause, not only the symptom. | Blocking UDP port 123 on a firewall and not noticing for months. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Tokens rejected after a restore
 
 > **Incident:** After a virtual machine was restored from a snapshot, every call from it to the cloud API fails with "signature expired", although the credentials are valid.

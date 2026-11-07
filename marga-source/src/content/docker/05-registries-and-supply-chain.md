@@ -77,6 +77,23 @@ On the cluster side, an admission policy (for example Kyverno or a policy contro
 - Make production tags immutable so a tag cannot be overwritten
 - Mirror critical base images, so a public outage does not stop your builds
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Registries, tags and image supply-chain security fits together
+node: n1 | Names, tags and digests | 0 | 0 | A full image reference looks like registry.example.com/team/shop-api:1.8.2. | Never rebuilding images, so base-image vulnerabilities pile up. | process
+node: n2 | Choosing and pinning base images | 1 | 1 | Prefer small, maintained bases: distroless, Alpine or a slim variant of an official image. | Signing images but not verifying them at admission. | process
+node: n3 | Scanning and SBOMs | 2 | 0 | A scanner compares the packages inside an image against vulnerability databases. | Scanning once at build time and never again. | process
+node: n4 | Signing and verifying | 3 | 1 | Signing proves an image was built by your pipeline and has not been altered. | Sharing a single registry password among all pipelines. | observe
+node: n5 | Registry hygiene | 4 | 0 | Use a private registry or a pull-through cache for production. | Check the Common mistakes list below this diagram for what usually goes wrong here. | external
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the same tag, two behaviours
 
 > **Incident:** A hotfix is pushed over `shop-api:1.8` to fix a bug. Half the nodes already had the old layer cached and keep running it, the other half pull the new image. Customers report inconsistent behaviour, and rollback cannot be confirmed because both versions carry the same tag.

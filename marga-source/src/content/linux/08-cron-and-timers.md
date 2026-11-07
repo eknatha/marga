@@ -107,6 +107,23 @@ A job that never ran is invisible. Make success observable: have the job ping a 
 $ /opt/backup/run.sh && curl -fsS -m 10 https://hc.example.com/ping/abc123
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Scheduling with cron and systemd timers fits together
+node: n1 | Cron syntax | 0 | 0 | A crontab line has five time fields and a command: minute, hour, day of month, month, day of week. | Assuming the cron timezone matches yours. | process
+node: n2 | Why cron jobs fail | 1 | 1 | Cron starts jobs with a tiny environment: a minimal PATH, no profile files, no interactive variables, and the current directory is the home directory. | Relying on the interactive PATH and environment. | process
+node: n3 | Preventing overlap with locks | 2 | 0 | If a job takes longer than its interval, cron starts a second copy on top of the first. | Overlapping runs of a slow job. | queue
+node: n4 | systemd timers | 3 | 1 | A timer is a unit that triggers a service unit. | Having no alert when the job stops running. | process
+node: n5 | Know when it did not run | 4 | 0 | A job that never ran is invisible. Make success observable: have the job ping a monitoring URL or write a metric on success, and alert when the signal is missing for... | Know when it did not run A job that never ran is invisible. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the certificate that did not renew
 
 > **Incident:** The certificate renewal cron job has been failing for two months. It worked when tested by hand. Now the production certificate expires at midnight and customers see browser warnings.

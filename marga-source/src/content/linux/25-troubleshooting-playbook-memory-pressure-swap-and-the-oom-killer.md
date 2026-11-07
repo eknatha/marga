@@ -59,6 +59,21 @@ The pod hit its own memory limit (cgroup), so the kernel killed it regardless of
 > Limits are enforced per cgroup.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Troubleshooting playbook: memory pressure, swap... fits together
+node: n1 | Available, not free | 0 | 0 | The column that matters is available: memory that can be given to programs without swapping, including reclaimable cache. | Treating low "free" memory as a problem. | process
+node: n2 | Swap and thrashing | 1 | 1 | A little swap use can be fine, since idle pages move out. | Adding swap to hide a leak. | process
+node: n3 | The OOM killer | 2 | 0 | When memory cannot be reclaimed, the kernel's OOM killer picks a process with a high oom_score and ends it. | The OOM killer When memory cannot be reclaimed, the kernel's OOM killer picks a process with a high oom_score and ends it. | process
+node: n4 | Host or container? | 3 | 1 | Containers run in cgroups with their own limit. | Sizing runtime heaps against the host, not the container limit. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The service that died at night
 
 > **Incident:** A Java service restarted every few hours with no error in its own log, and the host showed plenty of free memory.

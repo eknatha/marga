@@ -89,6 +89,25 @@ argparse prints a usage error to standard error and exits with code 2.
 > Required arguments are validated before your code runs, so no custom handling is needed.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Writing command-line tools in Python fits together
+node: n1 | Arguments with argparse | 0 | 0 | argparse builds --help, checks types and rejects unknown options with exit code 2. | Printing logs on standard output. | process
+node: n2 | Configuration order | 1 | 1 | Use this order of precedence: command-line option, then environment variable, then a config file, then a default. | Secrets passed as flags. | process
+node: n3 | Output | 2 | 0 | Print results to standard output and logs and errors to standard error. | Never mix log lines into JSON output. | process
+node: n4 | Exit codes | 3 | 1 | 0 means success, 1 a general failure, 2 a usage error (the argparse default) and 130 an interrupt. | Unclear exit codes. | process
+node: n5 | Testing | 4 | 0 | Test the function, not the process. Use subprocess only for a small number of end-to-end checks. | Code in if __name__ blocks that cannot be tested. | observe
+node: n6 | Packaging | 5 | 1 | In pyproject.toml, add [project.scripts] with svcctl = "svcctl.cli:main". | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: the JSON that wasn't JSON
 
 > **Incident:** A monitoring job that parses the tool's `--json` output starts failing after a release.

@@ -52,6 +52,19 @@ def restart_unhealthy(service, state, dry_run=True):
 
 Review automated actions weekly and delete the ones nobody trusts.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Runbook automation and guardrails fits together
+node: n1 | The ladder | 0 | 0 | Documented: a clear runbook that people follow. | Skipping dry runs. | process
+node: n2 | A guarded action | 1 | 1 | . | No limit on how many things change at once. | process
+node: n3 | Guardrails | 2 | 0 | Preconditions use several independent signals, never one. | Automation with no audit log. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The restart loop
 
 > **Incident:** Auto-restart hit a healthy fleet when the metrics system failed.
