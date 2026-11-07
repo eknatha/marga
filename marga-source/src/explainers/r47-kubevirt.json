@@ -1,0 +1,657 @@
+[
+ {
+  "id": "x-kv-arch",
+  "module": "kubevirt",
+  "lesson": "kubevirt/why-vms-on-kubernetes-and-how-kubevirt-works",
+  "title": "From a VM object to a running guest",
+  "summary": "Follow a VirtualMachine from kubectl to a guest running in a launcher pod.",
+  "actors": [
+   "User",
+   "API",
+   "Controller",
+   "Handler",
+   "Launcher pod"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Apply the VirtualMachine",
+    "n": "The user applies a VirtualMachine object and the API server validates it."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Controller sees the VM",
+    "n": "virt-controller watches the object and decides that an instance must run."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Create VMI and pod",
+    "n": "The controller creates a VirtualMachineInstance and a virt-launcher pod through the API."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Pod is scheduled",
+    "n": "The normal scheduler places the pod on a node and virt-handler on that node sees it."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Start the domain",
+    "n": "virt-handler asks libvirt inside the launcher pod to start the QEMU domain."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Guest is running",
+    "n": "The guest boots, the VMI reports an IP, and the user can open the console."
+   }
+  ]
+ },
+ {
+  "id": "x-kv-install",
+  "module": "kubevirt",
+  "lesson": "kubevirt/installing-kubevirt-and-using-virtctl",
+  "title": "Installing KubeVirt on a cluster",
+  "summary": "Two manifests turn a plain cluster into one that can run VMs.",
+  "actors": [
+   "Admin",
+   "Operator",
+   "KubeVirt CR",
+   "Components",
+   "Node"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Apply the operator",
+    "n": "The admin applies the operator manifest, which creates the operator and the CRDs."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Apply the KubeVirt resource",
+    "n": "The admin creates the KubeVirt custom resource that says what to install."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Operator reads it",
+    "n": "The operator reads the resource and decides which components and versions to deploy."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Components are deployed",
+    "n": "It deploys virt-api, virt-controller and a virt-handler on every schedulable node."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Node exposes kvm",
+    "n": "virt-handler and the device plugin advertise the kvm device if /dev/kvm exists."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Available condition",
+    "n": "The resource reports Available and the admin can start a first VM."
+   }
+  ]
+ },
+ {
+  "id": "x-kv-runstrat",
+  "module": "kubevirt",
+  "lesson": "kubevirt/virtualmachines-vmis-and-run-strategies",
+  "title": "Run strategies and the VM lifecycle",
+  "summary": "See how Always, Manual and Halted change what happens to the instance.",
+  "actors": [
+   "User",
+   "VirtualMachine",
+   "Controller",
+   "VMI"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Set runStrategy Always",
+    "n": "The user sets runStrategy to Always on the VirtualMachine."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Controller reacts",
+    "n": "virt-controller notices that no instance exists though one should run."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Create the VMI",
+    "n": "It creates the VirtualMachineInstance, which then moves through Scheduling to Running."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Guest crashes",
+    "n": "The guest powers off unexpectedly and the VMI ends."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Always recreates it",
+    "n": "Because the strategy is Always, the controller creates a new VMI automatically."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Set Halted",
+    "n": "The user changes the strategy to Halted for maintenance."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Instance removed",
+    "n": "The controller deletes the VMI and the VM object remains with its disks and settings."
+   }
+  ]
+ },
+ {
+  "id": "x-kv-dv",
+  "module": "kubevirt",
+  "lesson": "kubevirt/vm-disks-datavolumes-and-cdi",
+  "title": "Importing a golden image and cloning it",
+  "summary": "A DataVolume imports an OS image once and clones it for new VMs.",
+  "actors": [
+   "User",
+   "DataVolume",
+   "CDI",
+   "Golden PVC",
+   "VM disk"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Create the golden DataVolume",
+    "n": "The user creates a DataVolume with an http source for the OS image."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "CDI starts an importer",
+    "n": "CDI starts an importer pod that downloads and converts the image."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Write to the PVC",
+    "n": "The importer writes the raw disk into a PVC that becomes the golden image."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Create a VM disk",
+    "n": "A new VM asks for a DataVolume whose source is the golden PVC."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "CDI clones",
+    "n": "CDI clones the golden PVC, using a fast storage copy when the driver supports it."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "VM disk ready",
+    "n": "The cloned PVC is bound and the VM can boot from its own copy."
+   }
+  ]
+ },
+ {
+  "id": "x-kv-storage",
+  "module": "kubevirt",
+  "lesson": "kubevirt/storage-for-vms-access-modes-block-mode-and-snapshots",
+  "title": "Why a disk decides whether a VM can migrate",
+  "summary": "Follow two VMs, one on RWO and one on RWX, through a migration request.",
+  "actors": [
+   "User",
+   "VMI on RWX",
+   "VMI on RWO",
+   "Storage",
+   "Migration"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 4,
+    "l": "Request a migration",
+    "n": "The user asks KubeVirt to migrate two VMs."
+   },
+   {
+    "f": 4,
+    "t": 1,
+    "l": "Check the RWX VM",
+    "n": "KubeVirt checks the first VMI and finds a shared RWX block disk."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Target attaches the disk",
+    "n": "The target launcher can attach the same disk because storage allows two nodes."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Check the RWO VM",
+    "n": "KubeVirt checks the second VMI and finds a ReadWriteOnce disk."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Attach is refused",
+    "n": "A second node cannot attach a RWO volume while the first still has it."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Report the condition",
+    "n": "LiveMigratable is False for the second VMI, with a message naming the storage."
+   }
+  ]
+ },
+ {
+  "id": "x-kv-net",
+  "module": "kubevirt",
+  "lesson": "kubevirt/vm-networking-masquerade-bridge-and-multus",
+  "title": "One VM on the pod network and a VLAN",
+  "summary": "Trace traffic through masquerade and a Multus bridge.",
+  "actors": [
+   "Client pod",
+   "Service",
+   "Masquerade NAT",
+   "Guest",
+   "VLAN bridge"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Call the Service",
+    "n": "A pod in the cluster calls the Service that selects the VM."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Reach the pod IP",
+    "n": "The Service sends traffic to the launcher pod IP on the pod network."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "NAT to the guest",
+    "n": "Masquerade translates the address and forwards the packet to the guest."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Guest uses the VLAN",
+    "n": "The guest sends traffic for the legacy system out of its second NIC."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "Reply from the VLAN",
+    "n": "The legacy server replies over the bridge with the guest's VLAN address."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Reply on the pod network",
+    "n": "The guest's answer to the pod network passes back through the NAT."
+   }
+  ]
+ },
+ {
+  "id": "x-kv-cloudinit",
+  "module": "kubevirt",
+  "lesson": "kubevirt/cloud-init-instance-types-and-vm-image-pipelines",
+  "title": "First boot of a repeatable VM",
+  "summary": "Combine an image, an instance type and cloud-init into a ready VM.",
+  "actors": [
+   "Pipeline",
+   "Image",
+   "VM spec",
+   "Instance type",
+   "Guest"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Build and test the image",
+    "n": "The pipeline builds a golden image, boots a test VM, and publishes it."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Choose a size",
+    "n": "The VM spec references the instance type medium for CPU and memory."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Reference the image",
+    "n": "The VM spec clones the tested image as its root disk."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Attach cloud-init data",
+    "n": "A cloud-init volume carries the user, SSH key and package list."
+   },
+   {
+    "f": 4,
+    "t": 4,
+    "l": "Cloud-init runs",
+    "n": "On first boot cloud-init creates the user and installs the guest agent."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Report ready",
+    "n": "The guest agent connects and the pipeline marks the VM ready."
+   }
+  ]
+ },
+ {
+  "id": "x-kv-migrate",
+  "module": "kubevirt",
+  "lesson": "kubevirt/live-migration-node-drains-and-eviction",
+  "title": "Failure and recovery: a migration that never finishes",
+  "summary": "A busy VM dirties memory faster than it is copied, and a policy fixes it.",
+  "actors": [
+   "Operator",
+   "Controller",
+   "Source launcher",
+   "Target launcher",
+   "Network"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Start a drain",
+    "n": "The operator drains a node and evictionStrategy LiveMigrate creates a migration."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Create the target pod",
+    "n": "The controller starts a target launcher and attaches the shared disk."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Copy memory pages",
+    "n": "The source launcher sends memory pages to the target over the network."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Guest changes memory",
+    "n": "A busy database rewrites pages faster than the link can send them."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Copy never converges",
+    "n": "Pages are resent again and again, so the remaining difference never gets small."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Migration times out",
+    "n": "The progress timeout fires and the migration fails while the drain waits."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Apply a MigrationPolicy",
+    "n": "The operator adds a policy with auto-converge and more bandwidth for database VMs."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Migration completes",
+    "n": "Auto-converge slows the guest, the copy converges, and the switch happens within seconds."
+   }
+  ],
+  "kind": "failure"
+ },
+ {
+  "id": "x-kv-cpu",
+  "module": "kubevirt",
+  "lesson": "kubevirt/cpu-memory-hugepages-and-vm-performance",
+  "title": "What a VM pod must reserve",
+  "summary": "Add up guest memory, overhead and dedicated CPU into pod resources.",
+  "actors": [
+   "Scheduler",
+   "Guest memory",
+   "Overhead",
+   "Pod",
+   "Node"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Read the VM memory",
+    "n": "The scheduler starts from the guest memory the VM asks for."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Add QEMU overhead",
+    "n": "KubeVirt adds memory for QEMU, libvirt and device emulation."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Compute pod request",
+    "n": "The sum becomes the pod request and the limit must be at least as large."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Reserve dedicated CPUs",
+    "n": "With the static CPU manager and Guaranteed QoS the pod gets exclusive cores."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "Hugepages are mapped",
+    "n": "If hugepages are requested the node must have them reserved or the pod waits."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Pod fits and starts",
+    "n": "When the node can satisfy everything, the launcher pod is scheduled."
+   }
+  ]
+ },
+ {
+  "id": "x-kv-snapshot",
+  "module": "kubevirt",
+  "lesson": "kubevirt/vm-snapshots-backup-and-restore",
+  "title": "A consistent snapshot and restore",
+  "summary": "Freeze the guest, snapshot the disks, and restore to a new VM.",
+  "actors": [
+   "User",
+   "Snapshot",
+   "Guest agent",
+   "CSI",
+   "VM"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Create a VirtualMachineSnapshot",
+    "n": "The user creates a snapshot object that names the VM."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Freeze the guest",
+    "n": "KubeVirt asks the guest agent to freeze file systems for a moment."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Snapshot every disk",
+    "n": "It asks the CSI driver for a VolumeSnapshot of each PVC."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Thaw the guest",
+    "n": "Once snapshots are created the guest is thawed and writes resume."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Create a restore",
+    "n": "Later the user creates a restore object that names the snapshot."
+   },
+   {
+    "f": 1,
+    "t": 4,
+    "l": "Disks and spec restored",
+    "n": "The VM is restored from the snapshot with its disks and definition."
+   }
+  ]
+ },
+ {
+  "id": "x-kv-ops",
+  "module": "kubevirt",
+  "lesson": "kubevirt/operating-kubevirt-monitoring-upgrades-and-troubleshooting",
+  "title": "Failure and recovery: old launchers after an upgrade",
+  "summary": "The control plane upgrades but running VMs keep the old version.",
+  "actors": [
+   "Admin",
+   "Operator",
+   "Control plane",
+   "VMs",
+   "Prometheus"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Apply the new operator",
+    "n": "The admin applies a newer operator manifest."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Control plane rolls",
+    "n": "virt-api, virt-controller and virt-handler are replaced with the new version."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "VMs keep old launchers",
+    "n": "Running VMs stay on their old virt-launcher until they restart or migrate."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "No alert fires",
+    "n": "The control plane is healthy, so no alert shows that VMs lag behind."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Check launcher versions",
+    "n": "Weeks later the admin lists the launcher image version of each VMI and finds the old one."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Set LiveMigrate update",
+    "n": "The admin sets workloadUpdateMethods to LiveMigrate in the KubeVirt resource."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Batch migrations begin",
+    "n": "The controller migrates VMs in batches to launchers of the new version."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Fleet is current",
+    "n": "All VMs run the new version, and non-migratable ones are listed for a planned restart."
+   }
+  ],
+  "kind": "failure"
+ },
+ {
+  "id": "x-kv-vmware",
+  "module": "kubevirt",
+  "lesson": "kubevirt/migrating-from-vmware-to-kubevirt",
+  "title": "One migration wave from VMware",
+  "summary": "Move a group of VMs with conversion, testing and cutover.",
+  "actors": [
+   "Planner",
+   "Forklift",
+   "vCenter",
+   "KubeVirt",
+   "Users"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Define the wave",
+    "n": "The planner lists VMs, maps networks and storage, and creates a plan."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Read from vCenter",
+    "n": "Forklift connects to vCenter and reads the VM disks and settings."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Convert and copy",
+    "n": "virt-v2v adapts each guest and the disks are copied into PVCs."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Boot and test",
+    "n": "The converted VM boots in a test network and the application is checked."
+   },
+   {
+    "f": 0,
+    "t": 4,
+    "l": "Schedule the cutover",
+    "n": "The planner agrees a window with users and keeps the source VM powered off."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Users move over",
+    "n": "DNS or load balancer targets switch to the new VM."
+   }
+  ]
+ }
+]

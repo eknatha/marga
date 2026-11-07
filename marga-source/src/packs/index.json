@@ -1,0 +1,337 @@
+{
+ "packs": [
+  {
+   "id": "linux",
+   "title": "Linux for engineers",
+   "summary": "Navigate, secure, package, schedule and troubleshoot a Linux server the way production work demands.",
+   "lessons": 35,
+   "file": "linux.pdf",
+   "bytes": 353750
+  },
+  {
+   "id": "git",
+   "title": "Git and version control",
+   "summary": "Track changes with Git: commits, branches, merging, rebase, remotes, pull requests, tags, hooks, large repositories, and recovery when things go wrong.",
+   "lessons": 12,
+   "file": "git.pdf",
+   "bytes": 178939
+  },
+  {
+   "id": "bash",
+   "title": "Shell scripting",
+   "summary": "Write Bash scripts that fail loudly, run safely, parse JSON from APIs and replace repetitive manual work.",
+   "lessons": 12,
+   "file": "bash.pdf",
+   "bytes": 184002
+  },
+  {
+   "id": "python",
+   "title": "Python for automation",
+   "summary": "Write Python scripts that handle files, processes, HTTP APIs and cloud SDKs, with tests and a packaged command-line tool.",
+   "lessons": 16,
+   "file": "python.pdf",
+   "bytes": 211920
+  },
+  {
+   "id": "networking",
+   "title": "Networking essentials",
+   "summary": "Reason about addresses, DNS, HTTP, TLS and firewalls well enough to debug any connectivity failure.",
+   "lessons": 18,
+   "file": "networking.pdf",
+   "bytes": 233541
+  },
+  {
+   "id": "docker",
+   "title": "Docker and containers",
+   "summary": "Build small, secure images, run multi-container applications, and understand registries, runtimes and the OCI standard.",
+   "lessons": 12,
+   "file": "docker.pdf",
+   "bytes": 190445
+  },
+  {
+   "id": "cicd",
+   "title": "CI/CD and delivery",
+   "summary": "Design pipelines that build, test and ship safely, secure the supply chain, and deploy with rolling, canary and declarative delivery.",
+   "lessons": 32,
+   "file": "cicd.pdf",
+   "bytes": 309877
+  },
+  {
+   "id": "kubernetes",
+   "title": "Kubernetes",
+   "summary": "Run workloads on Kubernetes from architecture and networking to Helm, autoscaling, operators, cluster upgrades, RBAC, troubleshooting and exam strategy.",
+   "lessons": 20,
+   "file": "kubernetes.pdf",
+   "bytes": 261074
+  },
+  {
+   "id": "terraform",
+   "title": "Terraform and infrastructure as code",
+   "summary": "Describe infrastructure as code, use advanced HCL, manage state and secrets safely, and build real AWS and Azure stacks.",
+   "lessons": 14,
+   "file": "terraform.pdf",
+   "bytes": 212066
+  },
+  {
+   "id": "cloud",
+   "title": "Cloud platforms: AWS and Azure",
+   "summary": "Core concepts side by side on AWS and Azure: identity, networks, DNS and CDN, compute, serverless, managed Kubernetes, security, monitoring and cost.",
+   "lessons": 21,
+   "file": "cloud.pdf",
+   "bytes": 259579
+  },
+  {
+   "id": "observability",
+   "title": "Observability",
+   "summary": "Instrument systems with metrics, logs and traces, ship them with OpenTelemetry, probe from outside, and alert on what users actually feel.",
+   "lessons": 12,
+   "file": "observability.pdf",
+   "bytes": 186607
+  },
+  {
+   "id": "sre",
+   "title": "Site reliability engineering",
+   "summary": "Define reliability with SLOs, respond to incidents, run on-call, plan capacity, practise failure and manage change safely.",
+   "lessons": 19,
+   "file": "sre.pdf",
+   "bytes": 253258
+  },
+  {
+   "id": "security",
+   "title": "DevSecOps and security",
+   "summary": "Build security into delivery: threat modeling, secrets, pipeline and supply chain checks, container and Kubernetes hardening, cloud identity and incident response.",
+   "lessons": 23,
+   "file": "security.pdf",
+   "bytes": 267414
+  },
+  {
+   "id": "ansible",
+   "title": "Ansible and configuration management",
+   "summary": "Describe servers in inventories and playbooks, keep them consistent with idempotent roles, protect secrets with Vault and roll changes out safely.",
+   "lessons": 12,
+   "file": "ansible.pdf",
+   "bytes": 175466
+  },
+  {
+   "id": "databases",
+   "title": "Databases for operators",
+   "summary": "Run relational databases with confidence: SQL, indexes and plans, transactions, backups, replication, safe migrations, caches and incident triage.",
+   "lessons": 12,
+   "file": "databases.pdf",
+   "bytes": 181383
+  },
+  {
+   "id": "go",
+   "title": "Go for DevOps engineers",
+   "summary": "Write small, fast, reliable Go services and tools: types, errors, interfaces, goroutines, context, HTTP, testing, containers and debugging.",
+   "lessons": 12,
+   "file": "go.pdf",
+   "bytes": 180468
+  },
+  {
+   "id": "helm",
+   "title": "Helm for beginners",
+   "summary": "Package, configure, upgrade and roll back Kubernetes applications with Helm: charts, values, templates, releases, dependencies and debugging.",
+   "lessons": 12,
+   "file": "helm.pdf",
+   "bytes": 169896
+  },
+  {
+   "id": "cloud-iam",
+   "title": "Cloud security and IAM",
+   "summary": "Control who and what can do what in the cloud: identities, roles and policies on AWS and Azure, least privilege, secrets and keys, private networking, audit logs and debugging access errors.",
+   "lessons": 12,
+   "file": "cloud-iam.pdf",
+   "bytes": 157738
+  },
+  {
+   "id": "k8s-ops",
+   "title": "Kubernetes administration and operations",
+   "summary": "Run clusters, not only apps: control plane and etcd, backups, safe upgrades, RBAC, node maintenance, quotas and autoscaling, network and pod security, and debugging cluster faults.",
+   "lessons": 12,
+   "file": "k8s-ops.pdf",
+   "bytes": 158707
+  },
+  {
+   "id": "argocd",
+   "title": "Continuous delivery with Argo CD",
+   "summary": "Deliver to Kubernetes by letting a controller pull the desired state from a repository: applications, sync and drift, Helm and Kustomize, environments, hooks, access and debugging.",
+   "lessons": 12,
+   "file": "argocd.pdf",
+   "bytes": 158427
+  },
+  {
+   "id": "llm",
+   "title": "LLM fundamentals",
+   "summary": "Understand how large language models work in practice: tokens, context windows, sampling, training, API calls, cost, latency, evaluation and debugging.",
+   "lessons": 12,
+   "file": "llm.pdf",
+   "bytes": 163080
+  },
+  {
+   "id": "prompting",
+   "title": "Prompting and structured output",
+   "summary": "Write reliable prompts, give examples, ask for step-by-step reasoning, get validated JSON back, and version and test your prompts.",
+   "lessons": 12,
+   "file": "prompting.pdf",
+   "bytes": 162059
+  },
+  {
+   "id": "claude-skills",
+   "title": "Claude Skills",
+   "summary": "Package expertise as skills Claude loads on demand: SKILL.md, descriptions that trigger, progressive disclosure, scripts, testing, sharing and security.",
+   "lessons": 12,
+   "file": "claude-skills.pdf",
+   "bytes": 160484
+  },
+  {
+   "id": "mcp",
+   "title": "Tool use and MCP",
+   "summary": "Let models call tools safely: function calling, the tool-use loop, the Model Context Protocol, building a server, permissions and prompt injection.",
+   "lessons": 12,
+   "file": "mcp.pdf",
+   "bytes": 162486
+  },
+  {
+   "id": "system-design",
+   "title": "System design for platform and SRE",
+   "summary": "Design systems that fail small: estimation, caching, queues, consistency, quorums, cells, shuffle sharding, load shedding, multi-region, change safety, and worked designs reviewed against real outages.",
+   "lessons": 33,
+   "file": "system-design.pdf",
+   "bytes": 396324
+  },
+  {
+   "id": "mlops",
+   "title": "MLOps: machine learning in production",
+   "summary": "Run models like any other production system: data checks, reproducible training, tested pipelines, a model registry, safe releases, serving, and monitoring for drift with a retraining loop.",
+   "lessons": 12,
+   "file": "mlops.pdf",
+   "bytes": 177013
+  },
+  {
+   "id": "aiops",
+   "title": "AIOps: algorithms for operations",
+   "summary": "Use statistics and machine learning to help run systems: anomaly detection, alert correlation, log and trace patterns, root cause hints, incident assistants and safe auto-remediation.",
+   "lessons": 12,
+   "file": "aiops.pdf",
+   "bytes": 171488
+  },
+  {
+   "id": "virtualization",
+   "title": "Virtualization",
+   "summary": "Understand hypervisors, CPU and memory overcommit, virtual disks and snapshots, virtual networks and live migration, and troubleshoot a KVM host.",
+   "lessons": 12,
+   "file": "virtualization.pdf",
+   "bytes": 168343
+  },
+  {
+   "id": "storage",
+   "title": "Storage and filesystems",
+   "summary": "Choose block, file or object storage, manage ext4 and XFS, LVM and RAID, NFS, iSCSI and Ceph, and diagnose slow or full disks.",
+   "lessons": 12,
+   "file": "storage.pdf",
+   "bytes": 174734
+  },
+  {
+   "id": "kubevirt",
+   "title": "KubeVirt: VMs on Kubernetes",
+   "summary": "Run virtual machines on Kubernetes: architecture, install, disks and CDI, storage and live migration, networking, performance, backup, operations and moving from VMware.",
+   "lessons": 12,
+   "file": "kubevirt.pdf",
+   "bytes": 154436
+  },
+  {
+   "id": "ceph",
+   "title": "Ceph and software-defined storage",
+   "summary": "Understand and operate Ceph: RADOS, OSDs and monitors, CRUSH and placement groups, RBD, CephFS, RGW, Rook on Kubernetes, performance, failure recovery and capacity planning.",
+   "lessons": 12,
+   "file": "ceph.pdf",
+   "bytes": 153095
+  },
+  {
+   "id": "vault",
+   "title": "Vault and secrets management",
+   "summary": "Manage secrets with HashiCorp Vault: seal and unseal, auth methods, policies, KV, dynamic secrets, PKI, transit encryption, Kubernetes integration, high availability and incident response.",
+   "lessons": 12,
+   "file": "vault.pdf",
+   "bytes": 151651
+  },
+  {
+   "id": "sql-ops",
+   "title": "SQL performance and database operations",
+   "summary": "Read query plans, add the right indexes, untangle locks, size connection pools and run replication, vacuum and day-two operations.",
+   "lessons": 12,
+   "file": "sql-ops.pdf",
+   "bytes": 169099
+  },
+  {
+   "id": "gpu-serving",
+   "title": "GPU, AI infrastructure and LLM serving",
+   "summary": "Know what limits inference on a GPU, run vLLM, TGI and Triton, schedule GPUs on Kubernetes, and control latency and cost.",
+   "lessons": 12,
+   "file": "gpu-serving.pdf",
+   "bytes": 169627
+  },
+  {
+   "id": "openstack",
+   "title": "OpenStack and private cloud",
+   "summary": "Run a private cloud: Keystone, Nova, Neutron, Cinder and Glance, quotas, scheduling, networking and day-two operations.",
+   "lessons": 12,
+   "file": "openstack.pdf",
+   "bytes": 174814
+  },
+  {
+   "id": "baremetal",
+   "title": "Bare metal and datacenter",
+   "summary": "Rack, provision and operate physical servers: BMC and IPMI, PXE provisioning, disks and RAID, leaf-spine networking and fleet operations.",
+   "lessons": 12,
+   "file": "baremetal.pdf",
+   "bytes": 162603
+  },
+  {
+   "id": "service-mesh",
+   "title": "Service mesh and Kubernetes networking",
+   "summary": "Understand pod networking, CNI and network policy, then run a service mesh with mTLS, traffic routing and troubleshooting.",
+   "lessons": 12,
+   "file": "service-mesh.pdf",
+   "bytes": 164450
+  },
+  {
+   "id": "proxies",
+   "title": "Reverse proxies and load balancers",
+   "summary": "Run nginx, HAProxy and Envoy in front of services: routing, TLS, load balancing, timeouts, caching, rate limits and debugging 502 and 504 errors.",
+   "lessons": 12,
+   "file": "proxies.pdf",
+   "bytes": 157814
+  },
+  {
+   "id": "messaging",
+   "title": "Messaging and streaming",
+   "summary": "Choose and operate queues and logs: RabbitMQ and Kafka, delivery guarantees, consumer groups, lag, retention, schemas and managed cloud services.",
+   "lessons": 12,
+   "file": "messaging.pdf",
+   "bytes": 158176
+  },
+  {
+   "id": "cfn-bicep",
+   "title": "CloudFormation and Bicep",
+   "summary": "Write and operate cloud-native infrastructure as code: AWS CloudFormation and Azure Bicep, change previews, stacks, modules, testing and debugging failed deployments.",
+   "lessons": 12,
+   "file": "cfn-bicep.pdf",
+   "bytes": 153210
+  },
+  {
+   "id": "gcp",
+   "title": "Google Cloud",
+   "summary": "Learn the Google Cloud model: projects, VPC, Compute Engine, Cloud Storage, GKE, Cloud Run, data and messaging services, operations and cost, with the gcloud CLI.",
+   "lessons": 12,
+   "file": "gcp.pdf",
+   "bytes": 153111
+  }
+ ],
+ "sheets": {
+  "file": "cheat-sheets.pdf",
+  "count": 39,
+  "bytes": 294655
+ }
+}

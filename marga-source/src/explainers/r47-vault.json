@@ -1,0 +1,665 @@
+[
+ {
+  "id": "x-vault-flow",
+  "module": "vault",
+  "lesson": "vault/what-vault-is-and-the-secrets-problem",
+  "title": "A request to Vault",
+  "summary": "A caller logs in, is checked against a policy and receives a secret.",
+  "actors": [
+   "Application",
+   "Auth method",
+   "Policy",
+   "Secrets engine",
+   "Audit log"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Log in",
+    "n": "The application presents an identity such as a service account token."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Receive a token",
+    "n": "Vault returns a token with policies and a time to live."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Request a secret",
+    "n": "The application sends the token with a request for a path."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Policy allows",
+    "n": "The policy check allows read on that path."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Return the secret",
+    "n": "The engine returns the secret with a lease."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Write an audit entry",
+    "n": "Vault records who asked, which path, and the outcome, with values hashed."
+   }
+  ]
+ },
+ {
+  "id": "x-vault-unseal",
+  "module": "vault",
+  "lesson": "vault/starting-vault-seal-unseal-and-storage",
+  "title": "Failure and recovery: a sealed Vault after reboot",
+  "summary": "Vault restarts sealed and is brought back with auto-unseal.",
+  "actors": [
+   "Node",
+   "Storage",
+   "Key holders",
+   "KMS",
+   "Applications"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Node restarts",
+    "n": "The Vault node reboots after a kernel patch."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Open storage",
+    "n": "Vault finds its encrypted data but cannot read it."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Requests fail",
+    "n": "Applications receive errors because Vault is sealed."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Need three shares",
+    "n": "Only one of five key holders is reachable, so the threshold is not met."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Configure auto-unseal",
+    "n": "The team configures a cloud KMS key to unwrap the root key at start."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Restart tests",
+    "n": "At the next restart Vault asks the KMS to unwrap the root key."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Unsealed automatically",
+    "n": "Vault unseals in seconds without a person."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Applications recover",
+    "n": "Requests succeed again and the team records a restart test in the runbook."
+   }
+  ],
+  "kind": "failure"
+ },
+ {
+  "id": "x-vault-auth",
+  "module": "vault",
+  "lesson": "vault/authentication-methods-and-tokens",
+  "title": "Kubernetes login",
+  "summary": "A pod proves its identity and receives a short-lived Vault token.",
+  "actors": [
+   "Pod",
+   "Kubernetes API",
+   "Vault",
+   "Role",
+   "Token"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Send the service account JWT",
+    "n": "The pod sends its service account token to the Kubernetes auth method."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Validate the token",
+    "n": "Vault asks the Kubernetes API to confirm the token is genuine."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Check the role binding",
+    "n": "Vault checks the service account name and namespace against the role."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Attach policies",
+    "n": "The matching role gives the policies that the token will carry."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Return a token",
+    "n": "Vault returns a token with a one hour TTL."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Renew or log in again",
+    "n": "Before expiry the pod renews the token or logs in again."
+   }
+  ]
+ },
+ {
+  "id": "x-vault-policy",
+  "module": "vault",
+  "lesson": "vault/policies-and-least-privilege-access",
+  "title": "How a policy decides",
+  "summary": "Vault compares a request path with the policies on the token.",
+  "actors": [
+   "Client",
+   "Token",
+   "Policy A",
+   "Policy B",
+   "Decision"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Send a request",
+    "n": "The client sends a read of secret/data/billing/db with its token."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Load policy A",
+    "n": "Policy A allows read under secret/data/billing/*."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Load policy B",
+    "n": "Policy B grants nothing on that path."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Capabilities are combined",
+    "n": "The capabilities from all policies are merged and a deny would win."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Allowed",
+    "n": "The merged result includes read, so Vault returns the secret."
+   },
+   {
+    "f": 0,
+    "t": 4,
+    "l": "A different path",
+    "n": "A read of secret/data/payments/db matches no rule and is denied."
+   }
+  ]
+ },
+ {
+  "id": "x-vault-kv",
+  "module": "vault",
+  "lesson": "vault/kv-secrets-engine-and-secret-versioning",
+  "title": "Two writers and check-and-set",
+  "summary": "Check-and-set stops a second writer from overwriting a newer version.",
+  "actors": [
+   "Engineer A",
+   "Engineer B",
+   "KV engine",
+   "Version 1",
+   "Version 2"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Read version 1",
+    "n": "Engineer A reads the secret and sees version 1."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Read version 1",
+    "n": "Engineer B also reads version 1."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Write with cas 1",
+    "n": "Engineer A writes a new value naming version 1 as the base."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Create version 2",
+    "n": "The engine accepts the write and creates version 2."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Write with cas 1",
+    "n": "Engineer B writes naming version 1, which is no longer current."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Reject the write",
+    "n": "The engine rejects it, so B reads version 2 and merges the change."
+   }
+  ]
+ },
+ {
+  "id": "x-vault-dynamic",
+  "module": "vault",
+  "lesson": "vault/dynamic-secrets-for-databases-and-clouds",
+  "title": "A dynamic database credential",
+  "summary": "Vault creates a user, hands it out with a lease, and drops it at expiry.",
+  "actors": [
+   "Application",
+   "Vault",
+   "Database",
+   "Lease",
+   "Expiry"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request credentials",
+    "n": "The application reads database/creds/orders-ro."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Create a user",
+    "n": "Vault runs the creation SQL with its admin account."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Create a lease",
+    "n": "It records a one hour lease for the new user."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Return username and password",
+    "n": "The application receives a unique login that only it holds."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Lease expires",
+    "n": "After an hour the lease ends without a renewal."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Drop the user",
+    "n": "Vault runs the revocation SQL and the credential stops working."
+   }
+  ]
+ },
+ {
+  "id": "x-vault-pki",
+  "module": "vault",
+  "lesson": "vault/pki-short-lived-certificates-with-vault",
+  "title": "Issuing a 24 hour certificate",
+  "summary": "A service requests a certificate from an intermediate CA.",
+  "actors": [
+   "Service",
+   "Vault PKI role",
+   "Intermediate CA",
+   "Root CA",
+   "Client"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Request a certificate",
+    "n": "The service asks the PKI role for a certificate for api.svc.example.internal."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Check the role",
+    "n": "Vault checks the domain and the maximum TTL allowed by the role."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Sign the leaf",
+    "n": "The intermediate CA signs a certificate valid for 24 hours."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Return key and certificate",
+    "n": "The service receives the private key, certificate and chain."
+   },
+   {
+    "f": 0,
+    "t": 4,
+    "l": "Clients connect",
+    "n": "A client verifies the chain up to the root it trusts."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Renew early",
+    "n": "After about 16 hours the service requests a fresh certificate."
+   }
+  ]
+ },
+ {
+  "id": "x-vault-transit",
+  "module": "vault",
+  "lesson": "vault/transit-encryption-as-a-service",
+  "title": "Encrypting a card number",
+  "summary": "The application never holds the key, only ciphertext.",
+  "actors": [
+   "Application",
+   "Vault transit",
+   "Key",
+   "Database",
+   "Auditor"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Send plaintext",
+    "n": "The application sends a base64 encoded card number to transit/encrypt/orders."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Use the key",
+    "n": "Vault encrypts it with the current version of the orders key."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Return ciphertext",
+    "n": "Vault returns vault:v3:... and the application stores it."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Store in the database",
+    "n": "The database holds only ciphertext."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Backup is exposed",
+    "n": "A backup is copied by mistake and the auditor reviews it."
+   },
+   {
+    "f": 4,
+    "t": 4,
+    "l": "Nothing readable",
+    "n": "The auditor finds only ciphertext, and the key is not in the backup."
+   }
+  ]
+ },
+ {
+  "id": "x-vault-k8s",
+  "module": "vault",
+  "lesson": "vault/vault-on-kubernetes-injector-csi-and-operators",
+  "title": "Failure and recovery: a pod that cannot mount its secret",
+  "summary": "A role binding mismatch keeps the init container from finishing.",
+  "actors": [
+   "Pod",
+   "Injector",
+   "Kubernetes auth",
+   "Vault",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Pod is created",
+    "n": "A pod with injector annotations is created in the shop namespace."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Add the agent",
+    "n": "The injector adds an init container and a sidecar for Vault Agent."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Agent logs in",
+    "n": "The agent sends the pod's service account token to Vault."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Role is checked",
+    "n": "Vault compares the service account to the role binding."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Login denied",
+    "n": "The role names the service account order but the pod uses orders."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Pod stays Pending",
+    "n": "The init container never finishes so the pod does not start."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "Read the role",
+    "n": "The operator reads the role and sees the mismatch."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "Fix the binding",
+    "n": "The role is corrected to the right service account and the pod starts."
+   }
+  ],
+  "kind": "failure"
+ },
+ {
+  "id": "x-vault-ha",
+  "module": "vault",
+  "lesson": "vault/vault-high-availability-raft-and-disaster-recovery",
+  "title": "Leader failure in a Raft cluster",
+  "summary": "A standby takes over when the active node fails.",
+  "actors": [
+   "Client",
+   "Load balancer",
+   "Active node",
+   "Standby 1",
+   "Standby 2"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Send a write",
+    "n": "The client sends a write through the load balancer."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Forward to the active node",
+    "n": "The balancer sends it to the node that reports itself active."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Replicate",
+    "n": "The active node replicates the write to standbys."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Active node fails",
+    "n": "The active node crashes after a hardware fault."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Election",
+    "n": "The standbys hold an election and one becomes the leader."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Health check moves",
+    "n": "The load balancer sees the new active node and routes there."
+   }
+  ]
+ },
+ {
+  "id": "x-vault-audit",
+  "module": "vault",
+  "lesson": "vault/audit-logging-monitoring-and-hardening-vault",
+  "title": "Failure and recovery: the audit disk fills",
+  "summary": "Vault stops answering because it cannot write its audit log.",
+  "actors": [
+   "Client",
+   "Vault",
+   "Audit device",
+   "Disk",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Normal request",
+    "n": "Clients send requests and Vault answers them."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Write audit entries",
+    "n": "Each request is logged to the audit device."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Disk fills",
+    "n": "Logs are never rotated and the disk reaches 100 percent."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Audit write fails",
+    "n": "Vault cannot write to its only audit device."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Requests are refused",
+    "n": "Vault refuses all requests rather than operate without a record."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "Free space",
+    "n": "The operator frees space and rotates the logs."
+   },
+   {
+    "f": 4,
+    "t": 1,
+    "l": "Add a second device",
+    "n": "A second audit device and a disk alert are added."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Service resumes",
+    "n": "Vault answers requests again and logs to two devices."
+   }
+  ],
+  "kind": "failure"
+ },
+ {
+  "id": "x-vault-incident",
+  "module": "vault",
+  "lesson": "vault/incident-response-rotating-and-revoking-secrets",
+  "title": "Responding to a leaked token",
+  "summary": "Contain, investigate and rotate after a token is exposed.",
+  "actors": [
+   "Scanner",
+   "Responder",
+   "Vault",
+   "Audit log",
+   "Downstream system"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Alert",
+    "n": "A scanner reports a token in a public repository."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Revoke by accessor",
+    "n": "The responder looks up the accessor and revokes the token."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Sweep leases",
+    "n": "Dynamic credentials issued to it are revoked by prefix."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Read the audit log",
+    "n": "The log shows which paths the token read and from where."
+   },
+   {
+    "f": 1,
+    "t": 4,
+    "l": "Rotate static secrets",
+    "n": "Each static secret the token read is replaced at its source."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Update KV",
+    "n": "The new values are written to Vault and consumers restarted."
+   }
+  ]
+ }
+]

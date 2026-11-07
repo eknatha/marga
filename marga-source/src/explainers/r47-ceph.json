@@ -1,0 +1,665 @@
+[
+ {
+  "id": "x-ceph-arch",
+  "module": "ceph",
+  "lesson": "ceph/what-ceph-is-rados-and-the-architecture",
+  "title": "One object through the Ceph stack",
+  "summary": "Follow a write from an S3 client through RGW and RADOS to OSD disks.",
+  "actors": [
+   "S3 client",
+   "RGW",
+   "RADOS",
+   "Monitors",
+   "OSDs"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "PUT an object",
+    "n": "The client sends an S3 PUT request to an RGW daemon."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Fetch the cluster map",
+    "n": "RGW has a current map of monitors, OSDs and rules from the monitors."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Write to RADOS",
+    "n": "RGW writes the object into a pool in RADOS using librados."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Primary OSD receives",
+    "n": "The object is hashed to a placement group and sent to the primary OSD."
+   },
+   {
+    "f": 4,
+    "t": 4,
+    "l": "Replicas written",
+    "n": "The primary writes locally and forwards the data to the replica OSDs."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Acknowledge",
+    "n": "After all copies are safe the OSD acknowledges and RGW returns success."
+   }
+  ]
+ },
+ {
+  "id": "x-ceph-quorum",
+  "module": "ceph",
+  "lesson": "ceph/monitors-managers-osds-and-quorum",
+  "title": "Failure and recovery: losing a monitor majority",
+  "summary": "Two monitors fail in the same rack and the cluster stops until quorum returns.",
+  "actors": [
+   "Client",
+   "Mon A",
+   "Mon B",
+   "Mon C",
+   "Operator"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Normal operation",
+    "n": "Clients ask the monitors for the map and the three monitors agree."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Rack loses power",
+    "n": "Monitors B and C share a rack, and both lose power."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Map request fails",
+    "n": "Monitor A alone cannot form a majority and refuses to commit changes."
+   },
+   {
+    "f": 0,
+    "t": 0,
+    "l": "IO stalls",
+    "n": "Clients cannot get an updated map, and applications see hung storage."
+   },
+   {
+    "f": 4,
+    "t": 1,
+    "l": "Diagnose",
+    "n": "The operator sees one of three monitors up and no quorum in ceph status."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Restore power",
+    "n": "Power is restored to the rack and the monitors start again."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Quorum returns",
+    "n": "Monitors B and C rejoin, a majority forms, and IO resumes."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "Spread monitors",
+    "n": "The operator redeploys monitors across three racks so one failure never removes the majority."
+   }
+  ],
+  "kind": "failure"
+ },
+ {
+  "id": "x-ceph-crush",
+  "module": "ceph",
+  "lesson": "ceph/crush-pools-and-placement-groups",
+  "title": "From object name to OSDs",
+  "summary": "Hash an object to a placement group and let CRUSH choose OSDs.",
+  "actors": [
+   "Client",
+   "Pool",
+   "Placement group",
+   "CRUSH",
+   "OSDs"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Write object invoice-42",
+    "n": "The client names the pool and the object invoice-42."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Hash to a PG",
+    "n": "The name is hashed, giving placement group 7.3 in the pool."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Ask CRUSH",
+    "n": "The client computes which OSDs hold PG 7.3 using the CRUSH rule."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Pick distinct hosts",
+    "n": "The rule picks three OSDs on three different hosts."
+   },
+   {
+    "f": 0,
+    "t": 4,
+    "l": "Send to the primary",
+    "n": "The client sends the write to the first OSD, which acts as primary."
+   },
+   {
+    "f": 4,
+    "t": 4,
+    "l": "Copies on three hosts",
+    "n": "The primary replicates to the other two, so a host failure loses at most one copy."
+   }
+  ]
+ },
+ {
+  "id": "x-ceph-cephadm",
+  "module": "ceph",
+  "lesson": "ceph/deploying-ceph-with-cephadm",
+  "title": "Bootstrapping and growing a cluster",
+  "summary": "Create the first node, add hosts and let the orchestrator create OSDs.",
+  "actors": [
+   "Admin",
+   "cephadm",
+   "Orchestrator",
+   "New host",
+   "Disks"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Bootstrap",
+    "n": "The admin runs cephadm bootstrap on the first host with its monitor IP."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Orchestrator is up",
+    "n": "The bootstrap creates a monitor, a manager and the orchestrator module."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Add a host",
+    "n": "The admin adds a second host with ceph orch host add."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Daemons are placed",
+    "n": "The orchestrator deploys monitor and OSD containers according to labels."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Find free disks",
+    "n": "It scans hosts for empty devices that match the OSD service rule."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "OSDs created",
+    "n": "New OSDs are created on the free disks and join the cluster."
+   }
+  ]
+ },
+ {
+  "id": "x-ceph-rbd",
+  "module": "ceph",
+  "lesson": "ceph/rbd-block-storage-for-vms-and-kubernetes",
+  "title": "A PVC becomes an RBD image",
+  "summary": "ceph-csi turns a Kubernetes volume claim into an image in a pool.",
+  "actors": [
+   "Pod",
+   "PVC",
+   "ceph-csi",
+   "RBD image",
+   "Pool"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Pod requests storage",
+    "n": "A pod asks for a PVC that uses the ceph-rbd StorageClass."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Provisioner is called",
+    "n": "The external provisioner calls the ceph-csi controller."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Create the image",
+    "n": "ceph-csi creates a thin provisioned RBD image of the requested size."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Objects in the pool",
+    "n": "The image is striped across objects in a replicated pool."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Map and mount",
+    "n": "On the node the image is mapped as a block device and mounted into the pod."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Write data",
+    "n": "The pod writes data, and the image uses space only as blocks are written."
+   }
+  ]
+ },
+ {
+  "id": "x-ceph-cephfs",
+  "module": "ceph",
+  "lesson": "ceph/cephfs-shared-file-systems-and-mds",
+  "title": "Reading a file on CephFS",
+  "summary": "The client asks the MDS for metadata and reads data directly from OSDs.",
+  "actors": [
+   "Client",
+   "Active MDS",
+   "Metadata pool",
+   "Data pool",
+   "Standby MDS"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Open a file",
+    "n": "The client sends the path to the active MDS."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Read metadata",
+    "n": "The MDS reads or caches the inode and layout from the metadata pool."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Grant capabilities",
+    "n": "It returns the file layout and gives the client rights to cache and read."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Read data directly",
+    "n": "The client reads the file objects from the data pool without going through the MDS."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "MDS fails",
+    "n": "The active MDS crashes while serving other clients."
+   },
+   {
+    "f": 4,
+    "t": 1,
+    "l": "Standby takes over",
+    "n": "A standby MDS replays the journal and becomes active within seconds."
+   }
+  ]
+ },
+ {
+  "id": "x-ceph-rgw",
+  "module": "ceph",
+  "lesson": "ceph/rgw-s3-compatible-object-storage-with-ceph",
+  "title": "A bucket listing that slows down",
+  "summary": "An oversized bucket index is resharded to restore listing speed.",
+  "actors": [
+   "App",
+   "Load balancer",
+   "RGW",
+   "Bucket index",
+   "Data pool"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "List a bucket",
+    "n": "The application lists a very large bucket through the load balancer."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Reach an RGW daemon",
+    "n": "The balancer forwards the request to a healthy RGW daemon."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Read the index",
+    "n": "RGW reads the bucket index, which sits in a single shard."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Index is overloaded",
+    "n": "With hundreds of millions of objects one shard is huge, so listing is slow."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Request times out",
+    "n": "RGW cannot answer in time and the application times out."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Reshard the index",
+    "n": "The operator reshards the bucket to many shards, and dynamic resharding is enabled."
+   }
+  ]
+ },
+ {
+  "id": "x-ceph-rook",
+  "module": "ceph",
+  "lesson": "ceph/rook-ceph-on-kubernetes",
+  "title": "Failure and recovery: draining storage nodes too quickly",
+  "summary": "Draining a second node before recovery finishes leaves data with one copy.",
+  "actors": [
+   "Operator",
+   "Node 1",
+   "Node 2",
+   "Ceph",
+   "Application"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Drain the first node",
+    "n": "The operator drains storage node 1 for maintenance."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "PGs degrade",
+    "n": "The PGs on node 1 lose a copy and Ceph starts recovery to other OSDs."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Drain the second node",
+    "n": "Without checking health, the operator drains node 2 as well."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Two copies are gone",
+    "n": "Some PGs have lost two of three copies and fall below min_size."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "IO blocks",
+    "n": "Those PGs go inactive, and the application sees hung volumes."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Diagnose",
+    "n": "The toolbox shows inactive PGs and the two drained nodes."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Uncordon node 2",
+    "n": "The operator uncordons node 2 so its OSDs return."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Recovery and IO resume",
+    "n": "PGs become active again, and the team waits for HEALTH_OK between drains."
+   }
+  ],
+  "kind": "failure"
+ },
+ {
+  "id": "x-ceph-ec",
+  "module": "ceph",
+  "lesson": "ceph/replication-erasure-coding-and-durability",
+  "title": "Writing an object to an EC 4+2 pool",
+  "summary": "Split an object into four data chunks and two coding chunks.",
+  "actors": [
+   "Client",
+   "Primary OSD",
+   "Data chunks",
+   "Coding chunks",
+   "Failure"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Send the object",
+    "n": "The client sends a 4 MB object to the primary OSD of the placement group."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Split into k chunks",
+    "n": "The primary splits it into four data chunks of 1 MB."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Compute m chunks",
+    "n": "It computes two coding chunks of 1 MB from the data."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Write six chunks",
+    "n": "Each chunk goes to a different host, giving six hosts in use."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Two hosts fail",
+    "n": "Two hosts holding chunks fail at the same time."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Object is still readable",
+    "n": "The remaining four chunks rebuild the object, so reads still succeed."
+   }
+  ]
+ },
+ {
+  "id": "x-ceph-perf",
+  "module": "ceph",
+  "lesson": "ceph/bluestore-networks-and-ceph-performance",
+  "title": "A replicated write on the network",
+  "summary": "Trace a write across the public and cluster networks.",
+  "actors": [
+   "Client",
+   "Public network",
+   "Primary OSD",
+   "Cluster network",
+   "Replica OSDs"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Write over the public network",
+    "n": "The client sends the write over the public network."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Primary receives",
+    "n": "The primary OSD receives the data and writes it to its WAL."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Replicate",
+    "n": "The primary sends the data to two replicas over the cluster network."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Replicas write",
+    "n": "Each replica writes to its own device and acknowledges."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Acks return",
+    "n": "Both acknowledgements arrive at the primary."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Acknowledge to client",
+    "n": "The primary acknowledges once all copies are safe, so latency follows the slowest replica."
+   }
+  ]
+ },
+ {
+  "id": "x-ceph-fail",
+  "module": "ceph",
+  "lesson": "ceph/ceph-failures-recovery-and-health-warnings",
+  "title": "Failure and recovery: replacing a failed disk",
+  "summary": "An OSD fails and a new disk is added without losing data.",
+  "actors": [
+   "OSD 12",
+   "Monitors",
+   "Other OSDs",
+   "Operator",
+   "New disk"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "OSD 12 fails",
+    "n": "The disk behind OSD 12 stops responding."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Mark it down",
+    "n": "Monitors mark OSD 12 down after missed heartbeats."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Degraded state",
+    "n": "Its PGs run with two copies and keep serving IO."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Mark it out",
+    "n": "After the timeout the monitors mark OSD 12 out and start recovery."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Rebuild copies",
+    "n": "Other OSDs create the missing third copies on different hosts."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Replace the disk",
+    "n": "The operator removes OSD 12 and adds a new disk as a new OSD."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Backfill",
+    "n": "Data flows onto the new OSD in the background."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Health returns",
+    "n": "ceph status shows HEALTH_OK, and the operator moves on to the next task."
+   }
+  ],
+  "kind": "failure"
+ },
+ {
+  "id": "x-ceph-ops",
+  "module": "ceph",
+  "lesson": "ceph/capacity-planning-upgrades-and-operating-ceph",
+  "title": "An orchestrated upgrade",
+  "summary": "cephadm upgrades daemons in a safe order, waiting for health between steps.",
+  "actors": [
+   "Operator",
+   "Orchestrator",
+   "Monitors",
+   "OSDs",
+   "Gateways"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Start the upgrade",
+    "n": "The operator starts an upgrade to a target Ceph version."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Upgrade monitors",
+    "n": "The orchestrator replaces monitors one at a time and waits for quorum."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Upgrade managers",
+    "n": "It then upgrades managers while a standby stays available."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Upgrade OSDs",
+    "n": "OSDs are restarted in small groups, with checks that PGs stay active."
+   },
+   {
+    "f": 1,
+    "t": 4,
+    "l": "Upgrade MDS and RGW",
+    "n": "Metadata and gateway daemons are upgraded last."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Report complete",
+    "n": "The status shows all daemons on the new version and the cluster HEALTH_OK."
+   }
+  ]
+ }
+]
