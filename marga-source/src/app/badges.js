@@ -6,9 +6,12 @@
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 var CAUTION1 = 'Self-reported completion record from MARGA by EknathaLabs. Not a certification, degree or qualification.';
 var CAUTION2 = 'The verification code only checks that the name, badge and date match each other. It does not confirm identity.';
-var HUES = { proxies: 100, messaging: 320, 'cfn-bicep': 255, gcp: 225, baremetal: 18, 'service-mesh': 175, 'system-design': 48, 'cloud-iam': 200, 'k8s-ops': 250, argocd: 28, llm: 262, prompting: 292, 'claude-skills': 20, mcp: 168, mlops: 142, aiops: 330, ai: 262, linux: 28, git: 12, go: 190, helm: 222, bash: 150, python: 52, networking: 195, docker: 212, cicd: 120, kubernetes: 235, terraform: 268, ansible: 352, cloud: 176, databases: 305, observability: 18, sre: 78, security: 332, devops: 215, devsecops: 332, virtualization: 160, storage: 38, 'sql-ops': 290, 'gpu-serving': 120, openstack: 8 };
+var HUES = { kubevirt: 205, ceph: 12, vault: 45, proxies: 100, messaging: 320, 'cfn-bicep': 255, gcp: 225, baremetal: 18, 'service-mesh': 175, 'system-design': 48, 'cloud-iam': 200, 'k8s-ops': 250, argocd: 28, llm: 262, prompting: 292, 'claude-skills': 20, mcp: 168, mlops: 142, aiops: 330, ai: 262, linux: 28, git: 12, go: 190, helm: 222, bash: 150, python: 52, networking: 195, docker: 212, cicd: 120, kubernetes: 235, terraform: 268, ansible: 352, cloud: 176, databases: 305, observability: 18, sre: 78, security: 332, devops: 215, devsecops: 332, virtualization: 160, storage: 38, 'sql-ops': 290, 'gpu-serving': 120, openstack: 8 };
 /* Each symbol is drawn on a 24 by 24 grid so the shape, not only the colour, tells badges apart. */
 var SYM = {
+  kubevirt: '<rect x="3" y="5" width="14" height="11" rx="1"/><path d="M7 20h6M10 16v4M20 8l-3 2v4l3 2z"/>',
+  ceph: '<circle cx="12" cy="6" r="2.5"/><circle cx="5.5" cy="17" r="2.5"/><circle cx="18.5" cy="17" r="2.5"/><path d="M10.5 8l-3.5 7M13.5 8l3.5 7M8 17h8"/>',
+  vault: '<rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="12" r="3.5"/><path d="M12 8.5v1.5M12 14v1.5M8.5 12H10M14 12h1.5"/>',
   proxies: '<rect x="9" y="4" width="6" height="16" rx="1"/><path d="M3 8h6M3 16h6M15 8h6M15 16h6"/>',
   messaging: '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 8l9 6 9-6"/>',
   'cfn-bicep': '<path d="M8 4c-2 0-3 1-3 3v2c0 1-1 2-2 3 1 1 2 2 2 3v2c0 2 1 3 3 3"/><path d="M12 8h7M12 12h5M12 16h7"/>',

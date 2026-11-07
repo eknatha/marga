@@ -2,7 +2,7 @@
 company: Amazon Web Services
 year: 2017
 area: Cloud outage
-modules: cloud, bash, sre, system-design, aiops, storage
+modules: cloud, bash, sre, system-design, aiops, storage, ceph
 source: AWS post-event summary | https://aws.amazon.com/message/41926/
 what: While debugging a slow billing system, an engineer ran a command meant to remove a few servers from an S3 subsystem. S3 in the busiest US region stopped serving requests for about four hours, and many sites that depend on it failed with it.
 cause: The command took a larger set of servers than intended, including those for the index and placement subsystems. The tool had no minimum-capacity limit, and restarting those subsystems at that scale took far longer than expected.
@@ -266,7 +266,7 @@ lesson: Plan for the best case as well as the worst, test scaling limits and quo
 company: Toyota
 year: 2023
 area: Capacity and scaling
-modules: linux, cloud, sre, system-design, storage
+modules: linux, cloud, sre, system-design, storage, ceph
 source: Toyota newsroom | https://global.toyota/en/newsroom/
 what: In August 2023 Toyota halted all of its Japanese assembly lines for about a day because its system for ordering parts stopped working.
 cause: During maintenance, servers ran out of disk space. The backup system used the same data store and had the same limit, so failing over to it did not help.

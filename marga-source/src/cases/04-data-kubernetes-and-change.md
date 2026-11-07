@@ -57,7 +57,7 @@ lesson: Automation must refuse actions that cross failure domains, and the tools
 company: Google Cloud
 year: 2022
 area: Cloud infrastructure
-modules: cloud, sre, linux, virtualization, openstack, baremetal
+modules: cloud, sre, linux, virtualization, openstack, baremetal, ceph
 source: Google Cloud incident report | https://status.cloud.google.com/incidents/fmEL9i2fArADKawkZAa2
 what: During a record heatwave on 19 July 2022 Google Cloud lost capacity in one zone of its London region. Most services recovered after about 18 hours, and some instances needed about 35 hours.
 cause: Several redundant cooling systems failed at the same time as extreme outside temperatures, so part of the zone was powered down to protect hardware. A routing change made during the response briefly isolated all three zones instead of one. About a third of the virtual machines and disks in the zone were affected, and some needed manual recovery.
@@ -101,7 +101,7 @@ lesson: Service account credentials need strict storage rules, support uploads s
 company: Uber
 year: 2014
 area: Cloud security
-modules: security, cloud, cicd, git, cloud-iam
+modules: security, cloud, cicd, git, cloud-iam, vault
 source: US Federal Trade Commission analysis | https://www.ftc.gov/system/files/documents/cases/1523054_uber_technologies_analysis.pdf
 what: In May 2014 an intruder opened an Amazon S3 data store of Uber and read a file with details of drivers, including licence numbers. Uber found out in September 2014.
 cause: An access key with full administrative rights had been posted publicly in a code-sharing site by an engineer. The FTC alleged that Uber used one shared key, did not limit access by job role, did not require multifactor authentication and stored sensitive data unencrypted.
@@ -123,7 +123,7 @@ lesson: Review who maintains the packages you depend on, pin and lock versions, 
 company: Travis CI
 year: 2021
 area: CI/CD security
-modules: cicd, security
+modules: cicd, security, vault
 source: The Register report | https://www.theregister.com/2021/09/15/travis_ci_leak/
 what: For at least a week in September 2021 a flaw let a pull request from a fork of a public project read the secret environment variables of the upstream project. The issue was reported on 7 September and fixed on 10 September.
 cause: The build system made secrets available to builds started from forked pull requests. The vendor patched quietly and its bulletin gave little detail, which was criticised by affected developers.
@@ -156,7 +156,7 @@ lesson: Registry accounts and automated build tokens are part of your supply cha
 company: Maersk
 year: 2017
 area: Ransomware and recovery
-modules: security, sre, networking
+modules: security, sre, networking, kubevirt
 source: iTnews report | https://www.itnews.com.au/news/maersk-had-to-reinstall-all-it-systems-after-notpetya-infection-481815
 what: In June 2017 the NotPetya malware crippled the global shipping company A.P. Moller-Maersk. It had to reinstall about 4,000 servers, 45,000 PCs and 2,500 applications.
 cause: The malware spread across the internal network by using stolen credentials and known flaws, and it wiped systems. All domain controllers were lost except one in Ghana, which had been offline because of a power cut and therefore held a clean copy.
@@ -167,7 +167,7 @@ lesson: Flat networks turn one infection into a global outage, and offline, isol
 company: TSB
 year: 2018
 area: Migration and releases
-modules: sre, cicd
+modules: sre, cicd, kubevirt
 source: IT Pro summary of the Slaughter and May review | https://itpro.com/business-strategy/digital-transformation/354155/tsbs-it-disaster-pinned-on-big-bang-approach-to
 what: In April 2018 TSB moved about five million customers to a new banking platform in one weekend. Customers lost access to accounts and services for days and fraud attempts rose sharply.
 cause: An independent review found that the platform was not robustly tested, that oversight of suppliers was weak and that the board had not seriously considered a phased move. TSB also pointed to inconsistent configuration of two data centres that were meant to be identical.

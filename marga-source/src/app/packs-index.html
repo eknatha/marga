@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Printable PDF packs | MARGA by EknathaLabs</title>
+<meta name="description" content="Free printable PDF study packs: every MARGA module as one PDF with lessons, diagrams and a cheat sheet, plus all cheat sheets together. Watermarked, offline, no sign-up.">
+<link rel="canonical" href="{{SITE}}/packs/">
+<meta property="og:title" content="Printable PDF packs">
+<meta property="og:url" content="{{SITE}}/packs/">
+<meta name="theme-color" content="#0B2B2E">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script>
+(function(){try{var t=localStorage.getItem('ea.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
+<link rel="stylesheet" href="../assets/app.css?v={{VER}}">
+<script src="../assets/a11y.js?v={{VER}}"></script>
+</head>
+<body class="standalone">
+<header class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="../"><img src="../icon.svg" alt="" width="26" height="26"><span><b>MARGA</b><span class="bn"> by EknathaLabs</span></span></a>
+  <nav class="topnav" aria-label="Site"><a href="../#/">Learning paths</a><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a></nav>
+</div></header>
+<main class="wrap sheet-page" id="main">
+  <header class="page-head">
+    <h1>Printable PDF packs</h1>
+    <p class="lede">One PDF for every module: all its lessons, diagrams and the cheat sheet. Every page carries the MARGA watermark. Free, offline, no account.</p>
+  </header>
+  <ul class="sheet-list">
+{{ROWS}}
+  </ul>
+</main>
+<footer class="foot"><div class="wrap foot-in"><span>MARGA by EknathaLabs</span><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="../#/interview">Interview questions</a><span class="visitors" id="visitors" hidden></span><p class="foot-promise">Free · No login · No ads · No cookies</p></div></footer>
+<script src="../assets/counter.js?v={{VER}}"></script>
+<script>if(window.MargaCounter&&'{{COUNTER}}'){MargaCounter.init('{{COUNTER}}','#visitors');MargaCounter.hit('/packs/',document.title);}</script>
+</body>
+</html>
