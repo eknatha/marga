@@ -393,10 +393,10 @@
     await ctx.close();
   });
 
-  await test('failure and recovery explainers: one filter, 77 stories, every skill has two, each linked to a lesson and its paths', async () => {
+  await test('failure and recovery explainers: one filter, 85 stories, every skill has two, each linked to a lesson and its paths', async () => {
     const { ctx, page, issues } = await open();
     await go(page, '/explainers?kind=failure'); await page.waitForSelector('.exf-chip');
-    eq(await page.locator('#exf-list li:not([hidden])').count(), 77, 'failure stories shown');
+    eq(await page.locator('#exf-list li:not([hidden])').count(), 85, 'failure stories shown');
     eq(await page.isChecked('#exf-fail'), true, 'filter checked from the URL');
     eq(await page.locator('#exf-list .exf-g:not([hidden])').count(), data.modules.length, 'every skill has failure stories');
     for (const g of await page.locator('#exf-list .exf-g:not([hidden])').all()) ok((await g.locator('li:not([hidden])').count()) >= 2, 'two or more per skill');

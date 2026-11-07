@@ -373,3 +373,9 @@ A language picker sits in the top bar. The interface, module titles and summarie
 - New content, each lesson with a diagram: Jenkins (7 lessons in `cicd`), Linux debugging tools (7 in `linux`), and four new modules of 12 lessons: `proxies`, `messaging`, `cfn-bicep`, `gcp`. Each has explainers, widgets, drills, a game, interview questions, glossary terms, reading, a cheat sheet and 14-language summaries.
 - Diagram rule is enforced for new lessons only; older lessons without diagrams are a backfill candidate.
 - Tests: `tools/e2e/21-round-46.part.js`.
+
+## Round 47: KubeVirt, Ceph, Vault, diagram backfill, PDF packs
+- Three new modules of 12 lessons each: `kubevirt` (VMs on Kubernetes), `ceph` (Ceph and software-defined storage) and `vault` (Vault and secrets management), with explainers, widgets, drills, interview questions, glossary terms, cheat sheets, a game, cases, badges and 14-language titles and summaries. They sit on the cloud, SRE and DevSecOps paths.
+- Diagram backfill: every lesson now has a diagram. `tools/mkdiagrams.py` added a "How the parts fit together" section to the 459 older lessons, built from each lesson's own sections and Common mistakes. These are section maps; the lessons written this round have hand-drawn mechanism diagrams. The validator now fails any lesson without a diagram block.
+- Printable PDF packs: `tools/mkpacks.py` (needs `reportlab`) writes one PDF per module plus one with all cheat sheets into `src/packs/`, with a diagonal MARGA watermark and a footer on every page. `tools/build.js` copies them to `dist/packs/` and builds `packs/index.html`, linked from the footer. Re-run `python3 tools/mkpacks.py` after changing lessons or cheat sheets, then rebuild. Packs are English only.
+- Tests: `tools/e2e/22-round-47.part.js`.

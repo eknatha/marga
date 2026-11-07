@@ -58,5 +58,5 @@ for i, k in enumerate(seq, 1):
 json.dump(refs, open(C + '/refs.json', 'w'), ensure_ascii=False, indent=1)
 json.dump(lev, open(C + '/levels.json', 'w'), ensure_ascii=False, indent=1)
 json.dump(st, open(sp, 'w'), ensure_ascii=False, indent=1)
-open('/home/claude/new46/en.txt', 'a', encoding='utf8').write('\n'.join(en) + '\n')
+open(os.environ.get('ENFILE','/home/claude/new46/en.txt'), 'a', encoding='utf8').write('\n'.join(en) + '\n')
 print(mod, 'added', len(en), 'total', nxt - 1)

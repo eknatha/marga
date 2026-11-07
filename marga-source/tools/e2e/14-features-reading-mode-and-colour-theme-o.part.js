@@ -151,7 +151,7 @@
     await setProgress(page, allDone());
     for (const m of Object.values(MODS)) {
       const last = m.lessons[m.lessons.length - 1];
-      ok(m.id === 'system-design' || m.lessons.some((l) => /debug|investigating|troubleshoot|day-two|failures/.test(l)), m.id + ' has a debugging lesson (last lesson: ' + last + ')');
+      ok(m.id === 'system-design' || m.lessons.some((l) => /debug|incident|investigating|troubleshoot|day-two|failures/.test(l)), m.id + ' has a debugging lesson (last lesson: ' + last + ')');
     }
     await go(page, '/lesson/kubernetes/debugging-kubernetes-workloads'); await page.waitForSelector('.predict');
     ok(await page.locator('.dg-node').count() > 0, 'diagram');
@@ -218,7 +218,7 @@
 
   await test('incident games: one per stage, a choice shows feedback, a game reaches an ending and is remembered', async () => {
     const { ctx, page } = await open(); await go(page, '/');
-    eq(data.games.length, 139, '139 games');
+    eq(data.games.length, 142, '142 games');
     for (const m of data.modules) ok(data.games.some((g) => g.module === m.id), m.id + ' has a game');
     await nav(page, '/practice'); ok(await page.locator('.prac a[href="#/games"]').count() === 1, 'hub card');
     await nav(page, '/games'); await page.waitForSelector('.game-card'); eq(await page.locator('.game-card').count(), data.games.length, 'all games listed');
@@ -244,7 +244,7 @@
 
   await test('incident games: every module has at least three games and every game explains the incident with cause, signs, fix and an example', async () => {
     const { ctx, page } = await open(); await go(page, '/');
-    for (const m of data.modules) ok(data.games.filter((g) => g.module === m.id).length >= (['virtualization', 'storage', 'sql-ops', 'gpu-serving', 'openstack'].includes(m.id) ? 2 : ['proxies', 'messaging', 'cfn-bicep', 'gcp'].includes(m.id) ? 1 : 3), m.id + ' has enough games');
+    for (const m of data.modules) ok(data.games.filter((g) => g.module === m.id).length >= (['virtualization', 'storage', 'sql-ops', 'gpu-serving', 'openstack'].includes(m.id) ? 2 : ['proxies', 'messaging', 'cfn-bicep', 'gcp', 'kubevirt', 'ceph', 'vault'].includes(m.id) ? 1 : 3), m.id + ' has enough games');
     for (const g of data.games) for (const k of ['cause', 'signs', 'fix', 'example']) ok(g.explain && g.explain[k] && g.explain[k].length >= 30, g.id + ' ' + k);
     const g = data.games.find((x) => x.id === 'the-retry-storm');
     await nav(page, '/game/' + g.id);
