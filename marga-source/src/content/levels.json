@@ -2266,5 +2266,149 @@
  "gcp/security-cost-and-debugging-on-google-cloud": {
   "s": "Most Google Cloud incidents come from broad permissions, exposed data and surprise cost. A few controls and a debugging routine cover them.",
   "i": "Least-privilege IAM with predefined roles, IAM Recommender, conditions; organization policies such as no service account keys and no public IPs; VPC Service Controls perimeters; Cloud Audit Logs; Security Command Center; budgets, committed use, rightsizing; debug with PERMISSION_DENIED, quota and API-not-enabled errors, Policy Troubleshooter."
+ },
+ "kubevirt/why-vms-on-kubernetes-and-how-kubevirt-works": {
+  "s": "Not every workload fits in a container. KubeVirt lets Kubernetes schedule and manage virtual machines next to containers, using the same API, storage and networking.",
+  "i": "KubeVirt adds custom resources such as VirtualMachine to Kubernetes. Each running VM lives inside a virt-launcher pod that runs libvirt and QEMU, scheduled by the normal scheduler and managed by virt-controller and virt-handler."
+ },
+ "kubevirt/installing-kubevirt-and-using-virtctl": {
+  "s": "Installing KubeVirt is two manifests and a wait, but it only performs well on nodes with hardware virtualization.",
+  "i": "Apply the virt-operator manifest, then a KubeVirt custom resource in the kubevirt namespace. Check nodes for /dev/kvm. Use useEmulation only for testing. Install virtctl to start, stop, console, VNC, SSH and migrate VMs."
+ },
+ "kubevirt/virtualmachines-vmis-and-run-strategies": {
+  "s": "A VirtualMachine is the durable definition; a VirtualMachineInstance is one running copy. The run strategy decides when KubeVirt starts and restarts it.",
+  "i": "A VirtualMachine object persists across restarts and owns the VMI. Set spec.runStrategy to Always, RerunOnFailure, Manual, Halted or Once. The template under spec.template describes CPU, memory, disks and interfaces."
+ },
+ "kubevirt/vm-disks-datavolumes-and-cdi": {
+  "s": "A VM needs a disk with an operating system on it. CDI fills a PVC from a URL, a registry image, an upload or another PVC so you do not have to copy images by hand.",
+  "i": "A DataVolume asks CDI to create and populate a PVC. Sources include http, registry, pvc and upload. dataVolumeTemplates in a VirtualMachine create the disk with the VM. containerDisk gives an ephemeral disk from a registry image."
+ },
+ "kubevirt/storage-for-vms-access-modes-block-mode-and-snapshots": {
+  "s": "The storage you choose decides whether a VM can live-migrate, how fast it runs and whether you can snapshot it.",
+  "i": "Live migration needs the disk reachable from two nodes at once, so use ReadWriteMany. Block volume mode avoids a file system layer and suits Ceph RBD. Check that the CSI driver supports snapshots and clones."
+ },
+ "kubevirt/vm-networking-masquerade-bridge-and-multus": {
+  "s": "A VM can use the pod network like any pod, or sit on a separate network with its own addresses. The binding mode decides what the guest sees.",
+  "i": "Masquerade NATs the guest behind the pod IP and is the default choice for the pod network. Bridge attaches the guest to a Linux bridge for secondary networks. Multus adds extra interfaces from NetworkAttachmentDefinitions. A Service exposes VM ports like any pod."
+ },
+ "kubevirt/cloud-init-instance-types-and-vm-image-pipelines": {
+  "s": "Hand-built VMs drift. Cloud-init sets users, keys and packages on first boot, and instance types make sizes reusable.",
+  "i": "Use a cloudInitNoCloud volume to pass userData and networkData. Reference a VirtualMachineClusterInstancetype for CPU and memory and a VirtualMachinePreference for devices. Build golden images with a pipeline, not by hand."
+ },
+ "kubevirt/live-migration-node-drains-and-eviction": {
+  "s": "Live migration copies a running VM's memory to another node and switches over with a short pause. Policies decide how much bandwidth it may use and what happens when it cannot finish.",
+  "i": "A VirtualMachineInstanceMigration object starts a migration. The eviction strategy LiveMigrate makes node drains migrate VMs instead of stopping them. A MigrationPolicy limits bandwidth, sets timeouts and can enable auto-converge or post-copy."
+ },
+ "kubevirt/cpu-memory-hugepages-and-vm-performance": {
+  "s": "A VM competes for node CPU and memory like any pod, and adds its own overhead. Performance settings trade flexibility for predictable speed.",
+  "i": "The pod's limits must cover guest memory plus overhead. Dedicated CPU placement needs the static CPU manager and Guaranteed QoS. Hugepages reduce page table cost. Overcommit raises density but risks noisy neighbours."
+ },
+ "kubevirt/vm-snapshots-backup-and-restore": {
+  "s": "A snapshot is quick but lives on the same storage. A backup is a copy somewhere else. VMs need both, and a consistent copy needs the guest to pause writes.",
+  "i": "VirtualMachineSnapshot uses CSI volume snapshots and the guest agent to freeze the file system. VirtualMachineRestore returns a VM to a snapshot. For disaster recovery copy data off the cluster with Velero and a CSI data mover or an export."
+ },
+ "kubevirt/operating-kubevirt-monitoring-upgrades-and-troubleshooting": {
+  "s": "Day two work is watching the control plane and the guests, upgrading without downtime, and finding faults in a known order.",
+  "i": "Scrape KubeVirt metrics with Prometheus and alert on unhealthy components, stuck migrations and VM resource pressure. Use workloadUpdateStrategy with LiveMigrate so upgrades move VMs to new launchers. Troubleshoot top down: VM, VMI, pod, node, storage, network, guest."
+ },
+ "kubevirt/migrating-from-vmware-to-kubevirt": {
+  "s": "A migration is a project, not a copy. Disks convert easily; drivers, networks, backups and operating habits are where the work lies.",
+  "i": "Inventory VMs and dependencies, group them in waves, convert disks with virt-v2v through the Migration Toolkit for Virtualization (Forklift upstream), install virtio drivers and the guest agent, map networks and storage, test, then cut over with a rollback plan."
+ },
+ "ceph/what-ceph-is-rados-and-the-architecture": {
+  "s": "Ceph stores everything as objects spread across many disks and servers, and offers block, file and S3-style access to the same pool of hardware.",
+  "i": "RADOS is the base layer. RBD gives block devices, CephFS gives a shared file system and RGW gives S3 and Swift object storage. Monitors hold the cluster map, OSDs store data, managers report metrics and MDS daemons serve file metadata."
+ },
+ "ceph/monitors-managers-osds-and-quorum": {
+  "s": "Ceph keeps its map of the cluster on the monitors and its data on the OSDs. If you understand quorum and the OSD states, most health messages make sense.",
+  "i": "Monitors use Paxos and need a majority, so run an odd number. An OSD is up or down and in or out. BlueStore writes data directly to the device with a RocksDB metadata store and a write-ahead log, which can sit on faster media."
+ },
+ "ceph/crush-pools-and-placement-groups": {
+  "s": "Ceph has no central lookup table. A client hashes an object to a placement group, and CRUSH computes which OSDs hold that group.",
+  "i": "An object belongs to a pool, hashes to a placement group (PG), and CRUSH maps the PG to a set of OSDs while respecting a failure domain such as host or rack. The PG autoscaler adjusts PG counts as pools grow."
+ },
+ "ceph/deploying-ceph-with-cephadm": {
+  "s": "cephadm runs every Ceph daemon in a container and manages them through an orchestrator, so you describe the cluster you want and let it converge.",
+  "i": "Run cephadm bootstrap on the first host, add hosts with ceph orch host add, create OSDs on free disks with ceph orch apply osd, and deploy RGW, MDS and monitors with service specifications."
+ },
+ "ceph/rbd-block-storage-for-vms-and-kubernetes": {
+  "s": "RBD turns RADOS into block devices that look like disks. It is the most common Ceph service, used for VM disks and Kubernetes volumes.",
+  "i": "An RBD image is striped across many objects in a pool. Snapshots and clones are copy-on-write. ceph-csi provides ReadWriteOnce and, in block mode, ReadWriteMany volumes. RBD mirroring copies images to another cluster for disaster recovery."
+ },
+ "ceph/cephfs-shared-file-systems-and-mds": {
+  "s": "CephFS gives many clients one shared file system. File data lives in RADOS, while metadata is handled by metadata server daemons.",
+  "i": "A CephFS has a data pool and a metadata pool. Active MDS daemons serve metadata and standbys take over on failure. Clients mount with the kernel client or FUSE. Subvolumes carry quotas, and ceph-csi offers ReadWriteMany volumes."
+ },
+ "ceph/rgw-s3-compatible-object-storage-with-ceph": {
+  "s": "RGW is a web service that speaks the S3 and Swift APIs and stores objects in RADOS. Applications use their normal S3 tools against your own cluster.",
+  "i": "RGW daemons sit behind a load balancer. Users and keys are created with radosgw-admin. Buckets have indexes that may need sharding. Lifecycle rules expire objects. Multisite replication links zones in realms and zone groups."
+ },
+ "ceph/rook-ceph-on-kubernetes": {
+  "s": "Rook is a Kubernetes operator that runs Ceph as pods and manages it with custom resources. It gives a Kubernetes cluster its own storage layer.",
+  "i": "The Rook operator watches a CephCluster resource and creates monitors, managers and OSDs as pods. CephBlockPool, CephFilesystem and CephObjectStore create pools and services. A StorageClass for ceph-csi then provisions PVCs."
+ },
+ "ceph/replication-erasure-coding-and-durability": {
+  "s": "Ceph can protect data by keeping several copies or by splitting it into chunks with parity. Each costs a different amount of space, speed and complexity.",
+  "i": "A replicated pool with size 3 stores three copies and uses three times the raw space. An erasure coded pool with k data chunks and m coding chunks survives m failures and uses (k+m)/k times the space, but costs more CPU and suits large objects."
+ },
+ "ceph/bluestore-networks-and-ceph-performance": {
+  "s": "Ceph performance is the sum of many small parts. The slowest device, the network or the recovery traffic is usually the limit.",
+  "i": "Use SSD or NVMe for metadata and DB/WAL, 25 GbE or faster networks for dense nodes, and enough memory per OSD. Benchmark with rados bench, rbd bench and fio before and after changes. Throttle recovery so clients keep their latency."
+ },
+ "ceph/ceph-failures-recovery-and-health-warnings": {
+  "s": "Ceph is built to expect failure. Knowing how it reacts, and which health warnings need action now, keeps small problems from becoming outages.",
+  "i": "Use ceph -s and ceph health detail first. A failed OSD triggers recovery; set noout for planned maintenance. Nearfull and full thresholds stop writes before disks overflow. Inconsistent PGs are repaired after finding the cause."
+ },
+ "ceph/capacity-planning-upgrades-and-operating-ceph": {
+  "s": "A Ceph cluster is never finished. Capacity grows, hardware ages and versions move on. A steady routine keeps changes boring.",
+  "i": "Plan to stay below about 70 percent usage so a host failure can be rebuilt. Upgrade with ceph orch upgrade in the supported order. Add capacity gradually to limit rebalancing. Alert on health, capacity trends, slow ops and scrub errors."
+ },
+ "vault/what-vault-is-and-the-secrets-problem": {
+  "s": "Passwords and keys in code, config files and chat are easy to leak and hard to rotate. Vault stores them centrally, hands them out on demand, and records who asked.",
+  "i": "Vault authenticates a caller, checks a policy, and returns a secret from a secrets engine, often with a lease that expires. It can store static secrets, create dynamic ones, encrypt data, and issue certificates, with every request written to an audit log."
+ },
+ "vault/starting-vault-seal-unseal-and-storage": {
+  "s": "Vault encrypts everything it stores with a key that is itself protected. On startup it is sealed and cannot read its data until it is unsealed.",
+  "i": "The master key is split into key shares with Shamir's secret sharing; a threshold of shares unseals Vault. Auto-unseal uses a cloud KMS or HSM instead. Integrated storage (Raft) is the recommended backend. Dev mode is in memory and not for real use."
+ },
+ "vault/authentication-methods-and-tokens": {
+  "s": "A caller logs in with an auth method and gets a token. The token carries policies and a lifetime.",
+  "i": "People use OIDC or LDAP. Applications use Kubernetes, cloud IAM or AppRole. Tokens have TTLs and can be renewed until a maximum. Prefer identity based methods so no secret is needed to get a secret."
+ },
+ "vault/policies-and-least-privilege-access": {
+  "s": "A policy says which paths a token can reach and what it can do there. Everything is denied unless a policy allows it.",
+  "i": "Policies are HCL files that map paths to capabilities such as read, create, update, delete and list. KV version 2 uses secret/data and secret/metadata paths. Templated policies use identity values so one policy serves many teams."
+ },
+ "vault/kv-secrets-engine-and-secret-versioning": {
+  "s": "Some secrets are static: a vendor API key, a licence, a webhook token. The KV engine stores them encrypted, with versions you can read and roll back.",
+  "i": "KV version 2 keeps a history of each secret. put writes a new version, patch updates keys, delete is soft, undelete restores it, and destroy removes a version permanently. Check-and-set prevents two writers from overwriting each other."
+ },
+ "vault/dynamic-secrets-for-databases-and-clouds": {
+  "s": "Instead of storing a database password, Vault creates a new user for each caller, with a lease, and deletes it when the lease ends.",
+  "i": "The database engine connects with a privileged account, and a role holds SQL statements to create and drop users. Reading database/creds/role returns a unique username and password with a TTL. Revoking the lease deletes the user. The AWS engine issues temporary STS credentials."
+ },
+ "vault/pki-short-lived-certificates-with-vault": {
+  "s": "Vault can act as a private certificate authority. It issues certificates on request, so lifetimes can be hours or days rather than years.",
+  "i": "Keep the root CA offline or in a separate mount, issue from an intermediate CA, and define roles that limit domains and TTLs. Applications request a certificate and renew it automatically. Short lifetimes reduce the need for revocation."
+ },
+ "vault/transit-encryption-as-a-service": {
+  "s": "Applications often need to encrypt fields but handle keys badly. Transit keeps the keys inside Vault and lets applications send data for encryption.",
+  "i": "Create a named key, send plaintext to transit/encrypt and receive ciphertext with a version prefix. Rotate the key and rewrap old ciphertext without exposing plaintext. For large data, ask for a data key and encrypt locally."
+ },
+ "vault/vault-on-kubernetes-injector-csi-and-operators": {
+  "s": "A pod should receive secrets without code changes and without a long-lived token. Several integration patterns exist, each with different trade-offs.",
+  "i": "Pods log in with their service account through Kubernetes auth. The Agent Injector adds a sidecar that writes secrets to a shared volume. The CSI provider mounts secrets as a volume. The Vault Secrets Operator syncs secrets into Kubernetes Secrets. External Secrets Operator does the same across many backends."
+ },
+ "vault/vault-high-availability-raft-and-disaster-recovery": {
+  "s": "Vault is a critical dependency. If it is down, applications cannot get secrets. A highly available setup and a tested recovery plan are essential.",
+  "i": "A Raft cluster has one active node and standbys that forward requests. Use an odd number of nodes across failure zones. Take regular snapshots with vault operator raft snapshot save. Enterprise replication provides performance and disaster recovery clusters."
+ },
+ "vault/audit-logging-monitoring-and-hardening-vault": {
+  "s": "Audit logs answer who did what. Monitoring says whether Vault is healthy. Hardening shrinks the damage if a node or token is compromised.",
+  "i": "Enable at least two audit devices; Vault refuses requests if none can record them. Export telemetry to Prometheus and alert on sealed state, leader changes and request errors. Use TLS, avoid root tokens, run as a non-root user, and restrict the host."
+ },
+ "vault/incident-response-rotating-and-revoking-secrets": {
+  "s": "Assume a secret will leak one day. What matters is how fast you can find the affected paths, cut off access and replace what was exposed.",
+  "i": "Look up the token and its accessor, revoke it with its children, revoke leases by prefix, rotate static secrets in KV and the downstream systems, and read the audit log to see what was accessed. Seal Vault only as a last resort."
  }
 }

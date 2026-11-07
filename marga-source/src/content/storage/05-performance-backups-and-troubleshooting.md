@@ -72,6 +72,21 @@ A backup you have not restored is a hope. Schedule a restore test, restore to a 
 4. Is it slow? `iostat -x`, then find the process.
 5. Is a network dependency hanging? Look for `D` state processes on NFS mounts.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Performance, backups and troubleshooting fits together
+node: n1 | A slow disk | 0 | 0 | await is the average wait per request in milliseconds. | Backups with no restore test, or stored on the same disk. | store
+node: n2 | A full disk | 1 | 1 | du adds up the files it can see, df reports what the filesystem has allocated. | Deleting random files to free space instead of finding the cause. | store
+node: n3 | Backups | 2 | 0 | A full backup copies everything. An incremental copies changes since the last backup of any kind, and a differential copies changes since the last full one. | - Snapshots are fast and local; they complement backups but do not replace them. | store
+node: n4 | Troubleshooting order | 3 | 1 | Is the device present and healthy?. lsblk, dmesg, SMART data. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The log that ate the disk
 
 > **Incident:** A disk alert fired at 100 percent, but the team could not find the files using the space.

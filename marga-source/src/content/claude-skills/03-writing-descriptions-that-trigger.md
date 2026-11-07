@@ -44,6 +44,21 @@ Narrow the description to specific tasks and trigger phrases, add exclusions, an
 > Specific verbs and objects.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Writing descriptions that trigger fits together
+node: n1 | Its job | 0 | 0 | The description answers two questions for the model: What can this skill do? | Only one phrasing of the request. | process
+node: n2 | Weak and strong | 1 | 1 | Weak: Helps with documents. Claude cannot tell when this applies, and it competes with everything. | Descriptions with no "when to use". | process
+node: n3 | Balance | 2 | 0 | Too narrow: "Use when the user says exactly "run the weekly report"" misses "can you make this week's numbers summary". | Over-broad descriptions that fire everywhere. | process
+node: n4 | Test it | 3 | 1 | Make a list of 10 requests that should trigger the skill (varied phrasing, with and without the file extension or tool name) and 10 that should not (near misses). | Fixing triggering by editing the body. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The skill that never loaded
 
 > **Incident:** A team wrote a careful skill for security reviews, but nobody saw it used.

@@ -60,6 +60,21 @@ zgrep -h "request_id=abc123" /var/log/app/app.log*.gz
 
 Use `-F` so the tail survives log rotation. Save useful pipelines as small scripts with arguments, and test them on a sample before running on huge files.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Log analysis one-liners and pipelines fits together
+node: n1 | Count and rank | 0 | 0 | The pattern is extract, sort, count, rank. | Using uniq without sort. | process
+node: n2 | Time windows and latency | 1 | 1 | . | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n3 | JSON logs | 2 | 0 | select filters, @tsv makes tabular text and -s reads the whole file as an array for aggregate math. | Parsing JSON logs with grep instead of jq. | observe
+node: n4 | Streaming | 3 | 1 | Use -F so the tail survives log rotation. | Running heavy pipelines on production hosts unthrottled. | queue
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Top failing endpoint in a minute
 
 > **Incident:** A four-command pipeline located the failing endpoint during an outage.

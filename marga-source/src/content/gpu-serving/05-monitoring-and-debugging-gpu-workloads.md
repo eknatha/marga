@@ -76,6 +76,21 @@ XID 79 means the GPU has fallen off the bus: usually a hardware, power or seatin
 5. For multi-GPU work, did every rank start and can they talk?
 6. Do driver and library versions match?
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Monitoring and debugging GPU workloads fits together
+node: n1 | nvidia-smi | 0 | 0 | Memory-Usage is the first thing to check for out-of-memory problems. | Using GPU-Util as a measure of useful work. | process
+node: n2 | DCGM and metrics | 1 | 1 | In Kubernetes, the DCGM exporter publishes GPU metrics for Prometheus. | Ignoring the kernel log for XID errors. | observe
+node: n3 | Common faults | 2 | 0 | Out of memory (OOM). | Running two memory-hungry processes on one card. | process
+node: n4 | Debugging order | 3 | 1 | Is the GPU visible?. nvidia-smi, then inside the container. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The job that ran at 100 percent and did nothing
 
 > **Incident:** A four-GPU training job showed full utilization for six hours and no progress.

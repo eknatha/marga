@@ -63,6 +63,21 @@ rm -rf / , which tries to delete everything it is allowed to.
 > An empty unquoted variable disappears. Always quote variables, use set -u so an unset variable stops the script, and check that the variable is not empty before a destructive command.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Debugging shell scripts fits together
+node: n1 | See every command: tracing | 0 | 0 | Each traced line starts with the PS4 prefix, so you see which line ran and with which expanded values. | Unquoted variables, which split on spaces and expand wildcards. | process
+node: n2 | Fail loudly | 1 | 1 | -e exits on an error, -u treats unset variables as errors, pipefail makes a pipeline fail when any part fails, and the ERR trap tells you where. | Fail loudly -e exits on an error, -u treats unset variables as errors, pipefail makes a pipeline fail when any part fails, and the ERR trap... | process
+node: n3 | Check before you run | 2 | 0 | shellcheck finds quoting mistakes, unused variables and unsafe patterns. | Assuming set -e catches every failure. | observe
+node: n4 | Terminal versus cron | 3 | 1 | Cron runs scripts with a minimal environment: a short PATH, no login files, a different working directory and no terminal. | Sending cron output nowhere. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: works by hand, fails at night
 
 > **Incident:** A nightly backup script runs fine when started manually, but the cron job produces no archive and no error.

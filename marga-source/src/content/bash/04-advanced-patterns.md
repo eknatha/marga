@@ -102,6 +102,23 @@ name="${1:-world}"        # default value
 echo "${name^^}"          # uppercase
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Advanced Bash: arguments, arrays and... fits together
+node: n1 | Options with getopts | 0 | 0 | A trailing colon after a letter in the option string means the option takes a value, and a leading colon turns on silent error handling so you print your own messages. | Forgetting shift after getopts. | process
+node: n2 | Arrays | 1 | 1 | The quoting is the whole point: "${hosts[@]}" expands to one word per element and preserves the element with a space in it, while an unquoted ${hosts[@]} splits it. | Using associative arrays on systems with Bash 3. | process
+node: n3 | Reading data safely | 2 | 0 | <(command) is process substitution: it makes a command's output look like a file. | Trusting echo with data that starts with a dash; prefer printf. | store
+node: n4 | Here-documents | 3 | 1 | An unquoted delimiter allows variable expansion. | Unquoted $var and ${array[@]}. | process
+node: n5 | Parameter expansion you will use | 4 | 0 | . | Looping over $(ls) or $(cat file). | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the filename with a space
 
 > **Incident:** A cleanup script loops `for f in $(ls /data/uploads)` and runs `rm $f`. A customer uploads a file named `report 2024.pdf`. The loop deletes `report` and `2024.pdf` as two separate names, and in another run an empty variable turns `rm $f` into a command with no operand.

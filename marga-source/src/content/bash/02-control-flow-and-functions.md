@@ -105,6 +105,21 @@ retry 5 3 curl -fsS http://localhost:8080/health
 
 `shift 2` drops the first two arguments so `"$@"` contains only the command to run. Because the function takes any command, you can reuse it for downloads, database checks or deploy steps.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Control flow and functions fits together
+node: n1 | Conditionals | 0 | 0 | [[ . ]] is Bash's extended test. | Using [ $var = x ] with an unquoted variable that can be empty. | process
+node: n2 | Loops | 1 | 1 | curl -fsS fails on HTTP errors (-f), stays quiet (-s) but still shows errors (-S). | Looping over ls output instead of a glob such as *.log. | process
+node: n3 | Functions | 2 | 0 | Functions return an exit code, not text. | Forgetting local in functions. | process
+node: n4 | A reusable retry function | 3 | 1 | shift 2 drops the first two arguments so "$@" contains only the command to run. | Using fixed sleep calls instead of checking readiness. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the deploy that "succeeded" against a dead app
 
 > **Incident:** A deploy script restarted the service and printed "Deploy complete" before the application finished loading. Smoke tests then failed intermittently, and one run marked the release healthy while the service was still down.

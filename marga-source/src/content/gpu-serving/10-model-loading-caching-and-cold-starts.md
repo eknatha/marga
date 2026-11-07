@@ -52,6 +52,19 @@ readinessProbe:
 
 The startup probe allows a long load without being killed, and readiness keeps traffic away until the model answers. Roll out with `maxUnavailable: 0` and a small `maxSurge`, so old replicas keep serving until new ones are ready. Remember that a surge needs spare GPUs.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Model loading, caching and cold starts fits together
+node: n1 | Where time goes | 0 | 0 | Pull the container image, often many gigabytes with CUDA libraries. | Writable model volumes shared by many pods. | process
+node: n2 | Caching | 1 | 1 | Use safetensors, which load quickly and avoid unsafe code execution. | Liveness probes that fire during model loading. | process
+node: n3 | Probes and rollouts | 2 | 0 | The startup probe allows a long load without being killed, and readiness keeps traffic away until the model answers. | Restarting all replicas together. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Killed while still loading
 
 > **Incident:** Pods restarted repeatedly because probes were too strict for a slow load.

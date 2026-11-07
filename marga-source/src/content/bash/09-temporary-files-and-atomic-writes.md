@@ -78,6 +78,21 @@ Truncated or half written, so the application may start with a broken configurat
 > Redirection with > truncates the file first, then writes. A crash in between leaves partial content.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Temporary files, locks and atomic writes fits together
+node: n1 | Never invent a temporary name | 0 | 0 | A fixed name such as /tmp/work is shared by every run, and another user can create it first and trick your script. | Creating the temporary file and the trap in the wrong order. | process
+node: n2 | Clean up with trap | 1 | 1 | Temporary files must disappear even if the script fails or you press Ctrl+C. | Using a plain lock file that a crash leaves behind. | process
+node: n3 | Write atomically | 2 | 0 | Writing straight into the final file means readers can see it half finished, and a crash leaves a broken file. | Renaming across filesystems and expecting it to be atomic. | process
+node: n4 | One copy at a time with flock | 3 | 1 | If a job runs every minute and sometimes takes two, you get two copies working on the same data. | The -n option fails at once instead of waiting. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Half a report
 
 > **Incident:** A nightly job regenerates the status page in place. At 02:00 customers sometimes saw a page that stopped in the middle of a table.

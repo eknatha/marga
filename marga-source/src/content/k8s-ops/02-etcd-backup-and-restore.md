@@ -47,6 +47,21 @@ Objects created or changed in the last three days are gone, and objects deleted 
 > State rolls back to the snapshot time.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How etcd backup and restore fits together
+node: n1 | Taking a snapshot | 0 | 0 | Use etcdctl with the endpoints and client certificates of your cluster. | Assuming etcd backup covers volumes. | process
+node: n2 | Store it well | 1 | 1 | Copy snapshots off the node at once, to storage in another location, encrypted and with limited access, because etcd holds Secrets. | Forgetting that etcd holds Secrets. | store
+node: n3 | Restoring | 2 | 0 | Restoring creates a new data directory from the snapshot with etcdutl snapshot restore, then the etcd static pod or service is pointed at it. | Never testing a restore. | process
+node: n4 | Limits of a backup | 3 | 1 | An etcd snapshot restores Kubernetes objects. | Leaving snapshots on the same node. | store
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The backup that could not restore
 
 > **Incident:** A cluster lost two of three etcd members and the team tried to restore the latest nightly snapshot.

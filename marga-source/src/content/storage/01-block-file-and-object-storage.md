@@ -57,6 +57,21 @@ $ fio --name=randread --rw=randread --bs=4k --size=1G --runtime=10 --time_based 
 
 `fio` is the standard tool for testing, and it should be run on a test disk, never on a disk with live data in a way that writes over files you need.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Block, file and object storage fits together
+node: n1 | Three kinds | 0 | 0 | A block device has no idea what is in it. | Treating object storage like a filesystem that supports small in-place edits. | process
+node: n2 | The numbers | 1 | 1 | Capacity: how much it holds. | Testing with fio on a path that has a cache and getting numbers that are too good. | process
+node: n3 | Device types | 2 | 0 | HDD (spinning): cheap per terabyte, a few hundred IOPS, milliseconds of latency. | Choosing a volume by price per terabyte without checking IOPS. | process
+node: n4 | Measuring | 3 | 1 | fio is the standard tool for testing, and it should be run on a test disk, never on a disk with live data in a way that writes over files you need. | Measuring fio is the standard tool for testing, and it should be run on a test disk, never on a disk with live data in a way that writes... | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The cheap disk that made the database slow
 
 > **Incident:** A report job that took ten minutes on the old server took two hours after migration to a cheaper volume type.

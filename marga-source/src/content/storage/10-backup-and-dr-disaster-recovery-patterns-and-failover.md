@@ -47,6 +47,21 @@ Up to roughly 5 seconds of recent writes may be lost. That is the RPO of asynchr
 > Async replication means non-zero RPO.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Backup and DR: disaster recovery patterns and... fits together
+node: n1 | Four patterns | 0 | 0 | Backup and restore: copies of data and the code to rebuild live elsewhere. | Replicating data but not secrets, images and configuration. | process
+node: n2 | Data is the hard part | 1 | 1 | Stateless servers are easy to rebuild. Data needs replication: asynchronous replication keeps latency low but can lose the last seconds on failover (non-zero RPO), while... | A DR site that drifts from production or lacks capacity and quota. | store
+node: n3 | Moving traffic | 2 | 0 | Common methods: DNS failover with health checks and a short TTL (some clients cache longer than the TTL), global load balancers or anycast addresses (faster, provider... | No decision rule for who triggers failover. | process
+node: n4 | Failback and keeping DR honest | 3 | 1 | After the primary returns, plan the way back: re-sync data in the reverse direction, switch traffic in a quiet window and then re-establish the original protection. | A DR site that is a year behind production will fail when you need it. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The standby that could not take the load
 
 > **Incident:** When a region failed, the standby in the second region started but ran out of capacity within minutes and returned errors.

@@ -49,6 +49,23 @@ List what the skill must never do without approval: restarts, deletes, data chan
 
 Try it on a known past incident and check that Claude follows the order, uses the scripts and stops at approvals. Improve the description if it does not trigger in the right situations.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Writing skills for runbooks and operations fits together
+node: n1 | A runbook skill | 0 | 0 | . | Skills that mix diagnosis and changes without a stop. | process
+node: n2 | Stop points | 1 | 1 | Ask the user for approval before any restart, scale, rollback or config change. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n3 | Scripts and references | 2 | 0 | Put repeatable queries in scripts/ so results are consistent, and put long reference material such as service maps in references/, loaded only when needed. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Safety | 3 | 1 | List what the skill must never do without approval: restarts, deletes, data changes and production access. | Putting secrets in the skill. | process
+node: n5 | Test it | 4 | 0 | Try it on a known past incident and check that Claude follows the order, uses the scripts and stops at approvals. | Vague descriptions that trigger in the wrong cases. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: The skill that restarted a service
 
 > **Incident:** A vague skill told Claude to fix problems and it restarted a production service.

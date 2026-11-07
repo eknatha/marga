@@ -40,6 +40,23 @@ Disk usage and inodes on the node, especially image storage and logs, then free 
 > Common cause.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Debugging cluster and node problems fits together
+node: n1 | Order of checks | 0 | 0 | Start at the symptom. A pod problem: kubectl describe pod (events), kubectl logs --previous. | Restarting things before looking at events. | observe
+node: n2 | NotReady nodes | 1 | 1 | kubectl describe node shows conditions: Ready, MemoryPressure, DiskPressure, PIDPressure, NetworkUnavailable. | Ignoring node conditions. | process
+node: n3 | Pending and evicted pods | 2 | 0 | A Pending pod shows the reason in events: insufficient CPU or memory, node selector or affinity mismatch, untolerated taints, unbound volume claims. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Control plane health | 3 | 1 | Check kubectl get --raw=/readyz?verbose, API server logs, etcd health and disk latency, and certificate expiry (kubeadm certs check-expiration). | No monitoring of certificate expiry. | process
+node: n5 | Close the loop | 4 | 0 | Record the timeline, the cause, the fix and a prevention (an alert on disk usage or certificate expiry, a quota, a runbook). | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: Certificates expired
 
 > **Incident:** All kubectl commands failed with a certificate error one morning.

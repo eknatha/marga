@@ -42,6 +42,21 @@ The description: the skill itself works, but its description does not match how 
 > Edit the description and re-test.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Debugging skills that do not trigger or misbehave fits together
+node: n1 | Discovery | 0 | 0 | Confirm the folder is where the product looks for skills, that the file is named exactly SKILL.md (case matters), that the header has valid --- lines and required... | Wrong file name or folder. | process
+node: n2 | Choosing | 1 | 1 | If the skill is listed but not used, test the description: phrase the request in the user's own words and see what happens. | Debugging the body when the description is the problem. | process
+node: n3 | Following | 2 | 0 | If the skill loads but the output ignores the instructions, check for contradictions between rules and examples, steps buried in long paragraphs, and instructions that... | Following If the skill loads but the output ignores the instructions, check for contradictions between rules and examples, steps buried in... | process
+node: n4 | Scripts and files | 3 | 1 | If a script fails, run it by hand with the same input. | Not testing scripts by hand. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The invisible skill
 
 > **Incident:** A new skill never appeared in the list of available skills.

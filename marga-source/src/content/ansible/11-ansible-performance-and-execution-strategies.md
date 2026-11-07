@@ -67,6 +67,21 @@ The default **linear** strategy waits for each task on all hosts. The **free** s
 
 `serial` limits how many hosts change at a time, starting with a canary. `max_fail_percentage` stops the play if too many fail. `run_once` runs a task on one host only. Profile slow runs with the `profile_tasks` callback.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Ansible performance and execution strategies fits together
+node: n1 | Connection tuning | 0 | 0 | Forks is how many hosts run in parallel. | Gathering facts that are never used. | process
+node: n2 | Facts | 1 | 1 | Gathering facts takes time on every host. | Changing all hosts at once. | process
+node: n3 | Strategies and async | 2 | 0 | The default linear strategy waits for each task on all hosts. | Default forks on a large fleet. | process
+node: n4 | Safe rollouts | 3 | 1 | serial limits how many hosts change at a time, starting with a canary. | No failure limit during rollouts. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: A forty minute run for a reload
 
 > **Incident:** A simple change took forty minutes because of fact gathering and few forks.

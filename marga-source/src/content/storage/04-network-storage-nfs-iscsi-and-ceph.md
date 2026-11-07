@@ -74,6 +74,21 @@ $ sudo ceph -s
 
 A down OSD leaves data with fewer copies than intended, shown as **degraded**. Ceph rebuilds copies on other disks automatically. Replacing the disk quickly keeps the cluster safe, and a full cluster is a serious failure: Ceph stops writes at about 95 percent full to protect itself.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Network storage: NFS, iSCSI and Ceph fits together
+node: n1 | NAS and SAN | 0 | 0 | NAS (network attached storage) shares files. | iSCSI on the same network as general traffic, with no multipath. | process
+node: n2 | NFS | 1 | 1 | NFS lets a server export a folder that clients mount like a local one. | Using soft mounts for data that matters. | process
+node: n3 | iSCSI | 2 | 0 | iSCSI carries SCSI commands over ordinary IP. | Different user IDs on client and server. | process
+node: n4 | Ceph | 3 | 1 | Ceph is a distributed storage system that runs on ordinary servers. | Letting a Ceph cluster fill past 85 percent. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The share that froze every server
 
 > **Incident:** One NFS server was rebooted, and thirty application servers hung within a minute.

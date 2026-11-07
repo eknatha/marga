@@ -77,6 +77,23 @@ done
 
 The `// empty` fallback prevents the literal string `null` ending up in the variable when there is no next page, so the loop ends cleanly.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Working with APIs and JSON using curl and jq fits together
+node: n1 | curl for scripts | 0 | 0 | The flags to remember: -s silences the progress meter, -S still shows errors, -f makes curl exit non-zero for HTTP 400 and above, -m sets a time limit, and -w prints... | Using curl without -f, so errors look like success. | process
+node: n2 | Credentials | 1 | 1 | Never write tokens on the command line, because they appear in the process list and shell history. | Putting tokens on the command line. | process
+node: n3 | jq basics | 2 | 0 | -r outputs raw strings without quotes, which is what shell variables want. | Forgetting -r, leaving quotes in shell variables. | process
+node: n4 | Building JSON safely | 3 | 1 | Never assemble JSON by gluing strings together: a quote in a value breaks the document. | Building JSON bodies with string concatenation. | process
+node: n5 | Pagination and status checks | 4 | 0 | The // empty fallback prevents the literal string null ending up in the variable when there is no next page, so the loop ends cleanly. | Ignoring pagination and seeing only the first page. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the pipeline that deployed on a 502
 
 > **Incident:** A deploy script runs `curl https://api/deploy/status | jq -r .state`. The API returns a 502 HTML page, jq fails to parse it, and because the pipeline lacks `pipefail` the step still exits 0. The pipeline then proceeds as if the deployment had succeeded.

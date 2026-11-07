@@ -69,6 +69,19 @@ $ sudo mdadm --detail /dev/md0 | grep -E 'State|Failed'
 
 `[U_]` shows one of two members is missing: the array is **degraded** but working.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How LVM and RAID fits together
+node: n1 | LVM | 0 | 0 | LVM (logical volume manager) adds a layer between disks and filesystems. | Extending an LV and forgetting to grow the filesystem. | process
+node: n2 | RAID | 1 | 1 | RAID combines disks for speed, safety or both. | RAID 5 on very large disks with no spare. | process
+node: n3 | Incident: Two failures, one night | 2 | 0 | One disk had failed a week before, the alert went to an unmonitored mailbox, and the rebuild began only after a second disk showed errors. | Treating RAID as a backup. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Two failures, one night
 
 > **Incident:** A RAID 5 array lost a second disk while rebuilding the first.

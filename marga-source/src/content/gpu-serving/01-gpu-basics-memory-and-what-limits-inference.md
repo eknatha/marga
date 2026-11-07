@@ -60,6 +60,23 @@ name, memory.total [MiB], memory.used [MiB]
 NVIDIA A100-SXM4-80GB, 81920 MiB, 40213 MiB
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How GPU basics: memory and what limits inference fits together
+node: n1 | What a GPU offers | 0 | 0 | A GPU has thousands of simple cores that do many multiplications at once, which suits the matrix arithmetic in neural networks. | Assuming more GPU cores will fix slow decoding when bandwidth is the limit. | process
+node: n2 | Weights | 1 | 1 | Memory for the model's weights is the parameter count times the bytes per parameter. | Using aggressive quantization with no quality test. | process
+node: n3 | The KV cache | 2 | 0 | While generating, the model keeps the key and value vectors of every token seen so far, so it does not recompute them. | Testing with one request and shipping. | store
+node: n4 | Prefill and decode | 3 | 1 | Generating a reply has two phases. | Sizing a GPU by weights only. | process
+node: n5 | Quantization | 4 | 0 | Quantization stores weights, and sometimes the KV cache, with fewer bits. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: The model that loaded and then crashed
 
 > **Incident:** A 13B model loaded fine on a 24 GB card and crashed under the first real traffic.

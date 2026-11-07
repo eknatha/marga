@@ -43,6 +43,21 @@ Read all files, look for network calls, downloads and broad shell access, run it
 > Treat it like unknown code.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Sharing, versioning and skill security fits together
+node: n1 | Keep them in version control | 0 | 0 | Store skills in a repository, one folder per skill, with a short README, a changelog and the test task set. | Installing skills without reading them. | process
+node: n2 | Versions | 1 | 1 | Give each skill a version in its README or a metadata field if your tooling supports it, and use clear commit messages. | No named owner for shared skills. | process
+node: n3 | Risks | 2 | 0 | A skill's instructions can steer Claude, and its scripts can run code in the environment. | Letting scripts make network calls without need. | process
+node: n4 | Review checklist | 3 | 1 | Read every file, including scripts and any hidden or encoded content. | Auto-updating from unreviewed sources. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The helpful script that phoned home
 
 > **Incident:** A reviewer found an unexpected network call in a popular shared skill.

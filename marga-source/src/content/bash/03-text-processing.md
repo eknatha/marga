@@ -84,6 +84,23 @@ grep ' 502 ' access.log | awk '{print $4}'       # 2. is field 4 the timestamp?
 grep ' 502 ' access.log | awk '{print $4}' | cut -c2-18 | sort | uniq -c   # 3. per minute
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Text processing with grep, sed and awk fits together
+node: n1 | The pipeline idea | 0 | 0 | Each Unix tool does one job and reads stdin and writes stdout. | Forgetting that field numbers depend on the log format. | queue
+node: n2 | Filter and count | 1 | 1 | The last line is a classic: extract the client address, sort so identical values are adjacent, uniq -c counts runs, and sort -rn puts the largest first. | Using uniq -c without sorting first. | process
+node: n3 | sed: substitute and delete | 2 | 0 | -i.bak edits the file in place and keeps a backup, which makes risky edits reversible. | Editing a file with sed -i without a backup. | process
+node: n4 | awk: columns, conditions and sums | 3 | 1 | awk runs a rule for each line: pattern {action}. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Build pipelines step by step | 4 | 0 | Never write a long pipeline in one go. Run the first stage, look at the output, then add the next stage. | Parsing structured data such as JSON with grep; use jq for that. | queue
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: which endpoint is failing?
 
 > **Incident:** The 502 count jumped. You need to know whether one path or the whole site is failing.

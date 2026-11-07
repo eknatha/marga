@@ -48,6 +48,21 @@ Managed control planes do not give you etcd, so rely on application manifests in
 
 Run a game day in an empty account or region at least twice a year. Time each step, record surprises and fix the gaps. Keep the runbook and credentials available outside the cluster being recovered.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How A cluster disaster recovery runbook fits together
+node: n1 | Classify what you have | 0 | 0 | Infrastructure: networks, nodes and control plane, defined in code. | Backups that were never restored. | process
+node: n2 | Rebuild | 1 | 1 | The order matters: infrastructure, cluster add-ons such as networking and storage drivers, secrets operator, then applications. | No order of steps for the rebuild. | process
+node: n3 | Restore state | 2 | 0 | Managed control planes do not give you etcd, so rely on application manifests in Git and a backup tool for namespaces and volumes. | Restore state Managed control planes do not give you etcd, so rely on application manifests in Git and a backup tool for namespaces and... | store
+node: n4 | Rehearse | 3 | 1 | Run a game day in an empty account or region at least twice a year. | Runbooks stored only inside the failed cluster. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The database nobody had restored
 
 > **Incident:** A cluster rebuilt quickly but databases took a day to recover.

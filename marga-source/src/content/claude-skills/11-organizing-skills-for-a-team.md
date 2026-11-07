@@ -45,6 +45,21 @@ Publish a catalog with each skill's name, description, owner, last review date a
 
 Review skills on a schedule, such as every quarter. Remove skills nobody uses and flag skills that run scripts or touch production for a security review. Record who may install which skills.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Organizing skills for a team fits together
+node: n1 | Naming and scope | 0 | 0 | Use a clear pattern such as team-area-task, and write descriptions that state when to use the skill and when not to. | No owner for a skill. | process
+node: n2 | Repository and review | 1 | 1 | Keep skills in version control. Require a review from the owning team for changes, run a lint check for front matter and broken links, and test with a few sample prompts. | Skills with production access and no review. | external
+node: n3 | Catalog | 2 | 0 | Publish a catalog with each skill's name, description, owner, last review date and risk level. | Duplicate skills with unclear differences. | observe
+node: n4 | Retire and audit | 3 | 1 | Review skills on a schedule, such as every quarter. | Never removing old skills. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Three skills for one job
 
 > **Incident:** Overlapping skills made Claude choose inconsistently.

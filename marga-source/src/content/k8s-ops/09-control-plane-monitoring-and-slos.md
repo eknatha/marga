@@ -55,6 +55,21 @@ Alert well before certificates expire, and rehearse renewal. Also track the API 
 
 Define platform objectives such as 99.9 percent of API reads under 1 second, and pod scheduling within 30 seconds at the 95th percentile. Alert on **burn rate** and review the numbers monthly with platform users.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Monitoring the control plane and setting SLOs fits together
+node: n1 | Key signals | 0 | 0 | Slow fsync usually means slow disks for etcd. | Ignoring request volume by client. | process
+node: n2 | Find heavy clients | 1 | 1 | Large list calls without pagination, aggressive polling and controllers in restart loops can overload the API server. | Find heavy clients Large list calls without pagination, aggressive polling and controllers in restart loops can overload the API server. | client
+node: n3 | Expiry | 2 | 0 | Alert well before certificates expire, and rehearse renewal. | Missing certificate expiry alerts. | process
+node: n4 | SLOs | 3 | 1 | Define platform objectives such as 99.9 percent of API reads under 1 second, and pod scheduling within 30 seconds at the 95th percentile. | No SLO for the platform. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The controller that listed everything
 
 > **Incident:** One controller's polling slowed the whole API.

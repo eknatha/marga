@@ -49,6 +49,19 @@ A compromised admin can delete production and backups together. Use a separate a
 > Separate the ability to write from the ability to delete.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Backup and DR: ransomware, immutable backups and... fits together
+node: n1 | What attackers do | 0 | 0 | A typical attack gains credentials, spreads, steals data, deletes or encrypts backups and then encrypts production. | Backups reachable with the same credentials as production. | process
+node: n2 | Immutable and isolated copies | 1 | 1 | Immutability / object lock / WORM: the storage refuses deletes and overwrites until a retention date, even for administrators in the retention-lock mode. | Retention shorter than the time attackers stay hidden. | process
+node: n3 | The recovery runbook | 2 | 0 | Write it before you need it, store it where it is reachable when systems are down (printed copy, offline copy, separate system), and include. | A runbook that exists only on systems that are down. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Restoring into a compromised network
 
 > **Incident:** After a ransomware attack, a company restored its servers from backup within a day, and they were encrypted again two hours later.

@@ -61,6 +61,21 @@ The six fields are device, mount point, type, options, dump (leave 0) and fsck o
 
 An unclean shutdown usually needs only a journal replay. When `fsck` is needed, run it on an unmounted filesystem and read what it will change first. Never run it on a mounted disk. For a disk with hardware errors, copy what you can with a tool such as `ddrescue` before repairing.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Filesystems, mounts and fstab fits together
+node: n1 | Common filesystems | 0 | 0 | ext4: the long-time Linux default. Stable, well understood, can grow and, with care, shrink. | Running fsck on a mounted filesystem. | process
+node: n2 | Inodes and journals | 1 | 1 | An inode holds a file's metadata: owner, permissions, size and where its data blocks are. | Editing fstab and not testing with mount -a. | process
+node: n3 | Mounting | 2 | 0 | Device names such as /dev/sdb1 can change between boots. | Referring to disks by /dev/sdX in fstab. | process
+node: n4 | Repair | 3 | 1 | An unclean shutdown usually needs only a journal replay. | Looking only at df -h and forgetting df -i. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The server that did not come back
 
 > **Incident:** After a routine reboot a server stayed in emergency mode and the team had no console access plan.

@@ -44,6 +44,21 @@ Move the table to a linked reference file and point to it from SKILL.md only for
 > Load on need.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Progressive disclosure and structure fits together
+node: n1 | Three levels | 0 | 0 | Metadata (name and description): always available, a few dozen tokens per skill. | Long reference files without a contents list. | process
+node: n2 | What goes where | 1 | 1 | Level 1: trigger-quality description only. | Putting everything in the body. | process
+node: n3 | Linking | 2 | 0 | In SKILL.md write precise pointers: "If the user needs Kubernetes manifests, read reference/k8s.md. | Deep chains of linked files. | process
+node: n4 | Measure | 3 | 1 | Check how big your skill is at each level. | Compare answer quality with and without a section. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The skill that crowded out the document
 
 > **Incident:** Users pasted long contracts and got shallow answers once a legal skill was active.

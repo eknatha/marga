@@ -57,6 +57,19 @@ If a GPU costs 4 USD per hour and serves 2 500 tokens per second at full load, i
 
 Compare against a hosted API price per million tokens at your real volume. Hosted wins at low or spiky use; self-hosting wins at steady high use, or when privacy and control matter.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Scaling, latency and cost fits together
+node: n1 | What users feel | 0 | 0 | TTFT (time to first token): how long before anything appears. | Comparing GPU cost with API cost at a single quiet hour. | client
+node: n2 | Scaling on the right signal | 1 | 1 | GPU use percentages are a poor signal. A GPU can read 100 percent "utilized" while only partly busy in terms of throughput, and CPU on the pod says nothing. | Scaling down fast and paying start-up time again. | process
+node: n3 | Cost | 2 | 0 | Cost per token = GPU price per hour ÷ tokens generated per hour. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Scaling on the wrong metric
 
 > **Incident:** A launch-day traffic spike produced timeouts although autoscaling was enabled and CPU was low.

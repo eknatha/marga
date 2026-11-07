@@ -83,6 +83,21 @@ Whether it has the correct Role tag, whether it matches the plugin filters, and 
 > The inventory is built from tags and filters.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Dynamic inventory for cloud environments fits together
+node: n1 | Inventory plugins | 0 | 0 | An inventory plugin reads a small YAML file that tells Ansible where to look. | Credentials stored in the inventory file. | process
+node: n2 | Target by tag | 1 | 1 | Playbooks target the generated groups. | Static host lists for autoscaled fleets. | process
+node: n3 | Mix with static inventory | 2 | 0 | A directory can contain several sources, and Ansible merges them. | Stale inventory cache. | process
+node: n4 | Check what it found | 3 | 1 | If groups are empty, check the filters, region and credentials first. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The server that nobody patched
 
 > **Incident:** A monthly patch run reported success, but a security scan later found 6 servers still unpatched.

@@ -39,6 +39,21 @@ A skill: it is shared, versioned, and loaded only when someone asks for release 
 > Repeatable, team-specific work.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How What a Claude Skill is fits together
+node: n1 | The idea | 0 | 0 | A skill is a folder. At minimum it holds a file named SKILL.md that starts with a short header giving the skill's name and a description of what it does and when to use... | Writing a skill for something the model already does well. | process
+node: n2 | Skills compared with other things | 1 | 1 | A prompt lives in one conversation. A skill is reusable and loaded only when relevant. | Treating a skill as a place for secrets. | process
+node: n3 | Where they are used | 2 | 0 | Skills are supported in several Claude products, such as the Claude apps, Claude Code and the API, with differences in how you install them: for example, a folder placed... | Assuming every product supports skills identically. | process
+node: n4 | When to write one | 3 | 1 | Write a skill when: the task repeats; the right way is specific to your team or domain; it takes more than a few lines of instruction; it benefits from templates... | Do not write one for a one-off question, or for general knowledge the model already has. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The copy-pasted prompt
 
 > **Incident:** Five engineers each kept a slightly different copy of the "write an incident summary" prompt.

@@ -76,6 +76,21 @@ sh is dash there, and `[[` is a Bash feature. Change the shebang to bash, or rew
 > The shebang decides which shell runs the script, no matter which shell you typed the command in.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Portable scripts, linting and style fits together
+node: n1 | sh is not bash | 0 | 0 | #!/bin/sh asks for a minimal POSIX shell. | Using #!/bin/sh and then Bash-only features. | process
+node: n2 | Find the mistakes with ShellCheck | 1 | 1 | ShellCheck reads a script and reports problems that are easy to miss: unquoted variables, wrong tests, useless uses of cat, and Bash-only features under an sh shebang. | Running scripts with sh script.sh and bypassing the shebang. | observe
+node: n3 | Readable by the next person | 2 | 0 | Scripts live longer than expected. | Ignoring ShellCheck warnings because the script works today. | process
+node: n4 | Test the edges | 3 | 1 | Run the script on the situations that break it: an empty folder, a name with a space, no arguments, and a missing command. | Leaving out usage text so nobody knows the arguments. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Works on my laptop
 
 > **Incident:** A pipeline step that ran a deployment script failed only on the build machine with a syntax error on a line that looked fine.

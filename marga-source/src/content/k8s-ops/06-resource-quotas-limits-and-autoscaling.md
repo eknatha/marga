@@ -49,6 +49,21 @@ It exceeded its memory limit; raise the limit based on observed usage or fix a m
 > Memory limits are hard.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Resource quotas, limits and autoscaling fits together
+node: n1 | Requests and limits | 0 | 0 | A request is what the scheduler reserves; a limit is the ceiling. | CPU limits that cause throttling. | client
+node: n2 | Quotas and defaults | 1 | 1 | A ResourceQuota caps the total CPU, memory, storage or object counts in a namespace. | Quotas without defaults. | process
+node: n3 | Horizontal Pod Autoscaler | 2 | 0 | The HPA changes the replica count based on metrics such as CPU use compared with the request, or custom metrics. | No requests set. | process
+node: n4 | Node autoscaling | 3 | 1 | The cluster autoscaler or Karpenter adds nodes when pods are Pending for lack of capacity and removes under-used ones. | HPA without requests. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Namespace full
 
 > **Incident:** A deployment could not create pods and showed "exceeded quota" events.

@@ -63,6 +63,21 @@ No. Success only means the job ran. Only a restore test with application-level c
 > Verify by restoring.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Backup and DR: testing restores and verifying... fits together
+node: n1 | Three levels of proof | 0 | 0 | The job finished: necessary but weak. Jobs can succeed and write empty or damaged files. | Testing restores with no application-level checks. | process
+node: n2 | An automated restore test | 1 | 1 | Run it from a scheduler, push the duration and result to your metrics system, and alert on failure and on a restore time that grows beyond a fraction of the RTO (for... | Never timing a restore against the RTO. | observe
+node: n3 | Timed drills | 2 | 0 | Beyond automation, run a drill where a person follows the written runbook to restore a service in a clean environment, with a clock. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | When a backup fails | 3 | 1 | Treat a failed or missing backup as an incident of its own priority: alert, investigate, fix and take a new backup soon, instead of waiting for the next window. | Restoring only after a disaster. | store
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Nine months of empty backups
 
 > **Incident:** When a file server failed, the team discovered that the nightly backups had been empty since a path change nine months earlier.

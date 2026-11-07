@@ -80,6 +80,21 @@ Three tasks are not idempotent; they change something every time and should be f
 > Repeated runs should converge to no changes.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Testing and linting Ansible code fits together
+node: n1 | Static checks | 0 | 0 | ansible-lint flags risky patterns: shell where a module exists, missing name, tasks that are never idempotent, deprecated syntax and unquoted file modes. | Ignoring lint warnings. | observe
+node: n2 | Check and diff mode | 1 | 1 | Check mode predicts changes without making them, and diff mode shows the exact file changes. | Trusting check mode as a guarantee. | observe
+node: n3 | Molecule | 2 | 0 | Molecule creates disposable containers or virtual machines, applies a role, verifies the result, and destroys them. | Testing only on one operating system version. | process
+node: n4 | Idempotence and pipeline | 3 | 1 | A good role changes something the first time and nothing the second. | Roles that are not idempotent. | queue
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The task that always changed
 
 > **Incident:** A nightly Ansible run reported 14 changes every night, so nobody noticed when a real, unwanted change appeared.

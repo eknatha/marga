@@ -83,6 +83,23 @@ Three lines: [a], [b] and [c]. The unquoted expansion splits "a b" into two word
 > Always use "${files[@]}" with quotes to keep each element as one word.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Arrays, associative arrays and parameter expansion fits together
+node: n1 | Indexed arrays | 0 | 0 | The form "${hosts[@]}" expands to one word per element, even for elements with spaces. | Unquoted ${array[@]}. | store
+node: n2 | Reading output into an array | 1 | 1 | mapfile (also readarray) reads one line per element and keeps spaces. | Parsing ls output. | process
+node: n3 | Associative arrays | 2 | 0 | Use these for lookups such as host to owner or service to port. | Using associative arrays on shells that lack them. | process
+node: n4 | Parameter expansion | 3 | 1 | . | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Where to stop | 4 | 0 | When a script needs nested data or heavy parsing, use jq or move to Python. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the backup that skipped half the files
 
 > **Incident:** A backup script reports success but misses files whose names contain spaces.

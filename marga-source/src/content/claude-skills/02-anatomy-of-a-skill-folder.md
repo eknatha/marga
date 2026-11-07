@@ -58,6 +58,21 @@ Keep the workflow in SKILL.md, and move tables, style guide and templates into s
 > Split by when it is needed.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Anatomy of a skill folder fits together
+node: n1 | A minimal skill | 0 | 0 | . | One giant SKILL.md. | process
+node: n2 | The header | 1 | 1 | The header sits between two lines of three dashes at the top of SKILL.md. | Names that do not match the folder or follow the rules. | process
+node: n3 | The body and supporting files | 2 | 0 | The body is plain Markdown that tells Claude what to do. | Chains of files that link to other files. | process
+node: n4 | Size and naming | 3 | 1 | Keep SKILL.md focused; a common guideline is a body of a few hundred lines at most, with detail pushed into linked files. | Secrets or personal data in the folder. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The skill nobody could review
 
 > **Incident:** A pull request added a skill with one 1,400-line SKILL.md file.

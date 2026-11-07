@@ -47,6 +47,21 @@ The deletion replicates to all copies within seconds. Replicas protect against h
 > Replication is not backup.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Backup and DR: strategy, the 3-2-1 rule and... fits together
+node: n1 | Start from objectives | 0 | 0 | For each system write down the RPO (how much data loss is acceptable) and the RTO (how long recovery may take). | Backing up data but not configuration, keys and runbooks. | process
+node: n2 | The 3-2-1 rule | 1 | 1 | Keep 3 copies of your data (the original plus two backups), on 2 different kinds of media or services, with 1 copy off-site (another region, account or provider). | Storing backups where the same credentials can delete them. | process
+node: n3 | Methods | 2 | 0 | Full: a complete copy. Simple to restore, but large and slow. | Treating replication as backup. | process
+node: n4 | Retention and cost | 3 | 1 | Keep recent backups often and older ones rarely: for example 7 daily, 4 weekly and 12 monthly, with legal or audit requirements overriding. | Keeping encryption keys only inside the system being protected. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The backup in the same account
 
 > **Incident:** After an administrator's credentials were stolen, the attacker deleted a production database and, with the same access, its backups.

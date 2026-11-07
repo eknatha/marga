@@ -63,6 +63,21 @@ Priority classes decide who is evicted first under pressure. Reserve high priori
 
 Namespaces do not isolate the kernel or control plane. If tenants are untrusted or have different compliance needs, use separate clusters or sandboxed runtimes. Track usage per team with labels and review quotas quarterly.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Multi-tenancy, namespaces and fair sharing fits together
+node: n1 | A tenant namespace | 0 | 0 | A ResourceQuota caps the total a namespace may request. | No default requests and limits. | process
+node: n2 | Access and network | 1 | 1 | Use RBAC roles bound to team groups in their own namespaces. | Namespaces with no quotas. | security
+node: n3 | Fair scheduling | 2 | 0 | Priority classes decide who is evicted first under pressure. | Check the Common mistakes list below this diagram for what usually goes wrong here. | queue
+node: n4 | Limits of sharing | 3 | 1 | Namespaces do not isolate the kernel or control plane. | Assuming namespaces isolate the kernel. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The batch job that ate the nodes
 
 > **Incident:** A team's job consumed all memory and evicted others.

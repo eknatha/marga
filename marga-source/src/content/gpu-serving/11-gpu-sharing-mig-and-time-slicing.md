@@ -50,6 +50,19 @@ sharing:
 
 Use **MIG** for multi-tenant or latency-sensitive inference. Use **time-slicing** for development, notebooks and tests where interference is acceptable. Use **whole GPUs** for large models and training. Monitor per-slice memory and utilization, and set limits so that one team cannot take all slices.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How GPU sharing: MIG, time-slicing and MPS fits together
+node: n1 | MIG | 0 | 0 | Multi-Instance GPU on supported data center GPUs splits a card into up to seven instances, each with its own memory, cache and compute. | Forgetting that time-slicing has no memory isolation. | process
+node: n2 | Time-slicing and MPS | 1 | 1 | Time-slicing makes several pods share a GPU by taking turns. | Using time-slicing for production inference. | process
+node: n3 | Choosing | 2 | 0 | Use MIG for multi-tenant or latency-sensitive inference. | Creating MIG layouts that waste slices. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: One notebook starved the rest
 
 > **Incident:** A shared GPU ran out of memory because one pod took almost all of it.

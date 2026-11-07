@@ -69,6 +69,19 @@ ansible-playbook site.yml --check --diff
 ansible-test sanity --docker
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Writing custom Ansible modules and filters fits together
+node: n1 | A small module | 0 | 0 | The module declares its arguments, reads the current state, compares it with the desired state and acts only if they differ. | No check mode support. | process
+node: n2 | Filters | 1 | 1 | Use it as {{ ansible_memtotal_mb * 1048576 / bytes_human }}. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n3 | Test and ship | 2 | 0 | Unit test the logic with pytest, run the module in a playbook twice and check that the second run reports no change, and run with --check --diff. | Shell commands that always report changed. | observe
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Always changed
 
 > **Incident:** A shell-based task reported changed on every run and hid real changes.

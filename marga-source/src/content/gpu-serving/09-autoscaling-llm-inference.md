@@ -51,6 +51,19 @@ kubectl get nodes -l node.kubernetes.io/instance-type=gpu -o wide
 
 Review the cost per thousand requests monthly.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Autoscaling LLM inference fits together
+node: n1 | The signal | 0 | 0 | Scale on what users feel. Good signals are queue depth, running requests per replica and time to first token. | Aggressive scale-down that causes reloads. | process
+node: n2 | Cold start | 1 | 1 | Adding capacity needs a new GPU node, then an image pull, then a model download and weight load. | No warm capacity for slow-starting models. | process
+node: n3 | Cost control | 2 | 0 | Set a maximum replica count and a budget alert. | No maximum replicas or budget alert. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Ten minutes of timeouts
 
 > **Incident:** A traffic spike outran GPU node startup.

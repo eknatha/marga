@@ -58,6 +58,21 @@ Recreate the cluster from infrastructure code, redeploy manifests from version c
 > Rebuild from code, restore the data.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Backup and DR: Kubernetes, etcd and volume... fits together
+node: n1 | Layers of a cluster | 0 | 0 | Declarative config: manifests, Helm values and Terraform in version control. | Backing up etcd but never testing a restore. | process
+node: n2 | etcd snapshots | 1 | 1 | Take snapshots on a schedule (for example every 30 minutes), copy them off the node, encrypt them (they contain Secrets), and test restoring on a throwaway cluster. | Storing etcd snapshots unencrypted on the node. | process
+node: n3 | Volume snapshots | 2 | 0 | The CSI snapshot API takes storage-level snapshots of PersistentVolumeClaims, if the driver supports it. | Assuming a volume snapshot is application-consistent. | store
+node: n4 | Tools and rebuild strategy | 3 | 1 | Tools such as Velero back up namespaced resources and volumes to object storage and can restore to another cluster, which also helps migrations. | Keeping snapshots only in the same storage system. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The snapshot that restored a broken database
 
 > **Incident:** A team restored a volume snapshot of their database after a failed upgrade, and the database then needed hours of crash recovery and lost recent transactions.

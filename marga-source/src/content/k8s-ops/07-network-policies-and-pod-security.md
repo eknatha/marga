@@ -53,6 +53,21 @@ An allowance for DNS egress to the cluster DNS pods.
 > Allow DNS.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Network policies and pod security fits together
+node: n1 | Default deny, then allow | 0 | 0 | A NetworkPolicy selects pods and lists allowed ingress and egress. | Assuming policies work without a supporting plugin. | process
+node: n2 | Enforcement | 1 | 1 | Policies are enforced by the network plugin (such as Calico or Cilium). | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n3 | Pod Security Standards | 2 | 0 | Three profiles: privileged (no limits), baseline (blocks known escalations such as privileged containers and host namespaces) and restricted (current hardening practice... | Running containers as root. | security
+node: n4 | Security context | 3 | 1 | Set it on pods and containers: runAsNonRoot: true, allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: { drop: ["ALL"] } and a seccomp profile. | Forgetting DNS in egress rules. | security
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Lateral movement
 
 > **Incident:** A compromised front-end pod scanned the cluster and reached the database pods directly.

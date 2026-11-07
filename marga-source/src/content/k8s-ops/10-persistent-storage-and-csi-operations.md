@@ -61,6 +61,19 @@ kubectl logs -n kube-system ds/csi-node -c driver | tail
 
 Typical errors are `FailedAttachVolume` (the volume is still attached to another node), `FailedMount` (a node or driver problem) and a PVC stuck in `Pending` (no matching class or no capacity). Read pod events first, then VolumeAttachment objects, then the driver logs. Never delete a VolumeAttachment or force detach without making sure the old node no longer writes to the disk.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Persistent storage and CSI operations fits together
+node: n1 | The objects | 0 | 0 | WaitForFirstConsumer delays creating the volume until a pod is scheduled, so it is created in the right zone. | Reclaim policy Delete for critical data. | process
+node: n2 | Expand and snapshot | 1 | 1 | Volumes can usually only grow. Snapshots are not backups on their own if they live in the same storage system, so copy important data elsewhere too. | Snapshots as the only backup. | process
+node: n3 | Debugging | 2 | 0 | Typical errors are FailedAttachVolume (the volume is still attached to another node), FailedMount (a node or driver problem) and a PVC stuck in Pending (no matching... | Forcing detach without fencing the node. | observe
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Multi-attach error
 
 > **Incident:** A pod could not start because the volume still belonged to a failed node.

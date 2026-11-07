@@ -45,6 +45,21 @@ Cordon and drain before touching hardware. A reset can clear transient faults, b
 
 Run DCGM health checks as a daemon set, export metrics to Prometheus and alert on Xid counts. A controller can taint a failing node automatically so new jobs avoid it.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How GPU failures, Xid errors and recovery fits together
+node: n1 | Where to look | 0 | 0 | An Xid is an error code from the driver. | Touching hardware before draining the node. | process
+node: n2 | Fault families | 1 | 1 | Memory: rising uncorrectable ECC errors or row remapping failures mean the GPU should be retired. | Treating every Xid as a software bug. | process
+node: n3 | Respond | 2 | 0 | Cordon and drain before touching hardware. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Automate | 3 | 1 | Run DCGM health checks as a daemon set, export metrics to Prometheus and alert on Xid counts. | No alert on Xid or ECC counters. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: A GPU that fell off the bus
 
 > **Incident:** A node lost one GPU in the middle of a job.

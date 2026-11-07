@@ -51,6 +51,25 @@ A **template** fixes the structure of the output, and an **example** shows tone 
 
 Give each reference one topic and a clear title. Date or version reference documents that change often, such as contact lists, and prefer pointing to a source of truth over copying it. Review skills the way you review code, and remove files nobody uses.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Skills with references, templates and assets fits together
+node: n1 | Layout | 0 | 0 | SKILL.md has the front matter and the main steps. | One huge SKILL.md. | process
+node: n2 | Linking | 1 | 1 | . | Copying changing data instead of linking to its source. | process
+node: n3 | Choose severity | 2 | 0 | Read references/severity-levels.md and choose the lowest level that matches the impact. | Long chains of references. | process
+node: n4 | Write the report | 3 | 1 | Copy templates/postmortem.md and fill each section. | Examples with real customer data. | process
+node: n5 | Templates and examples | 4 | 0 | A template fixes the structure of the output, and an example shows tone and level of detail. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | Maintain | 5 | 1 | Give each reference one topic and a clear title. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: The skill nobody could update
 
 > **Incident:** A long single file contained outdated escalation contacts.

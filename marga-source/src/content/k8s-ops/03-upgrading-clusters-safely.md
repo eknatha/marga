@@ -36,6 +36,21 @@ Before the upgrade, by scanning the cluster and repositories for deprecated API 
 > Check first, not after.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Upgrading clusters safely fits together
+node: n1 | One minor version at a time | 0 | 0 | You upgrade from 1.N to 1.N+1, not across several minors at once. | Skipping minor versions. | process
+node: n2 | Deprecated APIs | 1 | 1 | Each release removes some API versions. A manifest using a removed version fails to apply. | Upgrading without a snapshot. | client
+node: n3 | Control plane then nodes | 2 | 0 | With kubeadm: upgrade the first control plane node (kubeadm upgrade plan, then apply), then the others with kubeadm upgrade node, then upgrade kubelet and kubectl... | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Rollback and rehearsal | 3 | 1 | Control plane upgrades are hard to undo, so the real rollback plan is a restored etcd snapshot and a documented procedure. | Draining without disruption budgets. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Ingress objects stopped working
 
 > **Incident:** After an upgrade, a team's routes disappeared and the pipeline failed to apply them.

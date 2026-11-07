@@ -43,6 +43,19 @@ python eval_prompts.py --endpoint http://localhost:8000/v1 --set support-tickets
 
 Use a task-specific evaluation set, not only public benchmarks. Compare accuracy, refusal behavior and formatting, and measure latency and throughput. Record the chosen format with the model version so everyone serves the same thing.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Quantization and sizing a model for a GPU fits together
+node: n1 | The memory math | 0 | 0 | Weights for a 70B model are about 140 GB in FP16, 70 GB in INT8 and 35 GB at 4 bits. | Counting weights but not the KV cache. | process
+node: n2 | Formats | 1 | 1 | FP16 or BF16: the usual baseline, best quality, largest size. | Filling GPU memory to 100 percent. | process
+node: n3 | Test before you ship | 2 | 0 | Use a task-specific evaluation set, not only public benchmarks. | Choosing a format using only public benchmarks. | observe
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Out of memory on load
 
 > **Incident:** A 70B model in FP16 could not load on one 80 GB GPU.

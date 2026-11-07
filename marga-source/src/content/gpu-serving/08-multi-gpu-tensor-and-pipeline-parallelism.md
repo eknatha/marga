@@ -40,6 +40,19 @@ kubectl describe node gpu-node-3 | grep -A5 "nvidia.com/gpu"
 
 Check that all pods of one tensor-parallel group are scheduled on the same node, using node affinity or a multi-GPU resource request.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Multi-GPU serving: tensor and pipeline parallelism fits together
+node: n1 | Two ways to split | 0 | 0 | Tensor parallelism (TP): every layer's weights are divided across GPUs, and GPUs exchange results at each layer. | Tensor parallelism across slow links. | process
+node: n2 | Topology | 1 | 1 | nvidia-smi topo -m shows how GPUs connect. | Ignoring topology when placing pods. | observe
+node: n3 | Replicas versus splitting | 2 | 0 | If a model fits on one GPU, run several independent replicas behind a load balancer. | Splitting a model that fits on one GPU. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Slower with more GPUs
 
 > **Incident:** Adding GPUs across nodes made serving slower.

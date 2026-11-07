@@ -62,6 +62,21 @@ A script that sums the lines and returns the total, with the model using the res
 > Use code for exact work.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Scripts and deterministic steps fits together
+node: n1 | Split the work | 0 | 0 | Give scripts the jobs where exactness matters: parse and validate a file against a rule, count or sum, call a documented internal API, convert formats, lint a... | Scripts with huge or cryptic output. | process
+node: n2 | A good script | 1 | 1 | It has a docstring with usage, prints short readable output, and returns a non-zero exit code on failure. | Letting the model do arithmetic. | process
+node: n3 | Safe scripts | 2 | 0 | Scripts run with whatever access the environment gives them. | Scripts that write or delete without warning. | process
+node: n4 | Test them | 3 | 1 | Run scripts by hand with good and bad inputs, and add unit tests in the skill folder. | Untested scripts. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The total that did not add up
 
 > **Incident:** A reporting skill computed monthly totals in the model's head.

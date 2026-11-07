@@ -54,6 +54,19 @@ python evals/compare.py results/main.json results/head.json --fail-on-regression
 
 Fail the merge on any regression in the must or must-not checks. Add a test every time a real failure is found, so the suite grows from experience.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Evaluating and regression testing skills fits together
+node: n1 | Trigger tests | 0 | 0 | A good description triggers on the first group and stays quiet on the second. | Only testing prompts that should trigger. | observe
+node: n2 | Output tests | 1 | 1 | Grade with a checklist, either by a person or by a model with a clear rubric you spot-check. | Not comparing against no skill. | observe
+node: n3 | Compare and gate | 2 | 0 | Run each task with and without the skill, and between the old and new version. | Fixing failures without adding tests. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: A description edit that triggered everywhere
 
 > **Incident:** A small wording change made a skill load for unrelated requests.

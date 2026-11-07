@@ -58,6 +58,21 @@ Look at the **percentiles**, especially the 99th and 99.9th. Averages hide the s
 
 Never run write tests on a device holding data. Use a scratch file or a new volume, and delete it afterwards. Test during maintenance windows on shared storage, since heavy tests affect neighbours.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Storage benchmarking with fio fits together
+node: n1 | The basics | 0 | 0 | IOPS counts operations per second, bandwidth is bytes per second and latency is the time per operation. | Only measuring sequential throughput. | process
+node: n2 | Jobs for real workloads | 1 | 1 | direct=1 bypasses the page cache, otherwise you measure memory. | Testing without direct I/O. | edge
+node: n3 | Reading the result | 2 | 0 | Look at the percentiles, especially the 99th and 99.9th. | Reading averages and ignoring the tail. | process
+node: n4 | Safety | 3 | 1 | Never run write tests on a device holding data. | Writing to a device that holds data. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Fast in the test, slow in production
 
 > **Incident:** A sequential test hid poor random latency.

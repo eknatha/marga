@@ -52,6 +52,23 @@ A service account, a Role allowing get/list/watch on pods, and a RoleBinding in 
 > Smallest scope.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How RBAC and service accounts fits together
+node: n1 | Four objects | 0 | 0 | A Role lists allowed verbs on resources inside one namespace. | Binding cluster-admin to fix errors. | process
+node: n2 | Subjects | 1 | 1 | Subjects are users, groups and service accounts. | Using the default service account for everything. | process
+node: n3 | Service accounts | 2 | 0 | Each pod runs as a service account, whose short-lived token is mounted into the pod so the application can call the API. | Never reviewing bindings. | process
+node: n4 | Avoid broad rights | 3 | 1 | Be careful with wildcards (*), the cluster-admin role, and powerful verbs such as create on pods, escalate, bind, impersonate, and reading Secrets cluster-wide: each can... | Granting wildcards. | process
+node: n5 | Checking access | 4 | 0 | Ask the cluster: kubectl auth can-i delete pods -n shop --as=jane and kubectl auth can-i --list -n shop --as=system:serviceaccount:shop:web. | These answer questions without trial and error. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: Forbidden for the controller
 
 > **Incident:** A custom controller crashed after deployment with permission errors.

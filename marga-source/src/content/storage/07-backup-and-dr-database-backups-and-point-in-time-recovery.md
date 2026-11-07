@@ -55,6 +55,21 @@ Twelve hours of valid changes. With WAL archiving you could replay up to 14:29 i
 > Continuous archiving shrinks the RPO.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Backup and DR: database backups and point-in-time... fits together
+node: n1 | Logical or physical | 0 | 0 | A logical backup (pg_dump) exports schema and data as SQL or an archive. | Copying live data files and calling it a backup. | observe
+node: n2 | Archive the WAL | 1 | 1 | Every change goes to the WAL first. If you archive each WAL segment to safe storage, you can replay changes on top of a base backup up to any moment. | No alert when archiving fails. | process
+node: n3 | Recover to a point in time | 2 | 0 | The restore fetches the base backup, then replays WAL up to the target time and stops. | Restoring over the damaged primary at once. | process
+node: n4 | MySQL and others | 3 | 1 | MySQL uses a full backup (for example with Percona XtraBackup) plus binary logs for point-in-time recovery. | Never testing a point-in-time restore. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The archive that stopped in January
 
 > **Incident:** During a recovery drill the team found that the last archived WAL segment was nine weeks old.

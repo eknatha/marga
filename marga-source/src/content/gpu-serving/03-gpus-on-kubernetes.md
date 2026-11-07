@@ -68,6 +68,23 @@ MIG gives predictable performance and isolation. Time-slicing is for development
 
 A large model needs several GPUs on **the same node** where possible, since links between GPUs inside a node (NVLink) are much faster than the network. A pod that asks for 4 GPUs needs a node with 4 free ones, and a cluster full of 2-GPU nodes can never schedule it. Distributed training across nodes needs fast networking and a scheduler that starts all pieces together (gang scheduling), or the job can deadlock with half its pods running.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How GPUs on Kubernetes fits together
+node: n1 | How GPUs reach pods | 0 | 0 | A GPU node needs three things: the NVIDIA driver, a container runtime hook that exposes devices to containers, and the device plugin, a daemonset that tells the kubelet... | Forgetting that drivers and the operator version must match the node image. | process
+node: n2 | Keeping other pods away | 1 | 1 | GPU nodes are expensive. | Leaving GPU nodes untainted so system pods consume capacity. | process
+node: n3 | When a pod stays Pending | 2 | 0 | Read this as: two nodes have GPUs but all are in use, and the other four have a taint the pod does not tolerate. | Requesting GPUs only in requests, or asking for fractions. | process
+node: n4 | Sharing a GPU | 3 | 1 | A whole GPU for a small model wastes money. | Using time-slicing for production with strict latency. | process
+node: n5 | Multi-GPU and multi-node | 4 | 0 | A large model needs several GPUs on the same node where possible, since links between GPUs inside a node (NVLink) are much faster than the network. | A pod that asks for 4 GPUs needs a node with 4 free ones, and a cluster full of 2-GPU nodes can never schedule it. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: Eight GPUs and a Pending pod
 
 > **Incident:** A team had eight free GPUs in the cluster and their four-GPU job stayed Pending.

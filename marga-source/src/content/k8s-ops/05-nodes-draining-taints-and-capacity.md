@@ -40,6 +40,23 @@ The budget requires both replicas, so no pod may be evicted. Lower the budget or
 > Budgets can block drains.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Nodes: draining, taints and capacity fits together
+node: n1 | Cordon and drain | 0 | 0 | kubectl cordon node-1 marks the node unschedulable but leaves pods running. | Forgetting daemonsets and local data flags. | process
+node: n2 | PodDisruptionBudgets | 1 | 1 | A PodDisruptionBudget says how many replicas of an application must remain available (minAvailable: 2) or may be unavailable (maxUnavailable: 1) during voluntary... | PDBs that allow zero disruptions. | process
+node: n3 | Taints and tolerations | 2 | 0 | A taint on a node repels pods unless they have a matching toleration. | Using taints without tolerations. | process
+node: n4 | Affinity and spread | 3 | 1 | Node affinity attracts pods to labelled nodes. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Capacity | 4 | 0 | kubectl describe node shows capacity, allocatable (what pods can use after system reservations) and what is already requested. | Draining without enough spare capacity. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: The drain that never finished
 
 > **Incident:** Node maintenance stalled for an hour with the message "Cannot evict pod as it would violate the pod's disruption budget".

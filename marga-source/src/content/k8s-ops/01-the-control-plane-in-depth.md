@@ -40,6 +40,23 @@ Three new pods are created but stay Pending without a node, until the scheduler 
 > Controllers create, the scheduler places.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How The control plane in depth fits together
+node: n1 | The API server | 0 | 0 | Every read and write goes through the API server. | Running etcd on slow shared disks. | client
+node: n2 | etcd | 1 | 1 | etcd is a consistent key-value store holding all cluster state: every object you create. | No monitoring of control plane latency. | process
+node: n3 | Scheduler and controllers | 2 | 0 | The scheduler watches for pods with no node and picks one by filtering (resources, taints, affinity) and scoring. | Treating the control plane as an afterthought. | queue
+node: n4 | On each node | 3 | 1 | The kubelet receives pod specs for its node, asks the container runtime to run them, runs probes and reports status. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | What breaks when | 4 | 0 | API server down: no changes and no kubectl; existing pods keep running. | Single API server in production. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: kubectl hangs
 
 > **Incident:** Engineers could not run any kubectl command and the dashboard timed out.

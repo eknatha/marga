@@ -61,6 +61,21 @@ The log line "GPU KV cache size" is the most useful number at startup. It says h
 - Start-up takes minutes. Use readiness probes, and do not send traffic until the model is loaded.
 - Pin the engine version, and test an upgrade, because behaviour and defaults change.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Serving stacks: vLLM, TGI and Triton fits together
+node: n1 | Why a loop is not enough | 0 | 0 | A simple server handles one request, or a fixed batch of requests, at a time. | Setting a very large max-model-len that nobody uses. | process
+node: n2 | The engines | 1 | 1 | vLLM: an open-source engine with continuous batching, PagedAttention and an OpenAI-compatible HTTP API. | Comparing engines with prompts that are nothing like real traffic. | process
+node: n3 | A vLLM example | 2 | 0 | Key settings. | Running two engines on one GPU without lowering memory utilization. | process
+node: n4 | Operating notes | 3 | 1 | Model weights are large (tens of GB). Cache them on a persistent volume so a restart does not download them again. | Redownloading weights on every restart. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The server that was slow with one GPU idle
 
 > **Incident:** A two-GPU server delivered only the speed of one.

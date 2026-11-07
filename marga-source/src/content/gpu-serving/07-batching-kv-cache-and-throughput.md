@@ -44,6 +44,21 @@ curl -s localhost:8000/metrics | grep -E "num_requests_(running|waiting)|time_to
 
 Watch queue length, cache usage, time to first token and tokens per second under realistic concurrency. Rising waiting requests with high cache usage means you need more memory, smaller limits or more replicas.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Batching, KV cache and throughput fits together
+node: n1 | Two phases | 0 | 0 | Prefill reads the whole prompt in one parallel pass and is compute heavy. | Ignoring queue depth and cache usage. | process
+node: n2 | Continuous batching | 1 | 1 | Static batching waits for a full batch and runs until the longest request ends. | Allowing very long contexts for every route. | process
+node: n3 | The knobs | 2 | 0 | max-num-seqs: more concurrent requests means higher throughput but more cache use and higher latency per request. | Tuning with a single test request. | process
+node: n4 | Measure | 3 | 1 | Watch queue length, cache usage, time to first token and tokens per second under realistic concurrency. | Setting memory utilization to 100 percent. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Fast alone, slow together
 
 > **Incident:** Latency jumped when concurrency increased because the cache was full.

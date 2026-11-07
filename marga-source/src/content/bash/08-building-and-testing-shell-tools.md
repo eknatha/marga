@@ -92,6 +92,21 @@ Print a usage message to standard error and exit with a non-zero code such as 64
 > Silent success hides mistakes. A clear message and a non-zero exit let callers and pipelines react.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Building and testing shell tools fits together
+node: n1 | Layout | 0 | 0 | Putting logic in functions and calling main only when the file is run (not sourced) lets tests load the functions without running the tool. | No validation of required options. | process
+node: n2 | Exit codes and messages | 1 | 1 | Use 0 for success, 1 for a general failure and 64 for a usage error (the convention from sysexits). | Mixing messages and results on standard output. | queue
+node: n3 | Tests with bats | 2 | 0 | Run shellcheck rotate.sh and bats tests/ in your pipeline. | Tests that touch real directories. | observe
+node: n4 | Idempotence and safety | 3 | 1 | A tool you may run twice should give the same result the second time. | No dry-run mode for destructive tools. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the cleanup that ran with the wrong variable
 
 > **Incident:** A cleanup script deletes the wrong directory because a path variable was empty after a typo in an option name.

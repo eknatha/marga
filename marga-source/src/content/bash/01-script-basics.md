@@ -81,6 +81,21 @@ done < hosts.txt
 
 `IFS= read -r` reads each line unchanged, without trimming spaces or interpreting backslashes. Redirecting `>/dev/null 2>&1` discards both normal output and errors. Common tests in `[ ... ]` are `-f` (file exists), `-d` (directory exists), `-z` (string is empty), `-n` (string is not empty), `-eq` (numbers equal) and `==` (strings equal).
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Script basics fits together
+node: n1 | Your first script | 0 | 0 | The first line, the shebang, tells the kernel which interpreter to use. | Spaces around = in assignments (name = value runs a command called name). | process
+node: n2 | Variables and quoting | 1 | 1 | . | Unquoted variables. | process
+node: n3 | Arguments and exit codes | 2 | 0 | Scripts receive arguments as $1, $2 and so on. | Ignoring exit codes, so the script reports success after a failure. | process
+node: n4 | Reading a file line by line and | 3 | 1 | IFS= read -r reads each line unchanged, without trimming spaces or interpreting backslashes. | Reading a file line by line and testing values IFS= read -r reads each line unchanged, without trimming spaces or interpreting backslashes. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the cleanup script that deleted too much
 
 > **Incident:** A cleanup script ran `rm -rf $BACKUP_DIR/*` nightly. After a config change `BACKUP_DIR` was never set. The shell expanded the line to `rm -rf /*`.

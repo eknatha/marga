@@ -48,6 +48,21 @@ Five tuned tasks may not represent real use. Test on a broader, held-out set inc
 > Do not overfit to your examples.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Testing and evaluating a skill fits together
+node: n1 | What to test | 0 | 0 | Triggering: does the skill load for the requests it should, and stay out of the way for the rest? | Not comparing with the skill disabled. | observe
+node: n2 | The task set | 1 | 1 | Write 10 to 20 realistic tasks. For each, write what a good result looks like as a checklist: required sections, forbidden content, specific facts that must appear. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n3 | With and without | 2 | 0 | Run each task twice, once with the skill disabled and once enabled. | Changing several things at once. | process
+node: n4 | Iterate and keep records | 3 | 1 | Change one thing per iteration (the description, a rule, an example, a script). | Testing only on tuned examples. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: It worked on my five
 
 > **Incident:** A skill passed every demo task but failed with real notes from other teams.
