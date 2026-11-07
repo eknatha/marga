@@ -50,6 +50,23 @@ The read went to a lagging replica. Read from the primary briefly after a write,
 
 Eventual consistency fails as confusing, not as down: duplicated actions, lost updates when two writers race, double spends. Strong consistency fails as unavailable: writes block during a partition. Name which failure the feature can tolerate.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Consistency and availability in practice fits together
+node: n1 | CAP, stated carefully | 0 | 0 | During a network partition, a system cannot both stay consistent (every read sees the latest write) and stay available (every request gets a non-error answer). | Reading from replicas right after a write with no lag handling. | store
+node: n2 | Levels you will meet | 1 | 1 | Strong (linearizable): reads see the latest completed write. | Never testing failover. | process
+node: n3 | Choose per feature | 2 | 0 | A shopping site can use different levels at once. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Replication lag | 3 | 1 | Read replicas lag. A user saves a profile, the page reloads from a replica, and the old profile shows. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Failover and what it sacrifices | 4 | 0 | Asynchronous replication keeps writes fast but a primary failure can lose the last writes. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: The failover that did not fail over
 
 > **Incident:** The primary database lost its disk array. The synchronous replica was healthy, but the cluster manager did not promote it.

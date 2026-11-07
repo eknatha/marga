@@ -75,6 +75,23 @@ ipmitool sel clear
 @after Use the evidence the hardware already collects. Replace the part it points to, and clear the log only after you have saved it.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Operating a fleet: failures, lifecycle and... fits together
+node: n1 | Common hardware failures | 0 | 0 | ECC memory corrects single-bit errors silently. | Replacing parts at random. | process
+node: n2 | A method for a sick server | 1 | 1 | Drain it: move workloads away so repair is safe. | Decide the part: do not swap parts at random. | process
+node: n3 | Lifecycle | 2 | 0 | A server goes through receiving (check against the order and asset tag), racking, provisioning, service, repair and retirement. | Forgetting to wipe disks and remove retired servers from inventory. | process
+node: n4 | Spares and warranty | 3 | 1 | Keep spare drives, DIMMs, power supplies and cables on site, since shipping can take days. | Having no spares and waiting days for a cable. | process
+node: n5 | Capacity | 4 | 0 | Plan for losing a rack and a feed. Leave room so that when machines are out for repair, the rest still carry the load. | Updating firmware everywhere at once. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: A fleet-wide reboot loop after a firmware update
 
 > **Incident:** After a firmware update across 120 servers, 30 would not come back.

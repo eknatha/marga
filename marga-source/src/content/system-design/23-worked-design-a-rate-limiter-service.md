@@ -66,6 +66,25 @@ Every request is rejected because the limiter cannot count, so a limiter fault b
 
 A limit of zero. A store that becomes the slowest call on the path. A distributed counter updated with read-then-write. Clients with no backoff. Operators unable to see which rule denied a request.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Worked design: a rate limiter service fits together
+node: n1 | Clarify | 0 | 0 | Limit requests per API key per second and per minute, with different tiers, plus a global protection limit per service. | A shared store call on every request with no fallback. | process
+node: n2 | Estimate | 1 | 1 | Gateway traffic 50,000 requests per second at peak across 20 gateway nodes, 200,000 active keys. | Read then write counters. | process
+node: n3 | Sketch | 2 | 0 | Local limiter in each gateway node (token bucket in memory), plus a shared store (replicated in-memory store) holding counts per key for accurate global limits... | Limits that can drop to zero. | process
+node: n4 | Deep-dive | 3 | 1 | Algorithm. A token bucket per key: tokens refill at the sustained rate up to the burst size; each request spends one. | No client guidance on backoff. | process
+node: n5 | Failure modes | 4 | 0 | . | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | Trade-offs | 5 | 1 | Accuracy against latency: chunked allowances are fast and approximate. | Fail-open protects availability and risks abuse during the outage. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: A quota that read zero
 
 > **Incident:** An automated process set a limit to zero from a bad reading, and the limiter obeyed.

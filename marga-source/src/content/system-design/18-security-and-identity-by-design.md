@@ -60,6 +60,25 @@ Every bucket in the account. Scope the role to read only that bucket (and prefix
 
 Long-lived keys in code. One role for everything. Admin interfaces exposed. Support and CI with more access than production. Secrets that cannot be rotated without an outage. Logs that the attacker can edit.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Security and identity by design fits together
+node: n1 | Assume a component will be | 0 | 0 | Design as if any one component, key or account will eventually be misused, and ask what that gives an attacker. | One broad role shared by many services. | process
+node: n2 | Least privilege | 1 | 1 | Give each workload only the permissions it needs, on the resources it needs. | Support and CI tools with wider access than production. | process
+node: n3 | Short-lived, bound credentials | 2 | 0 | A long-lived key is a standing invitation. | Long-lived keys in code or images. | process
+node: n4 | Protect the control and support | 3 | 1 | Support tools, admin consoles and CI systems often have wide access and weaker controls. | Exposed admin consoles. | process
+node: n5 | Secrets, keys and recovery | 4 | 0 | Store secrets in a manager, not in code, images or logs. | Plan the compromise runbook before you need it: how to find where a secret is used, how to rotate it without downtime, how to revoke... | security
+node: n6 | Supply chain | 5 | 1 | Dependencies and build systems are part of the design. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: A key that opened the data store
 
 > **Incident:** A long-lived access key was published in a public repository and later used to read a data store.

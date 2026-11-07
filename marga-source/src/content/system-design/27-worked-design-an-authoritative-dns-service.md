@@ -68,6 +68,25 @@ Every site fails the check and withdraws its route, so no site is left to answer
 
 A single provider or single prefix. A health check that depends on the control plane. Zone changes pushed everywhere at once. The repair tools depending on the names that are down.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Worked design: an authoritative DNS service fits together
+node: n1 | Clarify | 0 | 0 | Serve authoritative answers for customer zones (or a company's internal and public zones). | Zone changes applied everywhere at once. | process
+node: n2 | Estimate | 1 | 1 | 100 million zones, 5 billion queries per day on average is about 58,000 per second, with attacks capable of 100x that. | Health checks that withdraw every site together. | process
+node: n3 | Sketch | 2 | 0 | A control plane (API, validation, change pipeline, zone database) and a data plane (name servers in many locations announcing the same addresses by anycast). | All name servers on one provider or prefix. | process
+node: n4 | Deep-dive | 3 | 1 | Anycast. Many sites announce the same IP addresses; routing sends each client to a nearby healthy site, and a failing site withdraws its routes. | Repair tools that need the broken service. | process
+node: n5 | Failure modes | 4 | 0 | . | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | Trade-offs | 5 | 1 | Short TTLs help failover and increase load. | A second provider costs money and demands careful zone sync. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: When the name servers disappear
 
 > **Incident:** The routes to the DNS servers were withdrawn and the name stopped resolving anywhere.

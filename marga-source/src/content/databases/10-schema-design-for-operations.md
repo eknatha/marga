@@ -63,6 +63,21 @@ The database cannot validate, compare, index or do arithmetic on them reliably, 
 > Types are constraints too.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Schema design that is easy to operate fits together
+node: n1 | Keys and types | 0 | 0 | Use a stable primary key that never changes and carries no business meaning: a bigint identity or a UUID. | Integer keys on tables that can grow large. | process
+node: n2 | Constraints | 1 | 1 | Let the database refuse bad data. | Missing constraints, so bad data accumulates. | process
+node: n3 | Layouts for growth | 2 | 0 | Tables that grow without limit (events, logs, payments) become slow to vacuum, back up and index. | One unbounded table with no archive plan. | process
+node: n4 | Designing for change | 3 | 1 | Make future migrations safe. Add new columns as nullable or with a cheap default, backfill in batches, then add constraints. | Renaming or dropping columns without a compatibility period. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The table nobody could change
 
 > **Incident:** A 900 million row events table needed a new column, and the migration locked writes long enough to cause an outage.

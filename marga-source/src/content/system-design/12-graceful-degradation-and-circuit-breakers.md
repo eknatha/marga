@@ -58,6 +58,25 @@ Every page view waits 5 seconds and holds a thread, so the page slows or fails. 
 
 Fallbacks that call the same failing dependency. Breakers that open for everyone because the failures were from one tenant. A degraded mode nobody has tested. Health checks that mark everything unhealthy at once and remove all capacity.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Graceful degradation and circuit breakers fits together
+node: n1 | Rank what matters | 0 | 0 | For a shop: checkout and login are critical; search and the product page are important; recommendations, reviews and the loyalty banner are optional. | Putting optional dependencies in the readiness check. | process
+node: n2 | Fallback options | 1 | 1 | Serve stale: return a cached copy, marked as possibly old. | A fallback that calls the failing service. | process
+node: n3 | Circuit breakers | 2 | 0 | A breaker wraps calls to a dependency and has three states. | Breakers with no half-open recovery. | process
+node: n4 | Fail open or closed | 3 | 1 | When a safety check cannot be reached, do you allow or deny? | Fail open or closed When a safety check cannot be reached, do you allow or deny? | process
+node: n5 | Shedding optional work | 4 | 0 | Under load, drop optional work first: analytics events, background refresh, expensive personalisation. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | Recovery | 5 | 1 | Do not fail back all at once. When a dependency returns, ramp traffic, keep the breaker half-open for a while, and avoid synchronized retries. | Recovery Do not fail back all at once. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: A health check that removed everything
 
 > **Incident:** A dependency failed. The health check included it, so every instance reported unhealthy and the load balancer sent traffic to none.

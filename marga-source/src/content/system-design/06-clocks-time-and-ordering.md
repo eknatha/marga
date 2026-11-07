@@ -54,6 +54,23 @@ A newer write from the slow server can carry an older timestamp and be discarded
 
 Silently, until the date arrives. A negative duration, an early expiry, a lock that two holders believe they own, a certificate that lapsed because nobody tracked it.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Clocks, time and ordering fits together
+node: n1 | Two kinds of clock | 0 | 0 | Wall-clock time is the calendar date and time, synchronised by NTP. | Measuring durations with the wall clock. | process
+node: n2 | Skew and drift | 1 | 1 | Two servers can differ by milliseconds or, if sync breaks, by seconds or more. | Last-write-wins by wall-clock timestamp. | process
+node: n3 | Leap seconds and other jumps | 2 | 0 | At midnight UTC on 1 January 2017, a leap second was inserted. | Assuming time differences are never negative. | process
+node: n4 | Ordering without wall clocks | 3 | 1 | Logical clocks (Lamport): a counter that increases with each event and each received message, giving an order consistent with cause and effect. | No alert on clock offset or certificate expiry. | process
+node: n5 | Practical rules | 4 | 0 | Run time sync everywhere and alert when offset grows. | - Never compute with a time difference you assume is positive; clamp or handle it. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: A leap second and a negative number
 
 > **Incident:** At midnight UTC a time difference computed by the DNS software was negative and a function that rejects negative values panicked.

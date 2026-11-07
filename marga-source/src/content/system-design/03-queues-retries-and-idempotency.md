@@ -48,6 +48,23 @@ Send an idempotency key with the request; the server stores the key with the res
 
 Unbounded queues hide overload until memory is gone. Missing jitter creates retry waves. Layered retries multiply load. Consumers without idempotency double-apply work after a redelivery.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Queues, retries, timeouts and idempotency fits together
+node: n1 | Queues and streams | 0 | 0 | A queue hands each message to one consumer and removes it after acknowledgement; good for work to be done once. | Assuming exactly-once delivery. | queue
+node: n2 | Timeouts | 1 | 1 | Every call needs a timeout shorter than the caller's own timeout. | Retrying at every layer. | process
+node: n3 | Retries | 2 | 0 | Retry only errors that may succeed later (timeouts, 503, connection reset), not ones that never will (400, 404). | Retries with no jitter or cap. | process
+node: n4 | Idempotency | 3 | 1 | An operation is idempotent if doing it twice has the same effect as once. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Backpressure and dead letters | 4 | 0 | If producers outrun consumers, queues grow without limit and latency climbs. | Alerting on queue length but not age. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: When retries became the outage
 
 > **Incident:** A dependency slowed down and the clients that called it retried aggressively, keeping it overloaded long after the original fault.

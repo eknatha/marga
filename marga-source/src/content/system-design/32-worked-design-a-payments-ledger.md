@@ -67,6 +67,25 @@ Debits equal credits, so the payment balances. A check that every payment sums t
 
 A retry charges the customer twice. A crash leaves money debited and not credited. An unknown processor result is guessed. A bug edits history. Reconciliation is skipped and mismatches grow.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Worked design: a payments ledger fits together
+node: n1 | Clarify | 0 | 0 | Customers pay merchants. The service creates a payment, authorises it with an external processor, captures it, and later refunds some or all of it. | No reconciliation with the processor. | process
+node: n2 | Estimate | 1 | 1 | Assume 5 million payments a day, about 60 a second on average and 300 at peak. | Updating or deleting ledger rows. | process
+node: n3 | Idempotency | 2 | 0 | The client sends an idempotency key with each request. | New reference on every retry. | process
+node: n4 | State machine and external calls | 3 | 1 | A payment moves through states: created, authorised, captured, refunded, failed. | Record the attempt before calling, use the processor's own idempotency key, and resolve unknown outcomes by querying the processor or by... | store
+node: n5 | Trade-offs | 4 | 0 | A single database gives strong consistency and simple correctness, at the cost of scaling limits that you can postpone by partitioning per merchant. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | Two entries that balance | 5 | 1 | Debits equal credits, so the payment balances. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: The timeout that charged twice
 
 > **Incident:** A payment request to an external processor timed out. The service treated the timeout as a failure and retried with a new reference, but the first request had in fact succeeded. The customer was charged twice.

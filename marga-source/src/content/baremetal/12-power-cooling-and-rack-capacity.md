@@ -36,6 +36,21 @@ Servers pull cold air in at the front and exhaust hot air at the back. Keep cold
 
 Record per rack: rated power, measured peak, space left, cooling limit and network ports. The smallest of these is the real capacity. Unused space with no spare power is **stranded**. Review monthly and before every order.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Power, cooling and rack capacity planning fits together
+node: n1 | Power budget | 0 | 0 | Estimate from measured draw at typical and peak load, not from the label on the power supply. | Budgeting from nameplate instead of measured draw. | process
+node: n2 | Redundant feeds | 1 | 1 | With A and B feeds, each server draws from both. | Letting A and B feeds both run near their limit. | process
+node: n3 | Cooling | 2 | 0 | Servers pull cold air in at the front and exhaust hot air at the back. | Leaving gaps in racks without blanking panels. | process
+node: n4 | Capacity tracking | 3 | 1 | Record per rack: rated power, measured peak, space left, cooling limit and network ports. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: One feed fails, the other trips
 
 > **Incident:** Losing feed A overloaded feed B and a breaker opened.

@@ -63,6 +63,23 @@ Cloud billing rewards switching things off. The main levers:
 
 Set a **budget alert** on every account on day one.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Cloud fundamentals fits together
+node: n1 | Regions and availability zones | 0 | 0 | A region is a geographic area with several data centers, such as eu-west-1 (Ireland) in AWS or westeurope in Azure. | Placing production in a single availability zone. | process
+node: n2 | Service models | 1 | 1 | Moving toward PaaS reduces operational work and risk, at the cost of some control. | Assuming the provider secures your configuration. | process
+node: n3 | Shared responsibility | 2 | 0 | The provider secures the cloud itself: buildings, hardware, hypervisors, the global network. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Organizing accounts | 3 | 1 | Use separate accounts or subscriptions for production and non-production, and often per team or workload. | Running everything in one account or subscription. | process
+node: n5 | Cost basics | 4 | 0 | Cloud billing rewards switching things off. | No budget alert and no tagging. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: an unexpected bill
 
 > **Incident:** The monthly invoice is four times higher than usual, and nobody launched anything new.

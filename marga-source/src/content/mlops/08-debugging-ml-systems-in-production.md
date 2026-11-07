@@ -29,6 +29,25 @@ Log the model version, the input features and the output for a sample of request
 
 Only when data and features match do you look at the model: evaluate the served version on a fresh labelled slice and compare with its gate result. Last, check serving: wrong model version loaded, stale cache, a fallback silently answering instead of the model.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Debugging ML systems in production fits together
+node: n1 | Start with what changed | 0 | 0 | List what changed in the last week: data sources, feature code, model version, serving image, traffic mix. | Not logging inputs, outputs and model version. | process
+node: n2 | Check the data, then the features | 1 | 1 | Compare today's inputs with the training set: null rates, ranges, new category values, row counts. | Fixing it without adding a check that would have caught it. | observe
+node: n3 | Replay the prediction | 2 | 0 | Log the model version, the input features and the output for a sample of requests. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Then the model, then serving | 3 | 1 | Only when data and features match do you look at the model: evaluate the served version on a fresh labelled slice and compare with its gate result. | Retraining before checking the data. | process
+node: n5 | Make it stay fixed | 4 | 0 | Add a data check at the pipeline boundary, a test that computes a feature the same way in training and serving, and an alert on the signal that would have caught this. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | A bottom-up check from the shell | 5 | 1 | The data check finds the null rate, the comparison shows serving computes the feature differently, and the replay reproduces the bad output. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Predict before you look
 
 Say what you expect each check to show before running it. A wrong guess teaches you where your picture of the system is wrong.

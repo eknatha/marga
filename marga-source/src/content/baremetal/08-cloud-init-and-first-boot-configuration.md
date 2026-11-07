@@ -54,6 +54,19 @@ less /var/log/cloud-init-output.log
 
 Check that the datasource was found, that the YAML is valid and which module failed. To re-test on a throwaway machine, run `cloud-init clean --logs` and reboot. Never do that on a node that already serves traffic.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How cloud-init and first-boot configuration fits together
+node: n1 | cloud-config | 0 | 0 | The file starts with #cloud-config and uses modules such as users, packages, write_files and runcmd. | Putting secrets in user data that others can read. | external
+node: n2 | Stages | 1 | 1 | cloud-init runs in order: local (find the datasource), network (get metadata and user data), config (run configuration modules) and final (package installs and scripts). | Assuming cloud-init runs every boot. | process
+node: n3 | Debugging | 2 | 0 | Check that the datasource was found, that the YAML is valid and which module failed. | Not validating the YAML schema. | observe
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The node with no keys
 
 > **Incident:** A fresh server booted but nobody could log in.

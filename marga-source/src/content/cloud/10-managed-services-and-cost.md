@@ -76,6 +76,21 @@ Unattached ("available") volumes are paying for storage nobody uses.
 
 Watch data transfer. Traffic between zones, out to the internet and between regions is billed, and chatty cross-zone designs can create surprising charges.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Managed services, reliability and cost fits together
+node: n1 | Managed services worth knowing | 0 | 0 | Queues deserve a special mention. Putting a queue between components absorbs bursts, lets a slow consumer catch up, and means a failure in one part does not instantly... | Using IP addresses instead of service DNS names. | process
+node: n2 | High availability and disaster | 1 | 1 | They answer different questions. | Treating Multi-AZ as a backup. | process
+node: n3 | Infrastructure that fails gracefully | 2 | 0 | Timeouts and retries with backoff on every network call. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Controlling cost | 3 | 1 | Unattached ("available") volumes are paying for storage nobody uses. | No cost alerts or ownership tags. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: a database failover causes an outage anyway
 
 > **Incident:** The primary database's zone fails. Multi-AZ failover happens in about a minute, but the application stays down for 25 minutes.

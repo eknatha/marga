@@ -56,6 +56,25 @@ Today's partition takes every write while older ones sit idle, a hot spot. Hash 
 
 A partition key chosen for convenience that skews. A modulo scheme that makes growth an outage. A directory that is a single point. A rebalance that saturates the network and slows production. A limit nobody watched until the single node hit it.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Partitioning, sharding and consistent hashing fits together
+node: n1 | Why partition | 0 | 0 | Reasons are size (data no longer fits), write rate (one primary cannot take the writes) and blast radius (a fault should reach only one partition). | Sequential partition keys. | process
+node: n2 | Schemes | 1 | 1 | Range: keys A to F on node 1, G to M on node 2. | hash mod N with no plan for growth. | process
+node: n3 | Choosing the key | 2 | 0 | A good key has many distinct values, spreads reads and writes evenly, and keeps data that is used together on the same partition. | Ignoring one huge tenant or key. | process
+node: n4 | Modulo is a trap, consistent | 3 | 1 | With hash(key) mod N, changing N from 10 to 11 moves about 90 percent of keys to different nodes, a storm of data movement and cache misses. | No alert on distance to a node limit. | process
+node: n5 | Cross-partition work | 4 | 0 | Queries that span partitions (joins, global secondary indexes, uniqueness checks, transactions) are slow or hard. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | Resharding | 5 | 1 | Plan it before you need it: choose a scheme that splits without downtime (split a partition in two while it serves traffic), copy data in the background, switch with a... | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: A table that hit a size limit
 
 > **Incident:** A single database table on one node grew until it reached a file size limit, and the service stopped.

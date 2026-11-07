@@ -66,6 +66,21 @@ sudo systemctl restart dnsmasq
 @after Watch the DHCP log while the server boots. If there is an offer but no TFTP transfer, the next-server address or the file name is wrong.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Provisioning: PXE, DHCP and images fits together
+node: n1 | The boot chain | 0 | 0 | The server powers on and its network card sends a DHCP request. | Leaving network boot first on machines in service. | process
+node: n2 | The answer file | 1 | 1 | Kickstart (Red Hat family), preseed (Debian) and autoinstall (Ubuntu) describe disks, packages, users and network. | Putting settings inside the install image instead of in cloud-init or configuration management. | process
+node: n3 | Images instead of installs | 2 | 0 | Installing packages on every machine is slow and each one drifts. | Running a single provisioning server that is itself unavailable when you need it. | process
+node: n4 | Tools | 3 | 1 | MAAS (Canonical) discovers machines, controls power through the BMC and deploys images. | Having no DHCP log to read when PXE fails. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Every new node booted into a reinstall
 
 > **Incident:** After an upgrade, nodes that were already in service rebooted into the installer and wiped themselves.

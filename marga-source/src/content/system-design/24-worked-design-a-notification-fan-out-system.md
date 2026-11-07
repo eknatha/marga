@@ -66,6 +66,25 @@ Password resets wait behind millions of marketing messages and arrive late. Use 
 
 A broadcast that starves critical alerts. Duplicate sends after a worker restart. A provider limit exceeded so the account is throttled or suspended. An expired credential for a provider. A dead-letter queue nobody reads.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Worked design: a notification fan-out system fits together
+node: n1 | Clarify | 0 | 0 | Producers publish events with a type, an audience and a payload. | Ignoring provider rate limits and quotas. | process
+node: n2 | Estimate | 1 | 1 | 50 million users, 5 notifications per user per day: 250 million a day, about 2,900 per second average, bursts to 10x on events (a flash sale or an outage notice). | Expanding a broadcast at intake. | process
+node: n3 | Sketch | 2 | 0 | Event intake API, an event stream, a fan-out service that expands audiences into per-recipient messages, priority queues per channel, channel workers that call... | One queue for all priorities. | process
+node: n4 | Deep-dive | 3 | 1 | Fan-out strategy. For targeted notices (one user), expand immediately. | Retrying without a budget. | process
+node: n5 | Failure modes | 4 | 0 | . | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | Trade-offs | 5 | 1 | At-least-once delivery with dedup is simpler than exactly-once and occasionally duplicates. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: A retry storm against shared infrastructure
 
 > **Incident:** One application retried aggressively and overloaded a shared service that many others needed.

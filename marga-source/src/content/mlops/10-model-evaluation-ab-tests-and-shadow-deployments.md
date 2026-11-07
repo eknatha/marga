@@ -45,6 +45,21 @@ Decide the duration and sample size before starting, so you do not stop when the
 
 Store the evaluation report with the model version, data version and decision. This helps future reviews and audits.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Model evaluation, A/B tests and shadow deployments fits together
+node: n1 | Metrics and slices | 0 | 0 | Pick a primary metric tied to the business goal and add guardrails such as latency, cost and error rate. | Judging only by overall averages. | observe
+node: n2 | Shadow deployment | 1 | 1 | In shadow mode the new model receives a copy of live requests, but its output is not used. | This catches crashes, performance problems and surprising predictions without risking users. | process
+node: n3 | Online experiments | 2 | 0 | Decide the duration and sample size before starting, so you do not stop when the numbers look good. | Stopping an experiment when it first looks good. | process
+node: n4 | Record | 3 | 1 | Store the evaluation report with the model version, data version and decision. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Better on average, worse for new users
 
 > **Incident:** A model improved overall metrics but hurt a user segment.

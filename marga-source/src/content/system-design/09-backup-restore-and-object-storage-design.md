@@ -61,6 +61,25 @@ Whether a restore from that backup has ever been tested and whether point-in-tim
 
 Backups in the same failure domain. Backups that were never restored. Credentials needed for restore kept only in the system being restored. Retention that deleted the good copy before the corruption was noticed. A restore that takes 3x the RTO.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Backup, restore and object storage design fits together
+node: n1 | Start from RPO and RTO | 0 | 0 | RPO says how much data you can lose, so how often you must capture changes. | Treating replicas as backups. | process
+node: n2 | Kinds of copies | 1 | 1 | Replicas: protect against node failure, but replicate deletes and corruption instantly. | Backups in the same account and control plane. | process
+node: n3 | Independence | 2 | 0 | Keep at least one copy that a single event cannot reach: another account, another region and, for important data, another provider. | No protection against deletion of the backups. | process
+node: n4 | Test restores | 3 | 1 | Schedule regular restore tests, automatically if possible, to a clean environment. | Never timing a restore. | observe
+node: n5 | Object storage by design | 4 | 0 | Object stores hold large amounts of data cheaply and durably, with high availability and simple APIs. | Check the Common mistakes list below this diagram for what usually goes wrong here. | store
+node: n6 | Cost and retention | 5 | 1 | Retention is a cost and a risk: long retention of personal data is a liability. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: The restore nobody had timed
 
 > **Incident:** After a destructive change, the team restored from backup and found it would take far longer than the business could accept.

@@ -61,6 +61,25 @@ Two lines of arithmetic give the load: about 23,000 messages a second on average
 
 Duplicate messages after a retry. A reconnect storm that overloads the gateways. Order lost because two nodes handle one conversation. A registry that says a user is online when they are not, so messages are pushed into the void.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Worked design: a chat and messaging service fits together
+node: n1 | Clarify | 0 | 0 | Direct messages and small groups up to 200 people, text and attachments by link, delivery receipts, history sync across devices, and a target of 99.95 percent... | Trying to guarantee global ordering. | process
+node: n2 | Estimate | 1 | 1 | Assume 50 million daily users, with 10 million connected at peak. | Ignoring connection counts and sizing only by requests. | process
+node: n3 | Deep-dive: ids, order and delivery | 2 | 0 | Each client generates a message id, so a retry cannot create a duplicate. | Relying on the session registry for delivery guarantees. | process
+node: n4 | Deep-dive: presence and fan-out | 3 | 1 | Presence changes often and few people need every change. | No jittered backoff on clients. | process
+node: n5 | Trade-offs | 4 | 0 | Per-conversation ordering is cheap, global ordering is not worth its cost. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | Sketching the capacity numbers | 5 | 1 | Two lines of arithmetic give the load: about 23,000 messages a second on average and around 70,000 at peak, with 200 gateways for ten million connections. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: When everyone reconnected at once
 
 > **Incident:** A gateway cluster restarted after a deployment. Every client reconnected within seconds, which overloaded authentication and the session registry, so many clients retried and made the overload last longer.

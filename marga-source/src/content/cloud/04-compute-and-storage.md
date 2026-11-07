@@ -81,6 +81,21 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
 
 > **Warning:** Replication copies mistakes as faithfully as it copies data. If someone deletes a file, replication deletes it everywhere. Versioning and backups are what bring it back.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Compute and storage fits together
+node: n1 | Compute options | 0 | 0 | A rule of thumb: pick the most managed option that still fits. | Treating a virtual machine as a pet that cannot be rebuilt. | process
+node: n2 | Scaling and load balancing | 1 | 1 | Put instances behind a load balancer across at least two zones, and let an autoscaling group (AWS) or scale set (Azure) add or remove instances based on a metric such as... | Check the Common mistakes list below this diagram for what usually goes wrong here. | edge
+node: n3 | Storage types | 2 | 0 | Object storage is the workhorse: practically unlimited, durable, cheap and accessed over HTTPS. | Leaving old snapshots and unattached disks to accumulate cost. | store
+node: n4 | Protecting data | 3 | 1 | Block public access at the account level for object storage, and allow exceptions deliberately. | Confusing replication with backup. | store
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: a bucket is public
 
 > **Incident:** A security scanner reports that the bucket `acme-reports` allows public reads. It contains customer exports.

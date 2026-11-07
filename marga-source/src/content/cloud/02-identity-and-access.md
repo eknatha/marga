@@ -87,6 +87,21 @@ $ az account show --query "{subscription:name, user:user.name}"
 
 Always check **who you are** before debugging **what you are allowed to do**.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Identity and access management fits together
+node: n1 | AWS IAM | 0 | 0 | A policy states which actions are allowed on which resources. | Wildcard actions and resources ("Action": "*") in policies. | process
+node: n2 | Azure access control | 1 | 1 | Azure splits identity from authorization. | Long-lived access keys stored in applications. | security
+node: n3 | Principles that apply everywhere | 2 | 0 | Least privilege. Start with nothing and add what is needed; do not start with admin and remove. | Using the root account or a global administrator for daily work. | process
+node: n4 | Verifying identity and permissions | 3 | 1 | Always check who you are before debugging what you are allowed to do. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: AccessDenied when the application reads a bucket
 
 > **Incident:** The API returns errors. The log says `AccessDenied: User: arn:aws:sts::123456789012:assumed-role/shop-api-role/i-0abc is not authorized to perform: s3:GetObject on resource: arn:aws:s3:::acme-uploads/shop/logo.png`.

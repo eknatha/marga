@@ -66,6 +66,25 @@ Series count can multiply by millions, memory and index size explode, and ingest
 
 The monitoring platform on the same cluster as the workload. Alerts that depend on the store that is overloaded. No alert for missing data. Logs ingested without limits. Dashboards that run expensive queries on every refresh.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Worked design: a metrics and log pipeline fits together
+node: n1 | Clarify | 0 | 0 | Collect metrics (numbers over time), logs (events) and traces from 2,000 services across several clusters. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n2 | Estimate | 1 | 1 | Metrics: 2,000 services times 50 instances times 500 series each is 50 million active series. | Monitoring that shares the failing platform. | process
+node: n3 | Sketch | 2 | 0 | Agents or collectors on each node, a regional buffer (a log or queue), ingest workers that write to a time-series store for metrics, an indexed store for recent logs and... | No alert for missing data. | process
+node: n4 | Deep-dive | 3 | 1 | Buffering and backpressure. Put a durable buffer between collectors and storage so a slow store does not drop data or push back into applications. | No cardinality limits. | process
+node: n5 | Failure modes | 4 | 0 | . | Unbounded buffers. | process
+node: n6 | Trade-offs | 5 | 1 | Dropping debug logs under pressure saves the pipeline and loses detail. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: Logs lost with the site
 
 > **Incident:** The primary data centre for a control plane and analytics system lost power, and logs were lost for days.

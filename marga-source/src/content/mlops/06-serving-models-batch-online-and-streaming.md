@@ -66,6 +66,25 @@ The readiness probe waits for the model to load. Batching is capped at eight mil
 
 A model takes minutes to load, so new pods receive traffic too early. Batching waits too long and breaks the latency budget. A traffic spike overloads the service and callers pile up retries. No fallback exists when the model is down.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Serving models: batch, online and streaming fits together
+node: n1 | Batch | 0 | 0 | Batch scoring runs the model over a large table on a schedule, then stores the results for other systems to read. | CPU-only autoscaling for a GPU model. | process
+node: n2 | Online | 1 | 1 | Online serving answers one request at a time through an API, usually in tens to hundreds of milliseconds. | Online serving for something that needs no freshness. | process
+node: n3 | Streaming | 2 | 0 | Streaming scores events as they arrive from a queue. | Serving traffic before the model has loaded. | queue
+node: n4 | Latency and batching | 3 | 1 | Model inference often runs much faster per item when several requests are grouped. | No timeout or fallback for the model call. | process
+node: n5 | Scale and protect | 4 | 0 | Autoscale on a signal that reflects load, such as queue depth or concurrent requests, not only CPU. | Set timeouts, limit concurrency, and return a safe default or an older cached answer when the model cannot respond. | process
+node: n6 | A model service with sensible limits | 5 | 1 | The readiness probe waits for the model to load. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: Retries that finished the job
 
 > **Incident:** A model service slowed down under load. Callers timed out and retried, which doubled the load and made it slower still, until the service stopped answering. The team had no concurrency limit and no fallback.

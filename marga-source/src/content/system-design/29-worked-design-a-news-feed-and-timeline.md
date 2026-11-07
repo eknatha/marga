@@ -62,6 +62,25 @@ The average account is fine for write fan-out, but one post from an account with
 
 A celebrity post floods the write path. The cache is lost and every feed rebuilds at once. The ranker adds seconds of latency. Deleted posts keep showing. A user who follows thousands of accounts times out.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Worked design: a news feed and timeline fits together
+node: n1 | Clarify | 0 | 0 | Users follow others, post short items with media links, and open a home feed of recent posts from those they follow. | Rebuilding every feed at once after a cache loss. | process
+node: n2 | Estimate | 1 | 1 | Assume 100 million daily users who open the feed 10 times a day, so a billion feed reads a day, about 12,000 a second and 35,000 at peak. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n3 | Fan-out on read | 2 | 0 | The feed is built when the user opens it: fetch recent posts from each followed account and merge them. | No fallback when ranking is slow. | process
+node: n4 | The hybrid | 3 | 1 | Use write fan-out for normal accounts and read-time merge for celebrity accounts. | Fan-out on write for every account. | process
+node: n5 | Trade-offs | 4 | 0 | Write fan-out spends storage and write work to buy fast reads. | Ranking improves engagement but needs a fallback, so the feed never goes blank. | process
+node: n6 | Counting feed insertions | 5 | 1 | The average account is fine for write fan-out, but one post from an account with 20 million followers would create 20 million inserts at once. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: A post from an account with millions of followers
 
 > **Incident:** A very popular account posted during a busy hour. The system pushed the post into millions of feed lists in a burst, which queued behind ordinary writes and delayed everyone's feed by several minutes.

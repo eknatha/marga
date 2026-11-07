@@ -64,6 +64,21 @@ A long-running or idle-in-transaction session (or an old replication slot) holds
 > Vacuum can only remove rows that no one can still see.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Postgres vacuum, bloat and routine maintenance fits together
+node: n1 | Dead rows and MVCC | 0 | 0 | Postgres never edits a row in place. An update writes a new version and marks the old one as dead once no transaction can still see it. | Using VACUUM FULL on a busy production table. | process
+node: n2 | Autovacuum | 1 | 1 | The autovacuum daemon vacuums and analyzes tables automatically when changes pass a threshold: by default 20 percent of the table plus 50 rows. | Leaving autovacuum thresholds at the defaults for huge tables. | process
+node: n3 | What blocks vacuum | 2 | 0 | Vacuum cannot remove a dead row that an old transaction might still see. | Ignoring idle-in-transaction sessions. | process
+node: n4 | Routine care and fixes | 3 | 1 | Plain VACUUM does not shrink the file; it makes space reusable. | Not monitoring transaction ID age. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The table that kept growing
 
 > **Incident:** A queue-like table with constant updates grew from 5 GB to 60 GB in a month, and dashboards slowed down.

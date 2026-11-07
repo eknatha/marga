@@ -60,6 +60,21 @@ The requests are too large. Lower them to match observed usage with headroom, an
 > Requests, not usage, drive scheduling.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How FinOps: Kubernetes cost allocation and resource... fits together
+node: n1 | Requests drive node count | 0 | 0 | The scheduler places a pod on a node if the node has enough unrequested CPU and memory. | Large requests "just in case". | client
+node: n2 | Allocate cost to teams | 1 | 1 | Split node cost by what each workload reserves (requests), blended with usage where available. | Tight CPU limits that throttle a latency-sensitive service. | process
+node: n3 | Set requests and limits well | 2 | 0 | Memory: set the request close to the working set plus headroom, and a limit at or slightly above it, since memory cannot be shared by throttling and over-use means a... | No quotas, so one namespace takes the cluster. | client
+node: n4 | Nodes and packing | 3 | 1 | Mix node sizes to fit pod shapes, use autoscalers that choose instance types for pending pods (such as Karpenter), consolidate underused nodes, and run fault-tolerant... | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Forty nodes for the work of twelve
 
 > **Incident:** A cluster grew from 12 to 40 nodes over a quarter, while traffic grew by only 20 percent.

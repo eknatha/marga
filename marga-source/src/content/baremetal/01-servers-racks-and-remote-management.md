@@ -73,6 +73,21 @@ ipmitool -H 10.20.0.52 -U admin -P "$BMC_PASS" chassis power cycle
 @after Read the event log first so you know why it hung, then power cycle through the BMC. Raise a ticket for the cause, not just the reboot.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Servers, racks and remote management fits together
+node: n1 | What is in the box | 0 | 0 | A rack server is measured in rack units: 1U is 4.45 cm tall. | Filling a rack by space and ignoring power and cooling. | process
+node: n2 | Power and cooling set the limit | 1 | 1 | A rack is not full when it runs out of space. | Plugging both power supplies into the same feed. | process
+node: n3 | The BMC: a computer inside the | 2 | 0 | The BMC has its own network port, its own address and its own power, so it works when the main server is off or hung. | Leaving the BMC on the production network with the default password. | process
+node: n4 | Keep the BMC safe | 3 | 1 | The BMC can power-cycle a server and open a console, so treat its network as a management network: separate from production, not reachable from the internet, with its... | Having no way in but SSH, so a hung host needs a trip to the datacentre. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The rack that tripped at noon
 
 > **Incident:** Four servers in one rack went off within a minute at 12:04.

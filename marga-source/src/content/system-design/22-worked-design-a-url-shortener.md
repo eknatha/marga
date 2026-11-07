@@ -66,6 +66,25 @@ The single cache or store partition that holds that key becomes a hot spot. Serv
 
 Collisions that send users to the wrong target. A counter that two servers share without coordination. A hot key that overloads one node. A takedown that does not purge the CDN. A cache that was sized for the warm case.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Worked design: a URL shortener fits together
+node: n1 | Clarify | 0 | 0 | Create a short link for a long URL; redirect on request. | Creation can be slower and can fail briefly. | process
+node: n2 | Estimate | 1 | 1 | Assume 100 million new links a month and 100 reads per write. | Spending the interview on key encoding and none on availability. | process
+node: n3 | Sketch | 2 | 0 | Clients, a CDN or edge cache, redirect service (stateless), a cache, a key-value store partitioned by short key, and a separate create service with a key generator. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Deep-dive | 3 | 1 | Key generation. Options: hash the URL and truncate (collisions possible, same URL gives same key, needs collision handling); a counter encoded in base 62 (no collisions... | A single counter that is a single point of failure. | process
+node: n5 | Failure modes | 4 | 0 | . | No story for a viral key. | process
+node: n6 | Trade-offs | 5 | 1 | Random keys avoid guessing but lose sortability. | Trade-offs Random keys avoid guessing but lose sortability. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: Traffic fifty times the plan
 
 > **Incident:** A launch brought far more traffic than anyone had planned for, and the backend scaled only because it could add machines quickly.

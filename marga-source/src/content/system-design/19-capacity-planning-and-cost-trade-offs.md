@@ -52,6 +52,25 @@ They need to carry 120 percent of one zone's share each (3 zones at 80 percent i
 
 A forecast made from average, not peak. A capacity test on a single component while the database is the limit. Autoscaling max set below the real need. A cost cut that removed the margin. A quota hit during a launch.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Capacity planning and cost trade-offs fits together
+node: n1 | Measure, then plan | 0 | 0 | Capacity planning starts with measured throughput per unit at the SLO: load test one instance (or one cell) until latency or errors cross your target, and record the... | Planning from averages. | process
+node: n2 | Limits that are not CPU | 1 | 1 | Systems hit other ceilings first: thread counts, file descriptors, database connections, network packets per second, load balancer limits, API rate limits and cloud... | Running every zone near its limit. | process
+node: n3 | Headroom and autoscaling | 2 | 0 | Autoscaling reacts in minutes; a spike arrives in seconds. | Watching CPU only. | process
+node: n4 | Cost as a design input | 3 | 1 | Cost per request or per customer is a number to estimate in the design, as you estimate latency. | Cost cuts with no recorded reliability trade. | process
+node: n5 | Savings that spend reliability | 4 | 0 | Some savings quietly cut resilience: one zone instead of three, no spare capacity, shorter retention that removes your ability to investigate, dropping a standby... | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | Cost spikes are incidents too | 5 | 1 | A runaway job, a retry storm, a crypto-mining intrusion or an unbounded log can multiply the bill in hours. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: The limit nobody listed
 
 > **Incident:** A small capacity addition pushed every server over an operating system limit and the service failed for hours.

@@ -58,6 +58,25 @@ The first rule uses a population stability index with a six hour window. The sec
 
 Alerts fire constantly on harmless changes, so people mute them. Nobody watches quality because labels are late. A retrain is triggered automatically with bad data. Drift is measured on features nobody cares about.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Monitoring drift and retraining fits together
+node: n1 | Data drift and concept drift | 0 | 0 | Data drift means the inputs changed: more mobile users, a new product, a different season. | Check the Common mistakes list below this diagram for what usually goes wrong here. | store
+node: n2 | What to monitor | 1 | 1 | Watch input features (null rate, range, distribution against a training reference), predictions (average score, share in each class) and, when labels arrive, real... | Ignoring segments that matter to the business. | observe
+node: n3 | When labels are late | 2 | 0 | Labels often arrive days or weeks later: a loan defaults months after approval. | Retraining automatically with no gate. | process
+node: n4 | Thresholds and noise | 3 | 1 | Distribution tests will flag tiny, harmless shifts if you run them on large data. | Alerting on every tiny distribution change. | process
+node: n5 | Retraining | 4 | 0 | Retrain on a schedule, on a trigger such as drift or a quality drop, or both. | Never comparing the model with a simple baseline. | process
+node: n6 | A drift alert rule | 5 | 1 | The first rule uses a population stability index with a six hour window. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: The model that aged quietly
 
 > **Incident:** A demand forecasting model was accurate at launch. A change in customer behaviour over several months made its forecasts steadily worse. No quality metric was reviewed, and the team found out when stock shortages appeared.

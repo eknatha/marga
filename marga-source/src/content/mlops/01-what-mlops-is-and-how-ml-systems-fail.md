@@ -52,6 +52,25 @@ The service is healthy by every operational signal, yet a third of one feature i
 
 A feature pipeline changes upstream and fills a column with nulls. A model trained on last year stays in production for two years. Training used a clean sample while production sees messy data. Nobody owns the question "is the model still good?", so nobody asks it.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How What MLOps is and how ML systems fail fits together
+node: n1 | The model is the small box | 0 | 0 | Code for the model itself is usually a small part of the system. | Versioning the model file but not the data or features. | process
+node: n2 | Two things change, not one | 1 | 1 | In ordinary software the code changes and the behaviour follows. | Treating a deployed model as finished. | process
+node: n3 | Training-serving skew | 2 | 0 | Skew means the model sees different inputs in production than it saw in training. | Computing features twice, once for training and once for serving. | process
+node: n4 | Silent failure | 3 | 1 | A fraud model that starts approving more risky payments raises no error. | Monitoring only latency and errors. | process
+node: n5 | What MLOps adds | 4 | 0 | Add four things to your DevOps toolbox: data and model versioning, automated evaluation as a release gate, monitoring of inputs and outputs, and a retraining path that... | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | What a healthy service can hide | 5 | 1 | The service is healthy by every operational signal, yet a third of one feature is missing. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: A green dashboard and a falling conversion rate
 
 > **Incident:** A team shipped a ranking model and watched latency and errors. Both stayed healthy. Weeks later the business noticed a drop in conversions. An upstream change had renamed a field, so one important feature arrived empty and the model quietly ranked worse.

@@ -101,6 +101,23 @@ $ checkov -d . --quiet --compact
 $ aws securityhub get-findings --filters '{"SeverityLabel":[{"Value":"CRITICAL","Comparison":"EQUALS"}],"RecordState":[{"Value":"ACTIVE","Comparison":"EQUALS"}]}' --max-items 5
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Cloud security, governance and compliance... fits together
+node: n1 | Structure for isolation | 0 | 0 | Do not run everything in one account. Separate accounts (AWS) or subscriptions (Azure) give hard boundaries for blast radius, billing and access. | One account for everything. | process
+node: n2 | Preventive guardrails | 1 | 1 | A service control policy sets the maximum permissions available in an account, whatever IAM says. | Guardrails enforced without an audit period or helpful error messages. | queue
+node: n3 | Data protection | 2 | 0 | Encrypt data at rest with managed keys, and use customer-managed keys (KMS, Key Vault) where policy requires control and rotation. | Key administrators who can also read all the data. | store
+node: n4 | Detective controls | 3 | 1 | Prevention will not catch everything. Continuous assessment finds drift and misconfiguration: AWS Security Hub, Config and GuardDuty; Microsoft Defender for Cloud and... | Relying on documentation instead of automated controls. | process
+node: n5 | Compliance as code | 4 | 0 | Express controls as code that runs in the pipeline before deployment, for example scanning Terraform with a policy engine, and run the same checks against live accounts. | Findings dashboards that nobody owns. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the public bucket in the dev account
 
 > **Incident:** A researcher reports that a storage bucket named after your company lists customer invoices to anyone. A developer had created it in a sandbox account for a demo, copied real exports into it, and set a public-read policy to share a link.

@@ -45,6 +45,19 @@ mokutil --list-enrolled | head
 
 If a node will not boot, use the BMC console to see the error. Boot a rescue image, mount the root and ESP, then reinstall the bootloader and regenerate configuration. Keep a tested rescue image on your provisioning server so fixing a node is routine.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How UEFI, bootloaders and Secure Boot fits together
+node: n1 | The chain | 0 | 0 | Firmware reads boot entries from NVRAM and starts the first valid one. | Removing the old boot entry before testing the new one. | process
+node: n2 | Secure Boot | 1 | 1 | With Secure Boot, firmware only runs code signed by a key it trusts. | Disabling Secure Boot instead of signing correctly. | security
+node: n3 | Recovery | 2 | 0 | If a node will not boot, use the BMC console to see the error. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The kernel that would not start
 
 > **Incident:** A custom kernel was rejected after Secure Boot was enabled.

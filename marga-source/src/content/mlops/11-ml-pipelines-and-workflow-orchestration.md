@@ -59,6 +59,21 @@ Set retries with backoff for transient failures, but not for logic errors. Cache
 
 Run on a schedule, when new data arrives or when drift monitoring requests it. Require a successful evaluation gate before anything is registered, and send alerts on failed runs.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How ML pipelines and workflow orchestration fits together
+node: n1 | Steps | 0 | 0 | A typical pipeline: ingest data, validate it, build features, train, evaluate against a threshold, register the model and optionally deploy. | Passing large data through the orchestrator. | process
+node: n2 | Data between steps | 1 | 1 | Pass references, such as dataset versions and object storage paths, not large data through the orchestrator. | Steps that are not idempotent. | store
+node: n3 | Reliability | 2 | 0 | Set retries with backoff for transient failures, but not for logic errors. | Notebooks as the only process. | process
+node: n4 | Triggers | 3 | 1 | Run on a schedule, when new data arrives or when drift monitoring requests it. | No evaluation gate before registration. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The notebook that nobody could rerun
 
 > **Incident:** A model could not be retrained because the process lived in a notebook.

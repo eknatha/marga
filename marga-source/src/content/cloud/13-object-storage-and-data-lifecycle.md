@@ -60,6 +60,21 @@ Yes, remove the delete marker or restore the previous version. Old versions keep
 > Versioning protects data and creates cost you need to manage.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Object storage and data lifecycle fits together
+node: n1 | Objects, not files | 0 | 0 | Object storage keeps whole objects (data plus metadata) in a flat namespace, addressed by key such as reports/2026/01/sales.csv. | Treating object storage like a fast local disk. | process
+node: n2 | Classes and lifecycle rules | 1 | 1 | Providers offer classes that trade price for access speed: hot for frequent access, infrequent access for monthly reads, and archive for data you rarely need and can... | No lifecycle rule, so data grows forever. | process
+node: n3 | Versioning and deletion protection | 2 | 0 | With versioning, an overwrite or delete creates a new version, and the old one stays recoverable. | Versioning without expiring old versions. | process
+node: n4 | Keep it private | 3 | 1 | Most exposures come from a permissive bucket policy or ACL. | Public access allowed on a bucket by accident. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The bucket that kept growing
 
 > **Incident:** A finance review found that a logging bucket cost more each month and no one could say why.

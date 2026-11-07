@@ -95,6 +95,23 @@ Cache static assets for a long time with **versioned file names** (`app.3f9a1.js
 
 Use managed certificates (AWS Certificate Manager, Azure-managed certificates) that renew automatically. CloudFront requires the certificate in the `us-east-1` region. Set CAA records, enforce HTTPS with a redirect, enable HSTS once you are certain everything serves HTTPS, and keep the origin reachable only from the CDN using a shared secret header or private connectivity.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How DNS, CDN and global traffic on AWS and Azure fits together
+node: n1 | Managed DNS | 0 | 0 | Route 53 on AWS and Azure DNS (or Azure Traffic Manager for routing) host the authoritative records for your domain. | Using a CNAME at the zone apex. | edge
+node: n2 | Records worth knowing | 1 | 1 | TTL controls caching. Lower it to 60 seconds before a planned migration, so the change takes effect quickly, and raise it again afterwards. | Caching personalised pages at the CDN. | process
+node: n3 | Routing policies | 2 | 0 | Beyond a simple answer, DNS can steer traffic. | Failover that depends on a shallow health check. | security
+node: n4 | CDN: CloudFront and Azure Front Door | 3 | 1 | A content delivery network has many edge locations that cache responses near users and terminate TLS there. | Changing DNS with a long TTL and no plan to wait. | external
+node: n5 | Certificates and the edge | 4 | 0 | Use managed certificates (AWS Certificate Manager, Azure-managed certificates) that renew automatically. | Letting the origin accept traffic directly, bypassing the CDN and its protections. | security
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the migration that took a day to complete
 
 > **Incident:** A team cuts `shop.example.com` over to a new load balancer by editing the record. Some customers reach the new stack immediately, others still hit the old one eight hours later, and the old stack has already been shut down.

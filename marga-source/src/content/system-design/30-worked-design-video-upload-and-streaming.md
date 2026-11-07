@@ -69,6 +69,25 @@ The job states its retry limit, timeout and where it goes if it fails for good. 
 
 A big upload restarts from zero after a network drop. A corrupt file makes workers retry forever. The queue backs up after a burst of uploads. A viral video overloads the origin. A takedown does not reach the CDN.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Worked design: video upload and streaming fits together
+node: n1 | Clarify | 0 | 0 | Creators upload videos up to several gigabytes. | Serving video from the origin instead of a CDN. | process
+node: n2 | Estimate | 1 | 1 | Assume 500,000 uploads a day averaging 500 MB, which is 250 TB a day of originals. | No path to purge a removed video from the cache. | process
+node: n3 | Transcoding pipeline | 2 | 0 | A completed upload creates a job in a queue. | Unlimited retries for failing jobs. | queue
+node: n4 | Storage and delivery | 3 | 1 | Keep originals in cheap, durable storage and renditions in standard storage. | Check the Common mistakes list below this diagram for what usually goes wrong here. | store
+node: n5 | Trade-offs | 4 | 0 | More renditions give better playback and cost more storage and compute. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | A job record in the pipeline | 5 | 1 | The job states its retry limit, timeout and where it goes if it fails for good. | A job record in the pipeline The job states its retry limit, timeout and where it goes if it fails for good. | queue
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: A file that never finished converting
 
 > **Incident:** One uploaded file had a corrupt header. Workers picked it up, crashed, and the job returned to the queue, over and over. Each retry consumed a worker, and the backlog delayed other creators.

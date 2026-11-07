@@ -52,6 +52,25 @@ At most 5 workers. Other customers lose workers only if their subsets overlap, a
 
 Shuffle sharding fails when faults are in shared infrastructure (a bad deploy to all workers) or when clients do not retry across the subset. Staged rollouts fail when the bake time is too short to catch slow failures, or when health checks measure the wrong thing.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Blast radius and shuffle sharding fits together
+node: n1 | Blast radius as a number | 0 | 0 | For each kind of fault write the share affected: a crashed host, a bad deploy, a poisoned input, a lost zone, a bad config. | Per-tenant limits missing or applied without sanity checks. | process
+node: n2 | Sharding to shrink it | 1 | 1 | If customers are divided among N shards, one customer's fault reaches 1/N of customers. | Percentage rollouts with no bake time. | process
+node: n3 | Shuffle sharding | 2 | 0 | Instead of mapping a customer to one shard, assign each customer a small random subset of workers, for example 2 out of 8. | Assuming sharding isolates faults that live in shared code. | process
+node: n4 | Poison requests | 3 | 1 | A request that crashes the worker that handles it, and which clients then retry onto other workers, spreads like a fire. | Global data replication of configuration within seconds with no staging. | client
+node: n5 | Noisy tenants | 4 | 0 | One tenant using too much hurts others unless there are per-tenant limits, quotas and fair queueing. | Noisy tenants One tenant using too much hurts others unless there are per-tenant limits, quotas and fair queueing. | process
+node: n6 | Rollout as blast radius control | 5 | 1 | Stage by cell, region or percentage; watch a bake time with real health signals; stop automatically on regression. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: One request crashed the fleet
 
 > **Incident:** A change with blank fields reached binaries that had a new, unprotected feature. A null pointer caused a crash loop everywhere.

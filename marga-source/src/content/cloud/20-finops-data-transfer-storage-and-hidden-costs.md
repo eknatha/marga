@@ -63,6 +63,21 @@ Cross-zone data transfer is billed per GB. Run the cache in each zone and route 
 > Zone placement has a price tag.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How FinOps: data transfer, storage tiers and hidden... fits together
+node: n1 | Data transfer paths | 0 | 0 | Rules differ by provider and change over time, so check the current price pages, but the pattern is stable. | Ignoring cross-zone and NAT charges in the design. | store
+node: n2 | NAT gateways and managed services | 1 | 1 | A managed NAT gateway charges an hourly fee and a per-GB processing fee on all traffic through it. | Keeping all data in the hottest storage class. | edge
+node: n3 | Storage tiers and lifecycle | 2 | 0 | Object storage has classes from hot to archive, with lower price per GB but retrieval fees, minimum storage periods and slower access. | Logging everything at debug level with long retention. | store
+node: n4 | Logs, metrics and traces | 3 | 1 | Ingest volume is often the biggest part of observability cost. | Unbounded metric labels. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The NAT bill
 
 > **Incident:** A small company saw its networking line become larger than its compute after a nightly job was moved into private subnets.

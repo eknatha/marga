@@ -70,6 +70,25 @@ With three replicas and quorum reads and writes, a read always overlaps the late
 
 A quorum cannot be met during a partition. Hints are lost when a node is down longer than the window. Last write wins hides a lost update. A hot key overloads its replicas. Rebalancing after adding nodes saturates the network.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Worked design: a distributed key-value store fits together
+node: n1 | Clarify | 0 | 0 | Operations are get, put and delete by key, with values up to a few kilobytes. | Placing all replicas in one zone. | process
+node: n2 | Estimate | 1 | 1 | Assume 10 TB of data, 200,000 operations a second at peak and 80 percent reads. | Choosing quorum sizes without thinking about R + W > N. | process
+node: n3 | Replication and quorums | 2 | 0 | With N replicas, a write waits for W acknowledgements and a read asks R replicas. | Relying on wall clocks to decide the latest write. | process
+node: n4 | Failure handling | 3 | 1 | When a replica is down, a coordinator stores hints for it and replays them when it returns. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Trade-offs | 4 | 0 | Larger quorums give stronger reads and slower, less available operations. | State what you offer, such as read-your-writes within a session, and what you do not, such as global transactions. | process
+node: n6 | A table definition with quorum | 5 | 1 | With three replicas and quorum reads and writes, a read always overlaps the latest successful write. | Rebalancing at full speed in production. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: Adding nodes during a busy hour
 
 > **Incident:** A team added several nodes to the cluster at peak traffic. The data movement used so much network bandwidth that normal reads and writes slowed down, and some requests missed their quorum timeouts.

@@ -42,6 +42,19 @@ ipmitool sel list > /var/tmp/sel.txt
 dmidecode -t memory | grep -E "Locator|Serial|Size"
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Hardware failure diagnosis and RMA fits together
+node: n1 | Where the clues are | 0 | 0 | Memory: corrected ECC errors that keep rising on one DIMM, then uncorrected errors and machine check events. | Ignoring corrected errors. | process
+node: n2 | Diagnosis method | 1 | 1 | Drain the workload first. Read the SEL for the first error, not just the last, and note the slot or serial. | Replacing several parts at once. | process
+node: n3 | RMA | 2 | 0 | Vendors want the serial number, the diagnostic output, the SEL and the exact error. | Skipping burn-in after a repair. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The weekly crash
 
 > **Incident:** A server crashed once a week until one DIMM was replaced.

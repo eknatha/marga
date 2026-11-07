@@ -53,6 +53,25 @@ One command trains and records code, data, seed and metrics together. The new-cu
 
 Results live in a notebook that was changed after the run. The data path points at a file that was overwritten. A seed is unset, so nobody can repeat the number. Two people compare runs on different test sets and argue about it.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Experiment tracking and reproducibility fits together
+node: n1 | What to record | 0 | 0 | For every run, record the code version, the data version, the parameters, the environment (library versions, hardware), the random seed, the metrics, and the output... | Leaving seeds and library versions unrecorded. | process
+node: n2 | A tracking server | 1 | 1 | Tools such as MLflow, or any system that stores runs, give you a place to log parameters and metrics from code and then compare runs in a table or chart. | Keeping results in notebooks with no run record. | process
+node: n3 | Compare fairly | 2 | 0 | A new model beating an old one means little if they used different data splits or metrics. | Comparing runs on different test sets. | process
+node: n4 | Control randomness | 3 | 1 | Random seeds, data shuffling and some GPU operations make results vary between runs. | Choosing a model on a difference smaller than the noise. | process
+node: n5 | Reproduce on demand | 4 | 0 | Package training in a container with pinned dependencies, run it from a commit, and read data by version id. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | Logging a run | 5 | 1 | One command trains and records code, data, seed and metrics together. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: The best model nobody could rebuild
 
 > **Incident:** A team deployed the best model from weeks of experiments. When it needed retraining, the new run was much worse. The notebook had been edited, the training file replaced and the library upgraded, and nobody had recorded the original settings.

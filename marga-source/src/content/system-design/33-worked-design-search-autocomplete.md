@@ -64,6 +64,25 @@ A new index is checked for size, sample coverage and blocked terms before a smal
 
 A bad index build ships to every node. A traffic spike at a big event overloads serving. An offensive suggestion appears. Debouncing is missing, so every keystroke is a request. The index is hours old and nobody notices.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Worked design: search autocomplete fits together
+node: n1 | Clarify | 0 | 0 | The user types into a search box and sees up to ten suggestions after each keystroke. | Requests on every keystroke with no debouncing. | process
+node: n2 | Estimate | 1 | 1 | Assume 200 million searches a day with six keystrokes on average that trigger suggestions, so 1.2 billion requests a day, about 14,000 a second and 40,000 at peak. | Shipping a new index to every node at once. | process
+node: n3 | Caching and the client | 2 | 0 | Most keystroke sequences repeat, so cache by prefix at the edge for a short time. | No blocklist at serving time. | client
+node: n4 | Ranking and freshness | 3 | 1 | Rank suggestions by recent popularity, with a decay so old trends fade, and personalise lightly if the user allows it. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Trade-offs | 4 | 0 | Precomputing the top ten per prefix costs memory and rebuild time, and buys speed. | Personalisation helps relevance but breaks sharing of cache entries between users. | process
+node: n6 | Checking an index before rollout | 5 | 1 | A new index is checked for size, sample coverage and blocked terms before a small staged rollout. | If the check fails, the last good index stays in place. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: A suggestion nobody should have seen
 
 > **Incident:** A new index included a phrase that appeared in a burst of spam queries. It showed up as a suggestion for a common word, and users saw it for several hours before the next build.

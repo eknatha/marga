@@ -86,6 +86,23 @@ Configure a **dead-letter queue** so messages that fail repeatedly are kept for 
 
 Cost scales with usage, which is wonderful at low volume and can become the expensive choice at constant high volume, where a container or VM may be cheaper. Watch for a recursive trigger (a function that writes to the bucket that triggers it), unbounded retries, and over-provisioned memory.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Serverless: Lambda, Azure Functions and... fits together
+node: n1 | The model | 0 | 0 | You upload a small unit of code with a handler. | Creating clients inside the handler on every call. | process
+node: n2 | Triggers | 1 | 1 | HTTP: a request through a gateway invokes the function synchronously. | No concurrency limits, letting one function starve others. | process
+node: n3 | Cold starts, concurrency and limits | 2 | 0 | A cold start happens when the platform must create a new execution environment: download code, start the runtime, run initialisation. | Triggering a function from its own output. | process
+node: n4 | Failure handling | 3 | 1 | Queue and event triggers retry on error, so your code runs at least once. | Assuming exactly-once delivery. | process
+node: n5 | Serverless cost thinking | 4 | 0 | Cost scales with usage, which is wonderful at low volume and can become the expensive choice at constant high volume, where a container or VM may be cheaper. | Choosing serverless for steady heavy load without comparing cost. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the function that triggered itself
 
 > **Incident:** A function resizes images uploaded to a bucket and writes the result back to the same bucket. Within minutes the invocation count explodes to millions, the bill alarm fires, and the account's concurrency limit throttles every other function, including checkout.

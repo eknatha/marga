@@ -49,6 +49,19 @@ Not by itself. Cost per order fell, so the platform became more efficient. Compa
 > Unit cost shows efficiency.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How FinOps: reading a cloud bill and tagging for... fits together
+node: n1 | How the bill is built | 0 | 0 | Every resource creates usage (instance hours, GB stored, requests, GB transferred), and each usage type has a price. | Looking only at the monthly total. | process
+node: n2 | Accounts and tags give ownership | 1 | 1 | Two tools assign cost to an owner. Accounts, subscriptions or projects are hard boundaries: one per environment or per team makes cost, permissions and limits clear. | Optional tags that nobody follows. | process
+node: n3 | Total cost and unit cost | 2 | 0 | A bill that grows 30 percent is bad news only if the business grew less. | Not tracking unit cost. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The mystery line
 
 > **Incident:** The finance team noticed a 38 percent rise in the monthly bill and nobody in engineering could say why.

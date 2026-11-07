@@ -66,6 +66,25 @@ Testing the add-ons against the new version in a copy of production and a canary
 
 One shared cluster for everything. Add-ons without redundancy or limits. Upgrades done everywhere in a weekend. Admission policies that block recovery actions. Tenants with no quotas.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Worked design: a multi-tenant Kubernetes platform fits together
+node: n1 | Clarify | 0 | 0 | 150 teams, 3,000 services, mixed criticality (customer-facing and batch). | One giant shared cluster. | process
+node: n2 | Estimate | 1 | 1 | 3,000 services at an average of 6 pods is 18,000 pods. | No tenant quotas or object limits. | process
+node: n3 | Sketch | 2 | 0 | Several clusters per region, each with the same platform layer (ingress, DNS, policy engine, observability agents, declarative delivery of platform config). | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Deep-dive | 3 | 1 | Tenancy model. Namespace-per-team in shared clusters is cheap and has weaker isolation; cluster-per-team gives strong isolation at high cost and operational load; a... | Upgrading every cluster at once. | process
+node: n5 | Failure modes | 4 | 0 | . | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | Trade-offs | 5 | 1 | More clusters mean smaller blast radius and more operational work (more upgrades, more config). | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: An upgrade that broke networking
 
 > **Incident:** A control plane upgrade changed a label that the network layer depended on, and cluster networking failed.

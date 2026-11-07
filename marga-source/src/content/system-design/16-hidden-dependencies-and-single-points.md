@@ -57,6 +57,25 @@ Customers cannot reach the status page either, so you cannot communicate. Host i
 
 A map that is a one-off drawing and is stale in a month. A dependency noted but never tested. A break-glass account nobody has tried this year.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Hidden dependencies and single points of failure fits together
+node: n1 | Four dependency graphs | 0 | 0 | Serving: what a user request touches: DNS, CDN, gateway, services, databases, identity, payments. | Status page and runbooks on the failing system. | process
+node: n2 | How to find hidden ones | 1 | 1 | Trace one request with distributed tracing and list every hostname called. | Vendors with no fallback plan. | process
+node: n3 | Cycles | 2 | 0 | A cycle is when A needs B to start and B needs A. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Single points of failure | 3 | 1 | One of anything: one DNS provider, one certificate expiry date, one engineer with the key, one account, one region, one person who knows the process. | Untracked certificate expiry. | process
+node: n5 | Third parties | 4 | 0 | You inherit the failures of vendors. Cloudflare Workers KV on 12 June 2025 failed when a third-party storage provider had its own outage, and many Cloudflare products... | For each vendor ask: what is the contract SLA, what is our fallback, and can we operate without it for an hour, a day? | process
+node: n6 | Keep recovery independent | 5 | 1 | Host the status page, the runbooks and the on-call tools outside the platform they describe. | Keep break-glass access that works when SSO is down. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: Monitoring that went down with the cluster
 
 > **Incident:** The monitoring system ran on the platform it watched. When the platform degraded, engineers lost their view of it.

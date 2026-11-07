@@ -65,6 +65,25 @@ A size and shape check before publishing, staged rollout with a bake time, consu
 
 Validation exists but tests a different parser. Staging exists but the pipeline has a "fast path" used in emergencies. Rollback needs the control plane that is down. The change tool and the monitoring share the same dependency.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Configuration and control plane change safety fits together
+node: n1 | Config is code | 0 | 0 | A configuration value can crash a binary, redirect traffic or disable security as surely as a code change. | Pushing config to all regions at once. | process
+node: n2 | Validate before you push | 1 | 1 | Schema and bounds: types, ranges, size limits. | A fast path that skips staging. | process
+node: n3 | Stage the rollout | 2 | 0 | Apply to a small cell or percentage, wait a bake time, check real health signals (error rate, latency, crash count), then proceed. | Consumers that crash on bad input. | process
+node: n4 | Control plane versus data plane | 3 | 1 | The data plane handles user traffic; the control plane changes configuration and scale. | On 2 November 2023 Cloudflare's control plane and analytics primary site lost power; customers could not change settings, and logs were... | store
+node: n5 | Real cases | 4 | 0 | Cloudflare, 18 November 2025: a database permissions change made a query return duplicate rows; the bot-management feature file doubled in size, passed a hard limit in... | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | Safe-change checklist | 5 | 1 | Can this change be previewed against production traffic or data? | Rollback depending on the failed system. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: A file that doubled
 
 > **Incident:** A generated configuration file doubled in size, exceeded a fixed limit in the proxy and the proxy crashed wherever it loaded it.

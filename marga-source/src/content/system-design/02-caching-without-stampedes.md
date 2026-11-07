@@ -55,6 +55,25 @@ All keys expire together, a burst of misses reaches the database at the same mom
 
 Silently. Stale data appears wrong only to the user who saw it. A stampede shows as a database spike right after a cache event. Alert on hit rate, miss rate and database load together; a hit rate that drops while database load rises is the signal.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Caching without stampedes fits together
+node: n1 | Patterns | 0 | 0 | Cache-aside: the app reads the cache; on a miss it reads the database and fills the cache. | A database sized only for the warm-cache case. | process
+node: n2 | TTL and invalidation | 1 | 1 | A TTL bounds how stale data can be. It is also a promise: "a user may see data up to this old". | No jitter on TTLs. | process
+node: n3 | The stampede | 2 | 0 | A popular key expires. Within milliseconds, thousands of requests miss together and all query the database for the same row. | - Jittered TTLs: add random spread so keys do not expire together. | process
+node: n4 | The cold start | 3 | 1 | After a deploy, a cache restart or a failover, the cache is empty. | No cache hit-rate alert. | process
+node: n5 | Hot keys and negative caching | 4 | 0 | One key getting a large share of traffic overloads the single cache node that holds it. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | When not to cache | 5 | 1 | Skip a cache when data must be exactly current (account balances shown for payment), when the hit rate would be low, or when the store is fast enough. | Using write-back for data you cannot lose. | store
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: Recovery that needed a warm cache
 
 > **Incident:** After a restart the cache was empty and the database fell over under the full read load.

@@ -45,6 +45,19 @@ Not immediately. Create a snapshot, notify likely owners, wait a grace period an
 > Reversible steps first.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How FinOps: rightsizing and removing waste fits together
+node: n1 | Rightsize from data | 0 | 0 | Look at utilization over a representative period (at least two weeks, and include month-end if the workload has one). | Sizing from average CPU instead of high percentiles. | store
+node: n2 | The waste checklist | 1 | 1 | Unattached volumes and old snapshots: left after instances were deleted. | Deleting "unused" resources without owners or a grace period. | observe
+node: n3 | Schedule what does not need to run | 2 | 0 | Development, test and demo environments often need to run only during working hours, which is about a quarter of the week. | Optimizing small items while ignoring a large database or data transfer. | queue
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The cleanup that deleted a restore
 
 > **Incident:** A cost cleanup removed "unused" snapshots older than 90 days, and a month later a team needed one of them to recover a customer database.

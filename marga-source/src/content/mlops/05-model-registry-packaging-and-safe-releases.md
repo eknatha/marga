@@ -52,6 +52,25 @@ The registry holds the version, the image digest and the previous version. A can
 
 The model file is copied by hand to a server. A release has no previous version to return to. The canary watches only latency, not quality. Everyone assumes someone else approved the model.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Model registry, packaging and safe releases fits together
+node: n1 | What a registry holds | 0 | 0 | A registry stores each model version with its run id, code and data versions, metrics, owner, and a stage such as staging, production or archived. | No named owner or approval for a model. | external
+node: n2 | Package it like a service | 1 | 1 | Wrap the model in a container with pinned libraries, a clear input schema and a health endpoint. | Copying model files by hand. | process
+node: n3 | Shadow release | 2 | 0 | In shadow mode the new model receives a copy of real traffic, but its answers are only logged, not used. | Canarying with only latency checks. | process
+node: n4 | Canary and A/B | 3 | 1 | A canary sends a small share of traffic, say 1 to 5 percent, to the new model and watches errors, latency and quality metrics before widening. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Rollback | 4 | 0 | Keep the previous model loaded or one command away. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | Moving a model through stages | 5 | 1 | The registry holds the version, the image digest and the previous version. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: A rollback that took a day
 
 > **Incident:** A new model started giving poor results in production. The team wanted to go back, but the old model had been deleted from the server and its training environment no longer existed. Rebuilding it took most of a day.

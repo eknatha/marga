@@ -57,6 +57,19 @@ About the always-on floor, up to roughly 40 instances (perhaps start lower), wit
 > Commit to the floor.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How FinOps: commitments, savings plans and spot... fits together
+node: n1 | Pricing models | 0 | 0 | On-demand: pay as you go, no commitment, highest unit price. | Buying everything at once with the same expiry date. | process
+node: n2 | Commit to the baseline, not the peak | 1 | 1 | Plot hourly usage over several months. The always-on floor is what you can commit to. | Not watching coverage and utilization after the purchase. | process
+node: n3 | Spot for fault-tolerant work | 2 | 0 | Good fits: batch jobs, CI runners, stateless web workers behind a load balancer, data processing with checkpoints, and Kubernetes node pools for scalable workloads. | Running stateful systems on spot. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: Paying for servers that were gone
 
 > **Incident:** A company bought a three-year commitment for a specific instance family, then migrated to containers on a different family six months later.

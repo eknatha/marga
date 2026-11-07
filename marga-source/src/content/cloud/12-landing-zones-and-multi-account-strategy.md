@@ -79,6 +79,23 @@ Organisation-level policies apply above the account's own permissions, so they l
 > Guardrails are boundaries, not trust in individuals.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Landing zones and multi-account strategy fits together
+node: n1 | Why many accounts | 0 | 0 | An account is a boundary for permissions, limits, billing and blast radius. | One account for all environments. | process
+node: n2 | A typical structure | 1 | 1 | Keep workloads out of the management account. | Running workloads in the management account. | process
+node: n3 | Guardrails | 2 | 0 | Policies attached to organisational units limit what even administrators in an account can do. | Guardrails changed without testing. | process
+node: n4 | Shared capabilities | 3 | 1 | Logging: audit logs from every account flow to a central, locked log archive account that workload admins cannot change. | Overlapping network ranges across accounts. | process
+node: n5 | Account vending | 4 | 0 | New accounts should come from a pipeline: a request creates the account in the right OU, applies baseline guardrails, enables logging, sets budgets and alerts, creates... | Teams get a safe account in minutes without a ticket queue. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: one account, one stolen key
 
 > **Incident:** A developer's access key leaks and an attacker starts instances for mining in the single account used for everything, including production databases.

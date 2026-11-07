@@ -51,6 +51,21 @@ Update one **canary** node per model, run burn-in and workload tests, then expan
 
 Run a scheduled job that compares live values with the baseline and opens a ticket on mismatch. After repairs or part swaps, re-apply the baseline before the node rejoins the pool.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Firmware and BIOS management at scale fits together
+node: n1 | What to manage | 0 | 0 | BIOS or UEFI settings: power profile, hyperthreading, virtualization, boot mode. | Skipping BIOS settings in the baseline. | process
+node: n2 | Baseline and inventory | 1 | 1 | Read current values through Redfish, for example the Bios and UpdateService resources, or the vendor tool, and compare to the baseline. | Failing to re-apply the baseline after repairs. | process
+node: n3 | Rolling out | 2 | 0 | Update one canary node per model, run burn-in and workload tests, then expand in small waves while watching error rates. | Updating all nodes of a redundant pair together. | process
+node: n4 | Drift | 3 | 1 | Run a scheduled job that compares live values with the baseline and opens a ticket on mismatch. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The slow rack
 
 > **Incident:** A group of nodes ran 30 percent slower after maintenance.

@@ -59,6 +59,21 @@ An anomaly alert on day-over-day change per service or tag, routed to the owning
 > Budgets catch totals, anomalies catch shifts.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How FinOps: budgets, anomaly alerts and a cost... fits together
+node: n1 | Budgets and anomalies | 0 | 0 | A budget is a planned amount per account, team or tag. | One budget alert at 100 percent. | process
+node: n2 | A review rhythm | 1 | 1 | Weekly, 15 minutes per team: top five changes in cost, untagged spend, new anomalies, the next action and its owner. | Alerts sent only to finance. | process
+node: n3 | Cost in design and delivery | 2 | 0 | Add a cost section to design documents: expected traffic, major cost drivers, a rough monthly estimate and what could surprise us. | Treating cost as a once-a-year clean-up. | process
+node: n4 | Who does what | 3 | 1 | Engineering owns the usage and the design. | Reviews that produce no owned actions. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The weekend loop
 
 > **Incident:** A misconfigured retry loop in a data job wrote the same objects millions of times over a long weekend, and the bill arrived three weeks later.

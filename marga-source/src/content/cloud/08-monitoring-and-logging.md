@@ -103,6 +103,23 @@ Log ingestion and retention are among the fastest-growing cloud bills.
 - Archive old logs to cheap object storage, and query them with Athena or Azure Data Explorer when needed
 - Alert on ingestion volume spikes, since a logging loop can cost thousands of dollars in a weekend
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Cloud monitoring and logging: CloudWatch and... fits together
+node: n1 | Which service does what | 0 | 0 | Metrics are numbers over time with short retention at full resolution. | Logs with unlimited retention and no budget alerts. | process
+node: n2 | Metrics and alarms | 1 | 1 | A good alarm reflects user impact or imminent failure, has a clear owner, and links to a runbook. | Alarms only on CPU and disk, none on errors and latency. | observe
+node: n3 | Querying logs | 2 | 0 | Install an agent or enable the platform integration to ship logs, use structured JSON where possible, and learn the query language. | Unstructured logs that cannot be queried. | observe
+node: n4 | Audit trails | 3 | 1 | CloudTrail and the Azure Activity Log answer security and troubleshooting questions: who deleted this, when did the security group change, which role was assumed. | Audit trail in the same account that attackers can modify. | observe
+node: n5 | Retention and cost | 4 | 0 | Log ingestion and retention are among the fastest-growing cloud bills. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the outage nobody was paged for
 
 > **Incident:** Customers cannot check out for 40 minutes before a support ticket reveals it. All dashboards were green. The alarm on instance CPU never fired, and the only alert on the load balancer watched for zero healthy hosts.

@@ -46,6 +46,23 @@ No. It has 2 of 5, which is not a majority. It stops accepting writes until a ma
 
 Two leaders after a pause. A quorum lost because all members shared one zone. Slow disks causing constant re-elections. A cluster whose members were replaced faster than they could catch up.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Quorums, leaders and split brain fits together
+node: n1 | Quorum | 0 | 0 | A quorum is a majority: more than half. If writes need acknowledgement from a majority, any two majorities share at least one node, so a later read of a majority sees... | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n2 | Leader election | 1 | 1 | Consensus systems such as etcd, ZooKeeper and Consul (using Raft or similar protocols) elect one leader. | Even-sized or single-zone consensus clusters. | process
+node: n3 | Split brain | 2 | 0 | Split brain is two nodes both acting as leader. | Trusting a lock lease without a fencing token. | process
+node: n4 | Fencing | 3 | 1 | The remedy is fencing: the resource itself refuses stale leaders. | Putting heavy application traffic on the consensus store. | process
+node: n5 | Operating consensus stores | 4 | 0 | Treat etcd, ZooKeeper or Consul as critical infrastructure: run 3 or 5 members across failure domains, keep disks fast (they sync to disk on every commit), monitor... | Check the Common mistakes list below this diagram for what usually goes wrong here. | store
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: The leader that did not know
 
 > **Incident:** A paused primary resumed after failover and kept writing, while the new primary also accepted writes.

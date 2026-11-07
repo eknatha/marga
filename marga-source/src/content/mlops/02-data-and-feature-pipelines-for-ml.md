@@ -55,6 +55,25 @@ Each line is a test on data, evaluated before training starts. A failing check s
 
 A schema changes upstream and the pipeline keeps running. A join silently drops half the rows. A feature uses information from after the event. The training set is edited by hand and nobody recorded how. A fix is applied to serving but not to training.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Data and feature pipelines for ML fits together
+node: n1 | Treat data like code and like an API | 0 | 0 | Data has a shape: columns, types, ranges and meanings. | Training on data that was never validated. | store
+node: n2 | Useful checks | 1 | 1 | Start with a short list: row count within an expected band, no unexpected nulls, values within range, categories from a known set, no duplicate keys, freshness (the... | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+node: n3 | Version the data | 2 | 0 | If you cannot say which data trained a model, you cannot reproduce it or explain a bad result. | Overwriting a dataset in place. | store
+node: n4 | Point-in-time correctness | 3 | 1 | When you build training rows, each feature must use only information that existed at the time of the label. | Using future information in a training feature. | process
+node: n5 | One definition of a feature | 4 | 0 | Write each feature once and use the same code for the training set and for serving. | Writing features twice, once for training and once for serving. | process
+node: n6 | A data check you can run in a | 5 | 1 | Each line is a test on data, evaluated before training starts. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: The feature that knew the future
 
 > **Incident:** A team built a model to predict customer cancellations and reported excellent test results. In production it performed far worse. One feature, "support tickets this month", included tickets raised after the customer had already decided to leave, which the model could not know at prediction time.

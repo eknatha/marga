@@ -74,6 +74,25 @@ About 6 percent of requests failed for 12 minutes, which is 12 minutes times 0.0
 
 The design passes review and decays: the router grows features, someone adds a global cache, a fast path appears. Re-run the dependency map and a failover drill every quarter, and track budget burn.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Worked design: a global API with a 99.99 percent... fits together
+node: n1 | Clarify | 0 | 0 | A public REST API for payments-style requests, global customers, 99.99 percent monthly availability measured at the edge as the share of valid requests answered... | Failover plans never drilled. | process
+node: n2 | Estimate | 1 | 1 | Assume 20,000 requests per second at peak, 70 percent reads, 3x peak to average. | Two zones and a load balancer, called four nines. | process
+node: n3 | Sketch | 2 | 0 | Two or three regions, each with several cells; each customer has a home cell in a home region. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Failure modes and the budget | 3 | 1 | Weighted by frequency, the sum must stay under 4.3 minutes. | No staged rollout. | process
+node: n5 | Trade-offs | 4 | 0 | Cells cost more (duplicate infrastructure, harder cross-customer queries). | No written trade-offs. | process
+node: n6 | Review against real outages | 5 | 1 | Cloudflare bot-management file (2025) and Azure Front Door (2025): one change to everything. | Your staged rollout and fail-static loaders answer these. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: A canary that was too big
 
 > **Incident:** The first stage of a rollout was 25 percent of all traffic. A fault there used most of the quarterly error budget in one afternoon.

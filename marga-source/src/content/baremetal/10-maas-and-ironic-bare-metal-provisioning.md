@@ -40,6 +40,19 @@ openstack server create --flavor baremetal-large --image jammy --network prod bm
 
 Choose **MAAS** when you want a focused tool for datacenter provisioning with a simple web UI and API. Choose **Ironic** when you already run OpenStack and want bare metal and virtual machines under one control plane. Both rely on a reliable network boot setup and correct BMC credentials.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How MAAS and Ironic: provisioning bare metal as a... fits together
+node: n1 | Lifecycle | 0 | 0 | Enroll: the machine PXE boots or is added with its BMC details. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n2 | Ironic | 1 | 1 | Ironic is the OpenStack bare metal service. | Skipping cleaning between users. | process
+node: n3 | Choosing | 2 | 0 | Choose MAAS when you want a focused tool for datacenter provisioning with a simple web UI and API. | Weak BMC credentials in the controller. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The server that kept the last tenant's data
 
 > **Incident:** A released machine was reallocated without cleaning.

@@ -58,6 +58,25 @@ Nothing: no logs means no errors counted, so the alert stays green during a tota
 
 Dashboards with fifty graphs and no SLO. Alerts on causes that do not matter. Traces without ids in the logs. Telemetry on the failing platform. A label that explodes cardinality and takes the metrics store down during the incident.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Observability by design fits together
+node: n1 | Start with the SLI | 0 | 0 | For each user journey, pick a small number of service level indicators measured as close to the user as practical: the share of requests that succeed and are fast... | Measuring only from inside the service. | process
+node: n2 | The signals | 1 | 1 | Golden signals: latency, traffic, errors, saturation. | Alerting on causes instead of symptoms. | process
+node: n3 | Metrics, logs and traces together | 2 | 0 | Metrics are cheap and aggregate: use them to detect and to size the problem. | High-cardinality metric labels. | observe
+node: n4 | Monitoring that survives | 3 | 1 | Do not run your only monitoring on the platform it watches. | Monitoring that depends on the monitored platform. | observe
+node: n5 | Alert quality | 4 | 0 | Every page should be urgent, actionable and linked to a runbook. | An alert that has never fired is untested. | observe
+node: n6 | Cost of telemetry | 5 | 1 | Telemetry can cost as much as the service. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: Blind during the outage
 
 > **Incident:** Engineers could not see the state of the platform because the monitoring system ran on it.

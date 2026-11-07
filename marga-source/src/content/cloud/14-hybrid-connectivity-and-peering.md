@@ -53,6 +53,21 @@ No. Peering is not transitive. Use a transit hub, or peer A with C directly.
 > Each peering is a separate relationship between two networks.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Connecting networks: peering, VPN and private... fits together
+node: n1 | Plan addresses first | 0 | 0 | Networks can only be connected if their ranges do not overlap. | Connecting with VPN and forgetting that DNS must resolve names on both sides. | process
+node: n2 | Ways to connect | 1 | 1 | Use a VPN as the backup for a dedicated line, so a cut fibre does not cut you off. | Assuming peering is transitive. | process
+node: n3 | Private endpoints | 2 | 0 | Cloud services such as storage or databases are usually reached over public addresses. | Letting every team choose its own address range. | process
+node: n4 | Routes and rules on both sides | 3 | 1 | A connection needs three things on each side: a route to the other range, a security rule that allows the traffic, and working DNS. | Adding a route on one side only. | edge
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The overlapping ranges
 
 > **Incident:** A migration project needed to connect a new analytics network to the production network, and the connection request was refused.

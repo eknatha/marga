@@ -46,6 +46,21 @@ Record daily peaks and growth for storage, connections and I/O. Forecast with tr
 
 For on-call, build one page: traffic, latency, errors, connections, locks, replication, disk and the top queries by total time. Keep the layout the same for every database.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Database observability and capacity planning fits together
+node: n1 | What to collect | 0 | 0 | Latency and throughput: queries per second and slow query rate. | Ignoring connection and lock metrics. | process
+node: n2 | Alert design | 1 | 1 | Alert on symptoms that matter to users, such as error rate or latency, and use cause metrics, such as lock waits or connection counts, for diagnosis and for early... | Alerting only when something is already down. | observe
+node: n3 | Capacity | 2 | 0 | Record daily peaks and growth for storage, connections and I/O. | Capacity forecasts that ignore lead time. | process
+node: n4 | Dashboard | 3 | 1 | For on-call, build one page: traffic, latency, errors, connections, locks, replication, disk and the top queries by total time. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Out of connections on the busiest day
 
 > **Incident:** Connections reached the limit during peak traffic.

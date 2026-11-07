@@ -53,6 +53,21 @@ mlflow runs describe --run-id "$RUN_ID"
 
 Monitor **freshness** of online features. Stale features silently degrade predictions.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Feature stores and data versioning fits together
+node: n1 | Skew | 0 | 0 | Training reads history from a warehouse with batch code. | Separate code for training and serving features. | process
+node: n2 | One definition | 1 | 1 | The offline store holds history for training, and the online store serves the latest values with low latency. | Using future data in training rows. | process
+node: n3 | Point in time | 2 | 0 | When building training rows, use only data that was available at the time of each label. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Version everything | 3 | 1 | Record the dataset version, feature definitions, code commit and parameters with every trained model. | Ignoring stale online features. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Perfect offline, poor online
 
 > **Incident:** A model's accuracy dropped after launch because of a feature mismatch.

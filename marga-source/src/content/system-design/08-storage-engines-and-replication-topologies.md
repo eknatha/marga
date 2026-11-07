@@ -54,6 +54,25 @@ Compaction has fallen behind, so reads check many files and compaction competes 
 
 Vacuum or compaction lag. WAL or log segments filling a disk. A follower that falls so far behind it cannot catch up. Multi-leader conflicts resolved silently by last write wins. Metadata that grows until start-up takes an hour.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Storage engines and replication topologies fits together
+node: n1 | Two storage engine families | 0 | 0 | B-tree engines (many relational databases) keep sorted pages on disk and update them in place. | Treating background cleanup as optional. | store
+node: n2 | Background work is part of the | 1 | 1 | Both families clean up behind the scenes: vacuum and autovacuum, compaction, checkpointing, log truncation, metadata cleanup. | One synchronous replica that blocks all writes when it dies. | process
+node: n3 | Replication topologies | 2 | 0 | Leader and followers: one node takes writes and ships a log to followers. | Multi-leader replication with no conflict plan. | observe
+node: n4 | Synchronous and asynchronous | 3 | 1 | Synchronous replication waits for a follower before acknowledging: no loss on failover, but latency, and a dead follower can block writes. | Asynchronous acknowledges at once: fast, but the last writes can be lost. | process
+node: n5 | Metadata and hidden growth | 4 | 0 | Systems also keep metadata: segment lists, tiered storage indexes, file catalogues. | No alert on replica lag or metadata growth. | store
+node: n6 | Choosing | 5 | 1 | Ask about the access pattern (point lookups, scans, writes per second), the consistency each feature needs, the growth, and the operations your team can actually run. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: A database that refused writes to protect itself
 
 > **Incident:** A database stopped accepting writes because it was nearing a hard internal limit after cleanup had not kept up.

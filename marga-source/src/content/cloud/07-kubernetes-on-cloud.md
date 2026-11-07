@@ -102,6 +102,23 @@ $ az aks upgrade --resource-group rg-shop --name shop-prod --kubernetes-version 
 
 Upgrade one minor version at a time, staging first. Check deprecated API usage before upgrading.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Managed Kubernetes: EKS and AKS fits together
+node: n1 | Shared responsibility | 0 | 0 | Managed does not mean hands-off. Versions go out of support, and an unsupported control plane is eventually upgraded for you, on the provider's schedule. | Ignoring Kubernetes version support deadlines. | process
+node: n2 | Creating and connecting | 1 | 1 | For production, define clusters in Terraform rather than one-off commands, so they are reviewed, repeatable and reproducible. | Putting broad permissions on the node role. | process
+node: n3 | Workload identity | 2 | 0 | A Pod that needs S3, a queue or a key vault should not carry access keys. | Treating the cluster as a pet created by hand instead of code. | security
+node: n4 | Exposure and networking | 3 | 1 | A Service of type LoadBalancer makes the cloud create a load balancer. | Choosing a small subnet and running out of Pod addresses. | edge
+node: n5 | Nodes and upgrades | 4 | 0 | Use managed node groups (EKS) or node pools (AKS) with several instance types and zones. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the Pod that could read every bucket
 
 > **Incident:** A security review finds that a small internal tool, running on the cluster, can list and read every S3 bucket in the account. It uses no access keys. A penetration tester shows that anyone who gets a shell in any Pod can read customer exports.

@@ -73,6 +73,21 @@ BONDING_OPTS='mode=802.3ad miimon=100 lacp_rate=fast xmit_hash_policy=layer3+4'
 @after With LACP both ends agree. Each flow stays on one link, and many flows spread across both.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Datacenter networking: leaf-spine and bonding fits together
+node: n1 | Top-of-rack and leaf-spine | 0 | 0 | Each rack has a top-of-rack (ToR) switch, which connects the servers in that rack. | Putting management and production traffic on one network. | process
+node: n2 | Bonding and LACP | 1 | 1 | A server with two NIC ports can join them into one logical link, called a bond (Linux) or a team. | Hiding link flaps because the bond keeps traffic flowing. | process
+node: n3 | VLANs and the management network | 2 | 0 | A VLAN splits one physical network into separate logical ones. | Keep management traffic apart from production traffic so a problem or an attacker on one cannot reach the other. | edge
+node: n4 | Cabling | 3 | 1 | Many faults are physical: a bent fibre, a dirty connector, a wrong optic, a cable plugged into the wrong port. | Configuring LACP on only one side. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: A server that dropped off every ten minutes
 
 > **Incident:** A server lost network for a few seconds, over and over.

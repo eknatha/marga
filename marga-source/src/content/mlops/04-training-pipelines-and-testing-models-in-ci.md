@@ -63,6 +63,25 @@ Each job depends on the one before it. The gate allows a tiny drop in the overal
 
 A pipeline trains on unvalidated data. A gate that only looks at the average lets a model that fails one customer group through. Training and serving use different library versions. A failed job is retried forever and fills the GPU queue.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Training pipelines and testing models in CI fits together
+node: n1 | The stages | 0 | 0 | A typical pipeline has these stages: ingest data, validate it, build features, train, evaluate, register the model and notify. | Retrying failed GPU jobs without limits. | process
+node: n2 | Three kinds of tests | 1 | 1 | Test the code with ordinary unit tests, for example that feature functions give expected results on small inputs. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+node: n3 | The evaluation gate | 2 | 0 | Before a model is registered, compare it with the current production model on the same held-out data. | Evaluating only on the average metric. | process
+node: n4 | Behavioural checks | 3 | 1 | Add simple behaviour tests: a tiny change that should not matter does not flip the answer, an obviously bad input is handled, and known hard cases still work. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+node: n5 | Containers and resources | 4 | 0 | Run each stage in a container with pinned dependencies and explicit CPU, memory and GPU requests. | Training and serving in different environments. | process
+node: n6 | A pipeline with an evaluation gate | 5 | 1 | Each job depends on the one before it. The gate allows a tiny drop in the overall metric but blocks any release that makes a named group worse, so a bad model never... | No gate between training and the registry. | queue
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: The retrain that shipped a worse model
 
 > **Incident:** A weekly retraining job replaced the production model automatically. One week, a data problem lowered quality for new customers. The average metric barely moved, so nothing flagged it, and the support team noticed first.

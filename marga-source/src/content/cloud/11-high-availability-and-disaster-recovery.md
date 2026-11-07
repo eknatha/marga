@@ -65,6 +65,25 @@ No, the drop is replicated too. You need point-in-time recovery or a separate ba
 > Replication protects against hardware and site failure, not against logical errors.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How High availability and disaster recovery in the... fits together
+node: n1 | Failure domains | 0 | 0 | Multi-zone design covers most hardware and data-centre failures cheaply and should be the default. | Choosing multi-region without a business reason. | process
+node: n2 | RTO and RPO | 1 | 1 | RTO is how long you can be down. RPO is how much data you can lose, measured in time since the last good copy. | Treating replication as backup. | process
+node: n3 | Disaster recovery patterns | 2 | 0 | . | Forgetting quotas, secrets and images in the second region. | process
+node: n4 | Data is the hard part | 3 | 1 | Stateless services are easy to rebuild. Data needs replication: synchronous replication has no loss but adds latency and can stop writes if the link breaks; asynchronous... | Data needs replication: synchronous replication has no loss but adds latency and can stop writes if the link breaks; asynchronous... | store
+node: n5 | Traffic and automation | 4 | 0 | Use health-checked DNS or a global load balancer to move traffic. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n6 | Prove it | 5 | 1 | Run restore drills each quarter and time them. | Never testing a restore or failover. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: the failover that did not work
 
 > **Incident:** A region becomes unavailable and the team starts a failover that had never been tested. It takes nine hours instead of the planned one.

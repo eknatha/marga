@@ -46,6 +46,23 @@ Effectively one. The shared database and the load balancer fail all 20 together,
 
 Cells fail when the router fails, when a "global" dependency sneaks in, or when a deploy hits every cell at once. Bulkheads fail when pools are sized so large they still exhaust the host.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Failure domains, cells and bulkheads fits together
+node: n1 | Failure domains | 0 | 0 | A process crash, a host, a rack, a power feed, a data centre or availability zone, a region, a cloud provider. | One global config or control plane everywhere at once. | process
+node: n2 | Cells | 1 | 1 | A cell is a complete, independent copy of the service for a slice of users. | Cells that call each other. | process
+node: n3 | Bulkheads | 2 | 0 | Named after ship compartments. Inside one service, separate resources so one noisy part cannot drain the rest: a separate thread or connection pool per dependency... | Inside one service, separate resources so one noisy part cannot drain the rest: a separate thread or connection pool per dependency... | process
+node: n4 | Hidden shared dependencies | 3 | 1 | Cells and zones are undone by what they share: one database, one DNS provider, one identity service, one configuration store, one deploy pipeline. | No hard limit on cell size. | process
+node: n5 | Static stability | 4 | 0 | A cell should keep running when its control plane is gone. | Counting replicas and calling it isolation. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: Three zones, one bad config
 
 > **Incident:** A service ran in three zones for resilience. A configuration change was applied to all three at once and all three crashed.

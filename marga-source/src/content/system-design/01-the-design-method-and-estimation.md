@@ -59,6 +59,21 @@ About 500 per second on average (50 million divided by roughly 100,000 seconds);
 
 Designs fail at the step skipped. Skip clarify and you build the wrong thing. Skip estimate and you build for the wrong size, either one node that melts or a sharded cluster nobody needs. Skip failure modes and the first outage writes them for you.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How The design method and back-of-envelope estimation fits together
+node: n1 | The six steps | 0 | 0 | Clarify. Who uses it, what must never be wrong, what may be slow, and what is the SLO? | Never saying what the design gives up. | process
+node: n2 | Estimation you can do in your head | 1 | 1 | Round hard. A day is about 100,000 seconds (86,400). | Designing for the average instead of the peak. | process
+node: n3 | Which numbers decide the design | 2 | 0 | Not every figure matters. Look for the number that crosses a threshold: one node's capacity, one network link, one partition's write limit. | Drawing before asking what the SLO is. | process
+node: n4 | Write assumptions down | 3 | 1 | "Assumed 3x peak, 5 KB responses, 99.9 percent of reads can be 60 seconds stale." Each assumption is a place where the design can be wrong. | Precise arithmetic on guessed inputs (use round numbers). | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The launch that was fifty times the plan
 
 > **Incident:** A game launched worldwide and traffic reached 50 times the initial target within days.

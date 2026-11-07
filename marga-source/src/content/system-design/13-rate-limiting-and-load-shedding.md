@@ -56,6 +56,25 @@ Retries add more load while the service is already doing work for clients that g
 
 A limiter that rejects good traffic because the key is wrong. A limiter store outage that blocks everything. Shedding that rejects critical requests first. A limit set once and never revisited as capacity changed.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Rate limiting, load shedding and admission control fits together
+node: n1 | Why overload collapses | 0 | 0 | When arrival exceeds capacity, queues grow. | Counting requests when concurrency is the real constraint. | edge
+node: n2 | Algorithms | 1 | 1 | Fixed window: count per minute; simple, but allows a burst of double at the window edge. | Limits only at the edge, none per dependency. | process
+node: n3 | Where to enforce | 2 | 0 | At the edge or gateway (cheap, early), per service (protects itself), and per dependency (protects the callee). | A distributed limiter needs shared state, which costs latency and can fail, so decide what happens if the limiter store is down: usually... | process
+node: n4 | Load shedding | 3 | 1 | When over capacity, reject deliberately: drop the lowest priority first (batch, prefetch, analytics), and reject new work rather than abandon work half done. | Check the Common mistakes list below this diagram for what usually goes wrong here. | edge
+node: n5 | Admission control and clients | 4 | 0 | Limit concurrency at the entrance based on measured latency, so the service accepts only what it can finish in time. | No Retry-After, so clients retry immediately. | client
+node: n6 | Capacity and autoscaling | 5 | 1 | Autoscaling is slow compared with a spike, and new instances start cold (empty caches, no connections). | Autoscaling as the only defence. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: A quota that went to zero
 
 > **Incident:** An automated quota system reduced a core service's quota to zero because the old system reported its usage as zero.

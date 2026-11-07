@@ -48,6 +48,21 @@ Cases come from real examples. Combine exact checks (valid JSON, required fields
 
 Record per request: prompt version, model version, input and output tokens, latency, cost, tool calls and user feedback, with sensitive data redacted. Alert on cost per request, error rate and format failures. Add failing real cases to the evaluation set, so the suite improves with experience.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How LLMOps: versioning prompts, models and evaluations fits together
+node: n1 | Prompts in version control | 0 | 0 | Store prompts with their model settings, review changes in pull requests and tag releases. | Prompts edited in consoles without history. | process
+node: n2 | Pin and upgrade | 1 | 1 | Use specific model versions instead of moving aliases. | Using moving model aliases in production. | process
+node: n3 | Evaluate in CI | 2 | 0 | Cases come from real examples. Combine exact checks (valid JSON, required fields), rule checks (no personal data) and graded checks for quality. | Not tracking cost per request. | process
+node: n4 | Observe | 3 | 1 | Record per request: prompt version, model version, input and output tokens, latency, cost, tool calls and user feedback, with sensitive data redacted. | No evaluation set. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The alias that changed
 
 > **Incident:** A model alias moved to a new version and broke JSON parsing.

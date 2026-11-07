@@ -57,6 +57,25 @@ The survivor needs 120 percent of its capacity, so it overloads. Active-active a
 
 A standby that was never exercised. A runbook that depends on the region that failed. DNS caches pinning users to a dead region. Replication lag larger than the RPO. Credentials or configs present only in the primary.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Multi-region design and global traffic fits together
+node: n1 | RTO and RPO | 0 | 0 | RTO (recovery time objective) is how long you can be down. | A recovery plan hosted on the failing system. | process
+node: n2 | Patterns | 1 | 1 | Backup and restore: hours of RTO, data loss up to the last backup. | A failover path used only in drills. | process
+node: n3 | Data is the hard part | 2 | 0 | Asynchronous replication risks losing the last seconds on failover (RPO above zero). | After a failover, decide how to fail back, and how to reconcile writes accepted during the split. | store
+node: n4 | Steering traffic | 3 | 1 | DNS (GeoDNS, weighted, health-checked): simple; limited by TTL and caches that ignore it, so failover takes minutes. | One DNS provider. | process
+node: n5 | Region-wide dependencies | 4 | 0 | Some services are effectively global in one place. | No capacity in the surviving region. | process
+node: n6 | Prove it | 5 | 1 | Run failover drills on a schedule. Verify capacity: the surviving region must take 100 percent of load (or the load you promise), not 50. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: The name that stopped resolving
 
 > **Incident:** A change on the internal backbone withdrew the routes to the company's DNS servers. The domain stopped resolving and internal tools that used the same network were also unreachable.

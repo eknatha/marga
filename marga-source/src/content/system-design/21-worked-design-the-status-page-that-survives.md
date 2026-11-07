@@ -71,6 +71,19 @@ The design that allowed a single command to remove too much, the missing guardra
 
 Reviews that stop at the trigger. Follow-ups that are only "be more careful". A list of 40 actions with no owner and no ordering. Rank by blast radius reduced per effort and track completion.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Worked design: a status page that survives the... fits together
+node: n1 | Part 1. The status page | 0 | 0 | Clarify. Customers and staff must see current state and updates during any outage of our platform, DNS, identity or cloud account. | Status page on the same stack. | process
+node: n2 | Part 2. Reviewing an outage design | 1 | 1 | A design review after an outage asks the same questions as a design review before one. | Review ends at human error. | process
+node: n3 | Incident: The dashboard that needed | 2 | 0 | This is a simulated illustration. In the real S3 incident of 28 February 2017, AWS reported that the status dashboard's own images were stored in S3, so it could not... | Actions that add procedure but no system change. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The dashboard that needed the broken service
 
 > **Incident:** During a major storage outage, the page that should have reported it was itself slow to update because it depended on the failing service.

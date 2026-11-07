@@ -91,6 +91,23 @@ sudo mdadm --detail /dev/md0
 @after Confirm the disk is really bad, replace it, and watch the rebuild finish. A degraded array is an incident until it shows clean.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Disks, RAID, firmware and burn-in fits together
+node: n1 | Drive types | 0 | 0 | SATA is cheap and fine for capacity. SAS is built for servers: dual path, better error handling. | Updating firmware on every node at once. | process
+node: n2 | RAID in short | 1 | 1 | RAID protects against a disk failing. It does not protect against deleting a file, a bad application update, or a fire. | Ignoring a degraded array for days. | process
+node: n3 | SMART: the disk's own report | 2 | 0 | Disks monitor themselves. smartctl reads that report. | Replace it before it fails completely. | store
+node: n4 | Firmware and BIOS | 3 | 1 | Disks, NICs, the BMC and the BIOS all have firmware. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Burn-in | 4 | 0 | New hardware fails early more often than old hardware. | Skipping burn-in and finding bad memory in production. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: Two disks, one batch
 
 > **Incident:** A RAID 5 array lost a second disk during the rebuild after the first one failed.
