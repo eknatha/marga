@@ -70,6 +70,19 @@ notAfter=Nov 24 03:14:06 2026 GMT
 
 Here the certificate is valid until November 24. Many ACME-issued certificates last about 90 days or less and are renewed automatically, so automation failure is the most common cause of an expiry.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How HTTP and TLS fits together
+node: n1 | HTTP in one page | 0 | 0 | HTTP is a text protocol: the client sends a request, the server sends a response. | Testing HTTPS by IP address without sending the right SNI name. | process
+node: n2 | Time every phase with curl | 1 | 1 | The values are cumulative seconds. Here DNS took 12 ms, the TCP connection was ready at 31 ms, and TLS finished at 94 ms. | Forgetting to reload the server after a certificate is renewed. | process
+node: n3 | What TLS does | 2 | 0 | TLS gives you three things: encryption so others cannot read traffic, integrity so it cannot be altered, and authentication so you know you reached the real server. | Serving the leaf certificate without the intermediate chain. | security
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: every client fails at 06:00
 
 > **Incident:** Health checks and customers all fail with a certificate error at the same moment.

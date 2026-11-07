@@ -64,6 +64,21 @@ Two heap profiles some time apart, and a goroutine dump. Compare them to see whi
 > Capture before restarting; compare to find growth.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Debugging Go programs: panics, leaks, races and... fits together
+node: n1 | Read the trace | 0 | 0 | Read from the top: the first line says what happened, the first frame in your own code shows where (client.go:48), and the receiver value 0x0 shows the method was called... | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n2 | Leaks and hangs | 1 | 1 | If requests hang or memory grows, look at goroutines. | Exposing pprof publicly. | process
+node: n3 | Profiling | 2 | 0 | The flame graph and top view show which functions use the most CPU or hold the most memory. | Guessing at performance without a profile. | process
+node: n4 | Races and the debugger | 3 | 1 | The race detector (go test -race, or go build -race for a staging binary) reports two goroutines touching the same variable. | Restarting before capturing a dump. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Forty thousand goroutines
 
 > **Incident:** Memory in a webhook forwarder climbed 100 MB per hour until the pod was killed.

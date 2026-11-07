@@ -55,6 +55,19 @@ A **template** is a prepared guest image with the operating system installed and
 
 **cloud-init** configures a guest at first boot from user data: host name, users, SSH keys, packages. It lets one generic template serve many roles.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Virtual disks, snapshots and templates fits together
+node: n1 | Image formats | 0 | 0 | The virtual size is what the guest sees. | Overcommitting thin disks with no alert on pool free space. | process
+node: n2 | Snapshots | 1 | 1 | A snapshot freezes the disk at a point in time. | Cloning a guest without changing its host name, machine id and SSH host keys. | process
+node: n3 | Templates and clones | 2 | 0 | A template is a prepared guest image with the operating system installed and cleaned. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The pool that filled overnight
 
 > **Incident:** A pool that was 60 percent full on Friday reached 100 percent on Sunday and every guest paused.

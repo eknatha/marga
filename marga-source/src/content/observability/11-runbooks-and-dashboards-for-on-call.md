@@ -54,6 +54,21 @@ Nobody owns the runbook or reviews it. Runbooks need an owner, a review date, an
 > Material that is not maintained decays silently.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Dashboards and runbooks for on-call fits together
+node: n1 | Design from the first five minutes | 0 | 0 | When an alert fires, the engineer asks: Is it real? | One huge dashboard for everything. | process
+node: n2 | Layers | 1 | 1 | Use three levels and link them. | Runbooks with commands that no longer work. | process
+node: n3 | Runbooks that work | 2 | 0 | A runbook is tied to one alert. It should open with what the alert means and how to confirm it, then give numbered steps with commands to copy, and say what is safe to... | Alerts without a runbook link. | process
+node: n4 | Keep them honest | 3 | 1 | Stale material is worse than none, because people trust it. | No owner or review date. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The 03:00 dashboard
 
 > **Incident:** An engineer needed 25 minutes to find that a rollout was the cause of an error spike, although the deploy was visible in the pipeline.

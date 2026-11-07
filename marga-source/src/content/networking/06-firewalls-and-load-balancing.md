@@ -85,6 +85,19 @@ server {
 
 Because the balancer terminates TLS and forwards plain HTTP, backends see the balancer's address. `X-Forwarded-For` carries the original client address so logs and rate limits stay meaningful.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Firewalls and load balancing fits together
+node: n1 | Firewall basics | 0 | 0 | A firewall matches packets against rules and applies an action: accept, drop (silently discard) or reject (discard and tell the sender). | Setting the default policy to DROP before allowing SSH. | process
+node: n2 | Cloud equivalents | 1 | 1 | A common pattern is to reference groups instead of addresses: allow the database's port from "the app security group" rather than from an IP range. | Allowing access by broad address ranges instead of by group. | external
+node: n3 | Load balancers | 2 | 0 | A load balancer spreads requests over several backends and removes failed ones. | Health checks that follow redirects or require authentication. | edge
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: all backends marked unhealthy after a release
 
 > **Incident:** The load balancer reports 0 healthy targets and returns 503 to users. The application is running on both servers and serves real traffic directly.

@@ -48,6 +48,19 @@ Up to 24 hours for caches that fetched it just before the change. Lower the TTL 
 > TTL sets the worst-case spread time.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How DNS, TLS and PKI: DNS records, resolution and... fits together
+node: n1 | Who answers | 0 | 0 | A program asks a stub resolver on the host, which asks a recursive resolver (your provider, the cloud VPC resolver or a company server). | Changing records without lowering the TTL first. | process
+node: n2 | Record types | 1 | 1 | A and AAAA: IPv4 and IPv6 addresses. | Putting a CNAME at the zone apex. | process
+node: n3 | TTL and caching | 2 | 0 | Each record carries a TTL in seconds. Resolvers may keep the answer that long. | Forgetting that failed lookups are cached too. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The migration that took a day to finish
 
 > **Incident:** A team moved a website to a new load balancer and changed the DNS record, but half of the customers kept reaching the old, switched-off address for most of a day.

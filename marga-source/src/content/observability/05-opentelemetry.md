@@ -130,6 +130,25 @@ $ curl -s localhost:8888/metrics | grep -E "otelcol_(receiver_accepted|exporter_
 
 Monitor the Collector itself: dropped or failed exports mean you have blind spots.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Instrumenting with OpenTelemetry fits together
+node: n1 | Building blocks | 0 | 0 | API and SDK: libraries in your language. | Sending directly to a vendor from every application. | process
+node: n2 | Automatic instrumentation | 1 | 1 | For common frameworks, auto-instrumentation wraps HTTP servers, clients and database drivers with no code change. | Skipping service.name, so everything appears as "unknown_service". | process
+node: n3 | Manual instrumentation | 2 | 0 | Add spans around business operations that frameworks cannot know about. | Putting personal data into span attributes. | process
+node: n4 | Context propagation | 3 | 1 | For a trace to cross services, each service passes the trace context to the next, normally in the W3C traceparent header. | It breaks at queues, batch jobs and custom protocols unless you inject and extract the context yourself. | process
+node: n5 | The Collector | 4 | 0 | A pipeline connects receivers, processors and exporters. | Sampling away error traces. | process
+node: n6 | Sampling | 5 | 1 | Storing every trace is expensive. Head sampling decides when the trace starts (simple, but may drop the interesting ones). | Not monitoring the Collector. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+edge: n5 | n6
+```
+
 ## Incident: traces stop at the queue
 
 > **Incident:** Slow checkouts are reported. The trace for a slow order shows the API call taking 80 ms, then ends. The delay is somewhere afterwards, in a worker that processes the payment queue, but the trace has no spans from it.

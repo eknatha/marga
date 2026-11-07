@@ -61,6 +61,21 @@ At that host and its storage path: the host's disks or multipath links, the shar
 > Common symptoms across guests point below them.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Virtualization operations: guest performance... fits together
+node: n1 | Method: top-down, then bottom-up | 0 | 0 | Define the symptom and the time window. Does it affect one guest, many guests on one host, or many hosts? | Diagnosing only inside the guest. | process
+node: n2 | CPU and memory pairs | 1 | 1 | If the balloon driver has taken memory from the guest (balloon.current below balloon.maximum) while the guest swaps, the host is short on memory. | Ignoring balloon and host memory pressure. | process
+node: n3 | Disk and network pairs | 2 | 0 | Compare the guest's await with the latency at the storage layer. | Leaving emulated devices on busy guests. | store
+node: n4 | Configuration checks | 3 | 1 | Check the XML for a sensible CPU model (host-passthrough or a modern model for performance), cache and io modes on disks, the machine type, whether the guest agent is... | Resizing a guest before locating the bottleneck. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The slow network inside the hypervisor
 
 > **Incident:** File transfers between two guests on the same host topped out at a small fraction of what the 10 Gb/s network should allow.

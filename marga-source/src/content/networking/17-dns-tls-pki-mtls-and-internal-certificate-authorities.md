@@ -66,6 +66,21 @@ Add the new CA to every trust bundle first, then issue new certificates from it,
 > Trust before you issue.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How DNS, TLS and PKI: mTLS and internal certificate... fits together
+node: n1 | Why mTLS | 0 | 0 | Normal TLS proves the server to the client. | Keeping the root CA key online on a shared server. | security
+node: n2 | A sensible CA design | 1 | 1 | Keep the root CA key offline (or in an HSM) and use it only to sign a few intermediate CAs. | Replacing a CA without a trust bundle overlap. | process
+node: n3 | cert-manager in Kubernetes | 2 | 0 | cert-manager watches Certificate objects, asks an Issuer (a CA, Vault, ACME or a cloud service) to sign them, stores the result in a Secret and renews before expiry. | Forgetting that the CA certificate itself expires. | process
+node: n4 | Trust bundles and rotation | 3 | 1 | Clients need the CA certificates they should trust, the trust bundle. | Issuing long-lived workload certificates. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The CA that expired on a Sunday
 
 > **Incident:** At 03:00 on a Sunday all service-to-service calls failed with "certificate has expired", although every leaf certificate had been renewed that day.

@@ -69,6 +69,21 @@ It did not get an answer from DHCP. Check the cable or wireless link, and whethe
 > Link-local addresses are assigned by the host when DHCP fails.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How DHCP, ARP and the local network fits together
+node: n1 | DHCP in four steps | 0 | 0 | A new host has no address, so it asks for one by broadcast. | Typing a static address that lies inside the DHCP pool. | process
+node: n2 | Reservations and ranges | 1 | 1 | A DHCP server hands out addresses from a pool. | Assuming a 169.254 address means a faulty machine. | process
+node: n3 | ARP: who has this address? | 2 | 0 | On an Ethernet network, frames are delivered by hardware (MAC) address. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Duplicate addresses and stale | 3 | 1 | If two machines use one address, ARP replies conflict, and traffic flips between them. | Forgetting that ARP does not cross routers. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Two servers, one address
 
 > **Incident:** After a hardware swap, a monitoring dashboard flickered between healthy and failed for an internal API at 10.0.3.27.

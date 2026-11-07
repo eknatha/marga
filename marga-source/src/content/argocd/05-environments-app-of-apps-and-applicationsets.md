@@ -66,6 +66,23 @@ An ApplicationSet with a cluster generator.
 > Generated applications.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Environments, app-of-apps and ApplicationSets fits together
+node: n1 | Layout | 0 | 0 | A common layout has a folder per application with a base and overlays per environment, or a folder per environment that points at shared charts. | One giant repository folder with no structure. | process
+node: n2 | App-of-apps | 1 | 1 | A parent Application points at a folder full of Application manifests. | Copy-pasted Application files. | process
+node: n3 | ApplicationSets | 2 | 0 | An ApplicationSet generates Applications from a template and a generator. | No review on generators. | process
+node: n4 | Promotion | 3 | 1 | Promote by copying a tested image tag or chart version from the staging overlay to production in a pull request, ideally automated after checks pass. | Promoting with merges that carry other changes. | process
+node: n5 | Blast radius | 4 | 0 | A generator that is mistaken can create or remove many applications at once. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: Fifty applications gone
 
 > **Incident:** A change to an ApplicationSet filter matched nothing and the controller started removing the generated applications.

@@ -59,6 +59,23 @@ Google's SRE book names four signals that fit nearly any service: latency, traff
 
 OpenTelemetry is the vendor-neutral standard for generating metrics, logs and traces from applications. Instrument once with it and send the data to whichever backend you choose, such as Prometheus for metrics, a log store, and a tracing system. This avoids rewriting application code if you change tools.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Observability fundamentals fits together
+node: n1 | Monitoring versus observability | 0 | 0 | Monitoring watches for failures you anticipated: disk above 90%, process down, error rate above a threshold. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+node: n2 | The three signals | 1 | 1 | They work together. A metric alert fires on high latency; a trace shows the slow call is to the payment service; the log lines from that service for the same request ID... | Dashboards with 40 graphs and no clear question they answer. | process
+node: n3 | What to measure: RED and USE | 2 | 0 | Two checklists save you from guessing. | Using averages for latency. | process
+node: n4 | The golden signals | 3 | 1 | Google's SRE book names four signals that fit nearly any service: latency, traffic, errors and saturation. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Instrumentation and standards | 4 | 0 | OpenTelemetry is the vendor-neutral standard for generating metrics, logs and traces from applications. | Logging everything with no structure, so nothing can be queried. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: all green, users unhappy
 
 > **Incident:** Customers complain about slow pages. The dashboard shows CPU at 30%, memory fine, and an average response time of 180 ms.

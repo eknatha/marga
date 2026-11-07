@@ -52,6 +52,21 @@ A search on one name misses lines from the other service, so you see only part o
 > Consistent field names are what make cross-service search work.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Structured logging and log design fits together
+node: n1 | From sentences to fields | 0 | 0 | A log line is an event with fields. | Free-text sentences with data buried inside. | process
+node: n2 | Correlation IDs | 1 | 1 | A user request passes through several services. | Different names for the same field. | process
+node: n3 | What to log | 2 | 0 | Log decisions and boundaries: request received and finished (with duration and status), calls to other systems and their results, retries, state changes, and unexpected... | Logging secrets or personal data. | observe
+node: n4 | Cost and retention | 3 | 1 | Logs are often the biggest observability cost. | Keeping all logs forever at full price. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Searching three spellings at 3 a.m.
 
 > **Incident:** A customer reported double charges, and the on-call engineer needed more than an hour to assemble what happened.

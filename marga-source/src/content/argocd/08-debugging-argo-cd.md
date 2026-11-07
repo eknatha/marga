@@ -40,6 +40,23 @@ Whether the project allows that destination namespace and whether the target ser
 > Project and RBAC.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Debugging Argo CD fits together
+node: n1 | Four stages | 0 | 0 | Fetch: can the repo server clone the repository and find the path and revision? | Not reproducing the render locally. | process
+node: n2 | Fetch and render | 1 | 1 | Errors like "authentication required", "revision not found" or "app path does not exist" are fetch problems: check repository credentials, branch names and the folder. | Forcing syncs with replace without understanding the cause. | process
+node: n3 | Apply failures | 2 | 0 | "is forbidden" means the Argo CD service account lacks permission; "not permitted in project" means the project does not allow that kind or destination; webhook or... | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Health and OutOfSync loops | 3 | 1 | A Degraded application needs ordinary Kubernetes debugging on the resources: events, logs, probes. | Changing things before reading the condition. | process
+node: n5 | Useful commands | 4 | 0 | argocd app get NAME, argocd app diff NAME, argocd app history NAME, argocd app logs NAME, kubectl -n argocd logs deploy/argocd-repo-server, and kubectl -n argocd logs... | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: Forever OutOfSync
 
 > **Incident:** An application showed OutOfSync after every sync although nothing had changed in the repository.

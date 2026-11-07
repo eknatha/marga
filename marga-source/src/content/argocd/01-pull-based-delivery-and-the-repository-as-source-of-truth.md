@@ -36,6 +36,21 @@ The controller detects drift and reverts the change to match the repository.
 > The repository wins.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Pull-based delivery and the repository as source... fits together
+node: n1 | Push and pull | 0 | 0 | Push: a CI job builds an image, then runs kubectl apply or helm upgrade using credentials for the cluster. | Mixing application code and cluster configuration without a plan. | process
+node: n2 | The repository as source of truth | 1 | 1 | The desired state of the cluster is written as manifests, Helm charts or Kustomize overlays in a repository. | Treating the repository as optional. | external
+node: n3 | Reconciliation and drift | 2 | 0 | The controller continuously compares desired state (the repository) with live state (the cluster). | Hand-editing the cluster and expecting it to stay. | process
+node: n4 | Trade-offs | 3 | 1 | Benefits: audit trail, consistent environments, simple rollback, fewer credentials in CI, and recovery by pointing a new cluster at the repository. | Putting plain-text secrets in it. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The hot-fix that vanished
 
 > **Incident:** An engineer scaled a deployment up by hand during a spike, and twenty minutes later it returned to 2 replicas.

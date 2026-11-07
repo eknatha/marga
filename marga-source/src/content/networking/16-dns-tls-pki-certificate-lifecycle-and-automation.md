@@ -66,6 +66,21 @@ The service was not reloaded after renewal. Add a deploy or reload hook and veri
 > Renewal is not complete until the service serves the new file.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How DNS, TLS and PKI: certificate lifecycle and... fits together
+node: n1 | From key to certificate | 0 | 0 | Generate a private key and keep it on the server (or in an HSM or key service). | Manual renewal with a calendar reminder. | security
+node: n2 | ACME and automatic validation | 1 | 1 | ACME (RFC 8555) is the protocol used by Let's Encrypt and other CAs. | Monitoring only public sites and not internal ones. | process
+node: n3 | Rotate and revoke | 2 | 0 | Renewal replaces the certificate; the service must reload it, or it keeps serving the old one until restart. | Renewing the file but not reloading the service. | process
+node: n4 | Watch the dates | 3 | 1 | Automation fails silently: a DNS credential expires, a firewall blocks port 80, a reload hook breaks. | Watch the dates Automation fails silently: a DNS credential expires, a firewall blocks port 80, a reload hook breaks. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The forgotten certificate
 
 > **Incident:** An internal tool that every engineer used for deployments stopped working on a Monday morning because its certificate had expired over the weekend.

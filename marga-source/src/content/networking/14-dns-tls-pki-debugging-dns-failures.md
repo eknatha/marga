@@ -58,6 +58,21 @@ The server uses another resolver or search path (resolv.conf, VPC resolver, spli
 > Test from where the client really is.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How DNS, TLS and PKI: debugging DNS failures fits together
+node: n1 | Read the status | 0 | 0 | NOERROR with an answer: the name resolved. | Treating SERVFAIL as "name does not exist". | process
+node: n2 | Test each hop | 1 | 1 | The host's own view: getent hosts name uses the same libraries as applications, including /etc/hosts and search domains. | Testing only with a public resolver. | observe
+node: n3 | Search domains and ndots | 2 | 0 | /etc/resolv.conf can hold a search list and options ndots:N. | Ignoring the search list and ndots in containers. | process
+node: n4 | Split-horizon and private zones | 3 | 1 | Internal and external users may get different answers for the same name. | Forgetting that private zones differ from public DNS. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Slow everything after a DNS change
 
 > **Incident:** After a platform upgrade, API calls from pods got slow, and the DNS servers showed ten times more queries than before.

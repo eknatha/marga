@@ -99,6 +99,23 @@ Each unique combination of label values is a separate time series. Labels with u
 
 > **Warning:** Never use user IDs, request IDs, IP addresses or raw URLs as metric labels. Those belong in logs and traces. Label values should come from a small, known set.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Metrics and Prometheus fits together
+node: n1 | Metric types | 0 | 0 | Each series is identified by a metric name plus labels. | Averaging percentiles across instances. | observe
+node: n2 | Scraping | 1 | 1 | In Kubernetes you normally use service discovery so Prometheus finds Pods automatically, usually through an operator that adds ServiceMonitor objects. | Not alerting on up == 0, so a dead target silently stops reporting. | client
+node: n3 | PromQL you will use constantly | 2 | 0 | Key rules. | A rate() window shorter than two scrapes. | process
+node: n4 | Recording rules | 3 | 1 | Expensive queries that you use often can be precomputed. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Cardinality | 4 | 0 | Each unique combination of label values is a separate time series. | High-cardinality labels. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: Prometheus runs out of memory
 
 > **Incident:** Prometheus restarts repeatedly with out-of-memory kills, and its dashboards have gaps.

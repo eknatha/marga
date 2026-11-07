@@ -65,6 +65,21 @@ The rule follows the instances that belong to the group, so scaling out or repla
 > Group references stay correct when addresses change, and they express intent.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Segmentation, security groups and least-privilege... fits together
+node: n1 | Zones and the path of a request | 0 | 0 | A typical design has three tiers. The public tier holds load balancers that accept traffic from the internet. | Rules without descriptions or owners. | client
+node: n2 | Security groups and ACLs | 1 | 1 | In most clouds there are two filters. A security group attaches to an instance or interface. | Testing only the allowed paths, never the blocked ones. | security
+node: n3 | Write rules with a reason | 2 | 0 | Every rule should answer: who, to what, on which port, and why. | Opening 0.0.0.0/0 for administration ports. | process
+node: n4 | Check what is really allowed | 3 | 1 | Rules drift. Review them on a schedule and test the paths that should be blocked, not only the ones that should work. | Allowing a whole private range because it is convenient. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Everything could reach the database
 
 > **Incident:** A pen test found that a forgotten test server in the public subnet could connect to the production database on port 5432.

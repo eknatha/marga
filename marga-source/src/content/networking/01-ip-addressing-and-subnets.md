@@ -75,6 +75,21 @@ $ ip route get 10.20.4.9
 
 This is sample output. `ip route get` tells you exactly which path the kernel will use for a destination, which settles most "why does it go that way" questions. Here `10.20.4.9` is outside `10.20.0.0/24`, so the packet goes to the gateway `10.20.0.1`.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How IP addressing and subnets fits together
+node: n1 | Addresses and CIDR | 0 | 0 | An IPv4 address is 32 bits, written as four decimal numbers (10.0.1.25). | Forgetting that cloud providers reserve addresses in each subnet. | process
+node: n2 | Private ranges | 1 | 1 | Three ranges are reserved for private networks and are not routed on the public internet. | Using the default range for every new network. | process
+node: n3 | Splitting a network | 2 | 0 | To divide 10.0.1.0/24 into four equal subnets, borrow two bits: each is a /26 with 64 addresses. | Confusing the subnet mask with the gateway address. | edge
+node: n4 | Routes and gateways | 3 | 1 | A host sends a packet directly when the destination is in its own subnet. | Check the Common mistakes list below this diagram for what usually goes wrong here. | edge
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: peering fails because the ranges overlap
 
 > **Incident:** Team A built a network on `10.0.0.0/16`. Team B built theirs on `10.0.0.0/16` too, because it was the default in the console. Peering is rejected.

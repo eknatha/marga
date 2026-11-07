@@ -72,6 +72,21 @@ The function looks at the **current** state and makes it match the desired state
 
 Use **controller-runtime** or Kubebuilder for custom resources. Run two replicas with **leader election**, give the service account minimal RBAC, expose metrics for queue depth and reconcile errors, and set resource limits.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Writing Kubernetes clients and controllers in Go fits together
+node: n1 | A simple client | 0 | 0 | In a cluster the program uses the service account token automatically, so RBAC must allow exactly the verbs it needs. | Broad RBAC for controllers. | client
+node: n2 | Informers and queues | 1 | 1 | The informer keeps a local cache updated by one watch, so reads do not hit the API server. | Informers and queues The informer keeps a local cache updated by one watch, so reads do not hit the API server. | queue
+node: n3 | Reconcile | 2 | 0 | The function looks at the current state and makes it match the desired state. | Reconcile functions that are not idempotent. | process
+node: n4 | Operate | 3 | 1 | Use controller-runtime or Kubebuilder for custom resources. | Running a single controller replica without leader election. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Polling the API every second
 
 > **Incident:** A script listing all pods in a loop slowed the control plane.

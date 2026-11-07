@@ -43,6 +43,21 @@ Replicate changed blocks to another site on a schedule or continuously, so that 
 
 Schedule restores into an isolated network, boot the VM, check that the service answers and record the time. Keep retention tiers such as daily, weekly and monthly, and protect some copies from deletion, for example with immutable storage.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How VM backup, replication and recovery fits together
+node: n1 | Snapshots and backups | 0 | 0 | A snapshot records a VM's disk state at a moment and stores changes separately. | Backups on the same storage as the VMs. | store
+node: n2 | Consistency | 1 | 1 | A crash-consistent copy is like pulling the power: filesystems usually recover, but databases may need repair. | Ignoring application consistency. | process
+node: n3 | Replication | 2 | 0 | Replicate changed blocks to another site on a schedule or continuously, so that a failover boots a recent copy. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Restore tests | 3 | 1 | Schedule restores into an isolated network, boot the VM, check that the service answers and record the time. | Never testing a restore. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The snapshot that filled the datastore
 
 > **Incident:** A long-lived snapshot grew until it filled storage.

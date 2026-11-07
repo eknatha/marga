@@ -66,6 +66,21 @@ Q: Which of these is a valid shortened form of 2001:0db8:0000:0000:0000:0000:000
 > Drop leading zeros and replace the longest run of zero groups with ::, once.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How IPv6 essentials for engineers fits together
+node: n1 | Reading addresses | 0 | 0 | An IPv6 address is 128 bits written as eight groups of four hexadecimal digits: 2001:0db8:0000:0000:0000:0000:0000:0001. | Using subnets smaller than /64. | process
+node: n2 | How hosts get an address | 1 | 1 | SLAAC (stateless autoconfiguration): the router announces the prefix in a router advertisement, and the host builds its own address from it. | Logging or validating addresses as IPv4 only. | process
+node: n3 | Neighbour discovery | 2 | 0 | IPv6 has no ARP. Hosts use ICMPv6 messages (neighbour solicitation and advertisement, router solicitation and advertisement) to find each other and routers. | Blocking all ICMPv6. | process
+node: n4 | Dual stack | 3 | 1 | Most networks run IPv4 and IPv6 side by side. | IPv6 records without IPv6 firewall rules. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: slow site for some users
 
 > **Incident:** A site loads in two seconds for most users and takes more than thirty seconds for users on one mobile network.

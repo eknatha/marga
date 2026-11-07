@@ -49,6 +49,23 @@ The manifests match the repository, but the workload is failing; look at pod eve
 > Separate questions.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Sync, health and drift fits together
+node: n1 | Two statuses | 0 | 0 | Sync status: Synced (live matches desired), OutOfSync (they differ) or Unknown (cannot compare). | Reading only sync status and ignoring health. | process
+node: n2 | Manual or automated | 1 | 1 | With manual sync, Argo CD shows differences and waits for a person or pipeline to sync. | Turning on prune everywhere on day one. | process
+node: n3 | Why prune needs care | 2 | 0 | Prune removes anything Argo CD manages that disappears from the source. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Expected differences | 3 | 1 | Controllers add fields, such as an autoscaler changing replicas or a webhook injecting certificates. | Fighting controllers instead of ignoring fields. | process
+node: n5 | Retrying | 4 | 0 | A sync can fail on a bad manifest. Use retry settings for transient problems, and read the sync result message for permanent ones. | No review for repository restructures. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: The prune that removed a namespace
 
 > **Incident:** After a folder rename, an automated application with prune turned on deleted its resources.

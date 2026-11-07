@@ -60,6 +60,21 @@ An MTU problem on the VPN path: small packets pass, large ones are dropped and t
 > Test with ping -M do at different sizes and lower the tunnel MTU or clamp the MSS.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Latency, bandwidth, MTU and network performance fits together
+node: n1 | Latency and bandwidth | 0 | 0 | Latency is how long a packet takes; round trip time (RTT) is there and back. | Testing only with small pings. | process
+node: n2 | Round trips add up | 1 | 1 | Opening a secure web request over a new connection costs a TCP handshake, a TLS handshake and then the request, several round trips before the first byte. | Buying bandwidth to fix a latency problem. | process
+node: n3 | Loss | 2 | 0 | Even 1 percent packet loss can cut TCP throughput a lot, because the sender slows down at each loss. | Reading loss on a middle hop as the cause. | process
+node: n4 | MTU | 3 | 1 | The maximum transmission unit is the largest packet a link carries, usually 1500 bytes. | Blocking all ICMP. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the VPN that only worked for small requests
 
 > **Incident:** After a new site-to-site VPN is set up, health checks pass but file downloads between offices stall at around 1 KB.

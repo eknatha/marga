@@ -44,6 +44,21 @@ The server does not send the intermediate certificate. Browsers can fetch it the
 > Serve leaf plus intermediates.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How DNS, TLS and PKI: the TLS handshake and... fits together
+node: n1 | The handshake in short | 0 | 0 | The client sends a hello with the versions and ciphers it supports and the SNI (the server name it wants, so one IP can serve many sites). | Installing only the leaf certificate. | process
+node: n2 | Chains and trust | 1 | 1 | A server certificate (the leaf) is signed by an intermediate CA, which is signed by a root CA that is in the client's trust store. | Forgetting SNI when testing with openssl. | process
+node: n3 | Names and SANs | 2 | 0 | Modern clients match the name against the Subject Alternative Name list, not the old Common Name. | Assuming a wildcard covers the apex and deeper subdomains. | process
+node: n4 | Time matters | 3 | 1 | Certificates have a not-before and a not-after date. | Testing with a browser only. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Works in Chrome, fails in the payment gateway
 
 > **Incident:** After a certificate renewal, customers could use the website but a partner's server-to-server calls started failing.

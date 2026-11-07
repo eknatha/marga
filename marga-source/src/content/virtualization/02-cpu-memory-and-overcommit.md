@@ -48,6 +48,19 @@ When the host itself starts using swap with guests running, memory is overcommit
 
 Large servers have several CPU sockets, each with memory attached. Reading memory from another socket is slower. A guest bigger than one socket may span both and lose speed. Where possible, pin large guests to one NUMA node, or size them to fit.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How CPU, memory and overcommit fits together
+node: n1 | Virtual CPUs | 0 | 0 | A vCPU is a thread of the host that runs a guest's CPU. | Overcommitting memory on a host that runs databases. | process
+node: n2 | Memory | 1 | 1 | Memory is the harder resource, because a guest that is out of memory fails instead of slowing down. | Giving every guest many vCPUs "to be safe": more vCPUs can make scheduling worse. | process
+node: n3 | NUMA | 2 | 0 | Large servers have several CPU sockets, each with memory attached. | Starting a guest larger than a NUMA node without pinning. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The Monday morning slowdown
 
 > **Incident:** Every Monday at 09:00 the web guests slowed, yet their graphs showed low CPU.

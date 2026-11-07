@@ -80,6 +80,21 @@ Copy the CA certificates into the image, or use a distroless static base which a
 > A bare image has no trust store.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Building CLI tools and small container images fits together
+node: n1 | A command-line tool | 0 | 0 | The standard flag package is enough for simple tools. | Putting secrets in command-line flags. | process
+node: n2 | Embed the version | 1 | 1 | Put a variable in main and set it at build time. | Running as root in the container. | process
+node: n3 | A multi-stage image | 2 | 0 | Compile in a full Go image and copy only the binary into a minimal one. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Choosing the base | 3 | 1 | scratch is an empty image: smallest, but no CA certificates, time zone data or user accounts unless you copy them in. | Forgetting CA certificates in scratch images. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Which build is running?
 
 > **Incident:** A bug fix did not seem to work, and nobody could say whether production had the new binary.

@@ -57,6 +57,21 @@ $ virsh list --all
 
 A virtual machine includes a full guest kernel. A container shares the host kernel and isolates processes with namespaces and cgroups. That makes containers lighter and faster to start, and virtual machines a stronger boundary because an attacker has to escape a hypervisor, not just a shared kernel. Many platforms run containers inside virtual machines to get both.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How What virtualization is and the types of hypervisor fits together
+node: n1 | What a hypervisor does | 0 | 0 | A hypervisor is the software that creates virtual machines and hands each one a share of CPU, memory, disk and network. | Forgetting that nested virtualization (a hypervisor inside a guest) needs the setting enabled on the outer host. | process
+node: n2 | Type 1 and type 2 | 1 | 1 | The line is not perfectly sharp. KVM is a part of the Linux kernel, so Linux itself becomes the hypervisor, which is why KVM is usually counted as type 1. | Judging a host by CPU use alone and ignoring memory, which is usually the first limit. | process
+node: n3 | The KVM stack | 2 | 0 | KVM is the kernel module that uses the CPU features. | Running guests on emulated disk and network devices instead of virtio. | process
+node: n4 | Virtual machines and containers | 3 | 1 | A virtual machine includes a full guest kernel. | Treating a virtual machine as a security boundary that needs no patching. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The guest that would not start
 
 > **Incident:** A new KVM host refused to start any guest and the team assumed the image was broken.

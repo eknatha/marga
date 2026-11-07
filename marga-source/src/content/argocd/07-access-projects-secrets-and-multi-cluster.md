@@ -50,6 +50,21 @@ Give each team an AppProject with its own allowed destinations and sources, and 
 > Projects are the boundary.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Access, projects, secrets and multi-cluster fits together
+node: n1 | Projects | 0 | 0 | An AppProject limits which repositories an application may use, which clusters and namespaces it may deploy to, and which resource kinds it may create (for example, no... | Using the default project for everything. | process
+node: n2 | RBAC and sign-in | 1 | 1 | Connect single sign-on (OpenID Connect) so people use company identities and MFA, and disable the shared admin account. | Shared admin login. | security
+node: n3 | Secrets | 2 | 0 | The repository must not hold plain secrets. | Plain secrets in values files. | security
+node: n4 | Multiple clusters | 3 | 1 | Register a remote cluster with argocd cluster add, which creates a service account in that cluster and stores its token in Argo CD. | One Argo CD with unlimited reach into production. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Secret in the repository
 
 > **Incident:** A scan found a database password in a values file inside the configuration repository.

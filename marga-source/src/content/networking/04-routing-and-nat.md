@@ -70,6 +70,21 @@ $ sudo conntrack -C
 
 NAT has consequences. Inbound connections cannot start unless a rule maps them. The tracking table has a finite size, so a host making huge numbers of connections can exhaust it. Many clients behind one NAT address look like a single client to rate limiters.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Routing, gateways and NAT fits together
+node: n1 | The host routing table | 0 | 0 | When a host sends a packet it asks one question: do I have a route for this destination? | Debugging with ping alone when ICMP is filtered. | process
+node: n2 | Changing routes | 1 | 1 | Changes made with ip route vanish at reboot. | Forgetting the return path: a route exists one way but not back. | edge
+node: n3 | Routers and forwarding | 2 | 0 | A Linux host becomes a router when forwarding is enabled and it has interfaces in more than one network. | Overlapping CIDR ranges between networks you later want to connect. | edge
+node: n4 | NAT | 3 | 1 | Network Address Translation rewrites addresses as packets pass through a device. | Not allowing for NAT when an application reports client addresses. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the new subnet that cannot reach the internet
 
 > **Incident:** A team creates a private subnet for a new service. Instances there can reach the database but every call to an external API times out. The same code works in the older subnet.

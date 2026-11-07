@@ -59,6 +59,21 @@ spec:
 
 Argo CD emits events and API logs for logins, syncs and changes. Ship them to central logging and alert on admin-level actions and manual syncs of production. Git history shows what changed, and Argo logs show who triggered it.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Argo CD: SSO, RBAC and audit fits together
+node: n1 | SSO | 0 | 0 | Store the client secret in the Argo CD secret, not in the config map. | Shared admin credentials. | process
+node: n2 | RBAC | 1 | 1 | Policies read as subject, resource, action, object. | Giving all developers sync rights in production. | security
+node: n3 | Projects | 2 | 0 | An AppProject limits which Git repositories an application may use, which clusters and namespaces it may deploy to and which Kubernetes kinds it may create. | Projects that allow any repository and cluster. | process
+node: n4 | Audit | 3 | 1 | Argo CD emits events and API logs for logins, syncs and changes. | No central audit logs. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Who synced production?
 
 > **Incident:** A bad sync happened and no one could say who triggered it.

@@ -103,6 +103,21 @@ Requests pile up waiting, goroutines and connections accumulate, and the service
 > A missing timeout turns one slow dependency into an outage.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Context, timeouts and graceful shutdown fits together
+node: n1 | Contexts | 0 | 0 | A context is created from a parent and can be cancelled. | Using http.DefaultClient with no timeout. | process
+node: n2 | Respect cancellation in your own | 1 | 1 | Loops and waits must check the context, or cancellation does nothing. | Never calling cancel. | process
+node: n3 | Timeouts in net/http | 2 | 0 | The default http.Client has no timeout, and a default server has none for slow clients. | Shutdown timeouts longer than the grace period. | process
+node: n4 | Graceful shutdown | 3 | 1 | When Kubernetes or systemd stops your service, it sends SIGTERM. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The service that never finished a deploy
 
 > **Incident:** Each rollout took ten minutes and ended with dropped requests.

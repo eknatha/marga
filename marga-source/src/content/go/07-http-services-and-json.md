@@ -87,6 +87,21 @@ They fail liveness and are restarted, turning a short database blip into an outa
 > Probes encode what a failure means.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How HTTP services, clients and JSON fits together
+node: n1 | Handlers and routing | 0 | 0 | Since Go 1.22 the standard router understands methods and path variables like {name}, read with r.PathValue("name"). | No body size limit on requests. | process
+node: n2 | JSON in and out | 1 | 1 | Limit the body size, reject unknown fields if your API is strict, and validate the values, because decoding only checks the shape. | Skipping validation after decoding. | process
+node: n3 | Middleware | 2 | 0 | Middleware wraps a handler to add behaviour such as logging or panic recovery. | Creating a client per request. | process
+node: n4 | Health endpoints and clients | 3 | 1 | Expose two endpoints: liveness (/healthz, the process is not stuck) and readiness (/readyz, it can take traffic: database reachable, caches warm). | Liveness probes that check dependencies. | client
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: A fresh client for each request
 
 > **Incident:** A collector service slowly ran out of sockets and began failing with connection errors.

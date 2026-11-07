@@ -99,6 +99,21 @@ A data race (run with -race) or a test that depends on time, ordering or shared 
 > Make tests deterministic and use the race detector.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Testing, benchmarks and tooling fits together
+node: n1 | A first test | 0 | 0 | Tests live next to the code in _test.go files. | Tests that depend on the network or the clock. | observe
+node: n2 | Helpers and temporary files | 1 | 1 | t.TempDir() gives a directory that is cleaned up after the test. | Not using subtests, so failures lack names. | process
+node: n3 | Coverage and benchmarks | 2 | 0 | Coverage shows what was executed, not whether it was checked well; use it to find untested branches, not as a target for its own sake. | Chasing coverage numbers. | process
+node: n4 | Tooling in CI | 3 | 1 | A reasonable pipeline for a Go service. | Skipping the race detector. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The 100 percent coverage that missed the bug
 
 > **Incident:** A report parser had full coverage and still sent wrong numbers to finance.

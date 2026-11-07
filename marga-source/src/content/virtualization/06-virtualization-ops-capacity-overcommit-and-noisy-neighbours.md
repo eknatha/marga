@@ -51,6 +51,21 @@ The hypervisor is not giving the guest the CPU it asks for: the host is oversubs
 > Steal is lost CPU time.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Virtualization operations: capacity, overcommit... fits together
+node: n1 | Overcommit by resource | 0 | 0 | CPU can be overcommitted well, because most guests are idle most of the time. | Mixing latency-sensitive and batch guests on one pool. | process
+node: n2 | Detect contention | 1 | 1 | Inside the guest: high steal time (%st in top or vmstat) means the guest wanted CPU and the host did not give it. | Overcommitting memory like CPU. | process
+node: n3 | NUMA, pinning and huge pages | 2 | 0 | Large hosts have several NUMA nodes, each with local memory. | No spare capacity to evacuate a failed host. | process
+node: n4 | Contain noisy neighbours | 3 | 1 | Set limits and shares so a single guest cannot take everything: CPU shares and quotas, disk I/O throttling (IOPS and bandwidth) and network rate limits through libvirt... | Judging by the ratio instead of measured contention. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The Monday morning stalls
 
 > **Incident:** Every Monday at 09:00 several unrelated application servers on the same host became slow for about 20 minutes.

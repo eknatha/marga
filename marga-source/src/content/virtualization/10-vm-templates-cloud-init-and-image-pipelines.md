@@ -61,6 +61,21 @@ Use **cloud-init** to set hostname, users, keys, network and join configuration 
 
 Test each image by booting it, checking that cloud-init completes and running a few smoke tests. Name images with a date or version, record the build commit and package list and keep only a few recent versions. Set a maximum age and rebuild monthly or when critical patches land.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How VM templates, cloud-init and image pipelines fits together
+node: n1 | A pipeline | 0 | 0 | Pin the ISO checksum and run the build in CI with a clean builder. | Leaving machine-specific data in images. | queue
+node: n2 | Clean and harden | 1 | 1 | Remove machine IDs, SSH host keys, logs and history so clones do not share identity. | Clean and harden Remove machine IDs, SSH host keys, logs and history so clones do not share identity. | security
+node: n3 | Identity at boot | 2 | 0 | Use cloud-init to set hostname, users, keys, network and join configuration on first boot, so one image serves every role. | Check the Common mistakes list below this diagram for what usually goes wrong here. | security
+node: n4 | Publish and retire | 3 | 1 | Test each image by booting it, checking that cloud-init completes and running a few smoke tests. | No smoke test for new images. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Two hundred clones with the same host keys
 
 > **Incident:** Cloned VMs shared SSH host keys because the template was not cleaned.

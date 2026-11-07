@@ -45,6 +45,23 @@ Restrict who can run `virsh` or use the management console, require strong authe
 
 Follow vendor guidance on CPU side-channel mitigations and understand their performance cost. Do not run high-risk, untrusted workloads on the same hosts as sensitive ones. Use separate clusters or dedicated hosts for different trust levels.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Hypervisor security and isolation fits together
+node: n1 | Minimal host | 0 | 0 | Install only what the hypervisor needs. Disable unused services and emulated devices in guests, such as floppy or legacy USB controllers, since device emulation code has... | Management interfaces reachable from guests. | process
+node: n2 | Network separation | 1 | 1 | Guests must never reach management or storage networks. | Unpatched hypervisors. | edge
+node: n3 | Confinement | 2 | 0 | sVirt or AppArmor profiles give each VM process its own label, so a compromised QEMU process cannot read other VMs' disks. | Running QEMU as root. | process
+node: n4 | Access and data | 3 | 1 | Restrict who can run virsh or use the management console, require strong authentication and log every action. | Mixing untrusted and sensitive workloads on one host. | security
+node: n5 | Mitigations and trust | 4 | 0 | Follow vendor guidance on CPU side-channel mitigations and understand their performance cost. | Do not run high-risk, untrusted workloads on the same hosts as sensitive ones. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: The management port in the guest VLAN
 
 > **Incident:** A guest could reach the hypervisor management interface.

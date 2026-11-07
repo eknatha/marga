@@ -85,6 +85,21 @@ Define a small interface for the behaviour you need, accept it as a parameter, a
 > Depend on behaviour, not on a concrete service.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Interfaces and packages fits together
+node: n1 | Implicit interfaces | 0 | 0 | An interface is a set of method signatures. | Creating an interface for every type. | process
+node: n2 | Accept interfaces, return structs | 1 | 1 | A common guideline: functions accept the smallest interface they need and return concrete types. | Making interfaces large. | process
+node: n3 | Test with a fake | 2 | 0 | The test needs no network and runs in microseconds. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+node: n4 | Packages | 3 | 1 | A package is a directory; all files in it share a name and a namespace. | Importing concrete clients deep inside business logic. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The tests that called the real API
 
 > **Incident:** A pipeline failed three times a week with timeouts, and no code had changed.

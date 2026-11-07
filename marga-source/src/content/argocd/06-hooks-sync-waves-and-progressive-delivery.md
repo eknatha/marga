@@ -40,6 +40,23 @@ A PreSync hook on the Job.
 > Hooks run around the sync.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Hooks, sync waves and progressive delivery fits together
+node: n1 | Sync waves | 0 | 0 | Annotate resources with argocd.argoproj.io/sync-wave: "N". | Waves that deadlock on health. | process
+node: n2 | Hooks | 1 | 1 | A hook is a resource, usually a Job, annotated with argocd.argoproj.io/hook. | Non-idempotent hooks. | process
+node: n3 | Canary and blue-green | 2 | 0 | A plain Deployment does a rolling update with no view of user impact. | Canary without metrics. | process
+node: n4 | Automated analysis | 3 | 1 | An AnalysisTemplate queries metrics, for example the error rate in Prometheus. | If the new version breaks the threshold during a canary step, the rollout aborts and traffic returns to the stable version without a person. | process
+node: n5 | Keep it simple first | 4 | 0 | Start with sync waves and a PreSync migration. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: The migration that ran twice
 
 > **Incident:** A retried sync ran a PreSync migration a second time and failed on a duplicate column.

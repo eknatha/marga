@@ -64,6 +64,23 @@ Saturation: queue depth and waiting time, not utilisation.
 > USE exists because utilisation alone hides queues.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How RED, USE and the golden signals in practice fits together
+node: n1 | RED: for services | 0 | 0 | For every service that handles requests, track. | Only utilisation, no saturation. | process
+node: n2 | USE: for resources | 1 | 1 | For every resource (CPU, memory, disks, network links, connection pools, queues), track. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n3 | The four golden signals | 2 | 0 | The SRE book's version combines both: latency (separate successful from failed requests, since fast errors hide slow problems), traffic, errors, and saturation. | Averages for latency. | process
+node: n4 | Percentiles, not averages | 3 | 1 | If 1 percent of requests take ten seconds, the average barely moves but one user in a hundred has a bad experience, and with many requests per page, most users will meet... | Averaging percentiles across instances. | process
+node: n5 | A dashboard that works | 4 | 0 | Put the user-facing view at the top: RED for the service, with the objective line drawn. | Different dashboard layouts for each service. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the green dashboard and the slow checkout
 
 > **Incident:** Customers complain about slow checkout while the dashboard shows CPU at 35 percent and average latency of 220 ms.

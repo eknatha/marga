@@ -78,6 +78,21 @@ $ psql -h 127.0.0.1 -p 15432 -U app appdb
 $ aws ssm start-session --target i-0abc123def --document-name AWS-StartPortForwardingSession --parameters portNumber=5432,localPortNumber=15432
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How VPNs, tunnels and private connectivity fits together
+node: n1 | How a tunnel works | 0 | 0 | The original packet is encrypted, wrapped inside a new packet addressed to the VPN peer, and sent across the internet. | Overlapping address ranges on the two sides. | process
+node: n2 | WireGuard | 1 | 1 | WireGuard is small, fast and simple. Each peer has a key pair, and configuration lists which peers may send which address ranges. | Forgetting routes or security rules after the tunnel is up. | process
+node: n3 | IPsec and cloud VPNs | 2 | 0 | IPsec is the long-standing standard supported by nearly every router and firewall. | A single tunnel with no failover and no monitoring. | external
+node: n4 | Private connectivity inside the | 3 | 1 | Not every connection needs a VPN. | Treating peering as transitive. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the tunnel that was up but carried nothing
 
 > **Incident:** The site-to-site VPN shows both tunnels as UP in the console, yet the application in the cloud cannot reach the on-premises database. Ping works from the gateway, but not from application servers.

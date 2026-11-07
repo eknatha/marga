@@ -78,6 +78,21 @@ Storing every trace and every debug log is expensive and rarely useful.
 
 Tail sampling is the most useful for diagnosis: you keep exactly the slow and failing requests, which are the ones you will want to look at.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Logs and distributed tracing fits together
+node: n1 | Structured logs | 0 | 0 | Plain text logs are written for people and are hard for machines to search. | Unstructured text logs that cannot be queried. | observe
+node: n2 | Searching logs | 1 | 1 | Whatever the backend (Loki, Elasticsearch, a cloud log service), the workflow is the same: narrow by time, then service, then a field, then follow an ID. | No request or trace ID in log lines. | observe
+node: n3 | Distributed tracing | 2 | 0 | A trace is the full journey of a single request. | Keeping every trace and debug log forever. | process
+node: n4 | Sampling and cost | 3 | 1 | Storing every trace and every debug log is expensive and rarely useful. | A custom HTTP client that drops trace headers. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: a trace is missing half its services
 
 > **Incident:** Traces for checkout show the API and the payment service, but the inventory service never appears, even though logs prove it handled the request.

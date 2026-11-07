@@ -84,6 +84,21 @@ It builds a single static binary, so you copy one file and run it, with no runti
 > Static, self-contained binaries are the main operational advantage.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Why Go for operations, and your first program fits together
+node: n1 | Why operations teams like Go | 0 | 0 | Go compiles to a single static binary with no interpreter or shared libraries to install, so you can copy one file to a server or put it into an almost empty container... | Building on a laptop with CGO enabled and then running on a different C library. | process
+node: n2 | A module and a first program | 1 | 1 | A Go project is a module, described by a go.mod file. | Ignoring the error return value. | process
+node: n3 | Build for any platform | 2 | 0 | Cross-compiling needs two environment variables and no extra tools. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | The standard toolbox | 3 | 1 | Go ships with its tools, so teams rarely argue about style or setup. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The tool that needed Python 3.11
 
 > **Incident:** An internal inventory script worked on laptops and failed on half the servers.

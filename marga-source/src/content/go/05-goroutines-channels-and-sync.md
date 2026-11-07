@@ -99,6 +99,21 @@ Use a bounded worker pool, a fixed number of goroutines reading jobs from a chan
 > Concurrency needs a limit that matches resources.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Goroutines, channels and sync fits together
+node: n1 | Goroutines and WaitGroup | 0 | 0 | A goroutine is a lightweight thread started with the go keyword. | Forgetting to wait for goroutines. | process
+node: n2 | Channels | 1 | 1 | A channel carries values between goroutines and synchronises them. | Closing a channel from the receiving side. | process
+node: n3 | Shared state | 2 | 0 | If goroutines must share a variable, protect it. | Unbounded goroutines. | store
+node: n4 | Limit concurrency and test for races | 3 | 1 | Starting 50,000 goroutines that each open a connection will exhaust file descriptors or overload the target. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Concurrent map writes in production
 
 > **Incident:** A health aggregator crashed every few days with a fatal error and no panic message to recover from.

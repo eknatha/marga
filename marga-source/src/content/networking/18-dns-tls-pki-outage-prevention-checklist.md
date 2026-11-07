@@ -49,6 +49,21 @@ A second authoritative provider with synchronized zones, a reasonable TTL for ca
 > Do not leave DNS as a single point of failure.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How DNS, TLS and PKI: outage prevention checklist fits together
+node: n1 | Know what you have | 0 | 0 | You cannot protect what you cannot list. | No inventory, so nobody knows what expires when. | process
+node: n2 | Alert before it hurts | 1 | 1 | Certificates: probe from outside and alert at 30, 14 and 7 days; a page at 7. | Registrar contact tied to one person's mailbox. | observe
+node: n3 | Change DNS like code | 2 | 0 | Store zone data as code (Terraform or a similar tool), review changes, and apply from a pipeline. | DNS changes made in a console with no review or rollback. | edge
+node: n4 | Make DNS itself redundant | 3 | 1 | Use at least two authoritative servers on separate networks, and for critical domains consider two independent providers with synchronized zones. | A single provider and a single point of failure for DNS. | edge
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The domain that expired
 
 > **Incident:** A company's main domain stopped resolving on a Friday evening, taking down the website, email and the single sign-on service.

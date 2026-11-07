@@ -88,6 +88,21 @@ It changes too, because the sub-slice shares the same underlying array. Copy it 
 > Slices are windows, not copies.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Types, structs, slices and maps fits together
+node: n1 | Variables and zero values | 0 | 0 | Declare with var or the short form := inside functions. | Every type has a zero value (0, "", false, nil), so a variable is never uninitialized. | process
+node: n2 | Slices | 1 | 1 | A slice is a window onto an array, with a length and a capacity. | Forgetting to assign the result of append. | process
+node: n3 | Maps | 2 | 0 | A map is a hash table with unordered keys. | Relying on map iteration order. | process
+node: n4 | Structs and methods | 3 | 1 | A struct groups fields; methods attach behaviour. | Assuming a sub-slice is a copy. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The map that panicked at startup
 
 > **Incident:** A new service crashed on its first request with a panic.

@@ -72,6 +72,21 @@ $ sudo tcpdump -ni eth0 'tcp port 5432 and host 10.0.1.12' -c 4
 
 `[S]` is a SYN, the first packet of a TCP connection. The client keeps retrying and the server never answers with `[S.]` (SYN-ACK). If the packets show up on the server but get no reply, the **host firewall** is dropping them. If they never show up on the server at all, something *between* the machines (a network firewall, security group or routing rule) is blocking them.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How A layered troubleshooting toolkit fits together
+node: n1 | Work from the bottom up | 0 | 0 | Test each layer and stop at the first failure. | Treating a failed ping as proof the host is down. | process
+node: n2 | Refused, timed out, unreachable | 1 | 1 | These three results mean different things, and recognizing them saves hours. | Debugging the application before checking the network path. | process
+node: n3 | Testing a port | 2 | 0 | -z scans without sending data, -v is verbose and -w 3 times out after three seconds. | Testing from your laptop instead of from the machine that has the problem. | observe
+node: n4 | Watch the packets | 3 | 1 | When tools disagree, look at the wire. tcpdump on the server shows whether packets arrive. | The client keeps retrying and the server never answers with [S.] (SYN-ACK). | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: app cannot reach the database after a network change
 
 > **Incident:** After the platform team moved the database to a new subnet, the orders app logs `connection timed out` to `10.0.2.15:5432`.

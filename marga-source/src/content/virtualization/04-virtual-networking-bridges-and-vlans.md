@@ -51,6 +51,21 @@ vnet1   30 PVID Egress Untagged
 
 **SR-IOV** lets one physical NIC present several virtual functions that are handed directly to guests. It skips the software switch, so latency and CPU use drop. The cost is flexibility: live migration and firewall rules at the host become harder.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Virtual networking: bridges, VLANs and NAT fits together
+node: n1 | The virtual switch | 0 | 0 | Each guest has one or more virtual NICs, usually virtio. | Two guests with the same MAC address after a clone. | process
+node: n2 | Network modes | 1 | 1 | Bridged: guests have addresses on the physical network and are visible to it. | Putting a guest on a NAT network and then wondering why clients cannot reach it. | edge
+node: n3 | VLANs | 2 | 0 | A VLAN splits one physical network into separate broadcast domains using a tag in the Ethernet frame. | Forgetting that a trunk port must allow every VLAN used. | process
+node: n4 | SR-IOV | 3 | 1 | SR-IOV lets one physical NIC present several virtual functions that are handed directly to guests. | Disabling the firewall on the host because a guest could not connect, without checking the VLAN first. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: A new guest with a link and no network
 
 > **Incident:** A guest came up, got no address from DHCP, and the team blamed the DHCP server.

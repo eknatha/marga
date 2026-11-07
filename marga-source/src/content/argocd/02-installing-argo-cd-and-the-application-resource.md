@@ -66,6 +66,21 @@ To sync it: without an automated policy the application stays OutOfSync until so
 > Manual by default.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Installing Argo CD and the Application resource fits together
+node: n1 | Install | 0 | 0 | Create a namespace and apply the official install manifest (or use the Helm chart). | Leaving the initial admin password in place. | process
+node: n2 | Components | 1 | 1 | The API server serves the UI, CLI and API and handles authentication. | Running the default project with no limits. | process
+node: n3 | The Application resource | 2 | 0 | The source says which repository, revision and folder. | Using a write-capable credential to read a repository. | process
+node: n4 | CLI and UI | 3 | 1 | The CLI logs in with argocd login, lists applications with argocd app list and shows differences with argocd app diff shop-api. | Installing without pinning a version. | client
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Unknown repository
 
 > **Incident:** A new application showed "ComparisonError: repository not accessible".

@@ -46,6 +46,21 @@ argocd version
 kubectl get applications -n argocd -o wide | grep -v Synced
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Argo CD: disaster recovery and upgrades fits together
+node: n1 | What to protect | 0 | 0 | Application manifests live in Git. Not in Git: cluster credentials, repository credentials, SSO client secrets, TLS certificates and any application or project objects... | Credentials that exist only in the live cluster. | process
+node: n2 | Backup | 1 | 1 | Encrypt backup files and store them off-cluster. | Check the Common mistakes list below this diagram for what usually goes wrong here. | store
+node: n3 | Rebuild | 2 | 0 | With the app-of-apps pattern, one root application points to a directory of other applications, so applying that single object restores the whole fleet. | Never rehearsing a rebuild. | process
+node: n4 | Upgrade | 3 | 1 | Read release notes for breaking changes and CRD updates, since Helm does not always upgrade CRDs. | Skipping minor versions in upgrades. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: A rebuilt cluster with no repository access
 
 > **Incident:** Argo CD came back but could not read private repositories.

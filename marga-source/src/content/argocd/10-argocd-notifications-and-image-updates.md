@@ -56,6 +56,19 @@ Use a version strategy that fits your release process. For production, prefer pu
 
 Automatic updates should land as commits so history, review and rollback still work. Never let a tool edit live objects while Git says something else.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Argo CD: notifications and image updates fits together
+node: n1 | Notifications | 0 | 0 | A trigger decides when, a template formats the message and a subscription says who receives it. | No notifications for failed syncs. | process
+node: n2 | Image updates | 1 | 1 | The Argo CD Image Updater or a pipeline step watches a registry and records a new tag in Git, either by committing to the manifest repository or opening a pull request. | Image updaters that bypass Git. | process
+node: n3 | Keep Git as truth | 2 | 0 | Automatic updates should land as commits so history, review and rollback still work. | Never let a tool edit live objects while Git says something else. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The silent Friday failure
 
 > **Incident:** A failed sync was noticed three days later.

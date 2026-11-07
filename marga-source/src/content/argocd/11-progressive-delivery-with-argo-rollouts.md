@@ -78,6 +78,19 @@ kubectl argo rollouts abort web
 
 **Blue-green** keeps the full old version running and switches all traffic at once after checks, which uses double resources but allows instant rollback. Use Argo CD to sync the Rollout from Git, and keep database changes backward compatible, because traffic may run both versions.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Progressive delivery with Argo Rollouts fits together
+node: n1 | A canary rollout | 0 | 0 | The canary receives a small share, then more if checks pass. | Weights that follow pod counts without a traffic router. | process
+node: n2 | Analysis | 1 | 1 | If the metric breaches the condition, the rollout aborts and traffic returns to the stable version. | Canary with no automated analysis. | process
+node: n3 | Operate | 2 | 0 | Blue-green keeps the full old version running and switches all traffic at once after checks, which uses double resources but allows instant rollback. | Database changes that break the old version. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: The canary that stopped itself
 
 > **Incident:** A release with a bug was aborted automatically at 10 percent.

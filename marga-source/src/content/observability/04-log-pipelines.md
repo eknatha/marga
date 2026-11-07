@@ -103,6 +103,23 @@ $ logcli labels namespace
 - Send long-term copies to object storage with lifecycle rules
 - Use rate limits per tenant so a noisy service cannot take down the log system
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Log pipelines with Loki, Elasticsearch and Fluent... fits together
+node: n1 | The pipeline | 0 | 0 | Produce: applications write to standard output as JSON. | Logging secrets, tokens or personal data. | queue
+node: n2 | Collecting with Fluent Bit | 1 | 1 | Fluent Bit is a lightweight agent that reads, parses and forwards logs. | Using high-cardinality labels in Loki. | process
+node: n3 | Loki or Elasticsearch | 2 | 0 | Loki follows the Prometheus idea: label by a few low-cardinality dimensions (namespace, app, env) and search within them. | Shipping every debug line from production. | process
+node: n4 | Querying with LogQL | 3 | 1 | The first part selects streams by label, the pipeline then filters and parses lines, and the metric forms turn logs into numbers you can graph or alert on. | No parsing, so everything is one unsearchable text blob. | observe
+node: n5 | Retention, volume and cost | 4 | 0 | Set retention per environment and per importance, for example 7 days for debug, 30 for application logs, a year for audit. | No monitoring of the logging system itself. | store
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: logs stop when the disk fills
 
 > **Incident:** An outage investigation begins, and the search backend returns nothing newer than two hours ago. The logging stack's disk filled during a spike when a service started printing stack traces in a tight loop, then the indexer stopped.

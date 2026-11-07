@@ -72,6 +72,23 @@ Every request creates a new time series, so series count and memory explode, que
 > Put request ids in logs and traces, not metric labels.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Telemetry cost, cardinality and retention fits together
+node: n1 | Cardinality | 0 | 0 | Each unique combination of label values creates a separate time series. | Unbounded label values. | process
+node: n2 | Logs | 1 | 1 | Logs are usually the largest volume. | Keeping debug logs on forever. | observe
+node: n3 | Traces | 2 | 0 | Tracing every request in a busy system is expensive. | Head-sampling away the failures. | process
+node: n4 | Retention and downsampling | 3 | 1 | Keep raw metrics at full resolution for days or weeks, then downsample (for example to five-minute averages) for months, because old data is read for trends, not detail. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Cost as a managed budget | 4 | 0 | Attribute volume and cost to teams (by label or by index), show them their usage, and set alerts on growth. | No owner for the telemetry bill. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the monitoring system that fell over
 
 > **Incident:** Prometheus runs out of memory and restarts every few minutes, and alerts stop for two hours.

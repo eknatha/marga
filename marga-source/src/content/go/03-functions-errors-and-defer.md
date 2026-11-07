@@ -92,6 +92,21 @@ The wrapped error. Callers can no longer use errors.Is or errors.As to detect th
 > Use %w when the cause matters to callers.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Functions, errors and defer fits together
+node: n1 | Errors are values | 0 | 0 | Check err != nil right after the call and return early. | Ignoring errors with _. | process
+node: n2 | Inspect errors | 1 | 1 | errors.Is compares an error (and everything it wraps) with a known value. | Returning errors without context. | process
+node: n3 | Defer | 2 | 0 | defer schedules a call to run when the surrounding function returns, whatever the path. | Deferring in a loop and holding files open. | process
+node: n4 | Panic and recover | 3 | 1 | panic stops normal flow and unwinds the stack. | Comparing error text. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The error that said only "failed"
 
 > **Incident:** A nightly job logged one word and no one could tell what failed.

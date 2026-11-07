@@ -55,6 +55,21 @@ virsh dumpxml gpu-vm | grep -A3 hostdev
 nvidia-smi -L        # run inside the guest
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How GPU passthrough and device assignment fits together
+node: n1 | How it works | 0 | 0 | The IOMMU translates and isolates device memory access. | Not checking IOMMU groups. | process
+node: n2 | Assign a device | 1 | 1 | With managed='yes', libvirt binds the device to VFIO when the VM starts and returns it afterwards. | Expecting live migration with passthrough devices. | process
+node: n3 | Limits | 2 | 0 | A passed-through device belongs to one VM at a time. | Skipping reset tests. | process
+node: n4 | Security | 3 | 1 | Assignment relies on the IOMMU for isolation. | Sharing a passthrough device between tenants. | security
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The host that froze on shutdown
 
 > **Incident:** A VM shutdown hung the whole host because the GPU could not reset.

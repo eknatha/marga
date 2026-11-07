@@ -55,6 +55,23 @@ Argo CD renders the chart and applies the manifests itself, without creating a H
 > Different tracking.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Helm and Kustomize with Argo CD fits together
+node: n1 | Helm sources | 0 | 0 | The Application source can be a chart in a Helm repository or a folder in the repository. | Assuming Helm release commands work. | process
+node: n2 | Kustomize | 1 | 1 | Point at a folder with a kustomization.yaml. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n3 | Keep values in the repository | 2 | 0 | Inline overrides set in the UI become live state that nobody reviewed. | Overrides outside the repository. | external
+node: n4 | Pin versions | 3 | 1 | Use an exact chart version, not a floating range or HEAD. | Floating chart versions. | process
+node: n5 | Hooks and tests | 4 | 0 | Helm hooks are converted into Argo CD hooks where possible, but behaviour differs from Helm's release lifecycle. | Not rendering locally before merge. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: The value nobody reviewed
 
 > **Incident:** A parameter was changed in the UI to hotfix replicas, and a later commit silently reverted it.

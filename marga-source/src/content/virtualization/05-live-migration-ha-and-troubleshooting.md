@@ -58,6 +58,21 @@ libvirtd[1043]: internal error: qemu unexpectedly closed the monitor
 libvirtd[1043]: cannot set up guest memory 'pc.ram': Cannot allocate memory
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Live migration, high availability and... fits together
+node: n1 | Live migration | 0 | 0 | Live migration (VMware vMotion, KVM live migration) copies a running guest's memory from one host to another while it keeps running, then switches over in a short pause... | Running clusters at high memory use and calling it efficient. | process
+node: n2 | High availability | 1 | 1 | HA restarts guests on another host after a host failure. | HA with no fencing. | process
+node: n3 | Plan for failure | 2 | 0 | Spare capacity must exist for the guests that restart. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n4 | Troubleshooting checklist | 3 | 1 | Is hardware virtualization on, and is kvm loaded? | Using a snapshot as the way to move a guest. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Maintenance that moved the problem
 
 > **Incident:** Draining a host for patching started a chain of guest failures on the next host.

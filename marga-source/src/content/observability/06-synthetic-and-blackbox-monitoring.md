@@ -125,6 +125,23 @@ Use dedicated test accounts and mark the traffic so analytics and billing ignore
 
 A probe running inside the same cluster as the service cannot see an ingress, DNS or internet-path failure. Run probes from **outside** the failure domain: a second region, another cloud, or a hosted probing service with many locations. Alert when a majority of locations fail, to avoid paging for a problem on the probe's own network.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Blackbox probes and synthetic monitoring fits together
+node: n1 | Two viewpoints | 0 | 0 | You need both. Blackbox tells you something is wrong right now; whitebox tells you why. | Paging on a single failed probe. | process
+node: n2 | The blackbox exporter | 1 | 1 | The exporter performs the probe on request. | Forgetting certificate expiry alerts. | process
+node: n3 | Useful alerts | 2 | 0 | Use for: 2m so one failed probe does not page anyone. | Probing only an internal health endpoint. | observe
+node: n4 | Synthetic journeys | 3 | 1 | A single GET shows the site responds. A synthetic transaction drives a real flow: log in, search, add to cart, check out in a test account. | Synthetic tests that use real customer data or are flaky. | process
+node: n5 | Where to probe from | 4 | 0 | A probe running inside the same cluster as the service cannot see an ingress, DNS or internet-path failure. | Probes running in the same failure domain as the service. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: green dashboards, dead website
 
 > **Incident:** At 14:05 a certificate renewal job fails silently and the certificate expires. Browsers show a full-page warning. Internal dashboards stay green because the application and the load balancer health checks use an internal plain-HTTP endpoint.

@@ -68,6 +68,21 @@ The destination host's CPU model or features differ from the source. Use a commo
 > Migration needs compatible CPUs.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Virtualization operations: libvirt and KVM... fits together
+node: n1 | Know the state | 0 | 0 | The domain XML is the source of truth for a guest: CPUs, memory, disks, NICs, devices. | Changing the running guest without --config. | store
+node: n2 | Snapshots and backups | 1 | 1 | A snapshot captures a guest's disk state (and optionally memory) at a moment. | Treating a snapshot on the same storage as a backup. | store
+node: n3 | Patching a host without downtime | 2 | 0 | Check capacity: the other hosts must have room for the guests on this one. | Live-migrating without checking CPU compatibility and capacity. | process
+node: n4 | Consistent hosts | 3 | 1 | Manage hosts as code: the same kernel and QEMU versions per pool, the same network and storage definitions, one source for libvirt networks and pools. | Drift between hosts is the root of failed migrations ("works on kvm01, fails on kvm02"). | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The snapshot chain
 
 > **Incident:** A database guest became slower every week, and finally froze when its datastore filled.

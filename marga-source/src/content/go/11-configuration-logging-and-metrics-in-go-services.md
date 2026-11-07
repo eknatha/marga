@@ -78,6 +78,19 @@ http.HandleFunc("/healthz", func(w http.ResponseWriter, _ *http.Request) { w.Wri
 
 Keep metric labels low-cardinality: never use user IDs or full URLs. Separate **liveness** from **readiness** checks, and make readiness reflect dependencies such as the database.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Configuration, logging and metrics in Go services fits together
+node: n1 | Configuration | 0 | 0 | Validate at start and fail fast with a clear message. | Free-text logs with no identifiers. | process
+node: n2 | Logging with slog | 1 | 1 | JSON logs with stable keys can be searched and aggregated. | Logging secrets or full connection strings. | observe
+node: n3 | Metrics and health | 2 | 0 | Keep metric labels low-cardinality: never use user IDs or full URLs. | High-cardinality metric labels. | observe
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: One request in a haystack
 
 > **Incident:** Free-text logs made tracing a single failing request very slow.
