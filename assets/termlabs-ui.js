@@ -270,11 +270,13 @@ async function runChecks() {
   box.innerHTML = html;
 }
 A.onAct('tl-check', runChecks);
+/* the hint ladder: every lab hint moves one rung closer to the answer */
+function rung(i, n) { return n < 2 || i === 0 ? 'Nudge' : i >= n - 1 ? 'Nearly the answer' : 'Pointer'; }
 A.onAct('tl-hint', function () {
   var l = cur.lab; if (cur.hintsShown >= l.hints.length) return;
   cur.hintsShown++;
   var ol = $('#tl-hints'); ol.hidden = false;
-  var li = document.createElement('li'); li.innerHTML = plain(l.hints[cur.hintsShown - 1]); ol.appendChild(li);
+  var li = document.createElement('li'); li.innerHTML = '<span class="rung">' + rung(cur.hintsShown - 1, l.hints.length) + '.</span> ' + plain(l.hints[cur.hintsShown - 1]); ol.appendChild(li);
   var b = $('#tl-hint'); b.textContent = cur.hintsShown >= l.hints.length ? 'No more hints' : 'Show the next hint (' + cur.hintsShown + ' of ' + l.hints.length + ' shown)';
   if (cur.hintsShown >= l.hints.length) b.disabled = true;
 });
