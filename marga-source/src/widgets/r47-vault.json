@@ -1,0 +1,667 @@
+[
+ {
+  "id": "vault-lease-exposure",
+  "module": "vault",
+  "lesson": "vault/dynamic-secrets-for-databases-and-clouds",
+  "title": "Credential exposure window",
+  "summary": "The TTL of a credential sets how long a leak stays useful.",
+  "inputs": [
+   {
+    "id": "ttl",
+    "label": "Credential lifetime",
+    "min": 1,
+    "max": 720,
+    "value": 1,
+    "step": 1,
+    "unit": "hours"
+   },
+   {
+    "id": "found",
+    "label": "Time until the leak is found",
+    "min": 1,
+    "max": 2000,
+    "value": 24,
+    "step": 1,
+    "unit": "hours"
+   },
+   {
+    "id": "renew",
+    "label": "Allowed renewals",
+    "min": 0,
+    "max": 50,
+    "value": 0,
+    "step": 1
+   },
+   {
+    "id": "count",
+    "label": "Credentials issued per day",
+    "min": 1,
+    "max": 5000,
+    "value": 200,
+    "step": 10
+   }
+  ],
+  "vars": [
+   [
+    "life",
+    "ttl * (1 + renew)"
+   ],
+   [
+    "expo",
+    "min(life, found)"
+   ],
+   [
+    "useful",
+    "life > found"
+   ],
+   [
+    "live",
+    "count * min(1, life / 24)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Credential",
+    "x": 0,
+    "y": 0,
+    "state": "life>168 ? 2 : (life>24 ? 1 : 0)",
+    "sub": "round(life) + ' hours of validity'"
+   },
+   {
+    "id": "l",
+    "label": "Leak found",
+    "x": 1,
+    "y": 0,
+    "state": "useful ? 2 : 0",
+    "sub": "round(found) + ' hours later'"
+   },
+   {
+    "id": "a",
+    "label": "Attacker use",
+    "x": 2,
+    "y": 0,
+    "state": "useful ? 2 : 0",
+    "sub": "round(expo) + ' hours of access'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "l",
+    "flow": "min(1, life/720 + 0.1)",
+    "bad": "useful"
+   },
+   {
+    "from": "l",
+    "to": "a",
+    "flow": "min(1, expo/720 + 0.1)",
+    "bad": "useful"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Hours of access",
+    "expr": "expo",
+    "dp": 0
+   },
+   {
+    "label": "Credential validity hours",
+    "expr": "life",
+    "dp": 0
+   },
+   {
+    "label": "Live credentials",
+    "expr": "live",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "useful && life > 168",
+    "tone": "bad",
+    "text": "The credential is still valid long after the leak is found. Shorten the TTL or revoke it at once."
+   },
+   {
+    "when": "useful",
+    "tone": "warn",
+    "text": "The credential is still valid when the leak is found. Revoke it and consider a shorter TTL."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The credential expired before the leak was found."
+   }
+  ],
+  "tries": [
+   "Set the lifetime to 720 hours.",
+   "Allow 10 renewals.",
+   "Set the lifetime to 1 hour."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A long lived credential outlives the leak.",
+    "tone": "bad",
+    "values": {
+     "ttl": 720,
+     "found": 24,
+     "renew": 2,
+     "count": 200
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A short lease expires first.",
+    "tone": "good",
+    "values": {
+     "ttl": 1,
+     "found": 24,
+     "renew": 0,
+     "count": 200
+    }
+   }
+  ]
+ },
+ {
+  "id": "vault-raft-quorum",
+  "module": "vault",
+  "lesson": "vault/vault-high-availability-raft-and-disaster-recovery",
+  "title": "Raft nodes and failures",
+  "summary": "The number of Vault nodes and where they sit decides how many failures the cluster survives.",
+  "inputs": [
+   {
+    "id": "nodes",
+    "label": "Vault nodes",
+    "min": 1,
+    "max": 9,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "zones",
+    "label": "Failure zones used",
+    "min": 1,
+    "max": 5,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "lostn",
+    "label": "Nodes failed",
+    "min": 0,
+    "max": 5,
+    "value": 1,
+    "step": 1
+   },
+   {
+    "id": "zonelost",
+    "label": "Zones lost",
+    "min": 0,
+    "max": 3,
+    "value": 0,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "maj",
+    "floor(nodes / 2) + 1"
+   ],
+   [
+    "perz",
+    "ceil(nodes / zones)"
+   ],
+   [
+    "gone",
+    "lostn + zonelost * perz"
+   ],
+   [
+    "alive",
+    "max(0, nodes - gone)"
+   ],
+   [
+    "ok",
+    "alive >= maj"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n",
+    "label": "Nodes",
+    "x": 0,
+    "y": 0,
+    "state": "nodes<3 ? 1 : 0",
+    "sub": "round(nodes) + ' nodes, majority ' + round(maj)"
+   },
+   {
+    "id": "f",
+    "label": "Failures",
+    "x": 1,
+    "y": 0,
+    "state": "ok ? 0 : 2",
+    "sub": "round(gone) + ' nodes lost'"
+   },
+   {
+    "id": "q",
+    "label": "Quorum",
+    "x": 2,
+    "y": 0,
+    "state": "ok ? 0 : 2",
+    "sub": "ok ? 'quorum holds' : 'no quorum'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n",
+    "to": "f",
+    "flow": "min(1, gone/9 + 0.1)",
+    "bad": "!ok"
+   },
+   {
+    "from": "f",
+    "to": "q",
+    "flow": "ok ? 0.2 : 1",
+    "bad": "!ok"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Nodes alive",
+    "expr": "alive",
+    "dp": 0
+   },
+   {
+    "label": "Majority needed",
+    "expr": "maj",
+    "dp": 0
+   },
+   {
+    "label": "Nodes tolerated lost",
+    "expr": "nodes - maj",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!ok",
+    "tone": "bad",
+    "text": "Fewer than a majority are alive, so Vault cannot elect a leader or commit writes. Restore nodes or spread them across more zones."
+   },
+   {
+    "when": "nodes < 3",
+    "tone": "warn",
+    "text": "One or two nodes cannot tolerate a failure. Use three or five nodes."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "A majority stays alive and Vault keeps serving."
+   }
+  ],
+  "tries": [
+   "Put all three nodes in one zone and lose that zone.",
+   "Use five nodes in three zones.",
+   "Lose two of three nodes."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nodes share one zone and the zone fails.",
+    "tone": "bad",
+    "values": {
+     "nodes": 3,
+     "zones": 1,
+     "lostn": 0,
+     "zonelost": 1
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Nodes spread across zones.",
+    "tone": "good",
+    "values": {
+     "nodes": 3,
+     "zones": 3,
+     "lostn": 0,
+     "zonelost": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "vault-secret-rotation",
+  "module": "vault",
+  "lesson": "vault/kv-secrets-engine-and-secret-versioning",
+  "title": "Rotation backlog",
+  "summary": "How many static secrets exist and how often you rotate decides how many are overdue.",
+  "inputs": [
+   {
+    "id": "secrets",
+    "label": "Static secrets",
+    "min": 5,
+    "max": 2000,
+    "value": 300,
+    "step": 5
+   },
+   {
+    "id": "days",
+    "label": "Rotation interval",
+    "min": 1,
+    "max": 365,
+    "value": 90,
+    "step": 1,
+    "unit": "days"
+   },
+   {
+    "id": "crew",
+    "label": "Secrets rotated per week",
+    "min": 1,
+    "max": 500,
+    "value": 20,
+    "step": 1
+   },
+   {
+    "id": "dyn",
+    "label": "Share that could be dynamic",
+    "min": 0,
+    "max": 100,
+    "value": 30,
+    "step": 5,
+    "unit": "%"
+   }
+  ],
+  "vars": [
+   [
+    "need",
+    "secrets * (100 - dyn) / 100"
+   ],
+   [
+    "perweek",
+    "need / max(1, days) * 7"
+   ],
+   [
+    "gap",
+    "perweek - crew"
+   ],
+   [
+    "backlog",
+    "gap > 0"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "s",
+    "label": "Static secrets",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(need) + ' to rotate'"
+   },
+   {
+    "id": "w",
+    "label": "Weekly rotation",
+    "x": 1,
+    "y": 0,
+    "state": "backlog ? 2 : 0",
+    "sub": "round(perweek) + ' needed, ' + round(crew) + ' done'"
+   },
+   {
+    "id": "r",
+    "label": "Risk",
+    "x": 2,
+    "y": 0,
+    "state": "backlog ? 2 : 0",
+    "sub": "backlog ? 'secrets go stale' : 'on schedule'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "s",
+    "to": "w",
+    "flow": "min(1, need/2000 + 0.2)",
+    "bad": "backlog"
+   },
+   {
+    "from": "w",
+    "to": "r",
+    "flow": "backlog ? 0.9 : 0.2",
+    "bad": "backlog"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Rotations needed per week",
+    "expr": "perweek",
+    "dp": 1
+   },
+   {
+    "label": "Rotations done per week",
+    "expr": "crew",
+    "dp": 0
+   },
+   {
+    "label": "Weekly shortfall",
+    "expr": "gap",
+    "dp": 1
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "backlog && gap > 20",
+    "tone": "bad",
+    "text": "Rotation falls far behind, so secrets stay in use for much longer than policy says. Automate rotation or move secrets to dynamic credentials."
+   },
+   {
+    "when": "backlog",
+    "tone": "warn",
+    "text": "Rotation is slightly behind. Automate or reduce the number of static secrets."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Rotation keeps up with the policy."
+   }
+  ],
+  "tries": [
+   "Rotate every day.",
+   "Make 90 percent dynamic.",
+   "Rotate only 1 per week."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Manual rotation cannot keep up.",
+    "tone": "bad",
+    "values": {
+     "secrets": 800,
+     "days": 30,
+     "crew": 20,
+     "dyn": 0
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Dynamic secrets cut the work.",
+    "tone": "good",
+    "values": {
+     "secrets": 800,
+     "days": 30,
+     "crew": 20,
+     "dyn": 90
+    }
+   }
+  ]
+ },
+ {
+  "id": "vault-token-ttl",
+  "module": "vault",
+  "lesson": "vault/authentication-methods-and-tokens",
+  "title": "Token lifetime and renewal load",
+  "summary": "Short TTLs limit a leak, but they increase the renewal traffic Vault must serve.",
+  "inputs": [
+   {
+    "id": "clients",
+    "label": "Clients with tokens",
+    "min": 10,
+    "max": 50000,
+    "value": 2000,
+    "step": 10
+   },
+   {
+    "id": "ttl",
+    "label": "Token TTL",
+    "min": 1,
+    "max": 1440,
+    "value": 60,
+    "step": 1,
+    "unit": "minutes"
+   },
+   {
+    "id": "cap",
+    "label": "Vault requests per second",
+    "min": 10,
+    "max": 5000,
+    "value": 500,
+    "step": 10
+   },
+   {
+    "id": "other",
+    "label": "Other requests per second",
+    "min": 0,
+    "max": 5000,
+    "value": 100,
+    "step": 10
+   }
+  ],
+  "vars": [
+   [
+    "rps",
+    "clients / (ttl * 60) * 2"
+   ],
+   [
+    "total",
+    "rps + other"
+   ],
+   [
+    "use",
+    "total / max(1, cap)"
+   ],
+   [
+    "long",
+    "ttl > 720"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "Clients",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(clients) + ' tokens'"
+   },
+   {
+    "id": "v",
+    "label": "Vault",
+    "x": 1,
+    "y": 0,
+    "state": "use>1 ? 2 : (use>0.7 ? 1 : 0)",
+    "sub": "round(total) + ' req/s'"
+   },
+   {
+    "id": "t",
+    "label": "Leak window",
+    "x": 2,
+    "y": 0,
+    "state": "long ? 2 : (ttl>240 ? 1 : 0)",
+    "sub": "round(ttl) + ' minutes'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "v",
+    "flow": "min(1, rps/cap + 0.1)",
+    "bad": "use>1"
+   },
+   {
+    "from": "v",
+    "to": "t",
+    "flow": "min(1, ttl/1440 + 0.1)",
+    "bad": "long"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Renewal requests per second",
+    "expr": "rps",
+    "dp": 2
+   },
+   {
+    "label": "Total load percent",
+    "expr": "use * 100",
+    "dp": 0
+   },
+   {
+    "label": "Leak window minutes",
+    "expr": "ttl",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "use > 1",
+    "tone": "bad",
+    "text": "Vault is overloaded by renewals and other requests. Lengthen the TTL a little, use batch tokens or add capacity."
+   },
+   {
+    "when": "long",
+    "tone": "warn",
+    "text": "The TTL is very long, so a leaked token stays useful for most of a day. Shorten it."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Renewal load is modest and the leak window is short."
+   }
+  ],
+  "tries": [
+   "Set the TTL to 1 minute for 50000 clients.",
+   "Set the TTL to 1440 minutes.",
+   "Raise the capacity to 5000."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Tiny TTLs overload Vault.",
+    "tone": "bad",
+    "values": {
+     "clients": 50000,
+     "ttl": 1,
+     "cap": 500,
+     "other": 200
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A balanced TTL.",
+    "tone": "good",
+    "values": {
+     "clients": 2000,
+     "ttl": 60,
+     "cap": 500,
+     "other": 100
+    }
+   }
+  ]
+ }
+]

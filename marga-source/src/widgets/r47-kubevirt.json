@@ -1,0 +1,673 @@
+[
+ {
+  "id": "kv-migration-time",
+  "module": "kubevirt",
+  "lesson": "kubevirt/live-migration-node-drains-and-eviction",
+  "title": "Live migration time and convergence",
+  "summary": "Guest memory size, how fast it changes and the migration bandwidth decide whether a live migration finishes.",
+  "inputs": [
+   {
+    "id": "mem",
+    "label": "Guest memory",
+    "min": 1,
+    "max": 512,
+    "value": 32,
+    "step": 1,
+    "unit": "GiB"
+   },
+   {
+    "id": "dirty",
+    "label": "Memory changed per second",
+    "min": 1,
+    "max": 3000,
+    "value": 200,
+    "step": 10,
+    "unit": "MiB/s"
+   },
+   {
+    "id": "bw",
+    "label": "Migration bandwidth",
+    "min": 50,
+    "max": 5000,
+    "value": 1000,
+    "step": 50,
+    "unit": "MiB/s"
+   },
+   {
+    "id": "ac",
+    "label": "Auto-converge on",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "eff",
+    "ac ? dirty * 0.4 : dirty"
+   ],
+   [
+    "net",
+    "bw - eff"
+   ],
+   [
+    "ok",
+    "net > bw * 0.1"
+   ],
+   [
+    "secs",
+    "ok ? mem * 1024 / max(1, net) : 0"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "s",
+    "label": "Source node",
+    "x": 0,
+    "y": 0,
+    "state": "ok ? (secs>300 ? 1 : 0) : 2",
+    "sub": "round(eff) + ' MiB/s dirtied'"
+   },
+   {
+    "id": "n",
+    "label": "Network",
+    "x": 1,
+    "y": 0,
+    "state": "bw<200 ? 1 : 0",
+    "sub": "round(bw) + ' MiB/s'"
+   },
+   {
+    "id": "t",
+    "label": "Target node",
+    "x": 2,
+    "y": 0,
+    "state": "ok ? 0 : 2",
+    "sub": "ok ? 'catches up' : 'never catches up'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "s",
+    "to": "n",
+    "flow": "min(1, eff/bw)",
+    "bad": "!ok"
+   },
+   {
+    "from": "n",
+    "to": "t",
+    "flow": "min(1, bw/5000 + 0.1)",
+    "bad": "!ok"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Time to migrate seconds",
+    "expr": "secs",
+    "dp": 0
+   },
+   {
+    "label": "Effective dirty rate MiB/s",
+    "expr": "eff",
+    "dp": 0
+   },
+   {
+    "label": "Spare bandwidth MiB/s",
+    "expr": "net",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!ok",
+    "tone": "bad",
+    "text": "Memory changes almost as fast as it is copied, so the migration never converges and the drain waits. Add bandwidth, turn on auto-converge or migrate at a quieter time."
+   },
+   {
+    "when": "secs > 300",
+    "tone": "warn",
+    "text": "The migration finishes but takes more than five minutes, so a busy guest may be throttled or time out."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The migration converges quickly with room to spare."
+   }
+  ],
+  "tries": [
+   "Raise the dirty rate to 900 MiB/s with auto-converge off.",
+   "Turn auto-converge on.",
+   "Double the bandwidth."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A busy database cannot be copied.",
+    "tone": "bad",
+    "values": {
+     "mem": 64,
+     "dirty": 950,
+     "bw": 1000,
+     "ac": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Auto-converge and more bandwidth.",
+    "tone": "good",
+    "values": {
+     "mem": 64,
+     "dirty": 950,
+     "bw": 2500,
+     "ac": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "kv-pod-memory",
+  "module": "kubevirt",
+  "lesson": "kubevirt/cpu-memory-hugepages-and-vm-performance",
+  "title": "Pod memory limit for a VM",
+  "summary": "The pod limit must cover guest memory plus an estimated overhead, or the launcher is killed for running out of memory.",
+  "inputs": [
+   {
+    "id": "guest",
+    "label": "Guest memory",
+    "min": 1,
+    "max": 256,
+    "value": 16,
+    "step": 1,
+    "unit": "GiB"
+   },
+   {
+    "id": "vcpu",
+    "label": "Guest vCPUs",
+    "min": 1,
+    "max": 64,
+    "value": 4,
+    "step": 1
+   },
+   {
+    "id": "limit",
+    "label": "Pod memory limit",
+    "min": 1,
+    "max": 300,
+    "value": 16,
+    "step": 1,
+    "unit": "GiB"
+   },
+   {
+    "id": "dev",
+    "label": "Devices and disks attached",
+    "min": 1,
+    "max": 20,
+    "value": 3,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "over",
+    "0.25 + guest * 0.02 + vcpu * 0.01 + dev * 0.03"
+   ],
+   [
+    "need",
+    "guest + over"
+   ],
+   [
+    "short",
+    "limit < need"
+   ],
+   [
+    "room",
+    "limit - need"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "g",
+    "label": "Guest memory",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(guest) + ' GiB'"
+   },
+   {
+    "id": "o",
+    "label": "Overhead",
+    "x": 1,
+    "y": 0,
+    "state": "0",
+    "sub": "round(over*100)/100 + ' GiB estimated'"
+   },
+   {
+    "id": "p",
+    "label": "Pod limit",
+    "x": 2,
+    "y": 0,
+    "state": "short ? 2 : (room<0.5 ? 1 : 0)",
+    "sub": "round(limit) + ' GiB'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "g",
+    "to": "p",
+    "flow": "min(1, guest/256 + 0.1)",
+    "bad": "short"
+   },
+   {
+    "from": "o",
+    "to": "p",
+    "flow": "min(1, over/4 + 0.1)",
+    "bad": "short"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Memory the pod needs GiB",
+    "expr": "need",
+    "dp": 2
+   },
+   {
+    "label": "Overhead estimate GiB",
+    "expr": "over",
+    "dp": 2
+   },
+   {
+    "label": "Room left GiB",
+    "expr": "room",
+    "dp": 2
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "short",
+    "tone": "bad",
+    "text": "The limit is below guest memory plus overhead, so the container will be killed with OOMKilled. Raise the limit above the sum."
+   },
+   {
+    "when": "room < 0.5",
+    "tone": "warn",
+    "text": "The limit leaves almost no room for spikes in overhead. Add a margin."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The pod limit covers the guest and its overhead with margin."
+   }
+  ],
+  "tries": [
+   "Set the limit equal to guest memory.",
+   "Add 16 more vCPUs.",
+   "Raise the limit by 2 GiB."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Limit equals guest memory.",
+    "tone": "bad",
+    "values": {
+     "guest": 16,
+     "vcpu": 8,
+     "limit": 16,
+     "dev": 6
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Limit with proper headroom.",
+    "tone": "good",
+    "values": {
+     "guest": 16,
+     "vcpu": 8,
+     "limit": 18,
+     "dev": 6
+    }
+   }
+  ]
+ },
+ {
+  "id": "kv-node-density",
+  "module": "kubevirt",
+  "lesson": "kubevirt/cpu-memory-hugepages-and-vm-performance",
+  "title": "VMs per node with overcommit",
+  "summary": "CPU overcommit and memory decide how many VMs a node can hold before neighbours start to suffer.",
+  "inputs": [
+   {
+    "id": "cores",
+    "label": "Node CPU cores",
+    "min": 8,
+    "max": 128,
+    "value": 48,
+    "step": 2
+   },
+   {
+    "id": "mem",
+    "label": "Node memory",
+    "min": 64,
+    "max": 2048,
+    "value": 512,
+    "step": 32,
+    "unit": "GiB"
+   },
+   {
+    "id": "vc",
+    "label": "vCPUs per VM",
+    "min": 1,
+    "max": 32,
+    "value": 4,
+    "step": 1
+   },
+   {
+    "id": "vm",
+    "label": "Memory per VM",
+    "min": 1,
+    "max": 256,
+    "value": 16,
+    "step": 1,
+    "unit": "GiB"
+   },
+   {
+    "id": "oc",
+    "label": "CPU overcommit ratio",
+    "min": 1,
+    "max": 10,
+    "value": 3,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "bycpu",
+    "cores * oc / vc"
+   ],
+   [
+    "bymem",
+    "(mem * 0.9) / (vm * 1.05)"
+   ],
+   [
+    "fit",
+    "floor(min(bycpu, bymem))"
+   ],
+   [
+    "ratio",
+    "oc"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "c",
+    "label": "CPU capacity",
+    "x": 0,
+    "y": 0,
+    "state": "oc>5 ? 2 : (oc>3 ? 1 : 0)",
+    "sub": "round(bycpu) + ' VMs by CPU'"
+   },
+   {
+    "id": "m",
+    "label": "Memory capacity",
+    "x": 1,
+    "y": 0,
+    "state": "0",
+    "sub": "round(bymem) + ' VMs by memory'"
+   },
+   {
+    "id": "n",
+    "label": "Node",
+    "x": 2,
+    "y": 0,
+    "state": "oc>5 ? 2 : (oc>3 ? 1 : 0)",
+    "sub": "round(fit) + ' VMs fit'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "c",
+    "to": "n",
+    "flow": "min(1, bycpu/100 + 0.1)",
+    "bad": "oc>5"
+   },
+   {
+    "from": "m",
+    "to": "n",
+    "flow": "min(1, bymem/100 + 0.1)",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "VMs that fit",
+    "expr": "fit",
+    "dp": 0
+   },
+   {
+    "label": "Limited by CPU",
+    "expr": "bycpu",
+    "dp": 0
+   },
+   {
+    "label": "Limited by memory",
+    "expr": "bymem",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "oc > 5",
+    "tone": "bad",
+    "text": "High CPU overcommit packs many VMs but busy neighbours will steal CPU and cause latency. Keep critical VMs on dedicated CPUs."
+   },
+   {
+    "when": "oc > 3",
+    "tone": "warn",
+    "text": "Moderate overcommit works for light workloads. Watch CPU steal and throttling."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Conservative overcommit leaves headroom for bursts."
+   }
+  ],
+  "tries": [
+   "Raise overcommit to 8.",
+   "Double the node memory.",
+   "Give each VM 16 vCPUs."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Dense packing with heavy overcommit.",
+    "tone": "bad",
+    "values": {
+     "cores": 48,
+     "mem": 512,
+     "vc": 4,
+     "vm": 8,
+     "oc": 8
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Moderate density with headroom.",
+    "tone": "good",
+    "values": {
+     "cores": 48,
+     "mem": 512,
+     "vc": 4,
+     "vm": 16,
+     "oc": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "kv-image-clone-time",
+  "module": "kubevirt",
+  "lesson": "kubevirt/vm-disks-datavolumes-and-cdi",
+  "title": "Image import versus clone",
+  "summary": "Downloading an image for every VM is slow. A golden image cloned inside the cluster is much faster.",
+  "inputs": [
+   {
+    "id": "size",
+    "label": "Image size",
+    "min": 1,
+    "max": 200,
+    "value": 20,
+    "step": 1,
+    "unit": "GB"
+   },
+   {
+    "id": "link",
+    "label": "Download link speed",
+    "min": 50,
+    "max": 10000,
+    "value": 500,
+    "step": 50,
+    "unit": "Mbit/s"
+   },
+   {
+    "id": "n",
+    "label": "VMs to create",
+    "min": 1,
+    "max": 200,
+    "value": 20,
+    "step": 1
+   },
+   {
+    "id": "gold",
+    "label": "Use a golden image clone",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "dl",
+    "size * 8000 / max(1, link)"
+   ],
+   [
+    "cl",
+    "size * 1000 / 400"
+   ],
+   [
+    "each",
+    "gold ? cl : dl"
+   ],
+   [
+    "total",
+    "each * n / 4"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "i",
+    "label": "Image source",
+    "x": 0,
+    "y": 0,
+    "state": "gold ? 0 : (dl>300 ? 2 : 1)",
+    "sub": "round(dl) + ' s per download'"
+   },
+   {
+    "id": "g",
+    "label": "Golden PVC",
+    "x": 1,
+    "y": 0,
+    "state": "gold ? 0 : 1",
+    "sub": "gold ? 'clone in cluster' : 'not used'"
+   },
+   {
+    "id": "v",
+    "label": "New VMs",
+    "x": 2,
+    "y": 0,
+    "state": "total>1800 ? 2 : (total>600 ? 1 : 0)",
+    "sub": "round(total/60) + ' min for all'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "i",
+    "to": "v",
+    "flow": "gold ? 0.1 : min(1, dl/600 + 0.2)",
+    "bad": "!gold && dl>300"
+   },
+   {
+    "from": "g",
+    "to": "v",
+    "flow": "gold ? min(1, 0.6) : 0.1",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Time per VM seconds",
+    "expr": "each",
+    "dp": 0
+   },
+   {
+    "label": "Total time minutes",
+    "expr": "total / 60",
+    "dp": 0
+   },
+   {
+    "label": "Download time seconds",
+    "expr": "dl",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "total > 1800",
+    "tone": "bad",
+    "text": "Creating the VMs takes more than half an hour because each one pulls the image. Import it once and clone."
+   },
+   {
+    "when": "total > 600",
+    "tone": "warn",
+    "text": "Creation is slow enough to delay deployments. A golden image would cut this sharply."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "VMs are created quickly."
+   }
+  ],
+  "tries": [
+   "Create 200 VMs with no golden image.",
+   "Turn on the golden image.",
+   "Slow the link to 100 Mbit/s."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Every VM downloads the image.",
+    "tone": "bad",
+    "values": {
+     "size": 40,
+     "link": 200,
+     "n": 50,
+     "gold": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Clone from a golden PVC.",
+    "tone": "good",
+    "values": {
+     "size": 40,
+     "link": 200,
+     "n": 50,
+     "gold": true
+    }
+   }
+  ]
+ }
+]

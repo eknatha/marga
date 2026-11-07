@@ -1,0 +1,664 @@
+[
+ {
+  "id": "ceph-failure-headroom",
+  "module": "ceph",
+  "lesson": "ceph/capacity-planning-upgrades-and-operating-ceph",
+  "title": "Capacity after a host failure",
+  "summary": "Used space and the number of hosts decide whether the survivors can absorb a lost host.",
+  "inputs": [
+   {
+    "id": "hosts",
+    "label": "Hosts",
+    "min": 3,
+    "max": 60,
+    "value": 10,
+    "step": 1
+   },
+   {
+    "id": "tb",
+    "label": "Raw TB per host",
+    "min": 10,
+    "max": 400,
+    "value": 60,
+    "step": 10,
+    "unit": "TB"
+   },
+   {
+    "id": "used",
+    "label": "Raw capacity used",
+    "min": 10,
+    "max": 99,
+    "value": 70,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "lost",
+    "label": "Hosts failed at once",
+    "min": 1,
+    "max": 3,
+    "value": 1,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "raw",
+    "hosts * tb"
+   ],
+   [
+    "usedtb",
+    "raw * used / 100"
+   ],
+   [
+    "left",
+    "max(1, (hosts - lost) * tb)"
+   ],
+   [
+    "after",
+    "usedtb / left * 100"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "u",
+    "label": "Used now",
+    "x": 0,
+    "y": 0,
+    "state": "used>85 ? 2 : (used>70 ? 1 : 0)",
+    "sub": "round(used) + ' percent'"
+   },
+   {
+    "id": "f",
+    "label": "Failure",
+    "x": 1,
+    "y": 0,
+    "state": "after>95 ? 2 : (after>85 ? 1 : 0)",
+    "sub": "'lose ' + round(lost) + ' host(s)'"
+   },
+   {
+    "id": "a",
+    "label": "After rebuild",
+    "x": 2,
+    "y": 0,
+    "state": "after>95 ? 2 : (after>85 ? 1 : 0)",
+    "sub": "round(after) + ' percent'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "u",
+    "to": "f",
+    "flow": "min(1, used/100)",
+    "bad": "after>95"
+   },
+   {
+    "from": "f",
+    "to": "a",
+    "flow": "min(1, after/100)",
+    "bad": "after>95"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Used after recovery percent",
+    "expr": "after",
+    "dp": 0
+   },
+   {
+    "label": "Raw TB",
+    "expr": "raw",
+    "dp": 0
+   },
+   {
+    "label": "Raw TB left",
+    "expr": "left",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "after > 95",
+    "tone": "bad",
+    "text": "The survivors would be full, so writes would stop during recovery. Add capacity or keep usage lower."
+   },
+   {
+    "when": "after > 85",
+    "tone": "warn",
+    "text": "The cluster would be nearfull after recovery. Add hosts soon."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The cluster can absorb the failure and stay below the warning levels."
+   }
+  ],
+  "tries": [
+   "Set used to 85 percent.",
+   "Fail two hosts at once.",
+   "Add ten more hosts."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Too full to survive a host loss.",
+    "tone": "bad",
+    "values": {
+     "hosts": 10,
+     "tb": 60,
+     "used": 82,
+     "lost": 1
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Headroom for a host loss.",
+    "tone": "good",
+    "values": {
+     "hosts": 10,
+     "tb": 60,
+     "used": 62,
+     "lost": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "ceph-ec-overhead",
+  "module": "ceph",
+  "lesson": "ceph/replication-erasure-coding-and-durability",
+  "title": "Replication versus erasure coding",
+  "summary": "Raw space, failures tolerated and hosts required for a replicated pool and an erasure coded pool.",
+  "inputs": [
+   {
+    "id": "data",
+    "label": "Data stored",
+    "min": 10,
+    "max": 5000,
+    "value": 500,
+    "step": 10,
+    "unit": "TB"
+   },
+   {
+    "id": "k",
+    "label": "EC data chunks (k)",
+    "min": 2,
+    "max": 12,
+    "value": 4,
+    "step": 1
+   },
+   {
+    "id": "m",
+    "label": "EC coding chunks (m)",
+    "min": 1,
+    "max": 4,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "hosts",
+    "label": "Hosts available",
+    "min": 3,
+    "max": 40,
+    "value": 8,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "rep",
+    "data * 3"
+   ],
+   [
+    "ec",
+    "data * (k + m) / k"
+   ],
+   [
+    "saved",
+    "rep - ec"
+   ],
+   [
+    "short",
+    "hosts < k + m"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "r",
+    "label": "Replicated size 3",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(rep) + ' TB raw'"
+   },
+   {
+    "id": "e",
+    "label": "EC k+m",
+    "x": 1,
+    "y": 0,
+    "state": "short ? 2 : 0",
+    "sub": "round(ec) + ' TB raw'"
+   },
+   {
+    "id": "h",
+    "label": "Hosts",
+    "x": 2,
+    "y": 0,
+    "state": "short ? 2 : 0",
+    "sub": "round(hosts) + ' available, ' + round(k+m) + ' needed'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "r",
+    "to": "e",
+    "flow": "min(1, rep/10000 + 0.2)",
+    "bad": "false"
+   },
+   {
+    "from": "e",
+    "to": "h",
+    "flow": "min(1, ec/10000 + 0.2)",
+    "bad": "short"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Replicated raw TB",
+    "expr": "rep",
+    "dp": 0
+   },
+   {
+    "label": "Erasure coded raw TB",
+    "expr": "ec",
+    "dp": 0
+   },
+   {
+    "label": "Raw TB saved",
+    "expr": "saved",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "short",
+    "tone": "bad",
+    "text": "There are fewer hosts than chunks, so placement groups cannot become active. Add hosts or lower k+m."
+   },
+   {
+    "when": "m < 2",
+    "tone": "warn",
+    "text": "With a single coding chunk the pool survives only one failure at a time."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The profile saves raw space and has enough hosts for its chunks."
+   }
+  ],
+  "tries": [
+   "Reduce hosts to 5 with k=4 and m=2.",
+   "Raise k to 8 and m to 3.",
+   "Set m to 1."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Not enough hosts for the profile.",
+    "tone": "bad",
+    "values": {
+     "data": 500,
+     "k": 4,
+     "m": 2,
+     "hosts": 5
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Enough hosts for 4+2.",
+    "tone": "good",
+    "values": {
+     "data": 500,
+     "k": 4,
+     "m": 2,
+     "hosts": 8
+    }
+   }
+  ]
+ },
+ {
+  "id": "ceph-recovery-window",
+  "module": "ceph",
+  "lesson": "ceph/ceph-failures-recovery-and-health-warnings",
+  "title": "Recovery window after a failure",
+  "summary": "How long the cluster runs with fewer copies depends on how much data must be rebuilt and how fast.",
+  "inputs": [
+   {
+    "id": "lost",
+    "label": "Data on the failed host",
+    "min": 1,
+    "max": 200,
+    "value": 40,
+    "step": 1,
+    "unit": "TB"
+   },
+   {
+    "id": "bw",
+    "label": "Cluster recovery speed",
+    "min": 100,
+    "max": 10000,
+    "value": 1500,
+    "step": 50,
+    "unit": "MB/s"
+   },
+   {
+    "id": "client",
+    "label": "Share kept for clients",
+    "min": 0,
+    "max": 90,
+    "value": 40,
+    "step": 5,
+    "unit": "%"
+   },
+   {
+    "id": "size",
+    "label": "Replicas",
+    "min": 2,
+    "max": 4,
+    "value": 3,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "rate",
+    "bw * (100 - client) / 100"
+   ],
+   [
+    "secs",
+    "lost * 1000000 / max(1, rate)"
+   ],
+   [
+    "hrs",
+    "secs / 3600"
+   ],
+   [
+    "risk",
+    "size < 3 ? hrs * 2 : hrs"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "f",
+    "label": "Failed host",
+    "x": 0,
+    "y": 0,
+    "state": "1",
+    "sub": "round(lost) + ' TB to rebuild'"
+   },
+   {
+    "id": "r",
+    "label": "Recovery",
+    "x": 1,
+    "y": 0,
+    "state": "hrs>48 ? 2 : (hrs>12 ? 1 : 0)",
+    "sub": "round(rate) + ' MB/s'"
+   },
+   {
+    "id": "d",
+    "label": "Fully replicated",
+    "x": 2,
+    "y": 0,
+    "state": "hrs>48 ? 2 : (hrs>12 ? 1 : 0)",
+    "sub": "round(hrs) + ' hours'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "f",
+    "to": "r",
+    "flow": "min(1, lost/200 + 0.1)",
+    "bad": "hrs>48"
+   },
+   {
+    "from": "r",
+    "to": "d",
+    "flow": "min(1, rate/10000 + 0.1)",
+    "bad": "hrs>48"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Recovery time hours",
+    "expr": "hrs",
+    "dp": 1
+   },
+   {
+    "label": "Rate for recovery MB/s",
+    "expr": "rate",
+    "dp": 0
+   },
+   {
+    "label": "Exposure weighted hours",
+    "expr": "risk",
+    "dp": 1
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "hrs > 48",
+    "tone": "bad",
+    "text": "The cluster stays degraded for more than two days. A second failure in that window can lose data, so add recovery bandwidth or capacity."
+   },
+   {
+    "when": "hrs > 12",
+    "tone": "warn",
+    "text": "The degraded window is long. Check recovery settings and network speed."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Recovery finishes quickly and the risk window is short."
+   }
+  ],
+  "tries": [
+   "Give clients 90 percent of the bandwidth.",
+   "Use only 2 replicas.",
+   "Double the recovery speed."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A long, risky recovery.",
+    "tone": "bad",
+    "values": {
+     "lost": 120,
+     "bw": 400,
+     "client": 80,
+     "size": 2
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Fast recovery with three copies.",
+    "tone": "good",
+    "values": {
+     "lost": 40,
+     "bw": 3000,
+     "client": 30,
+     "size": 3
+    }
+   }
+  ]
+ },
+ {
+  "id": "ceph-pg-count",
+  "module": "ceph",
+  "lesson": "ceph/crush-pools-and-placement-groups",
+  "title": "Placement groups per OSD",
+  "summary": "The pool PG count and replica size decide how many placement groups each OSD carries.",
+  "inputs": [
+   {
+    "id": "osds",
+    "label": "OSDs",
+    "min": 3,
+    "max": 500,
+    "value": 60,
+    "step": 1
+   },
+   {
+    "id": "pgs",
+    "label": "PGs in the pool",
+    "min": 8,
+    "max": 16384,
+    "value": 1024,
+    "step": 8
+   },
+   {
+    "id": "size",
+    "label": "Replicas",
+    "min": 2,
+    "max": 4,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "pools",
+    "label": "Pools of this size",
+    "min": 1,
+    "max": 20,
+    "value": 3,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "per",
+    "pgs * size * pools / osds"
+   ],
+   [
+    "ideal",
+    "pow(2, round(log(100 * osds / (size * pools)) / log(2)))"
+   ],
+   [
+    "low",
+    "per < 50"
+   ],
+   [
+    "high",
+    "per > 250"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "p",
+    "label": "PG count",
+    "x": 0,
+    "y": 0,
+    "state": "high ? 2 : (low ? 1 : 0)",
+    "sub": "round(pgs) + ' per pool'"
+   },
+   {
+    "id": "o",
+    "label": "OSDs",
+    "x": 1,
+    "y": 0,
+    "state": "high ? 2 : (low ? 1 : 0)",
+    "sub": "round(per) + ' PGs per OSD'"
+   },
+   {
+    "id": "i",
+    "label": "Suggested count",
+    "x": 2,
+    "y": 0,
+    "state": "0",
+    "sub": "round(ideal) + ' per pool'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "p",
+    "to": "o",
+    "flow": "min(1, per/300)",
+    "bad": "high"
+   },
+   {
+    "from": "o",
+    "to": "i",
+    "flow": "0.4",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "PGs per OSD",
+    "expr": "per",
+    "dp": 0
+   },
+   {
+    "label": "Suggested PGs per pool",
+    "expr": "ideal",
+    "dp": 0
+   },
+   {
+    "label": "OSDs",
+    "expr": "osds",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "high",
+    "tone": "bad",
+    "text": "Each OSD carries too many PGs, which costs memory and slows peering. Reduce the PG count or add OSDs."
+   },
+   {
+    "when": "low",
+    "tone": "warn",
+    "text": "Each OSD carries few PGs, so data may spread unevenly. Raise the PG count or let the autoscaler do it."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The number of PGs per OSD is in a healthy range around 100."
+   }
+  ],
+  "tries": [
+   "Set PGs to 8192.",
+   "Set PGs to 16.",
+   "Add 200 OSDs."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Far too many placement groups.",
+    "tone": "bad",
+    "values": {
+     "osds": 30,
+     "pgs": 4096,
+     "size": 3,
+     "pools": 3
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A balanced PG count.",
+    "tone": "good",
+    "values": {
+     "osds": 60,
+     "pgs": 1024,
+     "size": 3,
+     "pools": 3
+    }
+   }
+  ]
+ }
+]
