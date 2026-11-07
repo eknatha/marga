@@ -104,6 +104,21 @@ This is abbreviated sample output. The symbols matter:
 
 > **Tip:** Save a plan with `terraform plan -out=tfplan` and apply exactly that file with `terraform apply tfplan`. What was reviewed is then exactly what runs.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Infrastructure as code and HCL basics fits together
+node: n1 | Why IaC | 0 | 0 | Repeatable: the same files create the same result in every environment. | Using the same names and state for every environment. | process
+node: n2 | The workflow | 1 | 1 | . | Applying without reading the plan. | queue
+node: n3 | HCL in five minutes | 2 | 0 | HCL (HashiCorp Configuration Language) is built from blocks that contain arguments. | Leaving provider versions unpinned. | process
+node: n4 | Reading a plan | 3 | 1 | This is abbreviated sample output. | Editing resources in the console, so reality drifts from the code. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the plan wants to destroy the database
 
 > **Incident:** A small change to a tag is proposed in review. The plan output says `1 to add, 0 to change, 1 to destroy`, and the destroyed resource is the production database.

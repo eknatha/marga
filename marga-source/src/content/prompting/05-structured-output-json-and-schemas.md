@@ -70,6 +70,21 @@ Use forced tool use or schema-constrained output; and parse strictly, rejecting 
 > Do not rely on a polite format request alone.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Structured output: JSON and schemas fits together
+node: n1 | Define the shape | 0 | 0 | Write the schema first, with allowed values and short descriptions. | Parsing JSON with regular expressions. | process
+node: n2 | Methods | 1 | 1 | Prompt only: describe the JSON and show examples. | Works often, and can fail by adding commentary or code fences. | process
+node: n3 | Parse strictly | 2 | 0 | Parse with a real JSON parser, never with regular expressions. | No handling for parse failure. | process
+node: n4 | Design for success | 3 | 1 | Use enums for categories, so the answer is one of a known set. | Free-text fields where an enum would do. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The comma that stopped the pipeline
 
 > **Incident:** An overnight extraction job halted on one invalid JSON line.

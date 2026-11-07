@@ -51,6 +51,19 @@ An agent calls tools, sees results and decides the next step until it finishes. 
 
 Set **step limits**, **time and cost budgets** and tool allowlists. Save checkpoints so work can resume. Handle tool errors by retrying a limited number of times and then asking for help. Log every step with inputs and outputs for review, and require approval for actions with side effects.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Agents and multi-step workflows fits together
+node: n1 | Workflows | 0 | 0 | Chaining: step one extracts, step two transforms, step three formats. | No step or budget limits. | queue
+node: n2 | The agent loop | 1 | 1 | An agent calls tools, sees results and decides the next step until it finishes. | Using an agent where a workflow would do. | process
+node: n3 | Controls | 2 | 0 | Set step limits, time and cost budgets and tool allowlists. | Unlimited retries of a failing tool. | process
+edge: n1 | n2
+edge: n2 | n3
+```
+
 ## Incident: A dozen calls for one task
 
 > **Incident:** An agent looped on a simple task and exceeded its budget.

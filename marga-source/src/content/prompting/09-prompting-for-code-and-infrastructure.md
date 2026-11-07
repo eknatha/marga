@@ -45,6 +45,21 @@ Models can invent flags and fields. Linters and dry runs catch many errors cheap
 
 Never paste secrets into prompts. Do not let generated commands run directly against production. Use review, a staging environment and guards such as `prevent_destroy` for important resources.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Prompting for code and infrastructure work fits together
+node: n1 | A good prompt | 0 | 0 | Name versions, tools, metric names and conventions. | Prompts with no versions or environment. | process
+node: n2 | Small changes | 1 | 1 | Ask for a diff or a single function, not a whole rewrite. | Applying generated changes without reading the plan. | process
+node: n3 | Verify | 2 | 0 | Models can invent flags and fields. Linters and dry runs catch many errors cheaply. | Check the Common mistakes list below this diagram for what usually goes wrong here. | observe
+node: n4 | Safety | 3 | 1 | Never paste secrets into prompts. Do not let generated commands run directly against production. | Pasting secrets into prompts. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The plan that replaced the database
 
 > **Incident:** A generated rename caused Terraform to replace a database.

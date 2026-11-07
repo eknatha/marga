@@ -85,6 +85,23 @@ terraform validate, which checks syntax and references without creating anything
 > The cheapest layer finds many errors. Run it first and on every change.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Testing Terraform code fits together
+node: n1 | Layers | 0 | 0 | . | Tests that leave resources behind. | process
+node: n2 | The cheap layers in a pipeline | 1 | 1 | Run these on every change. They need no cloud credentials for most steps (use -backend=false and, for the plan, a read-only role). | Only testing by applying to production. | queue
+node: n3 | terraform test | 2 | 0 | Terraform has a built-in test framework with files that end in .tftest.hcl. | Integration tests on every commit in an expensive account. | observe
+node: n4 | Integration tests | 3 | 1 | Use a separate account or project with budget alerts, unique names (random suffix) so tests can run in parallel, and a clean-up job that removes leftovers older than a... | Policy checks that can be skipped by developers. | observe
+node: n5 | What to assert | 4 | 0 | Security: encryption on, public access off, least-privilege policies. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the module that opened the database
 
 > **Incident:** A module update makes a database reachable from the internet in a staging account. It is found two weeks later by an external scan.

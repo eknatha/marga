@@ -1,0 +1,50 @@
+{
+ "what-vault-is-and-the-secrets-problem": {
+  "r": "A database password lived in a config file copied into six repositories. When a contractor left, nobody knew where all the copies were, so the password was never changed.",
+  "x": "Move secrets out of files and into a system that gives each caller its own short-lived, audited access."
+ },
+ "starting-vault-seal-unseal-and-storage": {
+  "r": "A cluster restarted after a patch and stayed sealed all night because the three key holders were on holiday. The team moved to auto-unseal with a cloud KMS.",
+  "x": "Decide how Vault will unseal before the first production restart, not during it. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "authentication-methods-and-tokens": {
+  "r": "Applications logged in with a static AppRole secret stored beside the code. That moved the secret problem rather than solving it. Switching to Kubernetes service account login removed the stored credential.",
+  "x": "The best login is one that proves identity from the platform, like a service account or cloud role, instead of a stored password."
+ },
+ "policies-and-least-privilege-access": {
+  "r": "A policy granted read on secret/* to every application. One service was breached and its token read every team's secrets. Per-application paths would have limited the damage.",
+  "x": "Give each identity the narrowest path it needs, and test the policy before you attach it. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "kv-secrets-engine-and-secret-versioning": {
+  "r": "Two engineers updated the same secret within minutes. The second write silently replaced the first, losing a key. Check-and-set and patch would have prevented it.",
+  "x": "Use KV for secrets you cannot generate, version them, and prefer dynamic secrets whenever the target system supports them."
+ },
+ "dynamic-secrets-for-databases-and-clouds": {
+  "r": "A leaked credential belonged to a user that existed for twenty minutes. By the time it was found, it had been deleted by Vault. The fix was cheap once the cause was understood, and the team added a check so it could not recur silently.",
+  "x": "Short-lived, per-caller credentials turn a leak from a crisis into a footnote. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "pki-short-lived-certificates-with-vault": {
+  "r": "A certificate expired on a weekend and an internal service stopped. With a lifetime of one year nobody remembered the renewal. Vault issued 24 hour certificates renewed automatically, so expiry stopped being an event.",
+  "x": "Make renewal automatic and frequent, and expiry stops being a surprise. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "transit-encryption-as-a-service": {
+  "r": "Credit card numbers were encrypted in the application with a key stored in the same config repository. Moving the key to transit meant a stolen database dump was useless without access to Vault.",
+  "x": "If an application never sees the key, a stolen database or backup is only ciphertext. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "vault-on-kubernetes-injector-csi-and-operators": {
+  "r": "A team had to rewrite every service to call the Vault API. Using the injector, secrets appeared as files and no application code changed. The fix was cheap once the cause was understood, and the team added a check so it could not recur silently.",
+  "x": "Pick the pattern by how the application wants its secret: a file, an environment variable, or a native Kubernetes Secret."
+ },
+ "vault-high-availability-raft-and-disaster-recovery": {
+  "r": "A single Vault node on a VM failed during a deploy window. Every pipeline stopped for two hours until the VM was rebuilt. A three node cluster would have continued without interruption.",
+  "x": "Treat Vault like a database: replicate it, back it up, and practise the restore. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "audit-logging-monitoring-and-hardening-vault": {
+  "r": "The only audit device wrote to a full disk. Vault stopped serving requests, taking down every application. A second audit device and a disk alert prevented a repeat.",
+  "x": "Audit logging is a dependency that can stop Vault. Monitor it, and keep a second device. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "incident-response-rotating-and-revoking-secrets": {
+  "r": "A developer committed a token to a public repository. The token had a 30 day TTL. Revoking it and its leases, then checking the audit log, showed one read of a test path only.",
+  "x": "Practice the response before you need it, with a runbook that names the commands and who may run them."
+ }
+}

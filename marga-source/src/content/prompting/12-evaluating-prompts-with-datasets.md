@@ -53,6 +53,21 @@ Report accuracy, format validity, cost and latency per version. Look at which ca
 
 Every production failure becomes a new test case. Review the set regularly and record why each case exists.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Evaluating prompts with datasets fits together
+node: n1 | The dataset | 0 | 0 | Collect real inputs, including awkward and rare ones. | Judging a prompt by a few examples. | store
+node: n2 | Checks | 1 | 1 | Use exact checks where answers are structured, rules for constraints such as length, and a rubric for open text. | Trusting model graders without checking them. | observe
+node: n3 | Compare | 2 | 0 | Report accuracy, format validity, cost and latency per version. | Using the test examples inside the prompt. | process
+node: n4 | Grow | 3 | 1 | Every production failure becomes a new test case. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: One fix, three regressions
 
 > **Incident:** A prompt change fixed one complaint and broke other cases.

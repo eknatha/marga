@@ -118,6 +118,23 @@ $ terraform apply tfplan
 
 Plan files can also contain secrets, so treat them as sensitive and delete them after use. CI systems should inject variables from a protected store and mask them in logs.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Secrets and sensitive data in Terraform fits together
+node: n1 | Where secrets leak | 0 | 0 | Source code: a password written in a .tf file or in terraform.tfvars committed to version control. | Believing sensitive = true encrypts the state. | security
+node: n2 | Do not choose passwords in code | 1 | 1 | Let the platform generate a password and keep it in a secret manager. | Committing terraform.tfvars or state files. | process
+node: n3 | Reading existing secrets | 2 | 0 | Notice the better pattern in the example: pass the name or ARN of the secret to the application and let the application fetch it at runtime with its IAM role. | Reading secrets with data sources and passing them into resource arguments unnecessarily. | security
+node: n4 | Securing the state backend | 3 | 1 | Store state in a remote backend with encryption at rest (for example an S3 bucket with SSE-KMS, or Azure Storage with encryption). | Leaving the state bucket readable by many people. | security
+node: n5 | Supplying inputs in a pipeline | 4 | 0 | Plan files can also contain secrets, so treat them as sensitive and delete them after use. | Keeping old plan files that contain secrets. | queue
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the password in the pull request
 
 > **Incident:** A developer adds `password = "S3cret!2024"` to a Terraform file and opens a pull request. The branch is pushed, the CI log prints the plan, and the password appears in the review tool, the build log and the plan artifact.

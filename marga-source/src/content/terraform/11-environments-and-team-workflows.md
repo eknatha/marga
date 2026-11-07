@@ -60,6 +60,21 @@ State locking in the remote backend: the second run waits or fails until the fir
 > Use a backend that supports locking, and avoid force-unlock unless you are sure the lock is stale.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Environments, repository layout and team workflows fits together
+node: n1 | One code base, several environments | 0 | 0 | Workspaces give one configuration multiple state files in the same backend. | Using workspaces for very different environments. | process
+node: n2 | Split state to limit blast radius | 1 | 1 | One state for everything is slow and risky: any plan reads every resource, and a bad apply can touch everything. | Applying a different plan than the reviewed one. | store
+node: n3 | Team workflow | 2 | 0 | A change is made on a branch and a pull request opens. | One giant state. | queue
+node: n4 | Credentials | 3 | 1 | Prefer short-lived credentials from the pipeline's identity (OpenID Connect to the cloud provider) over stored keys. | Long-lived keys in the pipeline. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the shared state that took four hours
 
 > **Incident:** An urgent security group change needs four hours because plans on the single shared state take 25 minutes and conflict with other people's applies.

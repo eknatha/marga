@@ -49,6 +49,21 @@ Mark the email as untrusted data in the prompt, and make sure the bot has no abi
 > Limit what a fooled model can do.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How System prompts, roles and context layout fits together
+node: n1 | System prompt | 0 | 0 | Put stable material in the system prompt: the role and purpose, rules and boundaries, the output format, tone, and what to do when unsure or when asked to do something... | Putting secrets in the system prompt. | process
+node: n2 | Tags and layout | 1 | 1 | Consistent tag names let you refer to parts ("use only <documents>") and make prompts easier to maintain. | Placing the question before long documents. | process
+node: n3 | Long inputs | 2 | 0 | For long documents, put them near the top, and put the question or task at the end, after the material. | Mixing untrusted text with instructions. | process
+node: n4 | Untrusted text | 3 | 1 | Anything from a user, a web page, an email or a tool result is data that may contain instructions ("ignore the rules above"). | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The prompt that leaked
 
 > **Incident:** A user got a chatbot to print its hidden instructions, including an internal discount code.

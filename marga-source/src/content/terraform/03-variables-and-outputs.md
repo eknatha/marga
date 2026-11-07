@@ -129,6 +129,23 @@ output "db_endpoint" {
 
 Outputs print after `apply` and are how modules return values to their callers. Read one with `terraform output assets_bucket`.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Variables, locals, outputs and validation fits together
+node: n1 | Input variables | 0 | 0 | Always give variables a type and a description. | Variables without types, so a string sneaks in where a number is expected. | process
+node: n2 | Supplying values | 1 | 1 | Terraform picks a value using this order, with later sources winning. | Secrets in .tfvars files that are shared. | process
+node: n3 | Locals | 2 | 0 | Locals give names to expressions so you write them once. | Constructing complex logic in locals that nobody can read. | process
+node: n4 | Expressions you will use constantly | 3 | 1 | Use terraform console to try expressions without applying anything. | Check the Common mistakes list below this diagram for what usually goes wrong here. | process
+node: n5 | Outputs | 4 | 0 | Outputs print after apply and are how modules return values to their callers. | Forgetting that sensitive does not protect state. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: a secret shows up in a pipeline log
 
 > **Incident:** A reviewer notices a database password in a CI job's plan output.

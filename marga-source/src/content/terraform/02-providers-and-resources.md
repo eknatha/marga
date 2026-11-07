@@ -113,6 +113,21 @@ aws_subnet.multi["b"]
 $ terraform graph | head
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Providers, resources and data sources fits together
+node: n1 | Providers | 0 | 0 | A provider is a plugin that knows how to manage one platform's API: AWS, Azure, Kubernetes, Cloudflare and many more. | Putting credentials in configuration files. | external
+node: n2 | A small network and server | 1 | 1 | Notice that aws_subnet.app uses aws_vpc.main.id. | Hard-coding AMI IDs that differ per region instead of using a data source. | edge
+node: n3 | Many of the same thing | 2 | 0 | Prefer for_each over count for anything that is not a simple on/off switch (count = var.enabled ? | Using count for lists whose members may be removed. | process
+node: n4 | Inspecting the graph and state | 3 | 1 | . | Check the Common mistakes list below this diagram for what usually goes wrong here. | store
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the plan wants to recreate subnets after a harmless edit
 
 > **Incident:** You delete the first of three subnets defined with `count`. The plan wants to destroy and recreate the other two.

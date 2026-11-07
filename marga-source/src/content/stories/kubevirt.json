@@ -1,0 +1,50 @@
+{
+ "why-vms-on-kubernetes-and-how-kubevirt-works": {
+  "r": "A team with a legacy licensing server could not containerise it. They ran it as a KubeVirt VM beside their containers, used the same CI to deploy it, and dropped a separate hypervisor cluster.",
+  "x": "A KubeVirt VM is a pod with a hypervisor inside. Everything you know about pods, nodes, volumes and networks still applies, plus the VM-specific parts."
+ },
+ "installing-kubevirt-and-using-virtctl": {
+  "r": "A demo cluster ran on cloud VMs without nested virtualization. VMs booted in minutes and ran at a tenth of normal speed because KubeVirt silently fell back to software emulation.",
+  "x": "Check for /dev/kvm on the nodes before you install. Emulation is for tests, never for production. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "virtualmachines-vmis-and-run-strategies": {
+  "r": "A team edited a running VMI directly to add memory. The change vanished at the next restart because the VirtualMachine was the source of truth. They edited the VM and restarted.",
+  "x": "Edit the VirtualMachine, not the VMI. The VMI is a disposable instance of what the VM describes. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "vm-disks-datavolumes-and-cdi": {
+  "r": "Each new VM downloaded a 10 GB image from the internet, taking twenty minutes and saturating the link. A golden image PVC cloned inside the cluster cut the start to under two minutes.",
+  "x": "Import the image once, keep it as a golden PVC, and clone it for each VM. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "storage-for-vms-access-modes-block-mode-and-snapshots": {
+  "r": "A cluster used ReadWriteOnce disks. Draining a node stopped every VM on it, because none could migrate. Moving the disks to a Ceph RBD block class with ReadWriteMany made drains live.",
+  "x": "If you want live migration, pick storage that supports ReadWriteMany in Block mode before you create the first VM."
+ },
+ "vm-networking-masquerade-bridge-and-multus": {
+  "r": "A legacy application needed a fixed IP on a production VLAN. The pod network could not provide it. A Multus bridge network on the VLAN gave the VM its own address while the pod network still reached the cluster.",
+  "x": "Use the pod network with masquerade by default, add a bridge secondary network only when the VM needs a real address on a VLAN."
+ },
+ "cloud-init-instance-types-and-vm-image-pipelines": {
+  "r": "Fifty VMs were each sized by copying YAML, and no two matched. After moving to instance types named small, medium and large, a size change was a one-line edit and every VM was consistent.",
+  "x": "Describe a VM by size, image and first-boot config as separate reusable pieces. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "live-migration-node-drains-and-eviction": {
+  "r": "A busy database VM kept re-dirtying memory faster than the network could copy it, so migrations never finished and drains hung. Auto-converge and a higher bandwidth limit let the migration complete.",
+  "x": "Rehearse a migration of your busiest VM before you need one during a drain or upgrade. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "cpu-memory-hugepages-and-vm-performance": {
+  "r": "A VM was killed by the node's memory manager although the guest looked healthy. The pod limit equalled guest memory, leaving no room for QEMU overhead, so the container was killed for exceeding its limit.",
+  "x": "Give the pod more than the guest sees, and test with the real load before choosing pinned CPUs or hugepages."
+ },
+ "vm-snapshots-backup-and-restore": {
+  "r": "A team relied on snapshots stored on the same Ceph pool as the disks. A pool failure removed both. Off-cluster backups would have survived it. The fix was cheap once the cause was understood, and the team added a check so it could not recur silently.",
+  "x": "Treat snapshots as an undo button and backups as the recovery plan, and test restores. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "operating-kubevirt-monitoring-upgrades-and-troubleshooting": {
+  "r": "An upgrade finished on the control plane but old virt-launcher pods kept running the previous version for weeks. A workload update strategy of LiveMigrate moved VMs to the new version during the next window.",
+  "x": "Upgrading the operator does not upgrade running VMs. Plan how each VM gets the new launcher. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "migrating-from-vmware-to-kubevirt": {
+  "r": "A team converted disks over a weekend, but Windows guests blue-screened because the storage driver was missing. A pilot wave with virtio drivers installed first would have found it.",
+  "x": "Migrate in small waves with a rollback for each, and run a pilot before the large VMs. Write the rule into your runbook and rehearse it before it matters."
+ }
+}

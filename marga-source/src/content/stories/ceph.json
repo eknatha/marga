@@ -1,0 +1,50 @@
+{
+ "what-ceph-is-rados-and-the-architecture": {
+  "r": "A company ran a SAN for VMs, NAS for files and a separate object store, each with its own team and licence. One Ceph cluster served all three from commodity servers, and grew by adding nodes.",
+  "x": "Ceph is a single storage engine with three front doors. Learn RADOS and the daemons first, because every service depends on them."
+ },
+ "monitors-managers-osds-and-quorum": {
+  "r": "A cluster had two monitors in one rack. A power loss took both, leaving one of three alive. Without a majority the cluster stopped all IO until a monitor came back.",
+  "x": "Spread monitors across failure domains and always keep a majority alive. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "crush-pools-and-placement-groups": {
+  "r": "A pool was created with replicas allowed on the same host. When one server failed, two of three copies of some data vanished together. A rule with host failure domain would have kept copies apart.",
+  "x": "Choose the failure domain on purpose, since it decides what failure your data survives. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "deploying-ceph-with-cephadm": {
+  "r": "A team built clusters by hand with package installs and ended with each node slightly different. After switching to cephadm and a specification file in Git, a rebuild matched production.",
+  "x": "Keep a service specification in version control and apply it, rather than running one-off commands you cannot repeat."
+ },
+ "rbd-block-storage-for-vms-and-kubernetes": {
+  "r": "A cluster used RBD for databases but took snapshots before every upgrade and never removed them. The snapshots grew with each change and filled the pool.",
+  "x": "Treat snapshots as short-lived, and watch pool usage with rbd du. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "cephfs-shared-file-systems-and-mds": {
+  "r": "Millions of small files in one directory overloaded a single MDS and made every ls slow. Adding active MDS daemons and spreading directories fixed the delay.",
+  "x": "Plan for the metadata load, not only the data size. Small files stress the MDS more than large ones."
+ },
+ "rgw-s3-compatible-object-storage-with-ceph": {
+  "r": "A backup tool wrote hundreds of millions of objects to one bucket. Listing slowed to a crawl until the bucket index was resharded. Automatic resharding is now on.",
+  "x": "Put RGW behind a load balancer, give each application its own user, and watch the size of bucket indexes."
+ },
+ "rook-ceph-on-kubernetes": {
+  "r": "A team wanted storage that moved with their cluster. Rook gave them RBD and CephFS from local NVMe disks in each node, with no separate storage cluster to manage.",
+  "x": "Rook handles deployment and healing; you still need to understand Ceph to read its health and plan capacity."
+ },
+ "replication-erasure-coding-and-durability": {
+  "r": "A team moved an object store of backups from three-way replication to 8+3 erasure coding and saved over half the raw capacity, with no loss of durability for sequential writes.",
+  "x": "Use replication for hot, small, random IO and erasure coding for large, colder data. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "bluestore-networks-and-ceph-performance": {
+  "r": "Client latency doubled every time a disk was replaced. Recovery was running at full speed and competing with clients. Lowering recovery priority with the mClock profile kept latency steady.",
+  "x": "Measure first, change one thing at a time, and protect client IO from recovery. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "ceph-failures-recovery-and-health-warnings": {
+  "r": "An operator rebooted three storage hosts one after another without waiting for recovery. Some placement groups lost two of three copies and went inactive until a host came back.",
+  "x": "One failure at a time, and wait for HEALTH_OK before the next step. Write the rule into your runbook and rehearse it before it matters."
+ },
+ "capacity-planning-upgrades-and-operating-ceph": {
+  "r": "A cluster at 82 percent used lost a server. Rebuilding its data pushed other OSDs past the full ratio and writes stopped. Planning headroom for a host failure would have avoided it.",
+  "x": "Size for the failure you must survive, not for the day it is healthy. Write the rule into your runbook and rehearse it before it matters."
+ }
+}

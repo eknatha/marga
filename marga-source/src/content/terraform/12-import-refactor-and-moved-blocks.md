@@ -69,6 +69,21 @@ A moved block from the old address to the new address inside the module.
 > The plan sees different addresses; moved tells Terraform they are the same object.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Importing resources and refactoring safely fits together
+node: n1 | Import existing resources | 0 | 0 | An import block tells Terraform that a resource in the cloud already exists and should be tracked at a given address. | Importing a resource and applying before the plan shows no changes. | process
+node: n2 | Rename and move with moved blocks | 1 | 1 | If you rename aws_instance.web to aws_instance.app, Terraform sees one resource to destroy and a new one to create. | Removing the moved block before every environment has applied it. | process
+node: n3 | Stop managing without destroying | 2 | 0 | To hand a resource to another team or tool, remove it from state without touching the real object. | Renaming resources without a moved block. | process
+node: n4 | Prove the refactor | 3 | 1 | The proof is the plan. Before and after a refactor, run terraform plan and read the summary line. | Forgetting prevent_destroy on databases and networks. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The plan that wanted to delete production
 
 > **Incident:** A cleanup moved all network resources into a module, and the pipeline plan showed 38 resources to destroy, including the production VPC.

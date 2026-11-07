@@ -199,6 +199,23 @@ $ terraform destroy -target=aws_instance.test
 
 Read the plan every time. Look for `-/+` (replace) and `destroy` lines on stateful resources such as databases. Use `lifecycle { prevent_destroy = true }` on the database and enable deletion protection. Tag everything with owner and environment so cost reports make sense.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How End to end: a web stack on AWS and on Azure fits together
+node: n1 | The design | 0 | 0 | Only the load balancer is public. Application servers sit in private subnets and the database in its own subnets, reachable only from the application tier. | Wide-open security groups and storage accounts for convenience. | process
+node: n2 | Project layout | 1 | 1 | Keep each cloud in its own root module with its own state. | One giant state for everything. | process
+node: n3 | AWS network and compute | 2 | 0 | The application security group allows traffic only from the load balancer's security group, not from an address range. | Not pinning provider versions. | edge
+node: n4 | Azure network and compute | 3 | 1 | Azure resources live in a resource group, which acts as a lifecycle and access boundary. | Check the Common mistakes list below this diagram for what usually goes wrong here. | edge
+node: n5 | Running it safely | 4 | 0 | Read the plan every time. Look for -/+ (replace) and destroy lines on stateful resources such as databases. | Forgetting that destroy is permanent for databases without snapshots. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+edge: n4 | n5
+```
+
 ## Incident: the apply that replaced the database
 
 > **Incident:** A change renames an RDS argument. The plan shows `aws_db_instance.main must be replaced`, but the engineer scrolls past it in a 400-line plan, approves it, and the database is destroyed and recreated empty.

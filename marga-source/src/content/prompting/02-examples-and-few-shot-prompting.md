@@ -60,6 +60,21 @@ Balance and diversify the examples, add borderline cases and an "unknown" case, 
 > Examples set the prior.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Examples and few-shot prompting fits together
+node: n1 | Instructions versus examples | 0 | 0 | Use examples when the rule is easy to demonstrate and hard to describe: a house style, a label set with fine differences, an unusual output shape. | Examples that are all the same kind. | process
+node: n2 | Choose them | 1 | 1 | Use 3 to 5 examples to start, and add more only if tests show gains. | Format that differs between examples. | process
+node: n3 | Traps | 2 | 0 | Copying: if all examples are short, answers get short; if all examples start with the same word, so will the outputs. | Using test cases as examples. | process
+node: n4 | Keep them maintainable | 3 | 1 | Store examples in a separate file, load them at run time, and test changes. | Adding examples that contradict the rules. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Everything is urgent
 
 > **Incident:** A triage prompt marked almost every ticket as high urgency.

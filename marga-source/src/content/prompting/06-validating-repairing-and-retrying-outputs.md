@@ -53,6 +53,21 @@ Reject it by rule, do not retry blindly, and route to human approval or a safe d
 > Business rules are code.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Validating, repairing and retrying outputs fits together
+node: n1 | Four layers | 0 | 0 | Syntax: does it parse? | Silent repairs that change meaning. | process
+node: n2 | Retry with feedback | 1 | 1 | Tell the model what was wrong. Limit retries (two or three), because each costs money and a model that fails three times usually needs a different prompt, not a fourth... | Trusting output because it parsed. | process
+node: n3 | Repair carefully | 2 | 0 | Some fixes are safe: trimming whitespace, removing a code fence, converting "Yes" to true for a field defined that way. | If a repair could change the meaning, do not do it silently. | process
+node: n4 | Fallbacks | 3 | 1 | Decide in advance what happens when validation keeps failing: use a default, route to a review queue, show "we could not process this" to the user, or switch to a... | No fallback path. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The invoice with a made-up total
 
 > **Incident:** An extraction pipeline stored totals that did not match the line items.

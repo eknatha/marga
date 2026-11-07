@@ -42,6 +42,21 @@ Collect the failing production inputs, add them to the evaluation set, and look 
 > Test sets must look like production.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Debugging bad prompts and outputs fits together
+node: n1 | Reproduce | 0 | 0 | Take the stored request: the full prompt, parameters and model version. | Fixing only the failing case. | process
+node: n2 | Reduce and isolate | 1 | 1 | Remove parts of the prompt until the failure disappears, then put the last removed part back. | Contradicting rules in examples. | process
+node: n3 | Patterns and fixes | 2 | 0 | Ignores a rule: the rule is buried or conflicts with an example. | Rewriting everything at once. | process
+node: n4 | Prove the fix | 3 | 1 | Change one thing, then run the full evaluation set several times and compare with the baseline, looking at the target failure and for new ones. | Relying on a prompt rule for a safety requirement. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The rule that was ignored
 
 > **Incident:** A summariser kept including customer email addresses despite a rule against it.

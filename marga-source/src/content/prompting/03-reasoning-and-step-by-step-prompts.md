@@ -53,6 +53,21 @@ Compare the value of the accuracy gain with the extra cost and delay for your us
 > Measure the trade-off.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Reasoning and step-by-step prompts fits together
+node: n1 | Why it helps | 0 | 0 | The model writes one token at a time. If the answer depends on several facts combined, writing the intermediate steps lets later tokens use them. | Using step-by-step reasoning for trivial tasks. | process
+node: n2 | Prompt patterns | 1 | 1 | Other useful patterns: ask for a plan before doing the work; ask the model to check its answer against the constraints; ask for two candidates and a comparison; break a... | Parsing the whole reply instead of the answer block. | process
+node: n3 | Extended thinking | 2 | 0 | Some models offer a built-in thinking mode where the model reasons before answering, with a budget of tokens you can set. | Showing or storing raw reasoning as fact. | process
+node: n4 | Keep the output clean | 3 | 1 | Parse only the part you asked for. With tags, extract the text between <answer> and </answer>; with a thinking feature, read the answer block. | Treating an explanation as proof. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The thinking that went to the customer
 
 > **Incident:** A support reply included the model's internal notes.

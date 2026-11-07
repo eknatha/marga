@@ -58,6 +58,21 @@ State a measurable limit and the reason, for example "at most three sentences, s
 > Replace adjectives with limits.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Anatomy of a good prompt fits together
+node: n1 | Five parts | 0 | 0 | Task: one clear instruction ("Classify this ticket"). | Mixing instructions and material without separators. | process
+node: n2 | Compare two prompts | 1 | 1 | Vague: Summarise this incident. | Leaving out the audience and purpose. | process
+node: n3 | Positive instructions and reasons | 2 | 0 | "Write in plain sentences" works better than "don't use jargon". | Positive instructions and reasons "Write in plain sentences" works better than "don't use jargon". | process
+node: n4 | Test on varied inputs | 3 | 1 | A prompt that works for one example may fail on a long input, an empty input, input in another language or input that contains instructions. | Testing on one friendly example. | observe
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The summary nobody could use
 
 > **Incident:** A weekly report prompt produced long essays that people stopped reading.

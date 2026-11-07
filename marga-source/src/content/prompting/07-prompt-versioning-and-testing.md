@@ -52,6 +52,21 @@ No review, no tests, and no way back. Change the file, run the evaluation set, r
 > Treat prompts as code.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Prompt versioning and testing fits together
+node: n1 | Files, not strings in code | 0 | 0 | Store each prompt in its own file with a name and version, and load it at run time. | Changing prompt and model at once. | process
+node: n2 | Review changes | 1 | 1 | Review a prompt change like code: what problem does it fix, which cases could it break, what do the evaluation results say? | No record of which version served a request. | process
+node: n3 | Test in CI | 2 | 0 | Run your evaluation set on every change to prompts, schemas, models and retrieval settings. | Editing production prompts by hand. | observe
+node: n4 | Roll out and back | 3 | 1 | Release a new prompt to a small percentage of traffic first, compare quality, errors, cost and latency, then widen. | No evaluation before release. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: The one-word edit
 
 > **Incident:** A well-meant edit to a prompt silently broke date handling.

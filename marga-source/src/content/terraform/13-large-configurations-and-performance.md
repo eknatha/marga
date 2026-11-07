@@ -66,6 +66,21 @@ Give each application its own stack and state, so unrelated changes do not share
 > Locks are per state. Smaller states mean less waiting and a smaller blast radius.
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Large configurations: structure, speed and blast... fits together
+node: n1 | The cost of one big state | 0 | 0 | Terraform reads every resource in the state during a plan to see if it changed, and each read is an API call. | Giving every stack read access to every state, including secrets. | store
+node: n2 | Split by lifecycle and owner | 1 | 1 | Put things that change at different speeds, or belong to different teams, in separate stacks, each with its own state. | Creating many tiny stacks with circular dependencies. | process
+node: n3 | Share values between stacks | 2 | 0 | A stack exposes outputs, and others read them. | Splitting by file name instead of by lifecycle and owner. | process
+node: n4 | Speed | 3 | 1 | Several settings help once the structure is sound. | Using -target as a normal habit. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: Eleven minutes for a tag change
 
 > **Incident:** A one-line tag change needed an eleven-minute plan, and during that time nobody else could change anything in the account.

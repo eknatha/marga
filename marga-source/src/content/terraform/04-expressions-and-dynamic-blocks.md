@@ -137,6 +137,21 @@ resource "aws_db_instance" "main" {
 }
 ```
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Expressions, loops and dynamic blocks fits together
+node: n1 | count and for_each | 0 | 0 | count creates N copies addressed by index. | Using count over a list whose items can be removed from the middle. | process
+node: n2 | for expressions and functions | 1 | 1 | A for expression transforms a list or map into another. | Not testing with terraform console and terraform plan first. | process
+node: n3 | dynamic blocks | 2 | 0 | Some resources contain repeated nested blocks, such as ingress rules in a security group. | Overusing dynamic blocks so readers cannot see the resulting resource. | process
+node: n4 | Conditionals and validation | 3 | 1 | . | Complex nested expressions in resource arguments instead of a named local. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: the plan that wants to destroy the whole fleet
 
 > **Incident:** Engineers remove one server name from the list that drives `count`. The next `terraform plan` shows 14 resources to destroy and 14 to create, including production instances that did not change.

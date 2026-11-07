@@ -74,6 +74,21 @@ $ terraform state rm aws_s3_bucket.legacy
 | `state rm` | Makes Terraform forget a resource **without** deleting it in the cloud |
 | `force-unlock ID` | Releases a stuck lock. Use only if you are certain no run is active |
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How State, backends and locking fits together
+node: n1 | What state is | 0 | 0 | State maps each resource address (aws_s3_bucket.logs) to the real object's ID and records its attributes. | One giant state for everything, so every plan is slow and a mistake can touch anything. | store
+node: n2 | Remote backends and locking | 1 | 1 | A local terraform.tfstate file works for experiments. | No encryption, versioning or access control on the state bucket. | process
+node: n3 | Importing existing resources | 2 | 0 | When something already exists in the cloud, bring it under management instead of recreating it. | Running force-unlock without checking for an active run. | process
+node: n4 | State commands | 3 | 1 | . | Keeping state in a repository or on a laptop. | store
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: "Error acquiring the state lock"
 
 > **Incident:** A pipeline run fails immediately with `Error: Error acquiring the state lock`, and the message shows a lock held by another run.

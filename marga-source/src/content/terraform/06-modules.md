@@ -115,6 +115,21 @@ infra/
 
 Each environment is its own root module with its **own state**. They call the same modules with different inputs. A change to dev cannot touch production, and you promote a module change by updating the version or path in each environment in turn. Avoid using one set of files with `terraform workspace` to separate production from development. Workspaces share code and backend configuration, which makes it easy to run a command against the wrong one.
 
+## How the parts fit together
+
+The lesson in one picture: each box is a section of this lesson, in the order you meet it. Select a box to see what it does and the mistake that usually goes with it.
+
+```diagram
+title: How Modules and project structure fits together
+node: n1 | A module | 0 | 0 | Calling it. | Renaming resources inside a module without a moved block. | process
+node: n2 | Designing a good module | 1 | 1 | Small, clear purpose. "A VPC with subnets" is a module. | Giant modules that do everything. | process
+node: n3 | Versions and sources | 2 | 0 | Always pin versions of modules you do not control, and read what a community module does before depending on it. | Unpinned remote modules. | process
+node: n4 | Layout for environments | 3 | 1 | Each environment is its own root module with its own state. | Environments that share one state. | process
+edge: n1 | n2
+edge: n2 | n3
+edge: n3 | n4
+```
+
 ## Incident: a module change breaks every environment at once
 
 > **Incident:** A fix to the shared `network` module is merged. The next scheduled run in production proposes to replace the subnets.
