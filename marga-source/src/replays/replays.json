@@ -1,0 +1,607 @@
+[
+ {
+  "id": "crashloop-pod",
+  "title": "A Pod in CrashLoopBackOff",
+  "level": "Beginner",
+  "module": "kubernetes",
+  "summary": "Find out why a Pod keeps restarting, from the first symptom to the fix.",
+  "steps": [
+   {
+    "cmd": "kubectl get pods",
+    "out": [
+     "NAME                    READY   STATUS             RESTARTS   AGE",
+     "shop-api-7d9c5-x2k4p   0/1     !CrashLoopBackOff  6          9m"
+    ],
+    "say": "Start with the symptom. The Pod restarts again and again, and READY stays at 0/1."
+   },
+   {
+    "cmd": "kubectl describe pod shop-api-7d9c5-x2k4p",
+    "out": [
+     "State:          Waiting (CrashLoopBackOff)",
+     "Last State:     Terminated",
+     "  Exit Code:    !1",
+     "Events:",
+     "  ~Back-off restarting failed container"
+    ],
+    "say": "Describe shows the last exit code. Code 1 means the app itself failed, not the platform."
+   },
+   {
+    "cmd": "kubectl logs shop-api-7d9c5-x2k4p --previous",
+    "out": [
+     "Error: environment variable DATABASE_URL is not set",
+     "!    at loadConfig (/app/config.js:12)"
+    ],
+    "say": "Read the logs of the previous run. The container died on a missing setting."
+   },
+   {
+    "cmd": "kubectl set env deployment/shop-api DATABASE_URL=postgres://db:5432/shop",
+    "out": [
+     "deployment.apps/shop-api env updated"
+    ],
+    "say": "Give the Deployment the missing variable. This starts a new rollout."
+   },
+   {
+    "cmd": "kubectl get pods",
+    "out": [
+     "NAME                    READY   STATUS    RESTARTS   AGE",
+     "shop-api-6b8f7-q9m2z   +1/1     +Running  0          21s"
+    ],
+    "say": "The new Pod is Ready. In real life, put the value in a ConfigMap or Secret, not in the command."
+   }
+  ],
+  "takeaway": "Describe, then logs --previous, then fix the cause. The exit code tells you whether to blame the app or the platform."
+ },
+ {
+  "id": "service-no-endpoints",
+  "title": "A Service with no endpoints",
+  "level": "Beginner",
+  "module": "kubernetes",
+  "summary": "Traffic fails although every Pod is Running. The label selector is the usual cause.",
+  "steps": [
+   {
+    "cmd": "curl -s -o /dev/null -w \"%{http_code}\\n\" http://shop.default.svc/",
+    "out": [
+     "!000"
+    ],
+    "say": "The request cannot connect at all, yet the Pods look healthy."
+   },
+   {
+    "cmd": "kubectl get endpoints shop",
+    "out": [
+     "NAME   ENDPOINTS   AGE",
+     "shop   !<none>     14m"
+    ],
+    "say": "An empty endpoints list means the Service selects no Pods. That is the whole problem."
+   },
+   {
+    "cmd": "kubectl get svc shop -o jsonpath=\"{.spec.selector}\"",
+    "out": [
+     "{\"app\":\"shop-web\"}"
+    ],
+    "say": "Read what the Service is looking for."
+   },
+   {
+    "cmd": "kubectl get pods --show-labels",
+    "out": [
+     "shop-7d9c5-x2k4p   1/1   Running   app=shop"
+    ],
+    "say": "The Pods are labelled app=shop, but the Service wants app=shop-web."
+   },
+   {
+    "cmd": "kubectl patch svc shop -p '{\"spec\":{\"selector\":{\"app\":\"shop\"}}}'",
+    "out": [
+     "service/shop patched"
+    ],
+    "say": "Fix the selector so it matches the Pod labels."
+   },
+   {
+    "cmd": "kubectl get endpoints shop",
+    "out": [
+     "NAME   ENDPOINTS                         AGE",
+     "shop   +10.244.1.7:8080,10.244.2.4:8080   15m"
+    ],
+    "say": "Endpoints appear at once, and traffic flows."
+   }
+  ],
+  "takeaway": "Running Pods do not mean reachable Pods. Check endpoints first when a Service fails."
+ },
+ {
+  "id": "disk-full",
+  "title": "Find what filled the disk",
+  "level": "Beginner",
+  "module": "linux",
+  "summary": "Narrow a full filesystem down to the one directory that caused it.",
+  "steps": [
+   {
+    "cmd": "df -h /",
+    "out": [
+     "Filesystem      Size  Used Avail Use% Mounted on",
+     "/dev/sda1        40G   40G     0 !100% /"
+    ],
+    "say": "The root filesystem is completely full, so writes fail."
+   },
+   {
+    "cmd": "sudo du -xh / --max-depth=1 | sort -h | tail -4",
+    "out": [
+     "1.2G\t/usr",
+     "2.8G\t/home",
+     "!31G\t/var",
+     "40G\t/"
+    ],
+    "say": "Stay on one filesystem with -x and sort. /var holds almost everything."
+   },
+   {
+    "cmd": "sudo du -xh /var --max-depth=2 | sort -h | tail -3",
+    "out": [
+     "1.1G\t/var/lib",
+     "!29G\t/var/log",
+     "31G\t/var"
+    ],
+    "say": "Go one level deeper. Logs are the culprit."
+   },
+   {
+    "cmd": "sudo ls -lhS /var/log | head -3",
+    "out": [
+     "-rw-r----- 1 root adm !28G Nov  7 09:12 app-debug.log"
+    ],
+    "say": "One debug log grew to 28 GB."
+   },
+   {
+    "cmd": "sudo truncate -s 0 /var/log/app-debug.log",
+    "out": [],
+    "say": "Truncate instead of deleting a file a process still holds open, or the space is not freed."
+   },
+   {
+    "cmd": "df -h /",
+    "out": [
+     "/dev/sda1        40G   12G   26G  +30% /"
+    ],
+    "say": "Space is back. Fix the cause with log rotation or a lower log level."
+   }
+  ],
+  "takeaway": "Use du with -x and sort to walk down to the biggest directory. Truncate open files; do not just delete them."
+ },
+ {
+  "id": "port-in-use",
+  "title": "Port already in use",
+  "level": "Beginner",
+  "module": "linux",
+  "summary": "A service refuses to start because another process owns its port.",
+  "steps": [
+   {
+    "cmd": "sudo systemctl start web",
+    "out": [
+     "Job for web.service failed."
+    ],
+    "say": "The service will not start."
+   },
+   {
+    "cmd": "journalctl -u web -n 3 --no-pager",
+    "out": [
+     "!bind() to 0.0.0.0:8080 failed (98: Address already in use)"
+    ],
+    "say": "The log names the problem exactly: port 8080 is taken."
+   },
+   {
+    "cmd": "sudo ss -ltnp | grep :8080",
+    "out": [
+     "LISTEN 0 128 *:8080 *:* users:((\"python3\",pid=2211,fd=3))"
+    ],
+    "say": "ss shows which process listens on the port, and its PID."
+   },
+   {
+    "cmd": "ps -p 2211 -o pid,user,etime,cmd",
+    "out": [
+     "  PID USER     ELAPSED CMD",
+     "!2211 deploy  3-02:11 python3 -m http.server 8080"
+    ],
+    "say": "It is a forgotten test server, running for three days."
+   },
+   {
+    "cmd": "sudo kill 2211 && sudo systemctl start web",
+    "out": [],
+    "say": "Stop the stray process, then start the real service."
+   },
+   {
+    "cmd": "systemctl is-active web",
+    "out": [
+     "+active"
+    ],
+    "say": "The service is up."
+   }
+  ],
+  "takeaway": "Read the error, find the owner with ss -ltnp, decide whether to stop it or move your service."
+ },
+ {
+  "id": "ssh-permissions",
+  "title": "SSH refuses the key",
+  "level": "Beginner",
+  "module": "linux",
+  "summary": "A private key with open permissions is ignored. Fix the mode and connect.",
+  "steps": [
+   {
+    "cmd": "ssh -i ~/.ssh/id_ed25519 deploy@10.0.0.12",
+    "out": [
+     "!WARNING: UNPROTECTED PRIVATE KEY FILE!",
+     "Permissions 0644 for 'id_ed25519' are too open.",
+     "deploy@10.0.0.12: Permission denied (publickey)."
+    ],
+    "say": "SSH refuses a key that others can read."
+   },
+   {
+    "cmd": "ls -l ~/.ssh/id_ed25519",
+    "out": [
+     "-rw-r--r-- 1 user user 411 Jan  5 id_ed25519"
+    ],
+    "say": "The file is readable by everyone: mode 644."
+   },
+   {
+    "cmd": "chmod 600 ~/.ssh/id_ed25519",
+    "out": [],
+    "say": "Only the owner should read and write a private key."
+   },
+   {
+    "cmd": "ssh -i ~/.ssh/id_ed25519 deploy@10.0.0.12",
+    "out": [
+     "+Welcome to Ubuntu 24.04 LTS",
+     "deploy@web-12:~$"
+    ],
+    "say": "The connection works."
+   }
+  ],
+  "takeaway": "A private key must be mode 600. The warning text tells you exactly that."
+ },
+ {
+  "id": "dns-dig",
+  "title": "Trace a DNS problem with dig",
+  "level": "Intermediate",
+  "module": "networking",
+  "summary": "Tell a bad record from a bad resolver by asking different servers.",
+  "steps": [
+   {
+    "cmd": "dig +short app.example.com",
+    "out": [
+     "!"
+    ],
+    "say": "The default resolver returns nothing for the name."
+   },
+   {
+    "cmd": "dig +short app.example.com @1.1.1.1",
+    "out": [
+     "203.0.113.10"
+    ],
+    "say": "A public resolver knows the name. So the record exists and our resolver is the problem."
+   },
+   {
+    "cmd": "dig +trace app.example.com | tail -3",
+    "out": [
+     "example.com.  172800 IN NS ns1.example.com.",
+     "app.example.com. 300 IN A 203.0.113.10"
+    ],
+    "say": "Following the chain from the root confirms the record is published."
+   },
+   {
+    "cmd": "cat /etc/resolv.conf",
+    "out": [
+     "nameserver !10.0.0.2"
+    ],
+    "say": "The machine uses an internal resolver at 10.0.0.2."
+   },
+   {
+    "cmd": "dig app.example.com @10.0.0.2 | grep status",
+    "out": [
+     "status: !SERVFAIL"
+    ],
+    "say": "That resolver fails. It needs attention, not the DNS zone."
+   }
+  ],
+  "takeaway": "Query the same name from two resolvers. If one answers and one fails, the fault is the resolver."
+ },
+ {
+  "id": "tls-expiry",
+  "title": "Check a certificate before it expires",
+  "level": "Intermediate",
+  "module": "security",
+  "summary": "Read the dates of a live certificate from the command line.",
+  "steps": [
+   {
+    "cmd": "echo | openssl s_client -connect shop.example.com:443 -servername shop.example.com 2>/dev/null | openssl x509 -noout -dates",
+    "out": [
+     "notBefore=Aug  9 00:00:00 2026 GMT",
+     "notAfter=!Nov 10 23:59:59 2026 GMT"
+    ],
+    "say": "The certificate ends in three days."
+   },
+   {
+    "cmd": "date -u",
+    "out": [
+     "Sat Nov  7 04:40:00 UTC 2026"
+    ],
+    "say": "Compare with today. Three days is too tight to ignore."
+   },
+   {
+    "cmd": "echo | openssl s_client -connect shop.example.com:443 2>/dev/null | openssl x509 -noout -issuer",
+    "out": [
+     "issuer=C=US, O=Let's Encrypt, CN=R11"
+    ],
+    "say": "The issuer is an automated CA, so renewal should have happened by itself."
+   },
+   {
+    "cmd": "sudo certbot renew --dry-run",
+    "out": [
+     "!Failed to renew: Timeout during connect (likely firewall problem)"
+    ],
+    "say": "Renewal fails because the challenge port is blocked. That is why the certificate is old."
+   },
+   {
+    "cmd": "sudo ufw allow 80/tcp && sudo certbot renew",
+    "out": [
+     "+Congratulations, all renewals succeeded."
+    ],
+    "say": "Open the port and renew. Then add monitoring for days left."
+   }
+  ],
+  "takeaway": "Certificates fail quietly. Alert on days left, and test renewal, not only issuance."
+ },
+ {
+  "id": "docker-exec",
+  "title": "Debug a container that exits",
+  "level": "Beginner",
+  "module": "docker",
+  "summary": "Read the logs, then run a shell in the same image to look around.",
+  "steps": [
+   {
+    "cmd": "docker ps -a --format \"table {{.Names}}\\t{{.Status}}\"",
+    "out": [
+     "NAMES   STATUS",
+     "api     !Exited (1) 4 seconds ago"
+    ],
+    "say": "The container started and stopped within seconds."
+   },
+   {
+    "cmd": "docker logs api",
+    "out": [
+     "Error: Cannot find module '/app/server.js'"
+    ],
+    "say": "The entry file is not where the image expects it."
+   },
+   {
+    "cmd": "docker run --rm -it --entrypoint sh myorg/api:1.4",
+    "out": [
+     "/ # ls /app",
+     "dist  package.json"
+    ],
+    "say": "Override the entrypoint to explore the image."
+   },
+   {
+    "cmd": "ls /app/dist",
+    "out": [
+     "server.js"
+    ],
+    "say": "The build output is in dist, not in /app."
+   },
+   {
+    "cmd": "docker run -d --name api myorg/api:1.4 node dist/server.js",
+    "out": [
+     "3f1c9a0d2b7e"
+    ],
+    "say": "Run with the right path. Then fix the Dockerfile CMD."
+   },
+   {
+    "cmd": "docker ps --format \"table {{.Names}}\\t{{.Status}}\"",
+    "out": [
+     "NAMES   STATUS",
+     "api     +Up 8 seconds"
+    ],
+    "say": "The container stays up."
+   }
+  ],
+  "takeaway": "Logs first, then a shell in the same image. Most start-up failures are wrong paths or missing settings."
+ },
+ {
+  "id": "terraform-drift",
+  "title": "Terraform plan shows drift",
+  "level": "Intermediate",
+  "module": "terraform",
+  "summary": "Someone changed a resource by hand. Plan shows what Terraform would undo.",
+  "steps": [
+   {
+    "cmd": "terraform plan",
+    "out": [
+     "  # aws_security_group.web will be updated in-place",
+     "  ~ ingress {",
+     "      ~ cidr_blocks = [",
+     "          - \"0.0.0.0/0\",",
+     "          + \"10.0.0.0/16\",",
+     "Plan: 0 to add, !1 to change, 0 to destroy."
+    ],
+    "say": "Plan shows a change nobody wrote in code. The live rule differs from the configuration."
+   },
+   {
+    "cmd": "aws ec2 describe-security-groups --group-ids sg-0abc --query \"SecurityGroups[0].IpPermissions[0].IpRanges\"",
+    "out": [
+     "[{\"CidrIp\": \"0.0.0.0/0\"}]"
+    ],
+    "say": "The live security group is open to the whole internet."
+   },
+   {
+    "cmd": "git log --oneline -3 -- network.tf",
+    "out": [
+     "a91c2de Restrict web ingress to the VPC"
+    ],
+    "say": "The code already says the VPC range. A person edited the console."
+   },
+   {
+    "cmd": "terraform apply",
+    "out": [
+     "aws_security_group.web: Modifying...",
+     "+Apply complete! Resources: 0 added, 1 changed, 0 destroyed."
+    ],
+    "say": "Apply puts the rule back as the code says. Then remove console write access."
+   }
+  ],
+  "takeaway": "Drift is a signal. Decide whether the code or the console is right, then make them match."
+ },
+ {
+  "id": "ceph-osd-down",
+  "title": "Ceph shows HEALTH_WARN: an OSD is down",
+  "level": "Intermediate",
+  "module": "ceph",
+  "summary": "Read the cluster state, find the down OSD and watch recovery.",
+  "steps": [
+   {
+    "cmd": "ceph -s",
+    "out": [
+     "  health: !HEALTH_WARN",
+     "          1 osds down",
+     "          Degraded data redundancy: 1204/9612 objects degraded",
+     "  osd: 9 osds: !8 up, 9 in"
+    ],
+    "say": "The cluster is serving data, but one OSD is down and objects have fewer copies."
+   },
+   {
+    "cmd": "ceph osd tree down",
+    "out": [
+     "ID  CLASS  WEIGHT   TYPE NAME        STATUS",
+     "-5  hdd    0.9      host node-c",
+     "7   hdd    0.3      osd.7        !down"
+    ],
+    "say": "osd.7 on node-c is the one."
+   },
+   {
+    "cmd": "ssh node-c sudo systemctl status ceph-osd@7 | head -3",
+    "out": [
+     "Active: !failed (Result: exit-code)"
+    ],
+    "say": "The daemon crashed on that host."
+   },
+   {
+    "cmd": "ssh node-c sudo journalctl -u ceph-osd@7 -n 2 --no-pager",
+    "out": [
+     "bluestore: error reading from device: Input/output error"
+    ],
+    "say": "A disk error. Replace the disk, do not just restart."
+   },
+   {
+    "cmd": "ceph osd out 7",
+    "out": [
+     "marked out osd.7."
+    ],
+    "say": "Mark it out so Ceph rebuilds the copies elsewhere."
+   },
+   {
+    "cmd": "ceph -s",
+    "out": [
+     "  health: ~HEALTH_WARN",
+     "  pgs: 190 active+clean, 14 active+recovering",
+     "  io: recovery: 120 MiB/s"
+    ],
+    "say": "Recovery is running. Wait for active+clean before touching anything else."
+   }
+  ],
+  "takeaway": "Down is not lost. Check the host and disk, mark it out, and let recovery finish before more changes."
+ },
+ {
+  "id": "vault-unseal",
+  "title": "Unseal a sealed Vault",
+  "level": "Intermediate",
+  "module": "vault",
+  "summary": "After a restart Vault is sealed and serves nothing until enough key shares are entered.",
+  "steps": [
+   {
+    "cmd": "vault status",
+    "out": [
+     "Initialized     true",
+     "Sealed          !true",
+     "Total Shares    5",
+     "Threshold       3",
+     "Unseal Progress 0/3"
+    ],
+    "say": "Vault is up but sealed. It needs 3 of the 5 key shares."
+   },
+   {
+    "cmd": "vault operator unseal",
+    "out": [
+     "Unseal Key (will be hidden):",
+     "Sealed          true",
+     "Unseal Progress 1/3"
+    ],
+    "say": "Each holder enters a share. One share alone does nothing."
+   },
+   {
+    "cmd": "vault operator unseal",
+    "out": [
+     "Unseal Progress 2/3"
+    ],
+    "say": "The second share."
+   },
+   {
+    "cmd": "vault operator unseal",
+    "out": [
+     "Sealed          +false",
+     "Cluster Name    vault-prod",
+     "HA Mode         active"
+    ],
+    "say": "The third share unseals Vault. It is active again."
+   },
+   {
+    "cmd": "vault token lookup",
+    "out": [
+     "policies [default]",
+     "ttl      !768h"
+    ],
+    "say": "Check who you are and how long the token lives. Long-lived tokens are a risk."
+   }
+  ],
+  "takeaway": "Unseal needs a quorum of key holders by design. Auto-unseal removes the manual step but not the need to protect the keys."
+ },
+ {
+  "id": "kubevirt-vm-pending",
+  "title": "A VM that will not start on Kubernetes",
+  "level": "Intermediate",
+  "module": "kubevirt",
+  "summary": "A VirtualMachineInstance stays Scheduling. The cause is usually storage or resources.",
+  "steps": [
+   {
+    "cmd": "kubectl get vmi",
+    "out": [
+     "NAME     AGE   PHASE        NODENAME",
+     "web-vm   6m    !Scheduling"
+    ],
+    "say": "The VM instance never gets a node."
+   },
+   {
+    "cmd": "kubectl describe vmi web-vm | tail -4",
+    "out": [
+     "Events:",
+     "  ~0/3 nodes are available: 3 Insufficient devices.kubevirt.io/kvm"
+    ],
+    "say": "No node offers the KVM device. Hardware virtualization is missing or the device plugin is not ready."
+   },
+   {
+    "cmd": "kubectl get nodes -o custom-columns=N:.metadata.name,KVM:.status.allocatable.\"devices\\.kubevirt\\.io/kvm\"",
+    "out": [
+     "N        KVM",
+     "node-a   !<none>",
+     "node-b   <none>"
+    ],
+    "say": "No node advertises KVM."
+   },
+   {
+    "cmd": "kubectl get kubevirt -n kubevirt -o jsonpath=\"{.items[0].spec.configuration.developerConfiguration.useEmulation}\"",
+    "out": [
+     ""
+    ],
+    "say": "Emulation is off, which is right for production. So the nodes need virtualization turned on."
+   },
+   {
+    "cmd": "ssh node-a \"egrep -c '(vmx|svm)' /proc/cpuinfo\"",
+    "out": [
+     "0"
+    ],
+    "say": "The CPU flags are missing. In a cloud VM, enable nested virtualization or use bare metal."
+   }
+  ],
+  "takeaway": "KubeVirt needs real virtualization on the node. Read the scheduling event before changing the VM spec."
+ }
+]

@@ -1,0 +1,439 @@
+[
+ {
+  "id": "web-on-kubernetes",
+  "title": "Three-tier web app on Kubernetes",
+  "level": "Beginner",
+  "summary": "A web front end, an API and a database, run as Deployments behind one entry point.",
+  "diagram": "title: Three-tier web app on Kubernetes\nnode: user | Browser | 0 | 1 | Sends requests to the public hostname. | If DNS or the certificate is wrong, nobody gets in. | client\nnode: ing | Ingress | 1 | 1 | Terminates TLS and routes by host and path. | A bad rule sends traffic to nothing; one controller is a single point of failure. | edge\nnode: web | Web Pods | 2 | 0 | Serve the front end; stateless, so they scale out. | A failing readiness probe removes Pods from rotation. | service\nnode: api | API Pods | 2 | 2 | Run the business logic behind a ClusterIP Service. | Missing resource limits let one Pod starve its neighbours. | service\nnode: db | PostgreSQL | 3 | 2 | Keeps the data on a persistent volume. | Losing the volume without a backup loses the data. | store\nnode: cache | Redis | 3 | 1 | Caches hot reads to take load off the database. | A cold or flushed cache sends a sudden burst to the database. | cache\nnode: mon | Prometheus | 1 | 2 | Scrapes metrics from every layer for alerts. | Without alerts you hear about outages from users. | observe\nedge: user | ing | HTTPS\nedge: ing | web | route\nedge: web | api | call\nedge: api | cache | read\nedge: api | db | query\nedge: mon | api | scrape",
+  "learn": [
+   {
+    "node": "ing",
+    "module": "kubernetes",
+    "why": "Services, Ingress and routing"
+   },
+   {
+    "node": "api",
+    "module": "kubernetes",
+    "why": "Deployments, probes and limits"
+   },
+   {
+    "node": "db",
+    "module": "storage",
+    "why": "Persistent volumes and backups"
+   },
+   {
+    "node": "db",
+    "module": "databases",
+    "why": "Running PostgreSQL well"
+   },
+   {
+    "node": "mon",
+    "module": "observability",
+    "why": "Metrics and alerting"
+   }
+  ],
+  "tradeoffs": [
+   "Managed database or in-cluster: managed saves operations work; in-cluster keeps everything portable.",
+   "One Ingress is simple; several isolate teams but add cost."
+  ],
+  "breaks": [
+   "Database pod rescheduled without its volume: data appears empty.",
+   "Ingress controller down: the whole site is unreachable although every Pod is healthy."
+  ]
+ },
+ {
+  "id": "event-driven",
+  "title": "Event-driven pipeline",
+  "level": "Intermediate",
+  "summary": "Producers publish events to a queue; independent consumers process them at their own pace.",
+  "diagram": "title: Event-driven pipeline\nnode: prod | Order service | 0 | 1 | Creates an event for each order. | If it publishes before the database commit, events describe orders that do not exist. | service\nnode: q | Message broker | 1 | 1 | Holds events durably until consumers take them. | If it is full or down, producers block or lose events. | queue\nnode: pay | Payment worker | 2 | 0 | Charges the card for each order event. | A retry without an idempotency key charges twice. | service\nnode: mail | Email worker | 2 | 1 | Sends the confirmation message. | A slow mail provider builds a backlog but should not block orders. | service\nnode: dlq | Dead-letter queue | 2 | 2 | Receives events that failed repeatedly. | Nobody reading it means failures are silent. | queue\nnode: db | Orders database | 3 | 0 | Stores the result of processing. | Two workers updating the same row need locking. | store\nnode: mon | Lag dashboard | 3 | 2 | Shows consumer lag and the dead-letter depth. | No lag alert means a stuck consumer goes unnoticed. | observe\nedge: prod | q | publish\nedge: q | pay | consume\nedge: q | mail | consume\nedge: pay | db | write\nedge: pay | dlq | fail\nedge: dlq | mon | alert",
+  "learn": [
+   {
+    "node": "q",
+    "module": "messaging",
+    "why": "Brokers, ordering, retries and dead letters"
+   },
+   {
+    "node": "pay",
+    "module": "system-design",
+    "why": "Idempotency and delivery guarantees"
+   },
+   {
+    "node": "mon",
+    "module": "observability",
+    "why": "Lag and queue depth alerts"
+   },
+   {
+    "node": "db",
+    "module": "databases",
+    "why": "Transactions and locking"
+   }
+  ],
+  "tradeoffs": [
+   "At-least-once delivery needs idempotent consumers; exactly-once is costly.",
+   "Ordering per key limits parallelism."
+  ],
+  "breaks": [
+   "Poison message blocks a partition until it is moved to the dead-letter queue.",
+   "Consumer lag grows silently when a worker hangs."
+  ]
+ },
+ {
+  "id": "ha-aws-web",
+  "title": "Highly available web on AWS",
+  "level": "Intermediate",
+  "summary": "Spread across two Availability Zones so the loss of one data centre does not take the site down.",
+  "diagram": "title: Highly available web on AWS\nnode: dns | Route 53 | 0 | 1 | Maps the name to the load balancer. | A low-health check lets traffic go to a dead endpoint. | edge\nnode: alb | Load balancer | 1 | 1 | Spreads requests across healthy instances in both zones. | Misconfigured health checks drain good instances. | edge\nnode: a | App in zone A | 2 | 0 | Instances in an Auto Scaling group. | If both zones share one subnet, the design is not really multi-AZ. | service\nnode: b | App in zone B | 2 | 2 | The second copy that keeps serving if A fails. | Not enough spare capacity: the surviving zone cannot take all the traffic. | service\nnode: rds | RDS Multi-AZ | 3 | 1 | Primary with a synchronous standby in another zone. | Failover takes about a minute; apps must reconnect. | store\nnode: iam | IAM roles | 1 | 0 | Give instances only the access they need. | A wide policy turns one leak into a full breach. | security\nnode: cw | CloudWatch | 1 | 2 | Alarms on errors, latency and healthy host count. | No alarm on healthy hosts means a half-dead fleet goes unseen. | observe\nedge: dns | alb | resolve\nedge: alb | a | forward\nedge: alb | b | forward\nedge: a | rds | query\nedge: b | rds | query\nedge: cw | alb | alarm",
+  "learn": [
+   {
+    "node": "alb",
+    "module": "cloud",
+    "why": "Load balancers, zones and Auto Scaling"
+   },
+   {
+    "node": "iam",
+    "module": "cloud-iam",
+    "why": "Roles and least privilege"
+   },
+   {
+    "node": "rds",
+    "module": "databases",
+    "why": "Replication and failover"
+   },
+   {
+    "node": "cw",
+    "module": "observability",
+    "why": "Alarms and health checks"
+   }
+  ],
+  "tradeoffs": [
+   "Multi-AZ doubles cost for resilience; a single AZ is cheaper but fragile.",
+   "Multi-region adds more resilience and much more complexity."
+  ],
+  "breaks": [
+   "An AZ fails and the remaining zone is already at 90 percent load.",
+   "Database failover works but the application keeps old connections."
+  ]
+ },
+ {
+  "id": "ci-cd-k8s",
+  "title": "CI/CD to Kubernetes",
+  "level": "Intermediate",
+  "summary": "Code goes from commit to production through automated tests, an image build and a rollout.",
+  "diagram": "title: CI/CD to Kubernetes\nnode: git | Source repository | 0 | 1 | Holds code and pipeline definition. | Unprotected main branch lets untested code ship. | external\nnode: ci | CI runner | 1 | 1 | Builds, tests and scans on every change. | A flaky test makes people ignore red builds. | process\nnode: reg | Image registry | 2 | 0 | Stores signed, versioned images. | Using the latest tag makes rollbacks guesswork. | store\nnode: scan | Security scan | 2 | 2 | Checks the image and dependencies for known flaws. | Scanning but never failing the build changes nothing. | security\nnode: cd | Deploy controller | 3 | 1 | Applies the new version to the cluster. | Deploying straight from a laptop skips every check. | process\nnode: k8s | Cluster | 4 | 1 | Rolls out with probes and keeps the old version until the new is ready. | No readiness probe means traffic reaches a Pod that is not ready. | service\nnode: obs | Monitoring | 4 | 2 | Watches error rate after release for a fast rollback. | No automatic rollback leaves users on a broken release. | observe\nedge: git | ci | push\nedge: ci | reg | push image\nedge: ci | scan | scan\nedge: reg | cd | new tag\nedge: cd | k8s | rollout\nedge: k8s | obs | metrics",
+  "learn": [
+   {
+    "node": "ci",
+    "module": "cicd",
+    "why": "Pipelines, caching and gates"
+   },
+   {
+    "node": "cd",
+    "module": "argocd",
+    "why": "Declarative delivery and sync"
+   },
+   {
+    "node": "k8s",
+    "module": "kubernetes",
+    "why": "Rolling updates and probes"
+   },
+   {
+    "node": "scan",
+    "module": "security",
+    "why": "Scanning and supply chain"
+   },
+   {
+    "node": "obs",
+    "module": "observability",
+    "why": "Release health"
+   }
+  ],
+  "tradeoffs": [
+   "Push-based CD is simple; pull-based keeps the cluster the source of truth.",
+   "More gates mean safer releases and slower feedback."
+  ],
+  "breaks": [
+   "A bad config passes tests but fails in the cluster; only a readiness probe catches it.",
+   "The registry is down and new Pods cannot pull the image."
+  ]
+ },
+ {
+  "id": "observability-stack",
+  "title": "Observability stack",
+  "level": "Intermediate",
+  "summary": "Metrics, logs and traces from every service, with alerts that page the right person.",
+  "diagram": "title: Observability stack\nnode: app | Applications | 0 | 1 | Emit metrics, structured logs and trace spans. | Unstructured logs cannot be searched at 3 a.m. | service\nnode: prom | Prometheus | 1 | 0 | Scrapes and stores metrics. | High-cardinality labels can exhaust its memory. | observe\nnode: logs | Log store | 1 | 1 | Collects and indexes logs. | Keeping everything forever gets expensive fast. | store\nnode: trace | Tracing backend | 1 | 2 | Follows one request across services. | Without sampling, tracing costs more than the app. | observe\nnode: graf | Dashboards | 2 | 1 | Show the health of the whole system. | A wall of graphs nobody understands hides the real signal. | client\nnode: alert | Alertmanager | 3 | 0 | Groups and routes alerts to on-call. | Alerts on causes instead of symptoms cause fatigue. | queue\nnode: oncall | On-call engineer | 4 | 0 | Gets paged, follows a runbook. | No runbook turns every page into guesswork. | external\nedge: app | prom | scrape\nedge: app | logs | ship\nedge: app | trace | spans\nedge: prom | graf | query\nedge: logs | graf | query\nedge: prom | alert | rules\nedge: alert | oncall | page",
+  "learn": [
+   {
+    "node": "prom",
+    "module": "observability",
+    "why": "Metrics, PromQL and alert rules"
+   },
+   {
+    "node": "alert",
+    "module": "sre",
+    "why": "SLOs, burn rate and paging"
+   },
+   {
+    "node": "oncall",
+    "module": "sre",
+    "why": "On-call and runbooks"
+   },
+   {
+    "node": "trace",
+    "module": "observability",
+    "why": "Tracing and correlation"
+   }
+  ],
+  "tradeoffs": [
+   "Managed observability saves effort; self-hosted gives control and lower cost at scale.",
+   "Page on symptoms such as errors and latency, ticket on causes."
+  ],
+  "breaks": [
+   "The monitoring system runs on the cluster it monitors and dies with it.",
+   "A silent exporter looks like a healthy service."
+  ]
+ },
+ {
+  "id": "vault-k8s",
+  "title": "Secrets with Vault on Kubernetes",
+  "level": "Advanced",
+  "summary": "Pods get short-lived credentials from Vault instead of long-lived secrets in manifests.",
+  "diagram": "title: Secrets with Vault on Kubernetes\nnode: pod | App Pod | 0 | 1 | Authenticates with its service account. | A shared service account lets any Pod read any secret. | service\nnode: auth | Kubernetes auth | 1 | 1 | Vault checks the account token with the API server. | A wide role binding gives away more than intended. | security\nnode: vault | Vault cluster | 2 | 1 | Issues secrets according to policy. | Sealed or unreachable Vault stops new credentials. | security\nnode: pol | Policy | 2 | 0 | Says which paths each role can read. | A wildcard policy defeats least privilege. | security\nnode: db | Database engine | 3 | 1 | Creates a unique database user for each lease. | Leases that never expire keep dead users alive. | store\nnode: audit | Audit log | 2 | 2 | Records every request, who and what. | Logs sent nowhere cannot support an investigation. | observe\nnode: raft | Raft storage | 3 | 2 | Replicates Vault data across three nodes. | Losing quorum makes Vault read-only or down. | store\nedge: pod | auth | token\nedge: auth | vault | validate\nedge: pol | vault | enforce\nedge: vault | db | create user\nedge: vault | audit | log\nedge: vault | raft | store",
+  "learn": [
+   {
+    "node": "auth",
+    "module": "vault",
+    "why": "Auth methods and tokens"
+   },
+   {
+    "node": "pol",
+    "module": "vault",
+    "why": "Policies and least privilege"
+   },
+   {
+    "node": "db",
+    "module": "vault",
+    "why": "Dynamic secrets"
+   },
+   {
+    "node": "pod",
+    "module": "kubernetes",
+    "why": "Service accounts and RBAC"
+   },
+   {
+    "node": "raft",
+    "module": "vault",
+    "why": "High availability and recovery"
+   }
+  ],
+  "tradeoffs": [
+   "Dynamic secrets limit damage but add a runtime dependency on Vault.",
+   "Sidecar injection is simple; CSI avoids extra containers."
+  ],
+  "breaks": [
+   "Vault restarts and stays sealed: no Pod can start new connections.",
+   "A leaked token with a long TTL stays valid until revoked."
+  ]
+ },
+ {
+  "id": "vm-and-containers",
+  "title": "VMs and containers on one platform",
+  "level": "Advanced",
+  "summary": "KubeVirt runs virtual machines beside containers, on storage that Ceph provides.",
+  "diagram": "title: VMs and containers on one platform\nnode: ctl | Kubernetes API | 1 | 0 | One control plane for Pods and VMs. | An unhealthy control plane stops changes, not running guests. | service\nnode: kv | KubeVirt | 1 | 1 | Turns a VirtualMachine into a KVM guest in a Pod. | Missing virtualization on the node leaves VMs pending. | service\nnode: vm | Guest VM | 2 | 1 | Runs the legacy application as before. | Without live migration support, node updates mean downtime. | service\nnode: pod | Container apps | 2 | 0 | Modern services next to the VMs. | Noisy neighbours without limits slow the VMs. | service\nnode: rook | Rook | 1 | 2 | Operates Ceph inside the cluster. | Rook upgrades must follow Ceph rules. | process\nnode: ceph | Ceph RBD | 2 | 2 | Block volumes that follow the VM to any node. | Near-full pools turn writes read-only. | store\nnode: net | Multus network | 3 | 1 | Gives VMs secondary networks and VLANs. | Wrong bridge settings isolate the VM. | edge\nedge: ctl | kv | CRDs\nedge: kv | vm | launch\nedge: ctl | pod | schedule\nedge: vm | ceph | disk\nedge: rook | ceph | operate\nedge: vm | net | attach",
+  "learn": [
+   {
+    "node": "kv",
+    "module": "kubevirt",
+    "why": "VirtualMachines and live migration"
+   },
+   {
+    "node": "ceph",
+    "module": "ceph",
+    "why": "Pools, CRUSH and recovery"
+   },
+   {
+    "node": "rook",
+    "module": "ceph",
+    "why": "Rook on Kubernetes"
+   },
+   {
+    "node": "net",
+    "module": "kubevirt",
+    "why": "VM networking"
+   },
+   {
+    "node": "vm",
+    "module": "virtualization",
+    "why": "Virtualization basics"
+   }
+  ],
+  "tradeoffs": [
+   "One platform lowers tooling cost; separate stacks isolate risk.",
+   "Live migration needs shared ReadWriteMany or block storage."
+  ],
+  "breaks": [
+   "Node drain evicts VMs that cannot live-migrate.",
+   "Ceph fills after one failure because there was no spare capacity."
+  ]
+ },
+ {
+  "id": "edge-and-proxy",
+  "title": "Edge, CDN and reverse proxy",
+  "level": "Intermediate",
+  "summary": "Requests are cached at the edge, protected, then balanced to origin servers.",
+  "diagram": "title: Edge, CDN and reverse proxy\nnode: user | Visitor | 0 | 1 | Requests a page from anywhere. | Distance and slow networks hurt speed. | client\nnode: cdn | CDN | 1 | 1 | Serves cached content near the visitor. | A wrong cache key shows one user another user's page. | edge\nnode: waf | WAF and rate limits | 2 | 0 | Blocks known attacks and floods. | Strict rules block real customers. | security\nnode: rp | Reverse proxy | 2 | 1 | Terminates TLS and routes to backends. | Missing timeouts let slow clients hold connections. | edge\nnode: app1 | Origin A | 3 | 0 | One backend instance. | If only one origin exists, the proxy cannot help. | service\nnode: app2 | Origin B | 3 | 2 | A second instance for balance and failover. | Sticky sessions make uneven load. | service\nnode: log | Access logs | 2 | 2 | Record every request for debugging. | No request ID makes tracing hard. | observe\nedge: user | cdn | request\nedge: cdn | waf | miss\nedge: waf | rp | allow\nedge: rp | app1 | balance\nedge: rp | app2 | balance\nedge: rp | log | log",
+  "learn": [
+   {
+    "node": "rp",
+    "module": "proxies",
+    "why": "Reverse proxies, TLS and timeouts"
+   },
+   {
+    "node": "cdn",
+    "module": "networking",
+    "why": "Caching and HTTP"
+   },
+   {
+    "node": "waf",
+    "module": "security",
+    "why": "WAF and rate limiting"
+   },
+   {
+    "node": "log",
+    "module": "observability",
+    "why": "Access logs"
+   }
+  ],
+  "tradeoffs": [
+   "Cache aggressively for speed; cache carefully for correctness.",
+   "A managed edge is easy; a self-run proxy gives control."
+  ],
+  "breaks": [
+   "Origin outage with a short cache TTL: the CDN passes the failure to everyone.",
+   "Large uploads hit a default body size limit."
+  ]
+ },
+ {
+  "id": "backup-dr",
+  "title": "Backup and disaster recovery",
+  "level": "Advanced",
+  "summary": "Three copies, two media and one off-site, with restores that are tested.",
+  "diagram": "title: Backup and disaster recovery\nnode: prod | Production data | 0 | 1 | The live system. | Replication copies deletions and corruption too. | store\nnode: snap | Snapshots | 1 | 0 | Fast local recovery points. | On the same storage, a storage failure loses both. | store\nnode: bk | Backup job | 1 | 2 | Copies data to another system on a schedule. | A job that fails silently leaves no backup. | process\nnode: off | Off-site copy | 2 | 2 | Stored in another region or provider, immutable. | Same credentials as production let an attacker delete it. | external\nnode: rest | Restore test | 3 | 1 | Regular rebuild in a clean environment. | An untested backup is only a hope. | process\nnode: rto | Runbook | 3 | 0 | Steps, owners and targets for recovery time. | An out-of-date runbook costs hours. | observe\nnode: dr | DR site | 2 | 1 | Warm standby in another region. | Never failed over means you do not know it works. | service\nedge: prod | snap | snapshot\nedge: prod | bk | copy\nedge: bk | off | replicate\nedge: off | rest | restore\nedge: rest | rto | measure\nedge: prod | dr | replicate",
+  "learn": [
+   {
+    "node": "bk",
+    "module": "storage",
+    "why": "Snapshots, backups and retention"
+   },
+   {
+    "node": "off",
+    "module": "security",
+    "why": "Immutable and separated copies"
+   },
+   {
+    "node": "dr",
+    "module": "sre",
+    "why": "RTO, RPO and drills"
+   },
+   {
+    "node": "prod",
+    "module": "databases",
+    "why": "Point-in-time recovery"
+   }
+  ],
+  "tradeoffs": [
+   "Lower RTO and RPO cost more; decide what an hour of downtime really costs.",
+   "Warm standby recovers faster than rebuild-from-backup, at higher cost."
+  ],
+  "breaks": [
+   "Ransomware encrypts production and the connected backup together.",
+   "The restore works but takes 14 hours when the target was 2."
+  ]
+ },
+ {
+  "id": "hybrid-network",
+  "title": "Hybrid network: on premises and cloud",
+  "level": "Advanced",
+  "summary": "A private link joins the office network to the cloud, with DNS and routing that work both ways.",
+  "diagram": "title: Hybrid network: on premises and cloud\nnode: onp | On-premises network | 0 | 1 | Office and data-centre servers. | Overlapping IP ranges make routing impossible. | external\nnode: fw | Firewall | 1 | 1 | Controls what crosses the link. | Allow-all rules defeat the point of a private link. | security\nnode: vpn | VPN or direct link | 2 | 1 | The encrypted or dedicated connection. | A single tunnel is a single point of failure. | edge\nnode: tgw | Cloud router | 3 | 1 | Routes between VPCs and the link. | Missing route entries create one-way traffic. | edge\nnode: vpc | Cloud network | 4 | 0 | Private subnets for the workloads. | Public subnets by accident expose servers. | service\nnode: dns | Hybrid DNS | 2 | 0 | Resolves names in both directions. | Split-brain DNS sends users to the wrong address. | edge\nnode: mon | Link monitoring | 2 | 2 | Tracks latency, loss and tunnel state. | No monitoring means you learn from a call. | observe\nedge: onp | fw | traffic\nedge: fw | vpn | encrypt\nedge: vpn | tgw | route\nedge: tgw | vpc | deliver\nedge: dns | vpn | resolve\nedge: mon | vpn | probe",
+  "learn": [
+   {
+    "node": "vpn",
+    "module": "networking",
+    "why": "Routing, subnets and VPN"
+   },
+   {
+    "node": "tgw",
+    "module": "cloud",
+    "why": "Cloud networking"
+   },
+   {
+    "node": "fw",
+    "module": "security",
+    "why": "Firewalls and segmentation"
+   },
+   {
+    "node": "dns",
+    "module": "networking",
+    "why": "DNS design"
+   },
+   {
+    "node": "mon",
+    "module": "observability",
+    "why": "Network monitoring"
+   }
+  ],
+  "tradeoffs": [
+   "VPN is cheap and quick; a dedicated link gives steady latency at higher cost.",
+   "Two links in different paths remove the single point of failure."
+  ],
+  "breaks": [
+   "Both tunnels share one device and fail together.",
+   "Route advertisements overlap and traffic loops."
+  ]
+ },
+ {
+  "id": "rag-service",
+  "title": "Retrieval-augmented AI service",
+  "level": "Advanced",
+  "summary": "An LLM answers from your own documents by retrieving the relevant passages first.",
+  "diagram": "title: Retrieval-augmented AI service\nnode: user | User question | 0 | 1 | Asks in natural language. | Ambiguous questions need a clarifying step. | client\nnode: gw | API gateway | 1 | 1 | Authenticates, rate-limits and logs. | No limits turn one bug into a large bill. | edge\nnode: emb | Embedding model | 2 | 0 | Turns the question into a vector. | A different model than the index gives poor matches. | service\nnode: vec | Vector store | 3 | 0 | Finds the closest document chunks. | Stale index returns outdated answers. | store\nnode: llm | Language model | 3 | 1 | Writes an answer from the question and passages. | May invent facts when the passages are weak. | service\nnode: guard | Guardrails | 2 | 2 | Filter prompt injection and unsafe output. | Trusting retrieved text as instructions is an attack path. | security\nnode: eval | Evaluation and logs | 4 | 1 | Samples answers and scores quality. | Without evaluation, quality drift goes unnoticed. | observe\nedge: user | gw | ask\nedge: gw | emb | embed\nedge: emb | vec | search\nedge: vec | llm | context\nedge: guard | llm | check\nedge: llm | eval | sample",
+  "learn": [
+   {
+    "node": "llm",
+    "module": "llm",
+    "why": "How language models behave"
+   },
+   {
+    "node": "emb",
+    "module": "mlops",
+    "why": "Serving and versioning models"
+   },
+   {
+    "node": "vec",
+    "module": "aiops",
+    "why": "Operating AI systems"
+   },
+   {
+    "node": "guard",
+    "module": "prompting",
+    "why": "Prompt design and injection"
+   },
+   {
+    "node": "eval",
+    "module": "mlops",
+    "why": "Monitoring models"
+   }
+  ],
+  "tradeoffs": [
+   "Bigger context windows reduce retrieval needs but cost more per call.",
+   "Fine-tuning changes style; retrieval keeps facts fresh."
+  ],
+  "breaks": [
+   "The index is not updated and the model confidently quotes last year's policy.",
+   "A retrieved web page contains instructions the model obeys."
+  ]
+ }
+]
