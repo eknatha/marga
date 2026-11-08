@@ -296,6 +296,7 @@ function renderChrome() {
     '<div class="nav-more-menu" id="nav-more-menu" hidden>' +
     '<a class="nav-ih" href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener" title="InterviewHub (opens in a new tab)"><b>InterviewHub</b><span>Question bank, opens in a new tab</span></a>' +
     '<a class="nav-certs" href="https://certs.eknathalabs.com" target="_blank" rel="noopener" title="Certifications (opens in a new tab)"><b>Certifications</b><span>Exam prep, opens in a new tab</span></a>' +
+    '<a href="#/studio" data-nav="studio"><b>Studio</b><span>Mastery map, architectures, cluster, replays</span></a>' +
     '<a href="#/cheatsheets" data-nav="cheatsheets"><b>Cheat sheets</b><span>Printable, with watermark</span></a>' +
     '<a href="#/cases" data-nav="cases"><b>Case studies</b><span>Real outages explained</span></a></div></div></nav>' +
     '<div class="tools">' +
@@ -309,7 +310,7 @@ function renderChrome() {
   $('#footer').innerHTML =
     '<footer class="foot"><div class="wrap foot-in">' +
     '<span>MARGA by EknathaLabs</span>' +
-    '<a href="cheatsheets/">Printable cheat sheets</a><a href="packs/">PDF packs</a><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="#/interview">Interview questions</a><a href="#/practice">Practice</a><a href="#/glossary">Glossary</a><a href="#/terminal-labs">Terminal labs</a><a href="#/badges">Badges</a><a href="#/license">Open content license</a>' +
+    '<a href="cheatsheets/">Printable cheat sheets</a><a href="packs/">PDF packs</a><a href="#/studio">Studio</a><a href="#/tour">Take the tour</a><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="#/interview">Interview questions</a><a href="#/practice">Practice</a><a href="#/glossary">Glossary</a><a href="#/terminal-labs">Terminal labs</a><a href="#/badges">Badges</a><a href="#/license">Open content license</a>' +
     '<span class="foot-note">Progress is saved in this browser only.</span>' +
     '<p class="foot-promise">Free \u00b7 No login \u00b7 No ads \u00b7 No cookies</p><p class="small foot-ver">Version ' + siteVer() + '</p></div></footer>';
   if (window.MargaCounter && D.counter) MargaCounter.rebind('#visitors');
@@ -1517,6 +1518,9 @@ if (typeof window.MargaGuide === "function") window.MargaGuide(api);
 if (typeof window.MargaDesigns === "function") window.MargaDesigns(api);
 if (typeof window.MargaLearn === "function") window.MargaLearn(api);
 if (typeof window.MargaCloudCompare === "function") window.MargaCloudCompare(api);
+if (typeof window.MargaStudio === "function") window.MargaStudio(api);
+if (typeof window.MargaMotion === "function") window.MargaMotion(api);
+if (typeof window.MargaTour === "function") window.MargaTour(api);
 
 /* ---------- accessibility panel ---------- */
 (function () {
