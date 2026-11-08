@@ -1231,6 +1231,39 @@ function checkI18n() {
   if (!/assets\/i18n\.js/.test(read(path.join(DIST, 'index.html')))) err('i18n', 'index.html does not load assets/i18n.js');
 }
 
+function checkStudio() {
+  const d = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/gallery/gallery.json'), 'utf8'));
+  const rp = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/replays/replays.json'), 'utf8'));
+  const gl = Array.isArray(d) ? d : (d.items || d.gallery || []);
+  const rl = Array.isArray(rp) ? rp : (rp.items || rp.replays || []);
+  const mods = new Set((A.modules || A.MODS || []).map((m) => m.id));
+  if (gl.length < 8) err('gallery', 'fewer than 8 architectures');
+  if (rl.length < 8) err('replays', 'fewer than 8 replay sessions');
+  const seen = new Set();
+  for (const g of gl) {
+    if (seen.has(g.id)) err('gallery', `duplicate id ${g.id}`);
+    seen.add(g.id);
+    if (!g.learn || !g.learn.length) err('gallery', `${g.id}: no learn list`);
+    for (const l of g.learn || []) if (mods.size && !mods.has(l.module)) err('gallery', `${g.id}: unknown module ${l.module}`);
+    if (!g.tradeoffs || !g.tradeoffs.length) err('gallery', `${g.id}: no tradeoffs`);
+    if (!g.breaks || !g.breaks.length) err('gallery', `${g.id}: no breaks`);
+  }
+  const rs = new Set();
+  for (const r of rl) {
+    if (rs.has(r.id)) err('replays', `duplicate id ${r.id}`);
+    rs.add(r.id);
+    if (!r.steps || r.steps.length < 4) err('replays', `${r.id}: fewer than 4 steps`);
+    for (const [i, st] of (r.steps || []).entries()) {
+      if (!st.cmd || !st.cmd.trim()) err('replays', `${r.id} step ${i + 1}: empty cmd`);
+      if (!st.say || st.say.length < 15) err('replays', `${r.id} step ${i + 1}: explanation too short`);
+    }
+  }
+  for (const f of ['tour', 'motion', 'studio']) {
+    if (!fs.existsSync(path.join(DIST, `assets/${f}.js`))) err('round48', `assets/${f}.js missing`);
+    else if (!new RegExp(`assets/${f}\\.js`).test(read(path.join(DIST, 'sw.js')))) err('round48', `${f}.js not in the service worker precache`);
+  }
+  stats.architectures = gl.length; stats.replays = rl.length;
+}
 const steps = [
   ['content schema', checkSchema],
   ['role paths', checkPaths],
@@ -1248,6 +1281,7 @@ const steps = [
   ['interactive widgets', checkWidgets], ['lesson stories and senior views', checkStories],
   ['learning plans', checkPlans],
   ['project tracks', checkTracks],
+  ['architecture gallery and terminal replays', checkStudio],
   ['languages (Telugu, Hindi, Tamil, Kannada, Malayalam, Bengali, Spanish, German, French, Portuguese)', checkI18n]
 ];
 for (const [name, fn] of steps) {

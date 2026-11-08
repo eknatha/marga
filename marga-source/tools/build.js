@@ -18,7 +18,7 @@ const SRC = path.join(ROOT, 'src');
 const DIST = path.join(ROOT, 'dist');
 const DOMAIN = 'marga.eknathalabs.com';
 // GoatCounter site code for the visitor count (https://CODE.goatcounter.com). Empty string disables it.
-const EXTRA = ['i18n.js', 'voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'placement.js', 'tracks.js', 'broken.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js', 'choose.js', 'skilllab.js', 'casefile.js', 'sdlab.js', 'widgets.js', 'diagrams.js', 'plans.js', 'replay.js', 'portfolio.js', 'guided.js', 'handbook.js', 'share.js', 'vmlinux.js', 'challenge-core.js', 'challenge.js', 'workshop.js', 'interviewlab.js', 'roadmap.js', 'searchpage.js', 'guide.js', 'explain-out.js', 'designs.js', 'crosslinks.js', 'cloudcompare.js', 'learn.js'];
+const EXTRA = ['i18n.js', 'voice.js', 'counter.js', 'calc.js', 'a11y.js', 'extras.js', 'net.js', 'search.js', 'yaml.js', 'explainers.js', 'lab.js', 'more.js', 'placement.js', 'tracks.js', 'broken.js', 'labs-ui.js', 'termlabs-ui.js', 'features.js', 'badges.js', 'choose.js', 'skilllab.js', 'casefile.js', 'sdlab.js', 'widgets.js', 'diagrams.js', 'plans.js', 'replay.js', 'portfolio.js', 'guided.js', 'handbook.js', 'share.js', 'vmlinux.js', 'challenge-core.js', 'challenge.js', 'workshop.js', 'interviewlab.js', 'roadmap.js', 'searchpage.js', 'guide.js', 'explain-out.js', 'designs.js', 'crosslinks.js', 'cloudcompare.js', 'learn.js', 'tour.js', 'motion.js', 'studio.js'];
 // terminal lab engine: loaded only when a terminal lab is opened, but cached for offline use
 const ENGINE = ['term-fs.js', 'term-parse.js', 'term-exec.js', 'term-cmds.js', 'term-text.js', 'term-awk.js', 'term-jq.js', 'term-sys.js', 'term-net.js', 'term-k8s.js', 'term-docker.js', 'term-cloud.js', 'term-iac.js', 'term-helm.js', 'term-infra.js', 'term-hw.js', 'term-labs.js'];
 const COUNTER = process.env.MARGA_COUNTER !== undefined ? process.env.MARGA_COUNTER : 'marga-eknathalabs';
@@ -566,7 +566,10 @@ function loadContent() {
       for (const w of j) tracks.push(w);
     }
   }
-  return { modules, paths, lessons, sheets, interview, cases, casefiles, widgets, plans, tracks, capstones, walkthroughs, mockdesigns, reading, games, arch, drills, glossary, labs, termlabs, vmlabs, challenges, predicts: PREDICTS };
+  // Round 48: terminal replays (src/replays) and reference architectures (src/gallery, drawn with the lesson diagram renderer)
+  const replays = JSON.parse(fs.readFileSync(path.join(SRC, 'replays', 'replays.json'), 'utf8'));
+  const gallery = JSON.parse(fs.readFileSync(path.join(SRC, 'gallery', 'gallery.json'), 'utf8')).map((g) => ({ ...g, html: renderDiagram(g.diagram) }));
+  return { modules, paths, lessons, sheets, interview, cases, casefiles, widgets, plans, tracks, capstones, walkthroughs, mockdesigns, reading, games, arch, drills, glossary, labs, termlabs, vmlabs, challenges, replays, gallery, predicts: PREDICTS };
 
 }
 
@@ -645,7 +648,7 @@ function main() {
   const opt = { 'atkinson-400.woff2': '@fontsource/atkinson-hyperlegible/files/atkinson-hyperlegible-latin-400-normal.woff2', 'atkinson-700.woff2': '@fontsource/atkinson-hyperlegible/files/atkinson-hyperlegible-latin-700-normal.woff2', 'opendyslexic-400.woff2': '@fontsource/opendyslexic/files/opendyslexic-latin-400-normal.woff2', 'opendyslexic-700.woff2': '@fontsource/opendyslexic/files/opendyslexic-latin-700-normal.woff2' };
   for (const [name, rel] of Object.entries(opt)) fs.copyFileSync(path.join(ROOT, 'node_modules', rel), path.join(DIST, 'assets', 'fonts', name));
 
-  const css = fontCss() + read('app/app.css') + '\n' + read('app/theme.css');
+  const css = fontCss() + read('app/app.css') + '\n' + read('app/theme.css') + '\n' + read('app/round48.css');
   const js = read('app/app.js');
   // lesson bodies (html, toc, references, search text) are about half the data: they ship as one small file per skill and load when needed
   const chunks = {}; const slim = {};

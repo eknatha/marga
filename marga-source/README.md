@@ -379,3 +379,10 @@ A language picker sits in the top bar. The interface, module titles and summarie
 - Diagram backfill: every lesson now has a diagram. `tools/mkdiagrams.py` added a "How the parts fit together" section to the 459 older lessons, built from each lesson's own sections and Common mistakes. These are section maps; the lessons written this round have hand-drawn mechanism diagrams. The validator now fails any lesson without a diagram block.
 - Printable PDF packs: `tools/mkpacks.py` (needs `reportlab`) writes one PDF per module plus one with all cheat sheets into `src/packs/`, with a diagonal MARGA watermark and a footer on every page. `tools/build.js` copies them to `dist/packs/` and builds `packs/index.html`, linked from the footer. Re-run `python3 tools/mkpacks.py` after changing lessons or cheat sheets, then rebuild. Packs are English only.
 - Tests: `tools/e2e/22-round-47.part.js`.
+
+## Round 48: guided tour and studio
+
+- `src/app/tour.js`: first-visit tour (path picker, spotlight steps), route `/tour`, ambient focus mode on lessons (key `f`, Esc exits). Keys `ea.tour`, `ea.focus`.
+- `src/app/motion.js`: skill-tree reveal, count-up stats, diagram auto-play, pass confetti. Respects reduced motion.
+- `src/app/studio.js`: `/studio`, `/mastery` (radar), `/architectures` (11, from `src/gallery/gallery.json`), `/replays` (12, from `src/replays/replays.json`), `/cluster` (simulated cluster).
+- Styles in `src/app/round48.css`. Validator checks gallery and replay data; e2e in `23-round-48.part.js`.
