@@ -1275,10 +1275,6 @@ module: aiops
 plain: A fix that runs automatically for a known fault.
 def: Automation that detects a known condition and applies a predefined fix, with limits, verification and rollback.
 
-## Kill switch
-module: aiops
-plain: One control that stops all automation.
-def: A global setting that disables automated actions at once, used when automation behaves unexpectedly.
 
 ## ARN
 module: cloud
@@ -1807,3 +1803,46 @@ def: An engine that encrypts and decrypts data with keys that never leave Vault.
 module: vault
 plain: A safe reference to a token.
 def: An identifier that lets you look up or revoke a token without knowing its value.
+
+## Approval tier
+module: aiops-practice
+plain: A rule for how much a robot may do alone.
+def: A level of autonomy for an automated action, matched to how much it can break and whether it can be undone.
+
+## Guard metric
+module: aiops-practice
+plain: A second check that the fix did not hurt something else.
+def: A signal checked after an action to catch harmful side effects, such as database connections after a scale-out.
+
+## Kill switch
+module: aiops
+plain: One control that stops all automation.
+def: A global setting that disables automated actions at once, used when automation behaves unexpectedly.
+
+
+
+## Change feed
+module: aiops
+plain: A list of what changed and when.
+def: One stream of deploys, configuration changes, flags and infrastructure changes used to link incidents to their causes.
+
+## Burn rate
+module: aiops
+plain: How quickly the allowed mistakes are being used up.
+def: How fast an error budget is being used compared with the rate that would use it exactly over the period.
+
+
+## Fail closed
+module: aiops-practice
+plain: If a safety check breaks, the robot stops.
+def: Stop acting when a safety check cannot be performed, instead of carrying on without it.
+
+## Replay test
+module: aiops-practice
+plain: Trying a tool on old incidents to see how it would have done.
+def: Running a detector or pipeline over recorded history and known incidents to measure what it would have done.
+
+## Egress allowlist
+module: aiops-practice
+plain: A list of the only places data may be sent.
+def: A short list of hosts an agent's tools may send data to, so everything else is blocked.
