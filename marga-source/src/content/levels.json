@@ -2410,5 +2410,93 @@
  "vault/incident-response-rotating-and-revoking-secrets": {
   "s": "Assume a secret will leak one day. What matters is how fast you can find the affected paths, cut off access and replace what was exposed.",
   "i": "Look up the token and its accessor, revoke it with its children, revoke leases by prefix, rotate static secrets in KV and the downstream systems, and read the audit log to see what was accessed. Seal Vault only as a last resort."
+ },
+ "aiops/statistics-for-ops-percentiles-seasonality-and-correlation": {
+  "s": "If a bus is on time for most riders but very late for a few, the average delay looks fine and the late riders still miss their trains. Percentiles show those riders.",
+  "i": "I use percentiles from merged histograms rather than averages, remove seasonality and trend before judging a point, prefer robust measures such as the median and MAD for spiky data, and treat correlation as a lead, not a cause."
+ },
+ "aiops/hands-on-anomaly-detection-z-score-mad-and-ewma": {
+  "s": "A smoke alarm that listens to a noisy kitchen needs to learn what normal noise sounds like. A very loud pan clatter should not make it deaf to the real alarm a minute later.",
+  "i": "I start with a seasonal baseline and a robust score such as MAD, add EWMA where drift matters, require a minimum duration, and replay each detector over weeks of history and known incidents before it can page anyone."
+ },
+ "aiops/change-point-and-trend-detection": {
+  "s": "A spike is a loud bang that fades. A change point is when the whole room gets louder and stays that way. You react differently to each.",
+  "i": "I separate spikes from level shifts and trends, use CUSUM for small lasting shifts, report the estimated start of the change rather than the alarm time, and alert on projected time to a limit instead of the raw level."
+ },
+ "aiops/event-deduplication-grouping-and-suppression-rules": {
+  "s": "A good receptionist notes that the same caller has rung five times and tells you once. A rules layer does that for alerts, with the caller's details written the same way each time.",
+  "i": "I define stable fingerprints, deduplicate repeats into a count, group by cluster or service with a short window, suppress only with an owner, reason and expiry, and replay a week of real events through any new rule before release."
+ },
+ "aiops/change-correlation-linking-incidents-to-deploys": {
+  "s": "When the lights go out, the first question is whether someone just touched the fuse box. A change feed is the list of who touched what and when.",
+  "i": "I build one feed of deploys, config, flags and infrastructure changes, match it to the estimated start of the incident by time and by scope, rank suspects with reasons and a rollback link, and allow the answer no recent change found."
+ },
+ "aiops/topology-and-dependency-aware-root-cause": {
+  "s": "If every house on a street loses power, you look for the shared cable, not the house with the loudest complaint.",
+  "i": "I model services, datastores and hosts as a graph from traces and a catalog, find failing nodes with healthy dependencies that many failing services depend on, use the time of the first abnormal signal, and show the path so stale edges are easy to spot."
+ },
+ "aiops/tuning-alerts-with-data-precision-recall-and-burn-rates": {
+  "s": "An alarm that rings for every piece of toast gets unplugged, and one that never rings is useless. You want it to ring when it should and stay quiet when it should not.",
+  "i": "I measure precision, recall, MTTA, MTTR and the share of incidents that users reported first, label alerts as actionable or not, use multi-window SLO burn-rate alerts as the baseline, and add ML only where it beats that baseline on history."
+ },
+ "aiops/multivariate-and-service-level-anomalies": {
+  "s": "If one of twelve identical clocks is wrong, you do not need its history. You compare it with the other eleven.",
+  "i": "I compare instances with their peers using median and MAD, use ratios instead of counts, view each service through the golden signals, add an isolation forest on a few well chosen features, and always report which features differ and by how much."
+ },
+ "aiops-practice/data-sources-and-pipelines-for-aiops": {
+  "s": "A detective cannot solve a case if the witnesses call the same person by different names and write down times in different time zones. The data has to agree first.",
+  "i": "I build metrics, events, changes and topology into one store, give every record the same canonical service name, store event and ingest time in UTC, check freshness and labels at ingestion, and redact secrets before storage."
+ },
+ "aiops-practice/remediation-patterns-and-approval-tiers": {
+  "s": "A new employee may water the plants alone but needs approval before moving the furniture. Actions need the same kind of tiers, based on how much they can break.",
+  "i": "I classify actions by blast radius and reversibility into tiers from read-only to human-performed, and write each action with preconditions, bounded scope, timeout, rate limit, idempotence and an undo, starting in log-only mode."
+ },
+ "aiops-practice/verifying-and-rolling-back-a-remediation": {
+  "s": "Switching the heating on is not the same as the room getting warm. You check the thermometer, not the switch.",
+  "i": "I verify the same symptom query that triggered the action, after a settling time and over a window, add guard metrics for side effects, undo or escalate automatically when verification fails, and test the undo path."
+ },
+ "aiops-practice/audit-trails-kill-switches-and-blast-radius-limits": {
+  "s": "A building has a fire alarm, a main switch and fireproof doors, so one fault cannot burn the whole place. Automation needs the same layers.",
+  "i": "I give automation a narrow short-lived identity, write an immutable audit record for every action, provide kill switches at several levels that are checked before every action, and cap scope, rate and daily budget of risky actions."
+ },
+ "aiops-practice/chaos-testing-your-automation": {
+  "s": "A fire drill finds out whether the exits work before there is a fire. Chaos tests do that for detection and automation.",
+  "i": "I write a hypothesis, inject a small announced fault in staging with a stop condition, check detection, explanation, action and the stop path, test negatives and the failure of the automation itself, and turn every gap into a regression test."
+ },
+ "aiops-practice/retrieval-over-runbooks-and-past-incidents": {
+  "s": "A librarian who reads the right book before answering gives better advice than one who answers from memory, especially if the librarian also tells you which book.",
+  "i": "I index runbooks and postmortems with service, status and review date, chunk by meaning, filter before ranking, combine keyword and vector search, cite every statement and abstain when nothing relevant is found."
+ },
+ "aiops-practice/agentic-ops-tools-mcp-and-approval-gates": {
+  "s": "A trainee can look at gauges and write notes on day one, and only later is trusted with the controls. An agent should earn reach the same way.",
+  "i": "I give an agent a small set of typed, narrow tools, often through MCP, start read-only, move to structured proposals, require a human gate that shows the exact action, and cap steps, time and tokens while keeping a full transcript."
+ },
+ "aiops-practice/prompt-injection-and-over-permissioned-agents": {
+  "s": "If a note pinned to a door says do whatever the next person tells you, a helper who reads every note might obey it. Helpers need limits that notes cannot change.",
+  "i": "I treat logs, tickets and fetched pages as untrusted input, keep secrets out of the model context, restrict egress to allowlisted hosts, validate tool arguments in code, require approval for writes, and test the agent with hostile strings."
+ },
+ "aiops-practice/evaluating-ai-ops-output-test-sets-and-shadow-mode": {
+  "s": "A new recipe is tried on a few friends before it goes on the menu. You taste it, count the complaints and only then serve everyone.",
+  "i": "I build a labelled incident set including quiet periods, measure recall, lead time, false alarms, top-k root cause accuracy and citation rate, run in shadow mode, track accept and reject rates, stage the rollout with written gates and keep a regression suite."
+ },
+ "aiops-practice/build-versus-buy-and-the-roi-case": {
+  "s": "Before buying a very expensive tool you test it on your own jobs, and you count all the cost, not just the sticker price.",
+  "i": "I choose build, buy or assemble by data fit, ownership and exit options, evaluate vendors in shadow mode on my own redacted incidents against targets set in advance, count total cost, and show return from a baseline and the same measures afterwards."
+ },
+ "aiops-practice/failure-modes-drift-feedback-loops-and-wrong-remediators": {
+  "s": "A clock that runs a minute slow each week still looks fine until you miss a train. AIOps tools drift in the same quiet way.",
+  "i": "I monitor the tools themselves: weekly precision and recall, input distributions, rollback share and repeat fixes per action, sample unflagged periods to break feedback loops, report coverage by tier and run exercises without the tool."
+ },
+ "aiops-practice/operating-aiops-ownership-on-call-and-lifecycle": {
+  "s": "A lift needs a maintenance contract, an inspection date and a phone number for when it sticks. A platform that moves people and changes systems needs the same.",
+  "i": "I name owners for every rule and automation, set SLOs for data freshness and alert delivery, give the platform an on-call rota and a degraded mode, run a lifecycle from proposal to retirement, use change control and track cost beside value."
+ },
+ "aiops-practice/debugging-a-misbehaving-aiops-pipeline": {
+  "s": "When a cake fails, you check the ingredients, the oven and the recipe in order instead of changing everything at once.",
+  "i": "I pull the decision record and replay it stage by stage across data, detection, correlation, explanation and action, find the first stage whose output is wrong for a correct input, fix that, and add a regression case."
+ },
+ "aiops-practice/capstone-a-mini-aiops-pipeline": {
+  "s": "Building a small working model of a bridge teaches more than reading about bridges. This project builds a tiny AIOps pipeline end to end.",
+  "i": "I simulate a metric and a change feed, detect a lasting shift with CUSUM, estimate its start, rank change suspects by time and scope, produce an evidence summary and a gated Tier 2 proposal with an audit record, and test it on several simulated incidents."
  }
 }
