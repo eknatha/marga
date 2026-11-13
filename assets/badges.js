@@ -6,7 +6,7 @@
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 var CAUTION1 = 'Self-reported completion record from MARGA by EknathaLabs. Not a certification, degree or qualification.';
 var CAUTION2 = 'The verification code only checks that the name, badge and date match each other. It does not confirm identity.';
-var HUES = { kubevirt: 205, ceph: 12, vault: 45, proxies: 100, messaging: 320, 'cfn-bicep': 255, gcp: 225, baremetal: 18, 'service-mesh': 175, 'system-design': 48, 'cloud-iam': 200, 'k8s-ops': 250, argocd: 28, llm: 262, prompting: 292, 'claude-skills': 20, mcp: 168, mlops: 142, aiops: 330, ai: 262, linux: 28, git: 12, go: 190, helm: 222, bash: 150, python: 52, networking: 195, docker: 212, cicd: 120, kubernetes: 235, terraform: 268, ansible: 352, cloud: 176, databases: 305, observability: 18, sre: 78, security: 332, devops: 215, devsecops: 332, virtualization: 160, storage: 38, 'sql-ops': 290, 'gpu-serving': 120, openstack: 8 };
+var HUES = { kubevirt: 205, ceph: 12, vault: 45, proxies: 100, messaging: 320, 'cfn-bicep': 255, gcp: 225, baremetal: 18, 'service-mesh': 175, 'system-design': 48, 'cloud-iam': 200, 'k8s-ops': 250, argocd: 28, llm: 262, prompting: 292, 'claude-skills': 20, mcp: 168, mlops: 142, aiops: 330, 'aiops-practice': 346, ai: 262, linux: 28, git: 12, go: 190, helm: 222, bash: 150, python: 52, networking: 195, docker: 212, cicd: 120, kubernetes: 235, terraform: 268, ansible: 352, cloud: 176, databases: 305, observability: 18, sre: 78, security: 332, devops: 215, devsecops: 332, virtualization: 160, storage: 38, 'sql-ops': 290, 'gpu-serving': 120, openstack: 8 };
 /* Each symbol is drawn on a 24 by 24 grid so the shape, not only the colour, tells badges apart. */
 var SYM = {
   kubevirt: '<rect x="3" y="5" width="14" height="11" rx="1"/><path d="M7 20h6M10 16v4M20 8l-3 2v4l3 2z"/>',
@@ -35,6 +35,7 @@ var SYM = {
   'claude-skills': '<path d="M4 7l8-4 8 4-8 4z"/><path d="M4 12l8 4 8-4M4 17l8 4 8-4"/>',
   mlops: '<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8.5 6h7M7 8.2l4 7.6M17 8.2l-4 7.6"/>',
   aiops: '<path d="M3 15l4-6 4 4 4-8 6 10"/><circle cx="18" cy="6" r="2"/>',
+  'aiops-practice': '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8 12l3 3 5-6"/>',
   mcp: '<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.5 11l7-4M8.5 13l7 4"/>',
   git: '<circle cx="6" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="10" r="2"/><path d="M6 8v8M18 12c0 3-3 3-8 4"/>',
   bash: '<path d="M8 4H6v16h2M16 4h2v16h-2M10 9l3 3-3 3"/>',
