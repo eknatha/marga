@@ -228,7 +228,8 @@
         "gpu-serving",
         "observability",
         "mlops",
-        "aiops"
+        "aiops",
+        "aiops-practice"
       ],
       "outcomes": [
         "Explain how ML systems fail quietly and what to monitor.",
@@ -239,7 +240,9 @@
         "Serve models in batch, online or streaming modes with sensible limits.",
         "Detect drift and retrain safely.",
         "Use anomaly detection, alert correlation and incident hints without losing human judgement.",
-        "Automate routine fixes with limits, verification and a kill switch."
+        "Automate routine fixes with limits, verification and a kill switch.",
+        "Build change correlation and topology-aware root cause hints, and measure them against real incidents.",
+        "Run agents and remediation safely with approval tiers, audit trails, kill switches and prompt injection defences."
       ]
     }
   ],
