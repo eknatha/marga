@@ -46,5 +46,37 @@
  "runbook-automation-and-guardrails": {
   "r": "An auto-restart script restarted a healthy service fleet because a metrics outage looked like failure. A precondition that checks several independent signals and a rate limit would have stopped it.",
   "x": "Automation multiplies mistakes as well as work. Earn trust with a ladder from manual to automatic, and make every action visible, limited and reversible."
+ },
+ "statistics-for-ops-percentiles-seasonality-and-correlation": {
+  "r": "A dashboard showed a healthy p99 of 320 ms while customers complained. It averaged the p99 of twelve pods, and one pod with a failing disk had a p99 of 2.9 seconds. Merging the histogram buckets and adding a per-pod maximum revealed the slow pod within minutes.",
+  "x": "Most detector disputes are really statistics disputes. Agree on percentiles, seasonality handling and minimum sample sizes first, and write them into the alert standards so every tool and team reads the same numbers the same way."
+ },
+ "hands-on-anomaly-detection-z-score-mad-and-ewma": {
+  "r": "A z-score detector on error rate stayed silent through a real outage because a short spike earlier had inflated the standard deviation about ninefold. Switching to MAD with a five minute minimum duration caught the next outage in two minutes, and the replay became a regression test.",
+  "x": "Pick the simplest detector that meets recall and false alarm targets on your own history. Keep the replay set versioned, hold some incidents out for honest testing, and give each detector an owner who retunes it when the system changes."
+ },
+ "change-point-and-trend-detection": {
+  "r": "An API service was restarted by the platform every few days and the memory graph looked bounded. A trend fit between restarts showed memory climbing about 38 MB an hour, a heap profile found a cache that never evicted, and the team alerted on time to limit from then on.",
+  "x": "The start time of a shift is worth more than the alarm, because it is what you compare with the change log. Make detectors emit both, and make sure restarts, gaps and seasonality are handled before anyone trusts a trend."
+ },
+ "event-deduplication-grouping-and-suppression-rules": {
+  "r": "An engineer silenced disk alerts for a database host during a migration and set no end time. Three weeks later the disk filled and nothing paged. The team required an expiry on every silence and added a weekly report of active silences.",
+  "x": "Keep rules in version control with owners and review. The cheapest noise reduction is a good rules layer, and it is also the source of the most invisible outages, so review silences and unused rules on a fixed schedule."
+ },
+ "change-correlation-linking-incidents-to-deploys": {
+  "r": "Checkout errors began at 14:03 with no deploys that afternoon. A pricing team had enabled a feature flag two minutes earlier, but the flag service was not in the change feed. Adding flags as a source made the correlator list it first and shortened the next similar incident to minutes.",
+  "x": "A change correlator is often the highest value AIOps feature per hour of effort. Its quality depends on feed completeness and on recording the true cause of each incident, which gives you labels to tune the weights."
+ },
+ "topology-and-dependency-aware-root-cause": {
+  "r": "The web frontend paged first and the first fifteen minutes went to its team. A dependency graph showed checkout and search both failing and both reading from one database whose latency rose first. A runaway report query was holding locks, and ending it cleared the incident.",
+  "x": "Treat topology as a product with owners and freshness checks. Compare catalog edges with trace edges, report the differences, and never present a root cause without the path that led to it."
+ },
+ "tuning-alerts-with-data-precision-recall-and-burn-rates": {
+  "r": "A payments team found that 9 percent of its 412 monthly alerts were actionable and one CPU rule had fired 188 times without ever needing action. They deleted it, added a burn-rate alert for the checkout SLO, and within a month the actionable share passed 60 percent.",
+  "x": "Make alert quality a standing metric with a weekly review of the worst five rules. Treat every missed incident as a test case, and compare any new detector with the SLO baseline rather than with nothing."
+ },
+ "multivariate-and-service-level-anomalies": {
+  "r": "Overall latency looked fine but one customer in twelve saw slow responses for two days. A per-pod baseline never fired, because that pod had been bad since its last restart. Peer comparison flagged it at once, and the pod with a failing network interface was replaced.",
+  "x": "Prefer methods that need no training and survive deploys, such as peer comparison and ratios, before reaching for models. Whatever you use, insist on explanations that a responder can check against the graphs."
  }
 }

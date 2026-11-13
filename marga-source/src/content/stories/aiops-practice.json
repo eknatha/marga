@@ -1,0 +1,58 @@
+{
+ "data-sources-and-pipelines-for-aiops": {
+  "r": "A correlation project matched almost nothing in its first month because metrics, alerts, deploys and tickets each used a different name for the same service. A catalog lookup at ingestion mapped aliases to one name, and matches rose from a few percent to nearly all records.",
+  "x": "Data contracts decide whether AIOps works. Own the schema, reject unknown services, monitor freshness per source and treat a quiet source as an incident, because silence looks exactly like a healthy system."
+ },
+ "remediation-patterns-and-approval-tiers": {
+  "r": "An auto-restart rule with no rate limit kept a leaking service alive for weeks and then restarted every pod within minutes at a traffic peak. The team added a cap of three runs an hour, a minimum of two healthy replicas and an alert on repeated fixes.",
+  "x": "Write tiers down and store them next to the action. Repeated firing of the same fix is a symptom, so build the escalation in from the start, and widen autonomy only after the logged-only and suggested stages show good results."
+ },
+ "verifying-and-rolling-back-a-remediation": {
+  "r": "Latency alerts triggered a scale-out of an API from 6 to 18 pods and latency improved, but the new pods exhausted the database connection pool and every service on that database failed. A connection guard and a cap on scale-out fixed the design.",
+  "x": "Success must mean the problem is gone and nothing else got worse. Record before and after state so undo is exact, and stop early when a guard crosses its limit instead of waiting for the full window."
+ },
+ "audit-trails-kill-switches-and-blast-radius-limits": {
+  "r": "An automation began rolling back healthy deploys and the kill switch did nothing, because the worker read the flag only at startup. The team made every action check the flag first, tested the switch weekly and added a global limit of 20 actions an hour.",
+  "x": "A control that has never been exercised is a belief, not a control. Test the stop path regularly, keep the switch in a store independent of what it controls, and make the automation fail closed when a check cannot run."
+ },
+ "chaos-testing-your-automation": {
+  "r": "A game day killed a database replica in staging. Failover ran and verification passed, but the old primary still accepted writes. In production that would have been split-brain. The team added fencing and a regression test that checks only one writer exists.",
+  "x": "Choose faults that match your past incidents and schedule a small set weekly plus a larger quarterly exercise. Track time to detect, explain and recover over months, since that trend is the honest measure of progress."
+ },
+ "retrieval-over-runbooks-and-past-incidents": {
+  "r": "An assistant told an engineer to restart a service with a command that no longer existed after a migration. A deprecated runbook had outranked the current one by a small margin. A status filter, a down-rank for old pages and a visible review date fixed it.",
+  "x": "Evaluate retrieval separately from the model with real questions and the right documents. Most bad answers come from stale or missing sources, so use the feedback button to find the runbooks that need work."
+ },
+ "agentic-ops-tools-mcp-and-approval-gates": {
+  "r": "An agent with a free-form query tool ran an expensive log search 37 times in one run and slowed the logging cluster during an outage. Typed tools with maximum windows, a call budget and rate limits for automated callers removed the problem.",
+  "x": "Policy lives in the host, not in the prompt. Replay past incidents in a sandbox to check both the diagnosis and the safety of the path taken, and rerun the set after every model or prompt change."
+ },
+ "prompt-injection-and-over-permissioned-agents": {
+  "r": "A test log line carried hidden instructions that made an incident agent try to post environment details to an external address. The host blocked the unknown host and the secret pattern, and since credentials lived in the tools and not the prompt there was nothing real to leak.",
+  "x": "Break the lethal combination: private data, untrusted input and outbound action. Remove at least one, enforce the rest in code, and keep an injection test set in the regression suite."
+ },
+ "evaluating-ai-ops-output-test-sets-and-shadow-mode": {
+  "r": "A root cause ranker impressed everyone in a demo of eight clean incidents. On the full set of 64 including messy ones, the true cause ranked first only 41 percent of the time. The team returned to shadow mode, fixed topology gaps and moved on once top-3 passed 80 percent.",
+  "x": "Version the incident set like code and report the number of cases beside each percentage. Audit accepted suggestions as well as rejected ones, because a very high acceptance rate can mean nobody is reading."
+ },
+ "build-versus-buy-and-the-roi-case": {
+  "r": "A team bought an alert noise product and reported success because the dashboard showed fewer vendor-grouped incidents. Actual alerts and tickets were unchanged and user-reported incidents had risen. They defined their own measures and renegotiated around them.",
+  "x": "Insist on independent measures, data export and a kill switch in the contract. State what the ROI did not count, and treat promises such as eliminates alert fatigue as claims to test."
+ },
+ "failure-modes-drift-feedback-loops-and-wrong-remediators": {
+  "r": "A service leaked memory for months and automatic restarts kept it up. The tool showed a 98 percent success rate but 1,204 of 1,640 runs were repeats on the same pods, and the restarts destroyed the evidence. A repeat alert and a heap profile before each restart exposed the leak.",
+  "x": "The failures that cost most are quiet. Give each automation a rollback share and a repeat count, capture evidence before acting, and assume automation bias will appear unless you audit and rehearse without the tool."
+ },
+ "operating-aiops-ownership-on-call-and-lifecycle": {
+  "r": "A change to the ingestion pipeline stopped one cluster's metrics and nothing paged for three days because the calm dashboards were believed. The team added a freshness SLO, a daily silent source report and an on-call rota for the platform itself.",
+  "x": "The pager path for AIOps must not depend on AIOps. Review every rule and model on a schedule, and retire the ones that no longer lead to action."
+ },
+ "debugging-a-misbehaving-aiops-pipeline": {
+  "r": "An outage in search paged the payments team, who lost twenty minutes. Data and detection were correct, but the routing step used a catalog alias that still mapped search to a retired payments component. Fixing the entry and testing that every routed team owns the service solved it.",
+  "x": "Debugging depends on records. If you cannot reconstruct what the tool saw and which version ran, you cannot debug it, so make decision records a requirement for anything that pages or acts."
+ },
+ "capstone-a-mini-aiops-pipeline": {
+  "r": "A learner's pipeline found the shift but listed no suspect because the change feed stored local time and the metric used UTC, so the deploy fell outside the window. Normalising both to UTC at ingestion fixed it, and a test now requires a timezone on every record.",
+  "x": "Use the capstone as an interview artefact. Be ready to explain each stage, the numbers you measured on simulated incidents, why the action is only proposed and how you would extend it with real data."
+ }
+}
