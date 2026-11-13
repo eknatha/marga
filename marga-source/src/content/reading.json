@@ -1816,5 +1816,56 @@
    "kind": "Reference",
    "why": "The injector, CSI provider and Secrets Operator."
   }
+ ],
+ "aiops-practice": [
+  {
+   "t": "Site Reliability Engineering: monitoring distributed systems",
+   "by": "Google SRE",
+   "u": "https://sre.google/sre-book/monitoring-distributed-systems/",
+   "kind": "Book chapter",
+   "why": "The classic explanation of the four golden signals and what makes an alert worth a page."
+  },
+  {
+   "t": "Alerting on SLOs",
+   "by": "Google SRE workbook",
+   "u": "https://sre.google/workbook/alerting-on-slos/",
+   "kind": "Book chapter",
+   "why": "Shows multi-window burn-rate alerts, the non-ML baseline every smarter detector should beat."
+  },
+  {
+   "t": "Automation at Google",
+   "by": "Google SRE",
+   "u": "https://sre.google/sre-book/automation-at-google/",
+   "kind": "Book chapter",
+   "why": "Explains the value and the dangers of automating operations, with lessons about runaway automation."
+  },
+  {
+   "t": "Building effective agents",
+   "by": "Anthropic",
+   "u": "https://www.anthropic.com/research/building-effective-agents",
+   "kind": "Article",
+   "why": "Practical guidance on designing tool-using agents with simple, composable patterns and clear limits."
+  },
+  {
+   "t": "OWASP Top 10 for LLM applications",
+   "by": "OWASP",
+   "u": "https://owasp.org/www-project-top-10-for-large-language-model-applications/",
+   "kind": "Security",
+   "why": "A security checklist that covers prompt injection and excessive agency, the main risks for operations agents."
+  },
+  {
+   "t": "Principles of Chaos Engineering",
+   "by": "Chaos community",
+   "u": "https://principlesofchaos.org/",
+   "kind": "Manifesto",
+   "why": "The short set of principles for running safe, hypothesis-driven fault experiments."
+  },
+  {
+   "t": "Model Context Protocol introduction",
+   "by": "Model Context Protocol",
+   "u": "https://modelcontextprotocol.io/docs/getting-started/intro",
+   "kind": "Documentation",
+   "why": "The official overview of the protocol used to expose operations tools and data to AI applications."
+  }
  ]
 }
