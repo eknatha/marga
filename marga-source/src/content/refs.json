@@ -577,6 +577,20 @@
     "Production hardening",
     "https://developer.hashicorp.com/vault/docs/concepts/production-hardening"
    ]
+  ],
+  "aiops-practice": [
+   [
+    "Google SRE book",
+    "https://sre.google/sre-book/table-of-contents/"
+   ],
+   [
+    "Model Context Protocol",
+    "https://modelcontextprotocol.io/docs/getting-started/intro"
+   ],
+   [
+    "OWASP Top 10 for LLM applications",
+    "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+   ]
   ]
  },
  "lessons": {
@@ -7585,6 +7599,230 @@
     "Rekey and rotate",
     "https://developer.hashicorp.com/vault/docs/commands/operator/rekey"
    ]
+  ],
+  "aiops/statistics-for-ops-percentiles-seasonality-and-correlation": [
+   [
+    "Prometheus: histograms and summaries",
+    "https://prometheus.io/docs/practices/histograms/"
+   ],
+   [
+    "Google SRE book: monitoring distributed systems",
+    "https://sre.google/sre-book/monitoring-distributed-systems/"
+   ]
+  ],
+  "aiops/hands-on-anomaly-detection-z-score-mad-and-ewma": [
+   [
+    "NIST handbook: EWMA control charts",
+    "https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc324.htm"
+   ],
+   [
+    "Prometheus: querying functions",
+    "https://prometheus.io/docs/prometheus/latest/querying/functions/"
+   ]
+  ],
+  "aiops/change-point-and-trend-detection": [
+   [
+    "NIST handbook: CUSUM control charts",
+    "https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc323.htm"
+   ],
+   [
+    "Prometheus: predict_linear and querying functions",
+    "https://prometheus.io/docs/prometheus/latest/querying/functions/"
+   ],
+   [
+    "Google SRE book: practical alerting",
+    "https://sre.google/sre-book/practical-alerting/"
+   ]
+  ],
+  "aiops/event-deduplication-grouping-and-suppression-rules": [
+   [
+    "Prometheus Alertmanager",
+    "https://prometheus.io/docs/alerting/latest/alertmanager/"
+   ],
+   [
+    "Alertmanager configuration",
+    "https://prometheus.io/docs/alerting/latest/configuration/"
+   ]
+  ],
+  "aiops/change-correlation-linking-incidents-to-deploys": [
+   [
+    "Google SRE book: effective troubleshooting",
+    "https://sre.google/sre-book/effective-troubleshooting/"
+   ],
+   [
+    "Google SRE book: managing incidents",
+    "https://sre.google/sre-book/managing-incidents/"
+   ]
+  ],
+  "aiops/topology-and-dependency-aware-root-cause": [
+   [
+    "OpenTelemetry concepts",
+    "https://opentelemetry.io/docs/concepts/"
+   ],
+   [
+    "Google SRE book: effective troubleshooting",
+    "https://sre.google/sre-book/effective-troubleshooting/"
+   ]
+  ],
+  "aiops/tuning-alerts-with-data-precision-recall-and-burn-rates": [
+   [
+    "Google SRE workbook: alerting on SLOs",
+    "https://sre.google/workbook/alerting-on-slos/"
+   ],
+   [
+    "Prometheus: alerting practices",
+    "https://prometheus.io/docs/practices/alerting/"
+   ]
+  ],
+  "aiops/multivariate-and-service-level-anomalies": [
+   [
+    "Google SRE book: monitoring distributed systems",
+    "https://sre.google/sre-book/monitoring-distributed-systems/"
+   ],
+   [
+    "Prometheus: querying basics",
+    "https://prometheus.io/docs/prometheus/latest/querying/basics/"
+   ]
+  ],
+  "aiops-practice/data-sources-and-pipelines-for-aiops": [
+   [
+    "OpenTelemetry semantic conventions",
+    "https://opentelemetry.io/docs/specs/semconv/"
+   ],
+   [
+    "OpenTelemetry concepts",
+    "https://opentelemetry.io/docs/concepts/"
+   ]
+  ],
+  "aiops-practice/remediation-patterns-and-approval-tiers": [
+   [
+    "Google SRE book: automation at Google",
+    "https://sre.google/sre-book/automation-at-google/"
+   ],
+   [
+    "Kubernetes: pod lifecycle",
+    "https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/"
+   ]
+  ],
+  "aiops-practice/verifying-and-rolling-back-a-remediation": [
+   [
+    "Kubernetes: deployments and rollbacks",
+    "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/"
+   ],
+   [
+    "Google SRE book: automation at Google",
+    "https://sre.google/sre-book/automation-at-google/"
+   ]
+  ],
+  "aiops-practice/audit-trails-kill-switches-and-blast-radius-limits": [
+   [
+    "Kubernetes: auditing",
+    "https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/"
+   ],
+   [
+    "Kubernetes: RBAC authorization",
+    "https://kubernetes.io/docs/reference/access-authn-authz/rbac/"
+   ]
+  ],
+  "aiops-practice/chaos-testing-your-automation": [
+   [
+    "Principles of Chaos Engineering",
+    "https://principlesofchaos.org/"
+   ],
+   [
+    "Chaos Mesh: simulate pod faults",
+    "https://chaos-mesh.org/docs/simulate-pod-chaos-on-kubernetes/"
+   ]
+  ],
+  "aiops-practice/retrieval-over-runbooks-and-past-incidents": [
+   [
+    "Anthropic: building effective agents",
+    "https://www.anthropic.com/research/building-effective-agents"
+   ],
+   [
+    "Google SRE book: postmortem culture",
+    "https://sre.google/sre-book/postmortem-culture/"
+   ]
+  ],
+  "aiops-practice/agentic-ops-tools-mcp-and-approval-gates": [
+   [
+    "Model Context Protocol: introduction",
+    "https://modelcontextprotocol.io/docs/getting-started/intro"
+   ],
+   [
+    "Anthropic: tool use overview",
+    "https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview"
+   ]
+  ],
+  "aiops-practice/prompt-injection-and-over-permissioned-agents": [
+   [
+    "OWASP Top 10 for LLM applications",
+    "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+   ],
+   [
+    "NIST AI risk management framework",
+    "https://www.nist.gov/itl/ai-risk-management-framework"
+   ]
+  ],
+  "aiops-practice/evaluating-ai-ops-output-test-sets-and-shadow-mode": [
+   [
+    "NIST AI risk management framework",
+    "https://www.nist.gov/itl/ai-risk-management-framework"
+   ],
+   [
+    "Google SRE workbook: alerting on SLOs",
+    "https://sre.google/workbook/alerting-on-slos/"
+   ]
+  ],
+  "aiops-practice/build-versus-buy-and-the-roi-case": [
+   [
+    "Google SRE book: service level objectives",
+    "https://sre.google/sre-book/service-level-objectives/"
+   ],
+   [
+    "OpenTelemetry documentation",
+    "https://opentelemetry.io/docs/"
+   ]
+  ],
+  "aiops-practice/failure-modes-drift-feedback-loops-and-wrong-remediators": [
+   [
+    "NIST AI risk management framework",
+    "https://www.nist.gov/itl/ai-risk-management-framework"
+   ],
+   [
+    "Google SRE book: automation at Google",
+    "https://sre.google/sre-book/automation-at-google/"
+   ]
+  ],
+  "aiops-practice/operating-aiops-ownership-on-call-and-lifecycle": [
+   [
+    "Google SRE book: being on-call",
+    "https://sre.google/sre-book/being-on-call/"
+   ],
+   [
+    "Google SRE book: service level objectives",
+    "https://sre.google/sre-book/service-level-objectives/"
+   ]
+  ],
+  "aiops-practice/debugging-a-misbehaving-aiops-pipeline": [
+   [
+    "Google SRE book: effective troubleshooting",
+    "https://sre.google/sre-book/effective-troubleshooting/"
+   ],
+   [
+    "OpenTelemetry concepts",
+    "https://opentelemetry.io/docs/concepts/"
+   ]
+  ],
+  "aiops-practice/capstone-a-mini-aiops-pipeline": [
+   [
+    "Prometheus: getting started",
+    "https://prometheus.io/docs/prometheus/latest/getting_started/"
+   ],
+   [
+    "Google SRE book: managing incidents",
+    "https://sre.google/sre-book/managing-incidents/"
+   ]
   ]
  },
  "sheets": {
@@ -8174,6 +8412,20 @@
    [
     "Production hardening",
     "https://developer.hashicorp.com/vault/docs/concepts/production-hardening"
+   ]
+  ],
+  "aiops-practice": [
+   [
+    "Google SRE book: automation at Google",
+    "https://sre.google/sre-book/automation-at-google/"
+   ],
+   [
+    "Chaos Mesh: simulate pod faults",
+    "https://chaos-mesh.org/docs/simulate-pod-chaos-on-kubernetes/"
+   ],
+   [
+    "OWASP Top 10 for LLM applications",
+    "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
    ]
   ]
  }
