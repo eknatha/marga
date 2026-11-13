@@ -245,6 +245,15 @@
     ]
   },
   {
+    "id": "aiops-practice",
+    "title": "AIOps in practice",
+    "summary": "Run AIOps safely: data pipelines, remediation tiers and verification, kill switches and audit, chaos tests, retrieval over runbooks, agents and approval gates, prompt injection, evaluation, build versus buy, failure modes and operations.",
+    "level": "Advanced",
+    "requires": [
+      "aiops"
+    ]
+  },
+  {
     "id": "virtualization",
     "title": "Virtualization",
     "summary": "Understand hypervisors, CPU and memory overcommit, virtual disks and snapshots, virtual networks and live migration, and troubleshoot a KVM host.",
