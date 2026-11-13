@@ -1,0 +1,834 @@
+[
+ {
+  "id": "ap-runaway",
+  "module": "aiops-practice",
+  "lesson": "aiops-practice/remediation-patterns-and-approval-tiers",
+  "title": "Runaway automation and rate limits",
+  "summary": "See how a rate limit and a healthy-replica precondition cap the damage when an automatic restart keeps firing.",
+  "inputs": [
+   {
+    "id": "pods",
+    "label": "Pods in the service",
+    "min": 3,
+    "max": 60,
+    "value": 12,
+    "step": 1
+   },
+   {
+    "id": "fires",
+    "label": "Times the rule fires per hour",
+    "min": 1,
+    "max": 120,
+    "value": 40,
+    "step": 1
+   },
+   {
+    "id": "cap",
+    "label": "Rate limit, runs per hour",
+    "min": 1,
+    "max": 60,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "lim",
+    "label": "Rate limit enabled",
+    "type": "toggle",
+    "value": true
+   }
+  ],
+  "vars": [
+   [
+    "runs",
+    "lim ? min(fires, cap) : fires"
+   ],
+   [
+    "share",
+    "min(1, runs/pods)*100"
+   ],
+   [
+    "left",
+    "max(0, pods - runs)"
+   ],
+   [
+    "ok",
+    "left >= 2"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "t",
+    "label": "Trigger",
+    "x": 0,
+    "y": 0,
+    "state": "fires>60 ? 1 : 0",
+    "sub": "round(fires) + ' fires an hour'"
+   },
+   {
+    "id": "g",
+    "label": "Rate limit",
+    "x": 1,
+    "y": 0,
+    "state": "lim ? 0 : 2",
+    "sub": "lim ? 'cap ' + cap + ' an hour' : 'no limit'"
+   },
+   {
+    "id": "s",
+    "label": "Service",
+    "x": 2,
+    "y": 0,
+    "state": "ok ? 0 : 2",
+    "sub": "round(left) + ' pods untouched'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "t",
+    "to": "g",
+    "flow": "min(1, fires/120)",
+    "bad": "!lim"
+   },
+   {
+    "from": "g",
+    "to": "s",
+    "flow": "min(1, runs/pods)",
+    "bad": "!ok"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Restarts per hour",
+    "expr": "runs",
+    "dp": 0
+   },
+   {
+    "label": "Share of the service restarted",
+    "expr": "share",
+    "dp": 0,
+    "unit": "%"
+   },
+   {
+    "label": "Pods left untouched",
+    "expr": "left",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!ok",
+    "tone": "bad",
+    "text": "Almost every pod is restarted within the hour, so the automation causes more harm than the fault. Add a rate limit and keep at least two healthy replicas."
+   },
+   {
+    "when": "share>30",
+    "tone": "warn",
+    "text": "A large part of the service is restarted each hour. Lower the cap and escalate repeated fixes to a person."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The limit keeps the damage small and leaves most of the service untouched."
+   }
+  ],
+  "tries": [
+   "Turn the rate limit off with 40 fires an hour.",
+   "Set the cap to 1 and watch the share restarted.",
+   "Raise the pod count to 60 and compare."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "No limit and a noisy trigger.",
+    "tone": "bad",
+    "values": {
+     "pods": 12,
+     "fires": 60,
+     "cap": 3,
+     "lim": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A cap of three runs an hour.",
+    "tone": "good",
+    "values": {
+     "pods": 12,
+     "fires": 60,
+     "cap": 2,
+     "lim": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "ap-burn-rate",
+  "module": "aiops",
+  "lesson": "aiops/tuning-alerts-with-data-precision-recall-and-burn-rates",
+  "title": "Burn rate and the time to exhaust a budget",
+  "summary": "Turn an error ratio and an SLO into a burn rate and see how long the monthly error budget would last at that rate.",
+  "inputs": [
+   {
+    "id": "slo",
+    "label": "SLO target",
+    "min": 90,
+    "max": 99.99,
+    "value": 99.9,
+    "step": 0.01,
+    "unit": "%"
+   },
+   {
+    "id": "err",
+    "label": "Current error ratio",
+    "min": 0,
+    "max": 20,
+    "value": 1.5,
+    "step": 0.1,
+    "unit": "%"
+   },
+   {
+    "id": "days",
+    "label": "Days in the budget period",
+    "min": 7,
+    "max": 30,
+    "value": 30,
+    "step": 1,
+    "unit": "days"
+   }
+  ],
+  "vars": [
+   [
+    "budget",
+    "max(0.001, 100 - slo)"
+   ],
+   [
+    "burn",
+    "err/budget"
+   ],
+   [
+    "hours",
+    "burn > 0 ? days*24/burn : days*24"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "u",
+    "label": "Users",
+    "x": 0,
+    "y": 0,
+    "state": "err>budget ? 1 : 0",
+    "sub": "round(err*10)/10 + '% failing'"
+   },
+   {
+    "id": "b",
+    "label": "Error budget",
+    "x": 1,
+    "y": 0,
+    "state": "burn>=14.4 ? 2 : (burn>=3 ? 1 : 0)",
+    "sub": "'burn rate ' + round(burn*10)/10"
+   },
+   {
+    "id": "a",
+    "label": "Alert",
+    "x": 2,
+    "y": 0,
+    "state": "burn>=14.4 ? 2 : (burn>=3 ? 1 : 0)",
+    "sub": "burn>=14.4 ? 'page now' : (burn>=3 ? 'ticket' : 'quiet')"
+   }
+  ],
+  "edges": [
+   {
+    "from": "u",
+    "to": "b",
+    "flow": "min(1, err/10)",
+    "bad": "burn>=14.4"
+   },
+   {
+    "from": "b",
+    "to": "a",
+    "flow": "min(1, burn/20)",
+    "bad": "burn>=14.4"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Burn rate",
+    "expr": "burn",
+    "dp": 1
+   },
+   {
+    "label": "Hours until the budget is gone",
+    "expr": "hours",
+    "dp": 0,
+    "unit": "hours"
+   },
+   {
+    "label": "Error budget",
+    "expr": "budget",
+    "dp": 2,
+    "unit": "%"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "burn>=14.4",
+    "tone": "bad",
+    "text": "At this rate the whole budget is gone in a couple of days. This is a page-level burn rate, so someone should act now."
+   },
+   {
+    "when": "burn>=3",
+    "tone": "warn",
+    "text": "The budget will run out well before the period ends. Open a ticket and look at it during working hours."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The budget is being used slowly enough to last the period."
+   }
+  ],
+  "tries": [
+   "Set the error ratio to 2 percent with a 99.9 percent SLO.",
+   "Lower the SLO to 99 percent with the same errors.",
+   "Set errors to 0.1 percent."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A one point five percent error ratio against 99.9 percent.",
+    "tone": "bad",
+    "values": {
+     "slo": 99.9,
+     "err": 1.5,
+     "days": 30
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Errors back to a tenth of a percent.",
+    "tone": "good",
+    "values": {
+     "slo": 99.9,
+     "err": 0.1,
+     "days": 30
+    }
+   }
+  ]
+ },
+ {
+  "id": "ap-verify-guard",
+  "module": "aiops-practice",
+  "lesson": "aiops-practice/verifying-and-rolling-back-a-remediation",
+  "title": "A scale-out and the connection guard",
+  "summary": "More pods lower latency but each one opens database connections. Check the guard before you call the fix a success.",
+  "inputs": [
+   {
+    "id": "before",
+    "label": "Pods before",
+    "min": 2,
+    "max": 30,
+    "value": 6,
+    "step": 1
+   },
+   {
+    "id": "after",
+    "label": "Pods after the action",
+    "min": 2,
+    "max": 90,
+    "value": 18,
+    "step": 1
+   },
+   {
+    "id": "conn",
+    "label": "Connections per pod",
+    "min": 1,
+    "max": 50,
+    "value": 15,
+    "step": 1
+   },
+   {
+    "id": "pool",
+    "label": "Database connection limit",
+    "min": 50,
+    "max": 2000,
+    "value": 400,
+    "step": 10
+   },
+   {
+    "id": "g",
+    "label": "Guard enabled",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "used",
+    "after*conn"
+   ],
+   [
+    "pct",
+    "min(200, used/pool*100)"
+   ],
+   [
+    "over",
+    "pct>85"
+   ],
+   [
+    "cap",
+    "g ? min(after, floor(pool*0.85/conn)) : after"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "label": "Action",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "before + ' to ' + round(cap) + ' pods'"
+   },
+   {
+    "id": "p",
+    "label": "Pods",
+    "x": 1,
+    "y": 0,
+    "state": "cap*conn>pool*0.85 ? 2 : 0",
+    "sub": "round(cap*conn) + ' connections'"
+   },
+   {
+    "id": "d",
+    "label": "Database",
+    "x": 2,
+    "y": 0,
+    "state": "cap*conn>pool ? 2 : (cap*conn>pool*0.85 ? 1 : 0)",
+    "sub": "round(min(200, cap*conn/pool*100)) + '% of the limit'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "a",
+    "to": "p",
+    "flow": "min(1, cap/90)",
+    "bad": "false"
+   },
+   {
+    "from": "p",
+    "to": "d",
+    "flow": "min(1, cap*conn/pool)",
+    "bad": "cap*conn>pool*0.85"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Pods after the guard",
+    "expr": "cap",
+    "dp": 0
+   },
+   {
+    "label": "Connections used",
+    "expr": "cap*conn",
+    "dp": 0
+   },
+   {
+    "label": "Share of the connection limit",
+    "expr": "min(200, cap*conn/pool*100)",
+    "dp": 0,
+    "unit": "%"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "cap*conn>pool",
+    "tone": "bad",
+    "text": "The new pods use more connections than the database allows, so every service on it starts to fail. A guard should have stopped the scale-out."
+   },
+   {
+    "when": "cap*conn>pool*0.85",
+    "tone": "warn",
+    "text": "The pool is nearly full. A small rise in traffic will exhaust it, so cap the action lower."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The action fits inside the database limit with room to spare."
+   }
+  ],
+  "tries": [
+   "Scale from 6 to 18 pods with the guard off.",
+   "Turn the guard on.",
+   "Raise the connection limit to 800."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Eighteen pods with no guard.",
+    "tone": "bad",
+    "values": {
+     "before": 6,
+     "after": 40,
+     "conn": 15,
+     "pool": 400,
+     "g": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The guard caps the scale-out.",
+    "tone": "good",
+    "values": {
+     "before": 6,
+     "after": 40,
+     "conn": 15,
+     "pool": 400,
+     "g": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "ap-roi",
+  "module": "aiops-practice",
+  "lesson": "aiops-practice/build-versus-buy-and-the-roi-case",
+  "title": "Payback on an AIOps tool",
+  "summary": "Use measured triage hours before and after a tool, the cost of an engineer hour and the annual cost to see net value and payback.",
+  "inputs": [
+   {
+    "id": "b",
+    "label": "Triage hours a week before",
+    "min": 5,
+    "max": 200,
+    "value": 46,
+    "step": 1,
+    "unit": "hours"
+   },
+   {
+    "id": "a",
+    "label": "Triage hours a week after",
+    "min": 0,
+    "max": 200,
+    "value": 31,
+    "step": 1,
+    "unit": "hours"
+   },
+   {
+    "id": "h",
+    "label": "Cost of an engineer hour",
+    "min": 20,
+    "max": 200,
+    "value": 85,
+    "step": 5
+   },
+   {
+    "id": "c",
+    "label": "Annual cost of the tool and its upkeep",
+    "min": 5000,
+    "max": 400000,
+    "value": 60000,
+    "step": 1000
+   }
+  ],
+  "vars": [
+   [
+    "saved",
+    "max(0,(b-a)*52)"
+   ],
+   [
+    "value",
+    "saved*h"
+   ],
+   [
+    "net",
+    "value-c"
+   ],
+   [
+    "pay",
+    "value>0 ? c/(value/12) : 99"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "t",
+    "label": "Tool",
+    "x": 0,
+    "y": 0,
+    "state": "net<0 ? 2 : 0",
+    "sub": "round(c/1000) + 'k a year'"
+   },
+   {
+    "id": "h",
+    "label": "Hours saved",
+    "x": 1,
+    "y": 0,
+    "state": "saved<200 ? 1 : 0",
+    "sub": "round(saved) + ' a year'"
+   },
+   {
+    "id": "v",
+    "label": "Value",
+    "x": 2,
+    "y": 0,
+    "state": "net<0 ? 2 : (pay>12 ? 1 : 0)",
+    "sub": "round(net/1000) + 'k net'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "t",
+    "to": "h",
+    "flow": "min(1, saved/2000)",
+    "bad": "saved<=0"
+   },
+   {
+    "from": "h",
+    "to": "v",
+    "flow": "min(1, value/200000)",
+    "bad": "net<0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Hours saved a year",
+    "expr": "saved",
+    "dp": 0
+   },
+   {
+    "label": "Net value a year",
+    "expr": "net",
+    "dp": 0
+   },
+   {
+    "label": "Payback in months",
+    "expr": "min(pay,99)",
+    "dp": 1
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "net<0",
+    "tone": "bad",
+    "text": "The measured time saved does not cover the cost. Renegotiate, narrow the scope or drop the tool."
+   },
+   {
+    "when": "pay>12",
+    "tone": "warn",
+    "text": "It pays back, but slowly. Check that the savings are measured and not estimated."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The tool pays back within a year on measured time alone."
+   }
+  ],
+  "tries": [
+   "Set the hours after to 44.",
+   "Double the annual cost.",
+   "Raise the engineer hour cost to 120."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Small gain, large cost.",
+    "tone": "bad",
+    "values": {
+     "b": 46,
+     "a": 42,
+     "h": 85,
+     "c": 120000
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Measured savings beat the cost.",
+    "tone": "good",
+    "values": {
+     "b": 46,
+     "a": 28,
+     "h": 85,
+     "c": 60000
+    }
+   }
+  ]
+ },
+ {
+  "id": "ap-agent-limits",
+  "module": "aiops-practice",
+  "lesson": "aiops-practice/agentic-ops-tools-mcp-and-approval-gates",
+  "title": "What an agent run can cost without limits",
+  "summary": "Step, time and token caps bound how long an agent loop can run and what it can spend while it investigates an incident.",
+  "inputs": [
+   {
+    "id": "steps",
+    "label": "Steps the agent may take",
+    "min": 1,
+    "max": 80,
+    "value": 12,
+    "step": 1
+   },
+   {
+    "id": "sec",
+    "label": "Seconds per tool call",
+    "min": 1,
+    "max": 30,
+    "value": 6,
+    "step": 1
+   },
+   {
+    "id": "tok",
+    "label": "Tokens per step",
+    "min": 500,
+    "max": 20000,
+    "value": 4000,
+    "step": 500
+   },
+   {
+    "id": "price",
+    "label": "Cost per thousand tokens",
+    "min": 0.1,
+    "max": 5,
+    "value": 1,
+    "step": 0.1,
+    "unit": "cents"
+   },
+   {
+    "id": "cap",
+    "label": "Step cap enabled",
+    "type": "toggle",
+    "value": true
+   }
+  ],
+  "vars": [
+   [
+    "n",
+    "cap ? steps : 80"
+   ],
+   [
+    "time",
+    "n*sec"
+   ],
+   [
+    "tokens",
+    "n*tok"
+   ],
+   [
+    "cost",
+    "tokens/1000*price/100"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "g",
+    "label": "Goal",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "'investigate checkout'"
+   },
+   {
+    "id": "l",
+    "label": "Agent loop",
+    "x": 1,
+    "y": 0,
+    "state": "time>300 ? 2 : (time>120 ? 1 : 0)",
+    "sub": "round(n) + ' steps, ' + round(time) + ' s'"
+   },
+   {
+    "id": "r",
+    "label": "Result",
+    "x": 2,
+    "y": 0,
+    "state": "cost>2 ? 2 : (cost>0.5 ? 1 : 0)",
+    "sub": "'about ' + round(cost*100)/100 + ' dollars'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "g",
+    "to": "l",
+    "flow": "0.5",
+    "bad": "false"
+   },
+   {
+    "from": "l",
+    "to": "r",
+    "flow": "min(1, n/80)",
+    "bad": "time>300"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Longest run",
+    "expr": "time",
+    "dp": 0,
+    "unit": "seconds"
+   },
+   {
+    "label": "Tokens used",
+    "expr": "tokens",
+    "dp": 0
+   },
+   {
+    "label": "Cost of one run",
+    "expr": "cost",
+    "dp": 2,
+    "unit": "dollars"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "time>300",
+    "tone": "bad",
+    "text": "A single run can go on for minutes during an incident and put heavy load on the tools it calls. Set a step cap and a time limit."
+   },
+   {
+    "when": "time>120",
+    "tone": "warn",
+    "text": "Runs are long enough that responders will wait or start working in parallel. Consider a lower cap."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The limits keep a run short, cheap and predictable."
+   }
+  ],
+  "tries": [
+   "Turn the step cap off.",
+   "Set the cap to 6 steps.",
+   "Raise tokens per step to 15000."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "No step cap and slow tools.",
+    "tone": "bad",
+    "values": {
+     "steps": 12,
+     "sec": 8,
+     "tok": 8000,
+     "price": 1,
+     "cap": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A cap of twelve steps.",
+    "tone": "good",
+    "values": {
+     "steps": 12,
+     "sec": 6,
+     "tok": 4000,
+     "price": 1,
+     "cap": true
+    }
+   }
+  ]
+ }
+]

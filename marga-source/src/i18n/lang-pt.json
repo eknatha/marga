@@ -1931,6 +1931,10 @@
   "vault": {
    "title": "Vault e gerenciamento de segredos",
    "summary": "Gerencie segredos com o HashiCorp Vault: selagem, métodos de autenticação, políticas, KV, segredos dinâmicos, PKI, criptografia Transit, integração com Kubernetes, alta disponibilidade e resposta a incidentes."
+  },
+  "aiops-practice": {
+   "title": "AIOps na prática",
+   "summary": "Opere AIOps com segurança: pipelines de dados, níveis de ações corretivas e verificação, interruptores de parada e auditoria, testes de caos, busca em runbooks, agentes e portões de aprovação, injeção de prompt, avaliação, construir ou comprar e operação."
   }
  },
  "paths": {
@@ -2562,6 +2566,28 @@
   "vault/vault-on-kubernetes-injector-csi-and-operators": "Vault no Kubernetes: injector, CSI e Vault Secrets Operator.",
   "vault/vault-high-availability-raft-and-disaster-recovery": "Alta disponibilidade com Raft, snapshots, replicação e recuperação de desastres.",
   "vault/audit-logging-monitoring-and-hardening-vault": "Logs de auditoria, monitoramento e endurecimento do Vault.",
-  "vault/incident-response-rotating-and-revoking-secrets": "Resposta a incidentes: revogar, rotacionar e investigar."
+  "vault/incident-response-rotating-and-revoking-secrets": "Resposta a incidentes: revogar, rotacionar e investigar.",
+  "aiops/statistics-for-ops-percentiles-seasonality-and-correlation": "As poucas estatísticas em que toda ferramenta AIOps se apoia: por que médias enganam, percentis, sazonalidade e por que correlação não é causa.",
+  "aiops/hands-on-anomaly-detection-z-score-mad-and-ewma": "Crie detectores z-score, MAD e EWMA em Python, veja onde cada um falha e teste-os com incidentes passados.",
+  "aiops/change-point-and-trend-detection": "Descubra quando o comportamento de uma métrica mudou, distinga uma mudança duradoura de um pico e projete o tempo até um limite.",
+  "aiops/event-deduplication-grouping-and-suppression-rules": "Transforme eventos brutos em poucos incidentes com impressões digitais, janelas de agrupamento e regras de supressão que expiram.",
+  "aiops/change-correlation-linking-incidents-to-deploys": "Crie um fluxo de mudanças, relacione-o ao horário de início do incidente e classifique os suspeitos com evidências.",
+  "aiops/topology-and-dependency-aware-root-cause": "Use o grafo de serviços para achar a causa comum de muitas falhas em vez de culpar o alerta mais barulhento.",
+  "aiops/tuning-alerts-with-data-precision-recall-and-burn-rates": "Meça precisão, recall e taxas de consumo dos alertas e use alertas de SLO como linha de base que todo modelo deve superar.",
+  "aiops/multivariate-and-service-level-anomalies": "Compare instâncias com seus pares, use razões e sinais dourados e mantenha explicáveis os resultados de vários sinais.",
+  "aiops-practice/data-sources-and-pipelines-for-aiops": "Projete os dados de eventos, métricas, mudanças e topologia que um sistema AIOps lê, com uma identidade comum e hora UTC.",
+  "aiops-practice/remediation-patterns-and-approval-tiers": "Classifique as correções automáticas em níveis de aprovação e escreva cada uma como uma ação limitada, reversível e idempotente.",
+  "aiops-practice/verifying-and-rolling-back-a-remediation": "Prove que uma correção funcionou verificando o sintoma e as métricas de guarda, e desfaça-a quando não funcionou.",
+  "aiops-practice/audit-trails-kill-switches-and-blast-radius-limits": "Adicione trilhas de auditoria, interruptores de parada, privilégio mínimo e limites de raio de impacto à automação.",
+  "aiops-practice/chaos-testing-your-automation": "Quebre coisas de propósito para testar a detecção, a explicação, a correção e o caminho de parada da sua automação.",
+  "aiops-practice/retrieval-over-runbooks-and-past-incidents": "Deixe um assistente buscar em runbooks e incidentes passados com filtros, citações e um honesto não encontrado.",
+  "aiops-practice/agentic-ops-tools-mcp-and-approval-gates": "Dê a um agente ferramentas tipadas e restritas, comece somente leitura e coloque portões de aprovação humana antes das mudanças.",
+  "aiops-practice/prompt-injection-and-over-permissioned-agents": "Entenda como logs e tickets podem conduzir um agente e defenda-se com privilégio mínimo e políticas no host.",
+  "aiops-practice/evaluating-ai-ops-output-test-sets-and-shadow-mode": "Meça a saída do AIOps com incidentes rotulados, modo sombra, taxas de revisão e um conjunto de regressão.",
+  "aiops-practice/build-versus-buy-and-the-roi-case": "Decida entre construir, comprar ou montar, teste fornecedores com seus incidentes e mostre retorno medido.",
+  "aiops-practice/failure-modes-drift-feedback-loops-and-wrong-remediators": "Perceba deriva, laços de realimentação, viés de cobertura e corretores errados antes que causem uma queda.",
+  "aiops-practice/operating-aiops-ownership-on-call-and-lifecycle": "Opere a plataforma AIOps como um serviço de produção com responsáveis, SLOs, plantão e ciclo de vida das regras.",
+  "aiops-practice/debugging-a-misbehaving-aiops-pipeline": "Descubra por que um sistema AIOps errou reproduzindo uma decisão etapa por etapa e adicionando um caso de regressão.",
+  "aiops-practice/capstone-a-mini-aiops-pipeline": "Crie um mini pipeline que detecta uma mudança, liga um deploy, classifica uma causa e propõe uma correção com aprovação."
  }
 }

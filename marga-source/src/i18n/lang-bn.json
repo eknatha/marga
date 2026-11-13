@@ -1915,6 +1915,10 @@
   "vault": {
    "title": "Vault ও গোপন তথ্য ব্যবস্থাপনা",
    "summary": "HashiCorp Vault দিয়ে গোপন তথ্য পরিচালনা করুন: সিল ও আনসিল, অথ পদ্ধতি, নীতি, KV, ডাইনামিক গোপন তথ্য, PKI, Transit এনক্রিপশন, Kubernetes সংযোগ, উচ্চ প্রাপ্যতা ও ঘটনার প্রতিক্রিয়া।"
+  },
+  "aiops-practice": {
+   "title": "বাস্তবে AIOps",
+   "summary": "AIOps নিরাপদে চালান: ডেটা পাইপলাইন, সংশোধনী পদক্ষেপের স্তর ও যাচাই, কিল সুইচ ও অডিট, কেয়স পরীক্ষা, রানবুক অনুসন্ধান, এজেন্ট ও অনুমোদন গেট, প্রম্পট ইনজেকশন, মূল্যায়ন, তৈরি না কেনা এবং পরিচালনা।"
   }
  },
  "paths": {
@@ -2546,6 +2550,28 @@
   "vault/vault-on-kubernetes-injector-csi-and-operators": "Kubernetes এ Vault: injector, CSI ও Vault Secrets Operator।",
   "vault/vault-high-availability-raft-and-disaster-recovery": "Raft সহ উচ্চ প্রাপ্যতা, স্ন্যাপশট, রেপ্লিকেশন ও দুর্যোগ পুনরুদ্ধার।",
   "vault/audit-logging-monitoring-and-hardening-vault": "অডিট লগ, পর্যবেক্ষণ এবং Vault এর শক্তিশালীকরণ।",
-  "vault/incident-response-rotating-and-revoking-secrets": "ঘটনার প্রতিক্রিয়া: বাতিল করুন, বদলান ও তদন্ত করুন।"
+  "vault/incident-response-rotating-and-revoking-secrets": "ঘটনার প্রতিক্রিয়া: বাতিল করুন, বদলান ও তদন্ত করুন।",
+  "aiops/statistics-for-ops-percentiles-seasonality-and-correlation": "প্রতিটি AIOps সরঞ্জাম যে কয়েকটি পরিসংখ্যানের উপর নির্ভর করে: গড় কেন বিভ্রান্ত করে, পার্সেন্টাইল, ঋতুভিত্তিকতা এবং সম্পর্ক কেন কারণ নয়।",
+  "aiops/hands-on-anomaly-detection-z-score-mad-and-ewma": "Python এ z-score, MAD ও EWMA শনাক্তকারী বানান, প্রতিটি কোথায় ব্যর্থ হয় দেখুন এবং আগের ঘটনায় পরীক্ষা করুন।",
+  "aiops/change-point-and-trend-detection": "কোন সময়ে মেট্রিকের আচরণ বদলেছে তা খুঁজুন, স্থায়ী পরিবর্তন ও হঠাৎ লাফ আলাদা করুন এবং সীমায় পৌঁছানোর সময় অনুমান করুন।",
+  "aiops/event-deduplication-grouping-and-suppression-rules": "ফিঙ্গারপ্রিন্ট, গ্রুপিং উইন্ডো এবং মেয়াদোত্তীর্ণ হওয়া দমন নিয়ম দিয়ে কাঁচা ইভেন্টকে কয়েকটি ঘটনায় পরিণত করুন।",
+  "aiops/change-correlation-linking-incidents-to-deploys": "পরিবর্তনের ফিড বানান, ঘটনা শুরুর সময়ের সঙ্গে মেলান এবং প্রমাণসহ সন্দেহভাজনদের সাজান।",
+  "aiops/topology-and-dependency-aware-root-cause": "সবচেয়ে হইচইওয়ালা সতর্কতাকে দোষ না দিয়ে সার্ভিস গ্রাফ দিয়ে অনেক ব্যর্থতার সাধারণ কারণ খুঁজুন।",
+  "aiops/tuning-alerts-with-data-precision-recall-and-burn-rates": "সতর্কতার নির্ভুলতা, রিকল ও বার্ন রেট মাপুন এবং যেকোনো মডেলকে ছাড়িয়ে যেতে হবে এমন ভিত্তি হিসেবে SLO সতর্কতা ব্যবহার করুন।",
+  "aiops/multivariate-and-service-level-anomalies": "ইনস্ট্যান্সকে সমকক্ষদের সঙ্গে তুলনা করুন, অনুপাত ও গোল্ডেন সিগন্যাল ব্যবহার করুন এবং বহু সংকেতের ফল ব্যাখ্যাযোগ্য রাখুন।",
+  "aiops-practice/data-sources-and-pipelines-for-aiops": "AIOps ব্যবস্থা যে ইভেন্ট, মেট্রিক, পরিবর্তন ও টপোলজি ডেটা পড়ে তা একটি পরিচয় ও UTC সময়সহ নকশা করুন।",
+  "aiops-practice/remediation-patterns-and-approval-tiers": "স্বয়ংক্রিয় সংশোধনকে অনুমোদনের স্তরে ভাগ করুন এবং প্রতিটিকে সীমিত, ফেরতযোগ্য ও বারবার চালালেও একই ফলের কাজ হিসেবে লিখুন।",
+  "aiops-practice/verifying-and-rolling-back-a-remediation": "উপসর্গ ও সুরক্ষা মেট্রিক যাচাই করে প্রমাণ করুন সংশোধন কাজ করেছে, না করলে তা ফিরিয়ে নিন।",
+  "aiops-practice/audit-trails-kill-switches-and-blast-radius-limits": "স্বয়ংক্রিয়তার চারপাশে অডিট ট্রেইল, কিল সুইচ, ন্যূনতম অনুমতি ও ক্ষতির পরিসর সীমা যোগ করুন।",
+  "aiops-practice/chaos-testing-your-automation": "আপনার স্বয়ংক্রিয়তার শনাক্তকরণ, ব্যাখ্যা, সংশোধন ও থামার পথ পরীক্ষা করতে ইচ্ছা করে জিনিস ভাঙুন।",
+  "aiops-practice/retrieval-over-runbooks-and-past-incidents": "ফিল্টার, উদ্ধৃতি ও সৎ পাওয়া যায়নি উত্তরসহ সহকারী রানবুক ও আগের ঘটনায় খুঁজুক।",
+  "aiops-practice/agentic-ops-tools-mcp-and-approval-gates": "এজেন্টকে সংকীর্ণ টাইপ করা সরঞ্জাম দিন, শুধু পড়া দিয়ে শুরু করুন এবং পরিবর্তনের আগে মানুষের অনুমোদন গেট রাখুন।",
+  "aiops-practice/prompt-injection-and-over-permissioned-agents": "লগ ও টিকিট কীভাবে এজেন্টকে চালাতে পারে বুঝুন এবং ন্যূনতম অনুমতি ও হোস্ট পক্ষের নীতি দিয়ে রক্ষা করুন।",
+  "aiops-practice/evaluating-ai-ops-output-test-sets-and-shadow-mode": "লেবেল করা ঘটনা, শ্যাডো মোড, পর্যালোচনার হার ও রিগ্রেশন স্যুট দিয়ে AIOps ফলাফল মাপুন।",
+  "aiops-practice/build-versus-buy-and-the-roi-case": "বানাবেন, কিনবেন না জোড়া দেবেন তা ঠিক করুন, নিজের ঘটনায় বিক্রেতাদের পরীক্ষা করুন এবং মাপা ফল দেখান।",
+  "aiops-practice/failure-modes-drift-feedback-loops-and-wrong-remediators": "বিভ্রাট ঘটানোর আগেই ড্রিফট, ফিডব্যাক লুপ, কভারেজ পক্ষপাত ও ভুল সংশোধক চিনুন।",
+  "aiops-practice/operating-aiops-ownership-on-call-and-lifecycle": "মালিক, SLO, অন-কল ও নিয়মের জীবনচক্রসহ AIOps প্ল্যাটফর্মকে প্রোডাকশন সেবা হিসেবে চালান।",
+  "aiops-practice/debugging-a-misbehaving-aiops-pipeline": "একটি সিদ্ধান্ত ধাপে ধাপে আবার চালিয়ে ও রিগ্রেশন কেস যোগ করে খুঁজুন AIOps ব্যবস্থা কেন ভুল করল।",
+  "aiops-practice/capstone-a-mini-aiops-pipeline": "পরিবর্তন শনাক্ত করে, ডিপ্লয় যুক্ত করে, কারণ সাজিয়ে এবং অনুমোদনসহ সংশোধন প্রস্তাব করে এমন ছোট পাইপলাইন বানান।"
  }
 }

@@ -1915,6 +1915,10 @@
   "vault": {
    "title": "Vault ಮತ್ತು ರಹಸ್ಯ ನಿರ್ವಹಣೆ",
    "summary": "HashiCorp Vault ನಿಂದ ರಹಸ್ಯಗಳನ್ನು ನಿರ್ವಹಿಸಿ: ಸೀಲ್ ಮತ್ತು ಅನ್‌ಸೀಲ್, ದೃಢೀಕರಣ ವಿಧಾನಗಳು, ನೀತಿಗಳು, KV, ಡೈನಾಮಿಕ್ ರಹಸ್ಯಗಳು, PKI, Transit ಎನ್‌ಕ್ರಿಪ್ಷನ್, Kubernetes ಏಕೀಕರಣ, ಹೆಚ್ಚಿನ ಲಭ್ಯತೆ ಮತ್ತು ಘಟನೆ ಪ್ರತಿಕ್ರಿಯೆ."
+  },
+  "aiops-practice": {
+   "title": "ಪ್ರಾಯೋಗಿಕ AIOps",
+   "summary": "AIOps ಅನ್ನು ಸುರಕ್ಷಿತವಾಗಿ ನಡೆಸಿ: ಡೇಟಾ ಪೈಪ್‌ಲೈನ್‌ಗಳು, ಸರಿಪಡಿಸುವ ಕ್ರಮಗಳ ಹಂತಗಳು ಮತ್ತು ದೃಢೀಕರಣ, ಕಿಲ್ ಸ್ವಿಚ್ ಮತ್ತು ಆಡಿಟ್, ಕೇಯಾಸ್ ಪರೀಕ್ಷೆಗಳು, ರನ್‌ಬುಕ್ ಹುಡುಕಾಟ, ಏಜೆಂಟ್‌ಗಳು ಮತ್ತು ಅನುಮೋದನೆ ದ್ವಾರಗಳು, ಪ್ರಾಂಪ್ಟ್ ಇಂಜೆಕ್ಷನ್, ಮೌಲ್ಯಮಾಪನ, ನಿರ್ಮಿಸುವುದೇ ಖರೀದಿಸುವುದೇ ಮತ್ತು ನಿರ್ವಹಣೆ."
   }
  },
  "paths": {
@@ -2546,6 +2550,28 @@
   "vault/vault-on-kubernetes-injector-csi-and-operators": "Kubernetes ನಲ್ಲಿ Vault: injector, CSI ಮತ್ತು Vault Secrets Operator.",
   "vault/vault-high-availability-raft-and-disaster-recovery": "Raft ನೊಂದಿಗೆ ಹೆಚ್ಚಿನ ಲಭ್ಯತೆ, ಸ್ನ್ಯಾಪ್‌ಶಾಟ್, ಪ್ರತಿಕೃತಿ ಮತ್ತು ವಿಪತ್ತು ಚೇತರಿಕೆ.",
   "vault/audit-logging-monitoring-and-hardening-vault": "ಆಡಿಟ್ ಲಾಗ್, ಮೇಲ್ವಿಚಾರಣೆ ಮತ್ತು Vault ಬಲವರ್ಧನೆ.",
-  "vault/incident-response-rotating-and-revoking-secrets": "ಘಟನೆ ಪ್ರತಿಕ್ರಿಯೆ: ರದ್ದುಗೊಳಿಸಿ, ಬದಲಿಸಿ ಮತ್ತು ತನಿಖೆ ಮಾಡಿ."
+  "vault/incident-response-rotating-and-revoking-secrets": "ಘಟನೆ ಪ್ರತಿಕ್ರಿಯೆ: ರದ್ದುಗೊಳಿಸಿ, ಬದಲಿಸಿ ಮತ್ತು ತನಿಖೆ ಮಾಡಿ.",
+  "aiops/statistics-for-ops-percentiles-seasonality-and-correlation": "ಪ್ರತಿ AIOps ಸಾಧನವೂ ಅವಲಂಬಿಸುವ ಕೆಲವು ಅಂಕಿಅಂಶಗಳು: ಸರಾಸರಿ ಏಕೆ ದಾರಿ ತಪ್ಪಿಸುತ್ತದೆ, ಶೇಕಡಾ ಮೌಲ್ಯಗಳು, ಋತುಮಾನ, ಸಹಸಂಬಂಧ ಕಾರಣವಲ್ಲ ಎಂಬುದು.",
+  "aiops/hands-on-anomaly-detection-z-score-mad-and-ewma": "Python ನಲ್ಲಿ z-score, MAD ಮತ್ತು EWMA ಪತ್ತೆಕಾರಕಗಳನ್ನು ಕಟ್ಟಿ, ಪ್ರತಿಯೊಂದೂ ಎಲ್ಲಿ ವಿಫಲವಾಗುತ್ತದೆ ಎಂದು ನೋಡಿ, ಹಿಂದಿನ ಘಟನೆಗಳ ಮೇಲೆ ಪರೀಕ್ಷಿಸಿ.",
+  "aiops/change-point-and-trend-detection": "ಮೆಟ್ರಿಕ್‌ನ ವರ್ತನೆ ಯಾವಾಗ ಬದಲಾಯಿತು ಎಂದು ಕಂಡುಹಿಡಿದು, ಶಾಶ್ವತ ಬದಲಾವಣೆ ಮತ್ತು ಏರಿಕೆಯನ್ನು ಬೇರ್ಪಡಿಸಿ, ಮಿತಿ ತಲುಪುವ ಸಮಯವನ್ನು ಅಂದಾಜಿಸಿ.",
+  "aiops/event-deduplication-grouping-and-suppression-rules": "ಬೆರಳಚ್ಚುಗಳು, ಗುಂಪು ಮಾಡುವ ಕಿಟಕಿಗಳು ಮತ್ತು ಅವಧಿ ಮುಗಿಯುವ ನಿಗ್ರಹ ನಿಯಮಗಳಿಂದ ಕಚ್ಚಾ ಘಟನೆಗಳನ್ನು ಕೆಲವೇ ಘಟನೆಗಳಾಗಿ ಪರಿವರ್ತಿಸಿ.",
+  "aiops/change-correlation-linking-incidents-to-deploys": "ಬದಲಾವಣೆಗಳ ಹರಿವನ್ನು ಕಟ್ಟಿ, ಘಟನೆ ಆರಂಭದ ಸಮಯಕ್ಕೆ ಹೊಂದಿಸಿ, ಸಾಕ್ಷ್ಯದೊಂದಿಗೆ ಶಂಕಿತರನ್ನು ಶ್ರೇಣೀಕರಿಸಿ.",
+  "aiops/topology-and-dependency-aware-root-cause": "ಅತಿ ಗದ್ದಲದ ಎಚ್ಚರಿಕೆಯನ್ನು ದೂಷಿಸುವ ಬದಲು, ಅನೇಕ ವೈಫಲ್ಯಗಳ ಸಾಮಾನ್ಯ ಕಾರಣವನ್ನು ಸೇವಾ ನಕ್ಷೆಯಿಂದ ಕಂಡುಹಿಡಿಯಿರಿ.",
+  "aiops/tuning-alerts-with-data-precision-recall-and-burn-rates": "ಎಚ್ಚರಿಕೆಗಳ ನಿಖರತೆ, ಮರುಪಡೆಯುವಿಕೆ ಮತ್ತು ಬರ್ನ್ ದರಗಳನ್ನು ಅಳೆದು, ಯಾವ ಮಾದರಿಯೂ ಮೀರಬೇಕಾದ ಮೂಲರೇಖೆಯಾಗಿ SLO ಎಚ್ಚರಿಕೆಗಳನ್ನು ಬಳಸಿ.",
+  "aiops/multivariate-and-service-level-anomalies": "ನಿದರ್ಶನಗಳನ್ನು ಅವುಗಳ ಸಹವರ್ತಿಗಳೊಂದಿಗೆ ಹೋಲಿಸಿ, ಅನುಪಾತಗಳು ಮತ್ತು ಮುಖ್ಯ ಸಂಕೇತಗಳನ್ನು ಬಳಸಿ, ಬಹು ಸಂಕೇತ ಫಲಿತಾಂಶಗಳನ್ನು ವಿವರಿಸಬಹುದಾದಂತೆ ಇಡಿ.",
+  "aiops-practice/data-sources-and-pipelines-for-aiops": "AIOps ವ್ಯವಸ್ಥೆ ಓದುವ ಘಟನೆ, ಮೆಟ್ರಿಕ್, ಬದಲಾವಣೆ ಮತ್ತು ಸ್ಥಳಶಾಸ್ತ್ರ ಡೇಟಾವನ್ನು ಒಂದೇ ಗುರುತು ಮತ್ತು UTC ಸಮಯದೊಂದಿಗೆ ವಿನ್ಯಾಸಗೊಳಿಸಿ.",
+  "aiops-practice/remediation-patterns-and-approval-tiers": "ಸ್ವಯಂಚಾಲಿತ ಸರಿಪಡಿಕೆಗಳನ್ನು ಅನುಮೋದನೆ ಹಂತಗಳಾಗಿ ವಿಂಗಡಿಸಿ, ಪ್ರತಿಯೊಂದನ್ನೂ ಮಿತಿಯುಳ್ಳ, ಹಿಂತಿರುಗಿಸಬಹುದಾದ, ಪುನರಾವರ್ತನೆಯಲ್ಲೂ ಒಂದೇ ಫಲ ನೀಡುವ ಕ್ರಿಯೆಯಾಗಿ ಬರೆಯಿರಿ.",
+  "aiops-practice/verifying-and-rolling-back-a-remediation": "ಲಕ್ಷಣ ಮತ್ತು ರಕ್ಷಣಾ ಮೆಟ್ರಿಕ್‌ಗಳನ್ನು ಪರಿಶೀಲಿಸಿ ಸರಿಪಡಿಕೆ ಕೆಲಸ ಮಾಡಿತು ಎಂದು ಸಾಬೀತುಪಡಿಸಿ, ಇಲ್ಲದಿದ್ದರೆ ಅದನ್ನು ರದ್ದುಗೊಳಿಸಿ.",
+  "aiops-practice/audit-trails-kill-switches-and-blast-radius-limits": "ಸ್ವಯಂಚಾಲನೆಯ ಸುತ್ತ ಲೆಕ್ಕಪರಿಶೋಧನೆ ದಾಖಲೆಗಳು, ಕಿಲ್ ಸ್ವಿಚ್, ಕನಿಷ್ಠ ಅನುಮತಿ ಮತ್ತು ಪರಿಣಾಮದ ವ್ಯಾಪ್ತಿ ಮಿತಿಗಳನ್ನು ಸೇರಿಸಿ.",
+  "aiops-practice/chaos-testing-your-automation": "ನಿಮ್ಮ ಸ್ವಯಂಚಾಲನೆಯ ಪತ್ತೆ, ವಿವರಣೆ, ಸರಿಪಡಿಕೆ ಮತ್ತು ನಿಲ್ಲಿಸುವ ಮಾರ್ಗವನ್ನು ಪರೀಕ್ಷಿಸಲು ಉದ್ದೇಶಪೂರ್ವಕವಾಗಿ ವಸ್ತುಗಳನ್ನು ಮುರಿಯಿರಿ.",
+  "aiops-practice/retrieval-over-runbooks-and-past-incidents": "ಫಿಲ್ಟರ್‌ಗಳು, ಉಲ್ಲೇಖಗಳು ಮತ್ತು ಪ್ರಾಮಾಣಿಕ ಸಿಗಲಿಲ್ಲ ಉತ್ತರದೊಂದಿಗೆ ರನ್‌ಬುಕ್‌ಗಳು ಮತ್ತು ಹಿಂದಿನ ಘಟನೆಗಳಲ್ಲಿ ಸಹಾಯಕ ಹುಡುಕಲಿ.",
+  "aiops-practice/agentic-ops-tools-mcp-and-approval-gates": "ಏಜೆಂಟ್‌ಗೆ ಕಿರಿದಾದ ವರ್ಗೀಕೃತ ಸಾಧನಗಳನ್ನು ನೀಡಿ, ಓದಲು ಮಾತ್ರದಿಂದ ಆರಂಭಿಸಿ, ಬದಲಾವಣೆಗಳ ಮೊದಲು ಮಾನವ ಅನುಮೋದನೆ ದ್ವಾರಗಳನ್ನು ಇಡಿ.",
+  "aiops-practice/prompt-injection-and-over-permissioned-agents": "ಲಾಗ್‌ಗಳು ಮತ್ತು ಟಿಕೆಟ್‌ಗಳು ಏಜೆಂಟ್‌ನನ್ನು ಹೇಗೆ ನಡೆಸಬಲ್ಲವು ಎಂದು ಅರಿತು, ಕನಿಷ್ಠ ಅನುಮತಿ ಮತ್ತು ಹೋಸ್ಟ್ ಬದಿಯ ನೀತಿಯಿಂದ ರಕ್ಷಿಸಿ.",
+  "aiops-practice/evaluating-ai-ops-output-test-sets-and-shadow-mode": "ಲೇಬಲ್ ಇರುವ ಘಟನೆಗಳು, ನೆರಳು ಕ್ರಮ, ಪರಿಶೀಲನೆ ದರಗಳು ಮತ್ತು ಹಿಂಜರಿತ ಸಂಗ್ರಹದಿಂದ AIOps ಫಲಿತಾಂಶವನ್ನು ಅಳೆಯಿರಿ.",
+  "aiops-practice/build-versus-buy-and-the-roi-case": "ಕಟ್ಟುವುದೇ, ಕೊಳ್ಳುವುದೇ ಅಥವಾ ಜೋಡಿಸುವುದೇ ಎಂದು ತೀರ್ಮಾನಿಸಿ, ನಿಮ್ಮ ಘಟನೆಗಳಲ್ಲಿ ಮಾರಾಟಗಾರರನ್ನು ಪರೀಕ್ಷಿಸಿ, ಅಳೆದ ಲಾಭವನ್ನು ತೋರಿಸಿ.",
+  "aiops-practice/failure-modes-drift-feedback-loops-and-wrong-remediators": "ಸ್ಥಗಿತ ಉಂಟುಮಾಡುವ ಮೊದಲು ವಿಚಲನೆ, ಪ್ರತಿಕ್ರಿಯೆ ಚಕ್ರಗಳು, ವ್ಯಾಪ್ತಿ ಪಕ್ಷಪಾತ ಮತ್ತು ತಪ್ಪು ಸರಿಪಡಿಸುವಿಕೆಗಳನ್ನು ಗುರುತಿಸಿ.",
+  "aiops-practice/operating-aiops-ownership-on-call-and-lifecycle": "ಮಾಲೀಕರು, SLO, ಕರೆ ಕರ್ತವ್ಯ ಮತ್ತು ನಿಯಮ ಜೀವನಚಕ್ರದೊಂದಿಗೆ AIOps ವೇದಿಕೆಯನ್ನು ಉತ್ಪಾದನಾ ಸೇವೆಯಾಗಿ ನಡೆಸಿ.",
+  "aiops-practice/debugging-a-misbehaving-aiops-pipeline": "ನಿರ್ಧಾರವನ್ನು ಹಂತ ಹಂತವಾಗಿ ಮರುಚಾಲನೆ ಮಾಡಿ ಹಿಂಜರಿತ ಪ್ರಕರಣ ಸೇರಿಸಿ, AIOps ವ್ಯವಸ್ಥೆ ಏಕೆ ತಪ್ಪಿತು ಎಂದು ಕಂಡುಹಿಡಿಯಿರಿ.",
+  "aiops-practice/capstone-a-mini-aiops-pipeline": "ಬದಲಾವಣೆ ಪತ್ತೆ ಮಾಡಿ, ನಿಯೋಜನೆಯನ್ನು ಜೋಡಿಸಿ, ಕಾರಣವನ್ನು ಶ್ರೇಣೀಕರಿಸಿ, ಅನುಮೋದನೆಯೊಂದಿಗೆ ಸರಿಪಡಿಕೆ ಸೂಚಿಸುವ ಸಣ್ಣ ಪೈಪ್‌ಲೈನ್ ಕಟ್ಟಿ."
  }
 }

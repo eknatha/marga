@@ -1915,6 +1915,10 @@
   "vault": {
    "title": "Vault и управление секретами",
    "summary": "Управляйте секретами с HashiCorp Vault: запечатывание, методы аутентификации, политики, KV, динамические секреты, PKI, шифрование Transit, интеграция с Kubernetes, высокая доступность и реагирование на инциденты."
+  },
+  "aiops-practice": {
+   "title": "AIOps на практике",
+   "summary": "Безопасно эксплуатируйте AIOps: конвейеры данных, уровни исправляющих действий и проверка, аварийные выключатели и аудит, хаос-тесты, поиск по ранбукам, агенты и шлюзы согласования, внедрение промптов, оценка, строить или покупать и эксплуатация."
   }
  },
  "paths": {
@@ -2546,6 +2550,28 @@
   "vault/vault-on-kubernetes-injector-csi-and-operators": "Vault в Kubernetes: injector, CSI и Vault Secrets Operator.",
   "vault/vault-high-availability-raft-and-disaster-recovery": "Высокая доступность на Raft, снимки, репликация и аварийное восстановление.",
   "vault/audit-logging-monitoring-and-hardening-vault": "Журналы аудита, мониторинг и укрепление Vault.",
-  "vault/incident-response-rotating-and-revoking-secrets": "Реагирование на инциденты: отзыв, ротация и расследование."
+  "vault/incident-response-rotating-and-revoking-secrets": "Реагирование на инциденты: отзыв, ротация и расследование.",
+  "aiops/statistics-for-ops-percentiles-seasonality-and-correlation": "Немногие статистики, на которых держится любой инструмент AIOps: почему средние обманывают, перцентили, сезонность и почему корреляция не причина.",
+  "aiops/hands-on-anomaly-detection-z-score-mad-and-ewma": "Создайте детекторы z-score, MAD и EWMA на Python, посмотрите, где каждый ошибается, и проверьте их на прошлых инцидентах.",
+  "aiops/change-point-and-trend-detection": "Найдите, когда изменилось поведение метрики, отличите устойчивый сдвиг от всплеска и спрогнозируйте время до предела.",
+  "aiops/event-deduplication-grouping-and-suppression-rules": "Превратите сырые события в несколько инцидентов с помощью отпечатков, окон группировки и правил подавления с истечением срока.",
+  "aiops/change-correlation-linking-incidents-to-deploys": "Постройте ленту изменений, сопоставьте её со временем начала инцидента и ранжируйте подозреваемых с доказательствами.",
+  "aiops/topology-and-dependency-aware-root-cause": "Используйте граф сервисов, чтобы найти общую причину многих сбоев, а не винить самый громкий алерт.",
+  "aiops/tuning-alerts-with-data-precision-recall-and-burn-rates": "Измеряйте точность, полноту и скорость расхода бюджета ошибок у алертов и используйте алерты по SLO как базу, которую должна превзойти любая модель.",
+  "aiops/multivariate-and-service-level-anomalies": "Сравнивайте экземпляры с аналогами, используйте отношения и золотые сигналы и сохраняйте объяснимость многосигнальных результатов.",
+  "aiops-practice/data-sources-and-pipelines-for-aiops": "Спроектируйте данные событий, метрик, изменений и топологии, которые читает система AIOps, с единой идентификацией и временем UTC.",
+  "aiops-practice/remediation-patterns-and-approval-tiers": "Разделите автоматические исправления по уровням согласования и опишите каждое как ограниченное, обратимое и идемпотентное действие.",
+  "aiops-practice/verifying-and-rolling-back-a-remediation": "Докажите, что исправление сработало, проверив симптом и защитные метрики, и отмените его, если нет.",
+  "aiops-practice/audit-trails-kill-switches-and-blast-radius-limits": "Добавьте в автоматизацию журналы аудита, аварийные выключатели, минимальные права и пределы радиуса поражения.",
+  "aiops-practice/chaos-testing-your-automation": "Намеренно ломайте систему, чтобы проверить обнаружение, объяснение, исправление и путь остановки вашей автоматизации.",
+  "aiops-practice/retrieval-over-runbooks-and-past-incidents": "Пусть помощник ищет по ранбукам и прошлым инцидентам с фильтрами, ссылками на источники и честным «не найдено».",
+  "aiops-practice/agentic-ops-tools-mcp-and-approval-gates": "Дайте агенту узкие типизированные инструменты, начните с режима только чтения и поставьте шлюзы согласования человеком перед изменениями.",
+  "aiops-practice/prompt-injection-and-over-permissioned-agents": "Поймите, как журналы и тикеты могут управлять агентом, и защититесь минимальными правами и политикой на стороне хоста.",
+  "aiops-practice/evaluating-ai-ops-output-test-sets-and-shadow-mode": "Оценивайте результаты AIOps по размеченным инцидентам, теневому режиму, доле принятых подсказок и набору регрессионных тестов.",
+  "aiops-practice/build-versus-buy-and-the-roi-case": "Решите, строить, покупать или собирать, проверьте поставщиков на своих инцидентах и покажите измеренную отдачу.",
+  "aiops-practice/failure-modes-drift-feedback-loops-and-wrong-remediators": "Замечайте дрейф, петли обратной связи, смещение покрытия и неверные исправления до того, как они вызовут сбой.",
+  "aiops-practice/operating-aiops-ownership-on-call-and-lifecycle": "Эксплуатируйте платформу AIOps как производственный сервис с владельцами, SLO, дежурством и жизненным циклом правил.",
+  "aiops-practice/debugging-a-misbehaving-aiops-pipeline": "Узнайте, почему система AIOps ошиблась, воспроизведя решение по этапам и добавив регрессионный случай.",
+  "aiops-practice/capstone-a-mini-aiops-pipeline": "Постройте мини-конвейер, который находит сдвиг, связывает развёртывание, ранжирует причину и предлагает исправление с согласованием."
  }
 }

@@ -1915,6 +1915,10 @@
   "vault": {
    "title": "Vault आणि गुपिते व्यवस्थापन",
    "summary": "HashiCorp Vault ने गुपिते सांभाळा: सील व अनसील, ऑथ पद्धती, धोरणे, KV, डायनॅमिक गुपिते, PKI, Transit एन्क्रिप्शन, Kubernetes एकीकरण, उच्च उपलब्धता आणि घटना प्रतिसाद."
+  },
+  "aiops-practice": {
+   "title": "प्रत्यक्षात AIOps",
+   "summary": "AIOps सुरक्षितपणे चालवा: डेटा पाइपलाइन, सुधारात्मक कृतींचे स्तर आणि पडताळणी, किल स्विच आणि ऑडिट, केऑस चाचण्या, रनबुक शोध, एजंट आणि मंजुरी गेट, प्रॉम्प्ट इंजेक्शन, मूल्यमापन, बनवायचे की विकत घ्यायचे आणि संचालन."
   }
  },
  "paths": {
@@ -2546,6 +2550,28 @@
   "vault/vault-on-kubernetes-injector-csi-and-operators": "Kubernetes वर Vault: injector, CSI आणि Vault Secrets Operator.",
   "vault/vault-high-availability-raft-and-disaster-recovery": "Raft सह उच्च उपलब्धता, स्नॅपशॉट, रेप्लिकेशन आणि आपत्ती रिकव्हरी.",
   "vault/audit-logging-monitoring-and-hardening-vault": "ऑडिट लॉग, निरीक्षण आणि Vault चे मजबुतीकरण.",
-  "vault/incident-response-rotating-and-revoking-secrets": "घटना प्रतिसाद: रद्द करा, बदला आणि तपास करा."
+  "vault/incident-response-rotating-and-revoking-secrets": "घटना प्रतिसाद: रद्द करा, बदला आणि तपास करा.",
+  "aiops/statistics-for-ops-percentiles-seasonality-and-correlation": "प्रत्येक AIOps साधन ज्यावर अवलंबून असते ती काही आकडेवारी: सरासरी का फसवते, पर्सेंटाइल, हंगामीपणा आणि सहसंबंध म्हणजे कारण नव्हे.",
+  "aiops/hands-on-anomaly-detection-z-score-mad-and-ewma": "Python मध्ये z-score, MAD आणि EWMA शोधक बनवा, प्रत्येक कुठे अपयशी ठरतो ते पाहा आणि जुन्या घटनांवर तपासा.",
+  "aiops/change-point-and-trend-detection": "मेट्रिकचे वर्तन कधी बदलले ते शोधा, कायमचा बदल आणि अचानक उसळी यातील फरक ओळखा आणि मर्यादा गाठण्याचा वेळ अंदाजा.",
+  "aiops/event-deduplication-grouping-and-suppression-rules": "फिंगरप्रिंट, गटबद्ध करण्याच्या खिडक्या आणि मुदत संपणारे दडपण नियम वापरून कच्च्या घटनांचे काही घटनांत रूपांतर करा.",
+  "aiops/change-correlation-linking-incidents-to-deploys": "बदलांचा प्रवाह बनवा, घटना सुरू होण्याच्या वेळेशी जुळवा आणि पुराव्यांसह संशयितांचा क्रम लावा.",
+  "aiops/topology-and-dependency-aware-root-cause": "सर्वात गोंगाटी सूचनेला दोष देण्याऐवजी सेवा आलेखातून अनेक अपयशांचे सामायिक कारण शोधा.",
+  "aiops/tuning-alerts-with-data-precision-recall-and-burn-rates": "सूचनांची अचूकता, रिकॉल आणि बर्न दर मोजा आणि कोणत्याही मॉडेलने मागे टाकावा असा पाया म्हणून SLO सूचना वापरा.",
+  "aiops/multivariate-and-service-level-anomalies": "इन्स्टन्सची तुलना त्यांच्या समकक्षांशी करा, गुणोत्तरे आणि गोल्डन सिग्नल वापरा आणि बहु संकेत निकाल स्पष्ट करता येतील असे ठेवा.",
+  "aiops-practice/data-sources-and-pipelines-for-aiops": "AIOps प्रणाली वाचते ते इव्हेंट, मेट्रिक, बदल आणि टोपोलॉजी डेटा एका ओळखीसह आणि UTC वेळेसह आराखडा करा.",
+  "aiops-practice/remediation-patterns-and-approval-tiers": "स्वयंचलित दुरुस्त्या मंजुरीच्या स्तरांत विभागा आणि प्रत्येक दुरुस्ती मर्यादित, उलट करता येणारी आणि पुन्हा चालवली तरी तोच परिणाम देणारी कृती म्हणून लिहा.",
+  "aiops-practice/verifying-and-rolling-back-a-remediation": "लक्षण आणि संरक्षण मेट्रिक तपासून दुरुस्ती चालली हे सिद्ध करा, नाही चालली तर ती मागे घ्या.",
+  "aiops-practice/audit-trails-kill-switches-and-blast-radius-limits": "स्वयंचलनाभोवती ऑडिट नोंदी, किल स्विच, किमान परवानगी आणि परिणामक्षेत्र मर्यादा जोडा.",
+  "aiops-practice/chaos-testing-your-automation": "तुमच्या स्वयंचलनाचा शोध, स्पष्टीकरण, दुरुस्ती आणि थांबवण्याचा मार्ग तपासण्यासाठी मुद्दाम गोष्टी मोडा.",
+  "aiops-practice/retrieval-over-runbooks-and-past-incidents": "फिल्टर, संदर्भ आणि प्रामाणिक सापडले नाही उत्तरासह सहाय्यकाला रनबुक आणि जुन्या घटनांत शोधू द्या.",
+  "aiops-practice/agentic-ops-tools-mcp-and-approval-gates": "एजंटला अरुंद प्रकारबद्ध साधने द्या, फक्त वाचनापासून सुरुवात करा आणि बदलांपूर्वी मानवी मंजुरी गेट ठेवा.",
+  "aiops-practice/prompt-injection-and-over-permissioned-agents": "लॉग आणि तिकिटे एजंटला कसे चालवू शकतात ते समजा आणि किमान परवानगी व होस्ट बाजूच्या धोरणाने संरक्षण करा.",
+  "aiops-practice/evaluating-ai-ops-output-test-sets-and-shadow-mode": "लेबल केलेल्या घटना, शॅडो मोड, पुनरावलोकन दर आणि रिग्रेशन संच वापरून AIOps निकाल मोजा.",
+  "aiops-practice/build-versus-buy-and-the-roi-case": "बनवायचे, विकत घ्यायचे की जोडायचे ते ठरवा, तुमच्या घटनांवर विक्रेत्यांची चाचणी घ्या आणि मोजलेला फायदा दाखवा.",
+  "aiops-practice/failure-modes-drift-feedback-loops-and-wrong-remediators": "खंड पडण्याआधीच ड्रिफ्ट, फीडबॅक लूप, कव्हरेज पक्षपात आणि चुकीचे दुरुस्तीकर्ते ओळखा.",
+  "aiops-practice/operating-aiops-ownership-on-call-and-lifecycle": "मालक, SLO, ऑन-कॉल आणि नियम जीवनचक्रासह AIOps प्लॅटफॉर्म उत्पादन सेवा म्हणून चालवा.",
+  "aiops-practice/debugging-a-misbehaving-aiops-pipeline": "एक निर्णय टप्प्याटप्प्याने पुन्हा चालवून आणि रिग्रेशन केस जोडून AIOps प्रणाली का चुकली ते शोधा.",
+  "aiops-practice/capstone-a-mini-aiops-pipeline": "बदल शोधणारी, डिप्लॉय जोडणारी, कारणाचा क्रम लावणारी आणि मंजुरीसह दुरुस्ती सुचवणारी छोटी पाइपलाइन बनवा."
  }
 }

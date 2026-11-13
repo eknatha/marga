@@ -1915,6 +1915,10 @@
   "vault": {
    "title": "Vault dan manajemen rahasia",
    "summary": "Kelola rahasia dengan HashiCorp Vault: seal, metode autentikasi, kebijakan, KV, rahasia dinamis, PKI, enkripsi Transit, integrasi Kubernetes, ketersediaan tinggi, dan respons insiden."
+  },
+  "aiops-practice": {
+   "title": "AIOps dalam praktik",
+   "summary": "Jalankan AIOps dengan aman: pipeline data, tingkat tindakan perbaikan dan verifikasi, sakelar darurat dan audit, uji kekacauan, pencarian runbook, agen dan gerbang persetujuan, injeksi prompt, evaluasi, bangun atau beli, dan operasi."
   }
  },
  "paths": {
@@ -2546,6 +2550,28 @@
   "vault/vault-on-kubernetes-injector-csi-and-operators": "Vault di Kubernetes: injector, CSI, dan Vault Secrets Operator.",
   "vault/vault-high-availability-raft-and-disaster-recovery": "Ketersediaan tinggi dengan Raft, snapshot, replikasi, dan pemulihan bencana.",
   "vault/audit-logging-monitoring-and-hardening-vault": "Log audit, pemantauan, dan penguatan Vault.",
-  "vault/incident-response-rotating-and-revoking-secrets": "Respons insiden: cabut, rotasi, dan selidiki."
+  "vault/incident-response-rotating-and-revoking-secrets": "Respons insiden: cabut, rotasi, dan selidiki.",
+  "aiops/statistics-for-ops-percentiles-seasonality-and-correlation": "Beberapa statistik yang menjadi dasar setiap alat AIOps: mengapa rata-rata menyesatkan, persentil, musiman, dan mengapa korelasi bukan sebab.",
+  "aiops/hands-on-anomaly-detection-z-score-mad-and-ewma": "Bangun detektor z-score, MAD, dan EWMA di Python, lihat di mana masing-masing gagal, dan uji pada insiden lama.",
+  "aiops/change-point-and-trend-detection": "Temukan kapan perilaku metrik berubah, bedakan perubahan tetap dari lonjakan, dan proyeksikan waktu menuju batas.",
+  "aiops/event-deduplication-grouping-and-suppression-rules": "Ubah peristiwa mentah menjadi beberapa insiden dengan sidik jari, jendela pengelompokan, dan aturan penekanan yang kedaluwarsa.",
+  "aiops/change-correlation-linking-incidents-to-deploys": "Bangun aliran perubahan, cocokkan dengan waktu mulai insiden, dan urutkan tersangka beserta bukti.",
+  "aiops/topology-and-dependency-aware-root-cause": "Gunakan graf layanan untuk menemukan penyebab bersama dari banyak kegagalan, bukan menyalahkan peringatan paling ribut.",
+  "aiops/tuning-alerts-with-data-precision-recall-and-burn-rates": "Ukur presisi, recall, dan burn rate peringatan, dan gunakan peringatan SLO sebagai acuan yang harus dikalahkan model mana pun.",
+  "aiops/multivariate-and-service-level-anomalies": "Bandingkan instans dengan rekannya, gunakan rasio dan sinyal emas, dan jaga hasil multi sinyal tetap bisa dijelaskan.",
+  "aiops-practice/data-sources-and-pipelines-for-aiops": "Rancang data peristiwa, metrik, perubahan, dan topologi yang dibaca sistem AIOps, dengan satu identitas dan waktu UTC.",
+  "aiops-practice/remediation-patterns-and-approval-tiers": "Kelompokkan perbaikan otomatis ke tingkat persetujuan dan tulis masing-masing sebagai tindakan terbatas, dapat dibatalkan, dan idempoten.",
+  "aiops-practice/verifying-and-rolling-back-a-remediation": "Buktikan perbaikan berhasil dengan memeriksa gejala dan metrik pengaman, dan batalkan bila gagal.",
+  "aiops-practice/audit-trails-kill-switches-and-blast-radius-limits": "Tambahkan jejak audit, sakelar darurat, hak akses minimum, dan batas radius dampak pada otomatisasi.",
+  "aiops-practice/chaos-testing-your-automation": "Rusak sesuatu dengan sengaja untuk menguji deteksi, penjelasan, perbaikan, dan jalur berhenti otomatisasi Anda.",
+  "aiops-practice/retrieval-over-runbooks-and-past-incidents": "Biarkan asisten mencari runbook dan insiden lama dengan filter, kutipan, dan jawaban jujur tidak ditemukan.",
+  "aiops-practice/agentic-ops-tools-mcp-and-approval-gates": "Beri agen alat bertipe yang sempit, mulai dari baca saja, dan pasang gerbang persetujuan manusia sebelum perubahan.",
+  "aiops-practice/prompt-injection-and-over-permissioned-agents": "Pahami bagaimana log dan tiket dapat mengarahkan agen dan bertahan dengan hak akses minimum dan kebijakan di sisi host.",
+  "aiops-practice/evaluating-ai-ops-output-test-sets-and-shadow-mode": "Ukur keluaran AIOps dengan insiden berlabel, mode bayangan, tingkat tinjauan, dan rangkaian regresi.",
+  "aiops-practice/build-versus-buy-and-the-roi-case": "Putuskan membangun, membeli, atau merakit, uji vendor dengan insiden Anda sendiri, dan tunjukkan hasil yang terukur.",
+  "aiops-practice/failure-modes-drift-feedback-loops-and-wrong-remediators": "Kenali penyimpangan, lingkaran umpan balik, bias cakupan, dan perbaikan yang salah sebelum menyebabkan gangguan.",
+  "aiops-practice/operating-aiops-ownership-on-call-and-lifecycle": "Jalankan platform AIOps sebagai layanan produksi dengan pemilik, SLO, jaga panggilan, dan siklus hidup aturan.",
+  "aiops-practice/debugging-a-misbehaving-aiops-pipeline": "Temukan mengapa sistem AIOps salah dengan memutar ulang keputusan tahap demi tahap dan menambahkan kasus regresi.",
+  "aiops-practice/capstone-a-mini-aiops-pipeline": "Bangun pipeline mini yang mendeteksi pergeseran, menautkan deploy, mengurutkan penyebab, dan mengusulkan perbaikan dengan persetujuan."
  }
 }

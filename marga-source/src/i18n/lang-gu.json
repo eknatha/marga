@@ -1915,6 +1915,10 @@
   "vault": {
    "title": "Vault અને ગુપ્ત માહિતી વ્યવસ્થાપન",
    "summary": "HashiCorp Vault વડે ગુપ્ત માહિતી સંભાળો: સીલ અને અનસીલ, ઓથ પદ્ધતિઓ, નીતિઓ, KV, ડાયનેમિક ગુપ્ત માહિતી, PKI, Transit એન્ક્રિપ્શન, Kubernetes એકીકરણ, ઉચ્ચ ઉપલબ્ધતા અને ઘટના પ્રતિભાવ."
+  },
+  "aiops-practice": {
+   "title": "વ્યવહારમાં AIOps",
+   "summary": "AIOps ને સુરક્ષિત રીતે ચલાવો: ડેટા પાઇપલાઇન, સુધારાત્મક કાર્યવાહીના સ્તર અને ચકાસણી, કિલ સ્વિચ અને ઓડિટ, કેઓસ પરીક્ષણ, રનબુક શોધ, એજન્ટ અને મંજૂરી દ્વાર, પ્રોમ્પ્ટ ઇન્જેક્શન, મૂલ્યાંકન, બનાવવું કે ખરીદવું અને સંચાલન."
   }
  },
  "paths": {
@@ -2546,6 +2550,28 @@
   "vault/vault-on-kubernetes-injector-csi-and-operators": "Kubernetes પર Vault: injector, CSI અને Vault Secrets Operator.",
   "vault/vault-high-availability-raft-and-disaster-recovery": "Raft સાથે ઉચ્ચ ઉપલબ્ધતા, સ્નેપશોટ, રેપ્લિકેશન અને આપત્તિ રિકવરી.",
   "vault/audit-logging-monitoring-and-hardening-vault": "ઓડિટ લોગ, નિરીક્ષણ અને Vault નું મજબૂતીકરણ.",
-  "vault/incident-response-rotating-and-revoking-secrets": "ઘટના પ્રતિભાવ: રદ કરો, બદલો અને તપાસ કરો."
+  "vault/incident-response-rotating-and-revoking-secrets": "ઘટના પ્રતિભાવ: રદ કરો, બદલો અને તપાસ કરો.",
+  "aiops/statistics-for-ops-percentiles-seasonality-and-correlation": "દરેક AIOps સાધન જેના પર આધાર રાખે છે તે થોડા આંકડા: સરેરાશ કેમ ભ્રમિત કરે છે, પર્સેન્ટાઇલ, મોસમીપણું અને સહસંબંધ એટલે કારણ નહીં.",
+  "aiops/hands-on-anomaly-detection-z-score-mad-and-ewma": "Python માં z-score, MAD અને EWMA શોધક બનાવો, દરેક ક્યાં નિષ્ફળ જાય છે તે જુઓ અને જૂની ઘટનાઓ પર ચકાસો.",
+  "aiops/change-point-and-trend-detection": "મેટ્રિકનું વર્તન ક્યારે બદલાયું તે શોધો, કાયમી ફેરફાર અને અચાનક ઉછાળા વચ્ચે ભેદ પારખો અને મર્યાદા સુધી પહોંચવાનો સમય અંદાજો.",
+  "aiops/event-deduplication-grouping-and-suppression-rules": "ફિંગરપ્રિન્ટ, જૂથ બનાવવાની બારીઓ અને મુદત પૂરી થતા દબાણ નિયમોથી કાચી ઘટનાઓને થોડી ઘટનાઓમાં ફેરવો.",
+  "aiops/change-correlation-linking-incidents-to-deploys": "ફેરફારોનો પ્રવાહ બનાવો, ઘટના શરૂ થવાના સમય સાથે મેળવો અને પુરાવા સાથે શંકાસ્પદોને ક્રમમાં ગોઠવો.",
+  "aiops/topology-and-dependency-aware-root-cause": "સૌથી ઘોંઘાટવાળી ચેતવણીને દોષ આપવાને બદલે સેવા આલેખથી ઘણી નિષ્ફળતાઓનું સહિયારું કારણ શોધો.",
+  "aiops/tuning-alerts-with-data-precision-recall-and-burn-rates": "ચેતવણીઓની ચોકસાઈ, રિકોલ અને બર્ન દર માપો અને કોઈ પણ મોડેલે પાર કરવો પડે તેવા આધાર તરીકે SLO ચેતવણીઓ વાપરો.",
+  "aiops/multivariate-and-service-level-anomalies": "ઇન્સ્ટન્સની તુલના તેમના સમકક્ષો સાથે કરો, ગુણોત્તર અને ગોલ્ડન સિગ્નલ વાપરો અને બહુ સંકેત પરિણામો સમજાવી શકાય તેવા રાખો.",
+  "aiops-practice/data-sources-and-pipelines-for-aiops": "AIOps સિસ્ટમ જે ઇવેન્ટ, મેટ્રિક, ફેરફાર અને ટોપોલોજી ડેટા વાંચે છે તેની રચના એક ઓળખ અને UTC સમય સાથે કરો.",
+  "aiops-practice/remediation-patterns-and-approval-tiers": "સ્વચાલિત સુધારાને મંજૂરીના સ્તરોમાં વહેંચો અને દરેકને મર્યાદિત, પાછું ફેરવી શકાય તેવી અને ફરી ચલાવતાં પણ એ જ પરિણામ આપતી ક્રિયા તરીકે લખો.",
+  "aiops-practice/verifying-and-rolling-back-a-remediation": "લક્ષણ અને સુરક્ષા મેટ્રિક ચકાસીને સાબિત કરો કે સુધારો કામ કર્યો, ન કર્યો તો તેને પાછો ખેંચો.",
+  "aiops-practice/audit-trails-kill-switches-and-blast-radius-limits": "સ્વચાલન આસપાસ ઓડિટ નોંધ, કિલ સ્વિચ, ઓછામાં ઓછી પરવાનગી અને અસર ક્ષેત્ર મર્યાદા ઉમેરો.",
+  "aiops-practice/chaos-testing-your-automation": "તમારા સ્વચાલનની શોધ, સમજૂતી, સુધારો અને અટકવાનો માર્ગ ચકાસવા જાણી જોઈને વસ્તુઓ તોડો.",
+  "aiops-practice/retrieval-over-runbooks-and-past-incidents": "ફિલ્ટર, સંદર્ભ અને પ્રામાણિક મળ્યું નહીં જવાબ સાથે સહાયકને રનબુક અને જૂની ઘટનાઓમાં શોધવા દો.",
+  "aiops-practice/agentic-ops-tools-mcp-and-approval-gates": "એજન્ટને સાંકડાં પ્રકારબદ્ધ સાધનો આપો, ફક્ત વાંચનથી શરૂ કરો અને ફેરફારો પહેલાં માનવ મંજૂરી દ્વાર મૂકો.",
+  "aiops-practice/prompt-injection-and-over-permissioned-agents": "લોગ અને ટિકિટ એજન્ટને કેવી રીતે દોરી શકે તે સમજો અને ઓછામાં ઓછી પરવાનગી અને હોસ્ટ બાજુની નીતિથી બચાવ કરો.",
+  "aiops-practice/evaluating-ai-ops-output-test-sets-and-shadow-mode": "લેબલ કરેલી ઘટનાઓ, શેડો મોડ, સમીક્ષા દર અને રિગ્રેશન સમૂહથી AIOps પરિણામ માપો.",
+  "aiops-practice/build-versus-buy-and-the-roi-case": "બનાવવું, ખરીદવું કે જોડવું તે નક્કી કરો, તમારી ઘટનાઓ પર વિક્રેતાઓની ચકાસણી કરો અને માપેલો લાભ બતાવો.",
+  "aiops-practice/failure-modes-drift-feedback-loops-and-wrong-remediators": "ખોટકો થાય તે પહેલાં ડ્રિફ્ટ, ફીડબેક લૂપ, કવરેજ પક્ષપાત અને ખોટા સુધારકોને ઓળખો.",
+  "aiops-practice/operating-aiops-ownership-on-call-and-lifecycle": "માલિકો, SLO, ઓન-કૉલ અને નિયમ જીવનચક્ર સાથે AIOps પ્લેટફોર્મને ઉત્પાદન સેવા તરીકે ચલાવો.",
+  "aiops-practice/debugging-a-misbehaving-aiops-pipeline": "એક નિર્ણયને તબક્કે તબક્કે ફરી ચલાવીને અને રિગ્રેશન કેસ ઉમેરીને શોધો કે AIOps સિસ્ટમ કેમ ખોટી પડી.",
+  "aiops-practice/capstone-a-mini-aiops-pipeline": "ફેરફાર શોધતી, ડિપ્લોય જોડતી, કારણનો ક્રમ બનાવતી અને મંજૂરી સાથે સુધારો સૂચવતી નાની પાઇપલાઇન બનાવો."
  }
 }

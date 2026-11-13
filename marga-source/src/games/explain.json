@@ -850,5 +850,11 @@
   "signs": "A scanner alert, and an audit log entry showing reads from an unknown address using the token's accessor.",
   "fix": "Revoke the token and its leases, read the audit log, rotate every static secret it could read, and shorten TTLs.",
   "example": "vault token revoke -accessor 7c1a3d6e took two minutes, and one vendor API key was regenerated and rewritten to KV."
+ },
+ "the-agent-that-tried-to-help": {
+  "cause": "The agent read untrusted text in a log, and nothing outside the model enforced which hosts and actions it could use.",
+  "signs": "Blocked calls to unknown hosts, tool calls the engineer did not expect and text in logs that addresses the model.",
+  "fix": "Enforce allowlists and approval in the host, keep secrets out of the model context and add hostile strings to a regression test set.",
+  "example": "A log line asks the agent to post environment data to an unknown server, and the host blocks the call and records it."
  }
 }
