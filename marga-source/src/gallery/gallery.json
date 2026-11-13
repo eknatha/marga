@@ -435,5 +435,52 @@
    "The index is not updated and the model confidently quotes last year's policy.",
    "A retrieved web page contains instructions the model obeys."
   ]
+ },
+ {
+  "id": "aiops-pipeline",
+  "title": "AIOps pipeline with human gates",
+  "level": "Advanced",
+  "summary": "Telemetry and changes flow into detection, correlation and an assistant, and any action passes a policy check and a human gate.",
+  "diagram": "title: AIOps pipeline with human gates\nnode: tel | Telemetry sources | 0 | 0 | Metrics, logs, traces and alerts. | Different names for one service break every join. | store\nnode: chg | Change feed | 0 | 2 | Deploys, flags, config and infrastructure changes. | A missing source hides the real cause. | store\nnode: norm | Normalise and check | 1 | 1 | Canonical names, UTC time and freshness checks. | A silent collector looks like a calm system. | security\nnode: det | Detect | 2 | 0 | Baselines, CUSUM and peer comparison. | A detector never replayed on history. | process\nnode: cor | Correlate and explain | 2 | 2 | Grouping, topology and change matching with reasons. | Stale topology gives a confident wrong cause. | process\nnode: asst | Assistant | 3 | 1 | Retrieves runbooks and proposes an action with evidence. | Output without citations cannot be checked. | service\nnode: pol | Policy and approval gate | 4 | 1 | Tiers, limits, kill switch and human approval. | A kill switch that is only read at startup. | security\nnode: act | Action and verify | 5 | 1 | Bounded change, symptom check, guard check, undo. | Exit code treated as success. | external\nedge: tel | norm | ingest\nedge: chg | norm | ingest\nedge: norm | det | clean data\nedge: norm | cor | clean data\nedge: det | asst | finding\nedge: cor | asst | suspects\nedge: asst | pol | proposal\nedge: pol | act | approved",
+  "learn": [
+   {
+    "node": "norm",
+    "module": "aiops-practice",
+    "why": "Data sources and pipelines for AIOps"
+   },
+   {
+    "node": "det",
+    "module": "aiops",
+    "why": "Detectors, baselines and change points"
+   },
+   {
+    "node": "cor",
+    "module": "aiops",
+    "why": "Change correlation and topology"
+   },
+   {
+    "node": "asst",
+    "module": "aiops-practice",
+    "why": "Retrieval and agents"
+   },
+   {
+    "node": "pol",
+    "module": "aiops-practice",
+    "why": "Tiers, kill switches and audit"
+   },
+   {
+    "node": "act",
+    "module": "aiops-practice",
+    "why": "Verifying and rolling back"
+   }
+  ],
+  "tradeoffs": [
+   "More autonomy saves time but widens the blast radius of a wrong decision.",
+   "Rules are easy to explain; models catch more but need evaluation and ownership."
+  ],
+  "breaks": [
+   "The change feed lacks feature flags, so the correlator finds no cause for a flag-driven outage.",
+   "A cached kill switch keeps the automation running after someone turned it off."
+  ]
  }
 ]

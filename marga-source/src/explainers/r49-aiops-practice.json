@@ -1,0 +1,724 @@
+[
+ {
+  "id": "x-ap-data",
+  "module": "aiops-practice",
+  "lesson": "aiops-practice/data-sources-and-pipelines-for-aiops",
+  "title": "From four sources to one timeline",
+  "summary": "Normalise metrics, alerts, changes and topology so one query can join them.",
+  "actors": [
+   "Sources",
+   "Collector",
+   "Gate",
+   "Catalog",
+   "AIOps store"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Sources send records",
+    "n": "Metrics, alerts, deploys and tickets arrive in different formats and with different names."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Collector forwards them",
+    "n": "The collector adds the source name and the ingest time and passes each record to the gate."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Gate asks the catalog",
+    "n": "The gate looks up the service name in the catalog to find the canonical name, team and tier."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Catalog answers or rejects",
+    "n": "A known alias maps to one canonical name. An unknown name is flagged and the record is held for review."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Check labels and time",
+    "n": "The gate converts times to UTC, checks required labels and drops obvious duplicates and out-of-range values."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Store the record",
+    "n": "Clean records are written to the store with both event time and ingest time kept."
+   },
+   {
+    "f": 4,
+    "t": 4,
+    "l": "Freshness metric updates",
+    "n": "Each source gets a freshness value, so a source that goes quiet raises an alert instead of looking calm."
+   }
+  ]
+ },
+ {
+  "id": "x-ap-tiers",
+  "module": "aiops-practice",
+  "lesson": "aiops-practice/remediation-patterns-and-approval-tiers",
+  "title": "Choosing the approval tier for an action",
+  "summary": "A proposed fix is classified by blast radius and reversibility.",
+  "actors": [
+   "Detector",
+   "Policy engine",
+   "Action",
+   "Human",
+   "Target service"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Finding arrives",
+    "n": "The detector reports a crash looping pod with the evidence that triggered the finding."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Look up the action",
+    "n": "The policy engine finds the restart action and reads its tier, scope and preconditions."
+   },
+   {
+    "f": 1,
+    "t": 4,
+    "l": "Check preconditions",
+    "n": "It confirms the service has at least two healthy replicas and that no deploy is in progress."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Check limits",
+    "n": "It counts recent runs against the rate limit and the daily budget of risky actions."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Tier 1 runs automatically",
+    "n": "A low-risk, reversible action within limits runs at once and is written to the audit log."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Tier 2 asks a person",
+    "n": "A rollback or drain shows the exact command, target and evidence and waits for approval."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Approval is recorded",
+    "n": "The approver name and time are stored with the action, and only then does it run."
+   }
+  ]
+ },
+ {
+  "id": "x-ap-verify",
+  "module": "aiops-practice",
+  "lesson": "aiops-practice/verifying-and-rolling-back-a-remediation",
+  "title": "An action that is verified and undone",
+  "summary": "Check the symptom and the guards after an action and undo it if either fails.",
+  "actors": [
+   "Action runner",
+   "Target service",
+   "Metrics",
+   "Verifier",
+   "On-call"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Save the state",
+    "n": "The runner records the current replica count so the exact state can be restored later."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Run the action",
+    "n": "The runner scales the service out within its cap and marks the time."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Wait to settle",
+    "n": "The verifier waits for a short settling period before it measures anything."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Query symptom and guards",
+    "n": "It runs the same error query that triggered the action and the database connection guard."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Metrics return values",
+    "n": "The error ratio has fallen but the connection guard shows 99 percent of the pool in use."
+   },
+   {
+    "f": 3,
+    "t": 0,
+    "l": "Verification fails",
+    "n": "The guard is over its limit, so the action is marked failed even though the symptom improved."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Undo the change",
+    "n": "The runner restores the saved replica count and disables this action for the service."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Escalate with evidence",
+    "n": "The on-call engineer receives a page with the symptom, the guard values and the undo result."
+   }
+  ]
+ },
+ {
+  "id": "x-ap-killswitch",
+  "module": "aiops-practice",
+  "lesson": "aiops-practice/audit-trails-kill-switches-and-blast-radius-limits",
+  "title": "Failure and recovery: automation that would not stop",
+  "summary": "A kill switch is set but a worker keeps acting because it cached the flag.",
+  "actors": [
+   "Engineer",
+   "Flag store",
+   "Worker",
+   "Target systems",
+   "Audit log"
+  ],
+  "steps": [
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Automation misfires",
+    "n": "A worker starts rolling back healthy deploys because of a bad correlation rule."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Actions are recorded",
+    "n": "Every rollback is written to the audit log with its trigger and evidence."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Engineer sets the kill switch",
+    "n": "The engineer sets the global flag to disabled from a phone."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Worker keeps acting",
+    "n": "The worker read the flag only at startup, so it never sees the change and continues."
+   },
+   {
+    "f": 0,
+    "t": 4,
+    "l": "Engineer checks the log",
+    "n": "The audit log shows rollbacks still happening after the switch was set, so the switch is not working."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Stop the worker process",
+    "n": "The engineer stops the worker process directly, which is the slower fallback."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Roll forward the damage",
+    "n": "The affected services are returned to their versions using the audit records of before and after state."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Fix the check",
+    "n": "The worker is changed to read the flag before every action, and it refuses to act if the store cannot be read."
+   }
+  ],
+  "kind": "failure"
+ },
+ {
+  "id": "x-ap-chaos",
+  "module": "aiops-practice",
+  "lesson": "aiops-practice/chaos-testing-your-automation",
+  "title": "One chaos experiment on automation",
+  "summary": "Inject a small fault in staging and check detection, explanation, action and the stop path.",
+  "actors": [
+   "Team",
+   "Chaos tool",
+   "Staging service",
+   "AIOps platform",
+   "Dashboard"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 0,
+    "l": "Write the hypothesis",
+    "n": "The team writes what should happen: alert in three minutes, one restart, recovery in five."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Announce and arm the stop",
+    "n": "The experiment is announced and a stop condition is set on the checkout error ratio."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Start the fault",
+    "n": "The chaos tool kills one pod of the staging API for sixty seconds."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Platform detects",
+    "n": "The platform sees the unresponsive pod and raises an alert; the time to detect is recorded."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Platform explains",
+    "n": "The correlator names the killed pod as the source and links the restart action."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Action runs and verifies",
+    "n": "The restart action runs once within its limits and the verifier confirms recovery."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Results are shown",
+    "n": "The dashboard compares measured times with the hypothesis and lists any gaps found."
+   }
+  ]
+ },
+ {
+  "id": "x-ap-retrieval",
+  "module": "aiops-practice",
+  "lesson": "aiops-practice/retrieval-over-runbooks-and-past-incidents",
+  "title": "A cited answer from your runbooks",
+  "summary": "The assistant filters, searches, ranks and cites before it answers.",
+  "actors": [
+   "Engineer",
+   "Assistant",
+   "Filter",
+   "Search index",
+   "Model"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Ask a question",
+    "n": "The engineer asks why checkout is timing out on the database during an incident."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Add incident context",
+    "n": "The assistant adds the failing service, its dependencies and recent changes to the query."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Filter by metadata",
+    "n": "Only active documents for checkout and its dependencies are kept, and deprecated ones are removed."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Keyword and vector search",
+    "n": "The index combines exact term matches and meaning-based matches, then reranks the top results."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Return chunks with scores",
+    "n": "The top chunks come back with titles, owners, review dates and scores."
+   },
+   {
+    "f": 1,
+    "t": 4,
+    "l": "Ask with sources only",
+    "n": "The model is told to answer only from the numbered sources and to cite them."
+   },
+   {
+    "f": 1,
+    "t": 0,
+    "l": "Show a cited answer",
+    "n": "The engineer sees the quoted steps with links, or a plain statement that nothing relevant was found."
+   }
+  ]
+ },
+ {
+  "id": "x-ap-agent",
+  "module": "aiops-practice",
+  "lesson": "aiops-practice/agentic-ops-tools-mcp-and-approval-gates",
+  "title": "An agent loop with a human gate",
+  "summary": "The agent reads evidence, proposes an action and waits for approval.",
+  "actors": [
+   "Engineer",
+   "Agent host",
+   "Model",
+   "Read tools",
+   "Approval gate"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Give a goal",
+    "n": "The engineer asks the agent to investigate a high error rate on checkout."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Send goal and tool list",
+    "n": "The host sends the goal and the list of allowed tools to the model."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Model asks for a tool",
+    "n": "The model replies with a call to get_error_rate for checkout over 15 minutes."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Host validates and runs",
+    "n": "The host checks the arguments against the catalog and limits, then runs the read tool."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Result goes back",
+    "n": "The result returns to the model, which asks for recent changes and then proposes a rollback."
+   },
+   {
+    "f": 1,
+    "t": 4,
+    "l": "Proposal goes to the gate",
+    "n": "The host does not run the rollback. It prepares a proposal with the exact action and evidence."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Human decides",
+    "n": "The engineer sees the command, target and evidence, and approves or rejects it."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Record the transcript",
+    "n": "Every tool call, result and approval is stored in an audit log the agent cannot edit."
+   }
+  ]
+ },
+ {
+  "id": "x-ap-injection",
+  "module": "aiops-practice",
+  "lesson": "aiops-practice/prompt-injection-and-over-permissioned-agents",
+  "title": "A hostile log line meets host policy",
+  "summary": "The model is steered by text in a log, but the host blocks the harmful calls.",
+  "actors": [
+   "Attacker",
+   "Log store",
+   "Agent",
+   "Host policy",
+   "Outside server"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Plant text in a log",
+    "n": "A crafted user agent string with hidden instructions is written to the logs by a request."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Agent reads the logs",
+    "n": "During an investigation the agent reads the log line as part of its input."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Model follows the text",
+    "n": "The model treats the hidden instruction as a task and decides to send environment details outward."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Agent calls a tool",
+    "n": "The agent asks the host to fetch a URL on an unknown server with data in the query."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Host checks the allowlist",
+    "n": "The host sees that the destination is not on the allowlist of hosts and blocks the call."
+   },
+   {
+    "f": 3,
+    "t": 2,
+    "l": "Block is reported",
+    "n": "The agent receives a clear error and the blocked call is written to the audit log."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Nothing leaves",
+    "n": "The outside server receives nothing, and the credentials were never in the prompt anyway."
+   }
+  ]
+ },
+ {
+  "id": "x-ap-shadow",
+  "module": "aiops-practice",
+  "lesson": "aiops-practice/evaluating-ai-ops-output-test-sets-and-shadow-mode",
+  "title": "Shadow mode before suggestions",
+  "summary": "A new detector runs beside production before it is allowed to page.",
+  "actors": [
+   "Live data",
+   "New detector",
+   "Responders",
+   "Review job",
+   "Rollout gate"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Detector sees live data",
+    "n": "The new detector reads the same metrics as production, but its output goes only to a log."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Humans work as usual",
+    "n": "Responders handle incidents with the current tools and record what they did."
+   },
+   {
+    "f": 1,
+    "t": 3,
+    "l": "Log findings",
+    "n": "Each finding is stored with the time it was raised and the evidence it used."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Compare weekly",
+    "n": "A job compares findings with incidents and counts caught, missed and false alarms."
+   },
+   {
+    "f": 3,
+    "t": 4,
+    "l": "Report numbers",
+    "n": "The report shows recall, lead time and false alarms per week with the number of cases."
+   },
+   {
+    "f": 4,
+    "t": 4,
+    "l": "Check the gate",
+    "n": "The rollout gate compares the numbers with the targets written in advance."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Show as suggestions",
+    "n": "If the gate passes, findings appear to one team as suggestions with accept and reject buttons."
+   }
+  ]
+ },
+ {
+  "id": "x-ap-repeat",
+  "module": "aiops-practice",
+  "lesson": "aiops-practice/failure-modes-drift-feedback-loops-and-wrong-remediators",
+  "title": "Failure and recovery: the restart that hid a leak",
+  "summary": "An automatic fix keeps succeeding while the real cause stays in place.",
+  "actors": [
+   "Service",
+   "Detector",
+   "Remediator",
+   "Weekly report",
+   "Engineer"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Memory climbs",
+    "n": "A service leaks memory slowly until its pods are close to their limits."
+   },
+   {
+    "f": 1,
+    "t": 2,
+    "l": "Detector raises a finding",
+    "n": "The detector sees saturation and triggers the restart action for the pod."
+   },
+   {
+    "f": 2,
+    "t": 0,
+    "l": "Pod restarts",
+    "n": "The restart clears the memory, the alert resolves and the evidence in the process is lost."
+   },
+   {
+    "f": 2,
+    "t": 2,
+    "l": "Success is recorded",
+    "n": "Verification passes every time, so the action shows a 98 percent success rate."
+   },
+   {
+    "f": 3,
+    "t": 3,
+    "l": "Repeat count is low on the dashboard",
+    "n": "The report only counts success, so repeated restarts of the same pods are invisible."
+   },
+   {
+    "f": 4,
+    "t": 3,
+    "l": "Engineer adds a repeat metric",
+    "n": "The engineer counts runs per target per day and finds the same pods restarted every few hours."
+   },
+   {
+    "f": 4,
+    "t": 0,
+    "l": "Capture evidence first",
+    "n": "A heap profile is taken before each restart, and it shows a cache that never evicts entries."
+   },
+   {
+    "f": 4,
+    "t": 2,
+    "l": "Fix the cause and add a guard",
+    "n": "The cache is fixed, and the action now escalates after three runs on one target in a day."
+   }
+  ],
+  "kind": "failure"
+ },
+ {
+  "id": "x-ap-degraded",
+  "module": "aiops-practice",
+  "lesson": "aiops-practice/operating-aiops-ownership-on-call-and-lifecycle",
+  "title": "The platform in degraded mode",
+  "summary": "When correlation fails, raw alerts still reach a person.",
+  "actors": [
+   "Alert source",
+   "Correlation service",
+   "Router",
+   "Platform on-call",
+   "Responder"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Alerts arrive",
+    "n": "Alerts flow to the correlation service, which normally groups them into incidents."
+   },
+   {
+    "f": 1,
+    "t": 1,
+    "l": "Correlation fails",
+    "n": "The service crashes after a bad release, and no groups are produced."
+   },
+   {
+    "f": 2,
+    "t": 1,
+    "l": "Router notices",
+    "n": "The router sees that the service has missed its health checks for a minute."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Switch to raw alerts",
+    "n": "The router enters degraded mode and sends raw alerts straight to responders."
+   },
+   {
+    "f": 2,
+    "t": 3,
+    "l": "Page the platform team",
+    "n": "A separate pager path, which does not depend on the platform, wakes the platform on-call."
+   },
+   {
+    "f": 3,
+    "t": 1,
+    "l": "Roll back the release",
+    "n": "The platform on-call rolls the correlation service back to its previous version."
+   },
+   {
+    "f": 2,
+    "t": 4,
+    "l": "Return to normal",
+    "n": "After health checks pass, the router resumes grouped incidents and notes the outage in the audit log."
+   }
+  ]
+ },
+ {
+  "id": "x-ap-debug",
+  "module": "aiops-practice",
+  "lesson": "aiops-practice/debugging-a-misbehaving-aiops-pipeline",
+  "title": "Replaying a bad decision stage by stage",
+  "summary": "Find the first stage whose output is wrong for a correct input.",
+  "actors": [
+   "Engineer",
+   "Decision record",
+   "Data stage",
+   "Correlation stage",
+   "Routing stage"
+  ],
+  "steps": [
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Fetch the decision",
+    "n": "The engineer retrieves the record of the wrong page, with inputs, version and output."
+   },
+   {
+    "f": 0,
+    "t": 2,
+    "l": "Replay the data stage",
+    "n": "The recorded inputs are replayed through the data stage and the output matches the record and looks right."
+   },
+   {
+    "f": 0,
+    "t": 3,
+    "l": "Replay correlation",
+    "n": "Grouping and the likely source are reproduced and are correct for the data given."
+   },
+   {
+    "f": 0,
+    "t": 4,
+    "l": "Replay routing",
+    "n": "The routing stage maps the service to a team and returns payments instead of discovery."
+   },
+   {
+    "f": 4,
+    "t": 4,
+    "l": "Inspect the lookup",
+    "n": "The lookup uses a catalog alias that still points the name search at a retired component."
+   },
+   {
+    "f": 0,
+    "t": 4,
+    "l": "Fix the mapping",
+    "n": "The engineer corrects the catalog entry and adds a test that every routed team owns the service."
+   },
+   {
+    "f": 0,
+    "t": 1,
+    "l": "Save as a regression case",
+    "n": "The decision becomes a regression case so the same mistake is caught before release."
+   }
+  ]
+ }
+]

@@ -212,9 +212,17 @@
    "id": "aiops",
    "title": "AIOps: algorithms for operations",
    "summary": "Use statistics and machine learning to help run systems: anomaly detection, alert correlation, log and trace patterns, root cause hints, incident assistants and safe auto-remediation.",
-   "lessons": 12,
+   "lessons": 20,
    "file": "aiops.pdf",
-   "bytes": 171488
+   "bytes": 228650
+  },
+  {
+   "id": "aiops-practice",
+   "title": "AIOps in practice",
+   "summary": "Run AIOps safely: data pipelines, remediation tiers and verification, kill switches and audit, chaos tests, retrieval over runbooks, agents and approval gates, prompt injection, evaluation, build versus buy, failure modes and operations.",
+   "lessons": 14,
+   "file": "aiops-practice.pdf",
+   "bytes": 200025
   },
   {
    "id": "virtualization",
@@ -331,7 +339,7 @@
  ],
  "sheets": {
   "file": "cheat-sheets.pdf",
-  "count": 39,
-  "bytes": 294655
+  "count": 40,
+  "bytes": 299209
  }
 }

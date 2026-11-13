@@ -603,5 +603,59 @@
    }
   ],
   "takeaway": "KubeVirt needs real virtualization on the node. Read the scheduling event before changing the VM spec."
+ },
+ {
+  "id": "latency-after-deploy",
+  "title": "Latency rose after a deploy",
+  "level": "Intermediate",
+  "module": "aiops",
+  "summary": "Find a latency shift, date it, link it to a change and roll it back, the way a change correlator would.",
+  "steps": [
+   {
+    "cmd": "promtool query instant http://prometheus:9090 'histogram_quantile(0.99, sum by (le) (rate(http_request_duration_seconds_bucket{service=\"checkout\"}[5m])))'",
+    "out": [
+     "{} => !1.82"
+    ],
+    "say": "The fleet p99 for checkout is 1.82 seconds. A merged histogram gives the correct percentile for the whole service."
+   },
+   {
+    "cmd": "promtool query instant http://prometheus:9090 'histogram_quantile(0.99, sum by (le) (rate(http_request_duration_seconds_bucket{service=\"checkout\"}[5m] offset 1h)))'",
+    "out": [
+     "{} => +0.31"
+    ],
+    "say": "One hour earlier the p99 was 0.31 seconds. This is a lasting shift, not a short spike, so something changed."
+   },
+   {
+    "cmd": "kubectl rollout history deployment/checkout",
+    "out": [
+     "REVISION  CHANGE-CAUSE",
+     "41        release 4.18.1",
+     "42        ~release 4.18.2 (14:01 UTC)"
+    ],
+    "say": "Ask what changed. A deploy landed at 14:01, a couple of minutes before the shift began. That is a strong suspect by time and by scope."
+   },
+   {
+    "cmd": "kubectl get events -n shop --sort-by=.lastTimestamp --field-selector involvedObject.name=checkout",
+    "out": [
+     "14:01  Normal  ScalingReplicaSet  Scaled up replica set checkout-7c9 to 6",
+     "14:02  Normal  ScalingReplicaSet  Scaled down replica set checkout-5f1 to 0"
+    ],
+    "say": "The events confirm the rollout finished at 14:02. No other change touched checkout in the last half hour."
+   },
+   {
+    "cmd": "kubectl rollout undo deployment/checkout",
+    "out": [
+     "deployment.apps/checkout rolled back"
+    ],
+    "say": "Roll back to the previous revision. This is a moderate-risk action that a person approves after seeing the evidence."
+   },
+   {
+    "cmd": "promtool query instant http://prometheus:9090 'histogram_quantile(0.99, sum by (le) (rate(http_request_duration_seconds_bucket{service=\"checkout\"}[5m])))'",
+    "out": [
+     "{} => +0.33"
+    ],
+    "say": "Verify the symptom with the same query that showed the problem. The p99 is back near normal, so the fix worked."
+   }
+  ]
  }
 ]
