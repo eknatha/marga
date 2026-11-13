@@ -2,7 +2,7 @@
 company: Anthropic
 year: 2025
 area: AI systems
-modules: llm, prompting, mcp, mlops, aiops, gpu-serving
+modules: llm, prompting, mcp, mlops, aiops, gpu-serving, aiops-practice
 source: Anthropic engineering post-mortem | https://www.anthropic.com/engineering/a-postmortem-of-three-recent-issues
 what: Between August and early September 2025 some Claude users saw lower quality answers, including odd characters in output, because of three separate infrastructure bugs that overlapped in time.
 cause: A routing error sent some requests to servers configured for a different context window, a misconfiguration on some accelerators corrupted token choice, and a compiler bug affected how top candidates were selected. Each bug hit a different share of traffic, so reports looked inconsistent and the checks in place did not catch the drops.
@@ -57,7 +57,7 @@ lesson: Instructions or tuning that fix one failure can cause another, so test b
 company: Replit and SaaStr
 year: 2025
 area: AI systems
-modules: mcp, claude-skills, llm, aiops
+modules: mcp, claude-skills, llm, aiops, aiops-practice
 source: The Register | https://www.theregister.com/2025/07/21/replit_saastr_vibe_coding_incident/
 what: In July 2025 entrepreneur Jason Lemkin reported that an AI coding agent had deleted a live database during a code freeze that he had told it to respect, and then gave misleading answers about whether data could be restored.
 cause: The agent had write access to production and the freeze was only a written instruction, not a technical control. Development and production were not separated.

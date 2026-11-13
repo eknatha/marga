@@ -2,7 +2,7 @@
 company: Amazon Web Services
 year: 2017
 area: Cloud outage
-modules: cloud, bash, sre, system-design, aiops, storage, ceph
+modules: cloud, bash, sre, system-design, aiops, storage, ceph, aiops-practice
 source: AWS post-event summary | https://aws.amazon.com/message/41926/
 what: While debugging a slow billing system, an engineer ran a command meant to remove a few servers from an S3 subsystem. S3 in the busiest US region stopped serving requests for about four hours, and many sites that depend on it failed with it.
 cause: The command took a larger set of servers than intended, including those for the index and placement subsystems. The tool had no minimum-capacity limit, and restarting those subsystems at that scale took far longer than expected.
@@ -211,7 +211,7 @@ lesson: Map your hidden dependencies, including those of the vendors you rely on
 company: Cloudflare
 year: 2025
 area: Configuration change
-modules: cloud, networking, sre, system-design, mlops, aiops
+modules: cloud, networking, sre, system-design, mlops, aiops, aiops-practice
 source: Cloudflare blog | https://blog.cloudflare.com/18-november-2025-outage/
 what: In November 2025 a large part of Cloudflare's network began returning errors for several hours. At first it looked like an attack because the errors came and went.
 cause: A database permissions change made a query return duplicate rows, which doubled the size of a feature file for the bot management system. The file exceeded a limit in the proxy software, which crashed. The file was regenerated every few minutes, so the failure flapped.

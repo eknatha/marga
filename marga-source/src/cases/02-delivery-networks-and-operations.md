@@ -2,7 +2,7 @@
 company: Facebook
 year: 2021
 area: Network and DNS
-modules: networking, cloud, sre, aiops, baremetal
+modules: networking, cloud, sre, aiops, baremetal, aiops-practice
 source: Meta engineering | https://engineering.fb.com/2021/10/05/networking-traffic/outage-details/
 what: In October 2021 Facebook, Instagram and WhatsApp were unreachable for about six hours. Even internal tools and badge access stopped working, which slowed recovery.
 cause: A maintenance command to assess backbone capacity unintentionally disconnected the data centers from each other. A bug in the audit tool failed to stop it. DNS servers saw that they could not reach the data centers and withdrew their BGP routes, so the outside world could no longer find Facebook.
@@ -24,7 +24,7 @@ lesson: A latent bug can wait for the right input. Detect quickly, be able to ro
 company: Roblox
 year: 2021
 area: Cloud outage
-modules: cloud, observability, sre, databases, aiops, sql-ops, openstack
+modules: cloud, observability, sre, databases, aiops, sql-ops, openstack, aiops-practice
 source: Roblox blog | https://corp.roblox.com/newsroom/2021/10/roblox-return-to-service-10-28-10-31-2021
 what: In late October 2021 Roblox was unavailable for around three days, affecting millions of players.
 cause: The Consul service discovery cluster degraded under heavy load after a new streaming feature was enabled and a storage performance issue in the underlying database. Roblox's monitoring also depended on Consul, so engineers could not see well.
@@ -46,7 +46,7 @@ lesson: Make deletion reversible, validate script input, and practise restoring 
 company: Knight Capital Group
 year: 2012
 area: Deployment and release
-modules: cicd, sre, ansible, argocd, aiops
+modules: cicd, sre, ansible, argocd, aiops, aiops-practice
 source: SEC administrative order | https://www.sec.gov/files/litigation/admin/2013/34-70694.pdf
 what: On 1 August 2012 a trading firm lost about 440 million dollars in roughly 45 minutes when its systems sent a flood of unintended orders.
 cause: A new feature was deployed by hand to eight servers, but one server was missed. A flag reused from older code activated unused code on that server. There was no kill switch, and alerts were not acted on.
