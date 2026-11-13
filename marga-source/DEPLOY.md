@@ -242,3 +242,5 @@ Round 46: delete the old `assets` folder before uploading, then upload everythin
 Round 47: delete the old `assets` folder before uploading, then upload everything in the zip. New folder `packs/` holds the PDF packs (about 8 MB); upload it too.
 
 Round 48: delete the old `assets` folder before uploading, then upload everything in the zip (keep `packs/`). No new settings.
+
+Round 49: delete the old `assets` folder before uploading, then upload everything in the zip (keep `packs/`). No new settings.

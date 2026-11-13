@@ -386,3 +386,10 @@ A language picker sits in the top bar. The interface, module titles and summarie
 - `src/app/motion.js`: skill-tree reveal, count-up stats, diagram auto-play, pass confetti. Respects reduced motion.
 - `src/app/studio.js`: `/studio`, `/mastery` (radar), `/architectures` (11, from `src/gallery/gallery.json`), `/replays` (12, from `src/replays/replays.json`), `/cluster` (simulated cluster).
 - Styles in `src/app/round48.css`. Validator checks gallery and replay data; e2e in `23-round-48.part.js`.
+
+## Round 49: the AIOps skill tree
+
+- `aiops` grew from 12 to 20 lessons: statistics for ops, hands-on detectors (z-score, MAD, EWMA), change-point and trend detection, deduplication and suppression rules, change correlation, topology-aware root cause, alert tuning with precision, recall and burn rates, and multivariate and service-level anomalies.
+- New module `aiops-practice` ("AIOps in practice", requires `aiops`, 14 lessons): data pipelines, remediation tiers, verification and rollback, audit trails and kill switches, chaos testing, retrieval over runbooks, agents and approval gates, prompt injection, evaluation and shadow mode, build versus buy and ROI, failure modes, operating AIOps, debugging a pipeline, and a capstone. It is on the MLOps and AIOps path after `aiops`.
+- Supporting content for the new module: 12 explainers (2 failure and recovery), 4 widgets (plus 1 for the `aiops` burn-rate lesson), 7 drills, 6 interview questions, glossary terms, a cheat sheet, a scenario game, an architecture gallery entry (`aiops-pipeline`), a terminal replay (`latency-after-deploy`), a PDF pack, badge art and 14-language module text. Lesson summaries are translated for the 12 full languages.
+- Tests: `tools/e2e/24-round-49.part.js`.

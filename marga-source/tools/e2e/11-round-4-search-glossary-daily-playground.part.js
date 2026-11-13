@@ -235,7 +235,7 @@
     await page.waitForSelector('.ex-list a');
     eq(await page.locator('.ex-list a').count(), data.modules.length, 'one handbook per skill');
     await nav(page, '/handbook/aiops'); await page.waitForSelector('#hb-dl');
-    eq(await page.locator('.hb-lesson').count(), 12, 'aiops lessons in the handbook');
+    eq(await page.locator('.hb-lesson').count(), 20, 'aiops lessons in the handbook');
     ok(await page.locator('#hb-doc .hb-gloss dt').count() >= 4, 'glossary in the handbook');
     ok(await page.locator('#hb-doc [id]').count() === 0, 'no duplicate ids from reused lessons');
     const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#hb-dl')]);
