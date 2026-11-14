@@ -27,11 +27,11 @@
   });
 
   await test('visitor count: counts each page view, shows unique visitors, keeps the last value, retries', async () => {
-    const { ctx, page, hits } = await open({ counterBody: '{"count":"5 000","count_unique":"987"}' });
+    const { ctx, page, hits } = await open({ counterBody: '{"count":"5 000","count_unique":"1987"}' });
     await ctx.addInitScript(() => { window.MARGA_FORCE_REMOTE = true; });
     await page.goto(BASE + '/#/cases');
     await page.waitForFunction(() => /^\d[\d ]* visitors?$/.test(document.querySelector('#visitors').textContent.trim()));
-    eq((await page.textContent('#visitors')).trim(), '987 visitors', 'prefers unique visitors');
+    eq((await page.textContent('#visitors')).trim(), '1987 visitors', 'prefers unique visitors');
     await nav(page, '/practice'); await nav(page, '/practice'); await nav(page, '/flashcards');
     await page.waitForTimeout(300);
     const paths = hits.map((u) => new URL(u).searchParams.get('p'));
@@ -41,25 +41,41 @@
     await ctx.close();
     // counter goes down: last good value is still shown, and the page keeps working
     const second = await browser.newContext({ serviceWorkers: 'block' });
-    await second.addInitScript(() => { window.MARGA_FORCE_REMOTE = true; localStorage.setItem('ea.vc', JSON.stringify({ n: '987', t: Date.now() })); });
+    await second.addInitScript(() => { window.MARGA_FORCE_REMOTE = true; localStorage.setItem('ea.vc', JSON.stringify({ n: '1987', t: Date.now() })); });
     let tries = 0;
     await second.route(/goatcounter\.com/, (r) => { if (/\/counter\//.test(r.request().url())) { tries++; return r.abort(); } return r.fulfill({ status: 200, contentType: 'image/gif', body: Buffer.from('R0lGODlhAQABAAAAACw=', 'base64') }); });
     const p2 = await second.newPage(); const errs = []; p2.on('pageerror', (e) => errs.push(e.message));
     await p2.goto(BASE + '/'); await p2.waitForSelector('#main h1');
     await p2.waitForFunction(() => /^\d[\d ]* visitors?$/.test(document.querySelector('#visitors').textContent.trim()));
-    eq((await p2.textContent('#visitors')).trim(), '987 visitors', 'cached value while offline');
+    eq((await p2.textContent('#visitors')).trim(), '1987 visitors', 'cached value while offline');
     await p2.waitForTimeout(4500);
     ok(tries >= 2, 'retried: ' + tries);
     eq(errs.length, 0, errs.join('|'));
     await second.close();
   });
 
+  await test('visitor count: a small total is not shown, and the limit can be lowered', async () => {
+    const { ctx, page } = await open({ counterBody: '{"count":"300","count_unique":"87"}' });
+    await ctx.addInitScript(() => { window.MARGA_FORCE_REMOTE = true; });
+    await page.goto(BASE + '/'); await page.waitForSelector('#main h1');
+    await page.waitForTimeout(3000);
+    ok(await page.locator('#visitors').isHidden(), 'hidden below 1000');
+    eq((await page.textContent('#visitors')).trim(), '', 'no text');
+    ok(/free/i.test(await page.textContent('.foot-proof')), 'the footer still says what the site is');
+    await ctx.close();
+    const low = await open({ counterBody: '{"count":"300","count_unique":"87"}' });
+    await low.ctx.addInitScript(() => { window.MARGA_FORCE_REMOTE = true; window.MARGA_COUNTER_MIN = 50; });
+    await low.page.goto(BASE + '/');
+    await low.page.waitForFunction(() => /^87 visitors$/.test(document.querySelector('#visitors').textContent.trim()));
+    await low.ctx.close();
+  });
+
   await test('visitor count: standalone cheat sheet pages count a view and show the total', async () => {
-    const { ctx, page, hits } = await open({ counterBody: '{"count":"10","count_unique":"7"}' });
+    const { ctx, page, hits } = await open({ counterBody: '{"count":"3000","count_unique":"2007"}' });
     await ctx.addInitScript(() => { window.MARGA_FORCE_REMOTE = true; });
     await page.goto(`${BASE}/cheatsheets/aws.html`);
     await page.waitForFunction(() => /^\d[\d ]* visitors?$/.test(document.querySelector('#visitors').textContent.trim()));
-    eq((await page.textContent('#visitors')).trim(), '7 visitors', 'sheet total');
+    eq((await page.textContent('#visitors')).trim(), '2007 visitors', 'sheet total');
     ok(hits.some((u) => new URL(u).searchParams.get('p') === '/cheatsheets/aws.html'), 'sheet view recorded: ' + hits.join(' '));
     await page.goto(`${BASE}/cheatsheets/`);
     await page.waitForSelector('#visitors:not([hidden])');

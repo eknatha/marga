@@ -65,7 +65,7 @@ def diagram_flow(block):
             p = [x.strip() for x in ln[5:].split('|')]
             nodes.append(p)
         elif ln.startswith('edge:'):
-            a, b = [x.strip() for x in ln[5:].split('|')]; edges.append((a, b))
+            a, b = [x.strip() for x in ln[5:].split('|')][:2]; edges.append((a, b))
     lab = {n[0]: n[1] for n in nodes}
     rows = [[Paragraph('Part', S['cellb']), Paragraph('What it does', S['cellb']), Paragraph('What goes wrong', S['cellb'])]]
     for n in nodes:

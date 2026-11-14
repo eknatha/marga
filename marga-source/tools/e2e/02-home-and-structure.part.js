@@ -19,12 +19,12 @@
     await ctx.close();
   });
 
-  await test('brand is MARGA and the visitor count shows at the top right', async () => {
+  await test('brand is MARGA and the visitor count sits quietly in the footer', async () => {
     const { ctx, page, issues, hits } = await open();
     await page.goto(BASE + '/');
     await page.waitForSelector('#main h1');
     eq((await page.textContent('.brand')).trim(), 'MARGA', 'header brand is just MARGA');
-    ok(await page.evaluate(() => { const r = document.querySelector('#visitors').getBoundingClientRect(), w = document.querySelector('.utilbar .wrap').getBoundingClientRect(); return r.right > w.right - 64 && r.top < 40; }), 'visitor count sits at the top right');
+    ok(await page.evaluate(() => !!document.querySelector('.foot #visitors') && !document.querySelector('.utilbar #visitors')), 'visitor count is in the footer, not the top bar');
     ok(!/Academy/i.test(await page.evaluate(() => document.title + document.body.innerText)), 'no leftover "Academy" wording');
     await page.waitForFunction(() => /^\d[\d ]* visitors?$/.test(document.querySelector('#visitors').textContent.trim()));
     eq((await page.textContent('#visitors')).trim(), '1 234 visitors', 'visitor text');
@@ -34,14 +34,15 @@
     await ctx.close();
   });
 
-  await test('visitor count says it is unavailable, with no errors on the page, when the counter is unreachable', async () => {
+  await test('visitor count stays hidden, with no errors and no "unavailable" text, when the counter is unreachable', async () => {
     const { ctx, page } = await open({ counterDown: true });
     const errs = []; page.on('pageerror', (e) => errs.push(e.message));
     await page.goto(BASE + '/');
     await page.waitForSelector('#main h1');
     await page.waitForTimeout(500);
-    ok(/^(Counting visitors|Visitor count unavailable)$/.test((await page.textContent('#visitors')).trim()), 'a visible state: ' + await page.textContent('#visitors'));
-    ok(await page.locator('#visitors').isVisible(), 'the footer line is visible');
+    eq((await page.textContent('#visitors')).trim(), '', 'no text while the counter is unreachable');
+    ok(await page.locator('#visitors').isHidden(), 'nothing is shown');
+    ok(!/unavailable|Counting visitors/.test(await page.evaluate(() => document.body.innerText)), 'no unavailable message anywhere');
     eq(errs.length, 0, errs.join(' | '));
     await ctx.close();
   });
@@ -52,7 +53,7 @@
     const live = await page.locator('.path-row, .row').count();
     const text = await page.evaluate(() => document.body.innerText);
     for (const t of ['DevOps Engineer', 'Cloud Engineer', 'Site Reliability Engineer', 'DevSecOps Engineer']) ok(text.includes(t), `missing path ${t}`);
-    for (const t of ['Platform Engineer', 'Kubernetes Administrator', 'MLOps']) ok(text.includes(t), `missing planned ${t}`);
+    for (const t of ['Platform Engineer', 'Kubernetes Administrator', 'FinOps and cloud cost', 'Data platform engineer', 'Network automation engineer']) ok(text.includes(t), `missing path ${t}`);
     eq(await page.locator('.planned li em').count() >= 3, true, 'planned badges');
     ok(live >= 3, 'path rows');
     eq(issues.length, 0, issues.join(' | '));

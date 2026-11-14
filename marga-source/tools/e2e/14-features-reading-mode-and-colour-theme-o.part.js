@@ -244,7 +244,7 @@
 
   await test('incident games: every module has at least three games and every game explains the incident with cause, signs, fix and an example', async () => {
     const { ctx, page } = await open(); await go(page, '/');
-    for (const m of data.modules) ok(data.games.filter((g) => g.module === m.id).length >= (['virtualization', 'storage', 'sql-ops', 'gpu-serving', 'openstack'].includes(m.id) ? 2 : ['proxies', 'messaging', 'cfn-bicep', 'gcp', 'kubevirt', 'ceph', 'vault'].includes(m.id) ? 1 : 3), m.id + ' has enough games');
+    for (const m of data.modules) ok(data.games.filter((g) => g.module === m.id).length >= (['virtualization', 'storage', 'sql-ops', 'gpu-serving', 'openstack', 'platform', 'k8s-exam'].includes(m.id) ? 2 : ['proxies', 'messaging', 'cfn-bicep', 'gcp', 'kubevirt', 'ceph', 'vault', 'aiops-practice', 'k8s-control-plane', 'k8s-lifecycle', 'k8s-network', 'k8s-resources', 'k8s-security','obs-deep','k8s-supply-chain','iac-beyond','leadership','ai-infra','rust-infra','db-ops','python-ops'].includes(m.id) ? 1 : 3), m.id + ' has enough games');
     for (const g of data.games) for (const k of ['cause', 'signs', 'fix', 'example']) ok(g.explain && g.explain[k] && g.explain[k].length >= 30, g.id + ' ' + k);
     const g = data.games.find((x) => x.id === 'the-retry-storm');
     await nav(page, '/game/' + g.id);

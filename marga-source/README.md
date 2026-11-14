@@ -393,3 +393,28 @@ A language picker sits in the top bar. The interface, module titles and summarie
 - New module `aiops-practice` ("AIOps in practice", requires `aiops`, 14 lessons): data pipelines, remediation tiers, verification and rollback, audit trails and kill switches, chaos testing, retrieval over runbooks, agents and approval gates, prompt injection, evaluation and shadow mode, build versus buy and ROI, failure modes, operating AIOps, debugging a pipeline, and a capstone. It is on the MLOps and AIOps path after `aiops`.
 - Supporting content for the new module: 12 explainers (2 failure and recovery), 4 widgets (plus 1 for the `aiops` burn-rate lesson), 7 drills, 6 interview questions, glossary terms, a cheat sheet, a scenario game, an architecture gallery entry (`aiops-pipeline`), a terminal replay (`latency-after-deploy`), a PDF pack, badge art and 14-language module text. Lesson summaries are translated for the 12 full languages.
 - Tests: `tools/e2e/24-round-49.part.js`.
+
+## Round 50: platform engineering, CKA and CKS, and a calmer UI
+
+- New skills: `platform` (14 lessons) and `k8s-exam` (14 lessons), each with games, explainers, widgets, drills, interview questions, glossary terms, cheat sheet, cases, reading and 12-language summaries.
+- New paths: Platform Engineer (21 skills) and Kubernetes Administrator (CKA and CKS, 10 skills). Planned paths are now FinOps, Data platform and Network automation.
+- New view `#/compare`: pick two to five roles and see shared and unique skills in a matrix.
+- Every module has a `why` line (40 to 140 characters, English only) shown on its page, tree tooltip, path stages and skill cards. The validator enforces it.
+- Module page: the primary Continue button, a state filter (All, To do, Passed) and a compact list for modules with six or more lessons.
+- Visitor counter: moved to the footer, hidden below `window.MARGA_COUNTER_MIN` (default 1000) and silent when unreachable.
+- Tests: `tools/e2e/25-round-50.part.js`. The game minimum is two for `platform` and `k8s-exam` and one for `aiops-practice`.
+
+### Round 50 addendum: CKA first, CKS next
+
+- The combined `k8s-admin` path is now two end goals: `cka` (Kubernetes Administrator) and `cks` (Kubernetes Security Specialist). CKS contains the whole CKA path, then `cicd`, `security` and `k8s-security`, and both end with `k8s-exam`.
+- Five new skills, 8 lessons each: `k8s-control-plane`, `k8s-lifecycle`, `k8s-network`, `k8s-resources`, `k8s-security`. Each has levels, stories, references, reading, drills, interview questions, glossary terms, a cheat sheet, 12 explainers, 4 widgets, a game and 14-language titles. Lesson summaries are translated into 12 languages.
+- `k8s-exam` now requires only `k8s-ops` so it fits both paths.
+- Not done: lesson bodies and the one-line `why` text are English only.
+
+## Round 51: eight new skills
+
+- New modules, 6 lessons each: `obs-deep` (Observability in depth), `k8s-supply-chain` (Kubernetes supply chain and runtime security), `iac-beyond` (IaC beyond Terraform), `leadership` (Behavioral and leadership track), `ai-infra` (AI infrastructure in production), `rust-infra` (Rust for infrastructure engineers), `db-ops` (Database operations in production), `python-ops` (Python for operations engineering). The module total is now 57.
+- Each has levels, stories, references, reading, drills, interview questions, glossary terms, a cheat sheet, case links, 12 explainers (6 failure and recovery), 4 widgets, one incident game, a badge colour and symbol, and 14-language module titles with 12-language lesson summaries.
+- Paths: `obs-deep` joins devops, cloud, sre, devsecops, platform and mlops; `k8s-supply-chain` joins devsecops and cks (before `k8s-exam`); `iac-beyond` joins devops, cloud, devsecops and platform; `leadership` joins devops, sre and platform (before `platform`); `ai-infra` joins mlops and sre; `rust-infra` joins devops, sre and platform; `db-ops` joins devops, cloud and sre; `python-ops` joins devops, cloud, sre and platform.
+- Tests: `tools/e2e/26-round-51.part.js`. The game minimum is one for each new module.
+- Not done: lesson bodies and `why` lines are English only; Telugu and Hindi have module text but no lesson summaries; translations were machine written and have no native review; explainers are generated from lesson content.

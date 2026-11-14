@@ -244,3 +244,9 @@ Round 47: delete the old `assets` folder before uploading, then upload everythin
 Round 48: delete the old `assets` folder before uploading, then upload everything in the zip (keep `packs/`). No new settings.
 
 Round 49: delete the old `assets` folder before uploading, then upload everything in the zip (keep `packs/`). No new settings.
+
+Round 50: delete the old `assets` folder before uploading, then upload everything in the zip (keep `packs/`). No new settings. Optional: set `window.MARGA_COUNTER_MIN` to change when the visitor count appears.
+
+Round 50 addendum: same upload steps. Delete the old `assets` folder, upload everything in the zip (keep `packs/`). The path id `k8s-admin` is replaced by `cka` and `cks`; old links to it simply show the paths list.
+
+Round 51: same upload steps. Delete the old `assets` folder, upload everything in the zip (keep `packs/`). No new settings. Eight new skills, so new PDF packs appear under `packs/`.
