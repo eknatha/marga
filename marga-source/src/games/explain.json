@@ -856,5 +856,107 @@
   "signs": "Blocked calls to unknown hosts, tool calls the engineer did not expect and text in logs that addresses the model.",
   "fix": "Enforce allowlists and approval in the host, keep secrets out of the model context and add hostile strings to a regression test set.",
   "example": "A log line asks the agent to post environment data to an unknown server, and the host blocks the call and records it."
+ },
+ "the-path-nobody-walks": {
+  "cause": "A golden path was not kept current and lacked an option teams needed, so teams left it and built unsupported setups.",
+  "signs": "Falling share of new services on the path, exceptions that name the same few reasons and old pinned versions in the template.",
+  "fix": "Interview teams that left, update versions by pull request, add optional modules and measure time to first deploy and exits.",
+  "example": "Supporting a second runtime and adding an optional queue module brings most leaving teams back within a quarter."
+ },
+ "the-database-that-never-appeared": {
+  "cause": "A cloud quota error was known to the controller but not shown in the object status, so users waited with no explanation.",
+  "signs": "SYNCED true with READY false for a long time, an object that never creates resources and errors only in controller logs.",
+  "fix": "Surface the underlying error in status, alert on long not-ready periods and add quota pre-checks to the composition.",
+  "example": "A Database object reports quota exceeded in its message and an alert fires after ten minutes."
+ },
+ "the-silent-snapshot": {
+  "cause": "The snapshot command lacked the certificate flags, so it timed out and left an empty file that nobody checked.",
+  "signs": "A zero byte backup file, a timeout message that scrolled past and snapshot status failing.",
+  "fix": "Take endpoint and certificate paths from the etcd manifest, run snapshot save with all four flags and verify with snapshot status.",
+  "example": "The manifest gives the cacert, cert and key paths and snapshot status then shows a hash and revision."
+ },
+ "passwords-in-the-backup": {
+  "cause": "Secrets were stored without encryption at rest, so a backup of etcd revealed a password in plain text.",
+  "signs": "Readable values in an etcd snapshot, no encryption configuration on the API server and wide access to backup storage.",
+  "fix": "Enable encryption at rest, rewrite all secrets, verify the raw value, rotate exposed credentials and restrict backups.",
+  "example": "After rewriting, reading a secret with etcdctl shows an encrypted prefix instead of the password."
+ },
+ "pending-with-no-events": {
+  "cause": "etcd disk latency made lease renewals fail, so the scheduler lost leadership and stopped placing pods.",
+  "signs": "Pods Pending with no events, scheduler lease errors, slow API requests and high etcd fsync times.",
+  "fix": "Move etcd to dedicated fast storage, restore the scheduler, then alert on etcd and API latency.",
+  "example": "After the move, fsync latency fell from 1.2 seconds to 8 milliseconds and pods scheduled within a second."
+ },
+ "the-old-snapshot": {
+  "cause": "The snapshot job lived on a node that was rebuilt, and nothing alerted when snapshots stopped.",
+  "signs": "The newest snapshot is months old, the schedule is missing after a rebuild and there is no alert on backup age.",
+  "fix": "Restore to a scratch cluster, reapply from source control, move snapshots to a monitored CronJob and rehearse restores.",
+  "example": "An alert on snapshot age fired at twelve hours during a later test and the job was fixed the same day."
+ },
+ "random-timeouts": {
+  "cause": "The node connection tracking table filled up during a traffic spike, so some packets to Services were dropped.",
+  "signs": "Intermittent timeouts, healthy pods, a working pod IP and kernel messages saying the table is full.",
+  "fix": "Raise the conntrack limit, reduce short lived connections with a DNS cache and alert on table usage.",
+  "example": "After the change conntrack use fell from ninety nine percent to forty percent at the same traffic level."
+ },
+ "slow-with-low-cpu": {
+  "cause": "A CPU limit throttled bursty threads, so requests were paused in short periods even though average CPU was low.",
+  "signs": "High p99 latency, low average CPU and a large share of throttled periods in the cgroup statistics.",
+  "fix": "Raise or remove the CPU limit, keep requests near typical use and alert on throttled ratio.",
+  "example": "After the limit moved from 500m to 2000m, p99 fell from three seconds to 300 milliseconds."
+ },
+ "the-miner-in-the-pod": {
+  "cause": "A vulnerable endpoint let an attacker run a miner in a pod that had broad egress and a reachable cloud role.",
+  "signs": "An unexpected shell, outbound connections to an unknown address, high CPU and new cloud API calls from the pod role.",
+  "fix": "Quarantine the pod, preserve evidence, rotate reachable credentials, rebuild from a patched image and add egress limits and detection.",
+  "example": "After the rebuild, a new connection attempt was blocked by egress policy and raised an alert within a minute."
+ },
+ "the-alert-nobody-trusted": {
+  "cause": "Alerts were based on raw resource metrics, so they were noisy, got muted, and a real user facing outage did not page.",
+  "signs": "Flapping CPU alerts, muted rules, users reporting errors before any alert and no runbook links on pages.",
+  "fix": "Define an SLO, alert on multiwindow burn rates, group and route with runbooks and test the rules with promtool and a game day.",
+  "example": "After the change a dependency failure in a game day paged within two minutes with the checkout runbook attached."
+ },
+ "the-image-nobody-signed": {
+  "cause": "An image was pushed by hand with a mutable tag and no signature, and nothing in the cluster verified where it came from.",
+  "signs": "An outbound connection alert, no provenance for the digest, a tag pointing to new content and no signature.",
+  "fix": "Contain, trace the digest, sign images in CI, enforce verification at admission and rebuild on a patched base.",
+  "example": "After enforcement an unsigned test image was rejected by the admission policy with a clear message."
+ },
+ "the-rename-that-destroyed-a-database": {
+  "cause": "A refactor changed a resource address without telling the tool, so the plan treated it as a new resource and planned a destroy.",
+  "signs": "A plan with destroy and create of the same type, and a renamed module or resource in the diff.",
+  "fix": "Stop, add a moved block, set prevent_destroy on critical resources and keep a backup before applying.",
+  "example": "After the moved block the plan reported no changes and the database stayed in place."
+ },
+ "the-incident-with-ten-commanders": {
+  "cause": "There was no incident commander and no roles, so many people made conflicting changes and nobody tracked what had been tried.",
+  "signs": "Simultaneous commands, repeated rollbacks, no timeline, silent stakeholders and a crowded channel.",
+  "fix": "Name a commander, assign roles, pause changes, update on a schedule and hold a blameless review.",
+  "example": "With a scribe and one operator the third attempt fixed the issue and the review added a missing alert."
+ },
+ "the-token-bill-that-doubled": {
+  "cause": "A single batch job and many repeated prompts consumed most tokens, while GPUs were reserved but mostly idle and no cost breakdown existed.",
+  "signs": "Spend doubling, GPU use at fifteen percent, one job with very high token counts and no caching at the gateway.",
+  "fix": "Break down cost, add caching, route easy tasks to smaller models, batch requests and share GPUs.",
+  "example": "After caching and routing, tokens per day fell by forty percent and GPU use rose to sixty percent."
+ },
+ "the-agent-that-stalled-under-load": {
+  "cause": "A blocking call in an async handler held a runtime worker thread, so other tasks could not run.",
+  "signs": "Low CPU, queued requests, regular stalls and tasks that run for a long time without awaiting.",
+  "fix": "Find the blocking call with tracing or tokio console and replace it with an async call or spawn_blocking, then add timeouts and a concurrency test.",
+  "example": "After the fix the p99 latency dropped from seconds to milliseconds under the same load."
+ },
+ "the-idle-transaction": {
+  "cause": "A forgotten idle transaction held a lock, so other sessions waited and the application retries made the queue longer.",
+  "signs": "Rising latency with low CPU, hundreds of waiting sessions and one old idle in transaction session.",
+  "fix": "Find the blocker with pg_blocking_pids, cancel it safely, set idle in transaction timeouts and alert on transaction age.",
+  "example": "After cancelling the blocker the waiting queries finished within a minute."
+ },
+ "the-cleanup-that-matched-everything": {
+  "cause": "A tag filter accepted an empty value and matched every resource, while the script had no limit and ran with broad permissions.",
+  "signs": "A dry run count far above normal, an empty filter variable and a scheduled run about to start.",
+  "fix": "Pause the schedule, reproduce the bug in a test, reject empty filters, cap changes per run and use a least privilege role with audit logs.",
+  "example": "After the fix the run aborted when it matched more than the cap and wrote the reason to the log."
  }
 }
