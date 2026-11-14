@@ -92,7 +92,7 @@ function skillCard(m) {
     : '<a class="btn btn-primary" href="#/module/' + m.id + '">' + (n ? 'Continue' : 'Open') + '</a>';
   var testout = s === 'pass' ? '' : '<a class="btn btn-quiet" href="#/testout/' + m.id + '">Test out</a>';
   return '<article class="skill s-' + s + '" id="skill-' + m.id + '"><div class="skill-top"><h3><a href="#/module/' + m.id + '">' + e(m.title) + '</a></h3><span class="chip ' + (s === 'pass' ? 'pass' : '') + '">' + STATE_TEXT[s] + '</span></div>' +
-    '<p>' + e(m.summary) + '</p>' +
+    '<p>' + e(m.summary) + '</p>' + A.whyLine(m) +
     '<p class="small">' + plural(tot, 'lesson') + ', about ' + hours(m.minutes) + '. ' + best + '</p>' +
     '<p class="small">Used in ' + plural(up.length, 'path') + (up.length ? ': ' + up.map(function (p) { return '<a href="#/path/' + p.id + '">' + e(p.title) + '</a>'; }).join(', ') : '') + '.</p>' +
     '<div class="bar" role="img" aria-label="' + pct(m) + ' percent complete"><i style="width:' + pct(m) + '%"></i></div>' +

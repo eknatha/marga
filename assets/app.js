@@ -19,6 +19,7 @@ var INTERVALS = [0, 1, 3, 7, 14, 30];
 function $(s, el) { return (el || document).querySelector(s); }
 function $$(s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); }
 function e(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function whyLine(m) { return m && m.why ? '<p class="why"><strong>Why it matters:</strong> ' + e(m.why) + '</p>' : ''; }
 function hours(min) { var h = min / 60; return h < 1 ? Math.round(min) + ' min' : (Math.round(h * 10) / 10) + ' h'; }
 function plural(n, one, many) { return n + ' ' + (n === 1 ? one : (many || one + 's')); }
 function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
@@ -285,7 +286,7 @@ function renderChrome() {
   var st = streaks();
   $('#chrome').innerHTML =
     '<div class="utilbar"><div class="wrap utilbar-in"><span class="util-promise">Free \u00b7 No login \u00b7 No ads \u00b7 No cookies</span>' +
-    (D.counter ? '<span class="visitors" id="visitors" role="status" aria-label="Visitor count" hidden></span>' : '') + '</div></div>' +
+    '</div></div>' +
     '<header class="topbar"><div class="wrap topbar-in">' +
     '<a class="brand" href="#/"><img src="icon.svg" alt="" width="26" height="26"><span><b>MARGA</b></span></a>' +
     '<nav class="topnav" id="topnav" aria-label="Main">' +
@@ -312,6 +313,8 @@ function renderChrome() {
     '<span>MARGA by EknathaLabs</span>' +
     '<a href="cheatsheets/">Printable cheat sheets</a><a href="packs/">PDF packs</a><a href="#/studio">Studio</a><a href="#/tour">Take the tour</a><a href="https://interviewhub.eknathalabs.com" target="_blank" rel="noopener">InterviewHub</a><a href="#/interview">Interview questions</a><a href="#/practice">Practice</a><a href="#/glossary">Glossary</a><a href="#/terminal-labs">Terminal labs</a><a href="#/badges">Badges</a><a href="#/license">Open content license</a>' +
     '<span class="foot-note">Progress is saved in this browser only.</span>' +
+    '<p class="foot-proof">' + plural(Object.keys(LES).length, 'lesson') + ' and ' + plural((D.games || []).length, 'game') + ', free, and they work offline once loaded.' +
+    (D.counter ? ' <span class="visitors" id="visitors" role="status" aria-label="Visitor count" hidden></span>' : '') + '</p>' +
     '<p class="foot-promise">Free \u00b7 No login \u00b7 No ads \u00b7 No cookies</p><p class="small foot-ver">Version ' + siteVer() + '</p></div></footer>';
   if (window.MargaCounter && D.counter) MargaCounter.rebind('#visitors');
 }
@@ -419,7 +422,7 @@ function treeDetail(p, id) {
     cta = nl ? '<a class="btn btn-primary" href="' + hrefLesson(nl) + '">' + (n ? 'Continue: ' : 'Start: ') + e(LES[nl].title) + '</a>' : '<span class="chip pass">All lessons passed</span>';
   }
   return '<button class="td-close" type="button" data-act="tree-close" aria-label="Close details">' + '&times;' + '</button>' +
-    '<p class="td-state s-' + s + '">' + word + '</p><h3>' + e(m.title) + '</h3><p class="td-sum">' + e(m.summary) + '</p>' +
+    '<p class="td-state s-' + s + '">' + word + '</p><h3>' + e(m.title) + '</h3><p class="td-sum">' + e(m.summary) + '</p>' + whyLine(m) +
     '<dl class="td-stats"><div><dt>Lessons</dt><dd>' + tot + '</dd></div><div><dt>Study time</dt><dd>' + hours(m.minutes) + '</dd></div><div><dt>Passed</dt><dd>' + n + '/' + tot + '</dd></div></dl>' +
     needs + unl + '<div class="td-cta">' + cta + '<a class="btn btn-quiet" href="#/module/' + m.id + '">Open the ' + e(m.title) + ' page</a></div>' +
     '<h4>Lessons</h4><ol class="td-lessons">' + m.lessons.slice(0, 8).map(function (l) { return '<li class="' + (isDone(l) ? 'done' : '') + '"><a href="' + hrefLesson(l) + '">' + e(LES[l].title) + '</a></li>'; }).join('') + '</ol>' + (m.lessons.length > 8 ? '<p class="td-note"><a href="#/module/' + m.id + '">All ' + m.lessons.length + ' lessons</a></p>' : '');
@@ -730,7 +733,7 @@ function pathsView() {
     '<div class="wrap"><div class="pipe-panel"><div class="pipe-head"><div role="tablist" aria-label="Role skill trees" class="tabs">' + tabs + '</div>' +
     '<p class="pipe-meta">' + plural(p.modules.length, 'skill') + ', about ' + hours(pp.minutes) + ' of study.</p></div>' + treeHtml(p) +
     '<p class="pipe-foot"><a href="#/path/' + p.id + '">See the full ' + e(p.title) + ' path with every topic</a></p></div>' +
-    '<h2 class="sub-h">All roles</h2><div class="rows">' + LIVE.map(pathRow).join('') + '</div>' +
+    '<h2 class="sub-h">All roles</h2><p class="small"><a class="btn btn-quiet" href="#/compare">Compare roles side by side</a> Not sure which one fits? See what they share and where they differ.</p><div class="rows">' + LIVE.map(pathRow).join('') + '</div>' +
     '<h2 class="sub-h">In development</h2><ul class="planned">' + PLANNED.map(function (x) { return '<li><strong>' + e(x.title) + '</strong><span>' + e(x.summary) + '</span><em>Planned</em></li>'; }).join('') + '</ul></div>';
   view.after = armTree;
 }
@@ -756,7 +759,7 @@ function stageRow(m, i) {
   var s = modStatus(m), n = modCount(m), tot = m.lessons.length;
   var req = m.requires.length ? 'Requires ' + m.requires.map(function (r) { return MOD[r].title; }).join(' and ') : 'No prerequisites';
   return '<article class="srow s-' + s + '"><span class="dot">' + (s === 'pass' ? ICON.check : s === 'lock' ? ICON.lock : '') + '</span>' +
-    '<div><h3><a href="#/module/' + m.id + '">' + e(m.title) + '</a></h3><p>' + e(m.summary) + '</p><p class="small">' + e(req) + '. ' + plural(tot, 'lesson') + ', about ' + hours(m.minutes) + '.</p>' +
+    '<div><h3><a href="#/module/' + m.id + '">' + e(m.title) + '</a></h3><p>' + e(m.summary) + '</p>' + whyLine(m) + '<p class="small">' + e(req) + '. ' + plural(tot, 'lesson') + ', about ' + hours(m.minutes) + '.</p>' +
     '<ol class="topics" aria-label="Topics in ' + e(m.title) + '">' + m.lessons.map(function (lid) { return '<li><a href="' + hrefLesson(lid) + '">' + e(LES[lid].title) + '</a></li>'; }).join('') + '</ol></div>' +
     '<div class="row-stat"><b>' + n + '/' + tot + '</b><span>' + ({ pass: 'Passed', run: 'In progress', ready: 'Ready', lock: 'Locked' }[s]) + '</span></div></article>';
 }
@@ -772,7 +775,7 @@ function moduleView(id) {
     lock = '<div class="gate"><strong>This stage is locked.</strong> Pass ' + missingReqs(m).map(function (r) { return '<a href="#/module/' + r.id + '">' + e(r.title) + '</a>'; }).join(' and ') + ' to open it. Know it already? ' + missingReqs(m).map(function (r) { return '<a href="#/testout/' + r.id + '">Test out of ' + e(r.title) + '</a>'; }).join(' or ') + '.</div>';
   }
   view.html = '<section class="page-head wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="#/paths">Paths</a></nav><h1>' + e(m.title) + '</h1>' +
-    '<p class="lede">' + e(m.summary) + '</p>' +
+    '<p class="lede">' + e(m.summary) + '</p>' + whyLine(m) +
     '<dl class="facts"><div><dt>Level</dt><dd>' + e(m.level) + '</dd></div><div><dt>Study time</dt><dd>About ' + hours(m.minutes) + '</dd></div><div><dt>Progress</dt><dd>' + n + ' of ' + tot + ' lessons</dd></div></dl>' +
     '<div class="bar wide" role="img" aria-label="' + pct + ' percent complete"><i style="width:' + pct + '%"></i></div>' + lock +
     '<p class="small">Practice this stage: <a href="#/drills/' + m.id + '">troubleshooting drills</a>, <a href="#/cases/' + m.id + '">case studies</a>, <a href="#/flashcards">flashcards</a>.</p>' +
@@ -786,10 +789,32 @@ function moduleView(id) {
       return bits.length ? '<p class="small">Watch and study: ' + bits.join(', ') + '.</p>' : '';
     })() +
     (sheets.length ? '<p class="small">Cheat sheet: ' + sheets.map(function (k) { return '<a href="#/cheatsheet/' + k + '">' + e(SHEETS[k].title) + '</a>'; }).join(', ') + '</p>' : '') +
-    '<div class="actions">' + printBar() + '</div>' + voiceSlot() +
-    '</section><div class="wrap"><ol class="jobs">' + m.lessons.map(function (lid, i) { return jobHtml(lid, i); }).join('') + '</ol>' + refsHtml(m.refs, 'Official documentation for this stage') + (window.MargaFeatures && MargaFeatures.moduleExtras ? MargaFeatures.moduleExtras(m.id) : '') + (api.chooseModule ? api.chooseModule(m.id) : '') + '</div>';
+    '<div class="actions">' + (function () { var nl = s === 'lock' ? null : m.lessons.filter(function (l) { return !isDone(l); })[0]; return nl ? '<a class="btn btn-primary" href="' + hrefLesson(nl) + '">' + (n ? 'Continue: ' : 'Start: ') + e(LES[nl].title) + '</a>' : ''; })() + printBar() + '</div>' + voiceSlot() +
+    '</section><div class="wrap">' + modTools(m) + '<ol class="jobs">' + m.lessons.map(function (lid, i) { return jobHtml(lid, i); }).join('') + '</ol>' + refsHtml(m.refs, 'Official documentation for this stage') + (window.MargaFeatures && MargaFeatures.moduleExtras ? MargaFeatures.moduleExtras(m.id) : '') + (api.chooseModule ? api.chooseModule(m.id) : '') + '</div>';
   view.voice = '#main'; view.voiceLabel = m.title;
-  view.after = null;
+  view.after = function () { applyModView(); };
+}
+/* lesson list controls: filter by state and a compact view that hides summaries (remembered in this browser) */
+var modFilter = 'all';
+function modCompactOn() { try { return localStorage.getItem('ea.modcompact') === '1'; } catch (x) { return false; } }
+function modTools(m) {
+  if (m.lessons.length < 6) return '';
+  var dn = m.lessons.filter(isDone).length, todo = m.lessons.length - dn;
+  modFilter = 'all';
+  var seg = [['all', 'All', m.lessons.length], ['todo', 'To do', todo], ['done', 'Passed', dn]].map(function (o) {
+    return '<button type="button" class="seg-b' + (o[0] === 'all' ? ' on' : '') + '" data-act="mod-filter" data-f="' + o[0] + '" aria-pressed="' + (o[0] === 'all') + '">' + o[1] + ' <span>' + o[2] + '</span></button>';
+  }).join('');
+  return '<div class="mod-tools" role="group" aria-label="Lesson list view"><div class="seg">' + seg + '</div>' +
+    '<label class="cmp-diff"><input type="checkbox" data-act="mod-compact"' + (modCompactOn() ? ' checked' : '') + '> Compact list</label></div>';
+}
+function applyModView() {
+  var ol = $('.jobs'); if (!ol) return;
+  ol.classList.toggle('compact', modCompactOn());
+  Array.prototype.forEach.call(ol.children, function (li) {
+    var d = li.classList.contains('j-done');
+    li.hidden = modFilter === 'done' ? !d : modFilter === 'todo' ? d : false;
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-act="mod-filter"]'), function (b) { var on = b.getAttribute('data-f') === modFilter; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
 }
 
 function jobHtml(lid, i) {
@@ -1472,10 +1497,12 @@ window.addEventListener('hashchange', function () { pmOpen(false); moreOpen(fals
 
 /* ---------- extension API (extras.js registers more views through this) ---------- */
 var actions = {};
+actions['mod-filter'] = function (el) { modFilter = el.getAttribute('data-f'); applyModView(); };
+actions['mod-compact'] = function (el) { try { localStorage.setItem('ea.modcompact', el.checked ? '1' : '0'); } catch (x) { /* ignore */ } applyModView(); };
 var afterHooks = [];
 var api = {
   D: D, MODS: MODS, MOD: MOD, LES: LES, LIVE: LIVE, PATH: PATH, LEVELS: LEVELS, IV: IV,
-  $: $, $$: $$, e: e, plural: plural, shuffle: shuffle, hours: hours,
+  $: $, $$: $$, e: e, plural: plural, shuffle: shuffle, hours: hours, whyLine: whyLine,
   state: function () { return S; }, save: save, markActive: markActive, renderChrome: renderChrome, setNav: setNav,
   view: view, toast: toast, printBar: printBar, printStyleSelect: printStyleSelect, voiceSlot: voiceSlot, wireSay: wireSay, refsHtml: refsHtml,
   searchAll: function (q, group, stage, limit) { return loadAll().then(function () { INDEX = null; buildIndex(); return { groups: GROUPS, counts: MargaSearch.counts(q, stage || ''), hits: MargaSearch.query(q, { kind: group || '', module: stage || '', limit: limit || 60 }) }; }); },
@@ -1494,6 +1521,7 @@ if (typeof window.MargaTermLabs === 'function') window.MargaTermLabs(api);
 if (typeof window.MargaFeatures === 'function') window.MargaFeatures(api);
 if (typeof window.MargaBadges === 'function') window.MargaBadges(api);
 if (typeof window.MargaChoose === 'function') window.MargaChoose(api);
+if (typeof window.MargaCompare === 'function') window.MargaCompare(api);
 if (typeof window.MargaSkillLabPage === 'function') window.MargaSkillLabPage(api);
 if (typeof window.MargaCaseFile === 'function') window.MargaCaseFile(api);
 if (typeof window.MargaSDLab === 'function') window.MargaSDLab(api);

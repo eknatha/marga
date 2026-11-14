@@ -6,9 +6,17 @@
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 var CAUTION1 = 'Self-reported completion record from MARGA by EknathaLabs. Not a certification, degree or qualification.';
 var CAUTION2 = 'The verification code only checks that the name, badge and date match each other. It does not confirm identity.';
-var HUES = { kubevirt: 205, ceph: 12, vault: 45, proxies: 100, messaging: 320, 'cfn-bicep': 255, gcp: 225, baremetal: 18, 'service-mesh': 175, 'system-design': 48, 'cloud-iam': 200, 'k8s-ops': 250, argocd: 28, llm: 262, prompting: 292, 'claude-skills': 20, mcp: 168, mlops: 142, aiops: 330, 'aiops-practice': 346, ai: 262, linux: 28, git: 12, go: 190, helm: 222, bash: 150, python: 52, networking: 195, docker: 212, cicd: 120, kubernetes: 235, terraform: 268, ansible: 352, cloud: 176, databases: 305, observability: 18, sre: 78, security: 332, devops: 215, devsecops: 332, virtualization: 160, storage: 38, 'sql-ops': 290, 'gpu-serving': 120, openstack: 8 };
+var HUES = { 'obs-deep': 22, 'k8s-supply-chain': 318, 'iac-beyond': 272, 'leadership': 38, 'ai-infra': 300, 'rust-infra': 25, 'db-ops': 200, 'python-ops': 55, platform: 292, 'k8s-exam': 215, cka: 235, cks: 350, 'k8s-control-plane': 245, 'k8s-lifecycle': 228, 'k8s-network': 188, 'k8s-resources': 150, 'k8s-security': 5, kubevirt: 205, ceph: 12, vault: 45, proxies: 100, messaging: 320, 'cfn-bicep': 255, gcp: 225, baremetal: 18, 'service-mesh': 175, 'system-design': 48, 'cloud-iam': 200, 'k8s-ops': 250, argocd: 28, llm: 262, prompting: 292, 'claude-skills': 20, mcp: 168, mlops: 142, aiops: 330, 'aiops-practice': 346, ai: 262, linux: 28, git: 12, go: 190, helm: 222, bash: 150, python: 52, networking: 195, docker: 212, cicd: 120, kubernetes: 235, terraform: 268, ansible: 352, cloud: 176, databases: 305, observability: 18, sre: 78, security: 332, devops: 215, devsecops: 332, virtualization: 160, storage: 38, 'sql-ops': 290, 'gpu-serving': 120, openstack: 8 };
 /* Each symbol is drawn on a 24 by 24 grid so the shape, not only the colour, tells badges apart. */
 var SYM = {
+  'obs-deep': '<path d="M3 17l5-6 4 3 5-8 4 5"/><circle cx="8" cy="11" r="1"/><circle cx="17" cy="6" r="1"/><path d="M3 21h18"/>',
+  'k8s-supply-chain': '<rect x="3" y="9" width="8" height="6" rx="1"/><rect x="13" y="9" width="8" height="6" rx="1"/><path d="M11 12h2M7 9V5M17 9V5M5 5h4M15 5h4"/>',
+  'iac-beyond': '<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/>',
+  'leadership': '<circle cx="12" cy="7" r="3"/><path d="M5 20c0-4 3-6 7-6s7 2 7 6"/><path d="M12 14v3"/>',
+  'ai-infra': '<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/><circle cx="12" cy="12" r="2"/>',
+  'rust-infra': '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>',
+  'db-ops': '<ellipse cx="12" cy="5" rx="7" ry="2.5"/><path d="M5 5v7c0 1.4 3 2.5 7 2.5s7-1.1 7-2.5V5M5 12v6c0 1.4 3 2.5 7 2.5s7-1.1 7-2.5v-6"/><path d="M9 9.5h6"/>',
+  'python-ops': '<path d="M12 3c-4 0-4 2-4 3v2h4v1H6c-2 0-3 1.5-3 4s1 4 3 4h2v-3c0-2 1.5-3 3-3h4c1.5 0 2-1 2-2V6c0-2-2-3-6-3z"/><path d="M10 6h.01M14 18h.01"/>',
   kubevirt: '<rect x="3" y="5" width="14" height="11" rx="1"/><path d="M7 20h6M10 16v4M20 8l-3 2v4l3 2z"/>',
   ceph: '<circle cx="12" cy="6" r="2.5"/><circle cx="5.5" cy="17" r="2.5"/><circle cx="18.5" cy="17" r="2.5"/><path d="M10.5 8l-3.5 7M13.5 8l3.5 7M8 17h8"/>',
   vault: '<rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="12" r="3.5"/><path d="M12 8.5v1.5M12 14v1.5M8.5 12H10M14 12h1.5"/>',
@@ -49,6 +57,15 @@ var SYM = {
   cloud: '<path d="M7 18a4 4 0 0 1-.5-8A5.5 5.5 0 0 1 17 8.5a4.5 4.5 0 0 1 .5 9.5z"/>',
   databases: '<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/>',
   observability: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  platform: '<rect x="3" y="15" width="18" height="5" rx="1"/><rect x="6" y="9" width="5" height="4"/><rect x="13" y="9" width="5" height="4"/><path d="M8.5 7V4M15.5 7V4"/>',
+  'k8s-exam': '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/><path d="M15 16l1.5 1.5L19 14"/>',
+  cka: '<path d="M12 2l8 4.5v9L12 20l-8-4.5v-9z"/><path d="M9 11l2 2 4-4"/>',
+  cks: '<path d="M12 2l8 4.5v9L12 20l-8-4.5v-9z"/><path d="M12 8v4M12 15v.5"/>',
+  'k8s-control-plane': '<circle cx="12" cy="12" r="3"/><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/>',
+  'k8s-lifecycle': '<path d="M5 12a7 7 0 0 1 12-5l2 2M19 12a7 7 0 0 1-12 5l-2-2"/><path d="M19 4v5h-5M5 20v-5h5"/>',
+  'k8s-network': '<circle cx="12" cy="5" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="M12 7v4M6 16l5-5M18 16l-5-5"/>',
+  'k8s-resources': '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  'k8s-security': '<path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M9 12l2 2 4-4"/>',
   sre: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   security: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
   devops: '<path d="M7 8c-3 0-5 2-5 4s2 4 5 4c4 0 6-8 10-8 3 0 5 2 5 4s-2 4-5 4c-4 0-6-8-10-8z"/>',

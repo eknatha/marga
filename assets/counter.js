@@ -7,6 +7,10 @@
 'use strict';
 var code = '', lastPath = '', timers = [], target = null, shown = '';
 var KEY = 'ea.vc';
+/* Quiet and honest: the number is shown only once it is large enough to mean something (default 1000).
+   Below that, and whenever the counter cannot be read, nothing is shown. Tests can change the limit. */
+function min() { return typeof window.MARGA_COUNTER_MIN === 'number' ? window.MARGA_COUNTER_MIN : 1000; }
+function num(n) { return parseInt(String(n).replace(/\D/g, ''), 10) || 0; }
 function local() { if (window.MARGA_FORCE_REMOTE) return false; return /^(localhost|127\..*|\[::1\]|)$/.test(location.hostname) || location.protocol === 'file:'; }
 function dnt() { return navigator.doNotTrack === '1' || window.doNotTrack === '1' || navigator.msDoNotTrack === '1'; }
 function base() { return 'https://' + code + '.goatcounter.com/'; }
@@ -34,11 +38,15 @@ function parse(j) {
   var n = String(raw === undefined ? '' : raw).replace(/[\s  ]/g, ' ').trim();
   return /^\d[\d ,.]*$/.test(n) ? n : '';
 }
-function say(text) { if (target && document.contains(target)) { target.textContent = text; target.hidden = false; } }
+function say(text) {
+  if (!target || !document.contains(target)) return;
+  target.textContent = text; target.hidden = !text;
+  if (text) target.title = 'Counted without cookies, logins or personal data. Unique visitors, as reported by the counter.';
+}
 function paint(n) {
   if (!n) return;
   shown = n;
-  say(n + (n === '1' ? ' visitor' : ' visitors'));
+  say(num(n) >= min() ? n + (n === '1' ? ' visitor' : ' visitors') : '');
 }
 function fetchTotal(attempt) {
   if (!code || !window.fetch) return;
@@ -55,7 +63,7 @@ function fetchTotal(attempt) {
       MargaCounter.status = 'unavailable'; MargaCounter.error = String(e && e.message || e);
       if (attempt === 0 && !shown) fallback();
       if (attempt < 3) timers.push(setTimeout(function () { fetchTotal(attempt + 1); }, [1500, 6000, 20000][attempt]));
-      else { if (!shown) say('Visitor count unavailable'); if (window.console && console.info) console.info('MARGA visitor count unavailable (' + MargaCounter.error + '). In GoatCounter settings, enable "Allow adding visitor counts on your website" and check the site code.'); }
+      else { if (window.console && console.info) console.info('MARGA visitor count unavailable (' + MargaCounter.error + '). In GoatCounter settings, enable "Allow adding visitor counts on your website" and check the site code.'); }
     });
 }
 /* Second source, used only when GoatCounter's public total cannot be read (for example the setting
@@ -63,7 +71,7 @@ function fetchTotal(attempt) {
    One hit per browser session, then plain reads. The number is its own count, not GoatCounter's. */
 var FB = 'https://abacus.jasoncameron.dev/';
 function fallback() {
-  if (!window.fetch || local()) { if (!shown) say('Visitor count unavailable'); return; }
+  if (!window.fetch || local()) return;
   var ns = 'marga-eknathalabs', key = 'visits', counted = false;
   try { counted = sessionStorage.getItem('ea.vc.hit') === '1'; } catch (x) { /* ignore */ }
   fetch(FB + (counted || dnt() ? 'get/' : 'hit/') + ns + '/' + key, { cache: 'no-store' })
@@ -75,13 +83,13 @@ function fallback() {
       store(KEY, JSON.stringify({ n: n, t: Date.now() }));
       MargaCounter.status = 'fallback'; paint(n);
     })
-    .catch(function () { if (!shown) say('Visitor count unavailable'); });
+    .catch(function () { /* stay silent */ });
 }
 function init(c, el) {
   code = c || '';
   target = typeof el === 'string' ? document.querySelector(el) : el;
   if (!code) return;
-  say('Counting visitors');
+  say('');
   try { var cached = JSON.parse(store(KEY) || 'null'); if (cached && cached.n) paint(cached.n); } catch (x) { /* ignore */ }
   // give a first-visit page view a moment to be recorded, then read the total
   timers.push(setTimeout(function () { fetchTotal(0); }, local() ? 0 : 1200));
