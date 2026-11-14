@@ -418,5 +418,155 @@
    "title": "व्यवहार में AIOps",
    "summary": "AIOps को सुरक्षित रूप से चलाएँ: डेटा पाइपलाइन, सुधार कार्रवाइयों के स्तर और सत्यापन, किल स्विच और ऑडिट, केऑस परीक्षण, रनबुक खोज, एजेंट और अनुमोदन द्वार, प्रॉम्प्ट इंजेक्शन, मूल्यांकन, बनाएँ या खरीदें और संचालन।"
   }
+ },
+ "platform": {
+  "te": {
+   "title": "ప్లాట్‌ఫారమ్ ఇంజనీరింగ్",
+   "summary": "అంతర్గత డెవలపర్ ప్లాట్‌ఫారమ్‌ను ఉత్పత్తిగా నిర్మించండి: గోల్డెన్ పాత్‌లు, కేటలాగ్, స్వయంసేవ, ప్లాట్‌ఫారమ్ API, రక్షణ కంచెలు, ఖర్చు, కొలమానాలు, స్వీకరణ."
+  },
+  "hi": {
+   "title": "प्लेटफ़ॉर्म इंजीनियरिंग",
+   "summary": "आंतरिक डेवलपर प्लेटफ़ॉर्म को उत्पाद की तरह बनाएँ: गोल्डन पाथ, कैटलॉग, स्वयं-सेवा, प्लेटफ़ॉर्म API, सुरक्षा घेरे, लागत, मापदंड और अपनाना।"
+  }
+ },
+ "k8s-exam": {
+  "te": {
+   "title": "CKA మరియు CKS పరీక్ష సాధన",
+   "summary": "వేగవంతమైన kubectl, క్లస్టర్ పనులు, సమస్య పరిష్కారం, భద్రత బలోపేతం, సమయ పరిమితి గల నమూనా పరీక్షలతో Kubernetes అడ్మినిస్ట్రేటర్, భద్రతా పరీక్షలకు సాధన చేయండి."
+  },
+  "hi": {
+   "title": "CKA और CKS परीक्षा का अभ्यास",
+   "summary": "तेज़ kubectl, क्लस्टर के काम, समस्या निवारण, सुरक्षा मज़बूती और समय-सीमा वाली मॉक परीक्षाओं से Kubernetes एडमिन और सुरक्षा परीक्षाओं का अभ्यास करें।"
+  }
+ },
+ "k8s-control-plane": {
+  "te": {
+   "title": "Control plane మరియు etcd లోపల",
+   "summary": "అభ్యర్థన API server గుండా ఎలా వెళ్తుంది, etcd స్థితిని ఎలా నిల్వ చేస్తుంది, scheduler, కంట్రోలర్లు, kubelet ఎలా పనిచేస్తాయి."
+  },
+  "hi": {
+   "title": "Control plane और etcd भीतर से",
+   "summary": "अनुरोध API server से कैसे गुजरता है, etcd स्थिति कैसे रखता है और scheduler, कंट्रोलर व kubelet कैसे काम करते हैं।"
+  }
+ },
+ "k8s-lifecycle": {
+  "te": {
+   "title": "క్లస్టర్ జీవితచక్రం మరియు HA",
+   "summary": "అధిక లభ్యత క్లస్టర్ల రూపకల్పన, kubeadm తో సృష్టి, సర్టిఫికెట్ నిర్వహణ, సురక్షిత అప్‌గ్రేడ్, వైఫల్యం నుండి కోలుకోవడం."
+  },
+  "hi": {
+   "title": "क्लस्टर जीवनचक्र और HA",
+   "summary": "उच्च उपलब्धता वाले क्लस्टर का डिज़ाइन, kubeadm से निर्माण, प्रमाणपत्र प्रबंधन, सुरक्षित अपग्रेड और विफलता से रिकवरी।"
+  }
+ },
+ "k8s-network": {
+  "te": {
+   "title": "Kubernetes నెట్‌వర్కింగ్ లోతుగా",
+   "summary": "నెట్‌వర్క్ మోడల్, CNI, Service, DNS, నెట్‌వర్క్ విధానాలు, Ingress మరియు స్థిర debug పద్ధతి."
+  },
+  "hi": {
+   "title": "Kubernetes नेटवर्किंग गहराई से",
+   "summary": "नेटवर्क मॉडल, CNI, Service, DNS, नेटवर्क नीतियाँ, Ingress और निश्चित debug पद्धति।"
+  }
+ },
+ "k8s-resources": {
+  "te": {
+   "title": "వనరుల నిర్వహణ మరియు autoscaling",
+   "summary": "Request, limit, కోటా, తొలగింపు, HPA, VPA, node autoscaling, అంతరాయ ప్రణాళిక."
+  },
+  "hi": {
+   "title": "संसाधन प्रबंधन और autoscaling",
+   "summary": "Request, limit, कोटा, बेदखली, HPA, VPA, node autoscaling और अवरोध योजना।"
+  }
+ },
+ "k8s-security": {
+  "te": {
+   "title": "Kubernetes భద్రత లోతుగా",
+   "summary": "ముప్పు నమూనాలు, గుర్తింపులు, RBAC, Pod Security, secret, బహుళ అద్దెదారులు, బలోపేతం, ఘటన ప్రతిస్పందన."
+  },
+  "hi": {
+   "title": "Kubernetes सुरक्षा गहराई से",
+   "summary": "खतरा मॉडल, पहचान, RBAC, Pod Security, secret, बहु-किरायेदारी, मजबूती और घटना प्रतिक्रिया।"
+  }
+ },
+ "obs-deep": {
+  "te": {
+   "title": "లోతైన Observability",
+   "summary": "PromQL, Prometheus స్కేలింగ్, burn rate హెచ్చరికలు, Loki log, tracing మరియు ఖర్చు నియంత్రణతో code గా observability."
+  },
+  "hi": {
+   "title": "गहराई से Observability",
+   "summary": "PromQL, Prometheus स्केलिंग, burn rate अलर्ट, Loki log, tracing और लागत नियंत्रण के साथ code के रूप में observability।"
+  }
+ },
+ "k8s-supply-chain": {
+  "te": {
+   "title": "Kubernetes సరఫరా గొలుసు మరియు రన్‌టైమ్ భద్రత",
+   "summary": "ముప్పులు, SLSA, స్కానింగ్, SBOM మరియు cosign, ప్రవేశంలో provenance, Falco, seccomp, AppArmor మరియు sandbox runtime."
+  },
+  "hi": {
+   "title": "Kubernetes आपूर्ति श्रृंखला और रनटाइम सुरक्षा",
+   "summary": "खतरे, SLSA, स्कैनिंग, SBOM और cosign, प्रवेश पर provenance, Falco, seccomp, AppArmor और sandbox runtime।"
+  }
+ },
+ "iac-beyond": {
+  "te": {
+   "title": "Terraform దాటిన IaC",
+   "summary": "OpenTofu, Pulumi, Terragrunt, పరీక్షలు, code గా విధానం, drift గుర్తింపు మరియు సురక్షిత state తరలింపు."
+  },
+  "hi": {
+   "title": "Terraform से आगे IaC",
+   "summary": "OpenTofu, Pulumi, Terragrunt, परीक्षण, code के रूप में नीति, drift पहचान और सुरक्षित state स्थानांतरण।"
+  }
+ },
+ "leadership": {
+  "te": {
+   "title": "ప్రవర్తన మరియు నాయకత్వ మార్గం",
+   "summary": "STAR కథలు, సాంకేతిక నిర్ణయాలు, అధికారం లేని ప్రభావం, మార్గదర్శకత్వం, సంఘటన నాయకత్వం మరియు senior, staff ఎదుగుదల."
+  },
+  "hi": {
+   "title": "व्यवहार और नेतृत्व मार्ग",
+   "summary": "STAR कहानियाँ, तकनीकी निर्णय, बिना अधिकार प्रभाव, मेंटरिंग, घटना नेतृत्व और senior, staff विकास।"
+  }
+ },
+ "ai-infra": {
+  "te": {
+   "title": "ఉత్పత్తిలో AI మౌలిక సదుపాయాలు",
+   "summary": "Kubernetes లో GPU, vector డేటాబేస్, RAG, LLM gateway, పరిశీలన మరియు మూల్యాంకనం, inference ఖర్చు మరియు సామర్థ్యం."
+  },
+  "hi": {
+   "title": "उत्पादन में AI इंफ्रास्ट्रक्चर",
+   "summary": "Kubernetes पर GPU, vector डेटाबेस, RAG, LLM gateway, निगरानी और मूल्यांकन, inference लागत और क्षमता।"
+  }
+ },
+ "rust-infra": {
+  "te": {
+   "title": "మౌలిక సదుపాయ ఇంజినీర్లకు Rust",
+   "summary": "యాజమాన్యం మరియు అరువు, Result లోపాలు, trait, clap మరియు serde CLI, tokio async మరియు static binary."
+  },
+  "hi": {
+   "title": "इंफ्रास्ट्रक्चर इंजीनियरों के लिए Rust",
+   "summary": "स्वामित्व और उधार, Result त्रुटियाँ, trait, clap और serde CLI, tokio async और static binary।"
+  }
+ },
+ "db-ops": {
+  "te": {
+   "title": "ఉత్పత్తిలో డేటాబేస్ నిర్వహణ",
+   "summary": "PostgreSQL replication మరియు failover, బ్యాకప్ మరియు PITR, pooling, అంతరాయం లేని తరలింపు, Redis, MongoDB మరియు runbook."
+  },
+  "hi": {
+   "title": "उत्पादन में डेटाबेस संचालन",
+   "summary": "PostgreSQL replication और failover, बैकअप और PITR, pooling, बिना रुकावट स्थानांतरण, Redis, MongoDB और runbook।"
+  }
+ },
+ "python-ops": {
+  "te": {
+   "title": "నిర్వహణ కోసం Python",
+   "summary": "ప్యాకేజీలు మరియు పరిసరాలు, CLI సాధనాలు, మళ్లీ ప్రయత్నించే API client, concurrency, pytest మరియు సురక్షిత cloud SDK."
+  },
+  "hi": {
+   "title": "संचालन के लिए Python",
+   "summary": "पैकेज और परिवेश, CLI उपकरण, पुनः प्रयास वाले API client, concurrency, pytest और सुरक्षित cloud SDK।"
+  }
  }
 }

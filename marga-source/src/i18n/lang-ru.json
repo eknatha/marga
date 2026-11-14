@@ -1919,6 +1919,66 @@
   "aiops-practice": {
    "title": "AIOps на практике",
    "summary": "Безопасно эксплуатируйте AIOps: конвейеры данных, уровни исправляющих действий и проверка, аварийные выключатели и аудит, хаос-тесты, поиск по ранбукам, агенты и шлюзы согласования, внедрение промптов, оценка, строить или покупать и эксплуатация."
+  },
+  "platform": {
+   "title": "Платформенная инженерия",
+   "summary": "Создайте внутреннюю платформу для разработчиков как продукт: золотые пути, каталог, самообслуживание, API платформы, ограничители, затраты, метрики и внедрение."
+  },
+  "k8s-exam": {
+   "title": "Подготовка к экзаменам CKA и CKS",
+   "summary": "Готовьтесь к экзаменам Kubernetes по администрированию и безопасности: быстрый kubectl, задачи по кластеру, диагностика, усиление защиты и пробные экзамены на время."
+  },
+  "k8s-control-plane": {
+   "title": "Управляющий слой и etcd изнутри",
+   "summary": "Как запрос проходит через API-сервер, как etcd хранит состояние и как действуют планировщик, контроллеры и kubelet."
+  },
+  "k8s-lifecycle": {
+   "title": "Жизненный цикл кластера и высокая доступность",
+   "summary": "Проектирование отказоустойчивых кластеров, создание через kubeadm, сертификаты, безопасные обновления и восстановление."
+  },
+  "k8s-network": {
+   "title": "Сети Kubernetes подробно",
+   "summary": "Сетевая модель, CNI, Services, DNS, сетевые политики, Ingress и единый порядок отладки."
+  },
+  "k8s-resources": {
+   "title": "Управление ресурсами и автомасштабирование",
+   "summary": "Requests, limits, квоты, вытеснение, HPA, VPA, автомасштабирование узлов и планирование прерываний."
+  },
+  "k8s-security": {
+   "title": "Безопасность Kubernetes подробно",
+   "summary": "Модели угроз, идентичности, RBAC, Pod Security, секреты, мультиарендность, укрепление и реагирование на инциденты."
+  },
+  "obs-deep": {
+   "title": "Наблюдаемость в глубину",
+   "summary": "PromQL, масштабирование Prometheus, оповещения по burn rate, логи Loki, трассировка и наблюдаемость как код с контролем затрат."
+  },
+  "k8s-supply-chain": {
+   "title": "Цепочка поставок и защита Kubernetes во время работы",
+   "summary": "Угрозы, SLSA, сканирование, SBOM и cosign, проверка происхождения, Falco, seccomp, AppArmor и изолированные среды."
+  },
+  "iac-beyond": {
+   "title": "IaC за пределами Terraform",
+   "summary": "OpenTofu, Pulumi, Terragrunt, тесты, политики как код, обнаружение дрейфа и безопасные миграции состояния."
+  },
+  "leadership": {
+   "title": "Поведенческий трек и лидерство",
+   "summary": "Истории STAR, технические решения, влияние без власти, наставничество, руководство инцидентами и рост до senior и staff."
+  },
+  "ai-infra": {
+   "title": "ИИ-инфраструктура в продакшене",
+   "summary": "GPU в Kubernetes, векторные базы, RAG, LLM-шлюзы, наблюдаемость и оценка, стоимость и ёмкость инференса."
+  },
+  "rust-infra": {
+   "title": "Rust для инженеров инфраструктуры",
+   "summary": "Владение и заимствование, ошибки с Result, трейты, CLI с clap и serde, async с tokio и статические бинарники."
+  },
+  "db-ops": {
+   "title": "Эксплуатация баз данных в продакшене",
+   "summary": "Репликация и переключение PostgreSQL, копии и PITR, пулы, миграции без простоя, Redis, MongoDB и runbook."
+  },
+  "python-ops": {
+   "title": "Python для эксплуатации",
+   "summary": "Пакеты и окружения, CLI-инструменты, API-клиенты с повторами, параллелизм, pytest и безопасные SDK облака."
   }
  },
  "paths": {
@@ -1945,6 +2005,18 @@
   "mlops": {
    "summary": "Эксплуатируйте машинное обучение и операции с алгоритмической поддержкой в продакшене: контейнеры и Kubernetes, конвейеры, наблюдаемость, затем MLOps и AIOps.",
    "audience": "DevOps- и SRE-инженеры, поддерживающие команды data science, и дата-инженеры, которым нужны продакшен-привычки."
+  },
+  "platform": {
+   "summary": "Создайте и эксплуатируйте внутреннюю платформу, на которой работают другие инженеры: доставка, Kubernetes, инфраструктура как код, политики, наблюдаемость, затраты и продуктовое мышление.",
+   "audience": "Разработчики, DevOps- и SRE-инженеры, переходящие на роли платформенной инженерии."
+  },
+  "cka": {
+   "summary": "Первая цель: создавать, обновлять, резервировать и чинить кластеры, с углублением в управляющий слой, сети и ресурсы, затем практика экзамена.",
+   "audience": "Инженеры, готовящиеся к CKA и желающие понять, как на самом деле работают кластеры."
+  },
+  "cks": {
+   "summary": "Вторая цель: весь путь CKA, затем безопасность конвейера, безопасность Kubernetes подробно и практика экзамена.",
+   "audience": "Администраторы, у которых есть CKA или которые к ней идут и теперь хотят укрепить кластеры."
   }
  },
  "lessons": {
@@ -2572,6 +2644,122 @@
   "aiops-practice/failure-modes-drift-feedback-loops-and-wrong-remediators": "Замечайте дрейф, петли обратной связи, смещение покрытия и неверные исправления до того, как они вызовут сбой.",
   "aiops-practice/operating-aiops-ownership-on-call-and-lifecycle": "Эксплуатируйте платформу AIOps как производственный сервис с владельцами, SLO, дежурством и жизненным циклом правил.",
   "aiops-practice/debugging-a-misbehaving-aiops-pipeline": "Узнайте, почему система AIOps ошиблась, воспроизведя решение по этапам и добавив регрессионный случай.",
-  "aiops-practice/capstone-a-mini-aiops-pipeline": "Постройте мини-конвейер, который находит сдвиг, связывает развёртывание, ранжирует причину и предлагает исправление с согласованием."
+  "aiops-practice/capstone-a-mini-aiops-pipeline": "Постройте мини-конвейер, который находит сдвиг, связывает развёртывание, ранжирует причину и предлагает исправление с согласованием.",
+  "platform/what-platform-engineering-is-and-how-it-differs-from-devops-and-sre": "Что такое платформа, чем она отличается от DevOps и SRE и когда она нужна.",
+  "platform/platform-as-a-product-users-roadmap-and-feedback": "Ведите платформу как продукт: знайте пользователей, ранжируйте проблемы, выпускайте понемногу и измеряйте внедрение.",
+  "platform/golden-paths-and-paved-roads": "Стройте золотые пути: поддерживаемые настройки по умолчанию, которые команды выбирают, потому что так проще, с возможностью настройки.",
+  "platform/anatomy-of-an-internal-developer-platform": "Разберите уровни внутренней платформы разработчиков и проследите один запрос через них.",
+  "platform/developer-portals-and-the-service-catalog": "Держите каталог ПО точным: владельцы в коде и автоматические проверки.",
+  "platform/scaffolding-templates-and-self-service-workflows": "Проектируйте шаблоны и процессы самообслуживания, которые проверяют, повторяют и сообщают о результате.",
+  "platform/platform-apis-with-crossplane-and-operators": "Предлагайте API платформы через Crossplane и операторы и показывайте честный статус.",
+  "platform/guardrails-policy-as-code-and-secure-defaults": "Применяйте ограничители как код: безопасные значения по умолчанию, понятные сообщения и поэтапное внедрение.",
+  "platform/environments-ephemeral-previews-and-multi-tenancy": "Создавайте арендаторов, предпросмотровые среды и сроки жизни, чтобы общая инфраструктура была безопасной и недорогой.",
+  "platform/cost-allocation-showback-and-unit-economics": "Распределяйте затраты по меткам, показывайте владельцам и отчитывайтесь о стоимости на единицу.",
+  "platform/measuring-developer-experience-dora-space-and-cognitive-load": "Измеряйте опыт разработчиков через DORA, SPACE и время адаптации, не ранжируя людей.",
+  "platform/platform-slos-support-and-on-call-for-the-platform-team": "Задайте SLO, поддержку и дежурства платформы и проведите границу с продуктовыми командами.",
+  "platform/adoption-migration-and-deprecation": "Ведите внедрение, миграции и вывод из эксплуатации, пока старая система не удалена.",
+  "platform/capstone-design-and-ship-a-golden-path": "Спроектируйте и выпустите золотой путь и проверьте его, замерив время нового инженера.",
+  "k8s-exam/the-exam-environment-speed-setup-and-the-docs": "Быстро начните экзамены CKA и CKS: псевдонимы, контекст, поиск по документации и бюджет времени.",
+  "k8s-exam/imperative-kubectl-and-fast-yaml": "Используйте императивный kubectl и YAML с dry-run, чтобы быстро создавать и менять объекты.",
+  "k8s-exam/cka-cluster-setup-with-kubeadm-and-upgrades": "Разверните кластер через kubeadm и обновляйте его по одной минорной версии.",
+  "k8s-exam/cka-etcd-backup-restore-and-static-pods": "Делайте резервную копию и восстановление etcd и безопасно правьте манифесты статических подов.",
+  "k8s-exam/cka-rbac-kubeconfig-and-certificate-tasks": "Решайте задачи по RBAC, kubeconfig и сертификатам и проверяйте права.",
+  "k8s-exam/cka-workloads-scheduling-and-configuration-tasks": "Выполняйте задачи по нагрузкам, планированию и конфигурации: выкаты, taint и лимиты ресурсов.",
+  "k8s-exam/cka-services-ingress-gateway-api-and-dns-tasks": "Решайте задачи по Service, Ingress, Gateway API, сетевым политикам и DNS.",
+  "k8s-exam/cka-storage-tasks": "Решайте задачи по хранилищу: тома, claim, классы и политика освобождения.",
+  "k8s-exam/cka-troubleshooting-method-and-scenarios": "Диагностируйте сверху вниз: симптом, события, журналы, узел и плоскость управления.",
+  "k8s-exam/cks-cluster-setup-and-hardening": "Усильте кластер с kube-bench, настройками kubelet и API и запретом по умолчанию.",
+  "k8s-exam/cks-system-hardening-apparmor-seccomp-and-the-host": "Используйте AppArmor, seccomp и capabilities и укрепляйте хост.",
+  "k8s-exam/cks-minimize-microservice-vulnerabilities": "Снижайте риск микросервисов через Pod Security, песочницы, шифрование на диске и взаимный TLS.",
+  "k8s-exam/cks-supply-chain-security": "Защитите цепочку поставок: минимальные образы, сканирование, digest и политика допуска.",
+  "k8s-exam/cks-monitoring-runtime-security-and-the-mock-run": "Используйте журналы аудита и Falco, держите контейнеры неизменяемыми и проходите пробный экзамен на время.",
+  "k8s-control-plane/the-request-path-authentication-authorization-and-admission": "Как запрос проходит аутентификацию, авторизацию и допуск перед сохранением.",
+  "k8s-control-plane/api-machinery-versions-watches-and-server-side-apply": "Версии API, watch, конфликты и server-side apply.",
+  "k8s-control-plane/etcd-data-model-raft-and-quorum": "Как etcd хранит объекты и подтверждает записи по кворуму Raft.",
+  "k8s-control-plane/etcd-operations-health-compaction-and-defragmentation": "Здоровье etcd: уплотнение, дефрагментация и сигналы тревоги.",
+  "k8s-control-plane/the-scheduler-filtering-scoring-and-binding": "Как планировщик фильтрует, оценивает и привязывает поды и как читать Pending.",
+  "k8s-control-plane/controllers-the-reconcile-loop-and-leader-election": "Контроллеры, циклы согласования и выбор лидера через lease.",
+  "k8s-control-plane/the-kubelet-pod-lifecycle-and-the-cri": "Как kubelet и среда выполнения превращают описание пода в контейнеры.",
+  "k8s-control-plane/control-plane-failure-modes-and-diagnosis": "Диагностика отказов управляющего слоя от симптома до компонента.",
+  "k8s-lifecycle/designing-a-highly-available-control-plane": "Проектирование отказоустойчивого управляющего слоя по доменам отказа.",
+  "k8s-lifecycle/bootstrapping-with-kubeadm-configuration-and-phases": "Создание кластера с конфигурацией и фазами kubeadm.",
+  "k8s-lifecycle/certificates-pki-expiry-and-rotation": "Сертификаты, проверка срока действия и безопасная ротация.",
+  "k8s-lifecycle/version-skew-and-upgrade-strategy": "Правила расхождения версий и план обновления на одну минорную версию.",
+  "k8s-lifecycle/node-lifecycle-joining-draining-and-replacing": "Добавление, опустошение и замена узлов без сбоя нагрузок.",
+  "k8s-lifecycle/backup-and-disaster-recovery-for-the-cluster": "Резервное копирование etcd, восстановление и репетиция аварийного восстановления.",
+  "k8s-lifecycle/cluster-api-and-declarative-cluster-management": "Декларативное управление кластерами через Cluster API.",
+  "k8s-lifecycle/capstone-plan-and-rehearse-an-upgrade-and-a-recovery": "Итоговый проект: спланировать и отрепетировать обновление и восстановление.",
+  "k8s-network/the-kubernetes-network-model": "Сетевая модель Kubernetes и её правила для подов.",
+  "k8s-network/cni-plugins-overlays-routing-and-ebpf": "Сравнение CNI-плагинов: оверлей, маршрутизация и eBPF.",
+  "k8s-network/services-clusterip-nodeport-and-kube-proxy": "Services, ClusterIP, NodePort и маршрутизация трафика через kube-proxy.",
+  "k8s-network/endpointslices-and-how-traffic-finds-pods": "EndpointSlices и то, как готовность определяет путь трафика.",
+  "k8s-network/coredns-and-service-discovery": "CoreDNS, домены поиска и обнаружение сервисов.",
+  "k8s-network/network-policies-in-depth": "Сетевые политики подробно: запрет по умолчанию, селекторы и DNS.",
+  "k8s-network/ingress-and-the-gateway-api": "Ingress и Gateway API для трафика, входящего в кластер.",
+  "k8s-network/debugging-kubernetes-networking": "Единый порядок отладки сети Kubernetes.",
+  "k8s-resources/requests-limits-and-qos-classes": "Requests, limits и классы QoS.",
+  "k8s-resources/cpu-and-memory-behaviour-throttling-and-oom": "Троттлинг CPU и OOM-убийства, и как их измерять.",
+  "k8s-resources/limitrange-resourcequota-and-priority": "LimitRange, ResourceQuota и классы приоритета для честного распределения.",
+  "k8s-resources/node-allocatable-pressure-and-eviction": "Выделяемые ресурсы узла, нехватка и порядок вытеснения.",
+  "k8s-resources/horizontal-pod-autoscaling": "Горизонтальное масштабирование подов от метрик до реплик.",
+  "k8s-resources/vertical-scaling-and-right-sizing": "Вертикальное масштабирование и подбор requests по реальному использованию.",
+  "k8s-resources/cluster-autoscaling-karpenter-and-keda": "Автомасштабирование кластера с Karpenter и по событиям с KEDA.",
+  "k8s-resources/disruption-budgets-topology-spread-and-capacity-planning": "Бюджеты прерываний, распределение по топологии и планирование ёмкости.",
+  "k8s-security/threat-model-and-the-layers-of-cluster-security": "Моделирование угроз кластера и многослойные меры защиты.",
+  "k8s-security/authentication-service-accounts-and-token-security": "Аутентификация, сервисные аккаунты и безопасность токенов.",
+  "k8s-security/rbac-design-least-privilege-and-auditing": "Проектирование RBAC с минимальными правами и аудит.",
+  "k8s-security/pod-security-standards-and-admission-policy": "Стандарты Pod Security и политики допуска.",
+  "k8s-security/secrets-encryption-at-rest-and-external-stores": "Секреты, шифрование в покое и внешние хранилища.",
+  "k8s-security/multi-tenancy-and-isolation": "Мультиарендность и изоляция между командами.",
+  "k8s-security/api-server-and-kubelet-hardening-with-cis": "Укрепление API-сервера и kubelet по бенчмарку CIS.",
+  "k8s-security/incident-response-for-a-compromised-cluster": "Реагирование на взлом кластера: сдержать, расследовать, восстановить.",
+  "obs-deep/promql-in-depth-rates-aggregation-and-recording-rules": "PromQL: rate, агрегация и recording rules, дающие верные ответы.",
+  "obs-deep/scaling-prometheus-ha-federation-and-long-term-storage": "Масштабирование Prometheus: шардирование, федерация и долгосрочное хранение.",
+  "obs-deep/slo-alerting-burn-rates-and-alertmanager-design": "Оповещения по burn rate и маршрутизация в Alertmanager на основе SLO.",
+  "obs-deep/logs-at-scale-loki-labels-and-retention": "Loki в больших объёмах: мало меток и разумное хранение.",
+  "obs-deep/distributed-tracing-sampling-and-correlation": "Трассировка с выборкой и связью трасс, логов и метрик.",
+  "obs-deep/observability-as-code-and-cost-control": "Дашборды и оповещения как код с контролем затрат.",
+  "k8s-supply-chain/the-software-supply-chain-threat-model-and-slsa": "Модель угроз цепочки поставок и уровни SLSA.",
+  "k8s-supply-chain/image-scanning-and-vulnerability-management": "Сканирование образов и управление уязвимостями с владельцами и сроками.",
+  "k8s-supply-chain/sboms-signing-and-verification-with-cosign": "Создание SBOM, подпись и проверка образов с cosign.",
+  "k8s-supply-chain/admission-enforcement-of-provenance-with-policy": "Обязательная проверка происхождения при допуске через политики.",
+  "k8s-supply-chain/runtime-detection-with-falco-and-audit-events": "Обнаружение атак во время работы с Falco и событиями аудита.",
+  "k8s-supply-chain/sandboxing-seccomp-apparmor-and-runtime-classes": "Сокращение поверхности атаки ядра: seccomp, AppArmor и песочницы.",
+  "iac-beyond/opentofu-and-the-terraform-ecosystem-choices": "OpenTofu и выбор между инструментами Terraform.",
+  "iac-beyond/pulumi-infrastructure-in-real-programming-languages": "Pulumi: инфраструктура на настоящих языках программирования.",
+  "iac-beyond/terragrunt-modules-and-multi-environment-structure": "Terragrunt, модули и структура для нескольких окружений.",
+  "iac-beyond/testing-infrastructure-code": "Тестирование кода инфраструктуры на нескольких уровнях.",
+  "iac-beyond/policy-as-code-and-drift-detection": "Политики как код и обнаружение дрейфа.",
+  "iac-beyond/state-secrets-and-safe-migrations": "Безопасная работа с состоянием, секретами и миграциями.",
+  "leadership/star-stories-and-behavioral-interviews": "Подготовка историй STAR для поведенческих интервью.",
+  "leadership/communicating-technical-decisions-and-design-reviews": "Объяснение технических решений и проведение дизайн-ревью.",
+  "leadership/influence-without-authority": "Влияние на другие команды без формальной власти.",
+  "leadership/mentoring-and-giving-feedback": "Наставничество и полезная обратная связь.",
+  "leadership/leading-through-incidents": "Руководство инцидентом: роли и понятные обновления.",
+  "leadership/senior-staff-scope-and-career-growth": "Рост до уровня senior и staff.",
+  "ai-infra/gpu-scheduling-and-sharing-on-kubernetes": "Планирование и совместное использование GPU в Kubernetes.",
+  "ai-infra/vector-databases-and-retrieval-operations": "Эксплуатация векторных баз и поиска.",
+  "ai-infra/rag-pipelines-in-production": "RAG-конвейеры в продакшене.",
+  "ai-infra/llm-gateways-routing-caching-and-rate-limits": "LLM-шлюзы: маршрутизация, кэш и лимиты.",
+  "ai-infra/llm-observability-evaluation-and-guardrails": "Наблюдаемость, оценка и защита LLM-приложений.",
+  "ai-infra/cost-and-capacity-engineering-for-inference": "Контроль затрат и ёмкости для инференса.",
+  "rust-infra/why-rust-ownership-borrowing-and-the-mental-model": "Владение, заимствование и ментальная модель Rust.",
+  "rust-infra/errors-option-result-and-the-question-mark": "Обработка ошибок с Option, Result и оператором вопроса.",
+  "rust-infra/structs-enums-traits-and-generics": "Моделирование данных: структуры, перечисления, трейты и обобщения.",
+  "rust-infra/cli-tools-with-clap-serde-and-files": "CLI-инструменты с clap, serde и файлами.",
+  "rust-infra/async-rust-with-tokio-and-network-services": "Асинхронные сетевые сервисы на tokio.",
+  "rust-infra/testing-cross-compilation-and-shipping-static-binaries": "Тесты, кросс-компиляция и поставка статических бинарников.",
+  "db-ops/postgresql-replication-and-high-availability": "Репликация PostgreSQL, переключение и защита от split brain.",
+  "db-ops/backups-pitr-and-restore-testing": "Резервные копии, восстановление на момент времени и проверка восстановления.",
+  "db-ops/connection-pooling-and-capacity": "Пулы соединений и планирование ёмкости.",
+  "db-ops/zero-downtime-migrations-and-upgrades": "Миграции без простоя и крупные обновления версий.",
+  "db-ops/redis-and-mongodb-operations": "Безопасная эксплуатация Redis и MongoDB.",
+  "db-ops/database-incidents-and-runbooks": "Реагирование на инциденты баз данных по runbook.",
+  "python-ops/project-structure-packaging-and-virtual-environments": "Упаковка инструментов с pyproject.toml и виртуальными окружениями.",
+  "python-ops/cli-tools-with-argparse-click-and-typer": "Создание безопасных инструментов командной строки.",
+  "python-ops/api-clients-retries-timeouts-and-pagination": "API-клиенты с таймаутами, повторами и пагинацией.",
+  "python-ops/concurrency-threads-asyncio-and-processes": "Выбор потоков, asyncio или процессов и ограничение параллелизма.",
+  "python-ops/testing-with-pytest-and-mocking-infrastructure": "Тестирование кода эксплуатации с pytest и заглушками.",
+  "python-ops/working-with-cloud-and-kubernetes-sdks-with-safe-patterns": "SDK облака и Kubernetes с безопасными приёмами."
  }
 }

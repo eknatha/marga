@@ -1846,3 +1846,323 @@ def: Running a detector or pipeline over recorded history and known incidents to
 module: aiops-practice
 plain: A list of the only places data may be sent.
 def: A short list of hosts an agent's tools may send data to, so everything else is blocked.
+
+## Golden path
+module: platform
+plain: The easy, supported way to do a common job.
+def: A supported, automated route for a common kind of workload, with sensible defaults, that a team can follow without extra approval and customise when it needs to.
+
+## Internal developer platform
+module: platform
+plain: A shared set of self-service tools for the people who build software in a company.
+def: An integrated set of capabilities, such as deploy, environments, secrets and observability, built and run as a product for internal developers.
+
+## Software catalog
+module: platform
+plain: A list of what exists and who owns it.
+def: A maintained inventory of services, libraries and resources with their owners, lifecycle, dependencies and links to docs and dashboards.
+
+## Cognitive load
+module: platform
+plain: How much a person has to keep in their head.
+def: The mental effort a team needs to build and run its software, which a platform tries to reduce by hiding repeated detail behind simple interfaces.
+
+## Showback
+module: platform
+plain: Showing a team what it costs without billing it.
+def: Reporting cloud cost per team or service so owners can see and act on it, without charging the amount back to their budget.
+
+## Composition
+module: platform
+plain: A recipe that turns one request into many resources.
+def: A Crossplane definition that maps a simple custom resource, such as a Database, to the underlying cloud resources and settings that implement it.
+
+## Static pod
+module: k8s-exam
+plain: A pod that a node starts from a file on its own disk.
+def: A pod managed directly by the kubelet from a manifest file in a watched directory, used for control plane components in kubeadm clusters.
+
+## etcd snapshot
+module: k8s-exam
+plain: A saved copy of the cluster's database.
+def: A point-in-time backup of etcd made with etcdctl snapshot save, which holds all cluster state and can be restored into a new data directory.
+
+## kubeadm upgrade
+module: k8s-exam
+plain: The standard steps to move a cluster to a newer version.
+def: The procedure of planning and applying a new control plane version with kubeadm, then draining and upgrading each worker's kubelet one minor version at a time.
+
+## AppArmor profile
+module: k8s-exam
+plain: A rule file that limits what a program can do.
+def: A Linux security profile loaded on a node that restricts a container's file, network and capability access when referenced by a pod.
+
+## seccomp profile
+module: k8s-exam
+plain: A list of the system calls a container may use.
+def: A filter that restricts which kernel system calls a container process can make, applied with RuntimeDefault or a local profile.
+
+## Pod Security admission
+module: k8s-exam
+plain: A built-in check that stops risky pods from starting.
+def: A built-in admission controller that enforces the privileged, baseline or restricted pod security standard per namespace using labels.
+
+## Admission plugin
+module: k8s-control-plane
+plain: A checkpoint that can change or refuse a request after you are allowed in.
+def: A plugin in the API server that mutates or validates a request after authentication and authorization and before it is stored.
+
+## Raft
+module: k8s-control-plane
+plain: The voting method etcd uses so members agree on every change.
+def: A consensus algorithm in which a leader replicates log entries and an entry commits when a majority of members have stored it.
+
+## etcd compaction
+module: k8s-control-plane
+plain: Throwing away old history so the database stops growing.
+def: An etcd operation that discards key revisions older than a chosen revision; it does not return disk space until defragmentation.
+
+## Informer
+module: k8s-control-plane
+plain: A local cache that keeps a controller up to date by watching.
+def: A client-side component that lists once, watches for changes and keeps a cache and event queue so controllers avoid repeated API calls.
+
+## Stacked etcd
+module: k8s-lifecycle
+plain: etcd running on the same machines as the control plane.
+def: A topology where each control plane node also runs an etcd member, which is simpler but couples two failure domains.
+
+## Version skew
+module: k8s-lifecycle
+plain: The allowed gap between component versions.
+def: The supported difference in minor versions between the API server, kubelet, kubectl and other components during an upgrade.
+
+## Cordoning a node
+module: k8s-lifecycle
+plain: Marking a node so no new pods are placed on it.
+def: Setting a node unschedulable so new pods avoid it while existing pods keep running.
+
+## Recovery point objective
+module: k8s-lifecycle
+plain: How much data you can afford to lose.
+def: The maximum acceptable age of the latest usable backup, which sets how often snapshots must be taken.
+
+## CNI plugin for pods
+module: k8s-network
+plain: The software that gives each pod a network interface and address.
+def: A plugin that follows the container network interface specification to create pod interfaces, assign addresses and program routes.
+
+## EndpointSlice
+module: k8s-network
+plain: The list of ready pod addresses behind a Service.
+def: An API object that lists the IP addresses and readiness of the pods that back a Service, split into slices for scale.
+
+## ndots
+module: k8s-network
+plain: A DNS setting that decides how many dots make a name complete.
+def: A resolver option, set to 5 in pods by default, below which a name is tried with each search domain before being tried as written.
+
+## Gateway API
+module: k8s-network
+plain: A newer, role based way to describe cluster entry points.
+def: A set of resources including GatewayClass, Gateway and routes that separate infrastructure, cluster and application ownership of traffic entry.
+
+## QoS class
+module: k8s-resources
+plain: A label that says which pods are evicted first.
+def: A class of Guaranteed, Burstable or BestEffort assigned from a pod requests and limits, used to order eviction under pressure.
+
+## CPU throttling
+module: k8s-resources
+plain: The kernel pausing a container that used its CPU quota.
+def: Enforcement of a CPU limit by the scheduler, which stops a container for the rest of a period once its quota is spent.
+
+## Disruption budget
+module: k8s-resources
+plain: A promise about how many replicas must stay up.
+def: An object that limits how many pods of an application may be voluntarily disrupted at once, for example during a drain.
+
+## Stabilization window
+module: k8s-resources
+plain: A waiting period that stops scaling from flapping.
+def: A period over which the autoscaler considers earlier recommendations before reducing replicas.
+
+## Service account token
+module: k8s-security
+plain: A short lived credential a pod uses to talk to the API.
+def: A signed token, projected into a pod with an audience and expiry, that identifies the pod service account to the API server.
+
+## Privilege escalation in RBAC
+module: k8s-security
+plain: Using one permission to gain a bigger one.
+def: A path in which a subject with rights such as create pods, bind roles or read secrets obtains permissions it was not granted directly.
+
+## Pod Security enforcement
+module: k8s-security
+plain: A built-in check that stops risky pods from starting.
+def: An admission controller that enforces the privileged, baseline or restricted standard per namespace using labels in enforce, audit and warn modes.
+
+## Encryption at rest
+module: k8s-security
+plain: Scrambling stored data so a stolen copy is unreadable.
+def: Encrypting API objects such as Secrets before they are written to etcd, with keys from a local provider or an external KMS.
+
+## Counter reset
+module: obs-deep
+plain: A counter dropping back to zero.
+def: When a counter returns to zero after a restart, rate and increase detect the drop and treat it as a reset instead of a negative change.
+
+## Recording rule
+module: obs-deep
+plain: A saved query that stores its result as a new series.
+def: A Prometheus rule evaluated on a schedule whose result is written as a new series, so dashboards and alerts read a cheap precomputed value.
+
+## Error budget burn rate
+module: obs-deep
+plain: How fast the error budget is being spent.
+def: The ratio of the observed error rate to the rate the SLO allows, where a value of one spends the budget exactly over the whole window.
+
+## Tail sampling
+module: obs-deep
+plain: Keeping traces after seeing the whole trace.
+def: A sampling method that decides after a trace completes, so errors and slow traces can be kept while most normal ones are dropped.
+
+## Build provenance
+module: k8s-supply-chain
+plain: A signed record of how an artefact was built.
+def: Metadata, often in the SLSA format, stating which source, builder and steps produced an artefact, signed so it can be verified.
+
+## Software bill of materials
+module: k8s-supply-chain
+plain: A list of the parts inside software.
+def: A software bill of materials that lists the packages and versions in an image in a format such as SPDX or CycloneDX.
+
+## Keyless signing
+module: k8s-supply-chain
+plain: Signing with a short lived identity, not a stored key.
+def: A Sigstore method where a short lived certificate bound to an identity from OIDC signs the artefact and the event is recorded in a transparency log.
+
+## Runtime detection
+module: k8s-supply-chain
+plain: Watching running workloads for suspicious behaviour.
+def: Rules over syscalls and Kubernetes audit events, as in Falco, that alert when a container does something unexpected such as spawning a shell.
+
+## OpenTofu
+module: iac-beyond
+plain: The open source fork of Terraform.
+def: A community maintained, Linux Foundation hosted fork of Terraform that keeps the language and providers mostly compatible.
+
+## Infrastructure drift
+module: iac-beyond
+plain: Real infrastructure differing from the code.
+def: A difference between the declared configuration, the state and the real resources, often caused by manual changes.
+
+## moved block
+module: iac-beyond
+plain: A declaration that a resource was renamed.
+def: A configuration block that tells the tool a resource has a new address, so it updates state instead of destroying and recreating it.
+
+## Rego policy checks
+module: iac-beyond
+plain: Rules checked automatically on every plan.
+def: Rules written in a language such as Rego or Sentinel and evaluated against a plan or configuration before changes are applied.
+
+## STAR
+module: leadership
+plain: Situation, Task, Action, Result.
+def: A structure for answering behavioral questions by describing the situation, your task, the actions you took and the measurable result.
+
+## Decision record
+module: leadership
+plain: A short written note of a decision and why.
+def: A document that captures the context, options, decision and consequences, so later readers understand the reasoning.
+
+## Blameless review
+module: leadership
+plain: Learning from failure without punishing people.
+def: A review of an incident that focuses on system and process causes and fixes rather than on individuals.
+
+## Engineering scope
+module: leadership
+plain: How wide your responsibility and impact are.
+def: The size of the problems you own and influence, which grows from tasks to features, systems and organisations as roles become more senior.
+
+## Time slicing
+module: ai-infra
+plain: Sharing a GPU by taking turns.
+def: A way to let several pods use one GPU by switching between them over time, without memory isolation.
+
+## Embedding
+module: ai-infra
+plain: A list of numbers that captures meaning.
+def: A vector produced by a model so that similar texts have vectors that are close together.
+
+## Semantic cache
+module: ai-infra
+plain: A cache that matches similar prompts.
+def: A cache for model answers keyed by the meaning of a prompt rather than its exact text.
+
+## Token budget
+module: ai-infra
+plain: A limit on tokens per user or team.
+def: A cap on the tokens a user, team or feature may consume per period, enforced at a gateway to control cost.
+
+## Ownership
+module: rust-infra
+plain: Each value has one owner.
+def: The Rust rule that every value has a single owner, and the value is dropped when the owner goes out of scope.
+
+## Borrow checker
+module: rust-infra
+plain: The compiler part that checks references.
+def: The compiler check that ensures references do not outlive their data and that a value has either many readers or one writer.
+
+## Result
+module: rust-infra
+plain: A value that is either success or an error.
+def: An enum with Ok and Err variants that makes failures part of a function type and forces callers to handle them.
+
+## Static binary
+module: rust-infra
+plain: A program with no external library needs.
+def: An executable that includes its libraries, often built against musl, so it runs on a minimal container or host.
+
+## Replication slot
+module: db-ops
+plain: A marker that keeps log for a replica.
+def: A PostgreSQL feature that stops the primary from removing write ahead log until a given replica has received it.
+
+## RPO and archiving
+module: db-ops
+plain: How much data you can afford to lose.
+def: The maximum acceptable amount of data loss measured in time, which sets how often backups and archiving must occur.
+
+## Write concern
+module: db-ops
+plain: How many copies must confirm a write.
+def: A MongoDB setting that decides how many members must acknowledge a write before it is reported as successful.
+
+## PostgreSQL vacuum
+module: db-ops
+plain: Cleaning dead rows in PostgreSQL.
+def: The process that removes dead row versions and updates statistics so tables do not bloat and queries stay fast.
+
+## Python venv isolation
+module: python-ops
+plain: A private set of packages for one project.
+def: A directory with its own interpreter and installed packages, so projects do not affect each other.
+
+## Exponential backoff
+module: python-ops
+plain: Waiting longer after each failed try.
+def: A retry strategy that doubles the delay after each failure, usually with random jitter, to avoid overloading a recovering service.
+
+## Fixture
+module: python-ops
+plain: Setup code a test can ask for.
+def: A pytest function that prepares or cleans up something, such as a temporary directory, and is injected by name.
+
+## Request idempotency key
+module: python-ops
+plain: A token that makes a repeat request safe.
+def: A unique value sent with a request so that the server can recognise a retry and avoid doing the action twice.

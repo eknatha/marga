@@ -1935,6 +1935,66 @@
   "aiops-practice": {
    "title": "AIOps na prática",
    "summary": "Opere AIOps com segurança: pipelines de dados, níveis de ações corretivas e verificação, interruptores de parada e auditoria, testes de caos, busca em runbooks, agentes e portões de aprovação, injeção de prompt, avaliação, construir ou comprar e operação."
+  },
+  "platform": {
+   "title": "Engenharia de plataforma",
+   "summary": "Crie uma plataforma interna para desenvolvedores como produto: caminhos dourados, catálogo, autosserviço, APIs de plataforma, proteções, custos, métricas e adoção."
+  },
+  "k8s-exam": {
+   "title": "Prática para os exames CKA e CKS",
+   "summary": "Pratique para os exames de administrador e segurança do Kubernetes com kubectl rápido, tarefas de cluster, diagnóstico, reforço de segurança e simulados com tempo."
+  },
+  "k8s-control-plane": {
+   "title": "Plano de controle e etcd por dentro",
+   "summary": "Como uma requisição flui pelo API server, como o etcd guarda o estado e como scheduler, controladores e kubelet agem."
+  },
+  "k8s-lifecycle": {
+   "title": "Ciclo de vida do cluster e alta disponibilidade",
+   "summary": "Projete clusters de alta disponibilidade, crie com kubeadm, gerencie certificados, atualize com segurança e recupere-se de falhas."
+  },
+  "k8s-network": {
+   "title": "Rede do Kubernetes a fundo",
+   "summary": "O modelo de rede, CNI, Services, DNS, políticas de rede, Ingress e um método fixo de depuração."
+  },
+  "k8s-resources": {
+   "title": "Gestão de recursos e autoscaling",
+   "summary": "Requests, limits, cotas, remoção, HPA, VPA, autoscaling de nós e planejamento de disrupções."
+  },
+  "k8s-security": {
+   "title": "Segurança do Kubernetes a fundo",
+   "summary": "Modelos de ameaça, identidades, RBAC, Pod Security, secrets, multilocação, reforço e resposta a incidentes."
+  },
+  "obs-deep": {
+   "title": "Observabilidade em profundidade",
+   "summary": "PromQL, escala do Prometheus, alertas de burn rate, logs com Loki, tracing e observabilidade como código com controle de custos."
+  },
+  "k8s-supply-chain": {
+   "title": "Cadeia de suprimentos e segurança em execução no Kubernetes",
+   "summary": "Ameaças, SLSA, varredura, SBOM e cosign, procedência na admissão, Falco, seccomp, AppArmor e runtimes isolados."
+  },
+  "iac-beyond": {
+   "title": "IaC além do Terraform",
+   "summary": "OpenTofu, Pulumi, Terragrunt, testes, política como código, detecção de drift e migrações de estado seguras."
+  },
+  "leadership": {
+   "title": "Trilha comportamental e de liderança",
+   "summary": "Histórias STAR, decisões técnicas, influência sem autoridade, mentoria, liderar incidentes e crescer para sênior e staff."
+  },
+  "ai-infra": {
+   "title": "Infraestrutura de IA em produção",
+   "summary": "GPUs no Kubernetes, bancos vetoriais, RAG, gateways de LLM, observabilidade e avaliação, custo e capacidade de inferência."
+  },
+  "rust-infra": {
+   "title": "Rust para engenheiros de infraestrutura",
+   "summary": "Propriedade e empréstimos, erros com Result, traits, CLI com clap e serde, async com tokio e binários estáticos."
+  },
+  "db-ops": {
+   "title": "Operação de bancos de dados em produção",
+   "summary": "Replicação e failover do PostgreSQL, backups e PITR, pool de conexões, migrações sem parada, Redis, MongoDB e runbooks."
+  },
+  "python-ops": {
+   "title": "Python para operações",
+   "summary": "Pacotes e ambientes, ferramentas CLI, clientes de API com novas tentativas, concorrência, pytest e SDKs de nuvem seguros."
   }
  },
  "paths": {
@@ -1961,6 +2021,18 @@
   "mlops": {
    "summary": "Opere aprendizado de máquina e operações assistidas por algoritmos em produção: contêineres e Kubernetes, pipelines, observabilidade, depois MLOps e AIOps.",
    "audience": "Engenheiros de DevOps e SRE que apoiam equipes de ciência de dados, e engenheiros de dados que precisam de hábitos de produção."
+  },
+  "platform": {
+   "summary": "Crie e opere a plataforma interna em que outros engenheiros entregam: entrega, Kubernetes, infraestrutura como código, políticas, observabilidade, custos e visão de produto.",
+   "audience": "Desenvolvedores, engenheiros DevOps e SRE que migram para funções de engenharia de plataforma."
+  },
+  "cka": {
+   "summary": "O primeiro objetivo: criar, atualizar, fazer backup e depurar clusters, com aprofundamento em plano de controle, rede e recursos, e depois prática de prova.",
+   "audience": "Engenheiros que se preparam para a CKA e querem entender como os clusters realmente funcionam."
+  },
+  "cks": {
+   "summary": "O segundo objetivo: toda a trilha CKA, depois segurança de pipeline, segurança do Kubernetes a fundo e prática de prova.",
+   "audience": "Administradores que têm a CKA ou estão a caminho e agora querem reforçar clusters."
   }
  },
  "lessons": {
@@ -2588,6 +2660,122 @@
   "aiops-practice/failure-modes-drift-feedback-loops-and-wrong-remediators": "Perceba deriva, laços de realimentação, viés de cobertura e corretores errados antes que causem uma queda.",
   "aiops-practice/operating-aiops-ownership-on-call-and-lifecycle": "Opere a plataforma AIOps como um serviço de produção com responsáveis, SLOs, plantão e ciclo de vida das regras.",
   "aiops-practice/debugging-a-misbehaving-aiops-pipeline": "Descubra por que um sistema AIOps errou reproduzindo uma decisão etapa por etapa e adicionando um caso de regressão.",
-  "aiops-practice/capstone-a-mini-aiops-pipeline": "Crie um mini pipeline que detecta uma mudança, liga um deploy, classifica uma causa e propõe uma correção com aprovação."
+  "aiops-practice/capstone-a-mini-aiops-pipeline": "Crie um mini pipeline que detecta uma mudança, liga um deploy, classifica uma causa e propõe uma correção com aprovação.",
+  "platform/what-platform-engineering-is-and-how-it-differs-from-devops-and-sre": "O que é uma plataforma, como ela difere de DevOps e SRE e quando você precisa de uma.",
+  "platform/platform-as-a-product-users-roadmap-and-feedback": "Gerencie a plataforma como produto: conheça os usuários, ordene os problemas, entregue em partes pequenas e meça a adoção.",
+  "platform/golden-paths-and-paved-roads": "Crie caminhos dourados: padrões com suporte que as equipes escolhem por serem mais fáceis, com opção de personalizar.",
+  "platform/anatomy-of-an-internal-developer-platform": "Entenda os planos de uma plataforma interna e acompanhe um pedido por eles.",
+  "platform/developer-portals-and-the-service-catalog": "Mantenha um catálogo de software correto com responsáveis no código e verificações automáticas.",
+  "platform/scaffolding-templates-and-self-service-workflows": "Projete modelos e fluxos de autosserviço que validam, repetem e informam.",
+  "platform/platform-apis-with-crossplane-and-operators": "Ofereça APIs de plataforma com Crossplane e operadores e mostre um status honesto.",
+  "platform/guardrails-policy-as-code-and-secure-defaults": "Aplique proteções como código: padrões seguros, mensagens claras e implantação em etapas.",
+  "platform/environments-ephemeral-previews-and-multi-tenancy": "Crie inquilinos, ambientes de pré-visualização e prazos de expiração para manter a infraestrutura compartilhada segura e barata.",
+  "platform/cost-allocation-showback-and-unit-economics": "Distribua custos com rótulos, mostre aos responsáveis e informe o custo por unidade.",
+  "platform/measuring-developer-experience-dora-space-and-cognitive-load": "Meça a experiência do desenvolvedor com DORA, SPACE e tempo de integração sem classificar pessoas.",
+  "platform/platform-slos-support-and-on-call-for-the-platform-team": "Defina SLOs, suporte e plantão da plataforma e trace a fronteira com as equipes de produto.",
+  "platform/adoption-migration-and-deprecation": "Conduza adoção, migrações e descontinuação até remover o sistema antigo.",
+  "platform/capstone-design-and-ship-a-golden-path": "Projete e entregue um caminho dourado e teste-o cronometrando uma pessoa nova na equipe.",
+  "k8s-exam/the-exam-environment-speed-setup-and-the-docs": "Comece rápido nos exames CKA e CKS: aliases, contexto, busca na documentação e orçamento de tempo.",
+  "k8s-exam/imperative-kubectl-and-fast-yaml": "Use kubectl imperativo e YAML com dry-run para criar e editar objetos rapidamente.",
+  "k8s-exam/cka-cluster-setup-with-kubeadm-and-upgrades": "Monte um cluster com kubeadm e atualize uma versão menor por vez.",
+  "k8s-exam/cka-etcd-backup-restore-and-static-pods": "Faça backup e restauração do etcd e edite manifestos de pods estáticos com segurança.",
+  "k8s-exam/cka-rbac-kubeconfig-and-certificate-tasks": "Resolva tarefas de RBAC, kubeconfig e certificados e teste as permissões.",
+  "k8s-exam/cka-workloads-scheduling-and-configuration-tasks": "Conclua tarefas de cargas, agendamento e configuração, como rollouts, taints e limites de recursos.",
+  "k8s-exam/cka-services-ingress-gateway-api-and-dns-tasks": "Resolva tarefas de Service, Ingress, Gateway API, políticas de rede e DNS.",
+  "k8s-exam/cka-storage-tasks": "Resolva tarefas de armazenamento com volumes, claims, classes e política de recuperação.",
+  "k8s-exam/cka-troubleshooting-method-and-scenarios": "Diagnostique de cima para baixo: sintoma, eventos, logs, nó e plano de controle.",
+  "k8s-exam/cks-cluster-setup-and-hardening": "Reforce um cluster com kube-bench, ajustes de kubelet e API e negação por padrão.",
+  "k8s-exam/cks-system-hardening-apparmor-seccomp-and-the-host": "Use AppArmor, seccomp e capacidades e reforce o host.",
+  "k8s-exam/cks-minimize-microservice-vulnerabilities": "Reduza o risco dos microsserviços com Pod Security, sandboxes, criptografia em repouso e TLS mútuo.",
+  "k8s-exam/cks-supply-chain-security": "Proteja a cadeia de suprimentos: imagens mínimas, varreduras, digests e política de admissão.",
+  "k8s-exam/cks-monitoring-runtime-security-and-the-mock-run": "Use logs de auditoria e Falco, mantenha contêineres imutáveis e faça um simulado com tempo.",
+  "k8s-control-plane/the-request-path-authentication-authorization-and-admission": "Como uma requisição passa por autenticação, autorização e admissão antes de ser gravada.",
+  "k8s-control-plane/api-machinery-versions-watches-and-server-side-apply": "Versões de API, watches, conflitos e server-side apply explicados.",
+  "k8s-control-plane/etcd-data-model-raft-and-quorum": "Como o etcd guarda objetos e usa o quórum do Raft para confirmar gravações.",
+  "k8s-control-plane/etcd-operations-health-compaction-and-defragmentation": "Mantenha o etcd saudável com compactação, desfragmentação e alarmes.",
+  "k8s-control-plane/the-scheduler-filtering-scoring-and-binding": "Como o scheduler filtra, pontua e vincula pods, e como ler um Pending.",
+  "k8s-control-plane/controllers-the-reconcile-loop-and-leader-election": "Controladores, laços de reconciliação e eleição de líder com leases.",
+  "k8s-control-plane/the-kubelet-pod-lifecycle-and-the-cri": "Como o kubelet e o runtime transformam a especificação do pod em contêineres.",
+  "k8s-control-plane/control-plane-failure-modes-and-diagnosis": "Diagnostique falhas do plano de controle do sintoma ao componente.",
+  "k8s-lifecycle/designing-a-highly-available-control-plane": "Projete um plano de controle de alta disponibilidade entre domínios de falha.",
+  "k8s-lifecycle/bootstrapping-with-kubeadm-configuration-and-phases": "Crie um cluster com a configuração e as fases do kubeadm.",
+  "k8s-lifecycle/certificates-pki-expiry-and-rotation": "Certificados, verificação de validade e rotação segura.",
+  "k8s-lifecycle/version-skew-and-upgrade-strategy": "Regras de diferença de versões e um plano de atualização de uma versão menor.",
+  "k8s-lifecycle/node-lifecycle-joining-draining-and-replacing": "Adicione, esvazie e substitua nós sem interromper as cargas.",
+  "k8s-lifecycle/backup-and-disaster-recovery-for-the-cluster": "Faça backup do etcd, restaure e ensaie a recuperação de desastres.",
+  "k8s-lifecycle/cluster-api-and-declarative-cluster-management": "Gerencie clusters de forma declarativa com Cluster API.",
+  "k8s-lifecycle/capstone-plan-and-rehearse-an-upgrade-and-a-recovery": "Projeto final: planeje e ensaie uma atualização e uma recuperação.",
+  "k8s-network/the-kubernetes-network-model": "O modelo de rede do Kubernetes e suas regras para os pods.",
+  "k8s-network/cni-plugins-overlays-routing-and-ebpf": "Plugins CNI comparados: sobreposição, roteamento e eBPF.",
+  "k8s-network/services-clusterip-nodeport-and-kube-proxy": "Services, ClusterIP, NodePort e como o kube-proxy roteia o tráfego.",
+  "k8s-network/endpointslices-and-how-traffic-finds-pods": "EndpointSlices e como a prontidão decide para onde vai o tráfego.",
+  "k8s-network/coredns-and-service-discovery": "CoreDNS, domínios de busca e descoberta de serviços.",
+  "k8s-network/network-policies-in-depth": "Políticas de rede a fundo: negar por padrão, seletores e DNS.",
+  "k8s-network/ingress-and-the-gateway-api": "Ingress e Gateway API para o tráfego que entra no cluster.",
+  "k8s-network/debugging-kubernetes-networking": "Um método fixo para depurar a rede do Kubernetes.",
+  "k8s-resources/requests-limits-and-qos-classes": "Requests, limits e classes de QoS explicados.",
+  "k8s-resources/cpu-and-memory-behaviour-throttling-and-oom": "Throttling de CPU e mortes por OOM, e como medi-los.",
+  "k8s-resources/limitrange-resourcequota-and-priority": "LimitRange, ResourceQuota e classes de prioridade para divisão justa.",
+  "k8s-resources/node-allocatable-pressure-and-eviction": "Alocável do nó, pressão e ordem de remoção.",
+  "k8s-resources/horizontal-pod-autoscaling": "Escalonamento horizontal de pods, das métricas às réplicas.",
+  "k8s-resources/vertical-scaling-and-right-sizing": "Escalonamento vertical e ajuste de requests pelo uso real.",
+  "k8s-resources/cluster-autoscaling-karpenter-and-keda": "Autoscaling de cluster com Karpenter e por eventos com KEDA.",
+  "k8s-resources/disruption-budgets-topology-spread-and-capacity-planning": "Orçamentos de disrupção, topologia e planejamento de capacidade.",
+  "k8s-security/threat-model-and-the-layers-of-cluster-security": "Modele as ameaças do cluster e coloque controles em camadas.",
+  "k8s-security/authentication-service-accounts-and-token-security": "Autenticação, contas de serviço e segurança de tokens.",
+  "k8s-security/rbac-design-least-privilege-and-auditing": "Projeto de RBAC com privilégio mínimo e auditoria.",
+  "k8s-security/pod-security-standards-and-admission-policy": "Padrões de Pod Security e política de admissão.",
+  "k8s-security/secrets-encryption-at-rest-and-external-stores": "Secrets, criptografia em repouso e armazenamentos externos.",
+  "k8s-security/multi-tenancy-and-isolation": "Multilocação e isolamento entre equipes.",
+  "k8s-security/api-server-and-kubelet-hardening-with-cis": "Reforce o API server e o kubelet com o benchmark CIS.",
+  "k8s-security/incident-response-for-a-compromised-cluster": "Responda a um cluster comprometido: conter, investigar e recuperar.",
+  "obs-deep/promql-in-depth-rates-aggregation-and-recording-rules": "PromQL com taxas, agregação e regras de gravação que dão respostas corretas.",
+  "obs-deep/scaling-prometheus-ha-federation-and-long-term-storage": "Escale o Prometheus com sharding, federação e armazenamento de longo prazo.",
+  "obs-deep/slo-alerting-burn-rates-and-alertmanager-design": "Alertas de burn rate e roteamento no Alertmanager ligados aos SLOs.",
+  "obs-deep/logs-at-scale-loki-labels-and-retention": "Opere o Loki em escala com poucos rótulos e retenção sensata.",
+  "obs-deep/distributed-tracing-sampling-and-correlation": "Tracing com amostragem e ligações entre traces, logs e métricas.",
+  "obs-deep/observability-as-code-and-cost-control": "Painéis e alertas como código, com controle de custos.",
+  "k8s-supply-chain/the-software-supply-chain-threat-model-and-slsa": "O modelo de ameaças da cadeia de suprimentos e os níveis SLSA.",
+  "k8s-supply-chain/image-scanning-and-vulnerability-management": "Escaneie imagens e gerencie vulnerabilidades com responsáveis e prazos.",
+  "k8s-supply-chain/sboms-signing-and-verification-with-cosign": "Crie SBOMs e assine e verifique imagens com cosign.",
+  "k8s-supply-chain/admission-enforcement-of-provenance-with-policy": "Exija a procedência na admissão por meio de políticas.",
+  "k8s-supply-chain/runtime-detection-with-falco-and-audit-events": "Detecte ataques em execução com Falco e eventos de auditoria.",
+  "k8s-supply-chain/sandboxing-seccomp-apparmor-and-runtime-classes": "Reduza a superfície do kernel com seccomp, AppArmor e sandboxes.",
+  "iac-beyond/opentofu-and-the-terraform-ecosystem-choices": "OpenTofu e como escolher entre as ferramentas Terraform.",
+  "iac-beyond/pulumi-infrastructure-in-real-programming-languages": "Pulumi: infraestrutura em linguagens de programação reais.",
+  "iac-beyond/terragrunt-modules-and-multi-environment-structure": "Terragrunt, módulos e estrutura multiambiente.",
+  "iac-beyond/testing-infrastructure-code": "Teste o código de infraestrutura em vários níveis.",
+  "iac-beyond/policy-as-code-and-drift-detection": "Política como código e detecção de drift.",
+  "iac-beyond/state-secrets-and-safe-migrations": "Trate estado, segredos e migrações com segurança.",
+  "leadership/star-stories-and-behavioral-interviews": "Prepare histórias STAR para entrevistas comportamentais.",
+  "leadership/communicating-technical-decisions-and-design-reviews": "Explique decisões técnicas e conduza revisões de design.",
+  "leadership/influence-without-authority": "Influencie outras equipes sem autoridade formal.",
+  "leadership/mentoring-and-giving-feedback": "Oriente pessoas e dê feedback útil.",
+  "leadership/leading-through-incidents": "Conduza um incidente com papéis e atualizações claras.",
+  "leadership/senior-staff-scope-and-career-growth": "Cresça para o escopo sênior e staff.",
+  "ai-infra/gpu-scheduling-and-sharing-on-kubernetes": "Agende e compartilhe GPUs no Kubernetes.",
+  "ai-infra/vector-databases-and-retrieval-operations": "Opere bancos vetoriais e a recuperação.",
+  "ai-infra/rag-pipelines-in-production": "Execute pipelines RAG em produção.",
+  "ai-infra/llm-gateways-routing-caching-and-rate-limits": "Gateways de LLM: roteamento, cache e limites de taxa.",
+  "ai-infra/llm-observability-evaluation-and-guardrails": "Observe, avalie e proteja aplicações com LLM.",
+  "ai-infra/cost-and-capacity-engineering-for-inference": "Controle custo e capacidade da inferência.",
+  "rust-infra/why-rust-ownership-borrowing-and-the-mental-model": "Propriedade, empréstimos e o modelo mental do Rust.",
+  "rust-infra/errors-option-result-and-the-question-mark": "Trate erros com Option, Result e o operador de interrogação.",
+  "rust-infra/structs-enums-traits-and-generics": "Modele dados com structs, enums, traits e genéricos.",
+  "rust-infra/cli-tools-with-clap-serde-and-files": "Crie ferramentas CLI com clap, serde e arquivos.",
+  "rust-infra/async-rust-with-tokio-and-network-services": "Escreva serviços de rede assíncronos com tokio.",
+  "rust-infra/testing-cross-compilation-and-shipping-static-binaries": "Teste, compile de forma cruzada e entregue binários estáticos.",
+  "db-ops/postgresql-replication-and-high-availability": "Replicação do PostgreSQL, failover e como evitar split brain.",
+  "db-ops/backups-pitr-and-restore-testing": "Backups, recuperação em um ponto no tempo e testes de restauração.",
+  "db-ops/connection-pooling-and-capacity": "Pool de conexões e planejamento de capacidade.",
+  "db-ops/zero-downtime-migrations-and-upgrades": "Migrações sem indisponibilidade e atualizações maiores.",
+  "db-ops/redis-and-mongodb-operations": "Opere Redis e MongoDB com segurança.",
+  "db-ops/database-incidents-and-runbooks": "Responda a incidentes de banco de dados com runbooks.",
+  "python-ops/project-structure-packaging-and-virtual-environments": "Empacote ferramentas com pyproject.toml e ambientes virtuais.",
+  "python-ops/cli-tools-with-argparse-click-and-typer": "Crie ferramentas de linha de comando seguras.",
+  "python-ops/api-clients-retries-timeouts-and-pagination": "Clientes de API com timeouts, novas tentativas e paginação.",
+  "python-ops/concurrency-threads-asyncio-and-processes": "Escolha threads, asyncio ou processos e limite a concorrência.",
+  "python-ops/testing-with-pytest-and-mocking-infrastructure": "Teste código de operações com pytest e dublês.",
+  "python-ops/working-with-cloud-and-kubernetes-sdks-with-safe-patterns": "Use SDKs de nuvem e Kubernetes com padrões seguros."
  }
 }

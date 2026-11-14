@@ -1919,6 +1919,66 @@
   "aiops-practice": {
    "title": "AIOps dalam praktik",
    "summary": "Jalankan AIOps dengan aman: pipeline data, tingkat tindakan perbaikan dan verifikasi, sakelar darurat dan audit, uji kekacauan, pencarian runbook, agen dan gerbang persetujuan, injeksi prompt, evaluasi, bangun atau beli, dan operasi."
+  },
+  "platform": {
+   "title": "Rekayasa platform",
+   "summary": "Bangun platform pengembang internal sebagai produk: jalur emas, katalog, swalayan, API platform, pagar pengaman, biaya, metrik, dan adopsi."
+  },
+  "k8s-exam": {
+   "title": "Latihan ujian CKA dan CKS",
+   "summary": "Berlatih untuk ujian administrator dan keamanan Kubernetes dengan kubectl cepat, tugas klaster, pemecahan masalah, penguatan keamanan, dan simulasi berwaktu."
+  },
+  "k8s-control-plane": {
+   "title": "Control plane dan etcd secara mendalam",
+   "summary": "Bagaimana permintaan mengalir lewat API server, bagaimana etcd menyimpan status, dan bagaimana scheduler, controller, dan kubelet bertindak."
+  },
+  "k8s-lifecycle": {
+   "title": "Siklus hidup klaster dan HA",
+   "summary": "Rancang klaster berketersediaan tinggi, bangun dengan kubeadm, kelola sertifikat, mutakhirkan dengan aman, dan pulih dari kegagalan."
+  },
+  "k8s-network": {
+   "title": "Jaringan Kubernetes secara mendalam",
+   "summary": "Model jaringan, CNI, Service, DNS, kebijakan jaringan, Ingress, dan metode debug yang tetap."
+  },
+  "k8s-resources": {
+   "title": "Manajemen sumber daya dan autoscaling",
+   "summary": "Request, limit, kuota, eviksi, HPA, VPA, autoscaling node, dan perencanaan gangguan."
+  },
+  "k8s-security": {
+   "title": "Keamanan Kubernetes secara mendalam",
+   "summary": "Model ancaman, identitas, RBAC, Pod Security, secret, multi-tenancy, penguatan, dan respons insiden."
+  },
+  "obs-deep": {
+   "title": "Observabilitas mendalam",
+   "summary": "PromQL, penskalaan Prometheus, peringatan burn rate, log Loki, tracing, dan observabilitas sebagai kode dengan kontrol biaya."
+  },
+  "k8s-supply-chain": {
+   "title": "Rantai pasok dan keamanan runtime Kubernetes",
+   "summary": "Ancaman, SLSA, pemindaian, SBOM dan cosign, provenance saat admisi, Falco, seccomp, AppArmor, dan runtime terisolasi."
+  },
+  "iac-beyond": {
+   "title": "IaC di luar Terraform",
+   "summary": "OpenTofu, Pulumi, Terragrunt, pengujian, kebijakan sebagai kode, deteksi drift, dan migrasi state yang aman."
+  },
+  "leadership": {
+   "title": "Jalur perilaku dan kepemimpinan",
+   "summary": "Cerita STAR, keputusan teknis, pengaruh tanpa otoritas, mentoring, memimpin insiden, dan tumbuh ke senior dan staf."
+  },
+  "ai-infra": {
+   "title": "Infrastruktur AI di produksi",
+   "summary": "GPU di Kubernetes, basis data vektor, RAG, gateway LLM, observabilitas dan evaluasi, biaya dan kapasitas inferensi."
+  },
+  "rust-infra": {
+   "title": "Rust untuk insinyur infrastruktur",
+   "summary": "Ownership dan borrowing, error dengan Result, trait, CLI dengan clap dan serde, async dengan tokio, dan binary statis."
+  },
+  "db-ops": {
+   "title": "Operasi basis data di produksi",
+   "summary": "Replikasi dan failover PostgreSQL, backup dan PITR, pooling, migrasi tanpa henti, Redis, MongoDB, dan runbook."
+  },
+  "python-ops": {
+   "title": "Python untuk operasi",
+   "summary": "Paket dan lingkungan, alat CLI, klien API dengan percobaan ulang, konkurensi, pytest, dan SDK cloud yang aman."
   }
  },
  "paths": {
@@ -1945,6 +2005,18 @@
   "mlops": {
    "summary": "Jalankan machine learning dan operasi berbantuan algoritma di produksi: kontainer dan Kubernetes, pipeline, observabilitas, lalu MLOps dan AIOps.",
    "audience": "DevOps dan SRE engineer yang mendukung tim data science, serta data engineer yang membutuhkan kebiasaan produksi."
+  },
+  "platform": {
+   "summary": "Bangun dan jalankan platform internal tempat insinyur lain merilis: pengiriman, Kubernetes, infrastruktur sebagai kode, kebijakan, observabilitas, biaya, dan pola pikir produk.",
+   "audience": "Pengembang, insinyur DevOps dan SRE yang beralih ke peran rekayasa platform."
+  },
+  "cka": {
+   "summary": "Tujuan pertama: membangun, memutakhirkan, mencadangkan, dan memecahkan masalah klaster, dengan pendalaman control plane, jaringan, dan sumber daya, lalu latihan ujian.",
+   "audience": "Insinyur yang menyiapkan CKA dan ingin memahami cara kerja klaster yang sebenarnya."
+  },
+  "cks": {
+   "summary": "Tujuan kedua: seluruh jalur CKA, lalu keamanan pipeline, keamanan Kubernetes mendalam, dan latihan ujian.",
+   "audience": "Administrator yang memegang atau menuju CKA dan kini ingin memperkuat klaster."
   }
  },
  "lessons": {
@@ -2572,6 +2644,122 @@
   "aiops-practice/failure-modes-drift-feedback-loops-and-wrong-remediators": "Kenali penyimpangan, lingkaran umpan balik, bias cakupan, dan perbaikan yang salah sebelum menyebabkan gangguan.",
   "aiops-practice/operating-aiops-ownership-on-call-and-lifecycle": "Jalankan platform AIOps sebagai layanan produksi dengan pemilik, SLO, jaga panggilan, dan siklus hidup aturan.",
   "aiops-practice/debugging-a-misbehaving-aiops-pipeline": "Temukan mengapa sistem AIOps salah dengan memutar ulang keputusan tahap demi tahap dan menambahkan kasus regresi.",
-  "aiops-practice/capstone-a-mini-aiops-pipeline": "Bangun pipeline mini yang mendeteksi pergeseran, menautkan deploy, mengurutkan penyebab, dan mengusulkan perbaikan dengan persetujuan."
+  "aiops-practice/capstone-a-mini-aiops-pipeline": "Bangun pipeline mini yang mendeteksi pergeseran, menautkan deploy, mengurutkan penyebab, dan mengusulkan perbaikan dengan persetujuan.",
+  "platform/what-platform-engineering-is-and-how-it-differs-from-devops-and-sre": "Apa itu platform, apa bedanya dengan DevOps dan SRE, dan kapan Anda membutuhkannya.",
+  "platform/platform-as-a-product-users-roadmap-and-feedback": "Kelola platform sebagai produk: kenali pengguna, urutkan masalah, rilis kecil-kecil, dan ukur adopsi.",
+  "platform/golden-paths-and-paved-roads": "Bangun jalur emas: pengaturan bawaan yang didukung dan dipilih tim karena lebih mudah, dengan opsi penyesuaian.",
+  "platform/anatomy-of-an-internal-developer-platform": "Pahami lapisan platform pengembang internal dan telusuri satu permintaan melaluinya.",
+  "platform/developer-portals-and-the-service-catalog": "Jaga katalog perangkat lunak tetap akurat dengan pemilik di dalam kode dan pemeriksaan otomatis.",
+  "platform/scaffolding-templates-and-self-service-workflows": "Rancang templat dan alur swalayan yang memvalidasi, mengulang, dan melapor.",
+  "platform/platform-apis-with-crossplane-and-operators": "Tawarkan API platform dengan Crossplane dan operator serta tampilkan status yang jujur.",
+  "platform/guardrails-policy-as-code-and-secure-defaults": "Terapkan pagar pengaman sebagai kode: bawaan aman, pesan jelas, dan peluncuran bertahap.",
+  "platform/environments-ephemeral-previews-and-multi-tenancy": "Buat penyewa, lingkungan pratinjau, dan masa kedaluwarsa agar infrastruktur bersama tetap aman dan murah.",
+  "platform/cost-allocation-showback-and-unit-economics": "Bagi biaya dengan label, tunjukkan kepada pemilik, dan laporkan biaya per unit.",
+  "platform/measuring-developer-experience-dora-space-and-cognitive-load": "Ukur pengalaman pengembang dengan DORA, SPACE, dan waktu orientasi tanpa memeringkat orang.",
+  "platform/platform-slos-support-and-on-call-for-the-platform-team": "Tetapkan SLO, dukungan, dan jaga siaga platform serta tarik batas dengan tim produk.",
+  "platform/adoption-migration-and-deprecation": "Jalankan adopsi, migrasi, dan penghentian sampai sistem lama dihapus.",
+  "platform/capstone-design-and-ship-a-golden-path": "Rancang dan rilis jalur emas, lalu uji dengan mengukur waktu seorang insinyur baru.",
+  "k8s-exam/the-exam-environment-speed-setup-and-the-docs": "Mulai cepat untuk ujian CKA dan CKS: alias, konteks, pencarian dokumentasi, dan anggaran waktu.",
+  "k8s-exam/imperative-kubectl-and-fast-yaml": "Gunakan kubectl imperatif dan YAML dry-run untuk membuat dan mengubah objek dengan cepat.",
+  "k8s-exam/cka-cluster-setup-with-kubeadm-and-upgrades": "Siapkan klaster dengan kubeadm dan perbarui satu versi minor setiap kali.",
+  "k8s-exam/cka-etcd-backup-restore-and-static-pods": "Cadangkan dan pulihkan etcd serta ubah manifes pod statis dengan aman.",
+  "k8s-exam/cka-rbac-kubeconfig-and-certificate-tasks": "Selesaikan tugas RBAC, kubeconfig, dan sertifikat serta uji izinnya.",
+  "k8s-exam/cka-workloads-scheduling-and-configuration-tasks": "Selesaikan tugas beban kerja, penjadwalan, dan konfigurasi seperti rollout, taint, dan batas sumber daya.",
+  "k8s-exam/cka-services-ingress-gateway-api-and-dns-tasks": "Selesaikan tugas Service, Ingress, Gateway API, kebijakan jaringan, dan DNS.",
+  "k8s-exam/cka-storage-tasks": "Selesaikan tugas penyimpanan dengan volume, klaim, kelas, dan kebijakan reklamasi.",
+  "k8s-exam/cka-troubleshooting-method-and-scenarios": "Telusuri masalah dari atas ke bawah: gejala, peristiwa, log, node, dan bidang kendali.",
+  "k8s-exam/cks-cluster-setup-and-hardening": "Perkuat klaster dengan kube-bench, pengaturan kubelet dan API, serta tolak secara bawaan.",
+  "k8s-exam/cks-system-hardening-apparmor-seccomp-and-the-host": "Gunakan AppArmor, seccomp, dan kapabilitas serta perkuat host.",
+  "k8s-exam/cks-minimize-microservice-vulnerabilities": "Kurangi risiko layanan mikro dengan Pod Security, sandbox, enkripsi saat diam, dan TLS timbal balik.",
+  "k8s-exam/cks-supply-chain-security": "Amankan rantai pasok: image minimal, pemindaian, digest, dan kebijakan admisi.",
+  "k8s-exam/cks-monitoring-runtime-security-and-the-mock-run": "Gunakan log audit dan Falco, jaga kontainer tak berubah, dan lakukan simulasi ujian berwaktu.",
+  "k8s-control-plane/the-request-path-authentication-authorization-and-admission": "Bagaimana permintaan melewati autentikasi, otorisasi, dan admisi sebelum disimpan.",
+  "k8s-control-plane/api-machinery-versions-watches-and-server-side-apply": "Versi API, watch, konflik, dan server-side apply dijelaskan.",
+  "k8s-control-plane/etcd-data-model-raft-and-quorum": "Bagaimana etcd menyimpan objek dan memakai kuorum Raft untuk mengesahkan penulisan.",
+  "k8s-control-plane/etcd-operations-health-compaction-and-defragmentation": "Jaga etcd tetap sehat dengan kompaksi, defragmentasi, dan pemulihan alarm.",
+  "k8s-control-plane/the-scheduler-filtering-scoring-and-binding": "Bagaimana scheduler menyaring, menilai, dan mengikat pod, serta cara membaca Pending.",
+  "k8s-control-plane/controllers-the-reconcile-loop-and-leader-election": "Controller, loop rekonsiliasi, dan pemilihan leader dengan lease.",
+  "k8s-control-plane/the-kubelet-pod-lifecycle-and-the-cri": "Bagaimana kubelet dan runtime mengubah spesifikasi pod menjadi kontainer.",
+  "k8s-control-plane/control-plane-failure-modes-and-diagnosis": "Diagnosis kegagalan control plane dari gejala hingga komponen.",
+  "k8s-lifecycle/designing-a-highly-available-control-plane": "Rancang control plane berketersediaan tinggi lintas domain kegagalan.",
+  "k8s-lifecycle/bootstrapping-with-kubeadm-configuration-and-phases": "Bangun klaster dengan konfigurasi dan fase kubeadm.",
+  "k8s-lifecycle/certificates-pki-expiry-and-rotation": "Sertifikat, pemeriksaan kedaluwarsa, dan rotasi yang aman.",
+  "k8s-lifecycle/version-skew-and-upgrade-strategy": "Aturan selisih versi dan rencana pemutakhiran satu versi minor.",
+  "k8s-lifecycle/node-lifecycle-joining-draining-and-replacing": "Gabungkan, kosongkan, dan ganti node tanpa mengganggu beban kerja.",
+  "k8s-lifecycle/backup-and-disaster-recovery-for-the-cluster": "Cadangkan etcd, pulihkan, dan latih pemulihan bencana.",
+  "k8s-lifecycle/cluster-api-and-declarative-cluster-management": "Kelola klaster secara deklaratif dengan Cluster API.",
+  "k8s-lifecycle/capstone-plan-and-rehearse-an-upgrade-and-a-recovery": "Proyek akhir: rencanakan dan latih pemutakhiran serta pemulihan.",
+  "k8s-network/the-kubernetes-network-model": "Model jaringan Kubernetes dan aturannya untuk pod.",
+  "k8s-network/cni-plugins-overlays-routing-and-ebpf": "Plugin CNI dibandingkan: overlay, routing, dan eBPF.",
+  "k8s-network/services-clusterip-nodeport-and-kube-proxy": "Service, ClusterIP, NodePort, dan cara kube-proxy mengarahkan lalu lintas.",
+  "k8s-network/endpointslices-and-how-traffic-finds-pods": "EndpointSlice dan bagaimana kesiapan menentukan arah lalu lintas.",
+  "k8s-network/coredns-and-service-discovery": "CoreDNS, domain pencarian, dan penemuan layanan.",
+  "k8s-network/network-policies-in-depth": "Kebijakan jaringan mendalam: tolak default, selektor, dan DNS.",
+  "k8s-network/ingress-and-the-gateway-api": "Ingress dan Gateway API untuk lalu lintas yang masuk ke klaster.",
+  "k8s-network/debugging-kubernetes-networking": "Metode tetap untuk men-debug jaringan Kubernetes.",
+  "k8s-resources/requests-limits-and-qos-classes": "Request, limit, dan kelas QoS dijelaskan.",
+  "k8s-resources/cpu-and-memory-behaviour-throttling-and-oom": "Throttling CPU dan OOM kill, serta cara mengukurnya.",
+  "k8s-resources/limitrange-resourcequota-and-priority": "LimitRange, ResourceQuota, dan kelas prioritas untuk pembagian adil.",
+  "k8s-resources/node-allocatable-pressure-and-eviction": "Allocatable node, tekanan, dan urutan eviksi.",
+  "k8s-resources/horizontal-pod-autoscaling": "Penskalaan pod horizontal dari metrik hingga replika.",
+  "k8s-resources/vertical-scaling-and-right-sizing": "Penskalaan vertikal dan penyesuaian request dari penggunaan nyata.",
+  "k8s-resources/cluster-autoscaling-karpenter-and-keda": "Autoscaling klaster dengan Karpenter dan berbasis peristiwa dengan KEDA.",
+  "k8s-resources/disruption-budgets-topology-spread-and-capacity-planning": "Anggaran gangguan, sebaran topologi, dan perencanaan kapasitas.",
+  "k8s-security/threat-model-and-the-layers-of-cluster-security": "Modelkan ancaman klaster dan tempatkan kontrol berlapis.",
+  "k8s-security/authentication-service-accounts-and-token-security": "Autentikasi, service account, dan keamanan token.",
+  "k8s-security/rbac-design-least-privilege-and-auditing": "Desain RBAC hak minimum dan audit.",
+  "k8s-security/pod-security-standards-and-admission-policy": "Standar Pod Security dan kebijakan admisi.",
+  "k8s-security/secrets-encryption-at-rest-and-external-stores": "Secret, enkripsi saat diam, dan penyimpanan eksternal.",
+  "k8s-security/multi-tenancy-and-isolation": "Multi-tenancy dan isolasi antar tim.",
+  "k8s-security/api-server-and-kubelet-hardening-with-cis": "Perkuat API server dan kubelet dengan benchmark CIS.",
+  "k8s-security/incident-response-for-a-compromised-cluster": "Tanggapi klaster yang diretas: batasi, selidiki, pulihkan.",
+  "obs-deep/promql-in-depth-rates-aggregation-and-recording-rules": "PromQL dengan rate, agregasi, dan recording rule yang memberi jawaban benar.",
+  "obs-deep/scaling-prometheus-ha-federation-and-long-term-storage": "Skalakan Prometheus dengan sharding, federasi, dan penyimpanan jangka panjang.",
+  "obs-deep/slo-alerting-burn-rates-and-alertmanager-design": "Peringatan burn rate dan perutean Alertmanager berbasis SLO.",
+  "obs-deep/logs-at-scale-loki-labels-and-retention": "Jalankan Loki dalam skala besar dengan sedikit label dan retensi yang wajar.",
+  "obs-deep/distributed-tracing-sampling-and-correlation": "Tracing dengan sampling dan tautan antara trace, log, dan metrik.",
+  "obs-deep/observability-as-code-and-cost-control": "Dasbor dan peringatan sebagai kode, dengan kontrol biaya.",
+  "k8s-supply-chain/the-software-supply-chain-threat-model-and-slsa": "Model ancaman rantai pasok dan tingkat SLSA.",
+  "k8s-supply-chain/image-scanning-and-vulnerability-management": "Pindai image dan kelola kerentanan dengan penanggung jawab dan tenggat.",
+  "k8s-supply-chain/sboms-signing-and-verification-with-cosign": "Buat SBOM serta tanda tangani dan verifikasi image dengan cosign.",
+  "k8s-supply-chain/admission-enforcement-of-provenance-with-policy": "Wajibkan provenance saat admisi melalui kebijakan.",
+  "k8s-supply-chain/runtime-detection-with-falco-and-audit-events": "Deteksi serangan saat runtime dengan Falco dan peristiwa audit.",
+  "k8s-supply-chain/sandboxing-seccomp-apparmor-and-runtime-classes": "Kurangi permukaan serangan kernel dengan seccomp, AppArmor, dan sandbox.",
+  "iac-beyond/opentofu-and-the-terraform-ecosystem-choices": "OpenTofu dan cara memilih di antara alat Terraform.",
+  "iac-beyond/pulumi-infrastructure-in-real-programming-languages": "Pulumi: infrastruktur dalam bahasa pemrograman sungguhan.",
+  "iac-beyond/terragrunt-modules-and-multi-environment-structure": "Terragrunt, modul, dan struktur multi lingkungan.",
+  "iac-beyond/testing-infrastructure-code": "Uji kode infrastruktur pada beberapa tingkat.",
+  "iac-beyond/policy-as-code-and-drift-detection": "Kebijakan sebagai kode dan deteksi drift.",
+  "iac-beyond/state-secrets-and-safe-migrations": "Tangani state, rahasia, dan migrasi dengan aman.",
+  "leadership/star-stories-and-behavioral-interviews": "Siapkan cerita STAR untuk wawancara perilaku.",
+  "leadership/communicating-technical-decisions-and-design-reviews": "Jelaskan keputusan teknis dan pimpin tinjauan desain.",
+  "leadership/influence-without-authority": "Memengaruhi tim lain tanpa otoritas formal.",
+  "leadership/mentoring-and-giving-feedback": "Membimbing orang dan memberi umpan balik yang berguna.",
+  "leadership/leading-through-incidents": "Pimpin insiden dengan peran dan pembaruan yang jelas.",
+  "leadership/senior-staff-scope-and-career-growth": "Tumbuh menuju cakupan senior dan staf.",
+  "ai-infra/gpu-scheduling-and-sharing-on-kubernetes": "Jadwalkan dan bagikan GPU di Kubernetes.",
+  "ai-infra/vector-databases-and-retrieval-operations": "Kelola basis data vektor dan pencarian.",
+  "ai-infra/rag-pipelines-in-production": "Jalankan pipeline RAG di produksi.",
+  "ai-infra/llm-gateways-routing-caching-and-rate-limits": "Gateway LLM: perutean, cache, dan batas laju.",
+  "ai-infra/llm-observability-evaluation-and-guardrails": "Amati, evaluasi, dan lindungi aplikasi LLM.",
+  "ai-infra/cost-and-capacity-engineering-for-inference": "Kendalikan biaya dan kapasitas inferensi.",
+  "rust-infra/why-rust-ownership-borrowing-and-the-mental-model": "Ownership, borrowing, dan model mental Rust.",
+  "rust-infra/errors-option-result-and-the-question-mark": "Tangani error dengan Option, Result, dan operator tanda tanya.",
+  "rust-infra/structs-enums-traits-and-generics": "Modelkan data dengan struct, enum, trait, dan generik.",
+  "rust-infra/cli-tools-with-clap-serde-and-files": "Bangun alat CLI dengan clap, serde, dan berkas.",
+  "rust-infra/async-rust-with-tokio-and-network-services": "Tulis layanan jaringan asinkron dengan tokio.",
+  "rust-infra/testing-cross-compilation-and-shipping-static-binaries": "Uji, kompilasi silang, dan kirim binary statis.",
+  "db-ops/postgresql-replication-and-high-availability": "Replikasi PostgreSQL, failover, dan menghindari split brain.",
+  "db-ops/backups-pitr-and-restore-testing": "Backup, pemulihan ke titik waktu tertentu, dan uji restore.",
+  "db-ops/connection-pooling-and-capacity": "Connection pooling dan perencanaan kapasitas.",
+  "db-ops/zero-downtime-migrations-and-upgrades": "Migrasi tanpa downtime dan peningkatan versi mayor.",
+  "db-ops/redis-and-mongodb-operations": "Kelola Redis dan MongoDB dengan aman.",
+  "db-ops/database-incidents-and-runbooks": "Tanggapi insiden basis data dengan runbook.",
+  "python-ops/project-structure-packaging-and-virtual-environments": "Kemas alat dengan pyproject.toml dan lingkungan virtual.",
+  "python-ops/cli-tools-with-argparse-click-and-typer": "Bangun alat baris perintah yang aman.",
+  "python-ops/api-clients-retries-timeouts-and-pagination": "Klien API dengan timeout, percobaan ulang, dan paginasi.",
+  "python-ops/concurrency-threads-asyncio-and-processes": "Pilih thread, asyncio, atau proses dan batasi konkurensi.",
+  "python-ops/testing-with-pytest-and-mocking-infrastructure": "Uji kode operasi dengan pytest dan tiruan.",
+  "python-ops/working-with-cloud-and-kubernetes-sdks-with-safe-patterns": "Gunakan SDK cloud dan Kubernetes dengan pola aman."
  }
 }

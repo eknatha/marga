@@ -1919,6 +1919,66 @@
   "aiops-practice": {
    "title": "বাস্তবে AIOps",
    "summary": "AIOps নিরাপদে চালান: ডেটা পাইপলাইন, সংশোধনী পদক্ষেপের স্তর ও যাচাই, কিল সুইচ ও অডিট, কেয়স পরীক্ষা, রানবুক অনুসন্ধান, এজেন্ট ও অনুমোদন গেট, প্রম্পট ইনজেকশন, মূল্যায়ন, তৈরি না কেনা এবং পরিচালনা।"
+  },
+  "platform": {
+   "title": "প্ল্যাটফর্ম ইঞ্জিনিয়ারিং",
+   "summary": "অভ্যন্তরীণ ডেভেলপার প্ল্যাটফর্মকে পণ্য হিসেবে গড়ুন: গোল্ডেন পাথ, ক্যাটালগ, স্বয়ংসেবা, প্ল্যাটফর্ম API, সুরক্ষা বেড়া, খরচ, পরিমাপ ও গ্রহণ।"
+  },
+  "k8s-exam": {
+   "title": "CKA ও CKS পরীক্ষার অনুশীলন",
+   "summary": "দ্রুত kubectl, ক্লাস্টারের কাজ, সমস্যা সমাধান, নিরাপত্তা শক্তিশালীকরণ ও সময়সীমার মক পরীক্ষা দিয়ে Kubernetes অ্যাডমিনিস্ট্রেটর ও নিরাপত্তা পরীক্ষার প্রস্তুতি নিন।"
+  },
+  "k8s-control-plane": {
+   "title": "Control plane ও etcd-র ভেতরে",
+   "summary": "অনুরোধ API server দিয়ে কীভাবে চলে, etcd অবস্থা কীভাবে রাখে এবং scheduler, কন্ট্রোলার ও kubelet কীভাবে কাজ করে।"
+  },
+  "k8s-lifecycle": {
+   "title": "ক্লাস্টারের জীবনচক্র ও HA",
+   "summary": "উচ্চ প্রাপ্যতার ক্লাস্টার নকশা, kubeadm দিয়ে তৈরি, সার্টিফিকেট পরিচালনা, নিরাপদ আপগ্রেড এবং ব্যর্থতা থেকে পুনরুদ্ধার।"
+  },
+  "k8s-network": {
+   "title": "Kubernetes নেটওয়ার্কিং গভীরে",
+   "summary": "নেটওয়ার্ক মডেল, CNI, Service, DNS, নেটওয়ার্ক নীতি, Ingress এবং নির্দিষ্ট debug পদ্ধতি।"
+  },
+  "k8s-resources": {
+   "title": "সম্পদ ব্যবস্থাপনা ও autoscaling",
+   "summary": "Request, limit, কোটা, উচ্ছেদ, HPA, VPA, node autoscaling ও বিঘ্ন পরিকল্পনা।"
+  },
+  "k8s-security": {
+   "title": "Kubernetes নিরাপত্তা গভীরে",
+   "summary": "হুমকির মডেল, পরিচয়, RBAC, Pod Security, secret, বহু-ভাড়াটে, শক্তিবৃদ্ধি ও ঘটনার সাড়া।"
+  },
+  "obs-deep": {
+   "title": "গভীর Observability",
+   "summary": "PromQL, Prometheus স্কেলিং, burn rate সতর্কতা, Loki log, tracing এবং খরচ নিয়ন্ত্রণসহ code হিসেবে observability।"
+  },
+  "k8s-supply-chain": {
+   "title": "Kubernetes সরবরাহ শৃঙ্খল ও রানটাইম নিরাপত্তা",
+   "summary": "হুমকি, SLSA, স্ক্যানিং, SBOM ও cosign, ভর্তিতে provenance, Falco, seccomp, AppArmor ও sandbox runtime।"
+  },
+  "iac-beyond": {
+   "title": "Terraform-এর বাইরে IaC",
+   "summary": "OpenTofu, Pulumi, Terragrunt, পরীক্ষা, code হিসেবে নীতি, drift শনাক্তকরণ ও নিরাপদ state স্থানান্তর।"
+  },
+  "leadership": {
+   "title": "আচরণ ও নেতৃত্বের পথ",
+   "summary": "STAR গল্প, প্রযুক্তিগত সিদ্ধান্ত, ক্ষমতাহীন প্রভাব, মেন্টরিং, ঘটনা নেতৃত্ব এবং senior ও staff বৃদ্ধি।"
+  },
+  "ai-infra": {
+   "title": "প্রোডাকশনে AI অবকাঠামো",
+   "summary": "Kubernetes-এ GPU, vector ডেটাবেস, RAG, LLM gateway, পর্যবেক্ষণ ও মূল্যায়ন, inference খরচ ও সক্ষমতা।"
+  },
+  "rust-infra": {
+   "title": "অবকাঠামো প্রকৌশলীদের জন্য Rust",
+   "summary": "মালিকানা ও ধার, Result ত্রুটি, trait, clap ও serde CLI, tokio async এবং static binary।"
+  },
+  "db-ops": {
+   "title": "প্রোডাকশনে ডেটাবেস পরিচালনা",
+   "summary": "PostgreSQL replication ও failover, ব্যাকআপ ও PITR, pooling, বিরতিহীন স্থানান্তর, Redis, MongoDB ও runbook।"
+  },
+  "python-ops": {
+   "title": "অপারেশনের জন্য Python",
+   "summary": "প্যাকেজ ও পরিবেশ, CLI সরঞ্জাম, পুনরায় চেষ্টার API client, concurrency, pytest ও নিরাপদ cloud SDK।"
   }
  },
  "paths": {
@@ -1945,6 +2005,18 @@
   "mlops": {
    "summary": "প্রোডাকশনে মেশিন লার্নিং ও অ্যালগরিদম-সহায়ক পরিচালনা চালান: কন্টেইনার ও Kubernetes, পাইপলাইন, পর্যবেক্ষণযোগ্যতা, তারপর MLOps ও AIOps।",
    "audience": "ডেটা সায়েন্স দলকে সহায়তা করা DevOps ও SRE ইঞ্জিনিয়ার এবং প্রোডাকশনের অভ্যাস দরকার এমন ডেটা ইঞ্জিনিয়ার।"
+  },
+  "platform": {
+   "summary": "অন্য প্রকৌশলীরা যে অভ্যন্তরীণ প্ল্যাটফর্মে কাজ প্রকাশ করেন তা গড়ুন ও চালান: ডেলিভারি, Kubernetes, কোড হিসেবে অবকাঠামো, নীতি, পর্যবেক্ষণ, খরচ ও পণ্য-ভাবনা।",
+   "audience": "প্ল্যাটফর্ম ইঞ্জিনিয়ারিং ভূমিকায় যাওয়া ডেভেলপার, DevOps ও SRE প্রকৌশলী।"
+  },
+  "cka": {
+   "summary": "প্রথম লক্ষ্য: ক্লাস্টার তৈরি, আপগ্রেড, ব্যাকআপ ও সমস্যা সমাধান; control plane, নেটওয়ার্ক ও সম্পদের গভীর পাঠ, তারপর পরীক্ষার অনুশীলন।",
+   "audience": "যে প্রকৌশলীরা CKA-র প্রস্তুতি নিচ্ছেন এবং ক্লাস্টার আসলে কীভাবে কাজ করে তা বুঝতে চান।"
+  },
+  "cks": {
+   "summary": "দ্বিতীয় লক্ষ্য: পুরো CKA পথ, তারপর pipeline নিরাপত্তা, Kubernetes নিরাপত্তা গভীরে ও পরীক্ষার অনুশীলন।",
+   "audience": "যাঁদের CKA আছে বা সেদিকে এগোচ্ছেন এমন অ্যাডমিনিস্ট্রেটর, যাঁরা এখন ক্লাস্টার শক্তিশালী করতে চান।"
   }
  },
  "lessons": {
@@ -2572,6 +2644,122 @@
   "aiops-practice/failure-modes-drift-feedback-loops-and-wrong-remediators": "বিভ্রাট ঘটানোর আগেই ড্রিফট, ফিডব্যাক লুপ, কভারেজ পক্ষপাত ও ভুল সংশোধক চিনুন।",
   "aiops-practice/operating-aiops-ownership-on-call-and-lifecycle": "মালিক, SLO, অন-কল ও নিয়মের জীবনচক্রসহ AIOps প্ল্যাটফর্মকে প্রোডাকশন সেবা হিসেবে চালান।",
   "aiops-practice/debugging-a-misbehaving-aiops-pipeline": "একটি সিদ্ধান্ত ধাপে ধাপে আবার চালিয়ে ও রিগ্রেশন কেস যোগ করে খুঁজুন AIOps ব্যবস্থা কেন ভুল করল।",
-  "aiops-practice/capstone-a-mini-aiops-pipeline": "পরিবর্তন শনাক্ত করে, ডিপ্লয় যুক্ত করে, কারণ সাজিয়ে এবং অনুমোদনসহ সংশোধন প্রস্তাব করে এমন ছোট পাইপলাইন বানান।"
+  "aiops-practice/capstone-a-mini-aiops-pipeline": "পরিবর্তন শনাক্ত করে, ডিপ্লয় যুক্ত করে, কারণ সাজিয়ে এবং অনুমোদনসহ সংশোধন প্রস্তাব করে এমন ছোট পাইপলাইন বানান।",
+  "platform/what-platform-engineering-is-and-how-it-differs-from-devops-and-sre": "প্ল্যাটফর্ম কী, DevOps ও SRE থেকে কীভাবে আলাদা এবং কখন দরকার।",
+  "platform/platform-as-a-product-users-roadmap-and-feedback": "প্ল্যাটফর্মকে পণ্য হিসেবে চালান: ব্যবহারকারী চিনুন, সমস্যা সাজান, ছোট করে প্রকাশ করুন ও গ্রহণ মাপুন।",
+  "platform/golden-paths-and-paved-roads": "গোল্ডেন পাথ গড়ুন: সহজ বলে দলগুলো যে সমর্থিত ডিফল্ট বেছে নেয়, কাস্টমাইজ করার উপায়সহ।",
+  "platform/anatomy-of-an-internal-developer-platform": "অভ্যন্তরীণ ডেভেলপার প্ল্যাটফর্মের স্তরগুলো বুঝুন এবং একটি অনুরোধ সেগুলোর মধ্য দিয়ে অনুসরণ করুন।",
+  "platform/developer-portals-and-the-service-catalog": "কোডে মালিক ও স্বয়ংক্রিয় পরীক্ষা রেখে সফটওয়্যার ক্যাটালগ নির্ভুল রাখুন।",
+  "platform/scaffolding-templates-and-self-service-workflows": "যাচাই, পুনরায় চেষ্টা ও রিপোর্ট করে এমন টেমপ্লেট ও স্বয়ংসেবা প্রবাহ নকশা করুন।",
+  "platform/platform-apis-with-crossplane-and-operators": "Crossplane ও অপারেটর দিয়ে প্ল্যাটফর্ম API দিন এবং সৎ অবস্থা দেখান।",
+  "platform/guardrails-policy-as-code-and-secure-defaults": "সুরক্ষা বেড়া কোড হিসেবে প্রয়োগ করুন: নিরাপদ ডিফল্ট, স্পষ্ট বার্তা ও ধাপে ধাপে চালু।",
+  "platform/environments-ephemeral-previews-and-multi-tenancy": "ভাগ করা অবকাঠামো নিরাপদ ও সস্তা রাখতে টেন্যান্ট, প্রিভিউ পরিবেশ ও মেয়াদ তৈরি করুন।",
+  "platform/cost-allocation-showback-and-unit-economics": "লেবেল দিয়ে খরচ ভাগ করুন, মালিকদের দেখান এবং প্রতি একক খরচ জানান।",
+  "platform/measuring-developer-experience-dora-space-and-cognitive-load": "মানুষকে র‍্যাংক না করে DORA, SPACE ও অনবোর্ডিং সময় দিয়ে ডেভেলপার অভিজ্ঞতা মাপুন।",
+  "platform/platform-slos-support-and-on-call-for-the-platform-team": "প্ল্যাটফর্মের SLO, সহায়তা ও অন-কল ঠিক করুন এবং পণ্য দলের সঙ্গে সীমানা টানুন।",
+  "platform/adoption-migration-and-deprecation": "পুরোনো ব্যবস্থা সরানো পর্যন্ত গ্রহণ, স্থানান্তর ও বন্ধ করা চালান।",
+  "platform/capstone-design-and-ship-a-golden-path": "গোল্ডেন পাথ নকশা করে প্রকাশ করুন এবং নতুন প্রকৌশলীর সময় মেপে পরীক্ষা করুন।",
+  "k8s-exam/the-exam-environment-speed-setup-and-the-docs": "CKA ও CKS পরীক্ষায় দ্রুত শুরু করুন: অ্যালিয়াস, কনটেক্সট, ডকুমেন্টেশন খোঁজা ও সময়ের বাজেট।",
+  "k8s-exam/imperative-kubectl-and-fast-yaml": "বস্তু দ্রুত বানাতে ও বদলাতে নির্দেশমূলক kubectl ও dry-run YAML ব্যবহার করুন।",
+  "k8s-exam/cka-cluster-setup-with-kubeadm-and-upgrades": "kubeadm দিয়ে ক্লাস্টার বানান এবং একবারে একটি মাইনর সংস্করণ আপগ্রেড করুন।",
+  "k8s-exam/cka-etcd-backup-restore-and-static-pods": "etcd ব্যাকআপ ও পুনরুদ্ধার করুন এবং স্ট্যাটিক পড ম্যানিফেস্ট নিরাপদে বদলান।",
+  "k8s-exam/cka-rbac-kubeconfig-and-certificate-tasks": "RBAC, kubeconfig ও সনদের কাজ করুন এবং অনুমতি পরীক্ষা করুন।",
+  "k8s-exam/cka-workloads-scheduling-and-configuration-tasks": "রোলআউট, টেইন্ট ও রিসোর্স সীমার মতো ওয়ার্কলোড, শিডিউলিং ও কনফিগারেশনের কাজ শেষ করুন।",
+  "k8s-exam/cka-services-ingress-gateway-api-and-dns-tasks": "Service, Ingress, Gateway API, নেটওয়ার্ক নীতি ও DNS-এর কাজ সমাধান করুন।",
+  "k8s-exam/cka-storage-tasks": "ভলিউম, ক্লেইম, ক্লাস ও পুনরুদ্ধার নীতি নিয়ে স্টোরেজের কাজ সামলান।",
+  "k8s-exam/cka-troubleshooting-method-and-scenarios": "লক্ষণ, ইভেন্ট, লগ, নোড ও কন্ট্রোল প্লেন ধরে উপর থেকে নিচে সমস্যা খুঁজুন।",
+  "k8s-exam/cks-cluster-setup-and-hardening": "kube-bench, kubelet ও API সেটিং এবং ডিফল্ট প্রত্যাখ্যান দিয়ে ক্লাস্টার শক্ত করুন।",
+  "k8s-exam/cks-system-hardening-apparmor-seccomp-and-the-host": "AppArmor, seccomp ও ক্যাপাবিলিটি ব্যবহার করে হোস্ট শক্ত করুন।",
+  "k8s-exam/cks-minimize-microservice-vulnerabilities": "Pod Security, স্যান্ডবক্স, বিশ্রামে এনক্রিপশন ও পারস্পরিক TLS দিয়ে মাইক্রোসার্ভিসের ঝুঁকি কমান।",
+  "k8s-exam/cks-supply-chain-security": "সরবরাহ শৃঙ্খল সুরক্ষিত করুন: ন্যূনতম ইমেজ, স্ক্যান, ডাইজেস্ট ও অ্যাডমিশন নীতি।",
+  "k8s-exam/cks-monitoring-runtime-security-and-the-mock-run": "অডিট লগ ও Falco ব্যবহার করুন, কনটেইনার অপরিবর্তনীয় রাখুন এবং সময়সীমার মক পরীক্ষা দিন।",
+  "k8s-control-plane/the-request-path-authentication-authorization-and-admission": "অনুরোধ সংরক্ষণের আগে প্রমাণীকরণ, অনুমোদন ও অ্যাডমিশনের মধ্য দিয়ে কীভাবে যায়।",
+  "k8s-control-plane/api-machinery-versions-watches-and-server-side-apply": "API সংস্করণ, watch, দ্বন্দ্ব ও server-side apply ব্যাখ্যা।",
+  "k8s-control-plane/etcd-data-model-raft-and-quorum": "etcd কীভাবে অবজেক্ট সংরক্ষণ করে এবং Raft কোরাম দিয়ে লেখা নিশ্চিত করে।",
+  "k8s-control-plane/etcd-operations-health-compaction-and-defragmentation": "compaction, defragmentation ও অ্যালার্ম পুনরুদ্ধারে etcd সুস্থ রাখুন।",
+  "k8s-control-plane/the-scheduler-filtering-scoring-and-binding": "scheduler কীভাবে পড ফিল্টার, স্কোর ও বাঁধে এবং Pending কীভাবে পড়বেন।",
+  "k8s-control-plane/controllers-the-reconcile-loop-and-leader-election": "কন্ট্রোলার, reconcile লুপ ও lease দিয়ে লিডার নির্বাচন।",
+  "k8s-control-plane/the-kubelet-pod-lifecycle-and-the-cri": "kubelet ও runtime কীভাবে পডের বিবরণকে কনটেইনারে রূপ দেয়।",
+  "k8s-control-plane/control-plane-failure-modes-and-diagnosis": "লক্ষণ থেকে উপাদান পর্যন্ত control plane ব্যর্থতা নির্ণয়।",
+  "k8s-lifecycle/designing-a-highly-available-control-plane": "ব্যর্থতার ডোমেন জুড়ে উচ্চ প্রাপ্যতার control plane নকশা।",
+  "k8s-lifecycle/bootstrapping-with-kubeadm-configuration-and-phases": "kubeadm কনফিগারেশন ও ধাপ দিয়ে ক্লাস্টার তৈরি।",
+  "k8s-lifecycle/certificates-pki-expiry-and-rotation": "সার্টিফিকেট, মেয়াদ পরীক্ষা ও নিরাপদ ঘূর্ণন।",
+  "k8s-lifecycle/version-skew-and-upgrade-strategy": "সংস্করণ ব্যবধানের নিয়ম ও এক minor সংস্করণের আপগ্রেড পরিকল্পনা।",
+  "k8s-lifecycle/node-lifecycle-joining-draining-and-replacing": "ওয়ার্কলোডে বিঘ্ন না ঘটিয়ে node যোগ, খালি ও প্রতিস্থাপন।",
+  "k8s-lifecycle/backup-and-disaster-recovery-for-the-cluster": "etcd ব্যাকআপ, পুনরুদ্ধার ও দুর্যোগ পুনরুদ্ধারের অনুশীলন।",
+  "k8s-lifecycle/cluster-api-and-declarative-cluster-management": "Cluster API দিয়ে ক্লাস্টার ঘোষণামূলকভাবে পরিচালনা।",
+  "k8s-lifecycle/capstone-plan-and-rehearse-an-upgrade-and-a-recovery": "শেষ প্রকল্প: আপগ্রেড ও পুনরুদ্ধার পরিকল্পনা ও মহড়া।",
+  "k8s-network/the-kubernetes-network-model": "Kubernetes নেটওয়ার্ক মডেল ও পডের নিয়ম।",
+  "k8s-network/cni-plugins-overlays-routing-and-ebpf": "CNI প্লাগইন তুলনা: overlay, routing ও eBPF।",
+  "k8s-network/services-clusterip-nodeport-and-kube-proxy": "Service, ClusterIP, NodePort এবং kube-proxy কীভাবে ট্রাফিক চালনা করে।",
+  "k8s-network/endpointslices-and-how-traffic-finds-pods": "EndpointSlice এবং প্রস্তুতি কীভাবে ট্রাফিকের গতিপথ ঠিক করে।",
+  "k8s-network/coredns-and-service-discovery": "CoreDNS, অনুসন্ধান ডোমেন ও সার্ভিস আবিষ্কার।",
+  "k8s-network/network-policies-in-depth": "নেটওয়ার্ক নীতি গভীরে: ডিফল্ট অস্বীকার, selector ও DNS।",
+  "k8s-network/ingress-and-the-gateway-api": "ক্লাস্টারে ঢোকা ট্রাফিকের জন্য Ingress ও Gateway API।",
+  "k8s-network/debugging-kubernetes-networking": "Kubernetes নেটওয়ার্ক debug করার একটি নির্দিষ্ট পদ্ধতি।",
+  "k8s-resources/requests-limits-and-qos-classes": "Request, limit ও QoS শ্রেণির ব্যাখ্যা।",
+  "k8s-resources/cpu-and-memory-behaviour-throttling-and-oom": "CPU throttling, OOM kill এবং সেগুলি মাপার উপায়।",
+  "k8s-resources/limitrange-resourcequota-and-priority": "ন্যায্য বণ্টনের জন্য LimitRange, ResourceQuota ও অগ্রাধিকার শ্রেণি।",
+  "k8s-resources/node-allocatable-pressure-and-eviction": "Node allocatable, চাপ ও উচ্ছেদের ক্রম।",
+  "k8s-resources/horizontal-pod-autoscaling": "মেট্রিক থেকে replica পর্যন্ত অনুভূমিক পড স্বয়ংক্রিয় স্কেলিং।",
+  "k8s-resources/vertical-scaling-and-right-sizing": "উল্লম্ব স্কেলিং ও প্রকৃত ব্যবহার থেকে request ঠিক করা।",
+  "k8s-resources/cluster-autoscaling-karpenter-and-keda": "Karpenter দিয়ে ক্লাস্টার autoscaling এবং KEDA দিয়ে ইভেন্টভিত্তিক স্কেলিং।",
+  "k8s-resources/disruption-budgets-topology-spread-and-capacity-planning": "বিঘ্ন বাজেট, topology বিস্তার ও ক্ষমতা পরিকল্পনা।",
+  "k8s-security/threat-model-and-the-layers-of-cluster-security": "ক্লাস্টারের হুমকির মডেল করে স্তরে স্তরে নিয়ন্ত্রণ বসান।",
+  "k8s-security/authentication-service-accounts-and-token-security": "প্রমাণীকরণ, service account ও token নিরাপত্তা।",
+  "k8s-security/rbac-design-least-privilege-and-auditing": "ন্যূনতম অধিকারের RBAC নকশা ও নিরীক্ষা।",
+  "k8s-security/pod-security-standards-and-admission-policy": "Pod Security মান ও admission নীতি।",
+  "k8s-security/secrets-encryption-at-rest-and-external-stores": "Secret, স্থির অবস্থায় এনক্রিপশন ও বাইরের সংরক্ষণাগার।",
+  "k8s-security/multi-tenancy-and-isolation": "বহু-ভাড়াটে ব্যবস্থা ও দলগুলির মধ্যে বিচ্ছিন্নতা।",
+  "k8s-security/api-server-and-kubelet-hardening-with-cis": "CIS benchmark দিয়ে API server ও kubelet শক্তিশালী করুন।",
+  "k8s-security/incident-response-for-a-compromised-cluster": "আপস হওয়া ক্লাস্টারে সাড়া: আটকান, তদন্ত করুন, পুনরুদ্ধার করুন।",
+  "obs-deep/promql-in-depth-rates-aggregation-and-recording-rules": "সঠিক ফল দেয় এমন PromQL rate, একত্রীকরণ ও recording rule।",
+  "obs-deep/scaling-prometheus-ha-federation-and-long-term-storage": "sharding, federation ও দীর্ঘমেয়াদি সংরক্ষণে Prometheus বড় করা।",
+  "obs-deep/slo-alerting-burn-rates-and-alertmanager-design": "SLO ভিত্তিক burn rate সতর্কতা ও Alertmanager রুটিং।",
+  "obs-deep/logs-at-scale-loki-labels-and-retention": "কম label ও যুক্তিসঙ্গত সংরক্ষণে Loki বড় পরিসরে চালানো।",
+  "obs-deep/distributed-tracing-sampling-and-correlation": "sampling এবং trace, log, metric সংযোগসহ tracing।",
+  "obs-deep/observability-as-code-and-cost-control": "খরচ নিয়ন্ত্রণসহ code হিসেবে dashboard ও সতর্কতা।",
+  "k8s-supply-chain/the-software-supply-chain-threat-model-and-slsa": "সরবরাহ শৃঙ্খলের হুমকি মডেল ও SLSA স্তর।",
+  "k8s-supply-chain/image-scanning-and-vulnerability-management": "image স্ক্যান করে দায়িত্বপ্রাপ্ত ও সময়সীমাসহ দুর্বলতা পরিচালনা।",
+  "k8s-supply-chain/sboms-signing-and-verification-with-cosign": "SBOM তৈরি এবং cosign দিয়ে image স্বাক্ষর ও যাচাই।",
+  "k8s-supply-chain/admission-enforcement-of-provenance-with-policy": "নীতির মাধ্যমে ভর্তির সময় provenance বাধ্যতামূলক করা।",
+  "k8s-supply-chain/runtime-detection-with-falco-and-audit-events": "Falco ও অডিট ঘটনা দিয়ে রানটাইম আক্রমণ শনাক্ত করা।",
+  "k8s-supply-chain/sandboxing-seccomp-apparmor-and-runtime-classes": "seccomp, AppArmor ও sandbox দিয়ে kernel আক্রমণের সুযোগ কমানো।",
+  "iac-beyond/opentofu-and-the-terraform-ecosystem-choices": "OpenTofu এবং Terraform সরঞ্জামের মধ্যে বাছাই।",
+  "iac-beyond/pulumi-infrastructure-in-real-programming-languages": "Pulumi: আসল প্রোগ্রামিং ভাষায় অবকাঠামো।",
+  "iac-beyond/terragrunt-modules-and-multi-environment-structure": "Terragrunt, module ও বহু পরিবেশের কাঠামো।",
+  "iac-beyond/testing-infrastructure-code": "অবকাঠামো code একাধিক স্তরে পরীক্ষা করা।",
+  "iac-beyond/policy-as-code-and-drift-detection": "code হিসেবে নীতি ও drift শনাক্তকরণ।",
+  "iac-beyond/state-secrets-and-safe-migrations": "state, গোপন তথ্য ও স্থানান্তর নিরাপদে সামলানো।",
+  "leadership/star-stories-and-behavioral-interviews": "আচরণগত সাক্ষাৎকারের জন্য STAR গল্প তৈরি করা।",
+  "leadership/communicating-technical-decisions-and-design-reviews": "প্রযুক্তিগত সিদ্ধান্ত ব্যাখ্যা ও ডিজাইন পর্যালোচনা পরিচালনা।",
+  "leadership/influence-without-authority": "আনুষ্ঠানিক ক্ষমতা ছাড়া অন্য দলকে প্রভাবিত করা।",
+  "leadership/mentoring-and-giving-feedback": "মানুষকে পথ দেখানো ও কার্যকর মতামত দেওয়া।",
+  "leadership/leading-through-incidents": "ভূমিকা ও স্পষ্ট আপডেটসহ ঘটনা পরিচালনা।",
+  "leadership/senior-staff-scope-and-career-growth": "senior ও staff পরিসরে বেড়ে ওঠা।",
+  "ai-infra/gpu-scheduling-and-sharing-on-kubernetes": "Kubernetes-এ GPU নির্ধারণ ও ভাগ করা।",
+  "ai-infra/vector-databases-and-retrieval-operations": "vector ডেটাবেস ও অনুসন্ধান পরিচালনা।",
+  "ai-infra/rag-pipelines-in-production": "প্রোডাকশনে RAG pipeline চালানো।",
+  "ai-infra/llm-gateways-routing-caching-and-rate-limits": "LLM gateway: রুটিং, cache ও হারের সীমা।",
+  "ai-infra/llm-observability-evaluation-and-guardrails": "LLM অ্যাপ পর্যবেক্ষণ, মূল্যায়ন ও সুরক্ষা।",
+  "ai-infra/cost-and-capacity-engineering-for-inference": "inference-এর খরচ ও সক্ষমতা নিয়ন্ত্রণ।",
+  "rust-infra/why-rust-ownership-borrowing-and-the-mental-model": "মালিকানা, ধার ও Rust-এর চিন্তা মডেল।",
+  "rust-infra/errors-option-result-and-the-question-mark": "Option, Result ও প্রশ্নচিহ্ন দিয়ে ত্রুটি সামলানো।",
+  "rust-infra/structs-enums-traits-and-generics": "struct, enum, trait ও generic দিয়ে ডেটা মডেল করা।",
+  "rust-infra/cli-tools-with-clap-serde-and-files": "clap, serde ও ফাইল দিয়ে CLI সরঞ্জাম বানানো।",
+  "rust-infra/async-rust-with-tokio-and-network-services": "tokio দিয়ে async নেটওয়ার্ক সেবা লেখা।",
+  "rust-infra/testing-cross-compilation-and-shipping-static-binaries": "পরীক্ষা, cross compile ও static binary বিতরণ।",
+  "db-ops/postgresql-replication-and-high-availability": "PostgreSQL replication, failover ও split brain এড়ানো।",
+  "db-ops/backups-pitr-and-restore-testing": "ব্যাকআপ, নির্দিষ্ট সময়ে পুনরুদ্ধার ও restore পরীক্ষা।",
+  "db-ops/connection-pooling-and-capacity": "সংযোগ pooling ও সক্ষমতা পরিকল্পনা।",
+  "db-ops/zero-downtime-migrations-and-upgrades": "বিরতিহীন স্থানান্তর ও বড় সংস্করণ আপগ্রেড।",
+  "db-ops/redis-and-mongodb-operations": "Redis ও MongoDB নিরাপদে চালানো।",
+  "db-ops/database-incidents-and-runbooks": "runbook দিয়ে ডেটাবেস ঘটনায় সাড়া দেওয়া।",
+  "python-ops/project-structure-packaging-and-virtual-environments": "pyproject.toml ও virtual environment দিয়ে সরঞ্জাম প্যাকেজ করা।",
+  "python-ops/cli-tools-with-argparse-click-and-typer": "নিরাপদ কমান্ড লাইন সরঞ্জাম বানানো।",
+  "python-ops/api-clients-retries-timeouts-and-pagination": "timeout, পুনরায় চেষ্টা ও পৃষ্ঠাভাগসহ API client।",
+  "python-ops/concurrency-threads-asyncio-and-processes": "thread, asyncio বা process বেছে concurrency সীমিত করা।",
+  "python-ops/testing-with-pytest-and-mocking-infrastructure": "pytest ও নকল বস্তু দিয়ে অপারেশন code পরীক্ষা।",
+  "python-ops/working-with-cloud-and-kubernetes-sdks-with-safe-patterns": "নিরাপদ নকশায় cloud ও Kubernetes SDK ব্যবহার।"
  }
 }

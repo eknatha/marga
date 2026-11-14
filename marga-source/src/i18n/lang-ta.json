@@ -1919,6 +1919,66 @@
   "aiops-practice": {
    "title": "நடைமுறையில் AIOps",
    "summary": "AIOps ஐ பாதுகாப்பாக இயக்குங்கள்: தரவு குழாய்கள், திருத்த நடவடிக்கை நிலைகள் மற்றும் சரிபார்ப்பு, கில் ஸ்விட்ச் மற்றும் தணிக்கை, கேயாஸ் சோதனைகள், ரன்புக் தேடல், முகவர்கள் மற்றும் ஒப்புதல் வாயில்கள், ப்ராம்ப்ட் இன்ஜெக்ஷன், மதிப்பீடு, உருவாக்குவதா வாங்குவதா மற்றும் இயக்கம்."
+  },
+  "platform": {
+   "title": "தள பொறியியல்",
+   "summary": "உள்ளக டெவலப்பர் தளத்தை ஒரு தயாரிப்பாக உருவாக்குங்கள்: தங்கப் பாதைகள், பட்டியல், சுயசேவை, தள API, பாதுகாப்பு வேலிகள், செலவு, அளவீடுகள், ஏற்பு."
+  },
+  "k8s-exam": {
+   "title": "CKA மற்றும் CKS தேர்வுப் பயிற்சி",
+   "summary": "வேகமான kubectl, கிளஸ்டர் பணிகள், சிக்கல் தீர்வு, பாதுகாப்பு வலுப்படுத்தல், நேர வரம்புடன் மாதிரித் தேர்வுகள் மூலம் Kubernetes நிர்வாகி மற்றும் பாதுகாப்புத் தேர்வுகளுக்குப் பயிலுங்கள்."
+  },
+  "k8s-control-plane": {
+   "title": "Control plane மற்றும் etcd உள்ளே",
+   "summary": "கோரிக்கை API server வழியாக எப்படிச் செல்கிறது, etcd நிலையை எப்படிச் சேமிக்கிறது, scheduler, கன்ட்ரோலர்கள், kubelet எப்படிச் செயல்படுகின்றன."
+  },
+  "k8s-lifecycle": {
+   "title": "கிளஸ்டர் வாழ்க்கைச் சுழற்சி மற்றும் HA",
+   "summary": "உயர் கிடைப்புத்திறன் கிளஸ்டர்களை வடிவமைத்து, kubeadm கொண்டு உருவாக்கி, சான்றிதழ்களை நிர்வகித்து, பாதுகாப்பாக மேம்படுத்தி, தோல்வியிலிருந்து மீளுங்கள்."
+  },
+  "k8s-network": {
+   "title": "Kubernetes நெட்வொர்க்கிங் ஆழமாக",
+   "summary": "நெட்வொர்க் மாதிரி, CNI, Service, DNS, நெட்வொர்க் கொள்கைகள், Ingress மற்றும் நிலையான debug முறை."
+  },
+  "k8s-resources": {
+   "title": "வள மேலாண்மை மற்றும் autoscaling",
+   "summary": "Request, limit, ஒதுக்கீடு, வெளியேற்றம், HPA, VPA, node autoscaling, இடையூறு திட்டமிடல்."
+  },
+  "k8s-security": {
+   "title": "Kubernetes பாதுகாப்பு ஆழமாக",
+   "summary": "அச்சுறுத்தல் மாதிரிகள், அடையாளங்கள், RBAC, Pod Security, secret, பல குத்தகை, வலுப்படுத்தல், சம்பவ பதிலளிப்பு."
+  },
+  "obs-deep": {
+   "title": "ஆழமான Observability",
+   "summary": "PromQL, Prometheus அளவிடல், burn rate எச்சரிக்கைகள், Loki log, tracing மற்றும் செலவுக் கட்டுப்பாட்டுடன் code ஆக observability."
+  },
+  "k8s-supply-chain": {
+   "title": "Kubernetes விநியோகச் சங்கிலி மற்றும் இயக்கநேரப் பாதுகாப்பு",
+   "summary": "அச்சுறுத்தல்கள், SLSA, ஸ்கேனிங், SBOM மற்றும் cosign, அனுமதியில் provenance, Falco, seccomp, AppArmor மற்றும் sandbox runtime."
+  },
+  "iac-beyond": {
+   "title": "Terraform-க்கு அப்பால் IaC",
+   "summary": "OpenTofu, Pulumi, Terragrunt, சோதனை, code ஆக கொள்கை, drift கண்டறிதல் மற்றும் பாதுகாப்பான state இடமாற்றம்."
+  },
+  "leadership": {
+   "title": "நடத்தை மற்றும் தலைமைப் பாதை",
+   "summary": "STAR கதைகள், தொழில்நுட்ப முடிவுகள், அதிகாரமின்றி தாக்கம், வழிகாட்டல், சம்பவத் தலைமை மற்றும் senior, staff வளர்ச்சி."
+  },
+  "ai-infra": {
+   "title": "உற்பத்தியில் AI உள்கட்டமைப்பு",
+   "summary": "Kubernetes-இல் GPU, vector தரவுத்தளம், RAG, LLM gateway, கண்காணிப்பு மற்றும் மதிப்பீடு, inference செலவு மற்றும் திறன்."
+  },
+  "rust-infra": {
+   "title": "உள்கட்டமைப்பு பொறியாளர்களுக்கான Rust",
+   "summary": "உரிமை மற்றும் கடன்வாங்கல், Result பிழைகள், trait, clap மற்றும் serde CLI, tokio async மற்றும் static binary."
+  },
+  "db-ops": {
+   "title": "உற்பத்தியில் தரவுத்தள இயக்கம்",
+   "summary": "PostgreSQL replication மற்றும் failover, காப்புப்பிரதி மற்றும் PITR, pooling, செயலிழப்பற்ற இடமாற்றம், Redis, MongoDB மற்றும் runbook."
+  },
+  "python-ops": {
+   "title": "இயக்கப் பணிக்கான Python",
+   "summary": "தொகுப்புகள் மற்றும் சூழல்கள், CLI கருவிகள், மறுமுயற்சி API client, concurrency, pytest மற்றும் பாதுகாப்பான cloud SDK."
   }
  },
  "paths": {
@@ -1945,6 +2005,18 @@
   "mlops": {
    "summary": "உற்பத்தியில் இயந்திரக் கற்றல் மற்றும் அல்காரிதம்-உதவிச் செயல்பாடுகளை இயக்குங்கள்: கன்டெய்னர்கள் மற்றும் Kubernetes, குழாய்வழிகள், கவனிப்புத்திறன், பிறகு MLOps மற்றும் AIOps.",
    "audience": "தரவு அறிவியல் குழுக்களை ஆதரிக்கும் DevOps மற்றும் SRE பொறியாளர்கள், உற்பத்திப் பழக்கங்கள் தேவைப்படும் தரவுப் பொறியாளர்கள்."
+  },
+  "platform": {
+   "summary": "மற்ற பொறியாளர்கள் வெளியிடும் உள்ளக தளத்தை உருவாக்கி இயக்குங்கள்: விநியோகம், Kubernetes, குறியீடாக உள்கட்டமைப்பு, கொள்கைகள், கண்காணிப்பு, செலவு, தயாரிப்புச் சிந்தனை.",
+   "audience": "தள பொறியியல் பணிகளுக்கு மாறும் டெவலப்பர்கள், DevOps மற்றும் SRE பொறியாளர்கள்."
+  },
+  "cka": {
+   "summary": "முதல் இலக்கு: கிளஸ்டர்களை உருவாக்கி, மேம்படுத்தி, காப்புப்பிரதி எடுத்து, பிழை நீக்குதல்; control plane, நெட்வொர்க், வளங்கள் ஆழ்ந்த பாடங்கள், பின்னர் தேர்வு பயிற்சி.",
+   "audience": "CKA-க்குத் தயாராகி, கிளஸ்டர்கள் உண்மையில் எப்படி இயங்குகின்றன என்பதைப் புரிந்துகொள்ள விரும்பும் பொறியாளர்கள்."
+  },
+  "cks": {
+   "summary": "இரண்டாவது இலக்கு: முழு CKA பாதை, பின்னர் pipeline பாதுகாப்பு, Kubernetes பாதுகாப்பு ஆழம், தேர்வு பயிற்சி.",
+   "audience": "CKA பெற்றவர்கள் அல்லது அதை நோக்கிச் செல்லும் நிர்வாகிகள், இப்போது கிளஸ்டர்களை வலுப்படுத்த விரும்புபவர்கள்."
   }
  },
  "lessons": {
@@ -2572,6 +2644,122 @@
   "aiops-practice/failure-modes-drift-feedback-loops-and-wrong-remediators": "இடைவெளி, பின்னூட்ட சுழற்சிகள், கவரேஜ் சார்பு, தவறான திருத்திகள் செயலிழப்பை ஏற்படுத்தும் முன் கண்டறியுங்கள்.",
   "aiops-practice/operating-aiops-ownership-on-call-and-lifecycle": "உரிமையாளர்கள், SLO, அழைப்புப் பணி, விதி வாழ்க்கைச் சுழற்சியுடன் AIOps தளத்தை உற்பத்தி சேவையாக இயக்குங்கள்.",
   "aiops-practice/debugging-a-misbehaving-aiops-pipeline": "ஒரு முடிவை நிலை நிலையாக மீண்டும் இயக்கி, பின்னடைவு நிகழ்வைச் சேர்த்து, AIOps அமைப்பு ஏன் தவறியது என்று கண்டறியுங்கள்.",
-  "aiops-practice/capstone-a-mini-aiops-pipeline": "மாற்றத்தைக் கண்டறிந்து, வெளியீட்டை இணைத்து, காரணத்தை வரிசைப்படுத்தி, ஒப்புதலுடன் திருத்தத்தை முன்மொழியும் சிறிய குழாயை உருவாக்குங்கள்."
+  "aiops-practice/capstone-a-mini-aiops-pipeline": "மாற்றத்தைக் கண்டறிந்து, வெளியீட்டை இணைத்து, காரணத்தை வரிசைப்படுத்தி, ஒப்புதலுடன் திருத்தத்தை முன்மொழியும் சிறிய குழாயை உருவாக்குங்கள்.",
+  "platform/what-platform-engineering-is-and-how-it-differs-from-devops-and-sre": "தளம் என்றால் என்ன, DevOps மற்றும் SRE இலிருந்து எப்படி வேறுபடுகிறது, எப்போது தேவை.",
+  "platform/platform-as-a-product-users-roadmap-and-feedback": "தளத்தை தயாரிப்பாக நடத்துங்கள்: பயனர்களை அறிந்து, சிக்கல்களை வரிசைப்படுத்தி, சிறிதாக வெளியிட்டு ஏற்பை அளவிடுங்கள்.",
+  "platform/golden-paths-and-paved-roads": "தங்கப் பாதைகளை உருவாக்குங்கள்: எளிதாக இருப்பதால் குழுக்கள் தேர்ந்தெடுக்கும் ஆதரிக்கப்படும் இயல்புநிலைகள், தனிப்பயனாக்கும் வழியுடன்.",
+  "platform/anatomy-of-an-internal-developer-platform": "உள்ளக டெவலப்பர் தளத்தின் அடுக்குகளைப் புரிந்து ஒரு கோரிக்கையை அவற்றின் வழியே பின்தொடருங்கள்.",
+  "platform/developer-portals-and-the-service-catalog": "குறியீட்டில் உரிமையாளர்களும் தானியங்கிச் சோதனைகளும் வைத்து மென்பொருள் பட்டியலைச் சரியாக வைத்திருங்கள்.",
+  "platform/scaffolding-templates-and-self-service-workflows": "சரிபார்த்து, மீண்டும் முயன்று, தெரிவிக்கும் வார்ப்புருக்களையும் சுயசேவை ஓட்டங்களையும் வடிவமையுங்கள்.",
+  "platform/platform-apis-with-crossplane-and-operators": "Crossplane மற்றும் ஆபரேட்டர்கள் மூலம் தள API வழங்கி நேர்மையான நிலையைக் காட்டுங்கள்.",
+  "platform/guardrails-policy-as-code-and-secure-defaults": "பாதுகாப்பு வேலிகளைக் குறியீடாகப் பயன்படுத்துங்கள்: பாதுகாப்பான இயல்புநிலை, தெளிவான செய்தி, படிப்படியான வெளியீடு.",
+  "platform/environments-ephemeral-previews-and-multi-tenancy": "வாடகைதாரர்கள், முன்னோட்டச் சூழல்கள், காலாவதி ஆகியவற்றை உருவாக்கிப் பகிர்ந்த உள்கட்டமைப்பைப் பாதுகாப்பாகவும் மலிவாகவும் வைத்திருங்கள்.",
+  "platform/cost-allocation-showback-and-unit-economics": "லேபிள்களால் செலவைப் பகிர்ந்து உரிமையாளர்களுக்குக் காட்டி, அலகுக்கான செலவைத் தெரிவியுங்கள்.",
+  "platform/measuring-developer-experience-dora-space-and-cognitive-load": "ஆட்களை வரிசைப்படுத்தாமல் DORA, SPACE, சேர்ப்பு நேரம் மூலம் டெவலப்பர் அனுபவத்தை அளவிடுங்கள்.",
+  "platform/platform-slos-support-and-on-call-for-the-platform-team": "தளத்தின் SLO, ஆதரவு, அழைப்புப் பணியை அமைத்து தயாரிப்புக் குழுக்களுடன் எல்லை வரையுங்கள்.",
+  "platform/adoption-migration-and-deprecation": "பழைய அமைப்பு நீக்கப்படும் வரை ஏற்பு, இடமாற்றம், நிறுத்தத்தை நடத்துங்கள்.",
+  "platform/capstone-design-and-ship-a-golden-path": "தங்கப் பாதையை வடிவமைத்து வெளியிட்டு, புதிய பொறியாளரின் நேரத்தை அளந்து சோதியுங்கள்.",
+  "k8s-exam/the-exam-environment-speed-setup-and-the-docs": "CKA மற்றும் CKS தேர்வுகளுக்கு வேகமாகத் தொடங்குங்கள்: மாற்றுப்பெயர்கள், சூழல், ஆவணத் தேடல், நேர ஒதுக்கீடு.",
+  "k8s-exam/imperative-kubectl-and-fast-yaml": "பொருள்களை விரைவாக உருவாக்கவும் திருத்தவும் கட்டளை முறை kubectl மற்றும் dry-run YAML பயன்படுத்துங்கள்.",
+  "k8s-exam/cka-cluster-setup-with-kubeadm-and-upgrades": "kubeadm மூலம் கிளஸ்டரை அமைத்து ஒரு நேரத்தில் ஒரு சிறு பதிப்பாக மேம்படுத்துங்கள்.",
+  "k8s-exam/cka-etcd-backup-restore-and-static-pods": "etcd ஐ காப்புப்பிரதி எடுத்து மீட்டெடுத்து, நிலையான pod மேனிஃபெஸ்ட்களைப் பாதுகாப்பாகத் திருத்துங்கள்.",
+  "k8s-exam/cka-rbac-kubeconfig-and-certificate-tasks": "RBAC, kubeconfig, சான்றிதழ் பணிகளைச் செய்து அனுமதிகளைச் சோதியுங்கள்.",
+  "k8s-exam/cka-workloads-scheduling-and-configuration-tasks": "ரோல்அவுட், taint, வள வரம்புகள் போன்ற பணிச்சுமை, திட்டமிடல், கட்டமைப்புப் பணிகளை முடியுங்கள்.",
+  "k8s-exam/cka-services-ingress-gateway-api-and-dns-tasks": "Service, Ingress, Gateway API, வலையமைப்புக் கொள்கை, DNS பணிகளைத் தீர்க்கவும்.",
+  "k8s-exam/cka-storage-tasks": "தொகுதிகள், கோரிக்கைகள், வகுப்புகள், மீட்புக் கொள்கை கொண்ட சேமிப்புப் பணிகளைக் கையாளுங்கள்.",
+  "k8s-exam/cka-troubleshooting-method-and-scenarios": "அறிகுறி, நிகழ்வுகள், பதிவுகள், node, கட்டுப்பாட்டுத் தளம் என மேலிருந்து கீழாகச் சிக்கல் தீருங்கள்.",
+  "k8s-exam/cks-cluster-setup-and-hardening": "kube-bench, kubelet மற்றும் API அமைப்புகள், இயல்பு மறுப்பு மூலம் கிளஸ்டரை வலுப்படுத்துங்கள்.",
+  "k8s-exam/cks-system-hardening-apparmor-seccomp-and-the-host": "AppArmor, seccomp, திறன்களைப் பயன்படுத்தி ஹோஸ்டை வலுப்படுத்துங்கள்.",
+  "k8s-exam/cks-minimize-microservice-vulnerabilities": "Pod Security, சாண்ட்பாக்ஸ், சேமிப்பில் குறியாக்கம், பரஸ்பர TLS மூலம் மைக்ரோசேவை அபாயத்தைக் குறையுங்கள்.",
+  "k8s-exam/cks-supply-chain-security": "விநியோகச் சங்கிலியைப் பாதுகாக்கவும்: குறைந்த படிமங்கள், ஸ்கேன், digest, அனுமதிக் கொள்கை.",
+  "k8s-exam/cks-monitoring-runtime-security-and-the-mock-run": "தணிக்கைப் பதிவுகள் மற்றும் Falco பயன்படுத்தி, கொள்கலன்களை மாறாதவையாக வைத்து, நேர வரம்புடன் மாதிரித் தேர்வு எழுதுங்கள்.",
+  "k8s-control-plane/the-request-path-authentication-authorization-and-admission": "கோரிக்கை சேமிக்கப்படுவதற்கு முன் அங்கீகாரம், அனுமதி, அட்மிஷன் வழியாக எப்படிச் செல்கிறது.",
+  "k8s-control-plane/api-machinery-versions-watches-and-server-side-apply": "API பதிப்புகள், watch, முரண்பாடுகள், server-side apply விளக்கம்.",
+  "k8s-control-plane/etcd-data-model-raft-and-quorum": "etcd பொருட்களை எப்படிச் சேமித்து Raft கோரத்தால் எழுதுதலை உறுதிசெய்கிறது.",
+  "k8s-control-plane/etcd-operations-health-compaction-and-defragmentation": "compaction, defragmentation, அலாரம் மீட்பு மூலம் etcd-ஐ ஆரோக்கியமாக வைத்திருங்கள்.",
+  "k8s-control-plane/the-scheduler-filtering-scoring-and-binding": "scheduler பாட்களை எப்படி வடிகட்டி, மதிப்பிட்டு, பிணைக்கிறது; Pending-ஐ எப்படிப் படிப்பது.",
+  "k8s-control-plane/controllers-the-reconcile-loop-and-leader-election": "கன்ட்ரோலர்கள், reconcile சுழற்சிகள், lease மூலம் தலைவர் தேர்வு.",
+  "k8s-control-plane/the-kubelet-pod-lifecycle-and-the-cri": "kubelet மற்றும் runtime பாட் விவரக்குறிப்பை கண்டெய்னர்களாக எப்படி மாற்றுகின்றன.",
+  "k8s-control-plane/control-plane-failure-modes-and-diagnosis": "அறிகுறியிலிருந்து கூறு வரை control plane தோல்விகளை கண்டறிதல்.",
+  "k8s-lifecycle/designing-a-highly-available-control-plane": "தோல்வி களங்கள் முழுவதும் உயர் கிடைப்புத்திறன் control plane வடிவமைத்தல்.",
+  "k8s-lifecycle/bootstrapping-with-kubeadm-configuration-and-phases": "kubeadm உள்ளமைவு மற்றும் கட்டங்களுடன் கிளஸ்டரை உருவாக்குதல்.",
+  "k8s-lifecycle/certificates-pki-expiry-and-rotation": "சான்றிதழ்கள், காலாவதி சோதனை, பாதுகாப்பான சுழற்சி.",
+  "k8s-lifecycle/version-skew-and-upgrade-strategy": "பதிப்பு வேறுபாடு விதிகள் மற்றும் ஒரு minor பதிப்பு மேம்படுத்தல் திட்டம்.",
+  "k8s-lifecycle/node-lifecycle-joining-draining-and-replacing": "பணிச்சுமைகளைத் தொந்தரவு செய்யாமல் node-களைச் சேர்த்தல், காலிசெய்தல், மாற்றுதல்.",
+  "k8s-lifecycle/backup-and-disaster-recovery-for-the-cluster": "etcd காப்புப்பிரதி, மீட்பு, பேரிடர் மீட்பு பயிற்சி.",
+  "k8s-lifecycle/cluster-api-and-declarative-cluster-management": "Cluster API மூலம் கிளஸ்டர்களை அறிவிப்பு முறையில் நிர்வகித்தல்.",
+  "k8s-lifecycle/capstone-plan-and-rehearse-an-upgrade-and-a-recovery": "இறுதித் திட்டம்: மேம்படுத்தல் மற்றும் மீட்பைத் திட்டமிட்டு பயிற்சி செய்தல்.",
+  "k8s-network/the-kubernetes-network-model": "Kubernetes நெட்வொர்க் மாதிரியும் பாட்களுக்கான விதிகளும்.",
+  "k8s-network/cni-plugins-overlays-routing-and-ebpf": "CNI plugin ஒப்பீடு: overlay, routing, eBPF.",
+  "k8s-network/services-clusterip-nodeport-and-kube-proxy": "Service, ClusterIP, NodePort மற்றும் kube-proxy போக்குவரத்தை எப்படி வழிநடத்துகிறது.",
+  "k8s-network/endpointslices-and-how-traffic-finds-pods": "EndpointSlice மற்றும் தயார்நிலை போக்குவரத்தின் பாதையை எப்படி தீர்மானிக்கிறது.",
+  "k8s-network/coredns-and-service-discovery": "CoreDNS, தேடல் களங்கள், சேவை கண்டறிதல்.",
+  "k8s-network/network-policies-in-depth": "நெட்வொர்க் கொள்கைகள் ஆழமாக: இயல்புநிலை மறுப்பு, selector, DNS.",
+  "k8s-network/ingress-and-the-gateway-api": "கிளஸ்டருக்குள் வரும் போக்குவரத்துக்கு Ingress மற்றும் Gateway API.",
+  "k8s-network/debugging-kubernetes-networking": "Kubernetes நெட்வொர்க்கை debug செய்ய ஒரு நிலையான முறை.",
+  "k8s-resources/requests-limits-and-qos-classes": "Request, limit மற்றும் QoS வகுப்புகள் விளக்கம்.",
+  "k8s-resources/cpu-and-memory-behaviour-throttling-and-oom": "CPU throttling, OOM kill மற்றும் அவற்றை அளப்பது எப்படி.",
+  "k8s-resources/limitrange-resourcequota-and-priority": "நியாயமான பகிர்வுக்கு LimitRange, ResourceQuota, முன்னுரிமை வகுப்புகள்.",
+  "k8s-resources/node-allocatable-pressure-and-eviction": "Node allocatable, அழுத்தம், வெளியேற்ற வரிசை.",
+  "k8s-resources/horizontal-pod-autoscaling": "அளவீடுகளிலிருந்து replica வரை கிடைமட்ட பாட் தானியங்கு அளவீடு.",
+  "k8s-resources/vertical-scaling-and-right-sizing": "செங்குத்து அளவீடு மற்றும் உண்மையான பயன்பாட்டின் அடிப்படையில் request சரிசெய்தல்.",
+  "k8s-resources/cluster-autoscaling-karpenter-and-keda": "Karpenter மூலம் கிளஸ்டர் autoscaling, KEDA மூலம் நிகழ்வு அடிப்படையிலான அளவீடு.",
+  "k8s-resources/disruption-budgets-topology-spread-and-capacity-planning": "இடையூறு பட்ஜெட், topology பரவல், திறன் திட்டமிடல்.",
+  "k8s-security/threat-model-and-the-layers-of-cluster-security": "கிளஸ்டர் அச்சுறுத்தல்களை மாதிரியாக்கி அடுக்குகளாக கட்டுப்பாடுகளை வைத்தல்.",
+  "k8s-security/authentication-service-accounts-and-token-security": "அங்கீகாரம், service account, token பாதுகாப்பு.",
+  "k8s-security/rbac-design-least-privilege-and-auditing": "குறைந்தபட்ச உரிமை RBAC வடிவமைப்பு மற்றும் தணிக்கை.",
+  "k8s-security/pod-security-standards-and-admission-policy": "Pod Security தரநிலைகள் மற்றும் அட்மிஷன் கொள்கை.",
+  "k8s-security/secrets-encryption-at-rest-and-external-stores": "Secret, ஓய்வில் உள்ள தரவு குறியாக்கம், வெளிப்புற சேமிப்பகங்கள்.",
+  "k8s-security/multi-tenancy-and-isolation": "பல குத்தகைதாரர் முறை மற்றும் குழுக்களுக்கிடையே தனிமைப்படுத்தல்.",
+  "k8s-security/api-server-and-kubelet-hardening-with-cis": "CIS benchmark மூலம் API server மற்றும் kubelet-ஐ வலுப்படுத்துதல்.",
+  "k8s-security/incident-response-for-a-compromised-cluster": "பாதிக்கப்பட்ட கிளஸ்டருக்கு பதிலளித்தல்: கட்டுப்படுத்து, விசாரி, மீட்டெடு.",
+  "obs-deep/promql-in-depth-rates-aggregation-and-recording-rules": "சரியான முடிவுகளைத் தரும் PromQL rate, திரட்டல் மற்றும் recording rule.",
+  "obs-deep/scaling-prometheus-ha-federation-and-long-term-storage": "sharding, federation மற்றும் நீண்டகால சேமிப்புடன் Prometheus-ஐ அளவிடுதல்.",
+  "obs-deep/slo-alerting-burn-rates-and-alertmanager-design": "SLO அடிப்படையிலான burn rate எச்சரிக்கைகள் மற்றும் Alertmanager வழித்தடம்.",
+  "obs-deep/logs-at-scale-loki-labels-and-retention": "குறைவான label மற்றும் நியாயமான தக்கவைப்புடன் Loki-ஐ பெரிய அளவில் இயக்குதல்.",
+  "obs-deep/distributed-tracing-sampling-and-correlation": "sampling மற்றும் trace, log, metric இணைப்புகளுடன் tracing.",
+  "obs-deep/observability-as-code-and-cost-control": "செலவுக் கட்டுப்பாட்டுடன் code ஆக dashboard மற்றும் எச்சரிக்கைகள்.",
+  "k8s-supply-chain/the-software-supply-chain-threat-model-and-slsa": "விநியோகச் சங்கிலி அச்சுறுத்தல் மாதிரி மற்றும் SLSA நிலைகள்.",
+  "k8s-supply-chain/image-scanning-and-vulnerability-management": "image-களை ஸ்கேன் செய்து பொறுப்பாளர் மற்றும் காலக்கெடுவுடன் பாதிப்புகளை நிர்வகித்தல்.",
+  "k8s-supply-chain/sboms-signing-and-verification-with-cosign": "SBOM உருவாக்கி cosign மூலம் image-களுக்கு கையொப்பமிட்டு சரிபார்த்தல்.",
+  "k8s-supply-chain/admission-enforcement-of-provenance-with-policy": "கொள்கை மூலம் அனுமதியின்போது provenance-ஐ கட்டாயப்படுத்துதல்.",
+  "k8s-supply-chain/runtime-detection-with-falco-and-audit-events": "Falco மற்றும் தணிக்கை நிகழ்வுகளால் இயக்கநேரத் தாக்குதல்களைக் கண்டறிதல்.",
+  "k8s-supply-chain/sandboxing-seccomp-apparmor-and-runtime-classes": "seccomp, AppArmor மற்றும் sandbox மூலம் kernel தாக்குதல் பரப்பைக் குறைத்தல்.",
+  "iac-beyond/opentofu-and-the-terraform-ecosystem-choices": "OpenTofu மற்றும் Terraform கருவிகளுக்கிடையே தேர்வு செய்யும் வழி.",
+  "iac-beyond/pulumi-infrastructure-in-real-programming-languages": "Pulumi: உண்மையான நிரலாக்க மொழிகளில் கட்டமைப்பு.",
+  "iac-beyond/terragrunt-modules-and-multi-environment-structure": "Terragrunt, module மற்றும் பல சூழல் அமைப்பு.",
+  "iac-beyond/testing-infrastructure-code": "உள்கட்டமைப்பு code-ஐ பல நிலைகளில் சோதித்தல்.",
+  "iac-beyond/policy-as-code-and-drift-detection": "code ஆக கொள்கை மற்றும் drift கண்டறிதல்.",
+  "iac-beyond/state-secrets-and-safe-migrations": "state, ரகசியங்கள் மற்றும் இடமாற்றங்களை பாதுகாப்பாக கையாளுதல்.",
+  "leadership/star-stories-and-behavioral-interviews": "நடத்தை நேர்காணலுக்கு STAR கதைகளைத் தயாரித்தல்.",
+  "leadership/communicating-technical-decisions-and-design-reviews": "தொழில்நுட்ப முடிவுகளை விளக்கி வடிவமைப்பு மதிப்பாய்வை நடத்துதல்.",
+  "leadership/influence-without-authority": "முறையான அதிகாரமின்றி பிற குழுக்களைத் தாக்கம் செய்தல்.",
+  "leadership/mentoring-and-giving-feedback": "மக்களுக்கு வழிகாட்டி பயனுள்ள கருத்தை வழங்குதல்.",
+  "leadership/leading-through-incidents": "பங்குகள் மற்றும் தெளிவான புதுப்பிப்புகளுடன் சம்பவத்தை வழிநடத்துதல்.",
+  "leadership/senior-staff-scope-and-career-growth": "senior மற்றும் staff நிலைக்கு வளருதல்.",
+  "ai-infra/gpu-scheduling-and-sharing-on-kubernetes": "Kubernetes-இல் GPU-களை திட்டமிட்டு பகிர்தல்.",
+  "ai-infra/vector-databases-and-retrieval-operations": "vector தரவுத்தளம் மற்றும் தேடலை இயக்குதல்.",
+  "ai-infra/rag-pipelines-in-production": "உற்பத்தியில் RAG pipeline-களை இயக்குதல்.",
+  "ai-infra/llm-gateways-routing-caching-and-rate-limits": "LLM gateway: வழித்தடம், cache மற்றும் வீத வரம்புகள்.",
+  "ai-infra/llm-observability-evaluation-and-guardrails": "LLM பயன்பாடுகளைக் கண்காணித்து மதிப்பிட்டு பாதுகாத்தல்.",
+  "ai-infra/cost-and-capacity-engineering-for-inference": "inference-க்கான செலவையும் திறனையும் கட்டுப்படுத்துதல்.",
+  "rust-infra/why-rust-ownership-borrowing-and-the-mental-model": "உரிமை, கடன்வாங்கல் மற்றும் Rust சிந்தனை மாதிரி.",
+  "rust-infra/errors-option-result-and-the-question-mark": "Option, Result மற்றும் கேள்விக்குறி இயக்கியால் பிழைகளைக் கையாளுதல்.",
+  "rust-infra/structs-enums-traits-and-generics": "struct, enum, trait மற்றும் generic மூலம் தரவை மாதிரியாக்குதல்.",
+  "rust-infra/cli-tools-with-clap-serde-and-files": "clap, serde மற்றும் கோப்புகளுடன் CLI கருவிகளை உருவாக்குதல்.",
+  "rust-infra/async-rust-with-tokio-and-network-services": "tokio மூலம் async வலையமைப்பு சேவைகளை எழுதுதல்.",
+  "rust-infra/testing-cross-compilation-and-shipping-static-binaries": "சோதனை, cross compile மற்றும் static binary வெளியீடு.",
+  "db-ops/postgresql-replication-and-high-availability": "PostgreSQL replication, failover மற்றும் split brain தவிர்த்தல்.",
+  "db-ops/backups-pitr-and-restore-testing": "காப்புப்பிரதி, குறிப்பிட்ட நேரத்திற்கு மீட்பு மற்றும் மீட்பு சோதனைகள்.",
+  "db-ops/connection-pooling-and-capacity": "இணைப்பு pooling மற்றும் திறன் திட்டமிடல்.",
+  "db-ops/zero-downtime-migrations-and-upgrades": "செயலிழப்பின்றி இடமாற்றம் மற்றும் பெரிய பதிப்பு மேம்படுத்தல்.",
+  "db-ops/redis-and-mongodb-operations": "Redis மற்றும் MongoDB-ஐ பாதுகாப்பாக இயக்குதல்.",
+  "db-ops/database-incidents-and-runbooks": "runbook மூலம் தரவுத்தள சம்பவங்களுக்கு பதிலளித்தல்.",
+  "python-ops/project-structure-packaging-and-virtual-environments": "pyproject.toml மற்றும் virtual environment மூலம் கருவிகளை தொகுத்தல்.",
+  "python-ops/cli-tools-with-argparse-click-and-typer": "பாதுகாப்பான கட்டளை வரி கருவிகளை உருவாக்குதல்.",
+  "python-ops/api-clients-retries-timeouts-and-pagination": "timeout, மறுமுயற்சி மற்றும் பக்கமிடலுடன் API client.",
+  "python-ops/concurrency-threads-asyncio-and-processes": "thread, asyncio அல்லது process தேர்ந்து concurrency-ஐ வரையறுத்தல்.",
+  "python-ops/testing-with-pytest-and-mocking-infrastructure": "pytest மற்றும் போலிகளுடன் செயல்பாட்டு code-ஐ சோதித்தல்.",
+  "python-ops/working-with-cloud-and-kubernetes-sdks-with-safe-patterns": "பாதுகாப்பான முறைகளுடன் cloud மற்றும் Kubernetes SDK பயன்படுத்துதல்."
  }
 }

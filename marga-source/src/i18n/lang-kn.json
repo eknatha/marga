@@ -1919,6 +1919,66 @@
   "aiops-practice": {
    "title": "ಪ್ರಾಯೋಗಿಕ AIOps",
    "summary": "AIOps ಅನ್ನು ಸುರಕ್ಷಿತವಾಗಿ ನಡೆಸಿ: ಡೇಟಾ ಪೈಪ್‌ಲೈನ್‌ಗಳು, ಸರಿಪಡಿಸುವ ಕ್ರಮಗಳ ಹಂತಗಳು ಮತ್ತು ದೃಢೀಕರಣ, ಕಿಲ್ ಸ್ವಿಚ್ ಮತ್ತು ಆಡಿಟ್, ಕೇಯಾಸ್ ಪರೀಕ್ಷೆಗಳು, ರನ್‌ಬುಕ್ ಹುಡುಕಾಟ, ಏಜೆಂಟ್‌ಗಳು ಮತ್ತು ಅನುಮೋದನೆ ದ್ವಾರಗಳು, ಪ್ರಾಂಪ್ಟ್ ಇಂಜೆಕ್ಷನ್, ಮೌಲ್ಯಮಾಪನ, ನಿರ್ಮಿಸುವುದೇ ಖರೀದಿಸುವುದೇ ಮತ್ತು ನಿರ್ವಹಣೆ."
+  },
+  "platform": {
+   "title": "ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ಎಂಜಿನಿಯರಿಂಗ್",
+   "summary": "ಆಂತರಿಕ ಡೆವಲಪರ್ ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ಅನ್ನು ಉತ್ಪನ್ನವಾಗಿ ನಿರ್ಮಿಸಿ: ಗೋಲ್ಡನ್ ಪಾತ್‌ಗಳು, ಕ್ಯಾಟಲಾಗ್, ಸ್ವಯಂಸೇವೆ, ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ API, ರಕ್ಷಣಾ ಬೇಲಿಗಳು, ವೆಚ್ಚ, ಅಳತೆಗಳು ಮತ್ತು ಅಳವಡಿಕೆ."
+  },
+  "k8s-exam": {
+   "title": "CKA ಮತ್ತು CKS ಪರೀಕ್ಷೆ ಅಭ್ಯಾಸ",
+   "summary": "ವೇಗದ kubectl, ಕ್ಲಸ್ಟರ್ ಕೆಲಸಗಳು, ದೋಷ ನಿವಾರಣೆ, ಭದ್ರತಾ ಬಲಪಡಿಸುವಿಕೆ ಮತ್ತು ಸಮಯ ಮಿತಿಯ ಅಣಕು ಪರೀಕ್ಷೆಗಳ ಮೂಲಕ Kubernetes ನಿರ್ವಾಹಕ ಮತ್ತು ಭದ್ರತಾ ಪರೀಕ್ಷೆಗಳಿಗೆ ಅಭ್ಯಾಸ ಮಾಡಿ."
+  },
+  "k8s-control-plane": {
+   "title": "Control plane ಮತ್ತು etcd ಒಳಗೆ",
+   "summary": "ವಿನಂತಿ API server ಮೂಲಕ ಹೇಗೆ ಹರಿಯುತ್ತದೆ, etcd ಸ್ಥಿತಿಯನ್ನು ಹೇಗೆ ಉಳಿಸುತ್ತದೆ, scheduler, ಕಂಟ್ರೋಲರ್ ಮತ್ತು kubelet ಹೇಗೆ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತವೆ."
+  },
+  "k8s-lifecycle": {
+   "title": "ಕ್ಲಸ್ಟರ್ ಜೀವನಚಕ್ರ ಮತ್ತು HA",
+   "summary": "ಹೆಚ್ಚು ಲಭ್ಯತೆಯ ಕ್ಲಸ್ಟರ್ ವಿನ್ಯಾಸ, kubeadm ನಿಂದ ರಚನೆ, ಪ್ರಮಾಣಪತ್ರ ನಿರ್ವಹಣೆ, ಸುರಕ್ಷಿತ ನವೀಕರಣ ಮತ್ತು ವೈಫಲ್ಯದಿಂದ ಚೇತರಿಕೆ."
+  },
+  "k8s-network": {
+   "title": "Kubernetes ನೆಟ್‌ವರ್ಕಿಂಗ್ ಆಳವಾಗಿ",
+   "summary": "ನೆಟ್‌ವರ್ಕ್ ಮಾದರಿ, CNI, Service, DNS, ನೆಟ್‌ವರ್ಕ್ ನೀತಿಗಳು, Ingress ಮತ್ತು ಸ್ಥಿರ debug ವಿಧಾನ."
+  },
+  "k8s-resources": {
+   "title": "ಸಂಪನ್ಮೂಲ ನಿರ್ವಹಣೆ ಮತ್ತು autoscaling",
+   "summary": "Request, limit, ಕೋಟಾ, ಹೊರಹಾಕುವಿಕೆ, HPA, VPA, node autoscaling ಮತ್ತು ಅಡಚಣೆ ಯೋಜನೆ."
+  },
+  "k8s-security": {
+   "title": "Kubernetes ಭದ್ರತೆ ಆಳವಾಗಿ",
+   "summary": "ಬೆದರಿಕೆ ಮಾದರಿ, ಗುರುತುಗಳು, RBAC, Pod Security, secret, ಬಹು ಬಾಡಿಗೆದಾರ, ಬಲಪಡಿಸುವಿಕೆ ಮತ್ತು ಘಟನೆ ಪ್ರತಿಕ್ರಿಯೆ."
+  },
+  "obs-deep": {
+   "title": "ಆಳವಾದ Observability",
+   "summary": "PromQL, Prometheus ವಿಸ್ತರಣೆ, burn rate ಎಚ್ಚರಿಕೆ, Loki log, tracing ಮತ್ತು ವೆಚ್ಚ ನಿಯಂತ್ರಣದೊಂದಿಗೆ code ರೂಪದ observability."
+  },
+  "k8s-supply-chain": {
+   "title": "Kubernetes ಪೂರೈಕೆ ಸರಪಳಿ ಮತ್ತು ರನ್‌ಟೈಮ್ ಭದ್ರತೆ",
+   "summary": "ಬೆದರಿಕೆಗಳು, SLSA, ಸ್ಕ್ಯಾನಿಂಗ್, SBOM ಮತ್ತು cosign, ಪ್ರವೇಶದಲ್ಲಿ provenance, Falco, seccomp, AppArmor ಮತ್ತು sandbox runtime."
+  },
+  "iac-beyond": {
+   "title": "Terraform ಆಚೆಗಿನ IaC",
+   "summary": "OpenTofu, Pulumi, Terragrunt, ಪರೀಕ್ಷೆ, code ರೂಪದ ನೀತಿ, drift ಪತ್ತೆ ಮತ್ತು ಸುರಕ್ಷಿತ state ವಲಸೆ."
+  },
+  "leadership": {
+   "title": "ವರ್ತನೆ ಮತ್ತು ನಾಯಕತ್ವ ಮಾರ್ಗ",
+   "summary": "STAR ಕಥೆಗಳು, ತಾಂತ್ರಿಕ ನಿರ್ಧಾರ, ಅಧಿಕಾರವಿಲ್ಲದ ಪ್ರಭಾವ, ಮಾರ್ಗದರ್ಶನ, ಘಟನೆ ನಾಯಕತ್ವ ಮತ್ತು senior, staff ಬೆಳವಣಿಗೆ."
+  },
+  "ai-infra": {
+   "title": "ಉತ್ಪಾದನೆಯಲ್ಲಿ AI ಮೂಲಸೌಕರ್ಯ",
+   "summary": "Kubernetes ನಲ್ಲಿ GPU, vector ಡೇಟಾಬೇಸ್, RAG, LLM gateway, ವೀಕ್ಷಣೆ ಮತ್ತು ಮೌಲ್ಯಮಾಪನ, inference ವೆಚ್ಚ ಮತ್ತು ಸಾಮರ್ಥ್ಯ."
+  },
+  "rust-infra": {
+   "title": "ಮೂಲಸೌಕರ್ಯ ಎಂಜಿನಿಯರ್‌ಗಳಿಗೆ Rust",
+   "summary": "ಮಾಲೀಕತ್ವ ಮತ್ತು ಎರವಲು, Result ದೋಷ, trait, clap ಮತ್ತು serde CLI, tokio async ಮತ್ತು static binary."
+  },
+  "db-ops": {
+   "title": "ಉತ್ಪಾದನೆಯಲ್ಲಿ ಡೇಟಾಬೇಸ್ ಕಾರ್ಯಾಚರಣೆ",
+   "summary": "PostgreSQL replication ಮತ್ತು failover, ಬ್ಯಾಕಪ್ ಮತ್ತು PITR, pooling, ಅಡಚಣೆಯಿಲ್ಲದ ವಲಸೆ, Redis, MongoDB ಮತ್ತು runbook."
+  },
+  "python-ops": {
+   "title": "ಕಾರ್ಯಾಚರಣೆಗಾಗಿ Python",
+   "summary": "ಪ್ಯಾಕೇಜ್ ಮತ್ತು ಪರಿಸರ, CLI ಸಾಧನ, ಮರುಪ್ರಯತ್ನದ API client, concurrency, pytest ಮತ್ತು ಸುರಕ್ಷಿತ cloud SDK."
   }
  },
  "paths": {
@@ -1945,6 +2005,18 @@
   "mlops": {
    "summary": "ಉತ್ಪಾದನೆಯಲ್ಲಿ ಯಂತ್ರ ಕಲಿಕೆ ಮತ್ತು ಅಲ್ಗಾರಿದಮ್-ಸಹಾಯಿತ ಕಾರ್ಯಾಚರಣೆಗಳನ್ನು ನಡೆಸಿ: ಕಂಟೈನರ್‌ಗಳು ಮತ್ತು Kubernetes, ಪೈಪ್‌ಲೈನ್‌ಗಳು, ವೀಕ್ಷಣಾಶೀಲತೆ, ನಂತರ MLOps ಮತ್ತು AIOps.",
    "audience": "ಡೇಟಾ ವಿಜ್ಞಾನ ತಂಡಗಳನ್ನು ಬೆಂಬಲಿಸುವ DevOps ಮತ್ತು SRE ಎಂಜಿನಿಯರ್‌ಗಳು, ಉತ್ಪಾದನಾ ಅಭ್ಯಾಸಗಳು ಬೇಕಾದ ಡೇಟಾ ಎಂಜಿನಿಯರ್‌ಗಳು."
+  },
+  "platform": {
+   "summary": "ಇತರ ಎಂಜಿನಿಯರ್‌ಗಳು ಬಿಡುಗಡೆ ಮಾಡುವ ಆಂತರಿಕ ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ಅನ್ನು ನಿರ್ಮಿಸಿ ನಡೆಸಿ: ವಿತರಣೆ, Kubernetes, ಕೋಡ್ ಆಗಿ ಮೂಲಸೌಕರ್ಯ, ನೀತಿಗಳು, ವೀಕ್ಷಣೆ, ವೆಚ್ಚ ಮತ್ತು ಉತ್ಪನ್ನ ಚಿಂತನೆ.",
+   "audience": "ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ಎಂಜಿನಿಯರಿಂಗ್ ಪಾತ್ರಗಳಿಗೆ ಬದಲಾಗುವ ಡೆವಲಪರ್‌ಗಳು, DevOps ಮತ್ತು SRE ಎಂಜಿನಿಯರ್‌ಗಳು."
+  },
+  "cka": {
+   "summary": "ಮೊದಲ ಗುರಿ: ಕ್ಲಸ್ಟರ್ ರಚಿಸಿ, ನವೀಕರಿಸಿ, ಬ್ಯಾಕಪ್ ಮಾಡಿ, ದೋಷ ನಿವಾರಿಸಿ; control plane, ನೆಟ್‌ವರ್ಕ್, ಸಂಪನ್ಮೂಲಗಳ ಆಳ ಪಾಠ, ನಂತರ ಪರೀಕ್ಷೆ ಅಭ್ಯಾಸ.",
+   "audience": "CKA ಗೆ ತಯಾರಾಗುತ್ತಿದ್ದು ಕ್ಲಸ್ಟರ್‌ಗಳು ನಿಜವಾಗಿ ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತವೆ ಎಂದು ತಿಳಿಯಲು ಬಯಸುವ ಎಂಜಿನಿಯರ್‌ಗಳು."
+  },
+  "cks": {
+   "summary": "ಎರಡನೇ ಗುರಿ: ಸಂಪೂರ್ಣ CKA ಮಾರ್ಗ, ನಂತರ pipeline ಭದ್ರತೆ, Kubernetes ಭದ್ರತೆ ಆಳ, ಪರೀಕ್ಷೆ ಅಭ್ಯಾಸ.",
+   "audience": "CKA ಹೊಂದಿರುವ ಅಥವಾ ಅದರತ್ತ ಸಾಗುತ್ತಿರುವ ನಿರ್ವಾಹಕರು, ಈಗ ಕ್ಲಸ್ಟರ್‌ಗಳನ್ನು ಬಲಪಡಿಸಲು ಬಯಸುವವರು."
   }
  },
  "lessons": {
@@ -2572,6 +2644,122 @@
   "aiops-practice/failure-modes-drift-feedback-loops-and-wrong-remediators": "ಸ್ಥಗಿತ ಉಂಟುಮಾಡುವ ಮೊದಲು ವಿಚಲನೆ, ಪ್ರತಿಕ್ರಿಯೆ ಚಕ್ರಗಳು, ವ್ಯಾಪ್ತಿ ಪಕ್ಷಪಾತ ಮತ್ತು ತಪ್ಪು ಸರಿಪಡಿಸುವಿಕೆಗಳನ್ನು ಗುರುತಿಸಿ.",
   "aiops-practice/operating-aiops-ownership-on-call-and-lifecycle": "ಮಾಲೀಕರು, SLO, ಕರೆ ಕರ್ತವ್ಯ ಮತ್ತು ನಿಯಮ ಜೀವನಚಕ್ರದೊಂದಿಗೆ AIOps ವೇದಿಕೆಯನ್ನು ಉತ್ಪಾದನಾ ಸೇವೆಯಾಗಿ ನಡೆಸಿ.",
   "aiops-practice/debugging-a-misbehaving-aiops-pipeline": "ನಿರ್ಧಾರವನ್ನು ಹಂತ ಹಂತವಾಗಿ ಮರುಚಾಲನೆ ಮಾಡಿ ಹಿಂಜರಿತ ಪ್ರಕರಣ ಸೇರಿಸಿ, AIOps ವ್ಯವಸ್ಥೆ ಏಕೆ ತಪ್ಪಿತು ಎಂದು ಕಂಡುಹಿಡಿಯಿರಿ.",
-  "aiops-practice/capstone-a-mini-aiops-pipeline": "ಬದಲಾವಣೆ ಪತ್ತೆ ಮಾಡಿ, ನಿಯೋಜನೆಯನ್ನು ಜೋಡಿಸಿ, ಕಾರಣವನ್ನು ಶ್ರೇಣೀಕರಿಸಿ, ಅನುಮೋದನೆಯೊಂದಿಗೆ ಸರಿಪಡಿಕೆ ಸೂಚಿಸುವ ಸಣ್ಣ ಪೈಪ್‌ಲೈನ್ ಕಟ್ಟಿ."
+  "aiops-practice/capstone-a-mini-aiops-pipeline": "ಬದಲಾವಣೆ ಪತ್ತೆ ಮಾಡಿ, ನಿಯೋಜನೆಯನ್ನು ಜೋಡಿಸಿ, ಕಾರಣವನ್ನು ಶ್ರೇಣೀಕರಿಸಿ, ಅನುಮೋದನೆಯೊಂದಿಗೆ ಸರಿಪಡಿಕೆ ಸೂಚಿಸುವ ಸಣ್ಣ ಪೈಪ್‌ಲೈನ್ ಕಟ್ಟಿ.",
+  "platform/what-platform-engineering-is-and-how-it-differs-from-devops-and-sre": "ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ಎಂದರೇನು, DevOps ಮತ್ತು SRE ಗಿಂತ ಹೇಗೆ ಭಿನ್ನ ಮತ್ತು ಯಾವಾಗ ಬೇಕು.",
+  "platform/platform-as-a-product-users-roadmap-and-feedback": "ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ಅನ್ನು ಉತ್ಪನ್ನವಾಗಿ ನಡೆಸಿ: ಬಳಕೆದಾರರನ್ನು ತಿಳಿಯಿರಿ, ಸಮಸ್ಯೆಗಳನ್ನು ಕ್ರಮಗೊಳಿಸಿ, ಚಿಕ್ಕದಾಗಿ ಬಿಡುಗಡೆ ಮಾಡಿ, ಅಳವಡಿಕೆ ಅಳೆಯಿರಿ.",
+  "platform/golden-paths-and-paved-roads": "ಗೋಲ್ಡನ್ ಪಾತ್‌ಗಳನ್ನು ನಿರ್ಮಿಸಿ: ಸುಲಭ ಎಂದು ತಂಡಗಳು ಆಯ್ಕೆ ಮಾಡುವ ಬೆಂಬಲಿತ ಡೀಫಾಲ್ಟ್‌ಗಳು, ಹೊಂದಿಸುವ ಅವಕಾಶದೊಂದಿಗೆ.",
+  "platform/anatomy-of-an-internal-developer-platform": "ಆಂತರಿಕ ಡೆವಲಪರ್ ಪ್ಲಾಟ್‌ಫಾರ್ಮ್‌ನ ಸ್ತರಗಳನ್ನು ಅರಿತು ಒಂದು ವಿನಂತಿಯನ್ನು ಅವುಗಳ ಮೂಲಕ ಹಿಂಬಾಲಿಸಿ.",
+  "platform/developer-portals-and-the-service-catalog": "ಕೋಡ್‌ನಲ್ಲಿ ಮಾಲೀಕರು ಮತ್ತು ಸ್ವಯಂಚಾಲಿತ ಪರಿಶೀಲನೆಗಳ ಮೂಲಕ ಸಾಫ್ಟ್‌ವೇರ್ ಕ್ಯಾಟಲಾಗ್ ಅನ್ನು ನಿಖರವಾಗಿಡಿ.",
+  "platform/scaffolding-templates-and-self-service-workflows": "ಪರಿಶೀಲಿಸಿ, ಮರುಪ್ರಯತ್ನಿಸಿ, ವರದಿ ಮಾಡುವ ಟೆಂಪ್ಲೇಟ್ ಮತ್ತು ಸ್ವಯಂಸೇವಾ ಕ್ರಮಗಳನ್ನು ವಿನ್ಯಾಸಗೊಳಿಸಿ.",
+  "platform/platform-apis-with-crossplane-and-operators": "Crossplane ಮತ್ತು ಆಪರೇಟರ್‌ಗಳ ಮೂಲಕ ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ API ನೀಡಿ ಪ್ರಾಮಾಣಿಕ ಸ್ಥಿತಿ ತೋರಿಸಿ.",
+  "platform/guardrails-policy-as-code-and-secure-defaults": "ರಕ್ಷಣಾ ಬೇಲಿಗಳನ್ನು ಕೋಡ್ ಆಗಿ ಬಳಸಿ: ಸುರಕ್ಷಿತ ಡೀಫಾಲ್ಟ್, ಸ್ಪಷ್ಟ ಸಂದೇಶ, ಹಂತ ಹಂತದ ಬಿಡುಗಡೆ.",
+  "platform/environments-ephemeral-previews-and-multi-tenancy": "ಹಂಚಿದ ಮೂಲಸೌಕರ್ಯ ಸುರಕ್ಷಿತ ಮತ್ತು ಅಗ್ಗವಾಗಿರಲು ಬಾಡಿಗೆದಾರರು, ಮುನ್ನೋಟ ಪರಿಸರಗಳು ಮತ್ತು ಅವಧಿ ಮುಕ್ತಾಯ ರಚಿಸಿ.",
+  "platform/cost-allocation-showback-and-unit-economics": "ಲೇಬಲ್‌ಗಳಿಂದ ವೆಚ್ಚ ಹಂಚಿ, ಮಾಲೀಕರಿಗೆ ತೋರಿಸಿ, ಪ್ರತಿ ಘಟಕದ ವೆಚ್ಚ ವರದಿ ಮಾಡಿ.",
+  "platform/measuring-developer-experience-dora-space-and-cognitive-load": "ಜನರನ್ನು ಶ್ರೇಣಿಗೊಳಿಸದೆ DORA, SPACE ಮತ್ತು ಸೇರ್ಪಡೆ ಸಮಯದಿಂದ ಡೆವಲಪರ್ ಅನುಭವ ಅಳೆಯಿರಿ.",
+  "platform/platform-slos-support-and-on-call-for-the-platform-team": "ಪ್ಲಾಟ್‌ಫಾರ್ಮ್‌ನ SLO, ಬೆಂಬಲ ಮತ್ತು ಆನ್-ಕಾಲ್ ನಿಗದಿಪಡಿಸಿ, ಉತ್ಪನ್ನ ತಂಡಗಳೊಂದಿಗೆ ಗಡಿ ಎಳೆಯಿರಿ.",
+  "platform/adoption-migration-and-deprecation": "ಹಳೆಯ ವ್ಯವಸ್ಥೆ ತೆಗೆಯುವವರೆಗೆ ಅಳವಡಿಕೆ, ವಲಸೆ ಮತ್ತು ನಿಲುಗಡೆ ನಡೆಸಿ.",
+  "platform/capstone-design-and-ship-a-golden-path": "ಗೋಲ್ಡನ್ ಪಾತ್ ವಿನ್ಯಾಸಗೊಳಿಸಿ ಬಿಡುಗಡೆ ಮಾಡಿ, ಹೊಸ ಎಂಜಿನಿಯರ್‌ನ ಸಮಯ ಅಳೆದು ಪರೀಕ್ಷಿಸಿ.",
+  "k8s-exam/the-exam-environment-speed-setup-and-the-docs": "CKA ಮತ್ತು CKS ಪರೀಕ್ಷೆಗೆ ವೇಗವಾಗಿ ಸಿದ್ಧರಾಗಿ: ಅಲಿಯಾಸ್, ಸಂದರ್ಭ, ದಾಖಲೆ ಹುಡುಕಾಟ ಮತ್ತು ಸಮಯ ಬಜೆಟ್.",
+  "k8s-exam/imperative-kubectl-and-fast-yaml": "ವಸ್ತುಗಳನ್ನು ತ್ವರಿತವಾಗಿ ರಚಿಸಲು ಮತ್ತು ಸಂಪಾದಿಸಲು ಆದೇಶ ಶೈಲಿಯ kubectl ಮತ್ತು dry-run YAML ಬಳಸಿ.",
+  "k8s-exam/cka-cluster-setup-with-kubeadm-and-upgrades": "kubeadm ಮೂಲಕ ಕ್ಲಸ್ಟರ್ ಸ್ಥಾಪಿಸಿ ಒಂದೊಂದು ಚಿಕ್ಕ ಆವೃತ್ತಿಯಂತೆ ಉನ್ನತೀಕರಿಸಿ.",
+  "k8s-exam/cka-etcd-backup-restore-and-static-pods": "etcd ಬ್ಯಾಕಪ್ ಮತ್ತು ಮರುಸ್ಥಾಪನೆ ಮಾಡಿ, ಸ್ಥಿರ ಪಾಡ್ ಮ್ಯಾನಿಫೆಸ್ಟ್ ಅನ್ನು ಸುರಕ್ಷಿತವಾಗಿ ಬದಲಿಸಿ.",
+  "k8s-exam/cka-rbac-kubeconfig-and-certificate-tasks": "RBAC, kubeconfig ಮತ್ತು ಪ್ರಮಾಣಪತ್ರ ಕೆಲಸಗಳನ್ನು ಮಾಡಿ ಅನುಮತಿಗಳನ್ನು ಪರೀಕ್ಷಿಸಿ.",
+  "k8s-exam/cka-workloads-scheduling-and-configuration-tasks": "ರೋಲ್‌ಔಟ್, ಟೇಂಟ್ ಮತ್ತು ಸಂಪನ್ಮೂಲ ಮಿತಿಗಳಂತಹ ಕೆಲಸಭಾರ, ವೇಳಾಪಟ್ಟಿ ಮತ್ತು ಸಂರಚನಾ ಕೆಲಸಗಳನ್ನು ಪೂರ್ಣಗೊಳಿಸಿ.",
+  "k8s-exam/cka-services-ingress-gateway-api-and-dns-tasks": "Service, Ingress, Gateway API, ನೆಟ್‌ವರ್ಕ್ ನೀತಿ ಮತ್ತು DNS ಕೆಲಸಗಳನ್ನು ಬಗೆಹರಿಸಿ.",
+  "k8s-exam/cka-storage-tasks": "ವಾಲ್ಯೂಮ್, ಕ್ಲೇಮ್, ವರ್ಗ ಮತ್ತು ಮರುಪಡೆಯುವ ನೀತಿಯೊಂದಿಗೆ ಸಂಗ್ರಹಣೆ ಕೆಲಸಗಳನ್ನು ನಿರ್ವಹಿಸಿ.",
+  "k8s-exam/cka-troubleshooting-method-and-scenarios": "ಲಕ್ಷಣ, ಘಟನೆಗಳು, ಲಾಗ್, ನೋಡ್ ಮತ್ತು ನಿಯಂತ್ರಣ ಸ್ತರ ಎಂದು ಮೇಲಿನಿಂದ ಕೆಳಗೆ ದೋಷ ಹುಡುಕಿ.",
+  "k8s-exam/cks-cluster-setup-and-hardening": "kube-bench, kubelet ಮತ್ತು API ಸೆಟ್ಟಿಂಗ್ ಹಾಗೂ ಡೀಫಾಲ್ಟ್ ನಿರಾಕರಣೆಯಿಂದ ಕ್ಲಸ್ಟರ್ ಬಲಪಡಿಸಿ.",
+  "k8s-exam/cks-system-hardening-apparmor-seccomp-and-the-host": "AppArmor, seccomp ಮತ್ತು ಸಾಮರ್ಥ್ಯಗಳನ್ನು ಬಳಸಿ ಹೋಸ್ಟ್ ಬಲಪಡಿಸಿ.",
+  "k8s-exam/cks-minimize-microservice-vulnerabilities": "Pod Security, ಸ್ಯಾಂಡ್‌ಬಾಕ್ಸ್, ವಿಶ್ರಾಂತಿಯಲ್ಲಿ ಎನ್‌ಕ್ರಿಪ್ಶನ್ ಮತ್ತು ಪರಸ್ಪರ TLS ಮೂಲಕ ಮೈಕ್ರೋಸೇವೆ ಅಪಾಯ ಕಡಿಮೆ ಮಾಡಿ.",
+  "k8s-exam/cks-supply-chain-security": "ಪೂರೈಕೆ ಸರಪಳಿ ಭದ್ರಪಡಿಸಿ: ಕನಿಷ್ಠ ಚಿತ್ರಗಳು, ಸ್ಕ್ಯಾನ್, ಡೈಜೆಸ್ಟ್ ಮತ್ತು ಪ್ರವೇಶ ನೀತಿ.",
+  "k8s-exam/cks-monitoring-runtime-security-and-the-mock-run": "ಆಡಿಟ್ ಲಾಗ್ ಮತ್ತು Falco ಬಳಸಿ, ಕಂಟೈನರ್ ಬದಲಾಗದಂತೆ ಇರಿಸಿ ಮತ್ತು ಸಮಯ ಮಿತಿಯ ಅಣಕು ಪರೀಕ್ಷೆ ಮಾಡಿ.",
+  "k8s-control-plane/the-request-path-authentication-authorization-and-admission": "ವಿನಂತಿಯನ್ನು ಉಳಿಸುವ ಮೊದಲು ದೃಢೀಕರಣ, ಅಧಿಕಾರ ಮತ್ತು ಪ್ರವೇಶ ಹಂತಗಳ ಮೂಲಕ ಹೇಗೆ ಹಾದುಹೋಗುತ್ತದೆ.",
+  "k8s-control-plane/api-machinery-versions-watches-and-server-side-apply": "API ಆವೃತ್ತಿಗಳು, watch, ಸಂಘರ್ಷಗಳು ಮತ್ತು server-side apply ವಿವರಣೆ.",
+  "k8s-control-plane/etcd-data-model-raft-and-quorum": "etcd ವಸ್ತುಗಳನ್ನು ಹೇಗೆ ಸಂಗ್ರಹಿಸುತ್ತದೆ ಮತ್ತು Raft ಕೋರಂ ಮೂಲಕ ಬರವಣಿಗೆಯನ್ನು ಹೇಗೆ ದೃಢಪಡಿಸುತ್ತದೆ.",
+  "k8s-control-plane/etcd-operations-health-compaction-and-defragmentation": "compaction, defragmentation ಮತ್ತು ಅಲಾರಂ ಚೇತರಿಕೆಯಿಂದ etcd ಆರೋಗ್ಯವಾಗಿಡಿ.",
+  "k8s-control-plane/the-scheduler-filtering-scoring-and-binding": "scheduler ಪಾಡ್‌ಗಳನ್ನು ಹೇಗೆ ಫಿಲ್ಟರ್ ಮಾಡಿ, ಅಂಕ ನೀಡಿ, ಬಂಧಿಸುತ್ತದೆ; Pending ಓದುವ ವಿಧಾನ.",
+  "k8s-control-plane/controllers-the-reconcile-loop-and-leader-election": "ಕಂಟ್ರೋಲರ್‌ಗಳು, reconcile ಲೂಪ್‌ಗಳು ಮತ್ತು lease ಮೂಲಕ ನಾಯಕ ಆಯ್ಕೆ.",
+  "k8s-control-plane/the-kubelet-pod-lifecycle-and-the-cri": "kubelet ಮತ್ತು runtime ಪಾಡ್ ವಿವರಣೆಯನ್ನು ಕಂಟೇನರ್‌ಗಳಾಗಿ ಹೇಗೆ ಪರಿವರ್ತಿಸುತ್ತವೆ.",
+  "k8s-control-plane/control-plane-failure-modes-and-diagnosis": "ಲಕ್ಷಣದಿಂದ ಘಟಕದವರೆಗೆ control plane ವೈಫಲ್ಯಗಳ ರೋಗನಿರ್ಣಯ.",
+  "k8s-lifecycle/designing-a-highly-available-control-plane": "ವೈಫಲ್ಯ ಡೊಮೇನ್‌ಗಳಾದ್ಯಂತ ಹೆಚ್ಚು ಲಭ್ಯತೆಯ control plane ವಿನ್ಯಾಸ.",
+  "k8s-lifecycle/bootstrapping-with-kubeadm-configuration-and-phases": "kubeadm ಸಂರಚನೆ ಮತ್ತು ಹಂತಗಳೊಂದಿಗೆ ಕ್ಲಸ್ಟರ್ ರಚಿಸಿ.",
+  "k8s-lifecycle/certificates-pki-expiry-and-rotation": "ಪ್ರಮಾಣಪತ್ರಗಳು, ಅವಧಿ ಮುಗಿಯುವ ತಪಾಸಣೆ ಮತ್ತು ಸುರಕ್ಷಿತ ತಿರುಗುವಿಕೆ.",
+  "k8s-lifecycle/version-skew-and-upgrade-strategy": "ಆವೃತ್ತಿ ವ್ಯತ್ಯಾಸ ನಿಯಮಗಳು ಮತ್ತು ಒಂದು minor ಆವೃತ್ತಿ ನವೀಕರಣ ಯೋಜನೆ.",
+  "k8s-lifecycle/node-lifecycle-joining-draining-and-replacing": "ಕೆಲಸದ ಹೊರೆಗಳಿಗೆ ಅಡ್ಡಿಯಾಗದಂತೆ node ಸೇರಿಸಿ, ಖಾಲಿ ಮಾಡಿ, ಬದಲಿಸಿ.",
+  "k8s-lifecycle/backup-and-disaster-recovery-for-the-cluster": "etcd ಬ್ಯಾಕಪ್, ಮರುಸ್ಥಾಪನೆ ಮತ್ತು ವಿಪತ್ತು ಚೇತರಿಕೆ ಅಭ್ಯಾಸ.",
+  "k8s-lifecycle/cluster-api-and-declarative-cluster-management": "Cluster API ಮೂಲಕ ಕ್ಲಸ್ಟರ್‌ಗಳನ್ನು ಘೋಷಣಾತ್ಮಕವಾಗಿ ನಿರ್ವಹಿಸಿ.",
+  "k8s-lifecycle/capstone-plan-and-rehearse-an-upgrade-and-a-recovery": "ಅಂತಿಮ ಯೋಜನೆ: ನವೀಕರಣ ಮತ್ತು ಚೇತರಿಕೆಯನ್ನು ಯೋಜಿಸಿ ಅಭ್ಯಾಸ ಮಾಡಿ.",
+  "k8s-network/the-kubernetes-network-model": "Kubernetes ನೆಟ್‌ವರ್ಕ್ ಮಾದರಿ ಮತ್ತು ಪಾಡ್‌ಗಳ ನಿಯಮಗಳು.",
+  "k8s-network/cni-plugins-overlays-routing-and-ebpf": "CNI ಪ್ಲಗಿನ್ ಹೋಲಿಕೆ: overlay, routing ಮತ್ತು eBPF.",
+  "k8s-network/services-clusterip-nodeport-and-kube-proxy": "Service, ClusterIP, NodePort ಮತ್ತು kube-proxy ಟ್ರಾಫಿಕ್ ಅನ್ನು ಹೇಗೆ ಮಾರ್ಗ ಮಾಡುತ್ತದೆ.",
+  "k8s-network/endpointslices-and-how-traffic-finds-pods": "EndpointSlice ಮತ್ತು ಸಿದ್ಧತೆ ಟ್ರಾಫಿಕ್ ಎಲ್ಲಿಗೆ ಹೋಗಬೇಕೆಂದು ಹೇಗೆ ನಿರ್ಧರಿಸುತ್ತದೆ.",
+  "k8s-network/coredns-and-service-discovery": "CoreDNS, ಹುಡುಕಾಟ ಡೊಮೇನ್‌ಗಳು ಮತ್ತು ಸೇವಾ ಅನ್ವೇಷಣೆ.",
+  "k8s-network/network-policies-in-depth": "ನೆಟ್‌ವರ್ಕ್ ನೀತಿಗಳ ಆಳ: ಡೀಫಾಲ್ಟ್ ನಿರಾಕರಣೆ, selector ಮತ್ತು DNS.",
+  "k8s-network/ingress-and-the-gateway-api": "ಕ್ಲಸ್ಟರ್‌ಗೆ ಬರುವ ಟ್ರಾಫಿಕ್‌ಗಾಗಿ Ingress ಮತ್ತು Gateway API.",
+  "k8s-network/debugging-kubernetes-networking": "Kubernetes ನೆಟ್‌ವರ್ಕ್ debug ಮಾಡಲು ಸ್ಥಿರ ವಿಧಾನ.",
+  "k8s-resources/requests-limits-and-qos-classes": "Request, limit ಮತ್ತು QoS ವರ್ಗಗಳ ವಿವರಣೆ.",
+  "k8s-resources/cpu-and-memory-behaviour-throttling-and-oom": "CPU throttling, OOM kill ಮತ್ತು ಅವನ್ನು ಅಳೆಯುವ ವಿಧಾನ.",
+  "k8s-resources/limitrange-resourcequota-and-priority": "ನ್ಯಾಯಯುತ ಹಂಚಿಕೆಗೆ LimitRange, ResourceQuota ಮತ್ತು ಆದ್ಯತಾ ವರ್ಗಗಳು.",
+  "k8s-resources/node-allocatable-pressure-and-eviction": "Node allocatable, ಒತ್ತಡ ಮತ್ತು ಹೊರಹಾಕುವ ಕ್ರಮ.",
+  "k8s-resources/horizontal-pod-autoscaling": "ಮೆಟ್ರಿಕ್‌ಗಳಿಂದ replica ವರೆಗೆ ಅಡ್ಡ ಪಾಡ್ ಸ್ವಯಂ ಸ್ಕೇಲಿಂಗ್.",
+  "k8s-resources/vertical-scaling-and-right-sizing": "ಲಂಬ ಸ್ಕೇಲಿಂಗ್ ಮತ್ತು ನಿಜವಾದ ಬಳಕೆಯಿಂದ request ಹೊಂದಿಸುವುದು.",
+  "k8s-resources/cluster-autoscaling-karpenter-and-keda": "Karpenter ಮೂಲಕ ಕ್ಲಸ್ಟರ್ autoscaling ಮತ್ತು KEDA ಮೂಲಕ ಈವೆಂಟ್ ಆಧಾರಿತ ಸ್ಕೇಲಿಂಗ್.",
+  "k8s-resources/disruption-budgets-topology-spread-and-capacity-planning": "ಅಡಚಣೆ ಬಜೆಟ್, topology ಹರಡುವಿಕೆ ಮತ್ತು ಸಾಮರ್ಥ್ಯ ಯೋಜನೆ.",
+  "k8s-security/threat-model-and-the-layers-of-cluster-security": "ಕ್ಲಸ್ಟರ್ ಬೆದರಿಕೆಗಳನ್ನು ಮಾದರಿ ಮಾಡಿ ಪದರಗಳಲ್ಲಿ ನಿಯಂತ್ರಣ ಇರಿಸಿ.",
+  "k8s-security/authentication-service-accounts-and-token-security": "ದೃಢೀಕರಣ, service account ಮತ್ತು token ಭದ್ರತೆ.",
+  "k8s-security/rbac-design-least-privilege-and-auditing": "ಕನಿಷ್ಠ ಅಧಿಕಾರದ RBAC ವಿನ್ಯಾಸ ಮತ್ತು ಲೆಕ್ಕಪರಿಶೋಧನೆ.",
+  "k8s-security/pod-security-standards-and-admission-policy": "Pod Security ಮಾನದಂಡಗಳು ಮತ್ತು admission ನೀತಿ.",
+  "k8s-security/secrets-encryption-at-rest-and-external-stores": "Secret, ವಿಶ್ರಾಂತಿಯಲ್ಲಿರುವ ದತ್ತಾಂಶದ ಎನ್‌ಕ್ರಿಪ್ಶನ್ ಮತ್ತು ಬಾಹ್ಯ ಸಂಗ್ರಹಣೆಗಳು.",
+  "k8s-security/multi-tenancy-and-isolation": "ಬಹು ಬಾಡಿಗೆದಾರ ವ್ಯವಸ್ಥೆ ಮತ್ತು ತಂಡಗಳ ನಡುವೆ ಪ್ರತ್ಯೇಕತೆ.",
+  "k8s-security/api-server-and-kubelet-hardening-with-cis": "CIS benchmark ಬಳಸಿ API server ಮತ್ತು kubelet ಬಲಪಡಿಸಿ.",
+  "k8s-security/incident-response-for-a-compromised-cluster": "ಹಾನಿಗೊಳಗಾದ ಕ್ಲಸ್ಟರ್‌ಗೆ ಪ್ರತಿಕ್ರಿಯೆ: ನಿಯಂತ್ರಿಸಿ, ತನಿಖೆ ಮಾಡಿ, ಚೇತರಿಸಿ.",
+  "obs-deep/promql-in-depth-rates-aggregation-and-recording-rules": "ಸರಿಯಾದ ಫಲಿತಾಂಶ ನೀಡುವ PromQL rate, ಸಂಗ್ರಹಣೆ ಮತ್ತು recording rule.",
+  "obs-deep/scaling-prometheus-ha-federation-and-long-term-storage": "sharding, federation ಮತ್ತು ದೀರ್ಘಕಾಲೀನ ಸಂಗ್ರಹಣೆಯೊಂದಿಗೆ Prometheus ವಿಸ್ತರಿಸುವುದು.",
+  "obs-deep/slo-alerting-burn-rates-and-alertmanager-design": "SLO ಆಧಾರಿತ burn rate ಎಚ್ಚರಿಕೆ ಮತ್ತು Alertmanager ಮಾರ್ಗ.",
+  "obs-deep/logs-at-scale-loki-labels-and-retention": "ಕಡಿಮೆ label ಮತ್ತು ಸೂಕ್ತ ಉಳಿಕೆಯೊಂದಿಗೆ Loki ದೊಡ್ಡ ಮಟ್ಟದಲ್ಲಿ ಚಲಾಯಿಸುವುದು.",
+  "obs-deep/distributed-tracing-sampling-and-correlation": "sampling ಮತ್ತು trace, log, metric ಸಂಪರ್ಕದೊಂದಿಗೆ tracing.",
+  "obs-deep/observability-as-code-and-cost-control": "ವೆಚ್ಚ ನಿಯಂತ್ರಣದೊಂದಿಗೆ code ರೂಪದಲ್ಲಿ dashboard ಮತ್ತು ಎಚ್ಚರಿಕೆ.",
+  "k8s-supply-chain/the-software-supply-chain-threat-model-and-slsa": "ಪೂರೈಕೆ ಸರಪಳಿ ಬೆದರಿಕೆ ಮಾದರಿ ಮತ್ತು SLSA ಹಂತಗಳು.",
+  "k8s-supply-chain/image-scanning-and-vulnerability-management": "image ಸ್ಕ್ಯಾನ್ ಮಾಡಿ ಹೊಣೆಗಾರ ಮತ್ತು ಗಡುವಿನೊಂದಿಗೆ ದುರ್ಬಲತೆ ನಿರ್ವಹಿಸುವುದು.",
+  "k8s-supply-chain/sboms-signing-and-verification-with-cosign": "SBOM ರಚಿಸಿ cosign ಮೂಲಕ image ಸಹಿ ಮಾಡಿ ಪರಿಶೀಲಿಸುವುದು.",
+  "k8s-supply-chain/admission-enforcement-of-provenance-with-policy": "ನೀತಿಯ ಮೂಲಕ ಪ್ರವೇಶದಲ್ಲಿ provenance ಕಡ್ಡಾಯಗೊಳಿಸುವುದು.",
+  "k8s-supply-chain/runtime-detection-with-falco-and-audit-events": "Falco ಮತ್ತು ಲೆಕ್ಕಪರಿಶೋಧನೆ ಘಟನೆಗಳಿಂದ ರನ್‌ಟೈಮ್ ದಾಳಿ ಪತ್ತೆ ಮಾಡುವುದು.",
+  "k8s-supply-chain/sandboxing-seccomp-apparmor-and-runtime-classes": "seccomp, AppArmor ಮತ್ತು sandbox ಮೂಲಕ kernel ದಾಳಿ ಮೇಲ್ಮೈ ಕಡಿಮೆ ಮಾಡುವುದು.",
+  "iac-beyond/opentofu-and-the-terraform-ecosystem-choices": "OpenTofu ಮತ್ತು Terraform ಸಾಧನಗಳ ನಡುವೆ ಆಯ್ಕೆ ಮಾಡುವ ವಿಧಾನ.",
+  "iac-beyond/pulumi-infrastructure-in-real-programming-languages": "Pulumi: ನಿಜವಾದ ಪ್ರೋಗ್ರಾಮಿಂಗ್ ಭಾಷೆಗಳಲ್ಲಿ ಮೂಲಸೌಕರ್ಯ.",
+  "iac-beyond/terragrunt-modules-and-multi-environment-structure": "Terragrunt, module ಮತ್ತು ಬಹು ಪರಿಸರ ರಚನೆ.",
+  "iac-beyond/testing-infrastructure-code": "ಮೂಲಸೌಕರ್ಯ code ಅನ್ನು ಹಲವು ಹಂತಗಳಲ್ಲಿ ಪರೀಕ್ಷಿಸುವುದು.",
+  "iac-beyond/policy-as-code-and-drift-detection": "code ರೂಪದಲ್ಲಿ ನೀತಿ ಮತ್ತು drift ಪತ್ತೆ.",
+  "iac-beyond/state-secrets-and-safe-migrations": "state, ರಹಸ್ಯ ಮತ್ತು ವಲಸೆಗಳನ್ನು ಸುರಕ್ಷಿತವಾಗಿ ನಿರ್ವಹಿಸುವುದು.",
+  "leadership/star-stories-and-behavioral-interviews": "ವರ್ತನೆ ಸಂದರ್ಶನಕ್ಕಾಗಿ STAR ಕಥೆಗಳನ್ನು ಸಿದ್ಧಪಡಿಸುವುದು.",
+  "leadership/communicating-technical-decisions-and-design-reviews": "ತಾಂತ್ರಿಕ ನಿರ್ಧಾರಗಳನ್ನು ವಿವರಿಸಿ ವಿನ್ಯಾಸ ಪರಿಶೀಲನೆ ನಡೆಸುವುದು.",
+  "leadership/influence-without-authority": "ಔಪಚಾರಿಕ ಅಧಿಕಾರವಿಲ್ಲದೆ ಇತರ ತಂಡಗಳ ಮೇಲೆ ಪ್ರಭಾವ ಬೀರುವುದು.",
+  "leadership/mentoring-and-giving-feedback": "ಜನರಿಗೆ ಮಾರ್ಗದರ್ಶನ ನೀಡಿ ಉಪಯುಕ್ತ ಪ್ರತಿಕ್ರಿಯೆ ನೀಡುವುದು.",
+  "leadership/leading-through-incidents": "ಪಾತ್ರಗಳು ಮತ್ತು ಸ್ಪಷ್ಟ ಅಪ್‌ಡೇಟ್‌ಗಳೊಂದಿಗೆ ಘಟನೆ ಮುನ್ನಡೆಸುವುದು.",
+  "leadership/senior-staff-scope-and-career-growth": "senior ಮತ್ತು staff ವ್ಯಾಪ್ತಿಗೆ ಬೆಳೆಯುವುದು.",
+  "ai-infra/gpu-scheduling-and-sharing-on-kubernetes": "Kubernetes ನಲ್ಲಿ GPU ಗಳನ್ನು ಯೋಜಿಸಿ ಹಂಚಿಕೊಳ್ಳುವುದು.",
+  "ai-infra/vector-databases-and-retrieval-operations": "vector ಡೇಟಾಬೇಸ್ ಮತ್ತು ಹುಡುಕಾಟ ನಿರ್ವಹಿಸುವುದು.",
+  "ai-infra/rag-pipelines-in-production": "ಉತ್ಪಾದನೆಯಲ್ಲಿ RAG pipeline ಚಲಾಯಿಸುವುದು.",
+  "ai-infra/llm-gateways-routing-caching-and-rate-limits": "LLM gateway: ಮಾರ್ಗ, cache ಮತ್ತು ದರ ಮಿತಿಗಳು.",
+  "ai-infra/llm-observability-evaluation-and-guardrails": "LLM ಅಪ್ಲಿಕೇಶನ್‌ಗಳನ್ನು ಗಮನಿಸಿ ಮೌಲ್ಯಮಾಪನ ಮಾಡಿ ರಕ್ಷಿಸುವುದು.",
+  "ai-infra/cost-and-capacity-engineering-for-inference": "inference ಗಾಗಿ ವೆಚ್ಚ ಮತ್ತು ಸಾಮರ್ಥ್ಯ ನಿಯಂತ್ರಿಸುವುದು.",
+  "rust-infra/why-rust-ownership-borrowing-and-the-mental-model": "ಮಾಲೀಕತ್ವ, ಎರವಲು ಮತ್ತು Rust ಚಿಂತನಾ ಮಾದರಿ.",
+  "rust-infra/errors-option-result-and-the-question-mark": "Option, Result ಮತ್ತು ಪ್ರಶ್ನಾರ್ಥಕ ಚಿಹ್ನೆಯಿಂದ ದೋಷ ನಿರ್ವಹಣೆ.",
+  "rust-infra/structs-enums-traits-and-generics": "struct, enum, trait ಮತ್ತು generic ಮೂಲಕ ಡೇಟಾ ಮಾದರಿ ಮಾಡುವುದು.",
+  "rust-infra/cli-tools-with-clap-serde-and-files": "clap, serde ಮತ್ತು ಕಡತಗಳೊಂದಿಗೆ CLI ಸಾಧನ ರಚಿಸುವುದು.",
+  "rust-infra/async-rust-with-tokio-and-network-services": "tokio ಮೂಲಕ async ಜಾಲ ಸೇವೆಗಳನ್ನು ಬರೆಯುವುದು.",
+  "rust-infra/testing-cross-compilation-and-shipping-static-binaries": "ಪರೀಕ್ಷೆ, cross compile ಮತ್ತು static binary ವಿತರಣೆ.",
+  "db-ops/postgresql-replication-and-high-availability": "PostgreSQL replication, failover ಮತ್ತು split brain ತಪ್ಪಿಸುವುದು.",
+  "db-ops/backups-pitr-and-restore-testing": "ಬ್ಯಾಕಪ್, ನಿರ್ದಿಷ್ಟ ಸಮಯಕ್ಕೆ ಮರುಸ್ಥಾಪನೆ ಮತ್ತು ಮರುಸ್ಥಾಪನೆ ಪರೀಕ್ಷೆ.",
+  "db-ops/connection-pooling-and-capacity": "ಸಂಪರ್ಕ pooling ಮತ್ತು ಸಾಮರ್ಥ್ಯ ಯೋಜನೆ.",
+  "db-ops/zero-downtime-migrations-and-upgrades": "ಅಡಚಣೆಯಿಲ್ಲದ ವಲಸೆ ಮತ್ತು ಪ್ರಮುಖ ಆವೃತ್ತಿ ನವೀಕರಣ.",
+  "db-ops/redis-and-mongodb-operations": "Redis ಮತ್ತು MongoDB ಅನ್ನು ಸುರಕ್ಷಿತವಾಗಿ ನಿರ್ವಹಿಸುವುದು.",
+  "db-ops/database-incidents-and-runbooks": "runbook ಮೂಲಕ ಡೇಟಾಬೇಸ್ ಘಟನೆಗಳಿಗೆ ಪ್ರತಿಕ್ರಿಯಿಸುವುದು.",
+  "python-ops/project-structure-packaging-and-virtual-environments": "pyproject.toml ಮತ್ತು virtual environment ಮೂಲಕ ಸಾಧನಗಳನ್ನು ಪ್ಯಾಕೇಜ್ ಮಾಡುವುದು.",
+  "python-ops/cli-tools-with-argparse-click-and-typer": "ಸುರಕ್ಷಿತ ಕಮಾಂಡ್ ಲೈನ್ ಸಾಧನ ರಚಿಸುವುದು.",
+  "python-ops/api-clients-retries-timeouts-and-pagination": "timeout, ಮರುಪ್ರಯತ್ನ ಮತ್ತು ಪುಟ ವಿಂಗಡಣೆಯೊಂದಿಗೆ API client.",
+  "python-ops/concurrency-threads-asyncio-and-processes": "thread, asyncio ಅಥವಾ process ಆಯ್ಕೆ ಮಾಡಿ concurrency ಮಿತಿಗೊಳಿಸುವುದು.",
+  "python-ops/testing-with-pytest-and-mocking-infrastructure": "pytest ಮತ್ತು ನಕಲಿ ವಸ್ತುಗಳಿಂದ ಕಾರ್ಯಾಚರಣೆ code ಪರೀಕ್ಷಿಸುವುದು.",
+  "python-ops/working-with-cloud-and-kubernetes-sdks-with-safe-patterns": "ಸುರಕ್ಷಿತ ಮಾದರಿಗಳೊಂದಿಗೆ cloud ಮತ್ತು Kubernetes SDK ಬಳಸುವುದು."
  }
 }
