@@ -828,7 +828,9 @@ html[data-a-fs="150"] .a11y-panel { max-height: calc((100vh - 90px) / 1.5); }
 .utilbar { background: var(--surface); border-bottom: 1px solid var(--line); font: 500 .82rem/1 var(--sans); color: var(--muted); }
 .utilbar-in { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 30px; }
 .util-promise { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-.utilbar .visitors { margin-left: auto; color: var(--ink); font-weight: 700; white-space: nowrap; }
+.foot-proof { flex-basis: 100%; margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+.foot .visitors { color: var(--muted); font-weight: 400; white-space: nowrap; }
+.foot .visitors:not([hidden])::before { margin-right: 6px; }
 @media (max-width: 560px) { .util-promise { display: none; } .utilbar-in { justify-content: flex-end; } }
 
 /* ---- skill trees ---- */
@@ -2100,6 +2102,43 @@ body.embed #main{padding-top:.5rem}
 .bs-tiers { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 .chipbtn { font: inherit; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
 .chipbtn[aria-pressed="true"] { border-color: var(--accent, currentColor); font-weight: 700; }
+
+/* ===== why it matters, compare roles, quiet footer proof (round 50) ===== */
+.why { margin: 6px 0 0; color: var(--ink); font-size: .95em; max-width: 46em; }
+.why strong { font-weight: 700; }
+.td-sum + .why { font-size: 13px; margin-top: 4px; }
+.cmp-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 18px; }
+.cmp-chip { font: 600 14px var(--sans); padding: 7px 13px; border-radius: 99px; border: 1px solid var(--line-strong); background: var(--paper); color: var(--muted); cursor: pointer; }
+.cmp-chip:hover { color: var(--ink); }
+.cmp-chip.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.cmp-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin: 14px 0 20px; }
+.cmp-card { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; background: var(--paper); }
+.cmp-card h3 { margin: 0 0 4px; font-size: 1.05rem; }
+.cmp-uniq { margin: 8px 0 0; font-size: 14px; }
+.cmp-diff { display: inline-flex; gap: 8px; align-items: center; margin: 4px 0 12px; font-size: 14px; }
+.cmp-scroll { position: relative; max-width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+.cmp-table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14px; }
+.cmp-table th, .cmp-table td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: center; vertical-align: top; }
+.cmp-table thead th { position: sticky; top: 0; background: var(--paper); font-weight: 700; }
+.cmp-table .cmp-skill { text-align: left; min-width: 220px; position: sticky; left: 0; background: var(--paper); }
+.cmp-skill a { font-weight: 700; }
+.cmp-why { display: block; color: var(--muted); font-weight: 400; font-size: 13px; margin-top: 2px; }
+.cmp-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); }
+.cmp-gap { display: inline-block; width: 12px; height: 2px; background: var(--line-strong); vertical-align: middle; }
+.cmp-one .cmp-dot { box-shadow: 0 0 0 3px var(--pass-soft); background: var(--pass); }
+.cmp-all .cmp-skill a { font-weight: 600; }
+.cmp-chip:focus-visible, .cmp-scroll:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.mod-tools { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; margin: 24px 0 -8px; max-width: 820px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; padding: 3px; background: var(--paper); }
+.seg-b { font: 600 14px var(--sans); border: 0; background: transparent; color: var(--muted); padding: 6px 12px; border-radius: 7px; cursor: pointer; }
+.seg-b span { font-weight: 400; }
+.seg-b.on { background: var(--ink); color: var(--paper); }
+.seg-b:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.jobs.compact .job-sum { display: none; }
+.jobs.compact .job-body { padding-bottom: 10px; }
+.jobs.compact .job-title { font-size: 1rem; }
+.jobs.compact .job-meta { margin-top: 2px; }
+.jobs li[hidden] { display: none; }
 
 /* ===== Round 35 theme layer: the merged design =====
    Loaded after app.css. Tokens first, then components.
