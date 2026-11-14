@@ -1,0 +1,625 @@
+[
+ {
+  "id": "nw-dns",
+  "module": "k8s-network",
+  "lesson": "k8s-network/coredns-and-service-discovery",
+  "title": "DNS lookups per request and ndots",
+  "summary": "Estimate the extra lookups an external name causes and when they overload DNS.",
+  "inputs": [
+   {
+    "id": "rps",
+    "label": "Requests per second per pod",
+    "min": 1,
+    "max": 500,
+    "value": 50,
+    "step": 1
+   },
+   {
+    "id": "pods",
+    "label": "Pods",
+    "min": 1,
+    "max": 200,
+    "value": 40,
+    "step": 1
+   },
+   {
+    "id": "ndots",
+    "label": "ndots setting",
+    "min": 1,
+    "max": 6,
+    "value": 5,
+    "step": 1
+   },
+   {
+    "id": "dots",
+    "label": "Dots in the name used",
+    "min": 0,
+    "max": 5,
+    "value": 2,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "tries",
+    "dots<ndots ? 3+1 : 1"
+   ],
+   [
+    "qps",
+    "rps*pods*tries"
+   ],
+   [
+    "cap",
+    "8000"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Lookups per call",
+    "x": 0,
+    "y": 0,
+    "state": "tries>2 ? 1 : 0",
+    "sub": "round(tries) + ' queries'"
+   },
+   {
+    "id": "n1",
+    "label": "Total queries",
+    "x": 1,
+    "y": 0,
+    "state": "qps>cap ? 2 : (qps>cap*0.6 ? 1 : 0)",
+    "sub": "round(qps) + ' a second'"
+   },
+   {
+    "id": "n2",
+    "label": "DNS capacity",
+    "x": 2,
+    "y": 0,
+    "state": "0",
+    "sub": "round(cap) + ' a second'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, tries/4)",
+    "bad": "tries>2"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, qps/cap)",
+    "bad": "qps>cap"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Queries per call",
+    "expr": "tries",
+    "dp": 0
+   },
+   {
+    "label": "Queries per second",
+    "expr": "qps",
+    "dp": 0
+   },
+   {
+    "label": "Share of capacity",
+    "expr": "qps/cap*100",
+    "dp": 0,
+    "unit": "%"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "qps>cap",
+    "tone": "bad",
+    "text": "DNS capacity is exceeded, so lookups time out. Use fully qualified names or lower ndots and add node caching."
+   },
+   {
+    "when": "qps>cap*0.6",
+    "tone": "warn",
+    "text": "DNS is close to its capacity. A traffic increase will cause timeouts."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Lookups fit well inside DNS capacity."
+   }
+  ],
+  "tries": [
+   "Set ndots to 1.",
+   "Raise pods to 200.",
+   "Use five dots in the name."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Short external names and many pods.",
+    "tone": "bad",
+    "values": {
+     "rps": 100,
+     "pods": 120,
+     "ndots": 5,
+     "dots": 2
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Names are fully qualified.",
+    "tone": "good",
+    "values": {
+     "rps": 100,
+     "pods": 120,
+     "ndots": 5,
+     "dots": 5
+    }
+   }
+  ]
+ },
+ {
+  "id": "nw-mtu",
+  "module": "k8s-network",
+  "lesson": "k8s-network/cni-plugins-overlays-routing-and-ebpf",
+  "title": "Overlay MTU and packet size",
+  "summary": "Check whether full size packets fit through the overlay.",
+  "inputs": [
+   {
+    "id": "node",
+    "label": "Node interface MTU",
+    "min": 1200,
+    "max": 9000,
+    "value": 1500,
+    "step": 10
+   },
+   {
+    "id": "overhead",
+    "label": "Overlay header bytes",
+    "min": 0,
+    "max": 100,
+    "value": 50,
+    "step": 1
+   },
+   {
+    "id": "pod",
+    "label": "Pod interface MTU",
+    "min": 1000,
+    "max": 9000,
+    "value": 1500,
+    "step": 10
+   }
+  ],
+  "vars": [
+   [
+    "fit",
+    "node-overhead"
+   ],
+   [
+    "gap",
+    "pod-fit"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Node link",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(node) + ' bytes'"
+   },
+   {
+    "id": "n1",
+    "label": "Largest overlay packet",
+    "x": 1,
+    "y": 0,
+    "state": "gap>0 ? 2 : 0",
+    "sub": "round(fit) + ' bytes'"
+   },
+   {
+    "id": "n2",
+    "label": "Pod MTU",
+    "x": 2,
+    "y": 0,
+    "state": "gap>0 ? 2 : 0",
+    "sub": "round(pod) + ' bytes'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, node/9000)",
+    "bad": "false"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, pod/9000)",
+    "bad": "gap>0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Largest packet that fits",
+    "expr": "fit",
+    "dp": 0
+   },
+   {
+    "label": "Bytes too large",
+    "expr": "max(0,gap)",
+    "dp": 0
+   },
+   {
+    "label": "Overhead",
+    "expr": "overhead",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "gap>0",
+    "tone": "bad",
+    "text": "Full size pod packets exceed what the overlay can carry, so big transfers hang. Lower the pod MTU."
+   },
+   {
+    "when": "overhead>80",
+    "tone": "warn",
+    "text": "The overhead is large. Check that the encapsulation is the one you expect."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Packets fit through the overlay without fragmentation."
+   }
+  ],
+  "tries": [
+   "Set the pod MTU to 1500 with overhead 50.",
+   "Raise the node MTU to 9000.",
+   "Set overhead to 90."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Pod and node MTU are equal.",
+    "tone": "bad",
+    "values": {
+     "node": 1500,
+     "overhead": 50,
+     "pod": 1500
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Pod MTU lowered.",
+    "tone": "good",
+    "values": {
+     "node": 1500,
+     "overhead": 50,
+     "pod": 1450
+    }
+   }
+  ]
+ },
+ {
+  "id": "nw-svc",
+  "module": "k8s-network",
+  "lesson": "k8s-network/endpointslices-and-how-traffic-finds-pods",
+  "title": "Endpoints and a rolling update",
+  "summary": "See how readiness and shutdown delay decide whether requests fail during a rollout.",
+  "inputs": [
+   {
+    "id": "ready",
+    "label": "Seconds for a pod to become ready",
+    "min": 1,
+    "max": 120,
+    "value": 15,
+    "step": 1,
+    "unit": "s"
+   },
+   {
+    "id": "spread",
+    "label": "Seconds for endpoint removal to spread",
+    "min": 0,
+    "max": 30,
+    "value": 5,
+    "step": 1,
+    "unit": "s"
+   },
+   {
+    "id": "prestop",
+    "label": "preStop delay",
+    "min": 0,
+    "max": 30,
+    "value": 0,
+    "step": 1,
+    "unit": "s"
+   },
+   {
+    "id": "rps",
+    "label": "Requests per second",
+    "min": 1,
+    "max": 1000,
+    "value": 100,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "lost",
+    "max(0,spread-prestop)*rps"
+   ],
+   [
+    "wait",
+    "ready"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Readiness",
+    "x": 0,
+    "y": 0,
+    "state": "ready>60 ? 1 : 0",
+    "sub": "round(ready) + ' s'"
+   },
+   {
+    "id": "n1",
+    "label": "Endpoint spread",
+    "x": 1,
+    "y": 0,
+    "state": "spread>prestop ? 2 : 0",
+    "sub": "round(spread) + ' s'"
+   },
+   {
+    "id": "n2",
+    "label": "Requests lost",
+    "x": 2,
+    "y": 0,
+    "state": "lost>0 ? 2 : 0",
+    "sub": "round(lost) + ' failed'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, ready/120)",
+    "bad": "ready>60"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, lost/3000)",
+    "bad": "lost>0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Requests that fail each pod stop",
+    "expr": "lost",
+    "dp": 0
+   },
+   {
+    "label": "Seconds to wait before exit",
+    "expr": "spread",
+    "dp": 0
+   },
+   {
+    "label": "Rollout wait per pod",
+    "expr": "wait",
+    "dp": 0,
+    "unit": "s"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "lost>0",
+    "tone": "bad",
+    "text": "Pods stop before clients learn they are gone, so requests fail. Add a preStop sleep at least as long as endpoint spread."
+   },
+   {
+    "when": "ready>60",
+    "tone": "warn",
+    "text": "Slow readiness makes rollouts long. Check the probe and startup work."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The pod keeps serving until endpoints have caught up, so no requests fail."
+   }
+  ],
+  "tries": [
+   "Set preStop to 5 seconds.",
+   "Raise the spread to 20 seconds.",
+   "Raise requests to 500 a second."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "No preStop delay.",
+    "tone": "bad",
+    "values": {
+     "ready": 15,
+     "spread": 8,
+     "prestop": 0,
+     "rps": 200
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A preStop sleep covers the spread.",
+    "tone": "good",
+    "values": {
+     "ready": 15,
+     "spread": 8,
+     "prestop": 10,
+     "rps": 200
+    }
+   }
+  ]
+ },
+ {
+  "id": "nw-policy",
+  "module": "k8s-network",
+  "lesson": "k8s-network/network-policies-in-depth",
+  "title": "Default deny and allowed flows",
+  "summary": "See which application flows still work after a default deny.",
+  "inputs": [
+   {
+    "id": "apps",
+    "label": "Applications",
+    "min": 1,
+    "max": 30,
+    "value": 8,
+    "step": 1
+   },
+   {
+    "id": "rules",
+    "label": "Allow rules written",
+    "min": 0,
+    "max": 60,
+    "value": 8,
+    "step": 1
+   },
+   {
+    "id": "deny",
+    "label": "Default deny egress",
+    "type": "toggle",
+    "value": true
+   },
+   {
+    "id": "dns",
+    "label": "DNS egress allowed",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "need",
+    "apps*2"
+   ],
+   [
+    "ok2",
+    "deny ? (dns ? min(rules,need) : 0) : need"
+   ],
+   [
+    "broken",
+    "need-ok2"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Applications",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(apps) + ' apps'"
+   },
+   {
+    "id": "n1",
+    "label": "Policy",
+    "x": 1,
+    "y": 0,
+    "state": "deny && !dns ? 2 : 0",
+    "sub": "deny ? 'default deny' : 'open'"
+   },
+   {
+    "id": "n2",
+    "label": "Flows working",
+    "x": 2,
+    "y": 0,
+    "state": "broken>0 ? 2 : 0",
+    "sub": "round(ok2) + ' of ' + round(need)"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, apps/30)",
+    "bad": "false"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, broken/need)",
+    "bad": "broken>0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Flows needed",
+    "expr": "need",
+    "dp": 0
+   },
+   {
+    "label": "Flows working",
+    "expr": "ok2",
+    "dp": 0
+   },
+   {
+    "label": "Flows broken",
+    "expr": "broken",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "deny && !dns",
+    "tone": "bad",
+    "text": "Every name lookup times out because DNS is blocked. Allow port 53 to the DNS pods in the same change."
+   },
+   {
+    "when": "broken>0",
+    "tone": "warn",
+    "text": "Some required flows have no allow rule. Add rules and test each one."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Every needed flow has a rule and the default deny still protects everything else."
+   }
+  ],
+  "tries": [
+   "Turn the DNS toggle on.",
+   "Lower the rules to 3.",
+   "Turn default deny off."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Deny with no DNS rule.",
+    "tone": "bad",
+    "values": {
+     "apps": 8,
+     "rules": 16,
+     "deny": true,
+     "dns": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "DNS is allowed and rules cover flows.",
+    "tone": "good",
+    "values": {
+     "apps": 8,
+     "rules": 16,
+     "deny": true,
+     "dns": true
+    }
+   }
+  ]
+ }
+]

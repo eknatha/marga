@@ -1,0 +1,662 @@
+[
+ {
+  "id": "rs-qos",
+  "module": "k8s-resources",
+  "lesson": "k8s-resources/requests-limits-and-qos-classes",
+  "title": "Which QoS class is this pod?",
+  "summary": "Set requests and limits to see the class and eviction order.",
+  "inputs": [
+   {
+    "id": "creq",
+    "label": "CPU request",
+    "min": 0,
+    "max": 4000,
+    "value": 500,
+    "step": 50,
+    "unit": "m"
+   },
+   {
+    "id": "clim",
+    "label": "CPU limit",
+    "min": 0,
+    "max": 4000,
+    "value": 500,
+    "step": 50,
+    "unit": "m"
+   },
+   {
+    "id": "mreq",
+    "label": "Memory request",
+    "min": 0,
+    "max": 4096,
+    "value": 256,
+    "step": 32,
+    "unit": "MiB"
+   },
+   {
+    "id": "mlim",
+    "label": "Memory limit",
+    "min": 0,
+    "max": 4096,
+    "value": 256,
+    "step": 32,
+    "unit": "MiB"
+   }
+  ],
+  "vars": [
+   [
+    "none",
+    "creq==0 && clim==0 && mreq==0 && mlim==0"
+   ],
+   [
+    "guar",
+    "creq>0 && creq==clim && mreq>0 && mreq==mlim"
+   ],
+   [
+    "cls",
+    "none ? 0 : (guar ? 2 : 1)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Requests",
+    "x": 0,
+    "y": 0,
+    "state": "none ? 2 : 0",
+    "sub": "round(creq) + 'm and ' + round(mreq) + ' MiB'"
+   },
+   {
+    "id": "n1",
+    "label": "Limits",
+    "x": 1,
+    "y": 0,
+    "state": "0",
+    "sub": "round(clim) + 'm and ' + round(mlim) + ' MiB'"
+   },
+   {
+    "id": "n2",
+    "label": "Class",
+    "x": 2,
+    "y": 0,
+    "state": "cls==0 ? 2 : (cls==1 ? 1 : 0)",
+    "sub": "cls==0 ? 'BestEffort' : (cls==1 ? 'Burstable' : 'Guaranteed')"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "1",
+    "bad": "false"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "1",
+    "bad": "false"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Class number (0 first evicted)",
+    "expr": "cls",
+    "dp": 0
+   },
+   {
+    "label": "CPU headroom to limit",
+    "expr": "max(0,clim-creq)",
+    "dp": 0,
+    "unit": "m"
+   },
+   {
+    "label": "Memory headroom to limit",
+    "expr": "max(0,mlim-mreq)",
+    "dp": 0,
+    "unit": "MiB"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "cls==0",
+    "tone": "bad",
+    "text": "This pod has no requests or limits, so it is evicted first and can be starved. Set at least requests."
+   },
+   {
+    "when": "cls==1",
+    "tone": "warn",
+    "text": "This pod is burstable. It can use spare capacity and is evicted by how far it is over its requests."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Requests equal limits, so the pod is Guaranteed and evicted last."
+   }
+  ],
+  "tries": [
+   "Set every value to 0.",
+   "Make limits equal requests.",
+   "Raise only the memory limit."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "No requests or limits.",
+    "tone": "bad",
+    "values": {
+     "creq": 0,
+     "clim": 0,
+     "mreq": 0,
+     "mlim": 0
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Requests equal limits.",
+    "tone": "good",
+    "values": {
+     "creq": 500,
+     "clim": 500,
+     "mreq": 512,
+     "mlim": 512
+    }
+   }
+  ]
+ },
+ {
+  "id": "rs-throttle",
+  "module": "k8s-resources",
+  "lesson": "k8s-resources/cpu-and-memory-behaviour-throttling-and-oom",
+  "title": "CPU limit and throttling",
+  "summary": "Estimate throttling from a limit and a burst of CPU use.",
+  "inputs": [
+   {
+    "id": "limit",
+    "label": "CPU limit",
+    "min": 100,
+    "max": 4000,
+    "value": 500,
+    "step": 50,
+    "unit": "m"
+   },
+   {
+    "id": "burst",
+    "label": "Burst CPU demand",
+    "min": 100,
+    "max": 8000,
+    "value": 1500,
+    "step": 50,
+    "unit": "m"
+   },
+   {
+    "id": "share",
+    "label": "Share of time in bursts",
+    "min": 1,
+    "max": 100,
+    "value": 20,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "threads",
+    "label": "Busy threads",
+    "min": 1,
+    "max": 16,
+    "value": 4,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "quota",
+    "limit/1000*100"
+   ],
+   [
+    "need",
+    "burst/1000*100"
+   ],
+   [
+    "over",
+    "need>quota ? (1-quota/need) : 0"
+   ],
+   [
+    "thr",
+    "over*share"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Limit",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(limit) + 'm'"
+   },
+   {
+    "id": "n1",
+    "label": "Burst",
+    "x": 1,
+    "y": 0,
+    "state": "burst>limit ? 1 : 0",
+    "sub": "round(burst) + 'm'"
+   },
+   {
+    "id": "n2",
+    "label": "Throttled",
+    "x": 2,
+    "y": 0,
+    "state": "thr>15 ? 2 : (thr>3 ? 1 : 0)",
+    "sub": "round(thr) + '% of time'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, limit/4000)",
+    "bad": "false"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, burst/8000)",
+    "bad": "burst>limit"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Quota per 100 ms",
+    "expr": "quota",
+    "dp": 0,
+    "unit": "ms"
+   },
+   {
+    "label": "Demand per 100 ms",
+    "expr": "need",
+    "dp": 0,
+    "unit": "ms"
+   },
+   {
+    "label": "Time throttled",
+    "expr": "thr",
+    "dp": 0,
+    "unit": "%"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "thr>15",
+    "tone": "bad",
+    "text": "The container is throttled often, so latency rises while average CPU looks fine. Raise the limit or remove it."
+   },
+   {
+    "when": "thr>3",
+    "tone": "warn",
+    "text": "Throttling is noticeable. Watch p99 latency and the throttled period ratio."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The limit covers the bursts, so throttling is rare."
+   }
+  ],
+  "tries": [
+   "Raise the limit to 2000m.",
+   "Raise threads to 12.",
+   "Lower the limit to 200m."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A low limit and big bursts.",
+    "tone": "bad",
+    "values": {
+     "limit": 500,
+     "burst": 2500,
+     "share": 40,
+     "threads": 8
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A limit above burst demand.",
+    "tone": "good",
+    "values": {
+     "limit": 3000,
+     "burst": 2500,
+     "share": 40,
+     "threads": 8
+    }
+   }
+  ]
+ },
+ {
+  "id": "rs-hpa",
+  "module": "k8s-resources",
+  "lesson": "k8s-resources/horizontal-pod-autoscaling",
+  "title": "What will the HPA decide?",
+  "summary": "Compute desired replicas from usage, target and limits.",
+  "inputs": [
+   {
+    "id": "cur",
+    "label": "Current replicas",
+    "min": 1,
+    "max": 50,
+    "value": 4,
+    "step": 1
+   },
+   {
+    "id": "use",
+    "label": "Current CPU use of requests",
+    "min": 1,
+    "max": 300,
+    "value": 90,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "target",
+    "label": "Target",
+    "min": 10,
+    "max": 95,
+    "value": 60,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "maxr",
+    "label": "Max replicas",
+    "min": 1,
+    "max": 100,
+    "value": 10,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "want",
+    "ceil(cur*use/target)"
+   ],
+   [
+    "des",
+    "min(maxr,max(1,want))"
+   ],
+   [
+    "capped",
+    "want>maxr"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Usage",
+    "x": 0,
+    "y": 0,
+    "state": "use>target*1.5 ? 2 : (use>target ? 1 : 0)",
+    "sub": "round(use) + '% of requests'"
+   },
+   {
+    "id": "n1",
+    "label": "Desired",
+    "x": 1,
+    "y": 0,
+    "state": "capped ? 2 : 0",
+    "sub": "round(des) + ' replicas'"
+   },
+   {
+    "id": "n2",
+    "label": "Cap",
+    "x": 2,
+    "y": 0,
+    "state": "capped ? 2 : 0",
+    "sub": "capped ? 'max reached' : 'room to grow'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, use/300)",
+    "bad": "use>target"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, des/maxr)",
+    "bad": "capped"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Replicas wanted",
+    "expr": "want",
+    "dp": 0
+   },
+   {
+    "label": "Replicas set",
+    "expr": "des",
+    "dp": 0
+   },
+   {
+    "label": "Change from now",
+    "expr": "des-cur",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "capped",
+    "tone": "bad",
+    "text": "The need is above the maximum, so the cap holds usage high. Raise the maximum or reduce load per pod."
+   },
+   {
+    "when": "use>target",
+    "tone": "warn",
+    "text": "The HPA will scale up. New pods need time to become ready."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Usage is at or below the target, so replicas stay or shrink after the window."
+   }
+  ],
+  "tries": [
+   "Set usage to 250 percent.",
+   "Lower the max to 5.",
+   "Set usage to 30 percent."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Max replicas is too low.",
+    "tone": "bad",
+    "values": {
+     "cur": 8,
+     "use": 200,
+     "target": 60,
+     "maxr": 10
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Max leaves room.",
+    "tone": "good",
+    "values": {
+     "cur": 8,
+     "use": 200,
+     "target": 60,
+     "maxr": 40
+    }
+   }
+  ]
+ },
+ {
+  "id": "rs-cap",
+  "module": "k8s-resources",
+  "lesson": "k8s-resources/disruption-budgets-topology-spread-and-capacity-planning",
+  "title": "Can the cluster lose a zone?",
+  "summary": "Check whether the other zones can host the replicas of a failed zone.",
+  "inputs": [
+   {
+    "id": "zones",
+    "label": "Zones",
+    "min": 2,
+    "max": 5,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "pods",
+    "label": "Pods in the cluster",
+    "min": 3,
+    "max": 300,
+    "value": 60,
+    "step": 3
+   },
+   {
+    "id": "cap",
+    "label": "Pod slots per zone",
+    "min": 1,
+    "max": 200,
+    "value": 30,
+    "step": 1
+   },
+   {
+    "id": "spread",
+    "label": "Replicas spread over zones",
+    "type": "toggle",
+    "value": true
+   }
+  ],
+  "vars": [
+   [
+    "perz",
+    "pods/zones"
+   ],
+   [
+    "left",
+    "(zones-1)*cap"
+   ],
+   [
+    "need",
+    "spread ? pods : pods*zones"
+   ],
+   [
+    "ok",
+    "left>=pods"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Pods per zone",
+    "x": 0,
+    "y": 0,
+    "state": "spread ? 0 : 2",
+    "sub": "round(perz) + ' pods'"
+   },
+   {
+    "id": "n1",
+    "label": "Slots after a loss",
+    "x": 1,
+    "y": 0,
+    "state": "left<pods ? 2 : 0",
+    "sub": "round(left) + ' slots'"
+   },
+   {
+    "id": "n2",
+    "label": "Result",
+    "x": 2,
+    "y": 0,
+    "state": "left<pods ? 2 : 0",
+    "sub": "left>=pods ? 'survives' : 'pods Pending'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, perz/100)",
+    "bad": "!spread"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, pods/left)",
+    "bad": "left<pods"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Pods to place",
+    "expr": "pods",
+    "dp": 0
+   },
+   {
+    "label": "Slots in the other zones",
+    "expr": "left",
+    "dp": 0
+   },
+   {
+    "label": "Missing slots",
+    "expr": "max(0,pods-left)",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "left<pods",
+    "tone": "bad",
+    "text": "The remaining zones cannot host all pods, so some stay Pending after a zone failure. Add headroom."
+   },
+   {
+    "when": "!spread",
+    "tone": "warn",
+    "text": "Without spreading, a single zone may hold all replicas of one app. Add topology spread constraints."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The other zones have room for every pod, and replicas are spread."
+   }
+  ],
+  "tries": [
+   "Set zones to 2 with 60 pods and 30 slots.",
+   "Turn the spread toggle off.",
+   "Raise slots to 60."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "No spare capacity.",
+    "tone": "bad",
+    "values": {
+     "zones": 3,
+     "pods": 60,
+     "cap": 25,
+     "spread": true
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Headroom added.",
+    "tone": "good",
+    "values": {
+     "zones": 3,
+     "pods": 60,
+     "cap": 35,
+     "spread": true
+    }
+   }
+  ]
+ }
+]

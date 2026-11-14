@@ -1,0 +1,627 @@
+[
+ {
+  "id": "lc-cert",
+  "module": "k8s-lifecycle",
+  "lesson": "k8s-lifecycle/certificates-pki-expiry-and-rotation",
+  "title": "Certificate expiry countdown",
+  "summary": "See how upgrades and alerts decide whether a certificate expiry is a surprise.",
+  "inputs": [
+   {
+    "id": "age",
+    "label": "Days since the last renewal",
+    "min": 0,
+    "max": 500,
+    "value": 200,
+    "step": 5,
+    "unit": "days"
+   },
+   {
+    "id": "life",
+    "label": "Certificate lifetime",
+    "min": 90,
+    "max": 730,
+    "value": 365,
+    "step": 5,
+    "unit": "days"
+   },
+   {
+    "id": "warn",
+    "label": "Alert lead time",
+    "min": 0,
+    "max": 90,
+    "value": 30,
+    "step": 5,
+    "unit": "days"
+   },
+   {
+    "id": "upg",
+    "label": "Cluster upgraded this year",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "age2",
+    "upg ? min(age,120) : age"
+   ],
+   [
+    "left",
+    "life-age2"
+   ],
+   [
+    "gap",
+    "left-warn"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Age",
+    "x": 0,
+    "y": 0,
+    "state": "age2>life ? 2 : 0",
+    "sub": "round(age2) + ' days old'"
+   },
+   {
+    "id": "n1",
+    "label": "Remaining",
+    "x": 1,
+    "y": 0,
+    "state": "left<0 ? 2 : (left<warn ? 1 : 0)",
+    "sub": "round(left) + ' days left'"
+   },
+   {
+    "id": "n2",
+    "label": "Alert",
+    "x": 2,
+    "y": 0,
+    "state": "warn<=0 ? 2 : 0",
+    "sub": "warn<=0 ? 'none' : 'at ' + round(warn) + ' days'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, age2/life)",
+    "bad": "left<0"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, warn/90)",
+    "bad": "warn<=0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Days until expiry",
+    "expr": "left",
+    "dp": 0
+   },
+   {
+    "label": "Days of notice",
+    "expr": "warn",
+    "dp": 0
+   },
+   {
+    "label": "Margin after alert",
+    "expr": "gap",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "left<0",
+    "tone": "bad",
+    "text": "The certificates have expired and the cluster is rejecting connections. Renew them on each control plane node."
+   },
+   {
+    "when": "warn<=0",
+    "tone": "warn",
+    "text": "No alert is set, so expiry will be a surprise. Alert at thirty days or more."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "There is time left and an alert is set, so renewal is a planned task."
+   }
+  ],
+  "tries": [
+   "Set the age to 400 days.",
+   "Turn on the upgrade toggle.",
+   "Set the alert lead time to 0."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A year-old certificate and no alert.",
+    "tone": "bad",
+    "values": {
+     "age": 380,
+     "life": 365,
+     "warn": 0,
+     "upg": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "An upgrade renewed them.",
+    "tone": "good",
+    "values": {
+     "age": 380,
+     "life": 365,
+     "warn": 30,
+     "upg": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "lc-skew",
+  "module": "k8s-lifecycle",
+  "lesson": "k8s-lifecycle/version-skew-and-upgrade-strategy",
+  "title": "Is this version combination supported?",
+  "summary": "Check kubelet and API server versions against the skew policy.",
+  "inputs": [
+   {
+    "id": "api",
+    "label": "API server minor version",
+    "min": 24,
+    "max": 34,
+    "value": 30,
+    "step": 1
+   },
+   {
+    "id": "kubelet",
+    "label": "Kubelet minor version",
+    "min": 22,
+    "max": 34,
+    "value": 29,
+    "step": 1
+   },
+   {
+    "id": "kubectl",
+    "label": "kubectl minor version",
+    "min": 22,
+    "max": 34,
+    "value": 30,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "kd",
+    "api-kubelet"
+   ],
+   [
+    "cd",
+    "abs(api-kubectl)"
+   ],
+   [
+    "bad1",
+    "kd<0 || kd>3"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "API server",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "'1.' + round(api)"
+   },
+   {
+    "id": "n1",
+    "label": "Kubelet",
+    "x": 1,
+    "y": 0,
+    "state": "bad1 ? 2 : (kd>2 ? 1 : 0)",
+    "sub": "'1.' + round(kubelet)"
+   },
+   {
+    "id": "n2",
+    "label": "kubectl",
+    "x": 2,
+    "y": 0,
+    "state": "cd>1 ? 2 : 0",
+    "sub": "'1.' + round(kubectl)"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "1",
+    "bad": "false"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, abs(kd)/6)",
+    "bad": "bad1"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Kubelet versions behind the API server",
+    "expr": "kd",
+    "dp": 0
+   },
+   {
+    "label": "kubectl difference",
+    "expr": "cd",
+    "dp": 0
+   },
+   {
+    "label": "Allowed kubelet gap",
+    "expr": "3",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "bad1",
+    "tone": "bad",
+    "text": "The kubelet is newer than the API server or too far behind, which is not supported. Upgrade in the documented order."
+   },
+   {
+    "when": "cd>1",
+    "tone": "warn",
+    "text": "kubectl is more than one minor version from the API server. Use a closer client version."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The combination is within the supported skew."
+   }
+  ],
+  "tries": [
+   "Set the kubelet to 33.",
+   "Set the kubelet to 25.",
+   "Set kubectl to 33."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A kubelet newer than the API server.",
+    "tone": "bad",
+    "values": {
+     "api": 30,
+     "kubelet": 32,
+     "kubectl": 30
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Kubelets are slightly behind.",
+    "tone": "good",
+    "values": {
+     "api": 30,
+     "kubelet": 29,
+     "kubectl": 30
+    }
+   }
+  ]
+ },
+ {
+  "id": "lc-rpo",
+  "module": "k8s-lifecycle",
+  "lesson": "k8s-lifecycle/backup-and-disaster-recovery-for-the-cluster",
+  "title": "How old can the backup be?",
+  "summary": "Compare snapshot frequency and restore time with what the business can accept.",
+  "inputs": [
+   {
+    "id": "every",
+    "label": "Hours between snapshots",
+    "min": 1,
+    "max": 168,
+    "value": 24,
+    "step": 1,
+    "unit": "hours"
+   },
+   {
+    "id": "rpo",
+    "label": "Acceptable data loss",
+    "min": 1,
+    "max": 72,
+    "value": 6,
+    "step": 1,
+    "unit": "hours"
+   },
+   {
+    "id": "restore",
+    "label": "Measured restore time",
+    "min": 5,
+    "max": 600,
+    "value": 90,
+    "step": 5,
+    "unit": "min"
+   },
+   {
+    "id": "rto",
+    "label": "Acceptable downtime",
+    "min": 10,
+    "max": 600,
+    "value": 60,
+    "step": 5,
+    "unit": "min"
+   }
+  ],
+  "vars": [
+   [
+    "over",
+    "every-rpo"
+   ],
+   [
+    "rover",
+    "restore-rto"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Snapshots",
+    "x": 0,
+    "y": 0,
+    "state": "over>0 ? 2 : 0",
+    "sub": "'every ' + round(every) + ' h'"
+   },
+   {
+    "id": "n1",
+    "label": "Restore",
+    "x": 1,
+    "y": 0,
+    "state": "rover>0 ? 2 : 0",
+    "sub": "round(restore) + ' min'"
+   },
+   {
+    "id": "n2",
+    "label": "Targets",
+    "x": 2,
+    "y": 0,
+    "state": "0",
+    "sub": "round(rpo) + ' h and ' + round(rto) + ' min'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, every/168)",
+    "bad": "over>0"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, restore/600)",
+    "bad": "rover>0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Hours over the data loss target",
+    "expr": "max(0,over)",
+    "dp": 0
+   },
+   {
+    "label": "Minutes over the downtime target",
+    "expr": "max(0,rover)",
+    "dp": 0
+   },
+   {
+    "label": "Worst case data loss in hours",
+    "expr": "every",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "over>0",
+    "tone": "bad",
+    "text": "Snapshots are less frequent than the data loss target. Increase the frequency or accept more loss."
+   },
+   {
+    "when": "rover>0",
+    "tone": "warn",
+    "text": "Restore takes longer than the downtime target. Automate and rehearse the steps."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Both targets are met by the current schedule and measured restore time."
+   }
+  ],
+  "tries": [
+   "Set the snapshot interval to 48 hours.",
+   "Raise the restore time to 200 minutes.",
+   "Lower the targets."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Daily snapshots against a six hour target.",
+    "tone": "bad",
+    "values": {
+     "every": 24,
+     "rpo": 6,
+     "restore": 90,
+     "rto": 60
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Snapshots every four hours.",
+    "tone": "good",
+    "values": {
+     "every": 4,
+     "rpo": 6,
+     "restore": 45,
+     "rto": 60
+    }
+   }
+  ]
+ },
+ {
+  "id": "lc-drain",
+  "module": "k8s-lifecycle",
+  "lesson": "k8s-lifecycle/node-lifecycle-joining-draining-and-replacing",
+  "title": "Can this node be drained?",
+  "summary": "See whether a disruption budget lets a drain finish.",
+  "inputs": [
+   {
+    "id": "rep",
+    "label": "Replicas of the app",
+    "min": 1,
+    "max": 12,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "minav",
+    "label": "Minimum available by budget",
+    "min": 0,
+    "max": 12,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "spare",
+    "label": "Spare capacity on other nodes (pods)",
+    "min": 0,
+    "max": 20,
+    "value": 4,
+    "step": 1
+   },
+   {
+    "id": "ds",
+    "label": "Pod runs on this node",
+    "type": "toggle",
+    "value": true
+   }
+  ],
+  "vars": [
+   [
+    "allowed",
+    "rep-minav"
+   ],
+   [
+    "can",
+    "ds ? (allowed>0 && spare>0) : true"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Replicas",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(rep) + ' replicas'"
+   },
+   {
+    "id": "n1",
+    "label": "Budget",
+    "x": 1,
+    "y": 0,
+    "state": "allowed<=0 ? 2 : 0",
+    "sub": "round(allowed) + ' may be evicted'"
+   },
+   {
+    "id": "n2",
+    "label": "Capacity",
+    "x": 2,
+    "y": 0,
+    "state": "spare<1 ? 2 : 0",
+    "sub": "round(spare) + ' pod slots'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, rep/12)",
+    "bad": "false"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, minav/12)",
+    "bad": "allowed<=0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Pods that may be evicted",
+    "expr": "allowed",
+    "dp": 0
+   },
+   {
+    "label": "Spare pod slots",
+    "expr": "spare",
+    "dp": 0
+   },
+   {
+    "label": "Drain can finish",
+    "expr": "can ? 1 : 0",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "ds && allowed<=0",
+    "tone": "bad",
+    "text": "The budget allows no disruption, so the drain waits forever. Add replicas or relax the minimum."
+   },
+   {
+    "when": "ds && spare<1",
+    "tone": "warn",
+    "text": "The pod can be evicted but nowhere has room. Add a node first."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The budget and capacity allow the drain to finish."
+   }
+  ],
+  "tries": [
+   "Set the minimum available equal to the replicas.",
+   "Set spare capacity to 0.",
+   "Turn off the pod toggle."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Budget allows nothing.",
+    "tone": "bad",
+    "values": {
+     "rep": 3,
+     "minav": 3,
+     "spare": 4,
+     "ds": true
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Replicas exceed the minimum.",
+    "tone": "good",
+    "values": {
+     "rep": 4,
+     "minav": 3,
+     "spare": 4,
+     "ds": true
+    }
+   }
+  ]
+ }
+]

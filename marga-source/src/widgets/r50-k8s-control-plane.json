@@ -1,0 +1,628 @@
+[
+ {
+  "id": "cp-etcd",
+  "module": "k8s-control-plane",
+  "lesson": "k8s-control-plane/etcd-data-model-raft-and-quorum",
+  "title": "etcd members and failure tolerance",
+  "summary": "Pick the number of members and failures to see whether the cluster can still write.",
+  "inputs": [
+   {
+    "id": "members",
+    "label": "etcd members",
+    "min": 1,
+    "max": 9,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "down",
+    "label": "Members down",
+    "min": 0,
+    "max": 9,
+    "value": 1,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "need",
+    "floor(members/2)+1"
+   ],
+   [
+    "up",
+    "max(0,members-down)"
+   ],
+   [
+    "tol",
+    "members-need"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Members",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(members) + ' members'"
+   },
+   {
+    "id": "n1",
+    "label": "Up",
+    "x": 1,
+    "y": 0,
+    "state": "up<need ? 2 : 0",
+    "sub": "round(up) + ' running'"
+   },
+   {
+    "id": "n2",
+    "label": "Writes",
+    "x": 2,
+    "y": 0,
+    "state": "up<need ? 2 : 0",
+    "sub": "up>=need ? 'accepted' : 'refused'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, members/9)",
+    "bad": "false"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, up/members)",
+    "bad": "up<need"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Votes needed",
+    "expr": "need",
+    "dp": 0
+   },
+   {
+    "label": "Members running",
+    "expr": "up",
+    "dp": 0
+   },
+   {
+    "label": "Failures tolerated",
+    "expr": "tol",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "up<need",
+    "tone": "bad",
+    "text": "Quorum is lost, so etcd refuses writes. Running pods continue but nothing can change until a member returns."
+   },
+   {
+    "when": "tol<1",
+    "tone": "warn",
+    "text": "This cluster tolerates no failure. A single member loss stops writes, so use three or five members."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "A majority is available, so writes are accepted and the cluster tolerates the stated failures."
+   }
+  ],
+  "tries": [
+   "Set members to 3 and down to 2.",
+   "Set members to 4 and compare tolerance with 3.",
+   "Set members to 1."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Two of three members are down.",
+    "tone": "bad",
+    "values": {
+     "members": 3,
+     "down": 2
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "One member is down.",
+    "tone": "good",
+    "values": {
+     "members": 3,
+     "down": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "cp-quota",
+  "module": "k8s-control-plane",
+  "lesson": "k8s-control-plane/etcd-operations-health-compaction-and-defragmentation",
+  "title": "etcd database growth and the quota",
+  "summary": "See how write rate and compaction decide when the space alarm fires.",
+  "inputs": [
+   {
+    "id": "writes",
+    "label": "Writes per second",
+    "min": 1,
+    "max": 500,
+    "value": 40,
+    "step": 1
+   },
+   {
+    "id": "size",
+    "label": "Average revision size",
+    "min": 1,
+    "max": 50,
+    "value": 4,
+    "step": 1,
+    "unit": "KB"
+   },
+   {
+    "id": "quota",
+    "label": "Space quota",
+    "min": 1,
+    "max": 16,
+    "value": 8,
+    "step": 1,
+    "unit": "GB"
+   },
+   {
+    "id": "comp",
+    "label": "Regular compaction and defrag",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "perday",
+    "writes*size*86400/1000000"
+   ],
+   [
+    "growth",
+    "comp ? perday*0.05 : perday"
+   ],
+   [
+    "days",
+    "growth>0 ? quota/growth : 999"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Writes",
+    "x": 0,
+    "y": 0,
+    "state": "writes>200 ? 1 : 0",
+    "sub": "round(writes) + ' a second'"
+   },
+   {
+    "id": "n1",
+    "label": "Growth",
+    "x": 1,
+    "y": 0,
+    "state": "days<3 ? 2 : (days<14 ? 1 : 0)",
+    "sub": "round(growth*10)/10 + ' GB a day'"
+   },
+   {
+    "id": "n2",
+    "label": "Time to alarm",
+    "x": 2,
+    "y": 0,
+    "state": "days<3 ? 2 : (days<14 ? 1 : 0)",
+    "sub": "round(days) + ' days'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, writes/500)",
+    "bad": "writes>200"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, growth/quota)",
+    "bad": "days<3"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Growth in GB a day",
+    "expr": "growth",
+    "dp": 1
+   },
+   {
+    "label": "Days until the quota is full",
+    "expr": "days",
+    "dp": 0
+   },
+   {
+    "label": "Quota in GB",
+    "expr": "quota",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "days<3",
+    "tone": "bad",
+    "text": "The quota fills within days, so writes will soon fail with NOSPACE. Compact and defragment, then find the heavy writer."
+   },
+   {
+    "when": "days<14",
+    "tone": "warn",
+    "text": "You have a few days. Schedule compaction and alert before the quota is close."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Growth is slow compared with the quota, so there is time to react to an alert."
+   }
+  ],
+  "tries": [
+   "Turn on compaction.",
+   "Raise writes to 400 per second.",
+   "Double the quota to 16 GB."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "A hot writer and no compaction.",
+    "tone": "bad",
+    "values": {
+     "writes": 400,
+     "size": 8,
+     "quota": 8,
+     "comp": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Compaction is on.",
+    "tone": "good",
+    "values": {
+     "writes": 400,
+     "size": 8,
+     "quota": 8,
+     "comp": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "cp-sched",
+  "module": "k8s-control-plane",
+  "lesson": "k8s-control-plane/the-scheduler-filtering-scoring-and-binding",
+  "title": "Will the pod fit on any node?",
+  "summary": "Check a pod against node capacity, taints and selectors before the scheduler does.",
+  "inputs": [
+   {
+    "id": "req",
+    "label": "Pod CPU request",
+    "min": 100,
+    "max": 16000,
+    "value": 2000,
+    "step": 100,
+    "unit": "m"
+   },
+   {
+    "id": "free",
+    "label": "Largest free CPU on any node",
+    "min": 100,
+    "max": 16000,
+    "value": 3500,
+    "step": 100,
+    "unit": "m"
+   },
+   {
+    "id": "nodes",
+    "label": "Nodes passing selector and taint",
+    "min": 0,
+    "max": 12,
+    "value": 4,
+    "step": 1
+   },
+   {
+    "id": "tol",
+    "label": "Pod tolerates the taint",
+    "type": "toggle",
+    "value": true
+   }
+  ],
+  "vars": [
+   [
+    "ok",
+    "req<=free && nodes>0"
+   ],
+   [
+    "fit",
+    "tol ? nodes : 0"
+   ],
+   [
+    "gap",
+    "max(0,req-free)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Pod",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(req) + 'm requested'"
+   },
+   {
+    "id": "n1",
+    "label": "Nodes",
+    "x": 1,
+    "y": 0,
+    "state": "fit<1 ? 2 : 0",
+    "sub": "round(fit) + ' candidates'"
+   },
+   {
+    "id": "n2",
+    "label": "Result",
+    "x": 2,
+    "y": 0,
+    "state": "req>free || fit<1 ? 2 : 0",
+    "sub": "req>free || fit<1 ? 'Pending' : 'Scheduled'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, req/16000)",
+    "bad": "req>free"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, fit/12)",
+    "bad": "fit<1"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Candidate nodes",
+    "expr": "fit",
+    "dp": 0
+   },
+   {
+    "label": "CPU short by",
+    "expr": "gap",
+    "dp": 0,
+    "unit": "m"
+   },
+   {
+    "label": "Free CPU on best node",
+    "expr": "free",
+    "dp": 0,
+    "unit": "m"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "req>free",
+    "tone": "bad",
+    "text": "No node has enough free CPU, so the event will say insufficient cpu. Lower the request or add larger nodes."
+   },
+   {
+    "when": "fit<1",
+    "tone": "bad",
+    "text": "No node passes the taints and selectors. The event will name the untolerated taint or unmatched label."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "At least one node passes every filter, so the pod will be scheduled."
+   }
+  ],
+  "tries": [
+   "Set the request above the free CPU.",
+   "Turn the toleration off.",
+   "Raise the free CPU."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "The request is larger than any node.",
+    "tone": "bad",
+    "values": {
+     "req": 8000,
+     "free": 3500,
+     "nodes": 4,
+     "tol": true
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The request fits.",
+    "tone": "good",
+    "values": {
+     "req": 2000,
+     "free": 3500,
+     "nodes": 4,
+     "tol": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "cp-lease",
+  "module": "k8s-control-plane",
+  "lesson": "k8s-control-plane/controllers-the-reconcile-loop-and-leader-election",
+  "title": "Leader election and API latency",
+  "summary": "See when slow API calls make a controller lose its lease.",
+  "inputs": [
+   {
+    "id": "lat",
+    "label": "API request latency",
+    "min": 50,
+    "max": 5000,
+    "value": 300,
+    "step": 50,
+    "unit": "ms"
+   },
+   {
+    "id": "dur",
+    "label": "Lease duration",
+    "min": 5,
+    "max": 60,
+    "value": 15,
+    "step": 1,
+    "unit": "s"
+   },
+   {
+    "id": "renew",
+    "label": "Renew deadline",
+    "min": 3,
+    "max": 50,
+    "value": 10,
+    "step": 1,
+    "unit": "s"
+   },
+   {
+    "id": "retries",
+    "label": "Calls needed per renewal",
+    "min": 1,
+    "max": 10,
+    "value": 2,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "need",
+    "lat*retries/1000"
+   ],
+   [
+    "margin",
+    "renew-need"
+   ],
+   [
+    "risk",
+    "need/renew"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "API latency",
+    "x": 0,
+    "y": 0,
+    "state": "lat>1500 ? 2 : (lat>600 ? 1 : 0)",
+    "sub": "round(lat) + ' ms'"
+   },
+   {
+    "id": "n1",
+    "label": "Renewal",
+    "x": 1,
+    "y": 0,
+    "state": "margin<0 ? 2 : (risk>0.5 ? 1 : 0)",
+    "sub": "round(need*10)/10 + ' s needed'"
+   },
+   {
+    "id": "n2",
+    "label": "Leader",
+    "x": 2,
+    "y": 0,
+    "state": "margin<0 ? 2 : 0",
+    "sub": "margin<0 ? 'lost' : 'held'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, lat/5000)",
+    "bad": "lat>1500"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, risk)",
+    "bad": "margin<0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Seconds needed to renew",
+    "expr": "need",
+    "dp": 1
+   },
+   {
+    "label": "Margin before the deadline",
+    "expr": "margin",
+    "dp": 1
+   },
+   {
+    "label": "Share of deadline used",
+    "expr": "risk*100",
+    "dp": 0,
+    "unit": "%"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "margin<0",
+    "tone": "bad",
+    "text": "The lease cannot be renewed in time, so leadership changes hands again and again. Fix API or etcd latency first."
+   },
+   {
+    "when": "risk>0.5",
+    "tone": "warn",
+    "text": "More than half the deadline is used on a good day. A small slowdown will cause a leader change."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Renewal has plenty of margin, so leadership is stable."
+   }
+  ],
+  "tries": [
+   "Raise latency to 3000 ms.",
+   "Raise the renew deadline.",
+   "Raise calls per renewal to 8."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Slow API and many calls.",
+    "tone": "bad",
+    "values": {
+     "lat": 3000,
+     "dur": 15,
+     "renew": 10,
+     "retries": 5
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Latency is normal.",
+    "tone": "good",
+    "values": {
+     "lat": 300,
+     "dur": 15,
+     "renew": 10,
+     "retries": 2
+    }
+   }
+  ]
+ }
+]

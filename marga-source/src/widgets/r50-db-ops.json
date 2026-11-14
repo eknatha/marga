@@ -1,0 +1,578 @@
+[
+ {
+  "id": "db-ha",
+  "module": "db-ops",
+  "lesson": "db-ops/postgresql-replication-and-high-availability",
+  "title": "Is the failover safe?",
+  "summary": "Toggle the controls against data loss and split brain.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Consensus store for leader",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Fencing or watchdog",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Lag alerts",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Slot size alerts",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Leader",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'consensus' : 'none'"
+   },
+   {
+    "id": "n1",
+    "label": "Fence",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'fenced' : 'none'"
+   },
+   {
+    "id": "n2",
+    "label": "Lag",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'alerting' : 'silent'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "Without a leader election, two nodes may accept writes."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "Election exists but fencing or alerts leave gaps."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Leader election, fencing and alerts protect the data."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Consensus store for leader\".",
+   "Turn on all four.",
+   "Turn on everything except \"Slot size alerts\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "db-bk",
+  "module": "db-ops",
+  "lesson": "db-ops/backups-pitr-and-restore-testing",
+  "title": "Can you really restore?",
+  "summary": "Choose the backup practices that make recovery real.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Base backups and WAL archive",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Offsite encrypted copy",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Archive failure alert",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Scheduled restore drill",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Backups",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'PITR ready' : 'dump only'"
+   },
+   {
+    "id": "n1",
+    "label": "Copy",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'offsite' : 'same account'"
+   },
+   {
+    "id": "n2",
+    "label": "Alerts",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'alerting' : 'silent'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "Without a continuous archive there is no point in time recovery."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "Backups exist but storage, alerts or drills are weak."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "PITR, offsite copies, alerts and drills are in place."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Base backups and WAL archive\".",
+   "Turn on all four.",
+   "Turn on everything except \"Scheduled restore drill\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "db-pool",
+  "module": "db-ops",
+  "lesson": "db-ops/connection-pooling-and-capacity",
+  "title": "Is connection use healthy?",
+  "summary": "Toggle the settings that keep a database away from the connection wall.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Pooler in transaction mode",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Pool sized to CPU",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Idle timeouts set",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Waiting client alert",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Pooler",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'pooled' : 'per pod'"
+   },
+   {
+    "id": "n1",
+    "label": "Size",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'sized' : 'huge'"
+   },
+   {
+    "id": "n2",
+    "label": "Timeouts",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'set' : 'none'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "Every pod opens its own connections, so scale out hits the limit."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "Pooling exists but sizing or alerts are missing."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Pooling, sizing, timeouts and alerts keep connections healthy."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Pooler in transaction mode\".",
+   "Turn on all four.",
+   "Turn on everything except \"Waiting client alert\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "db-mig",
+  "module": "db-ops",
+  "lesson": "db-ops/zero-downtime-migrations-and-upgrades",
+  "title": "Is the migration safe?",
+  "summary": "Check the steps of a zero downtime schema change.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Expand and contract",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Lock timeout set",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Concurrent index builds",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Rollback written",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Plan",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'compatible' : 'breaking'"
+   },
+   {
+    "id": "n1",
+    "label": "Lock",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'set' : 'none'"
+   },
+   {
+    "id": "n2",
+    "label": "Index",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'concurrent' : 'blocking'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "A breaking change can stop writes the moment it runs."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "The plan is compatible but locks or rollback need work."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Compatible steps, timeouts and a rollback keep traffic flowing."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Expand and contract\".",
+   "Turn on all four.",
+   "Turn on everything except \"Rollback written\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ }
+]

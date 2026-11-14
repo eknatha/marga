@@ -1,0 +1,578 @@
+[
+ {
+  "id": "ai-gpu",
+  "module": "ai-infra",
+  "lesson": "ai-infra/gpu-scheduling-and-sharing-on-kubernetes",
+  "title": "Are your GPUs used well?",
+  "summary": "Toggle the practices that stop GPU waste.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Utilisation measured",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Sharing method chosen",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Right sized requests",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Idle GPUs released",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Metrics",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'measured' : 'unknown'"
+   },
+   {
+    "id": "n1",
+    "label": "Sharing",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'MIG or slicing' : 'whole GPUs'"
+   },
+   {
+    "id": "n2",
+    "label": "Requests",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'right sized' : 'oversized'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "Nobody measures GPU use, so waste is invisible."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "Use is measured but sharing or release still wastes capacity."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Measured, shared and released: GPUs earn their cost."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Utilisation measured\".",
+   "Turn on all four.",
+   "Turn on everything except \"Idle GPUs released\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "ai-vec",
+  "module": "ai-infra",
+  "lesson": "ai-infra/vector-databases-and-retrieval-operations",
+  "title": "Is retrieval healthy?",
+  "summary": "Check the controls behind reliable vector search.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "ANN index tuned",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Metadata filters used",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Ingestion freshness alert",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Recall tested",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Index",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'tuned' : 'sequential scan'"
+   },
+   {
+    "id": "n1",
+    "label": "Filters",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'filtered' : 'none'"
+   },
+   {
+    "id": "n2",
+    "label": "Freshness",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'alerting' : 'silent'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "A sequential scan makes every query slow as data grows."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "Search is fast but freshness or recall might hurt answers."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Index, filters, freshness and recall are covered."
+   }
+  ],
+  "tries": [
+   "Turn on only \"ANN index tuned\".",
+   "Turn on all four.",
+   "Turn on everything except \"Recall tested\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "ai-gw",
+  "module": "ai-infra",
+  "lesson": "ai-infra/llm-gateways-routing-caching-and-rate-limits",
+  "title": "Does the gateway protect you?",
+  "summary": "Toggle the gateway features that control cost and failures.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Rate limits per team",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Response cache",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Fallback model",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Token budgets",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Limits",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'limited' : 'open'"
+   },
+   {
+    "id": "n1",
+    "label": "Cache",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'cached' : 'none'"
+   },
+   {
+    "id": "n2",
+    "label": "Fallback",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'fallback' : 'single provider'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "Without limits one team can exhaust a shared quota."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "Limits exist but cost or failure handling is incomplete."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Limits, cache, fallback and budgets protect the service."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Rate limits per team\".",
+   "Turn on all four.",
+   "Turn on everything except \"Token budgets\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "ai-obs",
+  "module": "ai-infra",
+  "lesson": "ai-infra/llm-observability-evaluation-and-guardrails",
+  "title": "Can you see model quality?",
+  "summary": "Check the observability and evaluation pieces.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Prompts and context traced",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Evaluation set on each change",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Guardrails for unsafe output",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "User feedback captured",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Traces",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'traced' : 'blind'"
+   },
+   {
+    "id": "n1",
+    "label": "Eval",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'tested' : 'none'"
+   },
+   {
+    "id": "n2",
+    "label": "Guardrails",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'guarded' : 'none'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "Quality problems stay invisible because nothing is traced."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "Tracing exists but evaluation or guardrails are missing."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Traces, evaluation, guardrails and feedback form a loop."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Prompts and context traced\".",
+   "Turn on all four.",
+   "Turn on everything except \"User feedback captured\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ }
+]

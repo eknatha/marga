@@ -1,0 +1,578 @@
+[
+ {
+  "id": "ib-tool",
+  "module": "iac-beyond",
+  "lesson": "iac-beyond/opentofu-and-the-terraform-ecosystem-choices",
+  "title": "Is the tool choice sound?",
+  "summary": "Check what a team should confirm before choosing an IaC tool.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Licence reviewed",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Provider support checked",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Team skills considered",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Tried on a small project",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Licence",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'reviewed' : 'unknown'"
+   },
+   {
+    "id": "n1",
+    "label": "Providers",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'checked' : 'assumed'"
+   },
+   {
+    "id": "n2",
+    "label": "Skills",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'considered' : 'ignored'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "The licence and provider support were never checked, so a surprise is likely."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "Some checks are done but a risk remains for the migration."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Licence, providers, skills and a pilot support the choice."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Licence reviewed\".",
+   "Turn on all four.",
+   "Turn on everything except \"Tried on a small project\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "ib-struct",
+  "module": "iac-beyond",
+  "lesson": "iac-beyond/terragrunt-modules-and-multi-environment-structure",
+  "title": "Will the layout scale?",
+  "summary": "Toggle the structure choices that keep many environments manageable.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Shared versioned modules",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Inputs per environment",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "State per environment",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Pinned module versions",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Modules",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'shared' : 'copied'"
+   },
+   {
+    "id": "n1",
+    "label": "Inputs",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'thin' : 'forked'"
+   },
+   {
+    "id": "n2",
+    "label": "State",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'split' : 'one file'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "Copy pasted environments drift apart and every fix must be repeated."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "The structure is shared but state or versions can still cause trouble."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Modules, inputs, state and versions are separated cleanly."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Shared versioned modules\".",
+   "Turn on all four.",
+   "Turn on everything except \"Pinned module versions\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "ib-test",
+  "module": "iac-beyond",
+  "lesson": "iac-beyond/testing-infrastructure-code",
+  "title": "Is the code tested?",
+  "summary": "Choose the test layers that run on each change.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Validate and lint",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Plan tests",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Policy checks",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Integration test in a scratch account",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Static",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'static' : 'none'"
+   },
+   {
+    "id": "n1",
+    "label": "Plan",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'plan tests' : 'none'"
+   },
+   {
+    "id": "n2",
+    "label": "Policy",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'policy' : 'none'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "No static checks means syntax and style errors reach review."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "Some layers exist but others are missing from the pipeline."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Static, plan, policy and integration tests all run."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Validate and lint\".",
+   "Turn on all four.",
+   "Turn on everything except \"Integration test in a scratch account\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "ib-state",
+  "module": "iac-beyond",
+  "lesson": "iac-beyond/state-secrets-and-safe-migrations",
+  "title": "Is the migration safe?",
+  "summary": "Turn on the steps of a safe state migration.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "State backed up",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Locking enabled",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "moved or import used",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Plan shows no changes",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Backup",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'backed up' : 'at risk'"
+   },
+   {
+    "id": "n1",
+    "label": "Lock",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'locked' : 'unlocked'"
+   },
+   {
+    "id": "n2",
+    "label": "Method",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'declarative' : 'manual edit'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "Changing state without a backup can lose track of real resources."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "Backups exist but the method or verification is weak."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Backup, locking, declarative moves and a clean plan."
+   }
+  ],
+  "tries": [
+   "Turn on only \"State backed up\".",
+   "Turn on all four.",
+   "Turn on everything except \"Plan shows no changes\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ }
+]

@@ -1,0 +1,634 @@
+[
+ {
+  "id": "ke-time",
+  "module": "k8s-exam",
+  "lesson": "k8s-exam/the-exam-environment-speed-setup-and-the-docs",
+  "title": "The exam clock",
+  "summary": "Check whether your average time per task fits the exam window, with && without a setup routine.",
+  "inputs": [
+   {
+    "id": "tasks",
+    "label": "Number of tasks",
+    "min": 10,
+    "max": 25,
+    "value": 17,
+    "step": 1
+   },
+   {
+    "id": "avg",
+    "label": "Average minutes per task",
+    "min": 3,
+    "max": 15,
+    "value": 7,
+    "step": 1,
+    "unit": "min"
+   },
+   {
+    "id": "dur",
+    "label": "Exam minutes",
+    "min": 60,
+    "max": 180,
+    "value": 120,
+    "step": 5,
+    "unit": "min"
+   },
+   {
+    "id": "setup",
+    "label": "Alias && snippet routine used",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "per",
+    "setup ? avg*0.8 : avg"
+   ],
+   [
+    "total",
+    "tasks*per + (setup ? 3 : 0)"
+   ],
+   [
+    "slack",
+    "dur-total"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Tasks",
+    "x": 0,
+    "y": 0,
+    "state": "tasks>20 ? 1 : 0",
+    "sub": "round(tasks) + ' tasks'"
+   },
+   {
+    "id": "n1",
+    "label": "Time per task",
+    "x": 1,
+    "y": 0,
+    "state": "per>avg ? 1 : 0",
+    "sub": "round(per*10)/10 + ' min'"
+   },
+   {
+    "id": "n2",
+    "label": "Finish",
+    "x": 2,
+    "y": 0,
+    "state": "slack<0 ? 2 : (slack<10 ? 1 : 0)",
+    "sub": "round(slack) + ' min spare'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, tasks/25)",
+    "bad": "false"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, total/dur)",
+    "bad": "slack<0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Minutes needed",
+    "expr": "total",
+    "dp": 0,
+    "unit": "min"
+   },
+   {
+    "label": "Minutes spare",
+    "expr": "slack",
+    "dp": 0,
+    "unit": "min"
+   },
+   {
+    "label": "Minutes per task",
+    "expr": "per",
+    "dp": 1,
+    "unit": "min"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "slack<0",
+    "tone": "bad",
+    "text": "You run out of time before the last task. Practise the opening routine && skip slow tasks to return to later."
+   },
+   {
+    "when": "slack<10",
+    "tone": "warn",
+    "text": "The margin is thin. A single slow task will cost you answers, so set a time cap for each task."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The pace leaves room to flag && revisit hard tasks."
+   }
+  ],
+  "tries": [
+   "Turn on the routine.",
+   "Raise the average to 9 minutes.",
+   "Cut the number of tasks to 12."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Slow tasks && no routine.",
+    "tone": "bad",
+    "values": {
+     "tasks": 17,
+     "avg": 8,
+     "dur": 120,
+     "setup": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A short routine saves a fifth.",
+    "tone": "good",
+    "values": {
+     "tasks": 17,
+     "avg": 7,
+     "dur": 120,
+     "setup": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "ke-etcd",
+  "module": "k8s-exam",
+  "lesson": "k8s-exam/cka-etcd-backup-restore-and-static-pods",
+  "title": "Snapshot flags && verification",
+  "summary": "See what a snapshot command produces when connection flags are missing && whether you would notice.",
+  "inputs": [
+   {
+    "id": "flags",
+    "label": "Connection flags given (endpoints, cacert, cert, key)",
+    "min": 0,
+    "max": 4,
+    "value": 2,
+    "step": 1
+   },
+   {
+    "id": "verify",
+    "label": "Run snapshot status afterwards",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "mins",
+    "label": "Minutes left in the task",
+    "min": 1,
+    "max": 20,
+    "value": 8,
+    "step": 1,
+    "unit": "min"
+   }
+  ],
+  "vars": [
+   [
+    "good",
+    "flags>=4"
+   ],
+   [
+    "noticed",
+    "good || verify"
+   ],
+   [
+    "lost",
+    "good ? 0 : (verify ? 3 : 15)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Command",
+    "x": 0,
+    "y": 0,
+    "state": "good ? 0 : 2",
+    "sub": "round(flags) + ' of 4 flags'"
+   },
+   {
+    "id": "n1",
+    "label": "Backup file",
+    "x": 1,
+    "y": 0,
+    "state": "good ? 0 : 2",
+    "sub": "good ? 'valid' : 'empty file'"
+   },
+   {
+    "id": "n2",
+    "label": "Check",
+    "x": 2,
+    "y": 0,
+    "state": "noticed ? 0 : 2",
+    "sub": "verify ? 'verified' : 'not checked'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, flags/4)",
+    "bad": "!good"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "good ? 1 : 0.2",
+    "bad": "!noticed"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Flags given",
+    "expr": "flags",
+    "dp": 0
+   },
+   {
+    "label": "Minutes lost later",
+    "expr": "lost",
+    "dp": 0,
+    "unit": "min"
+   },
+   {
+    "label": "Minutes left",
+    "expr": "max(0, mins-lost)",
+    "dp": 0,
+    "unit": "min"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!noticed",
+    "tone": "bad",
+    "text": "The file is empty && nobody checked it. The restore task later fails && costs far more time than the check would have."
+   },
+   {
+    "when": "!good",
+    "tone": "warn",
+    "text": "You caught the problem, but a complete command the first time would have saved time. Copy the flags from the manifest."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The snapshot is valid && verified."
+   }
+  ],
+  "tries": [
+   "Give all four flags.",
+   "Turn on verification with two flags.",
+   "Reduce the minutes left to 2."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Two flags && no check.",
+    "tone": "bad",
+    "values": {
+     "flags": 2,
+     "verify": false,
+     "mins": 8
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All flags && a status check.",
+    "tone": "good",
+    "values": {
+     "flags": 4,
+     "verify": true,
+     "mins": 8
+    }
+   }
+  ]
+ },
+ {
+  "id": "ke-upgrade",
+  "module": "k8s-exam",
+  "lesson": "k8s-exam/cka-cluster-setup-with-kubeadm-and-upgrades",
+  "title": "Upgrade time && the forgotten uncordon",
+  "summary": "Estimate the time for a kubeadm upgrade && the pods left pending if a node is not uncordoned.",
+  "inputs": [
+   {
+    "id": "workers",
+    "label": "Worker nodes",
+    "min": 1,
+    "max": 10,
+    "value": 3,
+    "step": 1
+   },
+   {
+    "id": "mins",
+    "label": "Minutes per node",
+    "min": 3,
+    "max": 25,
+    "value": 8,
+    "step": 1,
+    "unit": "min"
+   },
+   {
+    "id": "pods",
+    "label": "Pods per worker",
+    "min": 2,
+    "max": 60,
+    "value": 12,
+    "step": 1
+   },
+   {
+    "id": "unc",
+    "label": "Every node uncordoned at the end",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "total",
+    "(workers+1)*mins"
+   ],
+   [
+    "stuck",
+    "unc ? 0 : pods"
+   ],
+   [
+    "left",
+    "max(0, 100-stuck*100/(workers*pods))"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Control plane",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "'upgraded'"
+   },
+   {
+    "id": "n1",
+    "label": "Workers",
+    "x": 1,
+    "y": 0,
+    "state": "stuck>0 ? 2 : 0",
+    "sub": "round(workers) + ' nodes'"
+   },
+   {
+    "id": "n2",
+    "label": "Pods",
+    "x": 2,
+    "y": 0,
+    "state": "stuck>0 ? 2 : 0",
+    "sub": "round(stuck) + ' unscheduled'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "1",
+    "bad": "false"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, workers/10)",
+    "bad": "stuck>0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Total minutes",
+    "expr": "total",
+    "dp": 0,
+    "unit": "min"
+   },
+   {
+    "label": "Pods that cannot schedule",
+    "expr": "stuck",
+    "dp": 0
+   },
+   {
+    "label": "Capacity still usable",
+    "expr": "left",
+    "dp": 0,
+    "unit": "%"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "stuck>0",
+    "tone": "bad",
+    "text": "A node is still cordoned. New pods stay Pending even though the upgrade looks finished. Uncordon every node && check them."
+   },
+   {
+    "when": "total>40",
+    "tone": "warn",
+    "text": "This will take a while. Keep one command sequence ready for each node."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "All nodes are back in service && the order was followed."
+   }
+  ],
+  "tries": [
+   "Turn on the uncordon step.",
+   "Increase the workers to 8.",
+   "Raise minutes per node to 20."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "One node left cordoned.",
+    "tone": "bad",
+    "values": {
+     "workers": 3,
+     "mins": 8,
+     "pods": 12,
+     "unc": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Every node uncordoned.",
+    "tone": "good",
+    "values": {
+     "workers": 3,
+     "mins": 8,
+     "pods": 12,
+     "unc": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "ke-dns",
+  "module": "k8s-exam",
+  "lesson": "k8s-exam/cka-services-ingress-gateway-api-and-dns-tasks",
+  "title": "Default deny egress && DNS",
+  "summary": "Apply a default deny egress rule && see how many applications fail to resolve names without a DNS rule.",
+  "inputs": [
+   {
+    "id": "apps",
+    "label": "Applications in the namespace",
+    "min": 1,
+    "max": 40,
+    "value": 8,
+    "step": 1
+   },
+   {
+    "id": "deny",
+    "label": "Default deny egress applied",
+    "type": "toggle",
+    "value": true
+   },
+   {
+    "id": "dns",
+    "label": "Rule allows DNS on port 53",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "rules",
+    "label": "Other allow rules written",
+    "min": 0,
+    "max": 10,
+    "value": 2,
+    "step": 1
+   }
+  ],
+  "vars": [
+   [
+    "broken",
+    "(deny && !dns) ? apps : 0"
+   ],
+   [
+    "ok",
+    "apps-broken"
+   ],
+   [
+    "pct",
+    "broken*100/apps"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Policy",
+    "x": 0,
+    "y": 0,
+    "state": "deny ? 1 : 0",
+    "sub": "deny ? 'deny egress' : 'open'"
+   },
+   {
+    "id": "n1",
+    "label": "DNS rule",
+    "x": 1,
+    "y": 0,
+    "state": "(deny && !dns) ? 2 : 0",
+    "sub": "dns ? 'port 53 allowed' : 'blocked'"
+   },
+   {
+    "id": "n2",
+    "label": "Applications",
+    "x": 2,
+    "y": 0,
+    "state": "broken>0 ? 2 : 0",
+    "sub": "round(ok) + ' working'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "deny ? 0.4 : 1",
+    "bad": "false"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, ok/apps)",
+    "bad": "broken>0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Applications failing",
+    "expr": "broken",
+    "dp": 0
+   },
+   {
+    "label": "Applications working",
+    "expr": "ok",
+    "dp": 0
+   },
+   {
+    "label": "Share failing",
+    "expr": "pct",
+    "dp": 0,
+    "unit": "%"
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "broken>0",
+    "tone": "bad",
+    "text": "Every name lookup times out because DNS is blocked. Add an egress rule for port 53 to the cluster DNS pods in the same change."
+   },
+   {
+    "when": "!deny",
+    "tone": "warn",
+    "text": "Nothing is blocked, so nothing is protected either. Add a default deny && then allow what is needed."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Traffic is denied by default && DNS is allowed, so applications resolve names."
+   }
+  ],
+  "tries": [
+   "Turn on the DNS rule.",
+   "Turn the deny policy off.",
+   "Raise the applications to 30."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Deny egress with no DNS rule.",
+    "tone": "bad",
+    "values": {
+     "apps": 8,
+     "deny": true,
+     "dns": false,
+     "rules": 2
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "DNS is allowed.",
+    "tone": "good",
+    "values": {
+     "apps": 8,
+     "deny": true,
+     "dns": true,
+     "rules": 2
+    }
+   }
+  ]
+ }
+]

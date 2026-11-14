@@ -1,0 +1,648 @@
+[
+ {
+  "id": "pl-queue",
+  "module": "platform",
+  "lesson": "platform/platform-as-a-product-users-roadmap-and-feedback",
+  "title": "Self-service && the request queue",
+  "summary": "Estimate the hours a platform team gets back when its most repeated request type becomes self-service.",
+  "inputs": [
+   {
+    "id": "req",
+    "label": "Requests of one type per month",
+    "min": 5,
+    "max": 300,
+    "value": 60,
+    "step": 5
+   },
+   {
+    "id": "mins",
+    "label": "Minutes of platform work each",
+    "min": 10,
+    "max": 480,
+    "value": 90,
+    "step": 5,
+    "unit": "min"
+   },
+   {
+    "id": "share",
+    "label": "Share that self-service can handle",
+    "min": 0,
+    "max": 100,
+    "value": 70,
+    "step": 5,
+    "unit": "%"
+   },
+   {
+    "id": "auto",
+    "label": "Self-service workflow built",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "hours",
+    "req*mins/60"
+   ],
+   [
+    "saved",
+    "auto ? hours*share/100 : 0"
+   ],
+   [
+    "left",
+    "hours-saved"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Requests",
+    "x": 0,
+    "y": 0,
+    "state": "req>150 ? 1 : 0",
+    "sub": "round(req) + ' a month'"
+   },
+   {
+    "id": "n1",
+    "label": "Platform queue",
+    "x": 1,
+    "y": 0,
+    "state": "left>60 ? 2 : (left>25 ? 1 : 0)",
+    "sub": "round(left) + ' hours left'"
+   },
+   {
+    "id": "n2",
+    "label": "Teams",
+    "x": 2,
+    "y": 0,
+    "state": "auto ? 0 : 1",
+    "sub": "auto ? 'self-serve' : 'waiting'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, req/300)",
+    "bad": "false"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, left/100)",
+    "bad": "left>60"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Hours of work a month",
+    "expr": "hours",
+    "dp": 0
+   },
+   {
+    "label": "Hours saved a month",
+    "expr": "saved",
+    "dp": 0
+   },
+   {
+    "label": "Hours still handled by hand",
+    "expr": "left",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "left>60",
+    "tone": "bad",
+    "text": "The queue still takes more than a day a week of platform time. Automate the common case so those requests no longer arrive."
+   },
+   {
+    "when": "left>25",
+    "tone": "warn",
+    "text": "Some of the work is gone but a large share remains. Check which variations still need a person."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Most of this request type no longer needs the platform team, && teams get their answer at once."
+   }
+  ],
+  "tries": [
+   "Turn on the self-service workflow with 70 percent coverage.",
+   "Lower the share to 30 percent && compare.",
+   "Double the requests per month."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Many requests handled by hand.",
+    "tone": "bad",
+    "values": {
+     "req": 120,
+     "mins": 90,
+     "share": 70,
+     "auto": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "The common case is automated.",
+    "tone": "good",
+    "values": {
+     "req": 120,
+     "mins": 90,
+     "share": 80,
+     "auto": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "pl-path",
+  "module": "platform",
+  "lesson": "platform/golden-paths-and-paved-roads",
+  "title": "Does the golden path pay for itself?",
+  "summary": "Compare the hours a path saves its users with the hours it takes the platform team to keep it current.",
+  "inputs": [
+   {
+    "id": "svc",
+    "label": "New services a year",
+    "min": 5,
+    "max": 300,
+    "value": 60,
+    "step": 5
+   },
+   {
+    "id": "adopt",
+    "label": "Share of services that use the path",
+    "min": 0,
+    "max": 100,
+    "value": 60,
+    "step": 5,
+    "unit": "%"
+   },
+   {
+    "id": "hrs",
+    "label": "Hours saved per service on the path",
+    "min": 5,
+    "max": 120,
+    "value": 40,
+    "step": 5,
+    "unit": "hours"
+   },
+   {
+    "id": "upkeep",
+    "label": "Platform hours a year to maintain the path",
+    "min": 50,
+    "max": 2000,
+    "value": 600,
+    "step": 50,
+    "unit": "hours"
+   }
+  ],
+  "vars": [
+   [
+    "users",
+    "svc*adopt/100"
+   ],
+   [
+    "saved",
+    "users*hrs"
+   ],
+   [
+    "net",
+    "saved-upkeep"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Services",
+    "x": 0,
+    "y": 0,
+    "state": "adopt<30 ? 1 : 0",
+    "sub": "round(users) + ' use the path'"
+   },
+   {
+    "id": "n1",
+    "label": "Hours saved",
+    "x": 1,
+    "y": 0,
+    "state": "net<0 ? 2 : 0",
+    "sub": "round(saved) + ' a year'"
+   },
+   {
+    "id": "n2",
+    "label": "Net",
+    "x": 2,
+    "y": 0,
+    "state": "net<0 ? 2 : (net<upkeep ? 1 : 0)",
+    "sub": "round(net) + ' hours'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, adopt/100)",
+    "bad": "adopt<30"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, saved/6000)",
+    "bad": "net<0"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Services on the path",
+    "expr": "users",
+    "dp": 0
+   },
+   {
+    "label": "Hours saved a year",
+    "expr": "saved",
+    "dp": 0
+   },
+   {
+    "label": "Net hours a year",
+    "expr": "net",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "net<0",
+    "tone": "bad",
+    "text": "The path costs more to keep than it saves. Raise adoption by fixing the reasons teams leave, || narrow the path."
+   },
+   {
+    "when": "net<upkeep",
+    "tone": "warn",
+    "text": "The path pays for itself but not by much. Check whether teams leave for a few fixable reasons."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The path saves much more time than it takes to maintain."
+   }
+  ],
+  "tries": [
+   "Drop adoption to 20 percent.",
+   "Raise hours saved per service to 80.",
+   "Double the upkeep hours."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Few teams use a costly path.",
+    "tone": "bad",
+    "values": {
+     "svc": 60,
+     "adopt": 20,
+     "hrs": 30,
+     "upkeep": 900
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Adoption recovers.",
+    "tone": "good",
+    "values": {
+     "svc": 60,
+     "adopt": 80,
+     "hrs": 40,
+     "upkeep": 600
+    }
+   }
+  ]
+ },
+ {
+  "id": "pl-alloc",
+  "module": "platform",
+  "lesson": "platform/cost-allocation-showback-and-unit-economics",
+  "title": "Unallocated spend && labels",
+  "summary": "See how many dollars nobody owns when labels are optional && how a deny policy changes that.",
+  "inputs": [
+   {
+    "id": "total",
+    "label": "Monthly spend",
+    "min": 10000,
+    "max": 1000000,
+    "value": 120000,
+    "step": 5000,
+    "unit": "dollars"
+   },
+   {
+    "id": "lab",
+    "label": "Share of resources labelled with an owner",
+    "min": 0,
+    "max": 100,
+    "value": 65,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "shared",
+    "label": "Share that is shared platform cost",
+    "min": 0,
+    "max": 40,
+    "value": 12,
+    "step": 1,
+    "unit": "%"
+   },
+   {
+    "id": "pol",
+    "label": "Policy denies unlabelled resources",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "lab2",
+    "pol ? 98 : lab"
+   ],
+   [
+    "own",
+    "total*(lab2/100)*(1-shared/100)"
+   ],
+   [
+    "un",
+    "max(0,total*(1-lab2/100))"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Cloud bill",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(total/1000) + 'k a month'"
+   },
+   {
+    "id": "n1",
+    "label": "Labels",
+    "x": 1,
+    "y": 0,
+    "state": "lab2<80 ? 2 : (lab2<95 ? 1 : 0)",
+    "sub": "round(lab2) + '% labelled'"
+   },
+   {
+    "id": "n2",
+    "label": "Owners",
+    "x": 2,
+    "y": 0,
+    "state": "un>total*0.2 ? 2 : (un>total*0.05 ? 1 : 0)",
+    "sub": "round(un/1000) + 'k unowned'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "1",
+    "bad": "false"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, lab2/100)",
+    "bad": "lab2<80"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Labelled share",
+    "expr": "lab2",
+    "dp": 0,
+    "unit": "%"
+   },
+   {
+    "label": "Unallocated dollars",
+    "expr": "un",
+    "dp": 0
+   },
+   {
+    "label": "Dollars attributed to teams",
+    "expr": "own",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "lab2<80",
+    "tone": "bad",
+    "text": "More than a fifth of the bill has no owner. Finance cannot hold anyone accountable, so require labels at creation."
+   },
+   {
+    "when": "lab2<95",
+    "tone": "warn",
+    "text": "Most spend is attributed but the gap is still large. Publish the unallocated figure weekly."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Almost every resource has an owner, so cost conversations start from facts."
+   }
+  ],
+  "tries": [
+   "Turn on the deny policy.",
+   "Lower the labelled share to 40 percent.",
+   "Raise the shared share to 30 percent."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Labels are optional.",
+    "tone": "bad",
+    "values": {
+     "total": 120000,
+     "lab": 65,
+     "shared": 12,
+     "pol": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "A policy requires labels.",
+    "tone": "good",
+    "values": {
+     "total": 120000,
+     "lab": 65,
+     "shared": 12,
+     "pol": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "pl-ttl",
+  "module": "platform",
+  "lesson": "platform/environments-ephemeral-previews-and-multi-tenancy",
+  "title": "Preview environments && expiry",
+  "summary": "See how many previews are alive && what they cost with && without an expiry sweep.",
+  "inputs": [
+   {
+    "id": "opens",
+    "label": "Previews opened per week",
+    "min": 5,
+    "max": 200,
+    "value": 40,
+    "step": 5
+   },
+   {
+    "id": "ttl",
+    "label": "Days a preview should live",
+    "min": 1,
+    "max": 30,
+    "value": 5,
+    "step": 1,
+    "unit": "days"
+   },
+   {
+    "id": "cost",
+    "label": "Cost of one preview a day",
+    "min": 1,
+    "max": 40,
+    "value": 8,
+    "step": 1,
+    "unit": "dollars"
+   },
+   {
+    "id": "sweep",
+    "label": "Nightly expiry sweep",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "live",
+    "sweep ? opens*ttl/7 : opens*12"
+   ],
+   [
+    "bill",
+    "live*cost*30"
+   ],
+   [
+    "extra",
+    "sweep ? 0 : opens*(12-ttl/7)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Pull requests",
+    "x": 0,
+    "y": 0,
+    "state": "0",
+    "sub": "round(opens) + ' previews a week'"
+   },
+   {
+    "id": "n1",
+    "label": "Live previews",
+    "x": 1,
+    "y": 0,
+    "state": "live>150 ? 2 : (live>60 ? 1 : 0)",
+    "sub": "round(live) + ' alive'"
+   },
+   {
+    "id": "n2",
+    "label": "Monthly cost",
+    "x": 2,
+    "y": 0,
+    "state": "bill>30000 ? 2 : (bill>10000 ? 1 : 0)",
+    "sub": "round(bill/1000) + 'k'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "min(1, opens/100)",
+    "bad": "false"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, live/300)",
+    "bad": "live>150"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Live previews",
+    "expr": "live",
+    "dp": 0
+   },
+   {
+    "label": "Monthly cost of previews",
+    "expr": "bill",
+    "dp": 0,
+    "unit": "dollars"
+   },
+   {
+    "label": "Forgotten previews",
+    "expr": "extra",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "live>150",
+    "tone": "bad",
+    "text": "Hundreds of previews are still alive. Without a sweep they build up for weeks. Set an expiry at creation && delete on a schedule."
+   },
+   {
+    "when": "live>60",
+    "tone": "warn",
+    "text": "The count is high. Shorten the time to live || reduce idle cost."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Previews expire on schedule && the cost stays predictable."
+   }
+  ],
+  "tries": [
+   "Turn on the sweep.",
+   "Set the time to live to 14 days.",
+   "Double the previews opened per week."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "No sweep && a busy week.",
+    "tone": "bad",
+    "values": {
+     "opens": 60,
+     "ttl": 5,
+     "cost": 8,
+     "sweep": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Expiry is enforced nightly.",
+    "tone": "good",
+    "values": {
+     "opens": 60,
+     "ttl": 5,
+     "cost": 8,
+     "sweep": true
+    }
+   }
+  ]
+ }
+]

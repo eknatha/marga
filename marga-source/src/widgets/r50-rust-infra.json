@@ -1,0 +1,578 @@
+[
+ {
+  "id": "ru-own",
+  "module": "rust-infra",
+  "lesson": "rust-infra/why-rust-ownership-borrowing-and-the-mental-model",
+  "title": "Will this compile?",
+  "summary": "Toggle the habits that satisfy the borrow checker.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Borrow instead of moving",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "One mutable reference at a time",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "References do not outlive data",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Clone only on purpose",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Borrow",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'borrowed' : 'moved'"
+   },
+   {
+    "id": "n1",
+    "label": "Mutability",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'exclusive' : 'shared mutable'"
+   },
+   {
+    "id": "n2",
+    "label": "Lifetime",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'valid' : 'dangling'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "Use after move or aliasing breaks the rules and the compiler refuses."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "The core rules hold but some choices will cost performance or clarity."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Borrowing, exclusivity and lifetimes are respected."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Borrow instead of moving\".",
+   "Turn on all four.",
+   "Turn on everything except \"Clone only on purpose\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "ru-err",
+  "module": "rust-infra",
+  "lesson": "rust-infra/errors-option-result-and-the-question-mark",
+  "title": "Is error handling solid?",
+  "summary": "Choose the error practices of a robust tool.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Result instead of panic",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Question mark propagation",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Context added to errors",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Exit code on failure",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Type",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'Result' : 'panic'"
+   },
+   {
+    "id": "n1",
+    "label": "Flow",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'propagated' : 'nested'"
+   },
+   {
+    "id": "n2",
+    "label": "Context",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'contextual' : 'bare'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "Panics crash the tool on expected failures."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "Errors are typed but context or exit codes are weak."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Errors are typed, propagated, explained and reported."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Result instead of panic\".",
+   "Turn on all four.",
+   "Turn on everything except \"Exit code on failure\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "ru-cli",
+  "module": "rust-infra",
+  "lesson": "rust-infra/cli-tools-with-clap-serde-and-files",
+  "title": "Is the CLI well built?",
+  "summary": "Toggle the pieces of a dependable command line tool.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "clap derive arguments",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "serde config",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Logic separate from main",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Tests for the logic",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Args",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'declared' : 'manual'"
+   },
+   {
+    "id": "n1",
+    "label": "Config",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'typed' : 'strings'"
+   },
+   {
+    "id": "n2",
+    "label": "Logic",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'separate' : 'mixed'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "Hand parsed arguments invite mistakes and poor help text."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "Arguments are fine but structure or tests are missing."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Arguments, config, structure and tests are all solid."
+   }
+  ],
+  "tries": [
+   "Turn on only \"clap derive arguments\".",
+   "Turn on all four.",
+   "Turn on everything except \"Tests for the logic\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "ru-ship",
+  "module": "rust-infra",
+  "lesson": "rust-infra/testing-cross-compilation-and-shipping-static-binaries",
+  "title": "Can you ship it anywhere?",
+  "summary": "Check what makes a Rust tool easy to distribute.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Static musl build",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Cross compile in CI",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Checksums published",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Release tests run",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Linking",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'static' : 'dynamic'"
+   },
+   {
+    "id": "n1",
+    "label": "Targets",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'automated' : 'by hand'"
+   },
+   {
+    "id": "n2",
+    "label": "Checksums",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'published' : 'none'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "A dynamically linked build may fail on minimal images."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "The binary runs but delivery steps are still manual."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Static builds, CI, checksums and tests make shipping routine."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Static musl build\".",
+   "Turn on all four.",
+   "Turn on everything except \"Release tests run\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ }
+]

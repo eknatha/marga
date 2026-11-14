@@ -1,0 +1,578 @@
+[
+ {
+  "id": "ld-star",
+  "module": "leadership",
+  "lesson": "leadership/star-stories-and-behavioral-interviews",
+  "title": "Is the story interview ready?",
+  "summary": "Check the parts of a strong behavioral story.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Clear situation",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "My own actions",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Measured result",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Lesson learned",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Situation",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'clear' : 'vague'"
+   },
+   {
+    "id": "n1",
+    "label": "Action",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'I did' : 'we did'"
+   },
+   {
+    "id": "n2",
+    "label": "Result",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'measured' : 'none'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "The story has no clear setting, so the listener cannot follow it."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "The story starts well but is missing action detail or impact."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Situation, actions, result and lesson are all present."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Clear situation\".",
+   "Turn on all four.",
+   "Turn on everything except \"Lesson learned\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "ld-design",
+  "module": "leadership",
+  "lesson": "leadership/communicating-technical-decisions-and-design-reviews",
+  "title": "Is the design review effective?",
+  "summary": "Toggle the habits that make reviews useful.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Written document shared early",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Options and trade-offs shown",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Decision recorded",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Open questions named",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Document",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'early' : 'late'"
+   },
+   {
+    "id": "n1",
+    "label": "Options",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'shown' : 'hidden'"
+   },
+   {
+    "id": "n2",
+    "label": "Decision",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'recorded' : 'lost'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "Without a document the review depends on who speaks loudest."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "A document exists but options or decisions are not captured."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The review leaves a document, a decision and open questions."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Written document shared early\".",
+   "Turn on all four.",
+   "Turn on everything except \"Open questions named\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "ld-feedback",
+  "module": "leadership",
+  "lesson": "leadership/mentoring-and-giving-feedback",
+  "title": "Will the feedback land?",
+  "summary": "Check the elements of feedback someone can act on.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Specific example",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Impact explained",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Given privately and soon",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Next step agreed",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Example",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'specific' : 'vague'"
+   },
+   {
+    "id": "n1",
+    "label": "Impact",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'explained' : 'missing'"
+   },
+   {
+    "id": "n2",
+    "label": "Timing",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'soon' : 'late'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "Vague feedback gives the person nothing to change."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "The message is specific but timing or follow up is weak."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Specific, timely and followed by a next step."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Specific example\".",
+   "Turn on all four.",
+   "Turn on everything except \"Next step agreed\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "ld-incident",
+  "module": "leadership",
+  "lesson": "leadership/leading-through-incidents",
+  "title": "Is the incident well led?",
+  "summary": "Choose the leadership practices running during an incident.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Commander named",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Roles assigned",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Updates on a schedule",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Review planned",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Command",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'named' : 'none'"
+   },
+   {
+    "id": "n1",
+    "label": "Roles",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'assigned' : 'everyone debugs'"
+   },
+   {
+    "id": "n2",
+    "label": "Updates",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'scheduled' : 'ad hoc'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "Nobody leads, so people take conflicting actions."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "There is a commander but coordination or learning is thin."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Command, roles, updates and a review are all in place."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Commander named\".",
+   "Turn on all four.",
+   "Turn on everything except \"Review planned\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ }
+]

@@ -1,0 +1,578 @@
+[
+ {
+  "id": "py-pack",
+  "module": "python-ops",
+  "lesson": "python-ops/project-structure-packaging-and-virtual-environments",
+  "title": "Is the tool packaged well?",
+  "summary": "Toggle the packaging basics that make a script installable anywhere.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "pyproject.toml and src layout",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Virtual environment",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Locked dependencies",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Entry point command",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Layout",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'packaged' : 'script'"
+   },
+   {
+    "id": "n1",
+    "label": "Env",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'isolated' : 'system'"
+   },
+   {
+    "id": "n2",
+    "label": "Lock",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'locked' : 'floating'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "A loose script depends on whatever is on the machine."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "Packaging is started but dependencies or entry points are loose."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Layout, environment, lock file and command are reproducible."
+   }
+  ],
+  "tries": [
+   "Turn on only \"pyproject.toml and src layout\".",
+   "Turn on all four.",
+   "Turn on everything except \"Entry point command\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "py-cli",
+  "module": "python-ops",
+  "lesson": "python-ops/cli-tools-with-argparse-click-and-typer",
+  "title": "Is the CLI safe to run?",
+  "summary": "Check the safety features of an operations tool.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Dry run available",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Target environment required",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Exit codes honest",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "JSON output option",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Preview",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'previews' : 'none'"
+   },
+   {
+    "id": "n1",
+    "label": "Target",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'explicit' : 'defaults to prod'"
+   },
+   {
+    "id": "n2",
+    "label": "Exit",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'honest' : 'always zero'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "Without a dry run the first run is the real run."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "A preview exists but target or exit codes could mislead."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Preview, explicit target, exit codes and output are safe."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Dry run available\".",
+   "Turn on all four.",
+   "Turn on everything except \"JSON output option\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "py-api",
+  "module": "python-ops",
+  "lesson": "python-ops/api-clients-retries-timeouts-and-pagination",
+  "title": "Is the API client resilient?",
+  "summary": "Choose the practices of a client that behaves under failure.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Timeouts set",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Backoff with jitter",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Retry only transient errors",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Pagination followed",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Timeout",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'bounded' : 'forever'"
+   },
+   {
+    "id": "n1",
+    "label": "Retry",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'spread' : 'instant'"
+   },
+   {
+    "id": "n2",
+    "label": "Scope",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'selective' : 'everything'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "Without timeouts a call can hang a job forever."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "Timeouts exist but retries or pagination may mislead."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Timeouts, retries, scope and pagination are handled."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Timeouts set\".",
+   "Turn on all four.",
+   "Turn on everything except \"Pagination followed\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "py-sdk",
+  "module": "python-ops",
+  "lesson": "python-ops/working-with-cloud-and-kubernetes-sdks-with-safe-patterns",
+  "title": "Is the automation guarded?",
+  "summary": "Toggle the guardrails around cloud SDK automation.",
+  "inputs": [
+   {
+    "id": "a",
+    "label": "Least privilege role",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "b",
+    "label": "Dry run and review first",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "c",
+    "label": "Cap changes per run",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "d",
+    "label": "Actions logged",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Role",
+    "x": 0,
+    "y": 0,
+    "state": "a ? 0 : 2",
+    "sub": "a ? 'scoped' : 'admin'"
+   },
+   {
+    "id": "n1",
+    "label": "Review",
+    "x": 1,
+    "y": 0,
+    "state": "b ? 0 : 2",
+    "sub": "b ? 'reviewed' : 'acts at once'"
+   },
+   {
+    "id": "n2",
+    "label": "Cap",
+    "x": 2,
+    "y": 0,
+    "state": "c ? 0 : 2",
+    "sub": "c ? 'capped' : 'unlimited'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "a?0:1",
+    "bad": "!a"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "b?0:1",
+    "bad": "!b"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Practices in place",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Practices missing",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total practices",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!a",
+    "tone": "bad",
+    "text": "Admin rights make any bug a large incident."
+   },
+   {
+    "when": "!b || !c || !d",
+    "tone": "warn",
+    "text": "Access is scoped but review, caps or logs are missing."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Role, review, caps and logs guard the automation."
+   }
+  ],
+  "tries": [
+   "Turn on only \"Least privilege role\".",
+   "Turn on all four.",
+   "Turn on everything except \"Actions logged\"."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing in place.",
+    "tone": "bad",
+    "values": {
+     "a": false,
+     "b": false,
+     "c": false,
+     "d": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All practices in place.",
+    "tone": "good",
+    "values": {
+     "a": true,
+     "b": true,
+     "c": true,
+     "d": true
+    }
+   }
+  ]
+ }
+]

@@ -1,0 +1,603 @@
+[
+ {
+  "id": "sc-rbac",
+  "module": "k8s-security",
+  "lesson": "k8s-security/rbac-design-least-privilege-and-auditing",
+  "title": "How risky is this role?",
+  "summary": "Score a role by the dangerous permissions it grants.",
+  "inputs": [
+   {
+    "id": "sec",
+    "label": "Read secrets",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "exec",
+    "label": "Exec into pods",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "podc",
+    "label": "Create pods",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "wild",
+    "label": "Wildcard verbs or resources",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "bind",
+    "label": "Bind or escalate roles",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "score",
+    "(sec?3:0)+(exec?2:0)+(podc?2:0)+(wild?4:0)+(bind?4:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Secrets",
+    "x": 0,
+    "y": 0,
+    "state": "sec ? 2 : 0",
+    "sub": "sec ? 'readable' : 'closed'"
+   },
+   {
+    "id": "n1",
+    "label": "Pod access",
+    "x": 1,
+    "y": 0,
+    "state": "exec||podc ? 1 : 0",
+    "sub": "exec||podc ? 'open' : 'closed'"
+   },
+   {
+    "id": "n2",
+    "label": "Escalation",
+    "x": 2,
+    "y": 0,
+    "state": "bind||wild ? 2 : 0",
+    "sub": "bind||wild ? 'possible' : 'closed'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "sec?1:0",
+    "bad": "sec"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "(exec?1:0)+(podc?1:0)",
+    "bad": "exec||podc"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Risk score",
+    "expr": "score",
+    "dp": 0
+   },
+   {
+    "label": "Dangerous permissions",
+    "expr": "(sec?1:0)+(exec?1:0)+(podc?1:0)+(wild?1:0)+(bind?1:0)",
+    "dp": 0
+   },
+   {
+    "label": "Maximum score",
+    "expr": "15",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "score>=6",
+    "tone": "bad",
+    "text": "This role is effectively admin. A holder can read credentials or grant themselves more access."
+   },
+   {
+    "when": "score>=2",
+    "tone": "warn",
+    "text": "This role holds sensitive rights. Limit it to a namespace and a named group."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "No sensitive permissions are granted, so the role is low risk."
+   }
+  ],
+  "tries": [
+   "Turn on secrets and exec.",
+   "Turn on wildcards.",
+   "Turn everything off."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Secrets, exec and wildcards.",
+    "tone": "bad",
+    "values": {
+     "sec": true,
+     "exec": true,
+     "podc": false,
+     "wild": true,
+     "bind": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Narrow role.",
+    "tone": "good",
+    "values": {
+     "sec": false,
+     "exec": false,
+     "podc": false,
+     "wild": false,
+     "bind": false
+    }
+   }
+  ]
+ },
+ {
+  "id": "sc-psa",
+  "module": "k8s-security",
+  "lesson": "k8s-security/pod-security-standards-and-admission-policy",
+  "title": "Does the pod pass the restricted standard?",
+  "summary": "Toggle security context settings to see whether the pod would be admitted.",
+  "inputs": [
+   {
+    "id": "nonroot",
+    "label": "Runs as non-root",
+    "type": "toggle",
+    "value": true
+   },
+   {
+    "id": "priv",
+    "label": "Privileged",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "esc",
+    "label": "Allows privilege escalation",
+    "type": "toggle",
+    "value": true
+   },
+   {
+    "id": "caps",
+    "label": "Drops all capabilities",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "sec",
+    "label": "Seccomp RuntimeDefault",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "fails",
+    "(nonroot?0:1)+(priv?3:0)+(esc?1:0)+(caps?0:1)+(sec?0:1)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Privileged",
+    "x": 0,
+    "y": 0,
+    "state": "priv ? 2 : 0",
+    "sub": "priv ? 'yes' : 'no'"
+   },
+   {
+    "id": "n1",
+    "label": "Escalation",
+    "x": 1,
+    "y": 0,
+    "state": "esc ? 1 : 0",
+    "sub": "esc ? 'allowed' : 'blocked'"
+   },
+   {
+    "id": "n2",
+    "label": "Admission",
+    "x": 2,
+    "y": 0,
+    "state": "fails>0 ? 2 : 0",
+    "sub": "fails>0 ? 'rejected' : 'admitted'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "priv?1:0",
+    "bad": "priv"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "esc?1:0",
+    "bad": "esc"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Rules broken",
+    "expr": "fails",
+    "dp": 0
+   },
+   {
+    "label": "Privileged weight",
+    "expr": "priv?3:0",
+    "dp": 0
+   },
+   {
+    "label": "Rules checked",
+    "expr": "5",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "priv",
+    "tone": "bad",
+    "text": "A privileged container breaks the baseline standard and is rejected in any enforced namespace."
+   },
+   {
+    "when": "fails>0",
+    "tone": "warn",
+    "text": "The pod breaks the restricted standard. Fix each item in the warning list."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "The pod meets the restricted standard and is admitted."
+   }
+  ],
+  "tries": [
+   "Turn privileged on.",
+   "Drop capabilities and set seccomp.",
+   "Allow escalation."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Privileged pod.",
+    "tone": "bad",
+    "values": {
+     "nonroot": true,
+     "priv": true,
+     "esc": true,
+     "caps": false,
+     "sec": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Restricted settings.",
+    "tone": "good",
+    "values": {
+     "nonroot": true,
+     "priv": false,
+     "esc": false,
+     "caps": true,
+     "sec": true
+    }
+   }
+  ]
+ },
+ {
+  "id": "sc-secret",
+  "module": "k8s-security",
+  "lesson": "k8s-security/secrets-encryption-at-rest-and-external-stores",
+  "title": "How exposed is a stored secret?",
+  "summary": "Show how encryption, access and rotation change the exposure of a database password.",
+  "inputs": [
+   {
+    "id": "enc",
+    "label": "Encryption at rest enabled",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "rewr",
+    "label": "Existing secrets rewritten",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "who",
+    "label": "People who can read secrets",
+    "min": 0,
+    "max": 100,
+    "value": 20,
+    "step": 1
+   },
+   {
+    "id": "rot",
+    "label": "Days since rotation",
+    "min": 0,
+    "max": 365,
+    "value": 200,
+    "step": 5,
+    "unit": "days"
+   }
+  ],
+  "vars": [
+   [
+    "stored",
+    "enc ? (rewr ? 0 : 1) : 2"
+   ],
+   [
+    "exp",
+    "stored*10+who/5+rot/30"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Stored value",
+    "x": 0,
+    "y": 0,
+    "state": "stored>0 ? 2 : 0",
+    "sub": "stored==2 ? 'readable' : (stored==1 ? 'mixed' : 'encrypted')"
+   },
+   {
+    "id": "n1",
+    "label": "Readers",
+    "x": 1,
+    "y": 0,
+    "state": "who>20 ? 2 : (who>5 ? 1 : 0)",
+    "sub": "round(who) + ' people'"
+   },
+   {
+    "id": "n2",
+    "label": "Age",
+    "x": 2,
+    "y": 0,
+    "state": "rot>90 ? 2 : (rot>30 ? 1 : 0)",
+    "sub": "round(rot) + ' days'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "stored/2",
+    "bad": "stored>0"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "min(1, who/100)",
+    "bad": "who>20"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Exposure score",
+    "expr": "exp",
+    "dp": 0
+   },
+   {
+    "label": "Readers",
+    "expr": "who",
+    "dp": 0
+   },
+   {
+    "label": "Days since rotation",
+    "expr": "rot",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "stored>0",
+    "tone": "bad",
+    "text": "Some secrets are stored readable. Enable encryption, rewrite every secret and check the raw value."
+   },
+   {
+    "when": "who>5 || rot>90",
+    "tone": "warn",
+    "text": "Too many readers or an old value. Reduce access and rotate."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Secrets are encrypted, readers are few and the value is fresh."
+   }
+  ],
+  "tries": [
+   "Turn on encryption but not the rewrite.",
+   "Set readers to 80.",
+   "Set rotation age to 5 days."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "No encryption.",
+    "tone": "bad",
+    "values": {
+     "enc": false,
+     "rewr": false,
+     "who": 20,
+     "rot": 200
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "Encrypted and rotated.",
+    "tone": "good",
+    "values": {
+     "enc": true,
+     "rewr": true,
+     "who": 3,
+     "rot": 10
+    }
+   }
+  ]
+ },
+ {
+  "id": "sc-ir",
+  "module": "k8s-security",
+  "lesson": "k8s-security/incident-response-for-a-compromised-cluster",
+  "title": "Response order for a compromised pod",
+  "summary": "Choose the steps taken and see which risks remain.",
+  "inputs": [
+   {
+    "id": "cont",
+    "label": "Contained with a policy",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "pres",
+    "label": "Evidence preserved",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "rot",
+    "label": "Credentials rotated",
+    "type": "toggle",
+    "value": false
+   },
+   {
+    "id": "rebuild",
+    "label": "Rebuilt from a clean image",
+    "type": "toggle",
+    "value": false
+   }
+  ],
+  "vars": [
+   [
+    "done",
+    "(cont?1:0)+(pres?1:0)+(rot?1:0)+(rebuild?1:0)"
+   ]
+  ],
+  "nodes": [
+   {
+    "id": "n0",
+    "label": "Containment",
+    "x": 0,
+    "y": 0,
+    "state": "cont ? 0 : 2",
+    "sub": "cont ? 'in place' : 'open'"
+   },
+   {
+    "id": "n1",
+    "label": "Evidence",
+    "x": 1,
+    "y": 0,
+    "state": "pres ? 0 : 1",
+    "sub": "pres ? 'kept' : 'at risk'"
+   },
+   {
+    "id": "n2",
+    "label": "Credentials",
+    "x": 2,
+    "y": 0,
+    "state": "rot ? 0 : 2",
+    "sub": "rot ? 'rotated' : 'reachable'"
+   }
+  ],
+  "edges": [
+   {
+    "from": "n0",
+    "to": "n1",
+    "flow": "cont?0:1",
+    "bad": "!cont"
+   },
+   {
+    "from": "n1",
+    "to": "n2",
+    "flow": "pres?0:1",
+    "bad": "!pres"
+   }
+  ],
+  "readouts": [
+   {
+    "label": "Steps done",
+    "expr": "done",
+    "dp": 0
+   },
+   {
+    "label": "Steps left",
+    "expr": "4-done",
+    "dp": 0
+   },
+   {
+    "label": "Total steps",
+    "expr": "4",
+    "dp": 0
+   }
+  ],
+  "verdicts": [
+   {
+    "when": "!cont",
+    "tone": "bad",
+    "text": "The attacker may still be active. Contain first with a deny policy and a cordon."
+   },
+   {
+    "when": "!rot || !pres",
+    "tone": "warn",
+    "text": "Containment is in place but credentials or evidence are exposed. Preserve, then rotate."
+   },
+   {
+    "when": "true",
+    "tone": "good",
+    "text": "Contained, preserved, rotated and rebuilt. Add detection for the entry point."
+   }
+  ],
+  "tries": [
+   "Turn on containment only.",
+   "Turn on all four.",
+   "Rotate without containing."
+  ],
+  "presets": [
+   {
+    "id": "break",
+    "label": "Break it",
+    "story": "Nothing done.",
+    "tone": "bad",
+    "values": {
+     "cont": false,
+     "pres": false,
+     "rot": false,
+     "rebuild": false
+    }
+   },
+   {
+    "id": "fix",
+    "label": "Fix it",
+    "story": "All steps.",
+    "tone": "good",
+    "values": {
+     "cont": true,
+     "pres": true,
+     "rot": true,
+     "rebuild": true
+    }
+   }
+  ]
+ }
+]
